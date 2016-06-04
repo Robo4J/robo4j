@@ -1,0 +1,97 @@
+group 'com.robo4j'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+apply from: 'libraries.gradle'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+
+project("robo4j-core"){
+    description = "Robo4j-Core"
+
+    group 'com.robo4j'
+    version "${robo4jVersion}"
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+        compile "org.javassist:javassist:${javassistVersion}"
+        compile "com.google.guava:guava:${guavaVersion}"
+        compile "org.apache.commons:commons-lang3:${apacheCommonsVersion}"
+        compile "org.apache.commons:commons-collections4:${apacheCollectionsVersion}"
+        compile "org.apache.commons:commons-exec:${apacheCollectionsExecVersion}"
+        compile "com.googlecode.json-simple:json-simple:${jsonVersion}"
+        compile "org.reflections:reflections-maven:${reflectionsVersion}"
+        compile "com.google.collections:google-collections:${googleCollectionsVersion}"
+        compile "org.apache.logging.log4j:log4j-api:${log4jApiVersion}"
+        compile "org.apache.logging.log4j:log4j-core:${log4jApiVersion}"
+        compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4jApiVersion}"
+        compile "lejos:ev3classes:${lejosVersion}"
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+}
+
+project("robo4j-line"){
+    description = "Robo4j CommandLine Client"
+
+    group 'com.robo4j'
+    version "${robo4jVersion}"
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    //create a single Jar with all dependencies
+    task fatJar(type: Jar) {
+        manifest {
+            attributes 'Implementation-Title': 'Robo4j-line',
+                    'Implementation-Version': version,
+                    'Main-Class': 'com.robo4j.line.Robo4jCommandLineMain'
+        }
+        baseName = project.name + '-all'
+        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+        with jar
+    }
+
+    dependencies {
+        compile (project(":robo4j-core"))
+        compile "org.javassist:javassist:${javassistVersion}"
+        compile "com.google.guava:guava:${guavaVersion}"
+        compile "org.reflections:reflections-maven:${reflectionsVersion}"
+        compile "com.google.collections:google-collections:${googleCollectionsVersion}"
+        compile "org.apache.logging.log4j:log4j-api:${log4jApiVersion}"
+        compile "org.apache.logging.log4j:log4j-core:${log4jApiVersion}"
+        compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4jApiVersion}"
+        compile "lejos:ev3classes:${lejosVersion}"
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+}
+
+
+
+
+
+
