@@ -1,15 +1,16 @@
 # robo4j
 
 * web: www.robo4j.io
-* twitter: @robo4j
+* twitter: @robo4j, @miragemiko
  
+Robo4.io :: "real-time" - synchronisation of asynchronous events/tasks
 
-1. robo4j is the robotics framework running on JVM, www.robo4j.io
+* robo4j is the robotics framework running on JVM
+* robo4j is capable to handle stream of commands and process all of them properly
+* robo4j version: alfa-0.1
 
-2. robo4j is capable to handle stream of commands and process all of them properly
+* documentation and how-to will be published soon
 
-3. much more is coming...
-
--- SOON --
+* code is under license: GPL version 3.0
 
 UNDER THE CONSTRUCTION, stay tuned 
