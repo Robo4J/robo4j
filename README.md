@@ -15,7 +15,14 @@ Robo4.io :: "real-time" - synchronisation of asynchronous events/tasks
 
 UNDER THE CONSTRUCTION, stay tuned 
 
+
+## Staying in Touch
+Follow [@robo4j][] or author [@miragemiko][]
+on Twitter. In-depth articles can be found at [Robo4j.io][] or [miragemiko blog][]
+
 ## License
 The Robo4j.io Framework is released under version 3.0 of the [General Public License][].
 
+[Robo4j.io]: http://www.robo4j.io
+[miragemiko blog]: http://www.miroslavkopecky.com
 [General Public License]: http://www.gnu.org/licenses/gpl-3.0-standalone.html0
