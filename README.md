@@ -26,3 +26,5 @@ The Robo4j.io Framework is released under version 3.0 of the [General Public Lic
 [Robo4j.io]: http://www.robo4j.io
 [miragemiko blog]: http://www.miroslavkopecky.com
 [General Public License]: http://www.gnu.org/licenses/gpl-3.0-standalone.html0
+[@robo4j]: https://twitter.com/robo4j
+[@miragemiko]: https://twitter.com/miragemiko
