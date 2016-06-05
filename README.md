@@ -3,17 +3,17 @@
 Robo4j is robotics oriented framework and provides comprehensive programming and configuration
 model for Java based application development.  
 
-### robo4j is the robotics framework running on JVM
-### robo4j is capable to handle stream of commands and process all of them properly
-### robo4j version: alfa-0.1
-
-> **Note:** under construciton.
+* [Robo4j.io][] :: is the robotics framework running on JVM
+* [Robo4j.io][] :: is capable to handle stream of commands and process all of them properly
+* [Robo4j.io][] :: version: alfa-0.1
 
 ## Documentation
 See currnet [Robo4j documentation][]
+> **Note:** under construciton.
 
 ## Building from Source
 The Robo4j framework uses a [Gradle][] building system
+> **Note:** Ensure that you have JDK 8 configured properly in your IDE.
 
 ## Requirements
 [Git][] and [Java JDK 8][]
