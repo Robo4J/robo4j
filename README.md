@@ -14,3 +14,8 @@ Robo4.io :: "real-time" - synchronisation of asynchronous events/tasks
 * code is under license: GPL version 3.0
 
 UNDER THE CONSTRUCTION, stay tuned 
+
+## License
+The Robo4j.io Framework is released under version 3.0 of the [General Public License][].
+
+[General Public License]: http://www.gnu.org/licenses/gpl-3.0-standalone.html0
