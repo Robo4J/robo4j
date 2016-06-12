@@ -5,7 +5,7 @@ model for Java based application development.
 
 * [Robo4j.io][] :: is the robotics framework running on JVM
 * [Robo4j.io][] :: is capable to handle stream of commands and process all of them properly
-* [Robo4j.io][] :: version: alfa-0.1
+* [Robo4j.io][] :: version: alfa-0.2
 
 ## Documentation
 See currnet [Robo4j documentation][]
