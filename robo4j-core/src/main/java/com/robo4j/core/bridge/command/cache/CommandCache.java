@@ -69,7 +69,7 @@ public final class CommandCache extends CommandCacheDefault implements DefaultSy
     //Private Methods
     @SuppressWarnings(value = "unchecked")
     private <Annotation extends BatchAnnotation,
-            Command extends BatchCommand>  Map<String, Command>
+            Command extends BatchCommand >  Map<String, Command>
                         initCache(LegoBrickPropertiesHolder holder, Class<Annotation> anno){
 
         try {

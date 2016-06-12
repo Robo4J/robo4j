@@ -19,10 +19,10 @@
 
 package com.robo4j.core.fronthand;
 
+import com.robo4j.commons.concurrent.LegoThreadFactory;
 import com.robo4j.core.control.LegoEngine;
 import com.robo4j.core.fronthand.command.FrontHandCommandEnum;
 import com.robo4j.core.lego.LegoBrickRemote;
-import com.robo4j.core.system.LegoThreadFactory;
 import com.robo4j.core.system.dto.LegoEngineDTO;
 import com.robo4j.core.system.enums.LegoAnalogPortEnum;
 import com.robo4j.core.system.enums.LegoEngineEnum;
@@ -79,35 +79,39 @@ public class LegoFrontHandProviderImp implements LegoFrontHandProvider {
     }
 
     @Override
-    public boolean process(FrontHandCommandEnum command) throws RemoteException {
+    public boolean process(FrontHandCommandEnum command){
 
-        if((Objects.isNull(motorHandPortA) || Objects.isNull(legoBrickRemote)) && active.get()){
-            return false;
+        try {
+            if((Objects.isNull(motorHandPortA) || Objects.isNull(legoBrickRemote)) && active.get()){
+                return false;
+            }
+            motorHandPortA.setSpeed(DEFAULT_SPEED);
+
+            switch (command){
+                case COMMAND:
+                    active.set(true);
+                    executorForCommands.execute(new FrontHandTouchProducer(exchanger, touchSensor));
+                    final Future<Boolean> engineActive = executorForCommands.submit(new FrontHandEngineConsumer(exchanger, motorHandPortA));
+                    try {
+                        active.set(engineActive.get());
+                    } catch (InterruptedException | ConcurrentModificationException | ExecutionException e) {
+                        throw new FrontHandException("SOMETHING ERROR CYCLE command= " + command, e);
+                    }
+                    break;
+                case EXIT:
+                    motorHandPortA.close();
+                    touchSensor.close();
+                    executorForCommands.shutdown();
+                    active.set(false);
+                    break;
+                default:
+                    throw new FrontHandException("SOMETHING WRONG NO command= " + command);
+            }
+            return true;
+        }catch (RemoteException e){
+            throw new FrontHandException("RUN ERROR PROCESS: ", e);
         }
-        motorHandPortA.setSpeed(DEFAULT_SPEED);
 
-        switch (command){
-            case COMMAND:
-                active.set(true);
-                executorForCommands.execute(new FrontHandTouchProducer(exchanger, touchSensor));
-                final Future<Boolean> engineActive = executorForCommands.submit(new FrontHandEngineConsumer(exchanger, motorHandPortA));
-                try {
-                    active.set(engineActive.get());
-                } catch (InterruptedException | ConcurrentModificationException | ExecutionException e) {
-                    throw new FrontHandException("SOMETHING ERROR CYCLE command= " + command, e);
-                }
-                break;
-            case EXIT:
-                motorHandPortA.close();
-                touchSensor.close();
-                executorForCommands.shutdown();
-                active.set(false);
-                break;
-            default:
-                throw new FrontHandException("SOMETHING WRONG NO command= " + command);
-        }
-
-        return true;
     }
 
     @Override

@@ -19,13 +19,11 @@
 
 package com.robo4j.core.bridge.command;
 
+import com.robo4j.commons.concurrent.TransferSignal;
 import com.robo4j.core.platform.PlatformProperties;
 import com.robo4j.core.platform.command.LegoPlatformCommandEnum;
-import com.robo4j.core.system.TransferSignal;
 
 /**
- * Bridge Command is handle by BUS
- *
  * Created by miroslavkopecky on 03/04/16.
  */
 public class BridgeCommand implements Comparable<BridgeCommand> , TransferSignal {

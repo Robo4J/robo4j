@@ -19,18 +19,25 @@
 
 package com.robo4j.core.agent;
 
+import com.robo4j.commons.agent.AgentCache;
+import com.robo4j.commons.agent.AgentConsumer;
+import com.robo4j.commons.agent.AgentProducer;
+import com.robo4j.commons.agent.AgentStatus;
+import com.robo4j.commons.agent.AgentStatusEnum;
+import com.robo4j.commons.agent.RoboAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 
 /**
+ * Current RoboCache is implement with String
+ *
  * Created by miroslavkopecky on 29/05/16.
  */
 public class GenericAgent implements RoboAgent {
 
-    private static final Logger logger = LoggerFactory.getLogger(GenericAgent.class);
-    private final AgentCache cache;
+    private final AgentCache<AgentStatus> cache;
     private final ExecutorService executor;
     private final AgentProducer producer;
     private final AgentConsumer consumer;
@@ -41,18 +48,16 @@ public class GenericAgent implements RoboAgent {
         this.executor = executor;
         this.producer = producer;
         this.consumer = consumer;
-        consumer.setCommandsQueue(producer.getCommandsQueue());
+        consumer.setMessageQueue(producer.getMessageQueue());
     }
 
 
     public AgentStatus activate(){
-
         executor.execute((Runnable) producer);
         executor.execute((Runnable) consumer);
 
-        final AgentStatus result = new AgentStatus(AgentStatusEnum.ACTIVE);
-        cache.put(result.toString());
-        logger.info("AGENT ACTIVE = " + cache);
+        final AgentStatus result = new AgentStatus<String>(AgentStatusEnum.ACTIVE);
+        cache.put(result);
         return result;
     }
 

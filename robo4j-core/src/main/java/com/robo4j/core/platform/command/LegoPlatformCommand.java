@@ -20,16 +20,14 @@
 package com.robo4j.core.platform.command;
 
 
+import com.robo4j.commons.concurrent.TransferSignal;
 import com.robo4j.core.engines.EngineCache;
 import com.robo4j.core.lego.LegoBrickRemoteProvider;
 import com.robo4j.core.platform.PlatformProperties;
 import com.robo4j.core.platform.provider.LegoBrickCommandsProvider;
 import com.robo4j.core.platform.provider.LegoBrickCommandsProviderImp;
-import com.robo4j.core.system.TransferSignal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.rmi.RemoteException;
 
 /**
  * Created by miroslavkopecky on 26/09/14.
@@ -68,15 +66,7 @@ public class LegoPlatformCommand implements Comparable<LegoPlatformCommand>, Tra
     }
 
     public boolean run(){
-        boolean status = false;
-        try{
-            legoBrickCommandsProvider.process(command);
-            status = true;
-        }catch (RemoteException | InterruptedException e){
-            logger.error("RUN COMMAND error e= " + e);
-        }
-
-        return status;
+        return legoBrickCommandsProvider.process(command);
     }
 
     @Override

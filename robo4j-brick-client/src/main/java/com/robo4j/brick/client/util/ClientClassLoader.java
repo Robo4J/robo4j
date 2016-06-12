@@ -33,7 +33,7 @@ public final class ClientClassLoader {
     private volatile ClassLoader cl;
 
     private ClientClassLoader(){
-        cl = RoboClassUtils.getClassLoader();
+        cl =  Thread.currentThread().getContextClassLoader();
     }
 
     public static ClientClassLoader getInstance(){

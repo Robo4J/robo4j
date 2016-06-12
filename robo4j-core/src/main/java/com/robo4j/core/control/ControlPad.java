@@ -19,7 +19,7 @@
 
 package com.robo4j.core.control;
 
-import com.robo4j.core.agent.RoboAgent;
+import com.robo4j.commons.agent.RoboAgent;
 import com.robo4j.core.bridge.BridgeControl;
 import com.robo4j.core.bridge.command.AdvancedCommand;
 import com.robo4j.core.bridge.command.BasicCommand;
@@ -51,7 +51,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -110,16 +109,14 @@ public class ControlPad extends BridgeControl {
         }
     }
 
-    public LegoBrickPropertiesHolder getLegoBrickPropertiesHolder(){
-        return legoBrickPropertiesHolder;
-    }
-
     public void addCommand(final CommandTypeEnum type, final String name, final String batch){
         switch (type){
             case COMPLEX:
+                logger.info("ADD COMMAND type = " + type + " name= " + name + " batch= " + batch);
                 addGenericCommand(new ComplexCommand(name, batch));
                 break;
             case BATCH:
+                logger.info("ADD COMMAND type = " + type + " name= " + name + " batch= " + batch);
                 addGenericCommand(new SimpleCommand(name, batch));
                 break;
             default:
@@ -152,6 +149,7 @@ public class ControlPad extends BridgeControl {
     /* basic commands types */
     void sendCommands(final String batch){
         try {
+            logger.info("CONQUER COMMANDS: " + batch);
             putCommand(batch);
         } catch (InterruptedException e) {
             throw new ControlException("Conquer COMMAND LINE = ", e);
@@ -160,6 +158,7 @@ public class ControlPad extends BridgeControl {
 
     void sendHandCommand(final String command){
         try {
+            logger.info("FRONT HAND COMMAND : " + command);
             putCommand(command);
         } catch (InterruptedException e) {
             throw  new ControlException("HAND COMMAND LINE = ", e);
@@ -167,21 +166,28 @@ public class ControlPad extends BridgeControl {
     }
 
 
+    /**
+     * Command is taken from the command cache
+     * @param batch
+     */
     void sendBatchCommand(final String batch){
         String[] commands = batch.trim().split(COMMAND_SPLITTER);
         try {
             putCommand(CONST_EXIT);
             for(String c: commands){
                 String seq = c.trim();
+                logger.info("BATCH COMMAND ENTER = " + seq);
                 if(seq.equals(CONST_EXIT)){
                     putCommand(CONST_EXIT);
                 } else {
                     final BatchCommand batchCommand = getGenericCommand(seq);
+                    logger.info("FOUND IN CACHE batchCommand= " + batchCommand);
                     if(batchCommand != null) {
                         if(batchCommand instanceof BasicCommand){
                             /* only basics commands move(30),back(30),left(180),right(180) */
                             String command = batchCommand.getBatch();
                             if(!command.isEmpty()){
+                                logger.info("BATCH SIMPLE COMMANDS command= " + command);
                                 putCommand(command);
 
                             } else {
@@ -191,7 +197,8 @@ public class ControlPad extends BridgeControl {
                         }
                         if(batchCommand instanceof AdvancedCommand){
                             for (String line: CommandUtil.getCommandsByTypes(batchCommand.getBatch())){
-
+                                /* advanced command contains sequence basic1;D:move(30),back(20) */
+                                //TODO: recursive command detection can be improved
                                 if(!line.contains(seq)){
                                     controlCommandsAdapter.properCommandWithPrefix(line);
                                 } else {
@@ -211,12 +218,8 @@ public class ControlPad extends BridgeControl {
     void sendActiveCommand(final String command){
         LegoPlatformCommandEnum legoCommand = LegoPlatformCommandEnum.getCommand(command);
         if(legoCommand != null){
-            processCommand(legoCommand);
+            processActiveCommand(legoCommand);
         }
-    }
-
-    public void setIpAddress(String ipAddress){
-        this.legoBrickPropertiesHolder.setAddress(ipAddress);
     }
 
     public void setPlatformCycles(String cycles){
@@ -280,85 +283,72 @@ public class ControlPad extends BridgeControl {
     }
 
     //Private Methods
-    private void processCommand(final LegoPlatformCommandEnum command){
-        try {
-            switch (command){
-                case INIT:
-                case EMERGENCY_STOP:
-                    logger.info("NOT IMPLEMENTED YET= " + command);
-                    break;
-                case STOP:
-                    legoBrickCommandsProvider.process(LegoPlatformCommandEnum.STOP);
-                    break;
-                case CLOSE:
-                case EXIT:
-                    activeThread.set(false);
-                    legoBrickCommandsProvider.process(LegoPlatformCommandEnum.EXIT);
-                    legoFrontHandProvider.process(FrontHandCommandEnum.EXIT);
-                    coreBusWithSensorDownSequence();
-                    active.set(false);
-                    break;
-                case MOVE:
-                    if(emergency.get()){
-                        throw new ControlException("MOVE FORWARD CAN'T BE DONE");
-                    }
-                case BACK:
-                case LEFT:
-                case RIGHT:
-                    legoBrickCommandsProvider.process(command);
-                    break;
-                case MOVE_CYCLES:
-                case MOVE_DESTINACE:
-                case BACK_CYCLES:
-                case BACK_DESTINACE:
-                case LEFT_CYCLES:
-                case RIGHT_CYCLES:
-                    legoBrickCommandsProvider.processWithProperty(command, properties.getCycleCommandProperty());
-                    break;
-                default:
-                    throw new ControlException("NO SUCH COMMAND");
-            }
-        } catch (RemoteException | InterruptedException e) {
-            throw new ControlException(e.getMessage(), e);
+    private void processActiveCommand(final LegoPlatformCommandEnum command){
+        switch (command){
+            case MOVE:
+                if(emergency.get()){
+                    throw new ControlException("MOVE FORWARD CAN'T BE DONE");
+                }
+            case BACK:
+            case LEFT:
+            case RIGHT:
+                legoBrickCommandsProvider.process(command);
+                break;
+            case STOP:
+                legoBrickCommandsProvider.process(LegoPlatformCommandEnum.STOP);
+                break;
+            case MOVE_CYCLES:
+            case MOVE_DISTANCE:
+            case BACK_CYCLES:
+            case BACK_DISTANCE:
+            case LEFT_CYCLES:
+            case RIGHT_CYCLES:
+            case INIT:
+            case EMERGENCY_STOP:
+            case CLOSE:
+            case EXIT:
+                throw new ControlException("COMMAND IS NOT SUPPORTED HERE= " + command);
+            default:
+                throw new ControlException("NO SUCH COMMAND");
         }
     }
 
     private void end(){
-        try {
-            activeThread.set(false);
-            legoBrickCommandsProvider.process(LegoPlatformCommandEnum.EXIT);
-            legoFrontHandProvider.process(FrontHandCommandEnum.EXIT);
-            coreBusWithSensorDownSequence();
-            active.set(false);
-        } catch (RemoteException | InterruptedException e) {
-            throw new ControlException("EXIT FAILURE: ", e);
-        }
+        activeThread.set(false);
+        legoBrickCommandsProvider.process(LegoPlatformCommandEnum.EXIT);
+        legoFrontHandProvider.process(FrontHandCommandEnum.EXIT);
+        coreBusWithSensorDownSequence();
+        active.set(false);
     }
 
-    private void coreBusWithSensorDownSequence() throws InterruptedException{
+    private void coreBusWithSensorDownSequence(){
         sensorBusDown();
         coreBusDown();
         guardianBusDown();
-        TimeUnit.SECONDS.sleep(5);
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            throw new ControlException("SHUTDOWN SEQUENCE: ", e);
+        }
         coreBusDownNow();
     }
 
     private void batchCommandTypePrint(final CommandTypeEnum type){
         switch (type){
             case BATCH:
-                logger.debug("COMMAND BATCH");
+                logger.info("COMMAND BATCH");
                 break;
             case DIRECT:
-                logger.debug("COMMAND DIRECT");
+                logger.info("COMMAND DIRECT");
                 break;
             case HAND:
-                logger.debug("COMMAND HAND");
+                logger.info("COMMAND HAND");
                 break;
             case COMPLEX:
-                logger.debug("COMMAND COMPLEX");
+                logger.info("COMMAND COMPLEX");
                 break;
             case ACTIVE:
-                logger.debug("COMMAND ACTIVE");
+                logger.info("COMMAND ACTIVE");
                 break;
             default:
                 throw new ControlException("NOT SUPPORTED STATE type: " + type);

@@ -19,6 +19,7 @@
 
 package com.robo4j.core.platform.provider;
 
+import com.robo4j.commons.concurrent.LegoThreadFactory;
 import com.robo4j.core.control.LegoEngine;
 import com.robo4j.core.lego.LegoBrickRemote;
 import com.robo4j.core.platform.PlatformException;
@@ -26,7 +27,6 @@ import com.robo4j.core.platform.PlatformProperties;
 import com.robo4j.core.platform.PlatformUtils;
 import com.robo4j.core.platform.command.LegoCommandProperty;
 import com.robo4j.core.platform.command.LegoPlatformCommandEnum;
-import com.robo4j.core.system.LegoThreadFactory;
 import com.robo4j.core.system.dto.LegoEngineDTO;
 import com.robo4j.core.system.enums.LegoAnalogPortEnum;
 import com.robo4j.core.system.enums.LegoEngineEnum;
@@ -63,6 +63,8 @@ public class LegoBrickCommandsProviderImp implements LegoBrickCommandsProvider {
     private static final int PLATFORM_ENGINES = 2;
     private static final int CENTIMETER_CYCLES = 33;
     private static final int ROTATION_CYCLES = 9;
+    private static final int DEFAULT_0 = 0;
+    private static final int DEFAULT_1 = 1;
     private static volatile ExecutorService executorForCommands;
     private static volatile RMIRegulatedMotor motorLeft;
     private static volatile RMIRegulatedMotor motorRight;
@@ -103,59 +105,24 @@ public class LegoBrickCommandsProviderImp implements LegoBrickCommandsProvider {
     }
 
     @Override
-    public boolean process(LegoPlatformCommandEnum direction) throws RemoteException, InterruptedException {
-
-        if((Objects.isNull(motorRight) || Objects.isNull(motorLeft)) && active.get()){
-            return false;
-        }
-        logger.debug("Start Lego Movement direction= " + direction);
-        motorLeft.setSpeed(properties.getCycles());
-        motorRight.setSpeed(properties.getCycles());
-        switch (direction){
-            case MOVE:
-                motorRight.forward();
-                motorLeft.forward();
-                break;
-            case BACK:
-                motorRight.backward();
-                motorLeft.backward();
-                break;
-            case LEFT:
-                motorLeft.forward();
-                motorRight.stop(true);
-                break;
-            case RIGHT:
-                motorRight.forward();
-                motorLeft.stop(true);
-                break;
-            case STOP:
-                motorLeft.stop(true);
-                motorRight.stop(true);
-                break;
-            case INIT:
-                String host = legoBrickRemote.getBrick().getHost();
-                active.set(true);
-                break;
-            case CLOSE:
-            case EXIT:
-                motorLeft.close();
-                motorRight.close();
-                executorForCommands.shutdown();
-                active.set(false);
-                break;
-            case EMERGENCY_STOP:
-                motorLeft.stop(true);
-                motorRight.stop(true);
-                break;
-            default:
-                throw new PlatformException("NO SUCH COMMAND direction= " + direction);
+    public boolean process(LegoPlatformCommandEnum direction) {
+        try{
+            if((Objects.isNull(motorRight) || Objects.isNull(motorLeft)) && active.get()){
+                return false;
+            }
+            logger.debug("Start Lego Movement direction= " + direction);
+            motorLeft.setSpeed(properties.getCycles());
+            motorRight.setSpeed(properties.getCycles());
+            Future<Boolean> commandEngine = runEngineByDirection(direction);
+            return commandEngine.get();
+        } catch (RemoteException | InterruptedException | ExecutionException e){
+            throw new PlatformException("RUN ERROR PROCESS: ", e);
         }
 
-        return true;
     }
 
     @Override
-    public boolean processWithProperty(LegoPlatformCommandEnum direction, LegoCommandProperty property) {
+    public boolean process(LegoPlatformCommandEnum direction, LegoCommandProperty property) {
         if((Objects.isNull(motorRight) || Objects.isNull(motorLeft)) && active.get()){
             return false;
         }
@@ -168,28 +135,22 @@ public class LegoBrickCommandsProviderImp implements LegoBrickCommandsProvider {
             switch (direction){
                 case MOVE_CYCLES:
                     cycles = Integer.valueOf(property.getValue().trim());
-                    executeBothEnginesByCycles(cycles);
-                    break;
-                case MOVE_DESTINACE:
+                    return executeBothEnginesByCycles(cycles);
+                case MOVE_DISTANCE:
                     cycles = Integer.valueOf(property.getValue().trim()) * CENTIMETER_CYCLES;
-                    executeBothEnginesByCycles(cycles);
-                    break;
-                case BACK_DESTINACE:
+                    return executeBothEnginesByCycles(cycles);
+                case BACK_DISTANCE:
                     cycles = -Integer.valueOf(property.getValue().trim()) * CENTIMETER_CYCLES;
-                    executeBothEnginesByCycles(cycles);
-                    break;
+                    return executeBothEnginesByCycles(cycles);
                 case LEFT_CYCLES:
                     cycles = (Integer.valueOf(property.getValue().trim()) * ROTATION_CYCLES);
-                    executeTurnByCycles(true, cycles);
-                    break;
+                    return executeTurnByCycles(cycles, motorRight, motorLeft);
                 case RIGHT_CYCLES:
                     cycles = (Integer.valueOf(property.getValue().trim()) * ROTATION_CYCLES);
-                    executeTurnByCycles(false, cycles);
-                    break;
+                    return executeTurnByCycles(cycles, motorLeft, motorRight);
                 default:
                     throw new PlatformException("NO SUCH COMMAND direction= " + direction + " property= " + property);
             }
-            return true;
         } catch (RemoteException e){
             throw new PlatformException("RUN ERROR: ", e);
         }
@@ -197,17 +158,68 @@ public class LegoBrickCommandsProviderImp implements LegoBrickCommandsProvider {
     }
 
     //Private Methods
-    private boolean executeTurnByCycles(boolean left, int cycles){
-        Condition engineActive = lock.newCondition();
-        Future<Boolean> first = executorForCommands.submit(() -> {
+    private Future<Boolean> runEngineByDirection(LegoPlatformCommandEnum direction){
+        return executorForCommands.submit(() -> {
+            switch (direction){
+                case MOVE:
+                    motorRight.forward();
+                    motorLeft.forward();
+                    break;
+                case BACK:
+                    motorRight.backward();
+                    motorLeft.backward();
+                    break;
+                case LEFT:
+                    motorLeft.forward();
+                    motorRight.stop(true);
+                    break;
+                case RIGHT:
+                    motorRight.forward();
+                    motorLeft.stop(true);
+                    break;
+                case STOP:
+                    motorLeft.stop(true);
+                    motorRight.stop(true);
+                    break;
+                case INIT:
+                    active.set(true);
+                    break;
+                case CLOSE:
+                case EXIT:
+                    logger.info("EXIT/CLOSE COMMAND CALLED");
+                    motorLeft.close();
+                    motorRight.close();
+                    executorForCommands.shutdown();
+                    active.set(false);
+                    break;
+                case EMERGENCY_STOP:
+                    motorLeft.stop(true);
+                    motorRight.stop(true);
+                    break;
+                default:
+                    throw new PlatformException("NO SUCH COMMAND direction= " + direction);
+            }
+            return true;
+        });
+    }
+
+    private Future<Boolean> runEngine(RMIRegulatedMotor engine, int cycles, Condition condition){
+        return executorForCommands.submit(() -> {
             lock.lock();
             try {
-                if(left) {
-                    motorRight.stop(true);
-                } else {
-                    motorLeft.stop(true);
+                switch(cycles){
+                    case DEFAULT_0:
+                        logger.info("Engine STOP");
+                        engine.stop(true);
+                        condition.await();
+                        break;
+                    default:
+                        logger.info("Engine RUN");
+                        engine.rotate(cycles);
+                        condition.signal();
+                        break;
                 }
-                engineActive.await();
+
             } catch (RemoteException | InterruptedException e) {
                 throw new PlatformException("Command error: ", e);
             }finally {
@@ -215,22 +227,14 @@ public class LegoBrickCommandsProviderImp implements LegoBrickCommandsProvider {
             }
             return true;
         });
-        Future<Boolean> second = executorForCommands.submit(() -> {
-            lock.lock();
-            try {
-                if(left){
-                    motorLeft.rotate(cycles);
-                } else {
-                    motorRight.rotate(cycles);
-                }
-                engineActive.signal();
-            } catch (RemoteException e) {
-                throw new PlatformException("Command error: ", e);
-            }finally {
-                lock.unlock();
-            }
-            return true;
-        });
+    }
+
+
+    private boolean executeTurnByCycles(int cycles, RMIRegulatedMotor... engines){
+        Condition engineActive = lock.newCondition();
+
+        Future<Boolean> first = runEngine(engines[DEFAULT_0], DEFAULT_0, engineActive);
+        Future<Boolean> second = runEngine(engines[DEFAULT_1], cycles, engineActive);
         try {
             return first.get() && second.get();
         } catch (InterruptedException | ExecutionException e) {
@@ -238,25 +242,24 @@ public class LegoBrickCommandsProviderImp implements LegoBrickCommandsProvider {
         }
     }
 
+
+    private Future<Boolean> executeEngine(RMIRegulatedMotor engine, int cycles){
+        return executorForCommands.submit(() -> {
+            try {
+                engine.rotate(cycles);
+            } catch (RemoteException e) {
+                throw new PlatformException("Command error: ", e);
+            }
+            return true;
+        });
+    }
+
     private boolean executeBothEnginesByCycles(int cycles){
 
-        Future<Boolean> engineLeft = executorForCommands.submit(() -> {
-            try {
-                motorLeft.rotate(cycles);
-            } catch (RemoteException e) {
-                throw new PlatformException("Command error: ", e);
-            }
-            return true;
-        });
+        logger.info("executeBothEnginesByCycles = " + cycles);
 
-        Future<Boolean> engineRight = executorForCommands.submit(() -> {
-            try {
-                motorRight.rotate(cycles);
-            } catch (RemoteException e) {
-                throw new PlatformException("Command error: ", e);
-            }
-            return true;
-        });
+        Future<Boolean> engineLeft = executeEngine(motorLeft, cycles);
+        Future<Boolean> engineRight = executeEngine(motorRight, cycles);
 
         try {
             return engineLeft.get() && engineRight.get();
@@ -273,6 +276,7 @@ public class LegoBrickCommandsProviderImp implements LegoBrickCommandsProvider {
 
     @Override
     public void exit() throws RemoteException, InterruptedException {
+        logger.info("MAIN EXIT COMMAND CALLED");
         motorLeft.close();
         motorRight.close();
     }

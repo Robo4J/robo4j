@@ -27,7 +27,7 @@ import com.robo4j.core.util.RoboExceptionEnum;
 public class RoboResourceException extends RuntimeException {
 
     public RoboResourceException(RoboExceptionEnum roboException) {
-        super(roboException.getDesc());
+        super(roboException.getName());
     }
 
 }

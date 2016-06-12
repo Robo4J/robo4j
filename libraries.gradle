@@ -1,7 +1,7 @@
 println "configure $project"
 
 ext {
-    robo4jVersion = "alfa-0.1"
+    robo4jVersion = "alfa-0.2"
 
     javassistVersion="3.20.0-GA"
     guavaVersion="19.0"

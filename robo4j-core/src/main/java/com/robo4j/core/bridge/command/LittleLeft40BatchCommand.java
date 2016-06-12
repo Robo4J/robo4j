@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This RoboExceptionEnum.java is part of robo4j.
+ * This LittleLeft40BatchCommand.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,45 +17,45 @@
  *
  */
 
-package com.robo4j.core.util;
+package com.robo4j.core.bridge.command;
 
-import com.robo4j.commons.enums.LegoSystemEnum;
+import com.robo4j.core.annotation.BatchAnnotation;
+import com.robo4j.core.bridge.command.cache.BatchCommand;
 
 /**
- * Created by miroslavkopecky on 23/05/16.
+ * Created by miroslavkopecky on 17/04/16.
  */
-public enum  RoboExceptionEnum implements LegoSystemEnum<Integer> {
+@BatchAnnotation(name = "littleLeft40", batch = "left(90),move(40)")
+public class LittleLeft40BatchCommand implements BatchCommand {
 
-    //@formatter:off
-    RESOURCES_NOT   (0, "Resource not available"),
-    RESOURCES_READ  (1, "Resource already read"),
-    HTTP_SERVER     (2, "Server Problem"),
-    ;
-    //@formatter:on
-
-    private int code;
     private String name;
+    private String batch;
 
-    RoboExceptionEnum(int code, String name) {
-        this.code = code;
-        this.name = name;
-    }
-
-    @Override
-    public Integer getType() {
-        return null;
+    public LittleLeft40BatchCommand() {
+        this.name = "littleLeft40";
+        this.batch = "left(90),move(40)";
     }
 
     @Override
     public String getName() {
-        return null;
+        return name;
     }
 
     @Override
+    public String getBatch() {
+        return batch;
+    }
+
+    @Override
+    public void setBatch(String batch) {
+        this.batch = batch;
+    }
+
+
+    @Override
     public String toString() {
-        return "RoboExceptionEnum{" +
-                "code=" + code +
-                ", name='" + name + '\'' +
+        return "LittleLeft40BatchCommand{" +
+                "batch='" + batch + '\'' +
                 '}';
     }
 }

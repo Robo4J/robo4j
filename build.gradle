@@ -72,6 +72,7 @@ project("robo4j-commons"){
     }
 }
 
+
 project("robo4j-core"){
     description = "Robo4j-Core"
 
@@ -89,12 +90,13 @@ project("robo4j-core"){
     }
 
     dependencies {
+        compile(project(":robo4j-commons"))
         compile "org.javassist:javassist:${javassistVersion}"
         compile "com.google.guava:guava:${guavaVersion}"
+        compile "com.googlecode.json-simple:json-simple:${jsonVersion}"
         compile "org.apache.commons:commons-lang3:${apacheCommonsVersion}"
         compile "org.apache.commons:commons-collections4:${apacheCollectionsVersion}"
         compile "org.apache.commons:commons-exec:${apacheCollectionsExecVersion}"
-        compile "com.googlecode.json-simple:json-simple:${jsonVersion}"
         compile "org.reflections:reflections-maven:${reflectionsVersion}"
         compile "com.google.collections:google-collections:${googleCollectionsVersion}"
         compile "org.apache.logging.log4j:log4j-api:${log4jApiVersion}"

@@ -21,14 +21,12 @@ package com.robo4j.core.fronthand;
 
 import com.robo4j.core.fronthand.command.FrontHandCommandEnum;
 
-import java.rmi.RemoteException;
-
 /**
  * Created by miroslavkopecky on 27/04/16.
  */
 public interface LegoFrontHandProvider {
 
-    boolean process(FrontHandCommandEnum command) throws RemoteException;
+    boolean process(FrontHandCommandEnum command);
 
     boolean isActive();
 

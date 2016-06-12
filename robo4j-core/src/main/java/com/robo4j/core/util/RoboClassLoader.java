@@ -48,7 +48,7 @@ public final class RoboClassLoader {
     }
 
     //Public Methods
-    ClassLoader getClassLoader(){
+    public ClassLoader getClassLoader(){
         return cl;
     }
 

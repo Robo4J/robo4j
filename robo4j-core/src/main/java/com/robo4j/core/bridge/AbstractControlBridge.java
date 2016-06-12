@@ -19,12 +19,12 @@
 
 package com.robo4j.core.bridge;
 
-import com.robo4j.core.agent.AgentConsumer;
-import com.robo4j.core.agent.AgentProducer;
-import com.robo4j.core.agent.AgentStatus;
+import com.robo4j.commons.agent.AgentConsumer;
+import com.robo4j.commons.agent.AgentProducer;
+import com.robo4j.commons.agent.AgentStatus;
+import com.robo4j.commons.agent.RoboAgent;
+import com.robo4j.commons.concurrent.LegoThreadFactory;
 import com.robo4j.core.agent.GenericAgent;
-import com.robo4j.core.agent.RoboAgent;
-import com.robo4j.core.system.LegoThreadFactory;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;

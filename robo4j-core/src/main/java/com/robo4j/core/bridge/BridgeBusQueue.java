@@ -19,7 +19,7 @@
 
 package com.robo4j.core.bridge;
 
-import com.robo4j.core.system.CoreBusQueue;
+import com.robo4j.commons.concurrent.CoreBusQueue;
 
 /**
  * Created by miroslavkopecky on 14/04/16.

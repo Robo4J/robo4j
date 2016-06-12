@@ -19,8 +19,9 @@
 
 package com.robo4j.core.bridge.task;
 
-import com.robo4j.core.agent.AgentConsumer;
-import com.robo4j.core.bridge.BridgeBusQueue;
+import com.robo4j.commons.agent.AgentConsumer;
+import com.robo4j.commons.concurrent.CoreBusQueue;
+import com.robo4j.commons.concurrent.LegoThreadFactory;
 import com.robo4j.core.bridge.BridgeUtils;
 import com.robo4j.core.bridge.command.BridgeCommand;
 import com.robo4j.core.fronthand.LegoFrontHandProvider;
@@ -29,8 +30,6 @@ import com.robo4j.core.lego.LegoException;
 import com.robo4j.core.platform.command.LegoCommandProperty;
 import com.robo4j.core.platform.command.LegoPlatformCommandEnum;
 import com.robo4j.core.platform.provider.LegoBrickCommandsProvider;
-import com.robo4j.core.system.LegoThreadFactory;
-import com.robo4j.core.system.QueueFIFOEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,14 +43,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by miroslavkopecky on 03/04/16.
  */
-public class BridgeCommandConsumer implements AgentConsumer, Runnable {
+public class BridgeCommandConsumer<QueueType extends CoreBusQueue> implements AgentConsumer, Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(BridgeCommandConsumer.class);
-    private LegoBrickCommandsProvider legoBrickCommandsProvider;
-    private LegoFrontHandProvider legoFrontHandProvider;
-    private BridgeBusQueue<QueueFIFOEntry<BridgeCommand>> commandsQueue; //
     private static volatile ExecutorService executorBridgeConsumer;
     private volatile AtomicBoolean active;
+    private LegoBrickCommandsProvider legoBrickCommandsProvider;
+    private LegoFrontHandProvider legoFrontHandProvider;
+    private QueueType commandsQueue; //
 
 
     public BridgeCommandConsumer(LegoBrickCommandsProvider legoBrickCommandsProvider,
@@ -64,10 +63,13 @@ public class BridgeCommandConsumer implements AgentConsumer, Runnable {
         logger.info("BridgeCommandConsumer INIT");
     }
 
+
+    @SuppressWarnings(value = "unchecked")
     @Override
-    public void setCommandsQueue(BridgeBusQueue<QueueFIFOEntry<BridgeCommand>> commandsQueue){
-        this.commandsQueue = commandsQueue;
+    public void setMessageQueue(CoreBusQueue commandsQueue) {
+        this.commandsQueue = (QueueType)commandsQueue;
     }
+
 
     @Override
     public void run() {
@@ -79,12 +81,12 @@ public class BridgeCommandConsumer implements AgentConsumer, Runnable {
         while(active.get() && commandsQueue.peek() != null){
             try {
                 final BridgeCommand bridgeCommand = (BridgeCommand) commandsQueue.take().getEntry();
-                logger.debug("CONSUMER COMMAND = " + bridgeCommand);
+                logger.info("CONSUMER COMMAND = " + bridgeCommand);
                 Future<Boolean> moveFuture = null;
 
                 if(Objects.isNull(bridgeCommand.getType())){
                     moveFuture = executorBridgeConsumer.submit(() -> {
-                        logger.debug("HAND COMMAND");
+                        logger.info("HAND COMMAND");
                         return legoFrontHandProvider.process(FrontHandCommandEnum.getCommand(bridgeCommand.getValue()));
                     });
 
@@ -92,33 +94,21 @@ public class BridgeCommandConsumer implements AgentConsumer, Runnable {
                     switch (bridgeCommand.getType()){
                         case MOVE:
                         case MOVE_CYCLES:
-                        case MOVE_DESTINACE:
-                            moveFuture= executorBridgeConsumer.submit(() -> {
-                                logger.debug("MOVE = " + bridgeCommand);
-                                return legoBrickCommandsProvider.processWithProperty(LegoPlatformCommandEnum.MOVE_DESTINACE, new LegoCommandProperty(bridgeCommand.getValue()));
-                            });
+                        case MOVE_DISTANCE:
+                            moveFuture= processBridgeCommand(bridgeCommand, LegoPlatformCommandEnum.MOVE_DISTANCE);
                             break;
                         case BACK:
                         case BACK_CYCLES:
-                        case BACK_DESTINACE:
-                            moveFuture = executorBridgeConsumer.submit(() -> {
-                                logger.debug("BACK = " + bridgeCommand);
-                                return legoBrickCommandsProvider.processWithProperty(LegoPlatformCommandEnum.BACK_DESTINACE, new LegoCommandProperty(bridgeCommand.getValue()));
-                            });
+                        case BACK_DISTANCE:
+                            moveFuture= processBridgeCommand(bridgeCommand, LegoPlatformCommandEnum.BACK_DISTANCE);
                             break;
                         case LEFT:
                         case LEFT_CYCLES:
-                            moveFuture = executorBridgeConsumer.submit(() -> {
-                                logger.debug("LEFT = " + bridgeCommand);
-                                return legoBrickCommandsProvider.processWithProperty(LegoPlatformCommandEnum.LEFT_CYCLES, new LegoCommandProperty(bridgeCommand.getValue()));
-                            });
+                            moveFuture= processBridgeCommand(bridgeCommand, LegoPlatformCommandEnum.LEFT_CYCLES);
                             break;
                         case RIGHT:
                         case RIGHT_CYCLES:
-                            moveFuture = executorBridgeConsumer.submit(() -> {
-                                logger.debug("RIGHT = " + bridgeCommand);
-                                return legoBrickCommandsProvider.processWithProperty(LegoPlatformCommandEnum.RIGHT_CYCLES, new LegoCommandProperty(bridgeCommand.getValue()));
-                            });
+                            moveFuture= processBridgeCommand(bridgeCommand, LegoPlatformCommandEnum.RIGHT_CYCLES);
                             break;
                         case INIT:
                         case CLOSE:
@@ -141,5 +131,14 @@ public class BridgeCommandConsumer implements AgentConsumer, Runnable {
 
         executorBridgeConsumer.shutdown();
         logger.info("COMMAND CONSUMER DONE");
+    }
+
+    //Private Method
+    private Future<Boolean> processBridgeCommand(BridgeCommand bridgeCommand, LegoPlatformCommandEnum type){
+        return executorBridgeConsumer.submit(() -> {
+                logger.info("PROCESS BRIDGE COMMAND = " + bridgeCommand);
+                return legoBrickCommandsProvider.process(type,
+                    new LegoCommandProperty(bridgeCommand.getValue()));
+            });
     }
 }

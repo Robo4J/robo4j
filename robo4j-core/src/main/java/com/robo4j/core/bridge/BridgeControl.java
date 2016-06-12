@@ -19,7 +19,7 @@
 
 package com.robo4j.core.bridge;
 
-import com.robo4j.core.agent.RoboAgent;
+import com.robo4j.commons.agent.RoboAgent;
 import com.robo4j.core.annotation.RoboEngine;
 import com.robo4j.core.annotation.SystemConfig;
 import com.robo4j.core.annotation.SystemProperties;

@@ -19,7 +19,7 @@
 
 package com.robo4j.core.platform.comm;
 
-import com.robo4j.core.system.CoreBusQueue;
+import com.robo4j.commons.concurrent.CoreBusQueue;
 
 /**
  * Core Platform Command Bus

@@ -29,7 +29,7 @@ import java.io.InputStream;
  *
  * Created by miroslavkopecky on 23/05/16.
  */
-public class InputStreamResource implements Resource {
+public class InputStreamResource implements Resource{
 
     private final InputStream source;
     private boolean reading;

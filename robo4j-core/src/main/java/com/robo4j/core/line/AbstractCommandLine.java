@@ -71,7 +71,7 @@ public abstract class AbstractCommandLine {
                         .forEach(c -> {
                             String name = c.getKey();
                             BatchCommand batchCommand = c.getValue();
-                            logger.info("COMMAND: type " + batchCommand.getType().getDef() + " name= " + name +
+                            logger.info("COMMAND: type " + batchCommand.getType().getName() + " name= " + name +
                                     " content= " + batchCommand.getBatch());
                         });
                 break;

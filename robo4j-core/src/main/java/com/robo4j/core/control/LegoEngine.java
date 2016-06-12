@@ -26,7 +26,7 @@ import com.robo4j.core.system.enums.LegoEnginePartEnum;
 /**
  * Created by miroslavkopecky on 05/05/16.
  */
-public interface LegoEngine extends RoboSystemConfig {
+public interface LegoEngine extends RoboSystemConfig{
 
     LegoAnalogPortEnum getPort();
     LegoEngineEnum getEngine();

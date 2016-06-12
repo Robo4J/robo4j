@@ -24,6 +24,6 @@ package com.robo4j.core.control;
  *
  * Created by miroslavkopecky on 28/04/16.
  */
-public interface RoboCoreCommand extends RoboTypeCommand{
+public interface RoboCoreCommand extends RoboTypeCommand {
     String getName();
 }

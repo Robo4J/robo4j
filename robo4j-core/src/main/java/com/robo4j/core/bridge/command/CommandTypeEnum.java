@@ -19,7 +19,7 @@
 
 package com.robo4j.core.bridge.command;
 
-import com.robo4j.core.system.LegoSystemEnum;
+import com.robo4j.commons.enums.LegoSystemEnum;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,13 +40,13 @@ public enum CommandTypeEnum implements LegoSystemEnum<Integer> {
     //@formatter:on
 
     private int code;
-    private String def;
+    private String name;
 
     private volatile static Map<String, CommandTypeEnum> defToCommandTypeMapping;
 
-    CommandTypeEnum(int code, String def) {
+    CommandTypeEnum(int code, String name) {
         this.code = code;
-        this.def = def;
+        this.name = name;
     }
 
     @Override
@@ -55,12 +55,8 @@ public enum CommandTypeEnum implements LegoSystemEnum<Integer> {
     }
 
     @Override
-    public String getDesc() {
-        return "Command = " + def;
-    }
-
-    public String getDef() {
-        return def;
+    public String getName() {
+        return name;
     }
 
 
@@ -68,7 +64,7 @@ public enum CommandTypeEnum implements LegoSystemEnum<Integer> {
     private static void initMapping(){
         defToCommandTypeMapping = new HashMap<>();
         for(CommandTypeEnum ct: values()){
-            defToCommandTypeMapping.put(ct.getDef(), ct);
+            defToCommandTypeMapping.put(ct.getName(), ct);
         }
     }
 
@@ -83,7 +79,7 @@ public enum CommandTypeEnum implements LegoSystemEnum<Integer> {
     public String toString() {
         return "CommandTypeEnum{" +
                 "code=" + code +
-                ", def='" + def + '\'' +
+                ", name='" + name + '\'' +
                 '}';
     }
 }

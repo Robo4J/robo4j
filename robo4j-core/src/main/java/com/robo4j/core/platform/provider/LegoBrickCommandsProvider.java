@@ -32,9 +32,9 @@ import java.rmi.RemoteException;
  */
 public interface LegoBrickCommandsProvider {
 
-    boolean process(LegoPlatformCommandEnum direction) throws RemoteException, InterruptedException;
+    boolean process(LegoPlatformCommandEnum direction);
 
-    boolean processWithProperty(LegoPlatformCommandEnum direction, LegoCommandProperty property);
+    boolean process(LegoPlatformCommandEnum direction, LegoCommandProperty property);
 
     void exit() throws RemoteException, InterruptedException;
 

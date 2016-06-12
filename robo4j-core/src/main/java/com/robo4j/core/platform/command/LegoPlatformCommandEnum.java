@@ -43,9 +43,9 @@ public enum LegoPlatformCommandEnum implements RoboCoreCommand, RoboTypeCommand 
     INIT            (6, "init"),
     CLOSE           (7, "close"),
     MOVE_CYCLES     (8, "move_cycle"),
-    MOVE_DESTINACE  (9, "move_destinace"),
+    MOVE_DISTANCE   (9, "move_distance"),
     BACK_CYCLES     (10, "back_cycle"),
-    BACK_DESTINACE  (11, "back_destinace"),
+    BACK_DISTANCE   (11, "back_distance"),
     LEFT_CYCLES     (12, "left_cycle"),
     RIGHT_CYCLES    (13, "right_cycle"),
     EMERGENCY_STOP  (14, "emergency_stop"),
@@ -95,12 +95,18 @@ public enum LegoPlatformCommandEnum implements RoboCoreCommand, RoboTypeCommand 
         return codeToLegoCommandTypeMapping.get(code);
     }
 
-    public static LegoPlatformCommandEnum getCommand(String code){
+    public static LegoPlatformCommandEnum getCommand(String name){
         if(codeToLegoCommandNameMapping == null)
             initMapping();
 
-        return codeToLegoCommandNameMapping.get(code);
+        return codeToLegoCommandNameMapping.get(name);
     }
 
-
+    @Override
+    public String toString() {
+        return "LegoPlatformCommandEnum{" +
+                "code=" + code +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

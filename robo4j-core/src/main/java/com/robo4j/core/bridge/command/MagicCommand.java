@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This AgentStatus.java is part of robo4j.
+ * This MagicCommand.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,39 +17,46 @@
  *
  */
 
-package com.robo4j.core.agent;
+package com.robo4j.core.bridge.command;
 
-import java.util.LinkedList;
-import java.util.List;
+import com.robo4j.core.annotation.BatchAnnotation;
+import com.robo4j.core.bridge.command.cache.BatchCommand;
 
 /**
- * Agent status is communication between Agent and the rest of the application
- *
- * Created by miroslavkopecky on 30/05/16.
+ * Created by miroslavkopecky on 17/04/16.
  */
-public class AgentStatus {
+@BatchAnnotation(name = "magic", batch = "move(30),right(360),back(30)")
+public class MagicCommand implements BatchCommand {
 
-    private AgentStatusEnum status;
-    private List<String> messages;
+    private String name;
+    private String batch;
 
-    public AgentStatus(AgentStatusEnum status) {
-        this.status = status;
-        this.messages = new LinkedList<>();
+    public MagicCommand() {
+        this.name = "magic";
     }
 
-    public void addMessage(String message){
-        messages.add(message);
+    @Override
+    public String getName() {
+        return name;
     }
 
-    public List<String> getMessages() {
-        return messages;
+
+    @Override
+    public String getBatch() {
+        return batch;
+    }
+
+    @Override
+    public void setBatch(String batch) {
+        this.batch = batch;
     }
 
     @Override
     public String toString() {
-        return "AgentStatus{" +
-                "status=" + status +
-                ", messages=" + messages +
+        return "MagicCommand{" +
+                "batch='" + batch + '\'' +
                 '}';
     }
 }
+
+
