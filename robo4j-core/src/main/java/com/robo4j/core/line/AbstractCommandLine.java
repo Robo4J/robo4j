@@ -20,9 +20,11 @@
 package com.robo4j.core.line;
 
 import com.google.common.collect.ImmutableMap;
+import com.robo4j.commons.io.FileLoader;
 import com.robo4j.core.bridge.command.cache.BatchCommand;
 import com.robo4j.core.control.ControlException;
 import com.robo4j.core.control.ControlPad;
+import com.robo4j.core.util.RoboClassLoader;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -37,6 +39,7 @@ import java.util.Scanner;
 public abstract class AbstractCommandLine {
 
     private static final String EXIT_COMMAND = "exit";
+    private static final String DIR_HELP = "help";
     private final Logger logger;
     private final JSONParser parser;
     private final ControlPad controlPad;
@@ -66,7 +69,7 @@ public abstract class AbstractCommandLine {
                 break;
             case COMMANDS:
                 activeSection = option.getCode();
-                logger.info("available commands...");
+                logger.info(helpMap.get(option));
                 controlPad.getCommandCache().entrySet().stream()
                         .forEach(c -> {
                             String name = c.getKey();
@@ -79,7 +82,6 @@ public abstract class AbstractCommandLine {
                 sectionActive = true;
                 activeSection = option.getCode();
                 while(sectionActive){
-                    logger.info("new command section");
                     logger.info(helpMap.get(option));
                     logger.info("TYPE COMMAND:");
                     String inputText = input.nextLine();
@@ -103,7 +105,7 @@ public abstract class AbstractCommandLine {
                 logger.info("new command section...");
                 break;
             case COMMAND_LINE:
-                logger.info("command-line section...");
+                logger.info(helpMap.get(option));
                 activeSection = option.getCode();
                 sectionActive = true;
                 try{
@@ -160,48 +162,16 @@ public abstract class AbstractCommandLine {
         return request.get(property).toString();
     }
 
-    private static final String COMMAND_EXAMPLE_1 = "{\"type\" : \"B\", \"name\" : \"magic22\", \"content\" : \"move(22),right(360),back(33)\" }";
     private static final Map<LineOptionsEnum, String> helpMap = new ImmutableMap.Builder<LineOptionsEnum, String>()
-            .put(LineOptionsEnum.INFO, "\nRobo4j.io command-line interface info\noptions numbers:" +
-                    "\n1. show help\n2. available commands\n3. save new command\n4. run command-line\n5. exit")
-            .put(LineOptionsEnum.HELP, "\nRobo4j.io command-line is designed to control the robot\n" +
-                    "over the command line interface.\nIt allows you to use Active, Basic, Complex command\n" +
-                    "to controll Robo4j.io Alfa robot.\nEvery option contains help after option has been chosen.\n" +
-                    "Options summary:\n" +
-                    "2. Available commands\n" +
-                    "The table contains the command name and robot command the will be processed\n" +
-                    "|   name       |  consist of commands              |\n" +
-                    "|   basic42    |  move(10),back(10)                |\n\n" +
-                    "3. Save command\n" +
-                    "Save specific command by using predefined prefix.\n" +
-                    "Prefixes:\n" +
-                    "a) Basic command    ->  B:\n" +
-                    "b) Complex command  ->  C:\n" +
-                    "example: "+ COMMAND_EXAMPLE_1 +"\n\n" +
-                    "4. Run Robo4j Command line\n" +
-                    "Usage of prexes allows you to send specific command to the Robot\n" +
-                    "prefixes:\n" +
-                    "a) B: - Basic command\n" +
-                    "b) C: - Complex command\n" +
-                    "c) H: - Hand command :: usage H:command \n" +
-                    "d) D: - Direct command :: usage D:move available option -> D:(move,back,left,right)\n\n" +
-                    "")
-            .put(LineOptionsEnum.NEW_COMMAND, "\nRobo4j.io new command section\n" +
-                    "You can create new command for the robot and store it into system internal cache" +
-                    "example: "+ COMMAND_EXAMPLE_1 +"\n\n")
-            .put(LineOptionsEnum.COMMAND_LINE, "\nRobo4j.io command-line\n" +
-                    "You can type any of your existing command\n" +
-                    "command types prefixes:\n" +
-                    "1. Active command - A:" +
-                    "2. Direct command - D:" +
-                    "3. Basic command - B:" +
-                    "4. Complex command - C:" +
-                    "5. Hand command - H:" +
-                    "example1: A:move\n" +
-                    "example2: D:move(30),back(30)\n" +
-                    "example3: B:basic1\n" +
-                    "example4: C:comp1\n" +
-                    "example5: H:command\n" +
-                    "note: in case of direct command you need to time A:stop!!!")
+            .put(LineOptionsEnum.INFO, FileLoader.loadFileToString(RoboClassLoader.getInstance().getClassLoader(),
+                    "info.txt", DIR_HELP))
+            .put(LineOptionsEnum.HELP, FileLoader.loadFileToString(RoboClassLoader.getInstance().getClassLoader(),
+                    "help.txt", DIR_HELP))
+            .put(LineOptionsEnum.COMMANDS, FileLoader.loadFileToString(RoboClassLoader.getInstance().getClassLoader(),
+                    "available_commands.txt", DIR_HELP))
+            .put(LineOptionsEnum.NEW_COMMAND, FileLoader.loadFileToString(RoboClassLoader.getInstance().getClassLoader(),
+                    "new_command.txt", DIR_HELP))
+            .put(LineOptionsEnum.COMMAND_LINE, FileLoader.loadFileToString(RoboClassLoader.getInstance().getClassLoader(),
+                    "command_line.txt", DIR_HELP))
             .build();
 }
