@@ -19,11 +19,11 @@
 
 package com.robo4j.line.engine;
 
-import com.robo4j.core.annotation.RoboEngine;
-import com.robo4j.core.control.LegoEngine;
-import com.robo4j.core.system.enums.LegoAnalogPortEnum;
-import com.robo4j.core.system.enums.LegoEngineEnum;
-import com.robo4j.core.system.enums.LegoEnginePartEnum;
+import com.robo4j.commons.annotation.RoboEngine;
+import com.robo4j.lego.control.LegoEngine;
+import com.robo4j.lego.enums.LegoAnalogPortEnum;
+import com.robo4j.lego.enums.LegoEngineEnum;
+import com.robo4j.lego.enums.LegoEnginePartEnum;
 
 /**
  * Created by miroslavkopecky on 04/06/16.

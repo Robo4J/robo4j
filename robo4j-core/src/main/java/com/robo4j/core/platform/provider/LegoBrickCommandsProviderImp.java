@@ -20,7 +20,6 @@
 package com.robo4j.core.platform.provider;
 
 import com.robo4j.commons.concurrent.LegoThreadFactory;
-import com.robo4j.core.control.LegoEngine;
 import com.robo4j.core.lego.LegoBrickRemote;
 import com.robo4j.core.platform.PlatformException;
 import com.robo4j.core.platform.PlatformProperties;
@@ -28,9 +27,10 @@ import com.robo4j.core.platform.PlatformUtils;
 import com.robo4j.core.platform.command.LegoCommandProperty;
 import com.robo4j.core.platform.command.LegoPlatformCommandEnum;
 import com.robo4j.core.system.dto.LegoEngineDTO;
-import com.robo4j.core.system.enums.LegoAnalogPortEnum;
-import com.robo4j.core.system.enums.LegoEngineEnum;
-import com.robo4j.core.system.enums.LegoEnginePartEnum;
+import com.robo4j.lego.control.LegoEngine;
+import com.robo4j.lego.enums.LegoAnalogPortEnum;
+import com.robo4j.lego.enums.LegoEngineEnum;
+import com.robo4j.lego.enums.LegoEnginePartEnum;
 import lejos.remote.ev3.RMIRegulatedMotor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

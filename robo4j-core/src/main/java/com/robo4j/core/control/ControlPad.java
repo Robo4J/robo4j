@@ -20,6 +20,7 @@
 package com.robo4j.core.control;
 
 import com.robo4j.commons.agent.RoboAgent;
+import com.robo4j.commons.control.RoboSystemConfig;
 import com.robo4j.core.bridge.BridgeControl;
 import com.robo4j.core.bridge.command.AdvancedCommand;
 import com.robo4j.core.bridge.command.BasicCommand;
@@ -46,6 +47,7 @@ import com.robo4j.core.platform.command.LegoPlatformCommandEnum;
 import com.robo4j.core.platform.provider.LegoBrickCommandsProvider;
 import com.robo4j.core.sensor.provider.SensorProvider;
 import com.robo4j.core.sensor.provider.SensorProviderImpl;
+import com.robo4j.lego.control.LegoEngine;
 import org.apache.commons.exec.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

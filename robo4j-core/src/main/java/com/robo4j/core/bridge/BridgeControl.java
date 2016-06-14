@@ -20,17 +20,17 @@
 package com.robo4j.core.bridge;
 
 import com.robo4j.commons.agent.RoboAgent;
-import com.robo4j.core.annotation.RoboEngine;
-import com.robo4j.core.annotation.SystemConfig;
-import com.robo4j.core.annotation.SystemProperties;
-import com.robo4j.core.annotation.SystemProvider;
+import com.robo4j.commons.annotation.RoboEngine;
+import com.robo4j.commons.annotation.SystemConfig;
+import com.robo4j.commons.annotation.SystemProperties;
+import com.robo4j.commons.annotation.SystemProvider;
 import com.robo4j.core.bridge.command.cache.CacheException;
 import com.robo4j.core.bridge.task.BridgeCommandConsumer;
 import com.robo4j.core.bridge.task.BridgeCommandProducer;
 import com.robo4j.core.control.ControlCommandsAdapter;
 import com.robo4j.core.control.ControlSystem;
 import com.robo4j.core.control.ControlUtil;
-import com.robo4j.core.control.RoboSystemConfig;
+import com.robo4j.commons.control.RoboSystemConfig;
 import com.robo4j.core.control.RoboSystemProperties;
 import com.robo4j.core.io.NetworkUtils;
 import com.robo4j.core.lego.LegoBrickProperties;

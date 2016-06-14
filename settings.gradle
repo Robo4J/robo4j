@@ -5,4 +5,5 @@ include 'robo4j-line'
 include 'robo4j-brick-client'
 include 'robo4j-commons'
 include 'robo4j-page'
+include 'robo4j-lego'
 

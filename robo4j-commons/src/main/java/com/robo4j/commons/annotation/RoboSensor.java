@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This LegoEngine.java is part of robo4j.
+ * This RoboSensor.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,18 +17,24 @@
  *
  */
 
-package com.robo4j.core.control;
+package com.robo4j.commons.annotation;
 
-import com.robo4j.core.system.enums.LegoAnalogPortEnum;
-import com.robo4j.core.system.enums.LegoEngineEnum;
-import com.robo4j.core.system.enums.LegoEnginePartEnum;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Created by miroslavkopecky on 05/05/16.
+ * Annotation is used to configure specific
+ * robo sensor connected to the platform
+ *
+ * Created by miroslavkopecky on 04/05/16.
  */
-public interface LegoEngine extends RoboSystemConfig{
-
-    LegoAnalogPortEnum getPort();
-    LegoEngineEnum getEngine();
-    LegoEnginePartEnum getPart();
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@RoboSystem
+public @interface RoboSensor {
+    String value() default "";
 }

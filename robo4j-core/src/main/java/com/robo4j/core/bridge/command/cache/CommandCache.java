@@ -19,7 +19,7 @@
 
 package com.robo4j.core.bridge.command.cache;
 
-import com.robo4j.core.annotation.BatchAnnotation;
+import com.robo4j.commons.annotation.BatchAnnotation;
 import com.robo4j.core.control.DefaultSystemConfig;
 import com.robo4j.core.lego.LegoBrickPropertiesHolder;
 import org.reflections.Reflections;

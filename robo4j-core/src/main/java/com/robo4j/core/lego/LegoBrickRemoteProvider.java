@@ -19,7 +19,7 @@
 
 package com.robo4j.core.lego;
 
-import com.robo4j.core.annotation.SystemProvider;
+import com.robo4j.commons.annotation.SystemProvider;
 import com.robo4j.core.control.utils.ConnectionUtil;
 import com.robo4j.core.lego.rmi.LegoUnitProviderUtil;
 import lejos.remote.ev3.RemoteEV3;

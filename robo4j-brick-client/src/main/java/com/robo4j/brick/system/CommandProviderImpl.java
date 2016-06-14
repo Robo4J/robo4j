@@ -24,10 +24,12 @@ import com.robo4j.brick.client.io.ClientException;
 import com.robo4j.brick.util.ConstantUtil;
 import com.robo4j.commons.command.GenericCommand;
 import com.robo4j.commons.concurrent.LegoThreadFactory;
+import com.robo4j.lego.control.LegoEngine;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.robotics.RegulatedMotor;
 
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,10 +52,10 @@ public class CommandProviderImpl implements CommandProvider {
     private ReentrantLock lock;
 
 
-    public CommandProviderImpl() {
+    public CommandProviderImpl(Map<String, LegoEngine> engineCache) {
         executorForCommands =  Executors.newFixedThreadPool(ConstantUtil.PLATFORM_ENGINES,
                 new LegoThreadFactory(ConstantUtil.PROVIDER_BUS));
-        engineInitiation();
+        engineInitiation(engineCache);
         lock = new ReentrantLock();
     }
 
@@ -91,9 +93,9 @@ public class CommandProviderImpl implements CommandProvider {
         return ROTATION_CYCLES * Integer.valueOf(value);
     }
 
-    private void engineInitiation(){
-        rightMotor = new NXTRegulatedMotor(LocalEV3.get().getPort("B"));
-        leftMotor = new NXTRegulatedMotor(LocalEV3.get().getPort("C"));
+    private void engineInitiation(Map<String, LegoEngine> engineCache){
+        rightMotor = new NXTRegulatedMotor(LocalEV3.get().getPort(engineCache.get("right").getPort().getType()));
+        leftMotor = new NXTRegulatedMotor(LocalEV3.get().getPort(engineCache.get("left").getPort().getType()));
     }
 
     private void engineSpeedSetup(int cycleSpeed){

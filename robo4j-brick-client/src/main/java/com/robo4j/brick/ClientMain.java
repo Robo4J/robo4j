@@ -53,7 +53,7 @@ public class ClientMain extends AbstractClient {
         try(ServerSocket server = new ServerSocket(PORT)){
             while(active){
                 Socket request = server.accept();
-                Future<String> result = submit(new RequestProcessorCallable(request));
+                Future<String> result = submit(new RequestProcessorCallable(request, getEngineCache()));
                 if(result.get().equals(ConstantUtil.EXIT)){
                     active = false;
                 }

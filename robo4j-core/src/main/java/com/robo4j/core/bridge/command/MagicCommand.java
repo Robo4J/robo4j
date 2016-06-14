@@ -19,7 +19,7 @@
 
 package com.robo4j.core.bridge.command;
 
-import com.robo4j.core.annotation.BatchAnnotation;
+import com.robo4j.commons.annotation.BatchAnnotation;
 import com.robo4j.core.bridge.command.cache.BatchCommand;
 
 /**

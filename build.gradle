@@ -41,7 +41,7 @@ project("robo4j-brick-client"){
     }
 
     dependencies {
-        compile(project(":robo4j-commons"))
+        compile(project(":robo4j-lego"))
         compile(project(":robo4j-page"))
         compile "lejos:ev3classes:${lejosVersion}@jar"
         compile "com.googlecode.json-simple:json-simple:${jsonVersion}"
@@ -90,7 +90,7 @@ project("robo4j-core"){
     }
 
     dependencies {
-        compile(project(":robo4j-commons"))
+        compile(project(":robo4j-lego"))
         compile "org.javassist:javassist:${javassistVersion}"
         compile "com.google.guava:guava:${guavaVersion}"
         compile "com.googlecode.json-simple:json-simple:${jsonVersion}"
@@ -103,6 +103,29 @@ project("robo4j-core"){
         compile "org.apache.logging.log4j:log4j-core:${log4jApiVersion}"
         compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4jApiVersion}"
         compile "lejos:ev3classes:${lejosVersion}"
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+}
+
+project("robo4j-lego"){
+    description = "Robo4j-Lego"
+
+    group 'com.robo4j'
+    version "${robo4jVersion}"
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+        compile(project(":robo4j-commons"))
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }

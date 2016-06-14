@@ -19,7 +19,7 @@
 
 package com.robo4j.core.bridge.task;
 
-import com.robo4j.core.control.LegoEngine;
+import com.robo4j.lego.control.LegoEngine;
 import com.robo4j.core.lego.LegoBrickPropertiesHolder;
 import com.robo4j.core.lego.LegoBrickRemote;
 import com.robo4j.core.platform.PlatformProperties;

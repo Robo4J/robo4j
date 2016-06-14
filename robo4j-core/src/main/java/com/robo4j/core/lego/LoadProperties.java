@@ -19,8 +19,8 @@
 
 package com.robo4j.core.lego;
 
-import com.robo4j.core.annotation.SystemConfig;
-import com.robo4j.core.control.RoboSystemConfig;
+import com.robo4j.commons.annotation.SystemConfig;
+import com.robo4j.commons.control.RoboSystemConfig;
 import com.robo4j.core.control.RoboSystemProperties;
 import com.robo4j.core.properties.LoadPropertiesHelper;
 

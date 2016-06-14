@@ -25,6 +25,7 @@ import com.robo4j.brick.client.http.HttpMethod;
 import com.robo4j.brick.client.http.HttpVersion;
 import com.robo4j.brick.client.util.HttpUtils;
 import com.robo4j.brick.util.ConstantUtil;
+import com.robo4j.lego.control.LegoEngine;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -52,9 +53,9 @@ public class RequestProcessorCallable implements Callable<String> {
     private final RequestProcessorFactory processorFactory;
     private Socket connection;
 
-    public RequestProcessorCallable(Socket connection) {
+    public RequestProcessorCallable(Socket connection,  Map<String, LegoEngine> engineCache) {
         this.connection = connection;
-        this.processorFactory = RequestProcessorFactory.getInstance();
+        this.processorFactory = RequestProcessorFactory.getInstance(engineCache);
     }
 
     private static String correctLine(String line){

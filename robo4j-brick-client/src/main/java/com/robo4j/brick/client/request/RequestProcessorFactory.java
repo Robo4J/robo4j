@@ -39,6 +39,7 @@ import com.robo4j.commons.agent.AgentStatus;
 import com.robo4j.commons.agent.AgentStatusEnum;
 import com.robo4j.commons.concurrent.LegoThreadFactory;
 import com.robo4j.commons.http.RequestHeaderProcessor;
+import com.robo4j.lego.control.LegoEngine;
 import com.robo4j.page.PageParser;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -73,7 +74,7 @@ final class RequestProcessorFactory {
     private final HttpPageLoader pageLoader;
     private final BrickMainAgent agent;
 
-    private RequestProcessorFactory(){
+    private RequestProcessorFactory(Map<String, LegoEngine> engineCache){
         this.pageLoader = new HttpPageLoader();
         this.factoryExecutor = Executors.newFixedThreadPool(ConstantUtil.PLATFORM_FACTORY,
                 new LegoThreadFactory(ConstantUtil.FACTORY_BUS));
@@ -82,14 +83,14 @@ final class RequestProcessorFactory {
         this.commandQueue = new LinkedBlockingQueue<>();
 
         this.agent = getAgent(new CommandProcessor(activeThread, commandQueue),
-                new CommandExecutor(activeThread, new CommandProviderImpl()));
+                new CommandExecutor(activeThread, new CommandProviderImpl(engineCache)));
     }
 
-    static RequestProcessorFactory getInstance(){
+    static RequestProcessorFactory getInstance(Map<String, LegoEngine> engineCache){
         if(INSTANCE == null){
             synchronized (RequestProcessorFactory.class){
                 if(INSTANCE == null){
-                    INSTANCE = new RequestProcessorFactory();
+                    INSTANCE = new RequestProcessorFactory(engineCache);
                 }
             }
         }

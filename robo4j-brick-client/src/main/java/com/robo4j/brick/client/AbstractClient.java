@@ -26,7 +26,7 @@ import java.util.concurrent.Future;
 /**
  * Created by miroslavkopecky on 09/06/16.
  */
-public abstract class AbstractClient<FutureType> {
+public abstract class AbstractClient<FutureType> extends AbstractRoboClient{
 
     private static ExecutorService executors;
 

@@ -19,8 +19,8 @@
 
 package com.robo4j.line.system;
 
-import com.robo4j.core.annotation.SystemProperties;
-import com.robo4j.core.control.RoboSystemConfig;
+import com.robo4j.commons.annotation.SystemProperties;
+import com.robo4j.commons.control.RoboSystemConfig;
 import com.robo4j.core.lego.LegoBrickProperties;
 import com.robo4j.core.lego.LegoBrickPropertiesHolder;
 
