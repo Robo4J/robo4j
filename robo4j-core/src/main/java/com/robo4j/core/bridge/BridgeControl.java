@@ -74,7 +74,7 @@ public abstract class BridgeControl<Configuration extends RoboSystemConfig> exte
     protected BridgeControl(final String corePackage){
         super();
         this.corePackage = corePackage;
-        systemCache = initCache(SystemProperties.class, SystemConfig.class, SystemProvider.class, RoboEngine.class);
+        systemCache = initCache(SystemProperties.class, SystemConfig.class, SystemProvider.class);
         roboAgents = new LinkedList<>();
     }
 
