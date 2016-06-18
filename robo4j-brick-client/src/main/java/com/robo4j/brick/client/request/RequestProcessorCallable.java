@@ -31,7 +31,6 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
@@ -66,8 +65,7 @@ public class RequestProcessorCallable implements Callable<String> {
     public String call() throws IOException{
         // for security checks
         String result = HttpUtils.STRING_EMPTY;
-        try(OutputStream raw = new BufferedOutputStream(connection.getOutputStream());
-            Writer out =  new OutputStreamWriter(raw);
+        try(Writer out =  new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))){
 
             final Map<String, String> tmpMap = new ConcurrentHashMap<>();
@@ -93,12 +91,17 @@ public class RequestProcessorCallable implements Callable<String> {
             if(Objects.nonNull(httpMethod) && Objects.nonNull(tokens)){
                 final HttpMessage httpMessage = new HttpMessage(httpMethod, URI.create(tokens[URI_VALUE_POSITION]),
                         HttpVersion.getByValue(tokens[VERSION_POSITION]), tmpMap);
-                switch (httpMethod){
+                final ProcessorResult processorResult;
+                switch (httpMethod) {
                     case GET:
-                        result = processorFactory.processGet(httpMessage, out);
+                        processorResult = processorFactory.processGet(httpMessage);
+                        out.write(processorResult.getMessage());
+                        result = processorResult.getStatus();
                         break;
                     case POST:
-                        result = processorFactory.processPost(httpMessage, in);
+                        processorResult = processorFactory.processPost(httpMessage, in);
+                        out.write(processorResult.getMessage());
+                        result = processorResult.getStatus();
                         break;
                     case HEAD:
                     case PUT:
@@ -107,11 +110,13 @@ public class RequestProcessorCallable implements Callable<String> {
                     case TRACE:
                     case OPTIONS:
                     default:
-                        processorFactory.processDefault(httpMessage, out);
+                        processorResult = processorFactory.processDefault(httpMessage);
+                        out.write(processorResult.getMessage());
+                        result = processorResult.getStatus();
+                        break;
                 }
-
+                out.flush();
             }
-
             return result;
         } catch (IOException | InterruptedException ex){
             System.err.println("Error talking to " + connection.getRemoteSocketAddress() + " ex= " + ex);

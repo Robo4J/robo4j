@@ -42,14 +42,18 @@ public final class HttpUtils {
     public static final String STRING_EMPTY = "";
     public static final String HTTP_COMMAND = "command";
     public static final String HTTP_AGENT_CACHE = "cache";
+    private static final String NEXT_LINE = "\r\n";
 
-    public static void setHeader(final Writer out, String responseCode) throws IOException {
-            out.write(responseCode + "\r\n");
-            out.write("Date: " + LocalDateTime.now() + "\r\n");
-            out.write("Server: robo4j-client \r\n");
-            out.write("Content-length: " + "\r\n");
-            out.write("Content-type: text/html; charset=utf-8" + "\r\n\r\n");
-            out.flush();
+    public static String setHeader(String responseCode, int length) throws IOException {
+        return new StringBuilder(STRING_EMPTY)
+                .append(responseCode).append(NEXT_LINE)
+                .append("Date: ")
+                .append(LocalDateTime.now())
+                .append(NEXT_LINE)
+                .append("Server: robo4j-client").append(NEXT_LINE)
+                .append("Content-length: ").append(length).append(NEXT_LINE)
+                .append("Content-type: text/html; charset=utf-8").append(NEXT_LINE).append(NEXT_LINE)
+                .toString();
     }
 
 }

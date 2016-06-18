@@ -27,7 +27,6 @@ import com.robo4j.brick.client.http.HttpException;
 import com.robo4j.brick.client.http.HttpMessage;
 import com.robo4j.brick.client.http.HttpPageLoader;
 import com.robo4j.brick.client.http.HttpVersion;
-import com.robo4j.brick.client.util.ClientCommException;
 import com.robo4j.brick.client.util.HttpUtils;
 import com.robo4j.brick.dto.ClientRequestDTO;
 import com.robo4j.brick.system.CommandProviderImpl;
@@ -47,7 +46,6 @@ import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Writer;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -98,12 +96,13 @@ final class RequestProcessorFactory {
     }
 
 
-    String processGet(final HttpMessage httpMessage, final Writer out) throws IOException, InterruptedException {
+    ProcessorResult processGet(final HttpMessage httpMessage) throws IOException, InterruptedException {
 
         String result = ConstantUtil.ACTIVE;
+        final StringBuilder message = new StringBuilder(ConstantUtil.EMPTY_STRING);
+        final String generatedMessage;
 
         if(HttpVersion.containsValue(httpMessage.getVersion())){
-            HttpUtils.setHeader(out, HttpUtils.HTTP_HEADER_OK);  // send a MIME header
             final URI uri  = httpMessage.getUri();
             final List<String> paths = Arrays.asList(httpMessage.getUri().getPath().split(ConstantUtil.getHttpSeparator(12))).stream()
                     .filter(e -> !e.isEmpty())
@@ -112,11 +111,15 @@ final class RequestProcessorFactory {
             if(paths.size() > ConstantUtil.DEFAULT_VALUE && ConstantUtil.availablePaths.containsAll(paths)){
                 switch (paths.get(ConstantUtil.DEFAULT_VALUE).toLowerCase()){
                     case ConstantUtil.STATUS:
-                        out.write(getStatusWebPage(agent.getCache().toString()));
+                        generatedMessage = getStatusWebPage(agent.getCache().toString());
+                        message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));  // send a MIME header
+                        message.append(generatedMessage);
                         break;
                     case ConstantUtil.EXIT:
                         activeThread.set(false);
-                        out.write(pageLoader.getWebPage(HttpUtils.PAGE_EXIT));
+                        generatedMessage = pageLoader.getWebPage(HttpUtils.PAGE_EXIT);
+                        message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));  // send a MIME header
+                        message.append(generatedMessage);
                         result = ConstantUtil.EXIT;
                     default:
                         break;
@@ -125,22 +128,27 @@ final class RequestProcessorFactory {
                 final List<ClientRequestDTO> resultList = parseURIQuery(uri.getQuery(), ConstantUtil.HTTP_QUERY_SEP);
                 commandQueue.put(resultList);
                 addAgentMessage(AgentStatusEnum.REQUEST_GET, resultList.toString());
-                out.write(getSuccessWebPage(resultList.toString()));
+                generatedMessage = getSuccessWebPage(resultList.toString());
+                message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));  // send a MIME header
+                message.append(generatedMessage);
             } else {
-                out.write(pageLoader.getWebPage(HttpUtils.PAGE_WELCOME));
+                generatedMessage =  pageLoader.getWebPage(HttpUtils.PAGE_WELCOME);
+                message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));
+                message.append(generatedMessage);
             }
 
         } else {
             activeThread.set(false);
-            HttpUtils.setHeader(out, HttpUtils.HTTP_HEADER_NOT_ALLOWED);
-            out.write(pageLoader.getWebPage(HttpUtils.PAGE_ERROR));
+            generatedMessage = pageLoader.getWebPage(HttpUtils.PAGE_ERROR);
+            message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_NOT_ALLOWED, generatedMessage.length()));
+            message.append(generatedMessage);
             result = ConstantUtil.EXIT;
         }
-        out.flush();
-        return result;
+        return new ProcessorResult(result, message.toString());
     }
 
-    String processPost(final HttpMessage httpMessage, final BufferedReader in){
+    ProcessorResult processPost(final HttpMessage httpMessage, final BufferedReader in){
+        final String status;
         final JSONParser parser = new JSONParser();
         char[] buffer = new char[RequestHeaderProcessor.getContentLength(httpMessage.getHeader())];
         if(buffer.length != ConstantUtil.DEFAULT_VALUE){
@@ -157,26 +165,28 @@ final class RequestProcessorFactory {
                 if(resultList.size() > ConstantUtil.DEFAULT_VALUE){
                     addAgentMessage(AgentStatusEnum.REQUEST_POST, request.toString());
                     commandQueue.put(resultList);
-                    return ConstantUtil.ACTIVE;
+                    status = ConstantUtil.ACTIVE;
                 } else {
-                    return ConstantUtil.EXIT;
+                    status = ConstantUtil.EXIT;
                 }
             } catch (IOException | ParseException | InterruptedException e) {
                 throw new HttpException("POST request issue", e);
             }
         } else {
-            return ConstantUtil.EXIT;
+            status = ConstantUtil.EXIT;
         }
+
+        return new ProcessorResult(status, "No Information about POST");
     }
 
-    void processDefault(final HttpMessage httpMessage, final Writer out) throws IOException{
+    ProcessorResult processDefault(final HttpMessage httpMessage) throws IOException{
+        final StringBuilder message = new StringBuilder(pageLoader.getWebPage(HttpUtils.PAGE_ERROR));
         if(HttpVersion.containsValue(httpMessage.getVersion())){
-            HttpUtils.setHeader(out, HttpUtils.HTTP_HEADER_NOT);  // send a MIME header
+            message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_NOT, message.length()));  // send a MIME header
         } else {
-            HttpUtils.setHeader(out, HttpUtils.HTTP_HEADER_NOT_ALLOWED);
+            message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_NOT_ALLOWED, message.length()));
         }
-        out.write(pageLoader.getWebPage(HttpUtils.PAGE_ERROR));
-        out.flush();
+        return new ProcessorResult(ConstantUtil.EXIT, message.toString());
     }
 
 
