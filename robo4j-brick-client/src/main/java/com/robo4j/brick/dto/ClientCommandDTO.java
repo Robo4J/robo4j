@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This QueryElement.java is part of robo4j.
+ * This ClientCommandDTO.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,36 +17,17 @@
  *
  */
 
-package com.robo4j.brick.util;
+package com.robo4j.brick.dto;
 
 import com.robo4j.brick.client.enums.RequestCommandEnum;
 
 /**
- * Created by miroslavkopecky on 09/06/16.
+ * Transformed command interface
+ * Created by miroslavkopecky on 19/06/16.
  */
-public class QueryElement {
-    private RequestCommandEnum name;
-    private String value;
+public interface ClientCommandDTO {
 
-    public QueryElement(String value) {
-        String[] values = value.split(ConstantUtil.getHttpSeparator(3));
-        this.name = RequestCommandEnum.getRequestValue(values[ConstantUtil.DEFAULT_VALUE]);
-        this.value = values[1];
-    }
+    RequestCommandEnum getType();
+    String getValue();
 
-    public RequestCommandEnum getName() {
-        return name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return "QueryElement{" +
-                "name='" + name + '\'' +
-                ", value='" + value + '\'' +
-                '}';
-    }
 }

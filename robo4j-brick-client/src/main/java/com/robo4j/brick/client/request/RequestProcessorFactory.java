@@ -23,15 +23,14 @@ package com.robo4j.brick.client.request;
 import com.robo4j.brick.client.agent.BrickMainAgent;
 import com.robo4j.brick.client.command.CommandExecutor;
 import com.robo4j.brick.client.command.CommandProcessor;
-import com.robo4j.brick.client.http.HttpException;
 import com.robo4j.brick.client.http.HttpMessage;
 import com.robo4j.brick.client.http.HttpPageLoader;
 import com.robo4j.brick.client.http.HttpVersion;
+import com.robo4j.brick.client.util.ClientCommException;
 import com.robo4j.brick.client.util.HttpUtils;
 import com.robo4j.brick.dto.ClientRequestDTO;
 import com.robo4j.brick.system.CommandProviderImpl;
 import com.robo4j.brick.util.ConstantUtil;
-import com.robo4j.brick.util.QueryElement;
 import com.robo4j.commons.agent.AgentConsumer;
 import com.robo4j.commons.agent.AgentProducer;
 import com.robo4j.commons.agent.AgentStatus;
@@ -40,8 +39,6 @@ import com.robo4j.commons.concurrent.LegoThreadFactory;
 import com.robo4j.commons.http.RequestHeaderProcessor;
 import com.robo4j.lego.control.LegoEngine;
 import com.robo4j.page.PageParser;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
@@ -49,7 +46,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -64,7 +60,6 @@ import java.util.stream.Collectors;
  */
 final class RequestProcessorFactory {
 
-    private static final int POST_COMMAND_SEP = 2;
     private static volatile  RequestProcessorFactory INSTANCE;
     private volatile ExecutorService factoryExecutor;
     private volatile AtomicBoolean activeThread;
@@ -97,17 +92,14 @@ final class RequestProcessorFactory {
 
 
     ProcessorResult processGet(final HttpMessage httpMessage) throws IOException, InterruptedException {
-
         String result = ConstantUtil.ACTIVE;
         final StringBuilder message = new StringBuilder(ConstantUtil.EMPTY_STRING);
         final String generatedMessage;
-
         if(HttpVersion.containsValue(httpMessage.getVersion())){
             final URI uri  = httpMessage.getUri();
             final List<String> paths = Arrays.asList(httpMessage.getUri().getPath().split(ConstantUtil.getHttpSeparator(12))).stream()
                     .filter(e -> !e.isEmpty())
                     .collect(Collectors.toList());
-
             if(paths.size() > ConstantUtil.DEFAULT_VALUE && ConstantUtil.availablePaths.containsAll(paths)){
                 switch (paths.get(ConstantUtil.DEFAULT_VALUE).toLowerCase()){
                     case ConstantUtil.STATUS:
@@ -125,7 +117,7 @@ final class RequestProcessorFactory {
                         break;
                 }
             } else if(uri != null && uri.getQuery() != null && !uri.getQuery().isEmpty()){
-                final List<ClientRequestDTO> resultList = parseURIQuery(uri.getQuery(), ConstantUtil.HTTP_QUERY_SEP);
+                final List<ClientRequestDTO> resultList = HttpUtils.parseURIQuery(uri.getQuery(), ConstantUtil.HTTP_QUERY_SEP);
                 commandQueue.put(resultList);
                 addAgentMessage(AgentStatusEnum.REQUEST_GET, resultList.toString());
                 generatedMessage = getSuccessWebPage(resultList.toString());
@@ -133,7 +125,7 @@ final class RequestProcessorFactory {
                 message.append(generatedMessage);
             } else {
                 generatedMessage =  pageLoader.getWebPage(HttpUtils.PAGE_WELCOME);
-                message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));
+                message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));  // send a MIME header
                 message.append(generatedMessage);
             }
 
@@ -149,28 +141,21 @@ final class RequestProcessorFactory {
 
     ProcessorResult processPost(final HttpMessage httpMessage, final BufferedReader in){
         final String status;
-        final JSONParser parser = new JSONParser();
+
         char[] buffer = new char[RequestHeaderProcessor.getContentLength(httpMessage.getHeader())];
         if(buffer.length != ConstantUtil.DEFAULT_VALUE){
             try {
                 in.read(buffer);
-                final JSONObject request = (JSONObject)parser.parse(String.valueOf(buffer));
-
-                final String requestedCommands = request.containsKey(HttpUtils.HTTP_COMMAND) ?
-                        request.get(HttpUtils.HTTP_COMMAND).toString() :
-                        ConstantUtil.EMPTY_STRING;
-                final String delimiter = ConstantUtil.getHttpSeparator(POST_COMMAND_SEP);
-
-                final List<ClientRequestDTO> resultList = parseURIQuery(requestedCommands, delimiter);
+                final List<ClientRequestDTO> resultList = HttpUtils.transformToCommands(String.valueOf(buffer));
                 if(resultList.size() > ConstantUtil.DEFAULT_VALUE){
-                    addAgentMessage(AgentStatusEnum.REQUEST_POST, request.toString());
+                    addAgentMessage(AgentStatusEnum.REQUEST_POST, resultList.toString());
                     commandQueue.put(resultList);
                     status = ConstantUtil.ACTIVE;
                 } else {
                     status = ConstantUtil.EXIT;
                 }
             } catch (IOException | ParseException | InterruptedException e) {
-                throw new HttpException("POST request issue", e);
+                throw new ClientCommException("POST request issue");
             }
         } else {
             status = ConstantUtil.EXIT;
@@ -191,7 +176,6 @@ final class RequestProcessorFactory {
 
 
     //Private Methods
-
     private String getSuccessWebPage(final String input) throws IOException{
         final Map<String, String > valuesMap = new HashMap<>();
         valuesMap.put(HttpUtils.HTTP_COMMAND, input);
@@ -213,16 +197,6 @@ final class RequestProcessorFactory {
         final AgentStatus<String> agentStatus = new AgentStatus<>(type);
         agentStatus.addMessage(message);
         agent.addStatus(agentStatus);
-    }
-
-    private List<ClientRequestDTO> parseURIQuery(final String uriQuery, final String delimiter){
-        return Arrays.asList(uriQuery
-                .split(delimiter))
-                .stream()
-                .filter(e -> !e.isEmpty())
-                .map(QueryElement::new)
-                .map(ClientRequestDTO::new)
-                .collect(Collectors.toCollection(LinkedList::new));
     }
 
     private BrickMainAgent getAgent(final AgentProducer producer, final AgentConsumer consumer){

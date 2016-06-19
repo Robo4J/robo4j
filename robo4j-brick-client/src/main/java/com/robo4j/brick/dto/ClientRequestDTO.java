@@ -20,7 +20,7 @@
 package com.robo4j.brick.dto;
 
 import com.robo4j.brick.client.enums.RequestCommandEnum;
-import com.robo4j.brick.util.QueryElement;
+import com.robo4j.brick.util.ConstantUtil;
 
 /**
  *
@@ -36,10 +36,17 @@ public class ClientRequestDTO {
     private String value;
 
 
-    public ClientRequestDTO(QueryElement element) {
+    public ClientRequestDTO(String value){
         this.stamp = System.currentTimeMillis();
-        this.type = element.getName();
-        this.value = element.getValue();
+        final String[] values = value.split(ConstantUtil.getHttpSeparator(3));
+        this.type = RequestCommandEnum.getRequestValue(values[ConstantUtil.DEFAULT_VALUE]);
+        this.value = values[1];
+    }
+
+    public ClientRequestDTO(RequestCommandEnum type, String value) {
+        this.stamp = System.currentTimeMillis();
+        this.type = type;
+        this.value = value;
     }
 
     public Long getStamp() {
