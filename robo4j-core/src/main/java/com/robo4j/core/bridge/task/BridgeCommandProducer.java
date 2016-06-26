@@ -54,7 +54,8 @@ public class BridgeCommandProducer implements AgentProducer, Runnable{
     private volatile AtomicBoolean emergency;
     private PlatformProperties properties;
 
-    public BridgeCommandProducer(AtomicBoolean emergency, AtomicBoolean active, LinkedBlockingQueue<String> commandLineQueue, PlatformProperties properties) {
+    public BridgeCommandProducer(AtomicBoolean active, AtomicBoolean emergency, LinkedBlockingQueue<String> commandLineQueue,
+                                 PlatformProperties properties) {
         this.emergency = emergency;
         this.active = active;
         this.commandsQueue = new BridgeBusQueue<QueueFIFOEntry<BridgeCommand>>(AWAIT_SECONDS);    //BridgeCommand

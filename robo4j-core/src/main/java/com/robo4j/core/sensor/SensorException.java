@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This SensorBusQueue.java is part of robo4j.
+ * This SensorException.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,16 +17,19 @@
  *
  */
 
-package com.robo4j.core.sensor.comm;
-
-import com.robo4j.commons.concurrent.CoreBusQueue;
+package com.robo4j.core.sensor;
 
 /**
- * Created by miroslavkopecky on 14/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 23.04.2016
  */
-public class SensorBusQueue<TransferType> extends CoreBusQueue {
+public class SensorException extends RuntimeException {
 
-    public SensorBusQueue(int awaitSeconds){
-        super(awaitSeconds);
+    public SensorException(String message) {
+        super(message);
+    }
+
+    public SensorException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

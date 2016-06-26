@@ -37,7 +37,6 @@ import java.util.Map;
 public class LegoBrickSetupProperties implements LegoBrickProperties, RoboSystemConfig {
 
     private Map<String, String> bricks;
-    private String corePackage;
     private String commandPackage;
     private String enginePackage;
 
@@ -45,7 +44,7 @@ public class LegoBrickSetupProperties implements LegoBrickProperties, RoboSystem
     public LegoBrickSetupProperties() {
         final Map<String, String> bricks = new HashMap<>();
         /* required to change BRICK_IP_1  */
-        bricks.put(LegoBrickPropertiesHolder.BRICK_IP_1, "127.0.0.0");
+        bricks.put(LegoBrickPropertiesHolder.BRICK_IP_1, "192.168.178.26");
         this.bricks = bricks;
         this.commandPackage = "com.robo4j.line.commands";
         this.enginePackage = "com.robo4j.line.engine";
@@ -58,7 +57,7 @@ public class LegoBrickSetupProperties implements LegoBrickProperties, RoboSystem
 
     @Override
     public String getCorePackage() {
-        return corePackage;
+        return null;
     }
 
     @Override
@@ -72,10 +71,14 @@ public class LegoBrickSetupProperties implements LegoBrickProperties, RoboSystem
     }
 
     @Override
+    public String getSensorPackage() {
+        return null;
+    }
+
+    @Override
     public String toString() {
         return "LegoBrickPropertiesTest{" +
                 "bricks=" + bricks +
-                ", corePackage='" + corePackage + '\'' +
                 ", commandPackage='" + commandPackage + '\'' +
                 '}';
     }

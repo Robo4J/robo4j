@@ -23,21 +23,28 @@ import com.robo4j.core.bridge.command.cache.BatchCommand;
 import com.robo4j.core.bridge.command.cache.CommandCache;
 import com.robo4j.core.engines.EngineCache;
 import com.robo4j.core.lego.LegoBrickPropertiesHolder;
+import com.robo4j.core.sensor.SensorCache;
 
 import java.util.Objects;
 
+
 /**
- * Created by miroslavkopecky on 28/05/16.
+ * Abstract class for robot bridge
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 28.05.2016
  */
 public abstract class AbstractBridgeCache {
 
     protected CommandCache commandCache;
     protected EngineCache engineCache;
+    protected SensorCache sensorCache;
 
 
     protected void initCache(LegoBrickPropertiesHolder holder) {
         commandCache = CommandCache.getInstance(holder);
         engineCache = EngineCache.getInstance(holder);
+        sensorCache = SensorCache.getInstance(holder);
     }
 
     protected boolean commandCacheActive(){
@@ -46,6 +53,10 @@ public abstract class AbstractBridgeCache {
 
     protected boolean engineCacheActive(){
         return Objects.nonNull(engineCache);
+    }
+
+    protected boolean sensorCacheActive(){
+        return Objects.nonNull(sensorCache);
     }
 
     protected void addGenericCommand(BatchCommand command){

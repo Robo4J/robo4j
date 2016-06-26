@@ -41,7 +41,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Created by miroslavkopecky on 03/04/16.
+ * Bridge Command Consumer consumes event/tasks from Producer
+ * and provides them to process
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 03.04.2016
  */
 public class BridgeCommandConsumer<QueueType extends CoreBusQueue> implements AgentConsumer, Runnable {
 
@@ -53,13 +57,13 @@ public class BridgeCommandConsumer<QueueType extends CoreBusQueue> implements Ag
     private QueueType commandsQueue; //
 
 
-    public BridgeCommandConsumer(LegoBrickCommandsProvider legoBrickCommandsProvider,
-                                 LegoFrontHandProvider legoFrontHandProvider,
-                                 AtomicBoolean active) {
+    public BridgeCommandConsumer(AtomicBoolean active,
+                                 LegoBrickCommandsProvider legoBrickCommandsProvider,
+                                 LegoFrontHandProvider legoFrontHandProvider ) {
+        this.active = active;
         this.legoBrickCommandsProvider = legoBrickCommandsProvider;
         this.legoFrontHandProvider = legoFrontHandProvider;
         executorBridgeConsumer = Executors.newSingleThreadExecutor(new LegoThreadFactory(BridgeUtils.BUS_COMMAND_CONSUMER));
-        this.active = active;
         logger.info("BridgeCommandConsumer INIT");
     }
 
@@ -136,9 +140,9 @@ public class BridgeCommandConsumer<QueueType extends CoreBusQueue> implements Ag
     //Private Method
     private Future<Boolean> processBridgeCommand(BridgeCommand bridgeCommand, LegoPlatformCommandEnum type){
         return executorBridgeConsumer.submit(() -> {
-                logger.info("PROCESS BRIDGE COMMAND = " + bridgeCommand);
-                return legoBrickCommandsProvider.process(type,
+            logger.info("PROCESS BRIDGE COMMAND = " + bridgeCommand);
+            return legoBrickCommandsProvider.process(type,
                     new LegoCommandProperty(bridgeCommand.getValue()));
-            });
+        });
     }
 }

@@ -24,6 +24,7 @@ import com.robo4j.core.fronthand.command.FrontHandCommandEnum;
 import com.robo4j.core.lego.LegoBrickRemote;
 import com.robo4j.core.system.dto.LegoEngineDTO;
 import com.robo4j.lego.control.LegoEngine;
+import com.robo4j.lego.control.LegoSensor;
 import com.robo4j.lego.enums.LegoAnalogPortEnum;
 import com.robo4j.lego.enums.LegoEngineEnum;
 import com.robo4j.lego.enums.LegoEnginePartEnum;
@@ -45,10 +46,11 @@ import static com.robo4j.core.lego.rmi.LegoUnitProviderUtil.createRMIEngine;
 import static com.robo4j.core.lego.rmi.LegoUnitProviderUtil.createTouchSensor;
 
 /**
- *
+ * Lego unit front hand provider
+ * is initiated when all components are available
  *
  * @author Miro Kopecky (@miragemiko)
- * @since 27/04/16
+ * @since 27.04.2016
  */
 public class LegoFrontHandProviderImp implements LegoFrontHandProvider {
 
@@ -66,11 +68,13 @@ public class LegoFrontHandProviderImp implements LegoFrontHandProvider {
 
 
     public LegoFrontHandProviderImp(final LegoBrickRemote legoBrickRemote,
-                                    final Map<String, LegoEngine> engineCache) {
+                                    final Map<String, LegoEngine> engineCache,
+                                    final Map<String, LegoSensor> sensorCache) {
         this.active = new AtomicBoolean(false);
         this.legoBrickRemote = legoBrickRemote;
         this.exchanger = new Exchanger<>();
-        executorForCommands = Executors.newFixedThreadPool(CONNECTED_ELEMENTS, new LegoThreadFactory(FrontHandUtils.BUS_FRONT_HAND));
+        executorForCommands = Executors.newFixedThreadPool(CONNECTED_ELEMENTS,
+                new LegoThreadFactory(FrontHandUtils.BUS_FRONT_HAND));
 
         engineCache.entrySet().stream()
                 .filter(entry -> entry.getValue().getPart().equals(LegoEnginePartEnum.HAND))
@@ -78,7 +82,11 @@ public class LegoFrontHandProviderImp implements LegoFrontHandProvider {
                     motorHandPortA = createEngine(legoBrickRemote, entry.getValue().getPort())
                 );
 
-        touchSensor = createTouchSensor(legoBrickRemote);
+        sensorCache.entrySet().stream()
+                .filter(entry -> entry.getValue().getPart().equals(LegoEnginePartEnum.HAND))
+                .forEach(entry ->
+                        touchSensor = createTouchSensor(legoBrickRemote, entry.getValue().getPort())
+                );
     }
 
     @Override

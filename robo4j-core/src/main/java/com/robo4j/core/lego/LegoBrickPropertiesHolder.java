@@ -33,6 +33,7 @@ public class LegoBrickPropertiesHolder implements RoboSystemProperties, RoboSyst
     public static final String CORE_PACKAGE = "core_package";
     public static final String COMMAND_PACKAGE = "commands_package";
     public static final String ENGINE_PACKAGE = "engine_package";
+    public static final String SENSOR_PACKAGE = "sensor_package";
     private Map<String, String> map;
 
     public LegoBrickPropertiesHolder(final Map<String, String> map) {
@@ -45,6 +46,7 @@ public class LegoBrickPropertiesHolder implements RoboSystemProperties, RoboSyst
         map.put(CORE_PACKAGE, legoBrickProperties.getCorePackage());
         map.put(COMMAND_PACKAGE, legoBrickProperties.getCommandPackage());
         map.put(ENGINE_PACKAGE, legoBrickProperties.getEnginePackage());
+        map.put(SENSOR_PACKAGE, legoBrickProperties.getSensorPackage());
     }
 
     @Override
@@ -70,6 +72,10 @@ public class LegoBrickPropertiesHolder implements RoboSystemProperties, RoboSyst
 
     public String getEnginePackage(){
         return map.get(ENGINE_PACKAGE);
+    }
+
+    public String getSensorPackage(){
+        return map.get(SENSOR_PACKAGE);
     }
 
     @Override

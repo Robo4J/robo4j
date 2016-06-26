@@ -49,7 +49,6 @@ public final class CommandCheckerUtil {
         } else if( patternActive.matcher(line).find()){
             result = 1;
         }
-        logger.info("isCommand result = " + result);
         return result;
     }
 

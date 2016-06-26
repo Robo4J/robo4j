@@ -165,13 +165,11 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
                 result = super.take();
                 lock.lock();
                 awaitCycle++;
-                System.out.println("TAKE HOLD CONSUMER  awaitCycle= " + awaitCycle);
             }
             conditionTrans.signalAll();
             synchronized (result){
                 result.notifyAll();
             }
-            System.out.println("TAKE result= " + result);
         } catch (InterruptedException e){
             System.out.println("TAKE error= " + e);
         } finally {

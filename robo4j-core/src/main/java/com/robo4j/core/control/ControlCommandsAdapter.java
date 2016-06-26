@@ -49,7 +49,6 @@ public class ControlCommandsAdapter {
                 return  commandParsed;
             case BATCH:
             case COMPLEX:
-                logger.info("COMMAND ADAPTER = " + commandParsed);
                 controlPad.sendBatchCommand(commandParsed.getLine());
                 return  commandParsed;
             case ACTIVE:

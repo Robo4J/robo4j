@@ -24,6 +24,7 @@ import com.robo4j.core.lego.rmi.LegoUnitProviderUtil;
 import com.robo4j.lego.enums.LegoSensorEnum;
 import com.robo4j.core.sensor.state.SensorDefaultState;
 import com.robo4j.core.sensor.state.SensorState;
+import com.robo4j.lego.enums.LegoSensorPortEnum;
 import lejos.remote.ev3.RMISampleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +50,8 @@ public class SensorProviderImpl implements SensorProvider {
         this.legoBrickRemote = legoBrickRemote;
     }
 
-    public SensorState connect(LegoSensorEnum type){
-        final RMISampleProvider sp = LegoUnitProviderUtil.getRMISampleProvider(legoBrickRemote, type);
+    public SensorState connect(LegoSensorEnum type, LegoSensorPortEnum port){
+        final RMISampleProvider sp = LegoUnitProviderUtil.getRMISampleProvider(legoBrickRemote, type, port);
         try {
             final StringBuilder sbFinalValue= new StringBuilder().append(sp.fetchSample()[DEFAULT_POSITION]) ;
             for(int i=1; i<type.getElements();i++){

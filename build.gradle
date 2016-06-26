@@ -12,44 +12,6 @@ repositories {
     mavenLocal()
 }
 
-project("robo4j-brick-client"){
-    description = "Robo4j-Brick-Client"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-
-    sourceCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
-    //create a single Jar with all dependencies
-    task fatJar(type: Jar) {
-        manifest {
-            attributes 'Implementation-Title': 'Robo4j-brick-client',
-                    'Implementation-Version': version,
-                    'Main-Class': 'com.robo4j.brick.ClientMain'
-        }
-        baseName = project.name + '-all'
-        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-        with jar
-    }
-
-    dependencies {
-        compile(project(":robo4j-lego"))
-        compile(project(":robo4j-page"))
-        compile "lejos:ev3classes:${lejosVersion}@jar"
-        compile "com.googlecode.json-simple:json-simple:${jsonVersion}"
-        testCompile "junit:junit:${junitVersion}@jar"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
-    }
-}
-
 project("robo4j-commons"){
     description = "Robo4j-Commons"
 
@@ -71,7 +33,6 @@ project("robo4j-commons"){
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 }
-
 
 project("robo4j-core"){
     description = "Robo4j-Core"
@@ -130,6 +91,48 @@ project("robo4j-lego"){
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 }
+
+project("robo4j-brick-client"){
+    description = "Robo4j-Brick-Client"
+
+    group 'com.robo4j'
+    version "${robo4jVersion}"
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    //create a single Jar with all dependencies
+    task fatJar(type: Jar) {
+        manifest {
+            attributes 'Implementation-Title': 'Robo4j-brick-client',
+                    'Implementation-Version': version,
+                    'Main-Class': 'com.robo4j.brick.ClientMain'
+        }
+        baseName = project.name + '-all'
+        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+        with jar
+    }
+
+    dependencies {
+        compile(project(":robo4j-lego"))
+        compile(project(":robo4j-page"))
+        compile "lejos:ev3classes:${lejosVersion}@jar"
+        compile "com.googlecode.json-simple:json-simple:${jsonVersion}"
+        testCompile "junit:junit:${junitVersion}@jar"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
+    }
+}
+
+
+
+
 
 project("robo4j-line"){
     description = "Robo4j CommandLine Client"

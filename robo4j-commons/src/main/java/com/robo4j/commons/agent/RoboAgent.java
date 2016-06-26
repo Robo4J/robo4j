@@ -20,7 +20,11 @@
 package com.robo4j.commons.agent;
 
 /**
- * Created by miroslavkopecky on 31/05/16.
+ *
+ * Default interface used for any agent
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 31.05.2016
  */
 public interface RoboAgent {
 

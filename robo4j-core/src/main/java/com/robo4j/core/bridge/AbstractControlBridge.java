@@ -25,6 +25,7 @@ import com.robo4j.commons.agent.AgentStatus;
 import com.robo4j.commons.agent.RoboAgent;
 import com.robo4j.commons.concurrent.LegoThreadFactory;
 import com.robo4j.core.agent.GenericAgent;
+import com.robo4j.core.agent.GenericAgentBuilder;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -34,7 +35,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Created by miroslavkopecky on 28/05/16.
+ * ControlBridge methods used for any future bridge
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 28.05.2016
  */
 public abstract class AbstractControlBridge<FutureType extends Callable> extends AbstractBridgeCache {
 
@@ -68,7 +72,11 @@ public abstract class AbstractControlBridge<FutureType extends Callable> extends
     }
 
     protected RoboAgent getCoreBridgeAgent(final AgentProducer producer, final AgentConsumer consumer){
-        final GenericAgent result = new GenericAgent(coreBus, producer, consumer);
+        final GenericAgent result = GenericAgentBuilder.Builder(coreBus)
+                .setProducer(producer)
+                .setConsumer(consumer)
+                .build();
+//        final GenericAgent result = new GenericAgent(coreBus, producer, consumer);
         final AgentStatus status = result.activate();
         return result;
     }

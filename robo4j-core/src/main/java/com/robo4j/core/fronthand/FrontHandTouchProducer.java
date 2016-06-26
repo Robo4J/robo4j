@@ -26,7 +26,9 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.Exchanger;
 
 /**
- * Created by miroslavkopecky on 27/04/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 27.04.2016
  */
 public class FrontHandTouchProducer implements Runnable {
 

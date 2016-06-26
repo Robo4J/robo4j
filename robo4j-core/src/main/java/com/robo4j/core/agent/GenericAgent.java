@@ -24,7 +24,7 @@ import com.robo4j.commons.agent.AgentConsumer;
 import com.robo4j.commons.agent.AgentProducer;
 import com.robo4j.commons.agent.AgentStatus;
 import com.robo4j.commons.agent.AgentStatusEnum;
-import com.robo4j.commons.agent.RoboAgent;
+import com.robo4j.commons.agent.DefaultAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,13 +35,18 @@ import java.util.concurrent.ExecutorService;
  *
  * Created by miroslavkopecky on 29/05/16.
  */
-public class GenericAgent implements RoboAgent {
+public class GenericAgent implements DefaultAgent {
 
+    private static final Logger logger = LoggerFactory.getLogger(GenericAgent.class);
     private final AgentCache<AgentStatus> cache;
-    private final ExecutorService executor;
-    private final AgentProducer producer;
-    private final AgentConsumer consumer;
+    private ExecutorService executor;
+    private AgentProducer producer;
+    private AgentConsumer consumer;
 
+
+    public GenericAgent(){
+        cache = new AgentCache<>();
+    }
     @SuppressWarnings(value = "unchecked")
     public GenericAgent(final ExecutorService executor, final AgentProducer producer, final AgentConsumer consumer) {
         cache = new AgentCache();
@@ -51,14 +56,31 @@ public class GenericAgent implements RoboAgent {
         consumer.setMessageQueue(producer.getMessageQueue());
     }
 
-
     public AgentStatus activate(){
+
         executor.execute((Runnable) producer);
         executor.execute((Runnable) consumer);
 
         final AgentStatus result = new AgentStatus<String>(AgentStatusEnum.ACTIVE);
         cache.put(result);
+        logger.info("AGENT ACTIVE = " + cache);
         return result;
+    }
+
+    @Override
+    public void setExecutor(ExecutorService executor) {
+        this.executor = executor;
+    }
+
+    @Override
+    public void setProducer(AgentProducer producer) {
+        this.producer = producer;
+    }
+
+    @Override
+    public void setConsumer(AgentConsumer consumer) {
+        this.consumer = consumer;
+
     }
 
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This SensorException.java is part of robo4j.
+ * This DefaultAgent.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,18 +17,18 @@
  *
  */
 
-package com.robo4j.core.sensor.state;
+package com.robo4j.commons.agent;
+
+import java.util.concurrent.ExecutorService;
 
 /**
- * Created by miroslavkopecky on 23/04/16.
+ * Interface to Any
+ * @author Miro Kopecky (@miragemiko)
+ * @since 22.06.2016
  */
-public class SensorException extends RuntimeException {
+public interface DefaultAgent extends RoboAgent {
 
-    public SensorException(String message) {
-        super(message);
-    }
-
-    public SensorException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    void setExecutor(ExecutorService executor);
+    void setProducer(AgentProducer producer);
+    void setConsumer(AgentConsumer consumer);
 }

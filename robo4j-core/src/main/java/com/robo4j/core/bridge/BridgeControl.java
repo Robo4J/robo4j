@@ -64,8 +64,6 @@ public abstract class BridgeControl<Configuration extends RoboSystemConfig> exte
     private static final Logger logger = LoggerFactory.getLogger(BridgeControl.class);
     private static final int START = 0;
 
-    protected volatile BridgeCommandProducer bridgeCommandProducer;
-    protected volatile BridgeCommandConsumer bridgeCommandConsumer;
     protected volatile ControlCommandsAdapter controlCommandsAdapter;
     private final String corePackage;
     protected Map<String, Configuration> systemCache;

@@ -111,7 +111,7 @@ public final class CommandCache extends CommandCacheDefault implements DefaultSy
 
     //Private Methods
     private boolean validateConfiguration(LegoBrickPropertiesHolder holder){
-        return !(Objects.isNull(holder.getCommandPackage()) || holder.getCommandPackage().isEmpty());
+        return Objects.nonNull(holder.getCommandPackage()) && !holder.getCommandPackage().isEmpty();
     }
 
 

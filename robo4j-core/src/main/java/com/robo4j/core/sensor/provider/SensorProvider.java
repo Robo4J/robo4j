@@ -21,11 +21,13 @@ package com.robo4j.core.sensor.provider;
 
 import com.robo4j.lego.enums.LegoSensorEnum;
 import com.robo4j.core.sensor.state.SensorState;
+import com.robo4j.lego.enums.LegoSensorPortEnum;
 
 /**
- * Created by miroslavkopecky on 24/02/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 24.02.2016
  */
 public interface SensorProvider {
 
-    SensorState connect(LegoSensorEnum type);
+    SensorState connect(LegoSensorEnum type, LegoSensorPortEnum port);
 }

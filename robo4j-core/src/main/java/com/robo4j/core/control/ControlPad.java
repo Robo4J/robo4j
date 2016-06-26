@@ -48,6 +48,7 @@ import com.robo4j.core.platform.provider.LegoBrickCommandsProvider;
 import com.robo4j.core.sensor.provider.SensorProvider;
 import com.robo4j.core.sensor.provider.SensorProviderImpl;
 import com.robo4j.lego.control.LegoEngine;
+import com.robo4j.lego.control.LegoSensor;
 import org.apache.commons.exec.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +63,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * Control pad is responsible to process command from user
  *
- * Created by miroslavkopecky on 16/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 16.04.2016
  */
 public class ControlPad extends BridgeControl {
 
@@ -93,6 +95,10 @@ public class ControlPad extends BridgeControl {
 
     public Map<String, LegoEngine> getEngineCache(){
         return engineCacheActive() ? MapUtils.copy(engineCache.getCache()) : Collections.EMPTY_MAP;
+    }
+
+    public Map<String, LegoSensor> getSensorCache(){
+        return sensorCacheActive() ?  MapUtils.copy(sensorCache.getCache()) : Collections.EMPTY_MAP;
     }
 
     public LegoBrickRemote getLegoBrickRemote(){
@@ -259,18 +265,17 @@ public class ControlPad extends BridgeControl {
 
                 legoBrickCommandsProvider = getLegoBrickCommandsProviderWithGuardian(properties);
                 sensorProvider = new SensorProviderImpl(legoBrickRemote);
-                legoFrontHandProvider = new LegoFrontHandProviderImp(legoBrickRemote, engineCache.getCache());
+                legoFrontHandProvider = new LegoFrontHandProviderImp(legoBrickRemote,
+                        engineCache.getCache(), sensorCache.getCache());
 
                 activeThread.set(true);
                 active.set(true);
 
                 controlCommandsAdapter = new ControlCommandsAdapter(this);
 
-                /* need to be rewritten Agent PRODUCER produces messages ->  consumer needs them*/
-                bridgeCommandProducer = new BridgeCommandProducer(emergency, activeThread, commandLineQueue, properties );
-                bridgeCommandConsumer = new BridgeCommandConsumer(legoBrickCommandsProvider, legoFrontHandProvider, activeThread);
-
-                final RoboAgent agent = getCoreBridgeAgent(bridgeCommandProducer, bridgeCommandConsumer);
+                final RoboAgent agent = getCoreBridgeAgent(
+                        new BridgeCommandProducer(activeThread, emergency, commandLineQueue, properties ),
+                        new BridgeCommandConsumer(activeThread, legoBrickCommandsProvider, legoFrontHandProvider));
 
                 roboAgents.add(agent);
 
