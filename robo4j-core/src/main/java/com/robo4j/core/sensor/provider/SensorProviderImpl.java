@@ -35,7 +35,8 @@ import java.rmi.RemoteException;
  *
  * Sensor Provider Implementation represent value/values , sensor mode and type
  *
- * Created by miroslavkopecky on 15/02/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 15.02.2016
  */
 public class SensorProviderImpl implements SensorProvider {
 

@@ -20,7 +20,8 @@
 package com.robo4j.core.platform;
 
 /**
- * Created by miroslavkopecky on 23/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 23.04.2016
  */
 public class PlatformException extends RuntimeException {
 

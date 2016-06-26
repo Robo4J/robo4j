@@ -44,7 +44,7 @@ public class LegoBrickSetupProperties implements LegoBrickProperties, RoboSystem
     public LegoBrickSetupProperties() {
         final Map<String, String> bricks = new HashMap<>();
         /* required to change BRICK_IP_1  */
-        bricks.put(LegoBrickPropertiesHolder.BRICK_IP_1, "192.168.178.26");
+        bricks.put(LegoBrickPropertiesHolder.BRICK_IP_1, "127.0.0.1");
         this.bricks = bricks;
         this.commandPackage = "com.robo4j.line.commands";
         this.enginePackage = "com.robo4j.line.engine";

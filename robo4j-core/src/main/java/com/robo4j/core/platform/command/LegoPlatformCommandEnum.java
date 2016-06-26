@@ -29,7 +29,8 @@ import java.util.Map;
 /**
  *
  * Supported direct plaform command
- * Created by miroslavkopecky on 26/09/14.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 20.04.2016
  */
 public enum LegoPlatformCommandEnum implements RoboCoreCommand, RoboTypeCommand {
 

@@ -23,7 +23,8 @@ import com.robo4j.commons.concurrent.TransferSignal;
 import com.robo4j.lego.enums.LegoSensorEnum;
 
 /**
- * Created by miroslavkopecky on 22/05/15.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 22.05.2016
  */
 public interface SensorState extends TransferSignal, Comparable<SensorDefaultState> {
 

@@ -28,7 +28,8 @@ import com.robo4j.core.platform.command.LegoCommandProperty;
  * 200(22)
  * 100(11)
  *
- * Created by miroslavkopecky on 31/03/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 31.03.2016
  */
 public class PlatformProperties {
 
