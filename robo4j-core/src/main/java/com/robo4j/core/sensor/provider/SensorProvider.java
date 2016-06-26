@@ -19,7 +19,7 @@
 
 package com.robo4j.core.sensor.provider;
 
-import com.robo4j.core.sensor.SensorType;
+import com.robo4j.lego.enums.LegoSensorEnum;
 import com.robo4j.core.sensor.state.SensorState;
 
 /**
@@ -27,5 +27,5 @@ import com.robo4j.core.sensor.state.SensorState;
  */
 public interface SensorProvider {
 
-    SensorState connect(SensorType type);
+    SensorState connect(LegoSensorEnum type);
 }

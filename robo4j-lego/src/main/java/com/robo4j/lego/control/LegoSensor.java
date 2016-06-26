@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This LegoFrontHandProvider.java is part of robo4j.
+ * This LegoSensor.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,19 +17,20 @@
  *
  */
 
-package com.robo4j.core.fronthand;
+package com.robo4j.lego.control;
 
-import com.robo4j.core.fronthand.command.FrontHandCommandEnum;
+import com.robo4j.lego.enums.LegoEnginePartEnum;
+import com.robo4j.lego.enums.LegoSensorEnum;
+import com.robo4j.lego.enums.LegoSensorPortEnum;
 
 /**
  * @author Miro Kopecky (@miragemiko)
- * @since  27/04/16
- *
+ * @since 26.06.2016
  */
-public interface LegoFrontHandProvider {
+public interface LegoSensor {
 
-    boolean process(FrontHandCommandEnum command);
-
-    boolean isActive();
+    LegoSensorPortEnum getPort();
+    LegoSensorEnum getSensor();
+    LegoEnginePartEnum getPart();
 
 }

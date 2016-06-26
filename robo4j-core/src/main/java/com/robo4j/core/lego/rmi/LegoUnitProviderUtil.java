@@ -20,7 +20,7 @@
 package com.robo4j.core.lego.rmi;
 
 import com.robo4j.core.lego.LegoBrickRemote;
-import com.robo4j.core.sensor.SensorType;
+import com.robo4j.lego.enums.LegoSensorEnum;
 import com.robo4j.core.system.dto.LegoEngineDTO;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3TouchSensor;
@@ -50,7 +50,7 @@ public final class LegoUnitProviderUtil {
 
     //TODO : make it modular -> not base on Enum
     public static EV3TouchSensor createTouchSensor(final LegoBrickRemote legoBrickRemote){
-        final Port portTouchSensor = legoBrickRemote.getBrick().getPort(SensorType.TOUCH.getPort());
+        final Port portTouchSensor = legoBrickRemote.getBrick().getPort(LegoSensorEnum.TOUCH.getPort());
         return new EV3TouchSensor(portTouchSensor);
     }
 
@@ -60,7 +60,7 @@ public final class LegoUnitProviderUtil {
         return result;
     }
 
-    public static RMISampleProvider getRMISampleProvider(final LegoBrickRemote legoBrickRemote, final SensorType type){
+    public static RMISampleProvider getRMISampleProvider(final LegoBrickRemote legoBrickRemote, final LegoSensorEnum type){
         return legoBrickRemote.getBrick().createSampleProvider(type.getPort(), type.getSource(), type.getMode());
     }
 }

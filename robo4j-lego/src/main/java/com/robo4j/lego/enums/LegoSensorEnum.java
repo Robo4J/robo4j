@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This SensorType.java is part of robo4j.
+ * This LegoSensorEnum.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,22 +17,23 @@
  *
  */
 
-package com.robo4j.core.sensor;
+package com.robo4j.lego.enums;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by miroslavkopecky on 15/02/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 15.02.2016
  */
-public enum SensorType {
+public enum LegoSensorEnum {
 
     //@formatter:off
-    //type      id      mode        source                                        port     elements
+    //type      id      mode        source                                        elements
     /**
      * Touch pressed 1 : free 0
      */
-    TOUCH       (0,     "Touch",    "lejos.hardware.sensor.EV3TouchSensor",       "S1",      1),
+    TOUCH       (0,     "Touch",    "lejos.hardware.sensor.EV3TouchSensor",       1),
     /**
      * Returns an SampleProvider object representing the gyro sensor in angle
      * mode. <br>
@@ -41,36 +42,33 @@ public enum SensorType {
      * negative rate indicates a rotation to the right. Angles are expressed in
      * degrees.<br>
      */
-    GYRO        (1,     "Angle",    "lejos.hardware.sensor.EV3GyroSensor",        "S4",     1),
+    GYRO        (1,     "Angle",    "lejos.hardware.sensor.EV3GyroSensor",         1),
 
     /**
      * size of the array is 3
      */
-    COLOR       (2,     "RGB",      "lejos.hardware.sensor.EV3ColorSensor",       "S2",     3),
+    COLOR       (2,     "RGB",      "lejos.hardware.sensor.EV3ColorSensor",        3),
 
     /**
      * distance is measured in meter
      */
-    SONIC       (3,     "Distance", "lejos.hardware.sensor.EV3UltrasonicSensor",  "S3",     1);
+    SONIC       (3,     "Distance", "lejos.hardware.sensor.EV3UltrasonicSensor",  1);
     //@formatter:on
 
     private int id;
     private String mode;
     private String source;
-    private String port;
     private int elements;
 
 
 
-    private volatile static Map<Integer, SensorType> codeToSensorTypMapping;
-    private volatile static Map<String, SensorType> codeToSensorSourceMapping;
-    private volatile static Map<String, SensorType>  codeToSensorPortMapping;
+    private volatile static Map<Integer, LegoSensorEnum> codeToSensorTypMapping;
+    private volatile static Map<String, LegoSensorEnum> codeToSensorSourceMapping;
 
-    SensorType(final int id, final String mode, final String source, final String port, final int elements){
+    LegoSensorEnum(final int id, final String mode, final String source, final int elements){
         this.id = id;
         this.mode = mode;
         this.source = source;
-        this.port = port;
         this.elements = elements;
     }
 
@@ -86,38 +84,28 @@ public enum SensorType {
         return source;
     }
 
-    public String getPort() {
-        return port;
-    }
-
     public int getElements(){
         return elements;
     }
 
-    public static SensorType getById(int id){
+    public static LegoSensorEnum getById(int id){
         if(codeToSensorTypMapping == null){
             initMapping();
         }
         return codeToSensorTypMapping.get(id);
     }
 
-    public static SensorType getBySource(int name){
+    public static LegoSensorEnum getBySource(int name){
         if(codeToSensorSourceMapping == null){
             initSourceMapping();
         }
         return codeToSensorSourceMapping.get(name);
     }
 
-    public static SensorType getByPort(int name){
-        if(codeToSensorPortMapping == null){
-            initPortMapping();
-        }
-        return codeToSensorPortMapping.get(name);
-    }
 
     @Override
     public String toString() {
-        return "SensorType=(" +
+        return "LegoSensorEnum=(" +
                 "Source='" + source + '\'' +
                 "Mode='" + mode + '\'' +
                 ')';
@@ -126,22 +114,15 @@ public enum SensorType {
     //Private Methods
     private static void initMapping(){
         codeToSensorTypMapping = new HashMap<>();
-        for(SensorType cmd: values()){
+        for(LegoSensorEnum cmd: values()){
             codeToSensorTypMapping.put(cmd.getId(), cmd);
         }
     }
 
     private static void initSourceMapping(){
         codeToSensorSourceMapping = new HashMap<>();
-        for(SensorType cmd: values()){
+        for(LegoSensorEnum cmd: values()){
             codeToSensorSourceMapping.put(cmd.getSource(), cmd);
-        }
-    }
-
-    private static void initPortMapping(){
-        codeToSensorPortMapping = new HashMap<>();
-        for(SensorType cmd: values()){
-            codeToSensorPortMapping.put(cmd.getPort(), cmd);
         }
     }
 

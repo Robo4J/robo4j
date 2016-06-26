@@ -21,7 +21,7 @@ package com.robo4j.core.sensor.provider;
 
 import com.robo4j.core.lego.LegoBrickRemote;
 import com.robo4j.core.lego.rmi.LegoUnitProviderUtil;
-import com.robo4j.core.sensor.SensorType;
+import com.robo4j.lego.enums.LegoSensorEnum;
 import com.robo4j.core.sensor.state.SensorDefaultState;
 import com.robo4j.core.sensor.state.SensorState;
 import lejos.remote.ev3.RMISampleProvider;
@@ -49,7 +49,7 @@ public class SensorProviderImpl implements SensorProvider {
         this.legoBrickRemote = legoBrickRemote;
     }
 
-    public SensorState connect(SensorType type){
+    public SensorState connect(LegoSensorEnum type){
         final RMISampleProvider sp = LegoUnitProviderUtil.getRMISampleProvider(legoBrickRemote, type);
         try {
             final StringBuilder sbFinalValue= new StringBuilder().append(sp.fetchSample()[DEFAULT_POSITION]) ;
@@ -68,7 +68,7 @@ public class SensorProviderImpl implements SensorProvider {
     }
 
     //Private Methods
-    private SensorState getState(SensorType type, String value){
+    private SensorState getState(LegoSensorEnum type, String value){
         return new SensorDefaultState(type, System.currentTimeMillis(), value, DEFAULT_PRIORITY);
     }
 

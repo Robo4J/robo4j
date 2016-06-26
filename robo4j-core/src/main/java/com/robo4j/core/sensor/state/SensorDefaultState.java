@@ -19,27 +19,27 @@
 
 package com.robo4j.core.sensor.state;
 
-import com.robo4j.core.sensor.SensorType;
+import com.robo4j.lego.enums.LegoSensorEnum;
 
 /**
  * Created by miroslavkopecky on 22/05/15.
  */
 public class SensorDefaultState implements SensorState  {
 
-    private final SensorType type;
+    private final LegoSensorEnum type;
     private final Long timestamp;
     private final String value;
     private final int priority;
 
 
-    public SensorDefaultState(SensorType type, Long timestamp, String value, Integer priority) {
+    public SensorDefaultState(LegoSensorEnum type, Long timestamp, String value, Integer priority) {
         this.type = type;
         this.timestamp = timestamp;
         this.value = value;
         this.priority = priority;
     }
 
-    public SensorType getType() {
+    public LegoSensorEnum getType() {
         return type;
     }
 

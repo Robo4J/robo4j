@@ -29,6 +29,7 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
@@ -67,6 +68,10 @@ public final class CommandCache extends CommandCacheDefault implements DefaultSy
 
 
     //Private Methods
+
+    /**
+     * Command cache should always contain default commands
+     */
     @SuppressWarnings(value = "unchecked")
     private <Annotation extends BatchAnnotation,
             Command extends BatchCommand >  Map<String, Command>
@@ -74,31 +79,39 @@ public final class CommandCache extends CommandCacheDefault implements DefaultSy
 
         try {
             final Map<String, Command> result = (Map<String, Command>)getInitCache();
-            Reflections reflections = new Reflections(new ConfigurationBuilder()
-                    .setUrls(ClasspathHelper.forPackage(holder.getCommandPackage()))
-                    .setExecutorService(Executors.newFixedThreadPool(REFLECTION_THREADS))
-                    .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
-            );
-            Set<Class<?>> classes = reflections.getTypesAnnotatedWith(anno);
-            reflections.getConfiguration().getExecutorService().shutdown();
 
-            for(Class c: classes){
-                Annotation batchCommand = (Annotation)c.getAnnotation(anno);
-                Command instance = (Command) c.getConstructor().newInstance();
-                if(batchCommand.batch().isEmpty() && instance.getBatch().isEmpty()){
-                    throw new CacheException("NO VALID DATA instance= " + c.getSimpleName());
-                } else if(!batchCommand.batch().isEmpty()){
-                    instance.setBatch(batchCommand.batch());
+            if(validateConfiguration(holder)){
+                Reflections reflections = new Reflections(new ConfigurationBuilder()
+                        .setUrls(ClasspathHelper.forPackage(holder.getCommandPackage()))
+                        .setExecutorService(Executors.newFixedThreadPool(REFLECTION_THREADS))
+                        .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
+                );
+                Set<Class<?>> classes = reflections.getTypesAnnotatedWith(anno);
+                reflections.getConfiguration().getExecutorService().shutdown();
+
+                for(Class c: classes){
+                    Annotation batchCommand = (Annotation)c.getAnnotation(anno);
+                    Command instance = (Command) c.getConstructor().newInstance();
+                    if(batchCommand.batch().isEmpty() && instance.getBatch().isEmpty()){
+                        throw new CacheException("NO VALID DATA instance= " + c.getSimpleName());
+                    } else if(!batchCommand.batch().isEmpty()){
+                        instance.setBatch(batchCommand.batch());
+                    }
+
+                    result.put(batchCommand.name(), instance);
+
                 }
-
-                result.put(batchCommand.name(), instance);
-
             }
 
             return result;
         } catch (Exception e){
             throw new CacheException("COMMAND CACHE PROBLEM", e);
         }
+    }
+
+    //Private Methods
+    private boolean validateConfiguration(LegoBrickPropertiesHolder holder){
+        return !(Objects.isNull(holder.getCommandPackage()) || holder.getCommandPackage().isEmpty());
     }
 
 

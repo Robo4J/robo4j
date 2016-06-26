@@ -45,7 +45,10 @@ import static com.robo4j.core.lego.rmi.LegoUnitProviderUtil.createRMIEngine;
 import static com.robo4j.core.lego.rmi.LegoUnitProviderUtil.createTouchSensor;
 
 /**
- * Created by miroslavkopecky on 27/04/16.
+ *
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 27/04/16
  */
 public class LegoFrontHandProviderImp implements LegoFrontHandProvider {
 
@@ -85,10 +88,10 @@ public class LegoFrontHandProviderImp implements LegoFrontHandProvider {
             if((Objects.isNull(motorHandPortA) || Objects.isNull(legoBrickRemote)) && active.get()){
                 return false;
             }
-            motorHandPortA.setSpeed(DEFAULT_SPEED);
 
             switch (command){
                 case COMMAND:
+                    motorHandPortA.setSpeed(DEFAULT_SPEED);
                     active.set(true);
                     executorForCommands.execute(new FrontHandTouchProducer(exchanger, touchSensor));
                     final Future<Boolean> engineActive = executorForCommands.submit(new FrontHandEngineConsumer(exchanger, motorHandPortA));
@@ -99,8 +102,12 @@ public class LegoFrontHandProviderImp implements LegoFrontHandProvider {
                     }
                     break;
                 case EXIT:
-                    motorHandPortA.close();
-                    touchSensor.close();
+                    if(Objects.nonNull(motorHandPortA)){
+                        motorHandPortA.close();
+                    }
+                    if(Objects.nonNull(touchSensor)){
+                        touchSensor.close();
+                    }
                     executorForCommands.shutdown();
                     active.set(false);
                     break;
