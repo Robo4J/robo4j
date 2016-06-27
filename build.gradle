@@ -20,6 +20,7 @@ project("robo4j-commons"){
 
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'maven'
 
     sourceCompatibility = 1.8
 
@@ -42,6 +43,7 @@ project("robo4j-core"){
 
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'maven'
 
     sourceCompatibility = 1.8
 
@@ -100,6 +102,7 @@ project("robo4j-brick-client"){
 
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'maven'
 
     sourceCompatibility = 1.8
 
@@ -142,6 +145,7 @@ project("robo4j-line"){
 
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'maven'
 
     sourceCompatibility = 1.8
 
@@ -185,6 +189,7 @@ project("robo4j-page"){
 
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'maven'
 
     sourceCompatibility = 1.8
 
