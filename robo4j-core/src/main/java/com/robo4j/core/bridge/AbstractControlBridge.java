@@ -63,8 +63,8 @@ public abstract class AbstractControlBridge<FutureType extends Callable> extends
         commandLineQueue = new LinkedBlockingQueue<>();
     }
 
-    public void submitToSensorBus(Runnable task){
-        sensorBus.submit(task);
+    public void executeToSensorBus(Runnable task){
+        sensorBus.execute(task);
     }
 
     protected void putCommand(String c) throws InterruptedException{

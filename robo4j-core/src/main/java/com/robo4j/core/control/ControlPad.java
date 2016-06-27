@@ -113,7 +113,8 @@ public class ControlPad extends BridgeControl {
         try {
             return ConnectionUtil.ping(legoBrickPropertiesHolder.getAddress());
         } catch (IOException e) {
-           throw new ControlException("BRICK CONNECTION ERROR= ", e);
+            logger.error("BRICK CONNECTION ERROR= ", e);
+            return false;
         }
     }
 

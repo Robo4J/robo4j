@@ -19,17 +19,22 @@
 
 package com.robo4j.core.io;
 
-import com.robo4j.core.control.ControlException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.function.Supplier;
 
 /**
- * Created by miroslavkopecky on 04/06/16.
+ * Simple network utils used for ping
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 04.06.2016
  */
 public final class NetworkUtils {
 
+    private static final Logger logger = LoggerFactory.getLogger(NetworkUtils.class);
     private static final int DEFAULT_TIMEOUT = 5000;
 
     public static  Supplier<Boolean> pingBrick(String address){
@@ -37,7 +42,8 @@ public final class NetworkUtils {
             try {
                 return InetAddress.getByName(address).isReachable(DEFAULT_TIMEOUT);
             } catch (IOException e) {
-                throw new ControlException("NETWORK PING error: ", e);
+                logger.error("NETWORK PING error:", e);
+                return false;
             }
         };
     }
