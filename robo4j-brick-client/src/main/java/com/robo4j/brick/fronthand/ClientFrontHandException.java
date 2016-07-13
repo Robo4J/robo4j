@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This LegoFrontHandProvider.java is part of robo4j.
+ * This ClientFrontHandException.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,19 +17,20 @@
  *
  */
 
-package com.robo4j.core.fronthand;
-
-import com.robo4j.core.fronthand.command.FrontHandCommandEnum;
+package com.robo4j.brick.fronthand;
 
 /**
  * @author Miro Kopecky (@miragemiko)
- * @since  27/04/16
- *
+ * @since 03.07.2016
  */
-public interface LegoFrontHandProvider {
+public class ClientFrontHandException extends RuntimeException {
 
-    boolean process(FrontHandCommandEnum command);
+    public ClientFrontHandException(String message) {
+        super(message);
+    }
 
-    boolean isActive();
+    public ClientFrontHandException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
 }

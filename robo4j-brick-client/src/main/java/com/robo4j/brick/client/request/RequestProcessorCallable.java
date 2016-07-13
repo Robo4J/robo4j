@@ -25,7 +25,9 @@ import com.robo4j.brick.client.http.HttpMethod;
 import com.robo4j.brick.client.http.HttpVersion;
 import com.robo4j.brick.client.util.HttpUtils;
 import com.robo4j.brick.util.ConstantUtil;
+import com.robo4j.commons.unit.DefaultUnit;
 import com.robo4j.lego.control.LegoEngine;
+import com.robo4j.lego.control.LegoSensor;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -44,7 +46,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Responsible for handling incoming request
  *
- * Created by miroslavkopecky on 28/02/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 28.02.2016
  */
 public class RequestProcessorCallable implements Callable<String> {
 
@@ -52,9 +55,10 @@ public class RequestProcessorCallable implements Callable<String> {
     private final RequestProcessorFactory processorFactory;
     private Socket connection;
 
-    public RequestProcessorCallable(Socket connection,  Map<String, LegoEngine> engineCache) {
+    public RequestProcessorCallable(Socket connection, Map<String, LegoEngine> engineCache,
+                                    Map<String, LegoSensor> sensorCache, Map<String, DefaultUnit> unitCache) {
         this.connection = connection;
-        this.processorFactory = RequestProcessorFactory.getInstance(engineCache);
+        this.processorFactory = RequestProcessorFactory.getInstance(engineCache, sensorCache, unitCache);
     }
 
     private static String correctLine(String line){
@@ -62,11 +66,11 @@ public class RequestProcessorCallable implements Callable<String> {
     }
 
     @Override
-    public String call() throws IOException{
+    public String call() throws IOException {
         // for security checks
         String result = HttpUtils.STRING_EMPTY;
-        try(Writer out =  new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))){
+        try(final Writer out =  new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
+            final BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))){
 
             final Map<String, String> tmpMap = new ConcurrentHashMap<>();
             boolean firstLine = true;
@@ -91,8 +95,9 @@ public class RequestProcessorCallable implements Callable<String> {
             if(Objects.nonNull(httpMethod) && Objects.nonNull(tokens)){
                 final HttpMessage httpMessage = new HttpMessage(httpMethod, URI.create(tokens[URI_VALUE_POSITION]),
                         HttpVersion.getByValue(tokens[VERSION_POSITION]), tmpMap);
-                final ProcessorResult processorResult;
-                switch (httpMethod) {
+
+                ProcessorResult processorResult;
+                switch (httpMethod){
                     case GET:
                         processorResult = processorFactory.processGet(httpMessage);
                         out.write(processorResult.getMessage());
@@ -105,6 +110,9 @@ public class RequestProcessorCallable implements Callable<String> {
                         break;
                     case HEAD:
                     case PUT:
+                        out.write("something more");
+                        result = ConstantUtil.ACTIVE;
+                        break;
                     case DELETE:
                     case CONNECT:
                     case TRACE:
@@ -121,7 +129,10 @@ public class RequestProcessorCallable implements Callable<String> {
         } catch (IOException | InterruptedException ex){
             System.err.println("Error talking to " + connection.getRemoteSocketAddress() + " ex= " + ex);
         } finally {
+
             try {
+                System.out.println("SOCKET CLOSED");
+
                 connection.close();
             } catch (IOException e) {
                 System.err.println("Error Closing Connection to " + connection.getRemoteSocketAddress() + " : " + e);

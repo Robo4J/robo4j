@@ -30,7 +30,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Task is holding guarding about the specific sensor values
  * Guardian is capable to send signal to the platform
  *
- * Created by miroslavkopecky on 31/03/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 31.03.2016
  */
 public class GuardianRunnable implements Runnable {
 

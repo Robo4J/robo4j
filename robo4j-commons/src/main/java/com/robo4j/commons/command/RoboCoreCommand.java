@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This RoboTypeCommand.java is part of robo4j.
+ * This RoboCoreCommand.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,15 +17,14 @@
  *
  */
 
-package com.robo4j.core.control;
-
-import com.robo4j.core.bridge.command.CommandTypeEnum;
+package com.robo4j.commons.command;
 
 /**
- * Maker Iterface to the command
+ * Marker interface for enums
  *
- * Created by miroslavkopecky on 28/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 28.04.2016
  */
-public interface RoboTypeCommand {
-    CommandTypeEnum getType();
+public interface RoboCoreCommand extends RoboTypeCommand {
+    String getName();
 }

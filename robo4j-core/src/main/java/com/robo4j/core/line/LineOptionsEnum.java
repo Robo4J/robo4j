@@ -23,7 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by miroslavkopecky on 04/06/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 04.06.2016
  */
 public enum LineOptionsEnum {
 

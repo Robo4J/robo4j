@@ -22,7 +22,8 @@ package com.robo4j.core.bridge;
 import com.robo4j.commons.concurrent.CoreBusQueue;
 
 /**
- * Created by miroslavkopecky on 14/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 14.04.2016
  */
 public class BridgeBusQueue<TransferType> extends CoreBusQueue {
 

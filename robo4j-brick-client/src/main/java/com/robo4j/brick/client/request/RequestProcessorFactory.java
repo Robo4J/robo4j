@@ -35,9 +35,13 @@ import com.robo4j.commons.agent.AgentConsumer;
 import com.robo4j.commons.agent.AgentProducer;
 import com.robo4j.commons.agent.AgentStatus;
 import com.robo4j.commons.agent.AgentStatusEnum;
+import com.robo4j.commons.agent.GenericAgent;
+import com.robo4j.commons.agent.ReceiverAgent;
 import com.robo4j.commons.concurrent.LegoThreadFactory;
 import com.robo4j.commons.http.RequestHeaderProcessor;
+import com.robo4j.commons.unit.DefaultUnit;
 import com.robo4j.lego.control.LegoEngine;
+import com.robo4j.lego.control.LegoSensor;
 import com.robo4j.page.PageParser;
 import org.json.simple.parser.ParseException;
 
@@ -46,6 +50,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -56,18 +61,25 @@ import java.util.stream.Collectors;
 
 /**
  * Request Factory Should be Singleton
- * Created by miroslavkopecky on 24/05/16.
+ * Request Factory looks like Unit
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 24.05.2016
  */
 final class RequestProcessorFactory {
 
-    private static volatile  RequestProcessorFactory INSTANCE;
+    private static final int MAIN_FACTORY_AGENT = 0;
+    private static volatile RequestProcessorFactory INSTANCE;
     private volatile ExecutorService factoryExecutor;
     private volatile AtomicBoolean activeThread;
     private volatile LinkedBlockingQueue<List<ClientRequestDTO>> commandQueue;
     private final HttpPageLoader pageLoader;
-    private final BrickMainAgent agent;
+    private final List<GenericAgent> agents;
 
-    private RequestProcessorFactory(Map<String, LegoEngine> engineCache){
+
+    private RequestProcessorFactory(Map<String, LegoEngine> engineCache,
+                                    Map<String, LegoSensor> sensorCache,
+                                    Map<String, DefaultUnit> unitCache ){
         this.pageLoader = new HttpPageLoader();
         this.factoryExecutor = Executors.newFixedThreadPool(ConstantUtil.PLATFORM_FACTORY,
                 new LegoThreadFactory(ConstantUtil.FACTORY_BUS));
@@ -75,20 +87,24 @@ final class RequestProcessorFactory {
         this.activeThread = new AtomicBoolean(true);
         this.commandQueue = new LinkedBlockingQueue<>();
 
-        this.agent = getAgent(new CommandProcessor(activeThread, commandQueue),
-                new CommandExecutor(activeThread, new CommandProviderImpl(engineCache)));
+        this.agents = new LinkedList<>();
+        this.agents.add(MAIN_FACTORY_AGENT, getAgent(new CommandProcessor(activeThread, commandQueue),
+                new CommandExecutor(activeThread, new CommandProviderImpl(engineCache, sensorCache, unitCache))));
     }
 
-    static RequestProcessorFactory getInstance(Map<String, LegoEngine> engineCache){
+    static RequestProcessorFactory getInstance(Map<String, LegoEngine> engineCache,
+                                               Map<String, LegoSensor> sensorCache,
+                                               Map<String, DefaultUnit> unitCache){
         if(INSTANCE == null){
             synchronized (RequestProcessorFactory.class){
                 if(INSTANCE == null){
-                    INSTANCE = new RequestProcessorFactory(engineCache);
+                    INSTANCE = new RequestProcessorFactory(engineCache, sensorCache, unitCache);
                 }
             }
         }
         return INSTANCE;
     }
+
 
 
     ProcessorResult processGet(final HttpMessage httpMessage) throws IOException, InterruptedException {
@@ -103,7 +119,8 @@ final class RequestProcessorFactory {
             if(paths.size() > ConstantUtil.DEFAULT_VALUE && ConstantUtil.availablePaths.containsAll(paths)){
                 switch (paths.get(ConstantUtil.DEFAULT_VALUE).toLowerCase()){
                     case ConstantUtil.STATUS:
-                        generatedMessage = getStatusWebPage(agent.getCache().toString());
+                        final ReceiverAgent receiverAgent = (ReceiverAgent)agents.get(MAIN_FACTORY_AGENT);
+                        generatedMessage = getStatusWebPage(receiverAgent.getCache().toString());
                         message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));  // send a MIME header
                         message.append(generatedMessage);
                         break;
@@ -164,19 +181,21 @@ final class RequestProcessorFactory {
         return new ProcessorResult(status, "No Information about POST");
     }
 
-    ProcessorResult processDefault(final HttpMessage httpMessage) throws IOException{
+    ProcessorResult processDefault(final HttpMessage httpMessage) throws IOException {
+
         final StringBuilder message = new StringBuilder(pageLoader.getWebPage(HttpUtils.PAGE_ERROR));
         if(HttpVersion.containsValue(httpMessage.getVersion())){
             message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_NOT, message.length()));  // send a MIME header
         } else {
             message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_NOT_ALLOWED, message.length()));
         }
+
         return new ProcessorResult(ConstantUtil.EXIT, message.toString());
     }
 
 
     //Private Methods
-    private String getSuccessWebPage(final String input) throws IOException{
+    private String getSuccessWebPage(final String input) throws IOException {
         final Map<String, String > valuesMap = new HashMap<>();
         valuesMap.put(HttpUtils.HTTP_COMMAND, input);
         return PageParser.parseAndReplace(
@@ -196,7 +215,8 @@ final class RequestProcessorFactory {
     private void addAgentMessage(final AgentStatusEnum type, final String message){
         final AgentStatus<String> agentStatus = new AgentStatus<>(type);
         agentStatus.addMessage(message);
-        agent.addStatus(agentStatus);
+        ReceiverAgent receiverAgent = (ReceiverAgent)agents.get(MAIN_FACTORY_AGENT);
+        receiverAgent.addStatus(agentStatus);
     }
 
     private BrickMainAgent getAgent(final AgentProducer producer, final AgentConsumer consumer){

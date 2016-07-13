@@ -22,6 +22,7 @@ package com.robo4j.core.lego;
 import com.robo4j.commons.annotation.SystemProvider;
 import com.robo4j.core.control.utils.ConnectionUtil;
 import com.robo4j.core.lego.rmi.LegoUnitProviderUtil;
+import com.robo4j.lego.control.LegoBrickRemote;
 import lejos.remote.ev3.RemoteEV3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,14 +31,13 @@ import java.io.IOException;
 import java.rmi.NotBoundException;
 
 /**
- * Created by miroslavkopecky on 20/10/14.
  *
  * Provides access only to the legoBrick Simple
  * uses RMI communication
  *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 20.10.2014
  */
-
-//TODO: needs to be fixed -> remove static
 @SystemProvider
 public class LegoBrickRemoteProvider implements LegoBrickRemote {
 
@@ -54,7 +54,7 @@ public class LegoBrickRemoteProvider implements LegoBrickRemote {
             brick = LegoUnitProviderUtil.getBrick(address);
             addressIp = address;
 
-        }catch (NotBoundException | IOException  e){
+        }catch (NotBoundException | IOException e){
             throw new LegoException("Brick is Kaput in constructor ", e);
         }
 

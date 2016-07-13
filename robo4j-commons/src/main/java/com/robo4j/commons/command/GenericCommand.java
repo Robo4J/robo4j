@@ -22,9 +22,10 @@ package com.robo4j.commons.command;
 import com.robo4j.commons.concurrent.TransferSignal;
 
 /**
- * Created by miroslavkopecky on 10/06/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 10.06.2016
  */
-public class GenericCommand<EnumType extends Enum<?>> implements Comparable<GenericCommand>, TransferSignal {
+public class GenericCommand<EnumType extends Enum<?>> implements RoboUnitCommand, Comparable<GenericCommand>, TransferSignal {
 
     private CommandProperties properties;
     private EnumType type;
@@ -41,6 +42,11 @@ public class GenericCommand<EnumType extends Enum<?>> implements Comparable<Gene
 
     public CommandProperties getProperties() {
         return properties;
+    }
+
+    @Override
+    public String getName() {
+        return "generic";
     }
 
     public EnumType getType() {

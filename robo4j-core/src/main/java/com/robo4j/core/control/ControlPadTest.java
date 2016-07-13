@@ -22,7 +22,8 @@ package com.robo4j.core.control;
 import java.util.Map;
 
 /**
- * Created by miroslavkopecky on 21/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 21.04.2016
  */
 //TODO : remove
 public class ControlPadTest {

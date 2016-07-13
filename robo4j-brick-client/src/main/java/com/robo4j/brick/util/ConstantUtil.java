@@ -21,13 +21,13 @@ package com.robo4j.brick.util;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
  * Commonly used constants
  *
- * Created by miroslavkopecky on 09/06/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 09.06.2016
  */
 public final class ConstantUtil {
 
@@ -45,7 +45,7 @@ public final class ConstantUtil {
     public static final String FACTORY_BUS = "factory-bus";
     public static final int DEFAULT_VALUE = 0;
     public static final int PLATFORM_FACTORY = 2; /* Producer Consumer */
-    public static final int PLATFORM_ENGINES = 2;
+    public static final int PLATFORM_ENGINES = 3;
     public static final int DEFAULT_PRIORITY = 1;
     public static final List<String> availablePaths = Arrays.asList(EXIT, STATUS);
 

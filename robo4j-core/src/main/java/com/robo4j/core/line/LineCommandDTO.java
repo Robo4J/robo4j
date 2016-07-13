@@ -19,12 +19,14 @@
 
 package com.robo4j.core.line;
 
-import com.robo4j.core.bridge.command.CommandTypeEnum;
+import com.robo4j.commons.command.CommandTypeEnum;
 
 /**
  *
  * DTO object for command line command
- * Created by miroslavkopecky on 04/06/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 04.06.2016
  */
 public class LineCommandDTO {
 

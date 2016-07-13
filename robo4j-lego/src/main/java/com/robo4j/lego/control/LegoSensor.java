@@ -24,6 +24,7 @@ import com.robo4j.lego.enums.LegoSensorEnum;
 import com.robo4j.lego.enums.LegoSensorPortEnum;
 
 /**
+ *
  * @author Miro Kopecky (@miragemiko)
  * @since 26.06.2016
  */

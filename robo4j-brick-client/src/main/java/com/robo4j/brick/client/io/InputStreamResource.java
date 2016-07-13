@@ -25,9 +25,10 @@ import java.io.InputStream;
  * InputStream resource for reading files
  * currently default web response
  *
- * Created by miroslavkopecky on 23/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 23.05.2016
  */
-public class InputStreamResource implements Resource{
+public class InputStreamResource implements Resource {
 
     private final InputStream source;
     private boolean reading;

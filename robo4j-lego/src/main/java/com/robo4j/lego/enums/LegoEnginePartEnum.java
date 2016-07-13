@@ -23,7 +23,9 @@ import com.robo4j.commons.control.RoboSystemConfig;
 import com.robo4j.commons.enums.LegoSystemEnum;
 
 /**
- * Created by miroslavkopecky on 05/05/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 05.05.2016
  */
 public enum LegoEnginePartEnum implements LegoSystemEnum<String>, RoboSystemConfig {
 

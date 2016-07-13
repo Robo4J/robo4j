@@ -21,133 +21,132 @@ package com.robo4j.brick.system;
 
 import com.robo4j.brick.client.enums.RequestCommandEnum;
 import com.robo4j.brick.client.io.ClientException;
+import com.robo4j.brick.unit.FrontHandUnit;
+import com.robo4j.brick.unit.PlatformUnit;
 import com.robo4j.brick.util.ConstantUtil;
+import com.robo4j.commons.agent.AgentConsumer;
+import com.robo4j.commons.agent.AgentProducer;
+import com.robo4j.commons.agent.AgentStatus;
+import com.robo4j.commons.agent.GenericAgent;
+import com.robo4j.commons.agent.ProcessAgent;
+import com.robo4j.commons.agent.ProcessAgentBuilder;
 import com.robo4j.commons.command.GenericCommand;
+import com.robo4j.commons.command.RoboUnitCommand;
 import com.robo4j.commons.concurrent.LegoThreadFactory;
+import com.robo4j.commons.unit.DefaultUnit;
 import com.robo4j.lego.control.LegoEngine;
-import lejos.hardware.ev3.LocalEV3;
-import lejos.hardware.motor.NXTRegulatedMotor;
-import lejos.robotics.RegulatedMotor;
+import com.robo4j.lego.control.LegoSensor;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
+import java.util.Objects;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 /**
- * Created by miroslavkopecky on 10/06/16.
+ *
+ * Command Provider works like Unint Element Object
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 10.06.2016
  */
-public class CommandProviderImpl implements CommandProvider {
+public class CommandProviderImpl extends DefaultUnit implements CommandProvider {
 
-    private static final int ROTATION_CYCLES = 9;
-    private static final int DEFAULT_0 = 0;
-    private static final int DEFAULT_1 = 1;
+    private static final int AGENT_HAND_POSITION = 0;
+    private static final int AGENT_PLATFORM_POSITION = 1;
 
-    private static volatile ExecutorService executorForCommands;
-    private static volatile RegulatedMotor rightMotor;
-    private static volatile RegulatedMotor leftMotor;
-    private ReentrantLock lock;
+    private volatile LinkedBlockingQueue<GenericCommand<RequestCommandEnum>> commandQueue;
+    private final List<GenericAgent> agents;
+    private final List<DefaultUnit> units;
 
 
-    public CommandProviderImpl(Map<String, LegoEngine> engineCache) {
-        executorForCommands =  Executors.newFixedThreadPool(ConstantUtil.PLATFORM_ENGINES,
+    public CommandProviderImpl(Map<String, LegoEngine> engineCache,
+                               Map<String, LegoSensor> sensorCache,
+                               Map<String, DefaultUnit> unitCache) {
+        executorForAgents =  Executors.newFixedThreadPool(ConstantUtil.PLATFORM_ENGINES,
                 new LegoThreadFactory(ConstantUtil.PROVIDER_BUS));
-        engineInitiation(engineCache);
-        lock = new ReentrantLock();
+        this.agents = new LinkedList<>();
+        this.units = new LinkedList<>();
+        this.active = new AtomicBoolean(false);
+
+        this.commandQueue = new LinkedBlockingQueue<>();
+
+        FrontHandUnit frontHandUnit = (FrontHandUnit)unitCache.get("frontHandUnit");
+        frontHandUnit.setExecutor(executorForAgents);
+        frontHandUnit.init(null, engineCache, sensorCache);
+        this.units.add(frontHandUnit);
+        this.agents.addAll(frontHandUnit.getAgents());
+
+
+        PlatformUnit platformUnit = (PlatformUnit)unitCache.get("platformUnit");
+        platformUnit.setExecutor(executorForAgents);
+        platformUnit.init(null, engineCache, null);
+        this.units.add(platformUnit);
+        this.agents.addAll(platformUnit.getAgents());
+
+        if(!agents.isEmpty()){
+            active.set(true);
+        }
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    @Override
+    public boolean process(final GenericCommand<RequestCommandEnum> command) {
+        switch (command.getType().getTarget()){
+            case SYSTEM:
+                return processSystemCommand(command);
+            case PLATFORM:
+                return processPlatformCommand(command);
+            case HAND_UNIT:
+                return processHandUnitCommand(command);
+            default:
+                throw new ClientException("no such command target= " + command );
+        }
+    }
+
+    //Protected Methods
+    @Override
+    protected GenericAgent createAgent(String name, AgentProducer producer, AgentConsumer consumer) {
+        return Objects.nonNull(producer) && Objects.nonNull(consumer) ? ProcessAgentBuilder.Builder(executorForAgents)
+                .setName(name)
+                .setProducer(producer)
+                .setConsumer(consumer)
+                .build() : null;
     }
 
     @Override
-    public boolean process(final GenericCommand<RequestCommandEnum> command) {
-
-        engineSpeedSetup(command.getProperties().getCyclesSpeed());
-        final int correctedCycles = adjustCyclesByValue(command.getValue());
-        switch (command.getType()){
-            case RIGHT:
-                return executeTurnByCycles(correctedCycles, leftMotor, rightMotor);
-            case LEFT:
-                return executeTurnByCycles(correctedCycles, rightMotor, leftMotor);
-            case MOVE:
-                return executeBothEnginesByCycles(correctedCycles, rightMotor, leftMotor);
-            case BACK:
-                return executeBothEnginesByCycles((-1)* correctedCycles, rightMotor, leftMotor);
-            case EXIT:
-                break;
-            default:
-                throw new ClientException("PROCESS FAILURE NO SUCH COMMAND= " + command );
-        }
-
-        return false;
+    protected Map<RoboUnitCommand, Function<ProcessAgent, AgentStatus>> initLogic(){
+        return null;
     }
+
 
     //Private Methods
-    /**
-     * Current adjustment for Angle and Distance
-     *
-     * @param value - value comes from command
-     * @return - number of cycles
-     */
-    private int adjustCyclesByValue(String value){
-        return ROTATION_CYCLES * Integer.valueOf(value);
-    }
-
-    private void engineInitiation(Map<String, LegoEngine> engineCache){
-        rightMotor = new NXTRegulatedMotor(LocalEV3.get().getPort(engineCache.get("right").getPort().getType()));
-        leftMotor = new NXTRegulatedMotor(LocalEV3.get().getPort(engineCache.get("left").getPort().getType()));
-    }
-
-    private void engineSpeedSetup(int cycleSpeed){
-        rightMotor.setSpeed(cycleSpeed);
-        leftMotor.setSpeed(cycleSpeed);
-    }
-
-    private boolean executeTurnByCycles(final int cycles, RegulatedMotor... engines){
-        Future<Boolean> first = runEngine(engines[DEFAULT_0], DEFAULT_0);
-        Future<Boolean> second = runEngine(engines[DEFAULT_1], cycles);
-        try {
-            return first.get() && second.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new ClientException("executeTurnByCycles error: ", e);
+    /* currently system commad is executed as EXIT */
+    private boolean processSystemCommand(final GenericCommand<RequestCommandEnum> command){
+        switch (command.getType()){
+            case EXIT:
+                System.out.println("EXIT COMMAND HAS BEEN CALLED");
+                active.set(false);
+                executorForAgents.shutdown();
+                return true;
+            default:
+                throw new ClientException("SYSTEM COMMAND= " + command );
         }
     }
 
-    private Future<Boolean> runEngine(RegulatedMotor engine, int cycles){
-        return executorForCommands.submit(() -> {
-            lock.lock();
-            try {
-                switch(cycles){
-                    case DEFAULT_0:
-                        engine.stop(true);
-                        break;
-                    default:
-                        engine.rotate(cycles);
-                        break;
-                }
-            }finally {
-                lock.unlock();
-            }
-            return true;
-        });
+    @SuppressWarnings(value = "unchecked")
+    private boolean processPlatformCommand(final GenericCommand<RequestCommandEnum> command){
+        PlatformUnit platformUnit = (PlatformUnit)units.get(AGENT_PLATFORM_POSITION);
+        return platformUnit.process(command);
     }
 
-    private boolean executeBothEnginesByCycles(int cycles, RegulatedMotor... engines){
-        Future<Boolean> engineLeft = executeEngine(engines[DEFAULT_0], cycles);
-        Future<Boolean> engineRight = executeEngine(engines[DEFAULT_1], cycles);
-
-        try {
-            return engineLeft.get() && engineRight.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new ClientException("BothEnginesByCycles error: ", e);
-        }
-    }
-
-    private Future<Boolean> executeEngine(RegulatedMotor engine, int cycles){
-        return executorForCommands.submit(() -> {
-            engine.rotate(cycles);
-            return true;
-        });
+    @SuppressWarnings(value = "unchecked")
+    private boolean processHandUnitCommand(final GenericCommand<RequestCommandEnum> command){
+        FrontHandUnit frontHandUnit = (FrontHandUnit)units.get(AGENT_HAND_POSITION);
+        return frontHandUnit.process(command);
     }
 
 }

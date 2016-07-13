@@ -22,12 +22,13 @@ package com.robo4j.commons.concurrent;
 import java.util.Date;
 
 /**
- * Created by miroslavkopecky on 26/09/14.
  *
  * Lego Thread stores the creation date, the start date and the finish date of the Thread. It provides a
  * method that calculates the execution time fo the thread. Overrides the toString method to return
  * information about the creationDate and the execution time of the thread
  *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 03.04.2016
  */
 public class LegoThread extends Thread{
 
@@ -57,7 +58,6 @@ public class LegoThread extends Thread{
         setStartDate();
         super.run();
         setFinishDate();
-        System.out.println("Thread= " + toString());
     }
 
     public long getExecutionTime(){

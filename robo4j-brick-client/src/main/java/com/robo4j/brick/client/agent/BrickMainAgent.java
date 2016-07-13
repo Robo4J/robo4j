@@ -24,14 +24,18 @@ import com.robo4j.commons.agent.AgentConsumer;
 import com.robo4j.commons.agent.AgentProducer;
 import com.robo4j.commons.agent.AgentStatus;
 import com.robo4j.commons.agent.AgentStatusEnum;
-import com.robo4j.commons.agent.RoboAgent;
+import com.robo4j.commons.agent.ReceiverAgent;
 
 import java.util.concurrent.ExecutorService;
 
 /**
- * Created by miroslavkopecky on 10/06/16.
+ * MainBrick agent responsible for handling incoming command and moving them to
+ * the desired destination (unit, agent)
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 10.06.2016
  */
-public class BrickMainAgent implements RoboAgent {
+public class BrickMainAgent implements ReceiverAgent {
 
     private final AgentCache<AgentStatus> cache;
     private final ExecutorService executor;
@@ -47,6 +51,7 @@ public class BrickMainAgent implements RoboAgent {
         consumer.setMessageQueue(producer.getMessageQueue());
     }
 
+    @Override
     public AgentStatus activate(){
 
         executor.execute((Runnable) producer);
@@ -57,10 +62,12 @@ public class BrickMainAgent implements RoboAgent {
         return result;
     }
 
+    @Override
     public AgentCache<AgentStatus> getCache() {
         return cache;
     }
 
+    @Override
     public void addStatus(AgentStatus status){
         this.cache.put(status);
     }

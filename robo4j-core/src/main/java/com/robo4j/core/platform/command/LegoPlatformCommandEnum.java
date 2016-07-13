@@ -19,9 +19,8 @@
 
 package com.robo4j.core.platform.command;
 
-import com.robo4j.core.bridge.command.CommandTypeEnum;
-import com.robo4j.core.control.RoboCoreCommand;
-import com.robo4j.core.control.RoboTypeCommand;
+import com.robo4j.commons.command.CommandTypeEnum;
+import com.robo4j.commons.command.RoboUnitCommand;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,10 +28,11 @@ import java.util.Map;
 /**
  *
  * Supported direct plaform command
+ *
  * @author Miro Kopecky (@miragemiko)
- * @since 20.04.2016
+ * @since 26.09.2014
  */
-public enum LegoPlatformCommandEnum implements RoboCoreCommand, RoboTypeCommand {
+public enum LegoPlatformCommandEnum implements RoboUnitCommand {
 
     //@formatter:off
     EXIT            (0, "exit"),
@@ -41,14 +41,7 @@ public enum LegoPlatformCommandEnum implements RoboCoreCommand, RoboTypeCommand 
     MOVE            (3, "move"),
     BACK            (4, "back"),
     STOP            (5, "stop"),
-    INIT            (6, "init"),
     CLOSE           (7, "close"),
-    MOVE_CYCLES     (8, "move_cycle"),
-    MOVE_DISTANCE   (9, "move_distance"),
-    BACK_CYCLES     (10, "back_cycle"),
-    BACK_DISTANCE   (11, "back_distance"),
-    LEFT_CYCLES     (12, "left_cycle"),
-    RIGHT_CYCLES    (13, "right_cycle"),
     EMERGENCY_STOP  (14, "emergency_stop"),
     ;
     //@formatter:on

@@ -20,7 +20,9 @@
 package com.robo4j.commons.agent;
 
 /**
- * Created by miroslavkopecky on 29/05/16.
+ *
+ *  @author Miro Kopecky (@miragemiko)
+ * @since 29.05.2016
  */
 public class AgentException extends RuntimeException {
 

@@ -24,7 +24,8 @@ import com.robo4j.core.bridge.command.cache.BatchCommand;
 /**
  * Contains only basic platform commands
  *
- * Created by miroslavkopecky on 18/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 18.04.2016
  */
 public class SimpleCommand implements BasicCommand, BatchCommand {
 

@@ -24,7 +24,9 @@ import com.robo4j.core.bridge.command.BasicCommand;
 import com.robo4j.core.bridge.command.cache.BatchCommand;
 
 /**
- * Created by miroslavkopecky on 04/06/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 24.04.2016
  */
 @BatchAnnotation(name = "line1")
 public class LineCommand1 implements BatchCommand, BasicCommand {

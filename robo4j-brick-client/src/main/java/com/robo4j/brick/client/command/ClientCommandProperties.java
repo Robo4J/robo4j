@@ -23,7 +23,9 @@ import com.robo4j.brick.util.ConstantUtil;
 import com.robo4j.commons.command.CommandProperties;
 
 /**
- * Created by miroslavkopecky on 10/06/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 10.06.2016
  */
 public class ClientCommandProperties implements CommandProperties {
 
@@ -32,6 +34,10 @@ public class ClientCommandProperties implements CommandProperties {
 
     public ClientCommandProperties() {
         this.cyclesSpeed = ConstantUtil.DEFAULT_ENGINE_SPEED;
+    }
+
+    public ClientCommandProperties(int cyclesSpeed) {
+        this.cyclesSpeed = cyclesSpeed;
     }
 
     public int getCyclesSpeed() {

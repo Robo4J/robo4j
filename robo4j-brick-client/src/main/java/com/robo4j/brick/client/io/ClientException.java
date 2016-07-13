@@ -20,7 +20,8 @@
 package com.robo4j.brick.client.io;
 
 /**
- * Created by miroslavkopecky on 24/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 24.05.2016
  */
 public class ClientException extends RuntimeException {
 

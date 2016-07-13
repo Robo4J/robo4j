@@ -19,14 +19,16 @@
 
 package com.robo4j.core.control;
 
+import com.robo4j.commons.command.CommandParsed;
+import com.robo4j.commons.util.CommandUtil;
 import com.robo4j.core.bridge.BridgeException;
-import com.robo4j.core.bridge.command.CommandParsed;
-import com.robo4j.core.bridge.command.CommandUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by miroslavkopecky on 28/04/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 28.04.2016
  */
 public class ControlCommandsAdapter {
 
@@ -49,6 +51,7 @@ public class ControlCommandsAdapter {
                 return  commandParsed;
             case BATCH:
             case COMPLEX:
+                logger.info("COMMAND ADAPTER = " + commandParsed);
                 controlPad.sendBatchCommand(commandParsed.getLine());
                 return  commandParsed;
             case ACTIVE:

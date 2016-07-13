@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ *
  * @author Miro Kopecky (@miragemiko)
  * @since 15.02.2016
  */
@@ -125,5 +126,6 @@ public enum LegoSensorEnum {
             codeToSensorSourceMapping.put(cmd.getSource(), cmd);
         }
     }
+
 
 }

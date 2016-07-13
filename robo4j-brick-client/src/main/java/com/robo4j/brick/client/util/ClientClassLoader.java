@@ -25,7 +25,8 @@ import java.io.InputStream;
  *
  * Singleton instance of classLoader
  *
- * Created by miroslavkopecky on 23/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 23.05.2016
  */
 public final class ClientClassLoader {
 

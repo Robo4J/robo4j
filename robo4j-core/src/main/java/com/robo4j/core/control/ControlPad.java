@@ -19,14 +19,18 @@
 
 package com.robo4j.core.control;
 
-import com.robo4j.commons.agent.RoboAgent;
+import com.robo4j.commons.agent.GenericAgent;
+import com.robo4j.commons.command.CommandParsed;
+import com.robo4j.commons.command.CommandProperties;
+import com.robo4j.commons.command.CommandTypeEnum;
+import com.robo4j.commons.command.FrontHandCommandEnum;
+import com.robo4j.commons.command.GenericCommand;
 import com.robo4j.commons.control.RoboSystemConfig;
+import com.robo4j.commons.util.CommandUtil;
 import com.robo4j.core.bridge.BridgeControl;
+import com.robo4j.core.bridge.BridgeUtils;
 import com.robo4j.core.bridge.command.AdvancedCommand;
 import com.robo4j.core.bridge.command.BasicCommand;
-import com.robo4j.core.bridge.command.CommandParsed;
-import com.robo4j.core.bridge.command.CommandTypeEnum;
-import com.robo4j.core.bridge.command.CommandUtil;
 import com.robo4j.core.bridge.command.ComplexCommand;
 import com.robo4j.core.bridge.command.SimpleCommand;
 import com.robo4j.core.bridge.command.cache.BatchCommand;
@@ -35,20 +39,19 @@ import com.robo4j.core.bridge.task.BridgeCommandConsumer;
 import com.robo4j.core.bridge.task.BridgeCommandProducer;
 import com.robo4j.core.control.utils.CommandCheckerUtil;
 import com.robo4j.core.control.utils.ConnectionUtil;
-import com.robo4j.core.fronthand.LegoFrontHandProvider;
-import com.robo4j.core.fronthand.LegoFrontHandProviderImp;
-import com.robo4j.core.fronthand.command.FrontHandCommandEnum;
 import com.robo4j.core.guardian.GuardianRunnable;
 import com.robo4j.core.io.NetworkUtils;
 import com.robo4j.core.lego.LegoBrickPropertiesHolder;
-import com.robo4j.core.lego.LegoBrickRemote;
 import com.robo4j.core.platform.PlatformProperties;
+import com.robo4j.core.platform.command.LegoCommandProperty;
 import com.robo4j.core.platform.command.LegoPlatformCommandEnum;
 import com.robo4j.core.platform.provider.LegoBrickCommandsProvider;
 import com.robo4j.core.sensor.provider.SensorProvider;
 import com.robo4j.core.sensor.provider.SensorProviderImpl;
+import com.robo4j.lego.control.LegoBrickRemote;
 import com.robo4j.lego.control.LegoEngine;
 import com.robo4j.lego.control.LegoSensor;
+import com.robo4j.lego.control.LegoUnit;
 import org.apache.commons.exec.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,9 +59,11 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
 
 /**
  * Control pad is responsible to process command from user
@@ -73,19 +78,15 @@ public class ControlPad extends BridgeControl {
     private static final String COMMAND_SPLITTER = ",";
 
     private volatile LegoBrickCommandsProvider legoBrickCommandsProvider;
-    private volatile LegoFrontHandProvider legoFrontHandProvider;
     private volatile SensorProvider sensorProvider;
     private volatile PlatformProperties properties;     // Engines properties
-    private volatile LegoBrickRemote legoBrickRemote;
     private volatile LegoBrickPropertiesHolder legoBrickPropertiesHolder;
 
 
     public ControlPad(final String corePackage) {
         super(corePackage);
         properties = new PlatformProperties();
-        legoBrickRemote = ((LegoBrickRemote)systemCache.get(ControlUtil.SYSTEM_PROVIDER));
         legoBrickPropertiesHolder = ((RoboSystemProperties)systemCache.get(ControlUtil.SYSTEM_CONFIG)).getProperties();
-
         initCache(legoBrickPropertiesHolder);
     }
 
@@ -101,9 +102,13 @@ public class ControlPad extends BridgeControl {
         return sensorCacheActive() ?  MapUtils.copy(sensorCache.getCache()) : Collections.EMPTY_MAP;
     }
 
+    public Map<String, LegoUnit> getUnitCache(){
+        return unitCacheActive() ? MapUtils.copy(unitCache.getCache()) : Collections.EMPTY_MAP;
+    }
+
     public LegoBrickRemote getLegoBrickRemote(){
         if(active.get()){
-            return legoBrickRemote;
+            return getRemoteBrickFromCache();
         } else {
             throw new ControlException("PLEASE ACTIVATE THE SYSTEM");
         }
@@ -225,9 +230,16 @@ public class ControlPad extends BridgeControl {
     }
 
     void sendActiveCommand(final String command){
-        LegoPlatformCommandEnum legoCommand = LegoPlatformCommandEnum.getCommand(command);
-        if(legoCommand != null){
-            processActiveCommand(legoCommand);
+        logger.info("ACTIVE COMMAND = " + command);
+        Matcher activeCommand = BridgeUtils.commandActivePattern.matcher(command.trim());
+
+        if(activeCommand.find()){
+            LegoPlatformCommandEnum legoCommand = LegoPlatformCommandEnum.getCommand(activeCommand.group(1));
+            if(legoCommand != null){
+                processActiveCommand(legoCommand, activeCommand.group(2));
+            }
+        } else {
+            logger.info("ACTIVE COMMAND NOT FOUND= " + activeCommand);
         }
     }
 
@@ -259,26 +271,27 @@ public class ControlPad extends BridgeControl {
     @SuppressWarnings(value = "unchecked")
     public boolean activate(){
 
+        //FIXME: need to be mocked isReachable
         try {
             if(!activeThread.get() && isBrickReachable()){
 
                 initBridge();
 
                 legoBrickCommandsProvider = getLegoBrickCommandsProviderWithGuardian(properties);
-                sensorProvider = new SensorProviderImpl(legoBrickRemote);
-                legoFrontHandProvider = new LegoFrontHandProviderImp(legoBrickRemote,
-                        engineCache.getCache(), sensorCache.getCache());
+                sensorProvider = new SensorProviderImpl(getRemoteBrickFromCache());
 
                 activeThread.set(true);
                 active.set(true);
 
                 controlCommandsAdapter = new ControlCommandsAdapter(this);
 
-                final RoboAgent agent = getCoreBridgeAgent(
+                final GenericAgent agent = getCoreBridgeAgent(
                         new BridgeCommandProducer(activeThread, emergency, commandLineQueue, properties ),
-                        new BridgeCommandConsumer(activeThread, legoBrickCommandsProvider, legoFrontHandProvider));
+                        new BridgeCommandConsumer(activeThread, legoBrickCommandsProvider,
+                                initRoboUnitByName("frontHandUnit")));
+                genericAgents.add(agent);
 
-                roboAgents.add(agent);
+                logger.info("UNIT Cache = " + unitCache);
 
             } else {
                 throw new ControlException("NO SYSTEM AVAILABLE");
@@ -291,7 +304,16 @@ public class ControlPad extends BridgeControl {
     }
 
     //Private Methods
-    private void processActiveCommand(final LegoPlatformCommandEnum command){
+    private LegoBrickRemote getRemoteBrickFromCache(){
+        return ((LegoBrickRemote)systemCache.get(ControlUtil.SYSTEM_PROVIDER));
+    }
+
+    private LegoUnit initRoboUnitByName(final String name){
+        return unitCache.getCache().get(name)
+                .init(getRemoteBrickFromCache(), engineCache.getCache(), sensorCache.getCache());
+    }
+
+    private void processActiveCommand(final LegoPlatformCommandEnum command, String speed){
         switch (command){
             case MOVE:
                 if(emergency.get()){
@@ -300,18 +322,13 @@ public class ControlPad extends BridgeControl {
             case BACK:
             case LEFT:
             case RIGHT:
-                legoBrickCommandsProvider.process(command);
+                logger.info("ACTIVE COMMAND = " + command + " SPEED = " + speed);
+                LegoCommandProperty commandProperty = new LegoCommandProperty("", Objects.isNull(speed) ? 300 : Integer.parseInt(speed));
+                legoBrickCommandsProvider.process(command, commandProperty);
                 break;
             case STOP:
                 legoBrickCommandsProvider.process(LegoPlatformCommandEnum.STOP);
                 break;
-            case MOVE_CYCLES:
-            case MOVE_DISTANCE:
-            case BACK_CYCLES:
-            case BACK_DISTANCE:
-            case LEFT_CYCLES:
-            case RIGHT_CYCLES:
-            case INIT:
             case EMERGENCY_STOP:
             case CLOSE:
             case EXIT:
@@ -323,8 +340,26 @@ public class ControlPad extends BridgeControl {
 
     private void end(){
         activeThread.set(false);
-        legoBrickCommandsProvider.process(LegoPlatformCommandEnum.EXIT);
-        legoFrontHandProvider.process(FrontHandCommandEnum.EXIT);
+//        legoBrickCommandsProvider.process(LegoPlatformCommandEnum.EXIT);
+
+        /* turn off all units */
+        //TODO: needs to be redesigned
+        unitCache.getCache().entrySet().stream()
+                .map(Map.Entry::getValue)
+                .forEach(e ->  {
+                    switch (e.getUnitName()){
+                        case  "frontHandUnit":
+                            e.process(FrontHandCommandEnum.EXIT);
+                            break;
+                        case "platformUnit":
+                            final CommandProperties properties = () -> 300;
+                            final GenericCommand<LegoPlatformCommandEnum> exitCommand =
+                                    new GenericCommand<>(properties, LegoPlatformCommandEnum.EXIT, "", 1);
+                            e.process(exitCommand);
+                            break;
+                    }
+                });
+
         coreBusWithSensorDownSequence();
         active.set(false);
     }
@@ -369,7 +404,7 @@ public class ControlPad extends BridgeControl {
 
         final BrickCommandProviderFuture future =  new BrickCommandProviderFuture(
                 (LegoBrickRemote) getSystemCache().get(ControlUtil.SYSTEM_PROVIDER),
-                legoBrickPropertiesHolder, properties, engineCache.getCache());
+                legoBrickPropertiesHolder, properties, engineCache.getCache(), unitCache.getCache());
         final Future<LegoBrickCommandsProvider> brickFuture = guardianBusSubmit(future);
         try {
             final LegoBrickCommandsProvider result = brickFuture.get();

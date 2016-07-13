@@ -21,11 +21,9 @@ package com.robo4j.brick.client.command;
 
 import com.robo4j.brick.client.enums.RequestCommandEnum;
 import com.robo4j.brick.client.io.ClientException;
-import com.robo4j.brick.client.util.ClientCommException;
 import com.robo4j.brick.system.CommandProvider;
 import com.robo4j.brick.util.ConstantUtil;
 import com.robo4j.commons.agent.AgentConsumer;
-import com.robo4j.commons.command.CommandProperties;
 import com.robo4j.commons.command.GenericCommand;
 import com.robo4j.commons.concurrent.CoreBusQueue;
 import com.robo4j.commons.concurrent.LegoThreadFactory;
@@ -41,9 +39,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * Command Executor is the consumer of command produced by Command Processor
  *
- * Created by miroslavkopecky on 10/06/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 10.06.2016
  */
-public class CommandExecutor<QueueType extends CoreBusQueue> implements AgentConsumer, Runnable{
+public class CommandExecutor<QueueType extends CoreBusQueue> implements AgentConsumer, Runnable {
 
 
     private volatile ExecutorService executorForCommands;
@@ -57,12 +56,14 @@ public class CommandExecutor<QueueType extends CoreBusQueue> implements AgentCon
                 new LegoThreadFactory(ConstantUtil.COMMAND_BUS));
         this.commandsProvider = commandsProvider;
         this.active = active;
+        System.out.println("CONSUMER UP active= " + active);
     }
 
     @SuppressWarnings(value = "unchecked")
     @Override
     public void setMessageQueue(CoreBusQueue commandsQueue) {
         this.commandsQueue = (QueueType) commandsQueue;
+        System.out.println("SET MESSAGE QUEUE= " + commandsQueue);
     }
 
 
@@ -70,7 +71,7 @@ public class CommandExecutor<QueueType extends CoreBusQueue> implements AgentCon
     @Override
     public void run() {
         if(commandsQueue == null){
-            throw new ClientCommException("ERROR: consumer queue");
+            throw new ClientException("ERROR: consumer queue");
         }
 
         while(active.get() && commandsQueue.peek() != null){
@@ -84,27 +85,44 @@ public class CommandExecutor<QueueType extends CoreBusQueue> implements AgentCon
                     case RIGHT:
                     case LEFT:
                     case EXIT:
-                        moveFuture = processCommand(command);
+                    case HAND:
+                        moveFuture = executorForCommands.submit(() -> commandsProvider.process(command));
                         break;
                     default:
+                        System.err.println("NO SUCH COMMAND= " + command);
                         throw new ClientException("NO SUCH COMMAND= " + command);
                 }
 
                  boolean result = moveFuture.get();
                 if(!result){
-                    throw new ClientCommException("ERROR ENGINE EXECUTION");
+                    throw new ClientException("ERROR ENGINE EXECUTION");
                 }
             } catch (InterruptedException | ExecutionException e) {
+                System.out.println("CommandExecutor e= " + e);
                 throw new ClientException("ERROR CONSUMER command execution");
             }
         }
         executorForCommands.shutdown();
     }
 
+    //    public Boolean processMove(int value){
+//        System.out.println("EXECUTE MOVE");
+//        Future<Boolean> engineLeft = executeEngine(leftMotor, value);
+//        Future<Boolean> engineRight = executeEngine(rightMotor, value);
+//
+//        try {
+//            return engineLeft.get() && engineRight.get();
+//        } catch (InterruptedException | ExecutionException e) {
+//            throw new ClientCommException("CLIENT GONE", e);
+//        }
+//    }
 
     //Private Method
-    private Future<Boolean> processCommand(GenericCommand<RequestCommandEnum> command){
-        return executorForCommands.submit(() -> commandsProvider.process(command)
-        );
+
+    private Future<Boolean> executeEngine(RegulatedMotor engine, int cycles){
+        return executorForCommands.submit(() -> {
+            engine.rotate(cycles);
+            return true;
+        });
     }
 }

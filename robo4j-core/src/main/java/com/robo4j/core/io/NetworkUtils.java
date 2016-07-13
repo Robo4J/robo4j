@@ -37,7 +37,7 @@ public final class NetworkUtils {
     private static final Logger logger = LoggerFactory.getLogger(NetworkUtils.class);
     private static final int DEFAULT_TIMEOUT = 5000;
 
-    public static  Supplier<Boolean> pingBrick(String address){
+    public static Supplier<Boolean> pingBrick(String address){
         return () -> {
             try {
                 return InetAddress.getByName(address).isReachable(DEFAULT_TIMEOUT);

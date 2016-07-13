@@ -24,7 +24,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Created by miroslavkopecky on 06/03/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 06.03.2016
  */
 public enum HttpVersion {
 

@@ -21,11 +21,11 @@ package com.robo4j.core.bridge.task;
 
 
 import com.robo4j.commons.agent.AgentProducer;
+import com.robo4j.commons.command.FrontHandCommandEnum;
 import com.robo4j.commons.concurrent.QueueFIFOEntry;
 import com.robo4j.core.bridge.BridgeBusQueue;
 import com.robo4j.core.bridge.BridgeUtils;
 import com.robo4j.core.bridge.command.BridgeCommand;
-import com.robo4j.core.fronthand.command.FrontHandCommandEnum;
 import com.robo4j.core.platform.PlatformProperties;
 import com.robo4j.core.platform.command.LegoPlatformCommandEnum;
 import org.slf4j.Logger;
@@ -36,11 +36,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 
 /**
- * Created by miroslavkopecky on 03/04/16.
+ *
+ * Represent Bridge command producer
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 03.04.2016
  */
 
 
-public class BridgeCommandProducer implements AgentProducer, Runnable{
+public class BridgeCommandProducer implements AgentProducer, Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(BridgeCommandProducer.class);
     private static final int AWAIT_SECONDS = 2;
@@ -48,6 +52,7 @@ public class BridgeCommandProducer implements AgentProducer, Runnable{
     private static final String COMMAND_DELIMITER = ",";
     private static final int COMMAND_NAME_POSS = 1;
     private static final int COMMAND_VALUE_POSS= 2;
+    private static final int COMMAND_SPEED_POSS= 3;
     private BridgeBusQueue commandsQueue;
     private LinkedBlockingQueue<String> commandLineQueue;
     private volatile AtomicBoolean active;
@@ -81,7 +86,7 @@ public class BridgeCommandProducer implements AgentProducer, Runnable{
                 final String commandLine = commandLineQueue.take();
                 final String[] separateCommandLines = commandLine.split(COMMAND_DELIMITER);
 
-                //TODO: check commands here ->
+                //TODO: check commands here -> improve logic
                 for(String command: separateCommandLines){
                     if(command.equals(FrontHandCommandEnum.COMMAND.getName())){
                         BridgeCommand bridgeCommand = new BridgeCommand(properties,
@@ -90,9 +95,18 @@ public class BridgeCommandProducer implements AgentProducer, Runnable{
                     } else {
                         Matcher matcherMain = BridgeUtils.commandLinePattern.matcher(command.trim());
                         if(matcherMain.find()){
-                            BridgeCommand bridgeCommand = new BridgeCommand(properties,
-                                    LegoPlatformCommandEnum.getCommand(matcherMain.group(COMMAND_NAME_POSS)),
-                                    matcherMain.group(COMMAND_VALUE_POSS), DEFAULT_PRIORITY);
+                            PlatformProperties cProperties = properties;
+                            String cName = matcherMain.group(COMMAND_NAME_POSS);
+                            String cValue = matcherMain.group(COMMAND_VALUE_POSS);
+                            String cSpeed = matcherMain.group(COMMAND_SPEED_POSS);
+                            if(cSpeed != null){
+                                cProperties = new PlatformProperties(Integer.parseInt(cSpeed),
+                                        properties.getCentimeterCycles());
+                                logger.info("SPEED is SET cProperties= " + cProperties + "cSpeed= " + cSpeed);
+
+                            }
+                            BridgeCommand bridgeCommand = new BridgeCommand(cProperties,
+                                    LegoPlatformCommandEnum.getCommand(cName), cValue, DEFAULT_PRIORITY);
                             logger.info("COMMAND TO TRANSFER = " + bridgeCommand);
                             commandsQueue.transfer(new QueueFIFOEntry(bridgeCommand));
                         }

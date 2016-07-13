@@ -28,26 +28,30 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * NOTE: required to change BRICK_IP_1 !!!
  *
- * Created by miroslavkopecky on 04/06/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 25.04.2016
  */
 
 @SystemProperties
 public class LegoBrickSetupProperties implements LegoBrickProperties, RoboSystemConfig {
 
     private Map<String, String> bricks;
+    private String corePackage;
     private String commandPackage;
     private String enginePackage;
-
+    private String sensorPackage;
+    private String unitPackage;
 
     public LegoBrickSetupProperties() {
         final Map<String, String> bricks = new HashMap<>();
-        /* required to change BRICK_IP_1  */
-        bricks.put(LegoBrickPropertiesHolder.BRICK_IP_1, "127.0.0.1");
+        bricks.put(LegoBrickPropertiesHolder.BRICK_IP_1, "<ROBO_IP>");
         this.bricks = bricks;
+        this.corePackage = "com.robo4j.line";
         this.commandPackage = "com.robo4j.line.commands";
         this.enginePackage = "com.robo4j.line.engine";
+        this.sensorPackage = "com.robo4j.line.sensor";
+        this.unitPackage = "com.robo4j.line.unit";
     }
 
     @Override
@@ -57,7 +61,7 @@ public class LegoBrickSetupProperties implements LegoBrickProperties, RoboSystem
 
     @Override
     public String getCorePackage() {
-        return null;
+        return corePackage;
     }
 
     @Override
@@ -72,13 +76,19 @@ public class LegoBrickSetupProperties implements LegoBrickProperties, RoboSystem
 
     @Override
     public String getSensorPackage() {
-        return null;
+        return sensorPackage;
+    }
+
+    @Override
+    public String getUnitPackage() {
+        return unitPackage;
     }
 
     @Override
     public String toString() {
         return "LegoBrickPropertiesTest{" +
                 "bricks=" + bricks +
+                ", corePackage='" + corePackage + '\'' +
                 ", commandPackage='" + commandPackage + '\'' +
                 '}';
     }

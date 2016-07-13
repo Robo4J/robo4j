@@ -19,6 +19,8 @@
 
 package com.robo4j.core.fronthand;
 
+import com.robo4j.commons.agent.AgentProducer;
+import com.robo4j.commons.concurrent.CoreBusQueue;
 import lejos.hardware.sensor.EV3TouchSensor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +29,13 @@ import java.util.concurrent.Exchanger;
 
 /**
  *
+ * maybe Exchanger should be removed
+ * Lego oriented
+ *
  * @author Miro Kopecky (@miragemiko)
  * @since 27.04.2016
  */
-public class FrontHandTouchProducer implements Runnable {
+public class FrontHandTouchProducer implements AgentProducer, Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(FrontHandTouchProducer.class);
 
@@ -39,9 +44,13 @@ public class FrontHandTouchProducer implements Runnable {
 
     /* Represent signal producer */
 
-    public FrontHandTouchProducer( Exchanger<Boolean> exchanger, EV3TouchSensor touchSensor) {
+    public FrontHandTouchProducer(Exchanger<Boolean> exchanger, EV3TouchSensor touchSensor) {
         this.exchanger = exchanger;
         this.touchSensor = touchSensor;
+    }
+
+    public EV3TouchSensor getTouchSensor() {
+        return touchSensor;
     }
 
     @Override
@@ -55,6 +64,11 @@ public class FrontHandTouchProducer implements Runnable {
         } finally {
             logger.info("TOUCH ENDS thread= " + Thread.currentThread().getName());
         }
+    }
+
+    @Override
+    public CoreBusQueue getMessageQueue() {
+        return null;
     }
 
     //Private Methods

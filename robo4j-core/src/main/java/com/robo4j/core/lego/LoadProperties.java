@@ -26,7 +26,8 @@ import com.robo4j.core.properties.LoadPropertiesHelper;
 
 
 /**
- * Created by miroslavkopecky on 11/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 11.04.2016
  */
 @SystemConfig
 public class LoadProperties implements RoboSystemConfig, RoboSystemProperties {
@@ -65,4 +66,10 @@ public class LoadProperties implements RoboSystemConfig, RoboSystemProperties {
         return LoadPropertiesHelper.loadProperties(BRICK_PROPERTIES + ENDING);
     }
 
+    @Override
+    public String toString() {
+        return "LoadProperties{" +
+                "properties=" + properties +
+                '}';
+    }
 }

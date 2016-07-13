@@ -19,11 +19,11 @@
 
 package com.robo4j.core.sensor.provider;
 
-import com.robo4j.core.lego.LegoBrickRemote;
 import com.robo4j.core.lego.rmi.LegoUnitProviderUtil;
-import com.robo4j.lego.enums.LegoSensorEnum;
 import com.robo4j.core.sensor.state.SensorDefaultState;
 import com.robo4j.core.sensor.state.SensorState;
+import com.robo4j.lego.control.LegoBrickRemote;
+import com.robo4j.lego.enums.LegoSensorEnum;
 import com.robo4j.lego.enums.LegoSensorPortEnum;
 import lejos.remote.ev3.RMISampleProvider;
 import org.slf4j.Logger;
@@ -34,6 +34,7 @@ import java.rmi.RemoteException;
 /**
  *
  * Sensor Provider Implementation represent value/values , sensor mode and type
+ *
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 15.02.2016

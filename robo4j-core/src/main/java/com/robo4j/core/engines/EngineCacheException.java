@@ -20,7 +20,8 @@
 package com.robo4j.core.engines;
 
 /**
- * Created by miroslavkopecky on 05/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 05.05.2016
  */
 public class EngineCacheException extends RuntimeException {
 

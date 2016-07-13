@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This RoboAgent.java is part of robo4j.
+ * This LegoPlatformUtil.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,15 +17,30 @@
  *
  */
 
-package com.robo4j.commons.agent;
+package com.robo4j.lego.util;
 
 /**
- *
- * Default interface used for any agent
+ * Utils helps to adjust command angle, movement
  *
  * @author Miro Kopecky (@miragemiko)
- * @since 31.05.2016
+ * @since 09.07.2016
  */
-public interface RoboAgent {
+public final class LegoPlatformUtil {
+    private static final int CENTIMETER_CYCLES = 33;
+    private static final int ROTATION_CYCLES = 9;
 
+    /**
+     * Current adjustment for Angle and Distance
+     *
+     * @param value - value comes from command
+     * @return - number of cycles
+     */
+    public static int adjustCyclesByValue(boolean angle, String value){
+        final int number = Integer.valueOf(value);
+        return angle ? ROTATION_CYCLES * number : CENTIMETER_CYCLES * number;
+    }
+
+    private LegoPlatformUtil(){
+        //no instance
+    }
 }

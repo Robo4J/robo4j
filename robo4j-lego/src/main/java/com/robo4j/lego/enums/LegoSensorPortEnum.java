@@ -23,10 +23,13 @@ import com.robo4j.commons.control.RoboSystemConfig;
 import com.robo4j.commons.enums.LegoSystemEnum;
 
 /**
+ * Configuration interface
+ *
+ *
  * @author Miro Kopecky (@miragemiko)
- * @since 26.06.2016
+ * @since 19.06.2016
  */
-public enum  LegoSensorPortEnum implements LegoSystemEnum<String>, RoboSystemConfig {
+public enum LegoSensorPortEnum implements LegoSystemEnum<String>, RoboSystemConfig {
 
     //@formatter:off
     //       type   name
@@ -34,7 +37,7 @@ public enum  LegoSensorPortEnum implements LegoSystemEnum<String>, RoboSystemCon
     S2      ("S2", "Sensor S2 Bus"),
     S3      ("S3", "Sensor S3 Bus"),
     S4      ("S4", "Sensor S4 Bus"),
-            ;
+    ;
     //@formatter:on
 
     private String type;
@@ -63,5 +66,4 @@ public enum  LegoSensorPortEnum implements LegoSystemEnum<String>, RoboSystemCon
                 ", name='" + name + '\'' +
                 '}';
     }
-
 }

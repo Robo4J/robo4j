@@ -19,15 +19,15 @@
 
 package com.robo4j.core.bridge.command.cache;
 
-import com.robo4j.core.bridge.command.CommandTypeEnum;
-import com.robo4j.core.control.RoboCoreCommand;
-import com.robo4j.core.control.RoboTypeCommand;
+import com.robo4j.commons.command.CommandTypeEnum;
+import com.robo4j.commons.command.RoboUnitCommand;
 
 /**
  *
- * Created by miroslavkopecky on 18/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 18.04.2016
  */
-public interface BatchCommand  extends RoboTypeCommand, RoboCoreCommand {
+public interface BatchCommand  extends RoboUnitCommand {
 
     String getBatch();
 

@@ -23,7 +23,8 @@ import com.robo4j.lego.enums.LegoAnalogPortEnum;
 import com.robo4j.lego.enums.LegoEngineEnum;
 
 /**
- * Created by miroslavkopecky on 04/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 04.05.2016
  */
 public class LegoEngineDTO {
 

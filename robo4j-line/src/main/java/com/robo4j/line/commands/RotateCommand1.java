@@ -24,7 +24,8 @@ import com.robo4j.core.bridge.command.BasicCommand;
 import com.robo4j.core.bridge.command.cache.BatchCommand;
 
 /**
- * Created by miroslavkopecky on 04/06/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 04.06.2016
  */
 @BatchAnnotation(name = "rotate1")
 public class RotateCommand1 implements BatchCommand, BasicCommand {

@@ -26,9 +26,10 @@ import java.util.concurrent.ExecutorService;
  * @author Miro Kopecky (@miragemiko)
  * @since 22.06.2016
  */
-public interface DefaultAgent extends RoboAgent {
+public interface DefaultAgent extends GenericAgent {
 
     void setExecutor(ExecutorService executor);
+    void setName(String name);
     void setProducer(AgentProducer producer);
     void setConsumer(AgentConsumer consumer);
 }

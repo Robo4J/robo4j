@@ -19,11 +19,12 @@
 
 package com.robo4j.core.sensor.provider;
 
-import com.robo4j.lego.enums.LegoSensorEnum;
 import com.robo4j.core.sensor.state.SensorState;
+import com.robo4j.lego.enums.LegoSensorEnum;
 import com.robo4j.lego.enums.LegoSensorPortEnum;
 
 /**
+ *
  * @author Miro Kopecky (@miragemiko)
  * @since 24.02.2016
  */

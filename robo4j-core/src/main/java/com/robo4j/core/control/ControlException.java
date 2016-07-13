@@ -20,7 +20,9 @@
 package com.robo4j.core.control;
 
 /**
- * Created by miroslavkopecky on 16/04/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 16.04.2016
  */
 public class ControlException extends RuntimeException {
 

@@ -20,7 +20,8 @@
 package com.robo4j.core.bridge;
 
 /**
- * Created by miroslavkopecky on 30/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 30.04.2016
  */
 public class BridgeException extends RuntimeException {
 

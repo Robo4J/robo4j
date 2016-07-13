@@ -27,7 +27,8 @@ import java.time.LocalDateTime;
  *
  * Basic Http constants and utils methods
  *
- * Created by miroslavkopecky on 23/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 23.05.2016
  */
 public final class HttpUtils {
 

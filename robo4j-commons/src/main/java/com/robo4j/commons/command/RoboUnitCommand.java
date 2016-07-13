@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This CommandException.java is part of robo4j.
+ * This RoboUnitCommand.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,18 +17,13 @@
  *
  */
 
-package com.robo4j.core.bridge.command;
+package com.robo4j.commons.command;
 
 /**
- * Created by miroslavkopecky on 24/04/16.
+ * Robot Unit Command is command abstraction used by unit
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 03.07.2016
  */
-public class CommandException extends RuntimeException {
-
-    public CommandException(String message) {
-        super(message);
-    }
-
-    public CommandException(String message, Throwable cause) {
-        super(message, cause);
-    }
+public interface RoboUnitCommand extends RoboCoreCommand {
 }

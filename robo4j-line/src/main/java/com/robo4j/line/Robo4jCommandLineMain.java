@@ -29,11 +29,14 @@ import org.slf4j.LoggerFactory;
 import java.util.Scanner;
 
 /**
- * Created by miroslavkopecky on 04/06/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 23.04.2016
  */
 public final class Robo4jCommandLineMain extends AbstractCommandLine {
 
     private static final Logger logger = LoggerFactory.getLogger(Robo4jCommandLineMain.class);
+    private static final String EXIT_COMMAND = "exit";
 
     public static void main(String... args){
         logger.info("... COMMAND INTERFACE ...");

@@ -22,9 +22,11 @@ package com.robo4j.core.sensor.state;
 import com.robo4j.lego.enums.LegoSensorEnum;
 
 /**
- * Created by miroslavkopecky on 22/05/15.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 22.05.2016
  */
-public class SensorDefaultState implements SensorState  {
+public class SensorDefaultState implements SensorState {
 
     private final LegoSensorEnum type;
     private final Long timestamp;

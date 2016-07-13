@@ -21,13 +21,9 @@ package com.robo4j.core.lego;
 
 import java.util.Map;
 
-
 /**
- *
- * General Lego Brick Interface
- *
  * @author Miro Kopecky (@miragemiko)
- * @since 25.04.2016
+ * @since 25.05.2016
  */
 public interface LegoBrickProperties {
 
@@ -36,5 +32,6 @@ public interface LegoBrickProperties {
     String getCommandPackage();
     String getEnginePackage();
     String getSensorPackage();
+    String getUnitPackage();
 
 }

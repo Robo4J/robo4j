@@ -19,39 +19,54 @@
 
 package com.robo4j.brick.client.enums;
 
+import com.robo4j.commons.command.CommandTargetEnum;
+import com.robo4j.commons.command.CommandTypeEnum;
+import com.robo4j.commons.command.RoboUnitCommand;
 import com.robo4j.commons.enums.LegoSystemEnum;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.robo4j.commons.command.CommandTargetEnum.HAND_UNIT;
+import static com.robo4j.commons.command.CommandTargetEnum.PLATFORM;
+import static com.robo4j.commons.command.CommandTargetEnum.SYSTEM;
+
 /**
- * Created by miroslavkopecky on 09/06/16.
+ * Command types designed for Robo-Brick client
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 09.06.2016
  */
-public enum RequestCommandEnum implements LegoSystemEnum<Integer> {
+public enum RequestCommandEnum implements RoboUnitCommand, LegoSystemEnum<CommandTypeEnum> {
 
     //@formatter:on
-    EXIT            (0, "exit"),
-    MOVE            (1, "move"),
-    RIGHT           (2, "right"),
-    LEFT            (3, "left"),
-    BACK            (4, "back"),
+    EXIT            (0, SYSTEM, "exit"),
+    MOVE            (1, PLATFORM, "move"),
+    RIGHT           (2, PLATFORM, "right"),
+    LEFT            (3, PLATFORM, "left"),
+    BACK            (4, PLATFORM, "back"),
+    HAND            (5, HAND_UNIT, "hand"),
     ;
     //@formatter:off
-
     private int code;
+    private CommandTargetEnum target;
     private String name;
 
-    private volatile static Map<String, RequestCommandEnum> codeToLegoCommandNameMapping;
+    private volatile static Map<Integer, RequestCommandEnum> codeToLegoCommandCodeMapping;
 
-
-    RequestCommandEnum(int c, String name){
+    RequestCommandEnum(int c, CommandTargetEnum target, String name){
         this.code = c;
+        this.target = target;
         this.name = name;
     }
 
-    @Override
-    public Integer getType() {
+    public int getCode() {
         return code;
+    }
+
+    @Override
+    public CommandTypeEnum getType() {
+        return CommandTypeEnum.DIRECT;
     }
 
     @Override
@@ -59,26 +74,46 @@ public enum RequestCommandEnum implements LegoSystemEnum<Integer> {
         return name;
     }
 
-
+    public CommandTargetEnum getTarget() {
+        return target;
+    }
 
     public static RequestCommandEnum getRequestValue(String name){
-        if(codeToLegoCommandNameMapping == null)
+        if(codeToLegoCommandCodeMapping == null){
             initMapping();
-        return codeToLegoCommandNameMapping.get(name);
+        }
+        return codeToLegoCommandCodeMapping.entrySet().stream()
+                .filter(e -> e.getValue().getName().equals(name))
+                .map(Map.Entry::getValue)
+                .reduce(null, (e1, e2) -> e2);
+    }
+
+    public static RequestCommandEnum getRequestCommand(CommandTargetEnum target, String name){
+        if(codeToLegoCommandCodeMapping == null){
+            initMapping();
+        }
+
+        return codeToLegoCommandCodeMapping.entrySet().stream()
+                .map(Map.Entry::getValue)
+                .filter(v -> v.getTarget().equals(target))
+                .filter(v -> v.getName().equals(name))
+                .reduce(null, (e1, e2) -> e2);
     }
 
     //Private Methods
     private static void initMapping(){
-        codeToLegoCommandNameMapping = new HashMap<>();
+        codeToLegoCommandCodeMapping = new HashMap<>();
         for(RequestCommandEnum ct: values()){
-            codeToLegoCommandNameMapping.put(ct.getName(), ct);
+            codeToLegoCommandCodeMapping.put(ct.getCode(), ct);
         }
     }
+
 
     @Override
     public String toString() {
         return "RequestCommandEnum{" +
                 "code=" + code +
+                ", target=" + target +
                 ", name='" + name + '\'' +
                 '}';
     }

@@ -17,19 +17,18 @@
  *
  */
 
-package com.robo4j.core.fronthand.command;
+package com.robo4j.commons.command;
 
-import com.robo4j.core.bridge.command.CommandTypeEnum;
-import com.robo4j.core.control.RoboCoreCommand;
-import com.robo4j.core.control.RoboTypeCommand;
+import com.robo4j.commons.enums.LegoSystemEnum;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by miroslavkopecky on 27/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 27.06.2016
  */
-public enum FrontHandCommandEnum implements RoboCoreCommand, RoboTypeCommand {
+public enum FrontHandCommandEnum implements RoboUnitCommand, LegoSystemEnum<CommandTypeEnum> {
 
     //@formatter:off
     EXIT            (0, "exit"),

@@ -29,11 +29,12 @@ import java.util.regex.Pattern;
  *
  * Utility Helps to check command line
  *
- * Created by miroslavkopecky on 02/06/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 02.06.2016
  */
 public final class CommandCheckerUtil {
     private static final Logger logger = LoggerFactory.getLogger(CommandCheckerUtil.class);
-    private static final Pattern patternDirect = Pattern.compile("D:[a-z]{4,5}\\(([-]?[0-9]+)\\);?");
+    private static final Pattern patternDirect = Pattern.compile("D:[a-z]{4,5}\\(([-]?[0-9]{1,3})[s]?+([0-9]{1,3})?+\\);?");
     private static final Pattern patternBasicComplex = Pattern.compile("([B|C]):([a-z0-9]);?");
     private static final Pattern patternHand = Pattern.compile("(H:)([a-z]);?");
     private static final Pattern patternActive = Pattern.compile("(A:)([a-z]{4,5});?");
@@ -49,6 +50,7 @@ public final class CommandCheckerUtil {
         } else if( patternActive.matcher(line).find()){
             result = 1;
         }
+        logger.info("isCommand result = " + result);
         return result;
     }
 

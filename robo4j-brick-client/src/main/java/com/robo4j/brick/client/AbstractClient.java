@@ -19,14 +19,18 @@
 
 package com.robo4j.brick.client;
 
+import com.robo4j.brick.reflect.AbstractRoboReflective;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 /**
- * Created by miroslavkopecky on 09/06/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 09.06.2016
  */
-public abstract class AbstractClient<FutureType> extends AbstractRoboClient{
+public abstract class AbstractClient<FutureType>  extends AbstractRoboReflective {
 
     private static ExecutorService executors;
 

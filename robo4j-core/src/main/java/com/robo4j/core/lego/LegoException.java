@@ -20,7 +20,8 @@
 package com.robo4j.core.lego;
 
 /**
- * Created by miroslavkopecky on 11/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 11.04.2016
  */
 public class LegoException extends RuntimeException {
 

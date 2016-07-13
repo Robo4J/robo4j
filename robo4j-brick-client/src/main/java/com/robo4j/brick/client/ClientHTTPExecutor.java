@@ -34,6 +34,9 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Created by miroslavkopecky on 28/02/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 28.02.2016
  */
 public class ClientHTTPExecutor extends ThreadPoolExecutor {
     private static final int NUM_THREADS = 2;
@@ -51,18 +54,29 @@ public class ClientHTTPExecutor extends ThreadPoolExecutor {
 
     @Override
     public void shutdown() {
+//        System.out.println("shutdown: Going to shutdown.");
+//        System.out.println("shutdown: Executed tasks: " + getCompletedTaskCount());
+//        System.out.println("shutdown: Running tasks: " + getActiveCount());
+//        System.out.println("shutdown: Pending tasks: " + getQueue().size());
         super.shutdown();
     }
 
     @Override
     public List<Runnable> shutdownNow() {
+//        System.out.println("shutdownNow: Going to immediately shutdown.");
+//        System.out.println("shutdownNow: Executed tasks: " + getCompletedTaskCount());
+//        System.out.println("shutdownNow: Running tasks: " + getActiveCount());
+//        System.out.println("shutdownNow: Pending tasks: " + getQueue().size());
         return super.shutdownNow();
     }
 
     @Override
     protected void beforeExecute(Thread t, Runnable r) {
+//        System.out.println("beforeExecute: A task is beginning: thread= " + t.getName() + " : " + r.hashCode());
         ExecutorTaskDetails executorTaskDetails = new ExecutorTaskDetails(t.getName(), LocalDateTime.now());
+//        System.out.println("beforeExecute: executorTaskDetails= " + executorTaskDetails);
         startTimes.put(String.valueOf(r.hashCode()), executorTaskDetails);
+//        System.out.println("beforeExecute: startTimes= " + startTimes);
     }
     private static long getMillsByLocalDateTime(LocalDateTime localDateTime){
         return localDateTime.toInstant(ZoneOffset.ofTotalSeconds(0)).toEpochMilli();
@@ -70,10 +84,22 @@ public class ClientHTTPExecutor extends ThreadPoolExecutor {
     @Override
     protected void afterExecute(Runnable r, Throwable t) {
         Future<?> result = (Future)r;
-        ExecutorTaskDetails executorTaskDetails = startTimes.remove(String.valueOf(r.hashCode()));
-        LocalDateTime startDate= executorTaskDetails.getLocalDateTime();
-        LocalDateTime finishDate = LocalDateTime.now();
-        long diff= getMillsByLocalDateTime(finishDate) - getMillsByLocalDateTime(startDate);
+//            System.out.println("afterExecute: *********************************");
+//            System.out.println("afterExecute: A task is finishing.");
+//            System.out.println("afterExecute: SleepTask Result= " + result.get());
+//            System.out.println("afterExecute: SleepTask Result hashCode= " + ((Future) r).get());
+
+            ExecutorTaskDetails executorTaskDetails = startTimes.remove(String.valueOf(r.hashCode()));
+//            System.out.println("afterExecute: startTimes= " + startTimes);
+//            System.out.println("afterExecute: executorTaskDetails= " + executorTaskDetails);
+
+            LocalDateTime startDate= executorTaskDetails.getLocalDateTime();
+            LocalDateTime finishDate = LocalDateTime.now();
+            long diff= getMillsByLocalDateTime(finishDate) - getMillsByLocalDateTime(startDate);
+
+//            System.out.println("afterExecute: SleepTask Duration=  " + diff);
+//            System.out.println("afterExecute: *********************************");
+
 
     }
 }

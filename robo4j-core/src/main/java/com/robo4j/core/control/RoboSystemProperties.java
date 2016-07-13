@@ -22,7 +22,9 @@ package com.robo4j.core.control;
 import com.robo4j.core.lego.LegoBrickPropertiesHolder;
 
 /**
- * Created by miroslavkopecky on 23/04/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 23.04.2016
  */
 public interface RoboSystemProperties {
 

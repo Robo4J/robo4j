@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This LegoBrickRemote.java is part of robo4j.
+ * This RoboTypeCommand.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,17 +17,14 @@
  *
  */
 
-package com.robo4j.core.lego;
-
-import com.robo4j.commons.control.RoboSystemConfig;
-import lejos.remote.ev3.RemoteEV3;
+package com.robo4j.commons.command;
 
 /**
- * Created by miroslavkopecky on 25/04/16.
+ * Maker Iterface to the command
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 28.04.2016
  */
-public interface LegoBrickRemote extends RoboSystemConfig {
-
-    RemoteEV3 getBrick();
-
-    RemoteEV3 getBrick(String address);
+public interface RoboTypeCommand <CommandType extends Enum<?>> {
+        CommandType getType();
 }

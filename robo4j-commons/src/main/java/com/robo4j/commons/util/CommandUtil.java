@@ -17,19 +17,19 @@
  *
  */
 
-package com.robo4j.core.bridge.command;
+package com.robo4j.commons.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.robo4j.commons.command.CommandParsed;
+import com.robo4j.commons.command.CommandTypeEnum;
 
 /**
- * Created by miroslavkopecky on 24/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 24.04.2016
  */
 public final class CommandUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(CommandUtil.class);
+    private static final String COMMAND_TYPE_CLOSE = ":";
     private static final int COMMAND_TYPE_END = 2;
-    protected static final String COMMAND_TYPE_CLOSE = ":";
     private static final String COMMAND_TYPE_SPLITTER = ";";
 
     public static CommandParsed getCommandType(String line){
@@ -37,9 +37,12 @@ public final class CommandUtil {
         if(result != null){
             return new CommandParsed(result, line.substring(COMMAND_TYPE_END, line.length()));
         } else {
-            logger.warn("NO SUCH COMMAND -> EXITING");
             return new CommandParsed(CommandTypeEnum.DIRECT, "exit");
         }
+    }
+
+    public static String getElementClose(){
+        return COMMAND_TYPE_CLOSE;
     }
 
     public static String[] getCommandsByTypes(final String line){

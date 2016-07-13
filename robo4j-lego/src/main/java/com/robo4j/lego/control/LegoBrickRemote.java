@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This HttpException.java is part of robo4j.
+ * This LegoBrickRemote.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,18 +17,19 @@
  *
  */
 
-package com.robo4j.brick.client.http;
+package com.robo4j.lego.control;
+
+import com.robo4j.commons.control.RoboSystemConfig;
 
 /**
- * Created by miroslavkopecky on 06/03/16.
+ * RemoteEV3 - specific lego system
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 24.04.2016
  */
-public class HttpException extends RuntimeException {
+public interface LegoBrickRemote<RemoteBrick> extends RoboSystemConfig {
 
-    public HttpException(String message) {
-        super(message);
-    }
+    RemoteBrick getBrick();
 
-    public HttpException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    RemoteBrick getBrick(String address);
 }

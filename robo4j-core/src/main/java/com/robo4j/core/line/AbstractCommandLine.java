@@ -34,7 +34,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 /**
- * Created by miroslavkopecky on 04/06/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 04.06.2016
  */
 public abstract class AbstractCommandLine {
 
@@ -55,7 +56,7 @@ public abstract class AbstractCommandLine {
 
     //Protected Methods
 
-    protected   Map<LineOptionsEnum, String> getHelp(){
+    protected Map<LineOptionsEnum, String> getHelp(){
         return helpMap;
     }
 
@@ -82,6 +83,7 @@ public abstract class AbstractCommandLine {
                 sectionActive = true;
                 activeSection = option.getCode();
                 while(sectionActive){
+                    logger.info("new command section");
                     logger.info(helpMap.get(option));
                     logger.info("TYPE COMMAND:");
                     String inputText = input.nextLine();
@@ -105,6 +107,7 @@ public abstract class AbstractCommandLine {
                 logger.info("new command section...");
                 break;
             case COMMAND_LINE:
+                logger.info("command-line section...");
                 logger.info(helpMap.get(option));
                 activeSection = option.getCode();
                 sectionActive = true;
@@ -146,7 +149,7 @@ public abstract class AbstractCommandLine {
     }
 
 
-    private LineCommandDTO transformToCommand(String text) throws CommandLineException{
+    private LineCommandDTO transformToCommand(String text) throws CommandLineException {
         try {
             final JSONObject request = (JSONObject)parser.parse(text);
             final String type = getProperty(request, "type");

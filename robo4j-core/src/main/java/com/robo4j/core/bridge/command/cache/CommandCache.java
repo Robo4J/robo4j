@@ -34,7 +34,10 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 
 /**
- * Created by miroslavkopecky on 17/04/16.
+ *
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 17.04.2016
  */
 public final class CommandCache extends CommandCacheDefault implements DefaultSystemConfig {
 
@@ -70,11 +73,11 @@ public final class CommandCache extends CommandCacheDefault implements DefaultSy
     //Private Methods
 
     /**
-     * Command cache should always contain default commands
+     * when anything is defined only default option (exit) is available
      */
     @SuppressWarnings(value = "unchecked")
     private <Annotation extends BatchAnnotation,
-            Command extends BatchCommand >  Map<String, Command>
+            Command extends BatchCommand> Map<String, Command>
                         initCache(LegoBrickPropertiesHolder holder, Class<Annotation> anno){
 
         try {
@@ -109,10 +112,8 @@ public final class CommandCache extends CommandCacheDefault implements DefaultSy
         }
     }
 
-    //Private Methods
     private boolean validateConfiguration(LegoBrickPropertiesHolder holder){
         return Objects.nonNull(holder.getCommandPackage()) && !holder.getCommandPackage().isEmpty();
     }
-
 
 }

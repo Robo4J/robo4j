@@ -21,8 +21,8 @@ package com.robo4j.core.engines;
 
 import com.robo4j.commons.annotation.RoboEngine;
 import com.robo4j.core.control.DefaultSystemConfig;
-import com.robo4j.lego.control.LegoEngine;
 import com.robo4j.core.lego.LegoBrickPropertiesHolder;
+import com.robo4j.lego.control.LegoEngine;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -38,7 +38,8 @@ import java.util.concurrent.Executors;
 /**
  * Engine configuration is unique
  *
- * Created by miroslavkopecky on 05/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 05.05.2016
  */
 public class EngineCache implements DefaultSystemConfig {
 

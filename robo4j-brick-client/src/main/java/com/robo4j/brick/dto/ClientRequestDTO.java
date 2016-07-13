@@ -27,13 +27,15 @@ import com.robo4j.brick.util.ConstantUtil;
  * Client Request Holder for incoming requests
  * Single instance
  *
- * Created by miroslavkopecky on 11/06/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 11.06.2016
  */
-public class ClientRequestDTO {
+public class ClientRequestDTO implements ClientCommandDTO {
 
     private Long stamp;
     private RequestCommandEnum type;
     private String value;
+    private String speed;
 
 
     public ClientRequestDTO(String value){
@@ -41,22 +43,37 @@ public class ClientRequestDTO {
         final String[] values = value.split(ConstantUtil.getHttpSeparator(3));
         this.type = RequestCommandEnum.getRequestValue(values[ConstantUtil.DEFAULT_VALUE]);
         this.value = values[1];
+        this.speed = "300";
     }
 
     public ClientRequestDTO(RequestCommandEnum type, String value) {
         this.stamp = System.currentTimeMillis();
         this.type = type;
         this.value = value;
+        this.speed = "300";
+    }
+
+    public ClientRequestDTO(RequestCommandEnum type, String value, String speed) {
+        this.stamp = System.currentTimeMillis();
+        this.type = type;
+        this.value = value;
+        this.speed = speed;
+    }
+
+    public String getSpeed() {
+        return speed;
     }
 
     public Long getStamp() {
         return stamp;
     }
 
+    @Override
     public RequestCommandEnum getType() {
         return type;
     }
 
+    @Override
     public String getValue() {
         return value;
     }
@@ -64,8 +81,10 @@ public class ClientRequestDTO {
     @Override
     public String toString() {
         return "ClientRequestDTO{" +
-                "type=" + type +
+                "stamp=" + stamp +
+                ", type=" + type +
                 ", value='" + value + '\'' +
+                ", speed='" + speed + '\'' +
                 '}';
     }
 }

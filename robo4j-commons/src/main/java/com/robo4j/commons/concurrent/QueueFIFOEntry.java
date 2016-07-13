@@ -23,7 +23,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * keep order in the queue
- * Created by miroslavkopecky on 13/04/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 13.04.2016
  */
 public class QueueFIFOEntry<FIFOTransferType extends Comparable<FIFOTransferType>>  implements Comparable<QueueFIFOEntry<FIFOTransferType>>, TransferSignal {
 

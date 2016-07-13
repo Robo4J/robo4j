@@ -25,7 +25,9 @@ import com.robo4j.lego.enums.LegoEngineEnum;
 import com.robo4j.lego.enums.LegoEnginePartEnum;
 
 /**
- * Created by miroslavkopecky on 05/05/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 05.05.2016
  */
 public interface LegoEngine extends RoboSystemConfig {
 

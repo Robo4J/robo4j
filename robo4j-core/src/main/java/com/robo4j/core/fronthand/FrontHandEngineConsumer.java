@@ -19,6 +19,8 @@
 
 package com.robo4j.core.fronthand;
 
+import com.robo4j.commons.agent.AgentConsumer;
+import com.robo4j.commons.concurrent.CoreBusQueue;
 import lejos.remote.ev3.RMIRegulatedMotor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +30,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Exchanger;
 
 /**
- * Created by miroslavkopecky on 27/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 27.04.2016
  */
-public class FrontHandEngineConsumer implements Callable<Boolean> {
+public class FrontHandEngineConsumer implements AgentConsumer, Callable<Boolean> {
 
     private static final Logger logger = LoggerFactory.getLogger(FrontHandEngineConsumer.class);
 
@@ -41,6 +44,15 @@ public class FrontHandEngineConsumer implements Callable<Boolean> {
     public FrontHandEngineConsumer(Exchanger<Boolean> exchanger, RMIRegulatedMotor engine){
         this.exchanger = exchanger;
         this.motorHandPortA = engine;
+    }
+
+    @Override
+    public void setMessageQueue(CoreBusQueue commandsQueue) {
+
+    }
+
+    public RMIRegulatedMotor getMotorHandPortA(){
+        return motorHandPortA;
     }
 
     @Override

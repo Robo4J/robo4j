@@ -21,10 +21,10 @@ package com.robo4j.core.fronthand;
 
 /**
  * @author Miro Kopecky (@miragemiko)
- * @since  27.04.2016*
+ * @since 27.04.2016
  */
 public final class FrontHandUtils {
 
-    protected static final String BUS_FRONT_HAND = "front-hand";
+    public static final String BUS_FRONT_HAND = "front-hand";
 
 }

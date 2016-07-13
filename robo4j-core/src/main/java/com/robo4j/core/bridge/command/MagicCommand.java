@@ -23,7 +23,9 @@ import com.robo4j.commons.annotation.BatchAnnotation;
 import com.robo4j.core.bridge.command.cache.BatchCommand;
 
 /**
- * Created by miroslavkopecky on 17/04/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 17.04.2016
  */
 @BatchAnnotation(name = "magic", batch = "move(30),right(360),back(30)")
 public class MagicCommand implements BatchCommand {

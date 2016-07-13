@@ -20,11 +20,14 @@
 package com.robo4j.brick.system;
 
 import com.robo4j.brick.client.enums.RequestCommandEnum;
-import com.robo4j.commons.command.CommandProperties;
 import com.robo4j.commons.command.GenericCommand;
 
 /**
- * Created by miroslavkopecky on 10/06/16.
+ * RoboUnit doesn't included the definition of the process method.
+ * Reason because process can be done by Agent without human input
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 10.06.2016
  */
 public interface CommandProvider {
 

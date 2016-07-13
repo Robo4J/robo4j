@@ -28,7 +28,9 @@ import java.rmi.RemoteException;
 /**
  *
  * Interface that provides methods with implemented logic
- * Created by miroslavkopecky on 27/09/14.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 27.09.2014
  */
 public interface LegoBrickCommandsProvider {
 

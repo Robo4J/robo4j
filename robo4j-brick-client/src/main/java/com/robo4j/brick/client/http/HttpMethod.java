@@ -28,7 +28,8 @@ import java.util.Objects;
  *  The HTTP request methods
  *  <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html">methods</a>
  *
- * Created by miroslavkopecky on 06/03/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 06.03.2016
  */
 public enum HttpMethod implements Comparator<HttpMethod> {
 

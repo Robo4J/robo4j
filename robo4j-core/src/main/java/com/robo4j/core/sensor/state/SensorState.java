@@ -23,6 +23,7 @@ import com.robo4j.commons.concurrent.TransferSignal;
 import com.robo4j.lego.enums.LegoSensorEnum;
 
 /**
+ *
  * @author Miro Kopecky (@miragemiko)
  * @since 22.05.2016
  */

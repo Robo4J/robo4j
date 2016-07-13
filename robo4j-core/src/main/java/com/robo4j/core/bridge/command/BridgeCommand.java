@@ -24,9 +24,10 @@ import com.robo4j.core.platform.PlatformProperties;
 import com.robo4j.core.platform.command.LegoPlatformCommandEnum;
 
 /**
- * Created by miroslavkopecky on 03/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 03.04.2016
  */
-public class BridgeCommand implements Comparable<BridgeCommand> , TransferSignal {
+public class BridgeCommand implements Comparable<BridgeCommand>, TransferSignal {
 
     private PlatformProperties properties;
     private LegoPlatformCommandEnum type;
@@ -90,6 +91,7 @@ public class BridgeCommand implements Comparable<BridgeCommand> , TransferSignal
         return "BridgeProperties{" +
                 "type=" + type +
                 ", value='" + value + '\'' +
+                ", properties= " + properties + '\'' +
                 '}';
     }
 }

@@ -22,10 +22,10 @@ package com.robo4j.core.bridge;
 import com.robo4j.commons.agent.AgentConsumer;
 import com.robo4j.commons.agent.AgentProducer;
 import com.robo4j.commons.agent.AgentStatus;
-import com.robo4j.commons.agent.RoboAgent;
+import com.robo4j.commons.agent.GenericAgent;
 import com.robo4j.commons.concurrent.LegoThreadFactory;
-import com.robo4j.core.agent.GenericAgent;
 import com.robo4j.core.agent.GenericAgentBuilder;
+import com.robo4j.lego.control.LegoUnit;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -35,8 +35,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * ControlBridge methods used for any future bridge
- *
  * @author Miro Kopecky (@miragemiko)
  * @since 28.05.2016
  */
@@ -61,18 +59,19 @@ public abstract class AbstractControlBridge<FutureType extends Callable> extends
         coreBus = Executors.newCachedThreadPool(new LegoThreadFactory(BridgeUtils.BUS_CORE_BUS));
         sensorBus = Executors.newCachedThreadPool(new LegoThreadFactory(BridgeUtils.BUS_SENSOR_BUS));
         commandLineQueue = new LinkedBlockingQueue<>();
+        initUnits();
     }
 
     public void executeToSensorBus(Runnable task){
         sensorBus.execute(task);
     }
 
-    protected void putCommand(String c) throws InterruptedException{
+    protected void putCommand(String c) throws InterruptedException {
         commandLineQueue.put(c);
     }
 
-    protected RoboAgent getCoreBridgeAgent(final AgentProducer producer, final AgentConsumer consumer){
-        final GenericAgent result = GenericAgentBuilder.Builder(coreBus)
+    protected GenericAgent getCoreBridgeAgent(final AgentProducer producer, final AgentConsumer consumer){
+        final com.robo4j.core.agent.GenericAgent result = GenericAgentBuilder.Builder(coreBus)
                 .setProducer(producer)
                 .setConsumer(consumer)
                 .build();
@@ -105,5 +104,14 @@ public abstract class AbstractControlBridge<FutureType extends Callable> extends
 
     protected void guardianBusDown(){
         guardianBus.shutdown();
+    }
+
+    //Private Methods
+    private void initUnits(){
+        unitCache.getCache().entrySet().stream()
+                .forEach(pre -> {
+                    LegoUnit legoUnit = pre.getValue();
+                    legoUnit.setExecutor(coreBus);
+                });
     }
 }

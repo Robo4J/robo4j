@@ -26,7 +26,9 @@ import com.robo4j.lego.enums.LegoEngineEnum;
 import com.robo4j.lego.enums.LegoEnginePartEnum;
 
 /**
- * Created by miroslavkopecky on 04/06/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 05.05.2016
  */
 @RoboEngine(value = "left")
 public class LeftEngine implements LegoEngine {

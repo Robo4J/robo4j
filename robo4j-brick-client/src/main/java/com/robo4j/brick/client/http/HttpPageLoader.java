@@ -33,7 +33,8 @@ import java.util.stream.Collectors;
  *
  * Responsible for loading pages
  *
- * Created by miroslavkopecky on 23/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 23.05.2016
  */
 public final class HttpPageLoader {
 
@@ -44,7 +45,7 @@ public final class HttpPageLoader {
         this.resourceLoader = new ResourceLoader();
     }
 
-    public String getWebPage(String name) throws IOException{
+    public String getWebPage(String name) throws IOException {
         final Resource resource = resourceLoader.getInputStream(Paths.get(HTTP_PAGES_DIR, name).toString());
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             return reader.lines().collect(Collectors.joining());

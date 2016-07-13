@@ -23,7 +23,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 /**
- * Created by miroslavkopecky on 03/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 03.05.2016
  */
 public final class ConnectionUtil {
     private static final int TIMEOUT = 2000;

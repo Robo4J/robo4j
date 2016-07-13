@@ -21,7 +21,9 @@ package com.robo4j.brick.client.request;
 
 /**
  * Result of HTTP Request processor
- * Created by miroslavkopecky on 18/06/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 18.06.2016
  */
 public final class ProcessorResult {
 

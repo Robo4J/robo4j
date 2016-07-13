@@ -20,11 +20,11 @@
 package com.robo4j.core.sensor;
 
 /**
+ *
  * @author Miro Kopecky (@miragemiko)
- * @since 23.04.2016
+ * @since 21.06.2016
  */
 public class SensorException extends RuntimeException {
-
     public SensorException(String message) {
         super(message);
     }

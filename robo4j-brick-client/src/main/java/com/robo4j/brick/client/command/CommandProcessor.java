@@ -21,8 +21,6 @@ package com.robo4j.brick.client.command;
 
 import com.robo4j.brick.bus.ClientBusQueue;
 import com.robo4j.brick.client.enums.RequestCommandEnum;
-import com.robo4j.brick.client.io.ClientException;
-import com.robo4j.brick.client.util.ClientCommException;
 import com.robo4j.brick.dto.ClientRequestDTO;
 import com.robo4j.brick.util.ConstantUtil;
 import com.robo4j.commons.agent.AgentProducer;
@@ -38,9 +36,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Command Processor is singleton
  * Command Processor is producer
  *
- * Created by miroslavkopecky on 09/06/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 09.06.2016
  */
-public final class CommandProcessor implements AgentProducer, Runnable{
+public final class CommandProcessor implements AgentProducer, Runnable {
 
     private static final int AWAIT_SECONDS = 2;
     private volatile AtomicBoolean active;
@@ -51,6 +50,7 @@ public final class CommandProcessor implements AgentProducer, Runnable{
         messageQueue = new ClientBusQueue<QueueFIFOEntry<?>>(AWAIT_SECONDS);
         this.active = active;
         this.inputQueue = inputQueue;
+        System.out.println("PRODUCER UP");
     }
 
     @Override
@@ -61,10 +61,10 @@ public final class CommandProcessor implements AgentProducer, Runnable{
     @Override
     @SuppressWarnings(value = "unchecked")
     public void run() {
+        //TODO: improve this part separate
         try {
             while(active.get()) {
                 final List<ClientRequestDTO> commandQueue = inputQueue.take();
-
                 for (ClientRequestDTO element : commandQueue) {
                     switch (element.getType()) {
                         case EXIT:
@@ -72,24 +72,26 @@ public final class CommandProcessor implements AgentProducer, Runnable{
                         case BACK:
                         case LEFT:
                         case RIGHT:
-                            messageQueue.transfer(getCommand(element.getType(), element.getValue()));
+                        case HAND:
+                            messageQueue.transfer(getCommand(element.getType(), element.getValue(), element.getSpeed()));
                             break;
                         default:
-                            throw new ClientCommException("NO such command element= " + element);
                     }
+
                 }
+
             }
         } catch (InterruptedException e) {
-            throw new ClientException("Command Processor problem ", e);
+            e.printStackTrace();
         }
 
     }
 
     //Private Methods
     @SuppressWarnings(value = "unchecked")
-    private QueueFIFOEntry getCommand(RequestCommandEnum type, String value){
+    private QueueFIFOEntry getCommand(RequestCommandEnum type, String value, String speed){
         /* client command holding default values */
-        final ClientCommandProperties properties = new ClientCommandProperties();
+        final ClientCommandProperties properties = new ClientCommandProperties(Integer.parseInt(speed));
         final GenericCommand<RequestCommandEnum> command = new GenericCommand<>(properties, type, value, ConstantUtil.DEFAULT_PRIORITY);
         return new QueueFIFOEntry<>(command);
     }

@@ -27,6 +27,7 @@ import com.robo4j.core.platform.command.LegoCommandProperty;
  *
  * 200(22)
  * 100(11)
+ * currently only basic calculation
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 31.03.2016
@@ -35,18 +36,24 @@ public class PlatformProperties {
 
     private static final int DEFAULT_CYCLES = 300;
     private static final int DEFAULT_CENTIMETER_CYCLES = 33;
+    private static final int DEFAULT_ROTATION_CYCLES = 9;
 
+    /* default engine speed  */
     private int cycles;
+    /* cycles calculation  */
     private int centimeterCycles;
+    private int angleCycles;
 
     public PlatformProperties() {
         this.cycles = DEFAULT_CYCLES;
         this.centimeterCycles = DEFAULT_CENTIMETER_CYCLES;
+        this.angleCycles = DEFAULT_ROTATION_CYCLES;
     }
 
     public PlatformProperties(int cycles, int centimeterCycles) {
         this.cycles = cycles;
         this.centimeterCycles = centimeterCycles;
+        this.angleCycles = DEFAULT_ROTATION_CYCLES;
     }
 
     public int getCycles() {
@@ -67,6 +74,14 @@ public class PlatformProperties {
 
     public void setCentimeterCycles(int centimeterCycles) {
         this.centimeterCycles = centimeterCycles;
+    }
+
+    public int getAngleCycles() {
+        return angleCycles;
+    }
+
+    public void setAngleCycles(int angleCycles) {
+        this.angleCycles = angleCycles;
     }
 
     public LegoCommandProperty getCycleCommandProperty(){

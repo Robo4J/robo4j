@@ -20,6 +20,7 @@
 package com.robo4j.core.platform;
 
 /**
+ *
  * @author Miro Kopecky (@miragemiko)
  * @since 25.04.2016
  */

@@ -23,7 +23,9 @@ import com.robo4j.commons.annotation.BatchAnnotation;
 import com.robo4j.core.bridge.command.cache.BatchCommand;
 
 /**
- * Created by miroslavkopecky on 17/04/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 17.04.2016
  */
 @BatchAnnotation(name = "littleLeft40", batch = "left(90),move(40)")
 public class LittleLeft40BatchCommand implements BatchCommand {

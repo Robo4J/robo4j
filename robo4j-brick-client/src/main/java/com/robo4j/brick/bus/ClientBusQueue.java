@@ -22,7 +22,8 @@ package com.robo4j.brick.bus;
 import com.robo4j.commons.concurrent.CoreBusQueue;
 
 /**
- * Created by miroslavkopecky on 10/06/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 10.06.2016
  */
 public class ClientBusQueue<TransferType> extends CoreBusQueue {
 

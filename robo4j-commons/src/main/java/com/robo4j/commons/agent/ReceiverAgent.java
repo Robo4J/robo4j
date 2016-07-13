@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This RoboCoreCommand.java is part of robo4j.
+ * This ReceiverAgent.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,13 +17,22 @@
  *
  */
 
-package com.robo4j.core.control;
+package com.robo4j.commons.agent;
 
 /**
- * Marker interface for enums
+ * Agent contains only producer and consumer which are operates together
+ * main function of the agent is activate. Then agent lives his life cycle.
+ * Agent allows the access to his internal cache
  *
- * Created by miroslavkopecky on 28/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 05.07.2016
  */
-public interface RoboCoreCommand extends RoboTypeCommand {
-    String getName();
+public interface ReceiverAgent extends GenericAgent {
+
+    AgentStatus activate();
+
+    AgentCache<AgentStatus> getCache();
+
+    void addStatus(AgentStatus status);
+
 }

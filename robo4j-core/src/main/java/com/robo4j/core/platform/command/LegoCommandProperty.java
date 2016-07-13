@@ -23,18 +23,29 @@ package com.robo4j.core.platform.command;
  *
  * Lego Property Is holding values for Lego Parts
  *
- * Created by miroslavkopecky on 28/03/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 28.03.2016
  */
 public class LegoCommandProperty {
 
     private String value;
+    private int speed;
 
     public LegoCommandProperty(String value) {
         this.value = value;
     }
 
+    public LegoCommandProperty(String value, int speed) {
+        this.value = value;
+        this.speed = speed;
+    }
+
     public String getValue() {
         return value;
+    }
+
+    public int getSpeed() {
+        return speed;
     }
 
     @Override
@@ -44,19 +55,23 @@ public class LegoCommandProperty {
 
         LegoCommandProperty that = (LegoCommandProperty) o;
 
+        if (speed != that.speed) return false;
         return value != null ? value.equals(that.value) : that.value == null;
 
     }
 
     @Override
     public int hashCode() {
-        return value != null ? value.hashCode() : 0;
+        int result = value != null ? value.hashCode() : 0;
+        result = 31 * result + speed;
+        return result;
     }
 
     @Override
     public String toString() {
-        return "LegoPlatformProperty{" +
+        return "LegoCommandProperty{" +
                 "value='" + value + '\'' +
+                ", speed='" + speed + '\'' +
                 '}';
     }
 }

@@ -27,7 +27,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by miroslavkopecky on 19/06/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 19.06.2016
  */
 public class RequestCommandDTOBuilder {
 

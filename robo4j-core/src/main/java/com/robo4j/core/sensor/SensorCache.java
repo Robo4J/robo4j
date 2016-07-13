@@ -37,18 +37,19 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 
 /**
- * Sensor cache is unique for RoboSystem
+ * Sensor cache is unique inside the RoboSystem
+ *
  *
  * @author Miro Kopecky (@miragemiko)
- * @since 26.06.2016
+ * @since 20.06.2016
  */
 public class SensorCache implements DefaultSystemConfig {
 
     private volatile static SensorCache INSTANCE;
     private volatile static Map<String, LegoSensor> cache;
 
-    private SensorCache(LegoBrickPropertiesHolder legoBrickPropertiesHolder){
-        cache = initCache(legoBrickPropertiesHolder, RoboSensor.class);
+    private SensorCache(LegoBrickPropertiesHolder holder){
+        cache = initCache(holder, RoboSensor.class);
     }
 
     public Map<String, LegoSensor> getCache() {
@@ -78,37 +79,36 @@ public class SensorCache implements DefaultSystemConfig {
      */
     @SuppressWarnings(value = "unchecked")
     private <Annotation extends RoboSensor, SensorType extends LegoSensor> Map<String, SensorType>
-    initCache(LegoBrickPropertiesHolder holder, Class<Annotation> annotation){
-        try{
-            final Map<String, LegoSensor> result = new HashMap<>();
-            if(validateConfiguration(holder)){
-                Reflections reflections = new Reflections(new ConfigurationBuilder()
-                        .setUrls(ClasspathHelper.forPackage(holder.getSensorPackage()))
-                        .setExecutorService(Executors.newFixedThreadPool(REFLECTION_THREADS))
-                        .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
-                );
-                Set<Class<?>> classes = reflections.getTypesAnnotatedWith(annotation);
-                reflections.getConfiguration().getExecutorService().shutdown();
+        initCache(LegoBrickPropertiesHolder holder, Class<Annotation> annotation){
+            try{
+                final Map<String, LegoSensor> result = new HashMap<>();
+                if(validateConfiguration(holder)){
+                    Reflections reflections = new Reflections(new ConfigurationBuilder()
+                            .setUrls(ClasspathHelper.forPackage(holder.getSensorPackage()))
+                            .setExecutorService(Executors.newFixedThreadPool(REFLECTION_THREADS))
+                            .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
+                    );
+                    Set<Class<?>> classes = reflections.getTypesAnnotatedWith(annotation);
+                    reflections.getConfiguration().getExecutorService().shutdown();
 
-                for(Class c: classes){
-                    Annotation roboSensor = (Annotation)c.getAnnotation(annotation);
-                    SensorType sensor = (SensorType) c.getConstructor().newInstance();
-                    if(Objects.isNull(sensor.getSensor()) || Objects.isNull(sensor.getPort())){
-                        throw new EngineCacheException("CACHE SENSOR NOT VALID = " + sensor);
-                    } else {
-                        result.put(roboSensor.value(), sensor);
+                    for(Class c: classes){
+                        Annotation roboSensor = (Annotation)c.getAnnotation(annotation);
+                        SensorType sensor = (SensorType) c.getConstructor().newInstance();
+                        if(Objects.isNull(sensor.getSensor()) || Objects.isNull(sensor.getPort())){
+                            throw new EngineCacheException("CACHE SENSOR NOT VALID = " + sensor);
+                        } else {
+                            result.put(roboSensor.value(), sensor);
+                        }
                     }
                 }
+                return (Map<String, SensorType>)result;
+            } catch (Exception e){
+                throw new SensorException("SENSOR CACHE PROBLEM", e);
             }
-            return (Map<String, SensorType>)result;
-        } catch (Exception e){
-            throw new SensorException("SENSOR CACHE PROBLEM", e);
-        }
     }
 
     /* Util method to check the configuration */
     private boolean validateConfiguration(final LegoBrickPropertiesHolder holder){
-        return Objects.nonNull(holder.getSensorPackage()) && !holder.getSensorPackage().isEmpty();
+        return Objects.nonNull(holder.getSensorPackage()) && !holder.getCommandPackage().isEmpty();
     }
-
 }

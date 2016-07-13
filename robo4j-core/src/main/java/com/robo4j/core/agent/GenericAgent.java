@@ -29,17 +29,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
+import java.util.function.BiFunction;
 
 /**
  * Current RoboCache is implement with String
  *
- * Created by miroslavkopecky on 29/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 29.05.2016
  */
 public class GenericAgent implements DefaultAgent {
 
     private static final Logger logger = LoggerFactory.getLogger(GenericAgent.class);
     private final AgentCache<AgentStatus> cache;
     private ExecutorService executor;
+    private String name;
     private AgentProducer producer;
     private AgentConsumer consumer;
 
@@ -56,20 +59,18 @@ public class GenericAgent implements DefaultAgent {
         consumer.setMessageQueue(producer.getMessageQueue());
     }
 
-    public AgentStatus activate(){
-
-        executor.execute((Runnable) producer);
-        executor.execute((Runnable) consumer);
-
-        final AgentStatus result = new AgentStatus<String>(AgentStatusEnum.ACTIVE);
-        cache.put(result);
-        logger.info("AGENT ACTIVE = " + cache);
-        return result;
+    public AgentStatus activate() {
+        return activateFunction().apply(producer, consumer);
     }
 
     @Override
     public void setExecutor(ExecutorService executor) {
         this.executor = executor;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
@@ -80,7 +81,17 @@ public class GenericAgent implements DefaultAgent {
     @Override
     public void setConsumer(AgentConsumer consumer) {
         this.consumer = consumer;
-
     }
 
+    //Private Methods
+    private BiFunction<AgentProducer, AgentConsumer, AgentStatus> activateFunction(){
+        return (AgentProducer producer, AgentConsumer consumer) -> {
+            executor.execute((Runnable) producer);
+            executor.execute((Runnable) consumer);
+            final AgentStatus result = new AgentStatus<String>(AgentStatusEnum.ACTIVE);
+            cache.put(result);
+            logger.info("AGENT ACTIVE = " + cache);
+            return result;
+        };
+    }
 }

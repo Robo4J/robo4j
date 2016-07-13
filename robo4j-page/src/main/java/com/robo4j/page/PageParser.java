@@ -24,8 +24,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Initiate version of template engine
- * Created by miroslavkopecky on 11/06/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 11.06.2016
  */
 public class PageParser {
 
@@ -34,8 +35,7 @@ public class PageParser {
     private static final Pattern pageValuePattern = Pattern.compile("("+BRACKET_START+"[a-z]+[0-9]?+"+BRACKET_END+")");
     private static final String EMPTY = "";
 
-    public static String  parseAndReplace(final String input, final Map<String, String> values) {
-
+    public static String parseAndReplace(final String input, final Map<String, String> values) {
         String result = input;
         final Matcher matcherMain = pageValuePattern.matcher(result.trim());
         int filledOut = 0;

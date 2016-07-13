@@ -25,7 +25,8 @@ import com.robo4j.core.control.RoboSystemProperties;
 import java.util.Map;
 
 /**
- * Created by miroslavkopecky on 11/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 11.04.2016
  */
 public class LegoBrickPropertiesHolder implements RoboSystemProperties, RoboSystemConfig {
 
@@ -34,6 +35,7 @@ public class LegoBrickPropertiesHolder implements RoboSystemProperties, RoboSyst
     public static final String COMMAND_PACKAGE = "commands_package";
     public static final String ENGINE_PACKAGE = "engine_package";
     public static final String SENSOR_PACKAGE = "sensor_package";
+    public static final String UNIT_PACKAGE = "unit_package";
     private Map<String, String> map;
 
     public LegoBrickPropertiesHolder(final Map<String, String> map) {
@@ -43,10 +45,12 @@ public class LegoBrickPropertiesHolder implements RoboSystemProperties, RoboSyst
     public LegoBrickPropertiesHolder(final LegoBrickProperties legoBrickProperties){
         /* add all available lego bricks */
         this.map = legoBrickProperties.getBricks();
+        //TODO: corepackage is currently duplicate to ControlPad
         map.put(CORE_PACKAGE, legoBrickProperties.getCorePackage());
         map.put(COMMAND_PACKAGE, legoBrickProperties.getCommandPackage());
         map.put(ENGINE_PACKAGE, legoBrickProperties.getEnginePackage());
         map.put(SENSOR_PACKAGE, legoBrickProperties.getSensorPackage());
+        map.put(UNIT_PACKAGE, legoBrickProperties.getUnitPackage());
     }
 
     @Override
@@ -76,6 +80,10 @@ public class LegoBrickPropertiesHolder implements RoboSystemProperties, RoboSyst
 
     public String getSensorPackage(){
         return map.get(SENSOR_PACKAGE);
+    }
+
+    public String getUnitPackage(){
+        return map.get(UNIT_PACKAGE);
     }
 
     @Override

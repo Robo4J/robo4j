@@ -23,7 +23,8 @@ import com.robo4j.commons.annotation.BatchAnnotation;
 import com.robo4j.core.bridge.command.cache.BatchCommand;
 
 /**
- * Created by miroslavkopecky on 18/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 18.04.2016
  */
 @BatchAnnotation(name = "bad")
 public class BadCommand implements BatchCommand {

@@ -22,6 +22,7 @@ package com.robo4j.brick.client.util;
 import com.robo4j.brick.client.enums.RequestCommandEnum;
 import com.robo4j.brick.dto.ClientRequestDTO;
 import com.robo4j.brick.util.ConstantUtil;
+import com.robo4j.commons.command.CommandTargetEnum;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -38,7 +39,8 @@ import java.util.stream.Collectors;
  *
  * Basic Http constants and utils methods
  *
- * Created by miroslavkopecky on 23/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 23.05.2016
  */
 public final class HttpUtils {
 
@@ -51,12 +53,15 @@ public final class HttpUtils {
     public static final String PAGE_STATUS = "status.html";
     public static final String PAGE_EXIT = "exit.html";
     public static final String STRING_EMPTY = "";
+
+    /* command represent command line order */
     public static final String HTTP_COMMAND = "command";
+    /* commands represent list of commands */
+    private static final String HTTP_COMMANDS = "commands";
+
     public static final String HTTP_AGENT_CACHE = "cache";
 
-    /* private values  */
     private static final String NEXT_LINE = "\r\n";
-    private static final String HTTP_COMMANDS = "commands";
     private static final int POST_COMMAND_SEP = 2;
 
     public static String setHeader(String responseCode, int length) throws IOException {
@@ -70,6 +75,7 @@ public final class HttpUtils {
                 .append("Content-type: text/html; charset=utf-8").append(NEXT_LINE).append(NEXT_LINE)
                 .toString();
     }
+
 
     /**
      * Parsing received buffer to the list of ClientRequestCommands
@@ -86,20 +92,17 @@ public final class HttpUtils {
                         ConstantUtil.getHttpSeparator(POST_COMMAND_SEP)));
                 break;
             case HTTP_COMMANDS:
-                System.out.println("RESULT= " + result);
                 result.addAll(parseJSONArray((JSONArray) request.get(HTTP_COMMANDS)));
                 break;
             default:
                 break;
         }
-
         return result;
     }
 
     public static List<ClientRequestDTO> parseURIQuery(final String uriQuery, final String delimiter){
-        return Arrays.asList(uriQuery
+        return Arrays.stream(uriQuery
                 .split(delimiter))
-                .stream()
                 .filter(e -> !e.isEmpty())
                 .map(ClientRequestDTO::new)
                 .collect(Collectors.toCollection(LinkedList::new));
@@ -125,11 +128,20 @@ public final class HttpUtils {
         return (List<ClientRequestDTO>)jsonArray.stream()
                 .map(e -> {
                     JSONObject obj = (JSONObject)e;
-                    RequestCommandEnum name = RequestCommandEnum.getRequestValue(obj.get("name").toString());
-                    return new ClientRequestDTO(name, obj.get("value").toString());
+
+                    final String target = obj.get("target").toString();
+                    final String name = obj.get("name").toString();
+                    final String value = obj.get("value").toString();
+                    RequestCommandEnum command = RequestCommandEnum.getRequestCommand(CommandTargetEnum.getByName(target),name);
+                    if(obj.containsKey("speed")){
+                        final String speed = obj.get("speed").toString();
+                        return new ClientRequestDTO(command, value, speed);
+                    } else {
+                        return new ClientRequestDTO(command, value);
+                    }
+
                 })
                 .collect(Collectors.toCollection(LinkedList::new));
     }
-
 
 }

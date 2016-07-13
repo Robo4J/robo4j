@@ -23,6 +23,11 @@ import com.robo4j.brick.client.AbstractClient;
 import com.robo4j.brick.client.io.ClientException;
 import com.robo4j.brick.client.request.RequestProcessorCallable;
 import com.robo4j.brick.util.ConstantUtil;
+import lejos.hardware.BrickFinder;
+import lejos.hardware.Button;
+import lejos.hardware.lcd.Font;
+import lejos.hardware.lcd.GraphicsLCD;
+import lejos.utility.Delay;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -31,30 +36,31 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
- *
- * Robo4j.io program for Lego EV3
- * program uses Lego EV3 internal resources
- *
- * Created by miroslavkopecky on 24/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 24.05.2016
  */
 public class ClientMain extends AbstractClient {
 
     private static final int PORT = 8022;
 
     public static void main(String... args){
+        System.out.println("...Robo4j running...");
         new ClientMain();
     }
 
     @SuppressWarnings(value = "unchecked")
     private ClientMain() {
 
-        System.out.println("Robo4j.io STARTS...");
+        System.out.println("SERVER starts...");
+
         boolean active = true;
         try(ServerSocket server = new ServerSocket(PORT)){
             while(active){
                 Socket request = server.accept();
-                Future<String> result = submit(new RequestProcessorCallable(request, getEngineCache()));
+                Future<String> result = submit(new RequestProcessorCallable(request,
+                        getEngineCache(), getSensorCache(), getUnitCache()));
                 if(result.get().equals(ConstantUtil.EXIT)){
+                    System.out.println("IS EXIT");
                     active = false;
                 }
             }
@@ -66,4 +72,5 @@ public class ClientMain extends AbstractClient {
         System.exit(0);
 
     }
+
 }

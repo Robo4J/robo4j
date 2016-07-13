@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Kopecky
- * This CommandTypeEnum.java is part of robo4j.
+ * This CommandTargetEnum.java is part of robo4j.
  *
  *     robo4j is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  *
  */
 
-package com.robo4j.core.bridge.command;
+package com.robo4j.commons.command;
 
 import com.robo4j.commons.enums.LegoSystemEnum;
 
@@ -25,26 +25,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by miroslavkopecky on 24/04/16.
+ * Command Target helps with particular command destination
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 05.07.2016
  */
-public enum CommandTypeEnum implements LegoSystemEnum<Integer> {
-
+public enum CommandTargetEnum implements LegoSystemEnum<Integer> {
 
     //@formatter:off
-    BATCH            (0, "B".concat(CommandUtil.COMMAND_TYPE_CLOSE)),
-    DIRECT           (1, "D".concat(CommandUtil.COMMAND_TYPE_CLOSE)),
-    HAND             (2, "H".concat(CommandUtil.COMMAND_TYPE_CLOSE)),
-    COMPLEX          (3, "C".concat(CommandUtil.COMMAND_TYPE_CLOSE)),
-    ACTIVE           (4, "A".concat(CommandUtil.COMMAND_TYPE_CLOSE)),
+    SYSTEM           (0, "system"),
+    PLATFORM         (1, "platform"),
+    HAND_UNIT        (2, "hand_unit"),
     ;
     //@formatter:on
 
     private int code;
     private String name;
 
-    private volatile static Map<String, CommandTypeEnum> defToCommandTypeMapping;
+    private volatile static Map<String, CommandTargetEnum> defToCommandTargetMapping;
 
-    CommandTypeEnum(int code, String name) {
+    CommandTargetEnum(int code, String name) {
         this.code = code;
         this.name = name;
     }
@@ -62,22 +62,21 @@ public enum CommandTypeEnum implements LegoSystemEnum<Integer> {
 
 
     private static void initMapping(){
-        defToCommandTypeMapping = new HashMap<>();
-        for(CommandTypeEnum ct: values()){
-            defToCommandTypeMapping.put(ct.getName(), ct);
+        defToCommandTargetMapping = new HashMap<>();
+        for(CommandTargetEnum ct: values()){
+            defToCommandTargetMapping.put(ct.getName(), ct);
         }
     }
 
-    public static CommandTypeEnum getByDefinition(String def){
-        if(defToCommandTypeMapping == null)
+    public static CommandTargetEnum getByName(String def){
+        if(defToCommandTargetMapping == null)
             initMapping();
-        return defToCommandTypeMapping.get(def);
+        return defToCommandTargetMapping.get(def);
     }
-
 
     @Override
     public String toString() {
-        return "CommandTypeEnum{" +
+        return "CommandTargetEnum{" +
                 "code=" + code +
                 ", name='" + name + '\'' +
                 '}';

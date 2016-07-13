@@ -25,7 +25,9 @@ import java.util.List;
 /**
  * Agent status is communication between Agent and the rest of the application
  *
- * Created by miroslavkopecky on 30/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 30.05.2016
+ *
  */
 public class AgentStatus<AgentMessage> {
 
@@ -35,6 +37,10 @@ public class AgentStatus<AgentMessage> {
     public AgentStatus(AgentStatusEnum status) {
         this.status = status;
         this.messages = new LinkedList<>();
+    }
+
+    public AgentStatusEnum getStatus(){
+        return status;
     }
 
     public void addMessage(AgentMessage message){

@@ -20,16 +20,16 @@
 package com.robo4j.core.bridge.task;
 
 import com.robo4j.commons.agent.AgentConsumer;
+import com.robo4j.commons.command.FrontHandCommandEnum;
 import com.robo4j.commons.concurrent.CoreBusQueue;
 import com.robo4j.commons.concurrent.LegoThreadFactory;
 import com.robo4j.core.bridge.BridgeUtils;
 import com.robo4j.core.bridge.command.BridgeCommand;
-import com.robo4j.core.fronthand.LegoFrontHandProvider;
-import com.robo4j.core.fronthand.command.FrontHandCommandEnum;
 import com.robo4j.core.lego.LegoException;
 import com.robo4j.core.platform.command.LegoCommandProperty;
 import com.robo4j.core.platform.command.LegoPlatformCommandEnum;
 import com.robo4j.core.platform.provider.LegoBrickCommandsProvider;
+import com.robo4j.lego.control.LegoUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +41,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ *
  * Bridge Command Consumer consumes event/tasks from Producer
  * and provides them to process
  *
@@ -53,18 +54,17 @@ public class BridgeCommandConsumer<QueueType extends CoreBusQueue> implements Ag
     private static volatile ExecutorService executorBridgeConsumer;
     private volatile AtomicBoolean active;
     private LegoBrickCommandsProvider legoBrickCommandsProvider;
-    private LegoFrontHandProvider legoFrontHandProvider;
+    private LegoUnit legoFrontHandUnit;
     private QueueType commandsQueue; //
 
 
     public BridgeCommandConsumer(AtomicBoolean active,
                                  LegoBrickCommandsProvider legoBrickCommandsProvider,
-                                 LegoFrontHandProvider legoFrontHandProvider ) {
+                                 LegoUnit legoFrontHandUnit) {
         this.active = active;
         this.legoBrickCommandsProvider = legoBrickCommandsProvider;
-        this.legoFrontHandProvider = legoFrontHandProvider;
+        this.legoFrontHandUnit = legoFrontHandUnit;
         executorBridgeConsumer = Executors.newSingleThreadExecutor(new LegoThreadFactory(BridgeUtils.BUS_COMMAND_CONSUMER));
-        logger.info("BridgeCommandConsumer INIT");
     }
 
 
@@ -79,42 +79,33 @@ public class BridgeCommandConsumer<QueueType extends CoreBusQueue> implements Ag
     public void run() {
 
         if(commandsQueue == null){
-            throw new LegoException("ERROR: consumer queue");
+             throw new LegoException("ERROR: consumer queue");
         }
 
         while(active.get() && commandsQueue.peek() != null){
             try {
                 final BridgeCommand bridgeCommand = (BridgeCommand) commandsQueue.take().getEntry();
-                logger.info("CONSUMER COMMAND = " + bridgeCommand);
                 Future<Boolean> moveFuture = null;
 
                 if(Objects.isNull(bridgeCommand.getType())){
-                    moveFuture = executorBridgeConsumer.submit(() -> {
-                        logger.info("HAND COMMAND");
-                        return legoFrontHandProvider.process(FrontHandCommandEnum.getCommand(bridgeCommand.getValue()));
-                    });
+                    moveFuture = executorBridgeConsumer.submit(() ->
+                        legoFrontHandUnit.process(FrontHandCommandEnum.getCommand(bridgeCommand.getValue()))
+                    );
 
                 } else {
                     switch (bridgeCommand.getType()){
                         case MOVE:
-                        case MOVE_CYCLES:
-                        case MOVE_DISTANCE:
-                            moveFuture= processBridgeCommand(bridgeCommand, LegoPlatformCommandEnum.MOVE_DISTANCE);
+                            moveFuture= processBridgeCommand(bridgeCommand, LegoPlatformCommandEnum.MOVE);
                             break;
                         case BACK:
-                        case BACK_CYCLES:
-                        case BACK_DISTANCE:
-                            moveFuture= processBridgeCommand(bridgeCommand, LegoPlatformCommandEnum.BACK_DISTANCE);
+                            moveFuture= processBridgeCommand(bridgeCommand, LegoPlatformCommandEnum.BACK);
                             break;
                         case LEFT:
-                        case LEFT_CYCLES:
-                            moveFuture= processBridgeCommand(bridgeCommand, LegoPlatformCommandEnum.LEFT_CYCLES);
+                            moveFuture= processBridgeCommand(bridgeCommand, LegoPlatformCommandEnum.LEFT);
                             break;
                         case RIGHT:
-                        case RIGHT_CYCLES:
-                            moveFuture= processBridgeCommand(bridgeCommand, LegoPlatformCommandEnum.RIGHT_CYCLES);
+                            moveFuture= processBridgeCommand(bridgeCommand, LegoPlatformCommandEnum.RIGHT);
                             break;
-                        case INIT:
                         case CLOSE:
                         case EXIT:
                         case STOP:
@@ -140,9 +131,12 @@ public class BridgeCommandConsumer<QueueType extends CoreBusQueue> implements Ag
     //Private Method
     private Future<Boolean> processBridgeCommand(BridgeCommand bridgeCommand, LegoPlatformCommandEnum type){
         return executorBridgeConsumer.submit(() -> {
-            logger.info("PROCESS BRIDGE COMMAND = " + bridgeCommand);
-            return legoBrickCommandsProvider.process(type,
-                    new LegoCommandProperty(bridgeCommand.getValue()));
-        });
+                logger.info("PROCESS BRIDGE COMMAND = " + bridgeCommand);
+                logger.info("PROCESS BRIDGE COMMAND speed= " + bridgeCommand.getProperties().getCycles());
+                logger.info("PROCESS BRIDGE COMMAND value= " + bridgeCommand.getValue());
+
+                return legoBrickCommandsProvider.process(type,
+                    new LegoCommandProperty(bridgeCommand.getValue(), bridgeCommand.getProperties().getCycles()));
+            });
     }
 }

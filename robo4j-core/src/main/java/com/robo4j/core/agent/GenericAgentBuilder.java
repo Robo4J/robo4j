@@ -26,15 +26,13 @@ import com.robo4j.commons.agent.DefaultAgent;
 import java.util.concurrent.ExecutorService;
 
 /**
- * Generic agent builder
- * initial version
+ * Generic Agent is used for normal operation
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 22.06.2016
  */
 public class GenericAgentBuilder<AgentType extends DefaultAgent> {
 
-    private static GenericAgentBuilder<DefaultAgent> target;
     private final AgentType agent;
     private final ExecutorService executor;
     private AgentProducer producer;
@@ -71,8 +69,7 @@ public class GenericAgentBuilder<AgentType extends DefaultAgent> {
     }
 
     public static GenericAgentBuilder<DefaultAgent> Builder(ExecutorService executor){
-        target = new GenericAgentBuilder<>(executor);
-        return target;
+        return new GenericAgentBuilder<>(executor);
     }
 
 

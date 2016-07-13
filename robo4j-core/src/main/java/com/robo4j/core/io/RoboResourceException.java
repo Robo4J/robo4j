@@ -22,7 +22,8 @@ package com.robo4j.core.io;
 import com.robo4j.core.util.RoboExceptionEnum;
 
 /**
- * Created by miroslavkopecky on 23/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 23.05.2016
  */
 public class RoboResourceException extends RuntimeException {
 

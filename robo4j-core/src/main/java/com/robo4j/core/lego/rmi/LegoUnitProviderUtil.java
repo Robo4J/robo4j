@@ -19,9 +19,9 @@
 
 package com.robo4j.core.lego.rmi;
 
-import com.robo4j.core.lego.LegoBrickRemote;
-import com.robo4j.lego.enums.LegoSensorEnum;
 import com.robo4j.core.system.dto.LegoEngineDTO;
+import com.robo4j.lego.control.LegoBrickRemote;
+import com.robo4j.lego.enums.LegoSensorEnum;
 import com.robo4j.lego.enums.LegoSensorPortEnum;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3TouchSensor;
@@ -31,6 +31,7 @@ import lejos.remote.ev3.RemoteEV3;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 import static com.robo4j.core.system.util.SystemUtil.getType;
 
@@ -38,29 +39,45 @@ import static com.robo4j.core.system.util.SystemUtil.getType;
  *
  * Util to create specific Unit on the platform
  *
- * Created by miroslavkopecky on 04/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 04.05.2016
  */
 public final class LegoUnitProviderUtil {
 
-    public static RMIRegulatedMotor createRMIEngine(final LegoBrickRemote legoBrickRemote, final LegoEngineDTO engine) {
 
+    public static RMIRegulatedMotor createRMIEngine(final LegoBrickRemote legoBrickRemote,
+                                                    final LegoEngineDTO engine,
+                                                    final int speed) throws RemoteException {
 
+        final RMIRegulatedMotor result = getRemoteEV3(legoBrickRemote.getBrick())
+                .createRegulatedMotor(getType(engine.getPort()), getType(engine.getType()));
+        result.setSpeed(speed);
+        return result;
+    }
+
+    public static RMIRegulatedMotor createRMIEngine(final LegoBrickRemote<RemoteEV3> legoBrickRemote, final LegoEngineDTO engine) {
         return legoBrickRemote.getBrick()
                 .createRegulatedMotor(getType(engine.getPort()), getType(engine.getType()));
     }
 
     public static EV3TouchSensor createTouchSensor(final LegoBrickRemote legoBrickRemote, final LegoSensorPortEnum port){
-        final Port portTouchSensor = legoBrickRemote.getBrick().getPort(port.getType());
+        final Port portTouchSensor = getRemoteEV3(legoBrickRemote.getBrick()).getPort(port.getType());
         return new EV3TouchSensor(portTouchSensor);
     }
-    public static RemoteEV3 getBrick(String address) throws IOException,  NotBoundException{
+
+    public static RemoteEV3 getBrick(String address) throws IOException, NotBoundException {
         RemoteEV3 result = new RemoteEV3(address);
         result.setDefault();
         return result;
     }
 
-    public static RMISampleProvider getRMISampleProvider(final LegoBrickRemote legoBrickRemote,
+    public static RMISampleProvider getRMISampleProvider(final LegoBrickRemote<RemoteEV3> legoBrickRemote,
                                                          final LegoSensorEnum type, final LegoSensorPortEnum port){
-        return legoBrickRemote.getBrick().createSampleProvider(port.getType(), type.getSource(), type.getMode());
+        return getRemoteEV3(legoBrickRemote.getBrick()).createSampleProvider(port.getType(), type.getSource(), type.getMode());
+    }
+
+    //Private Methdos
+    private static RemoteEV3 getRemoteEV3(Object obj){
+        return (RemoteEV3)obj;
     }
 }

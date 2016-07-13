@@ -20,7 +20,9 @@
 package com.robo4j.core.bridge.command.cache;
 
 /**
- * Created by miroslavkopecky on 18/04/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 18.04.2016
  */
 public class CacheException extends RuntimeException {
 

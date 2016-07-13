@@ -28,7 +28,8 @@ import java.lang.annotation.Target;
 /**
  * Annotates Batch Command
  *
- * Created by miroslavkopecky on 17/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 17.04.2016
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

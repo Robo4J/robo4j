@@ -17,10 +17,12 @@
  *
  */
 
-package com.robo4j.core.bridge.command;
+package com.robo4j.commons.command;
 
 /**
- * Created by miroslavkopecky on 25/04/16.
+ *
+ * @author Miro Kopecky (@miragemiko)
+ * @since 25.04.2016
  */
 public class CommandParsed {
 

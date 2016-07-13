@@ -23,7 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by miroslavkopecky on 30/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 30.05.2016
  */
 public enum  AgentStatusEnum {
 

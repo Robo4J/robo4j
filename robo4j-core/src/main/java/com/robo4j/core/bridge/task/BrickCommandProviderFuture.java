@@ -19,36 +19,43 @@
 
 package com.robo4j.core.bridge.task;
 
-import com.robo4j.lego.control.LegoEngine;
 import com.robo4j.core.lego.LegoBrickPropertiesHolder;
-import com.robo4j.core.lego.LegoBrickRemote;
 import com.robo4j.core.platform.PlatformProperties;
 import com.robo4j.core.platform.provider.LegoBrickCommandsProvider;
 import com.robo4j.core.platform.provider.LegoBrickCommandsProviderImp;
+import com.robo4j.lego.control.LegoBrickRemote;
+import com.robo4j.lego.control.LegoEngine;
+import com.robo4j.lego.control.LegoUnit;
+import lejos.remote.ev3.RemoteEV3;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
- * Created by miroslavkopecky on 30/03/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 30.03.2016
  */
 public class BrickCommandProviderFuture implements Callable<LegoBrickCommandsProvider> {
 
-    private LegoBrickRemote legoBrickRemote;
+    private LegoBrickRemote<RemoteEV3> legoBrickRemote;
     private LegoBrickPropertiesHolder legoBrickPropertiesHolder;
     private PlatformProperties properties;
     private Map<String, LegoEngine> engineCache;
+    private Map<String, LegoUnit> unitCache;
 
     public BrickCommandProviderFuture(final LegoBrickRemote brickRemote, final LegoBrickPropertiesHolder holder,
-                                      final PlatformProperties properties, final Map<String, LegoEngine> engineCache) {
+                                      final PlatformProperties properties, final Map<String, LegoEngine> engineCache,
+                                      final Map<String, LegoUnit> unitCache) {
         this.legoBrickRemote = brickRemote;
         this.legoBrickPropertiesHolder = holder;
         this.properties = properties;
         this.engineCache = engineCache;
+        this.unitCache = unitCache;
+
     }
 
     @Override
     public LegoBrickCommandsProvider call() throws Exception {
-        return new LegoBrickCommandsProviderImp(legoBrickRemote, properties, engineCache);
+        return new LegoBrickCommandsProviderImp(legoBrickRemote, properties, engineCache, unitCache);
     }
 }
