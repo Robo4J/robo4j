@@ -1,5 +1,0 @@
-Robo4j.io new command section
-You can create new command for the robot and
-store it into system internal cache. new command
-format is JSON like.
-example: {"type" : "B", "name" : "magic22", "content" : "move(22),right(360),back(33)" }

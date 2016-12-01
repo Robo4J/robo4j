@@ -1,33 +1,32 @@
 /*
- * Copyright (C) 2016. Miroslav Kopecky
- * This RequestProcessorCallable.java is part of robo4j.
+ * Copyright (C)  2016. Miroslav Kopecky
+ * This RequestProcessorCallable.java  is part of robo4j.
  *
- *     robo4j is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
+ *  robo4j is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *     robo4j is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
+ *  robo4j is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *     You should have received a copy of the GNU General Public License
- *     along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
- *
+ *  You should have received a copy of the GNU General Public License
+ *  along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.robo4j.brick.client.request;
 
 
-import com.robo4j.brick.client.http.HttpMessage;
-import com.robo4j.brick.client.http.HttpMethod;
-import com.robo4j.brick.client.http.HttpVersion;
-import com.robo4j.brick.client.util.HttpUtils;
+import com.robo4j.brick.client.enums.RequestStatusEnum;
+import com.robo4j.brick.client.enums.RequestUnitStatusEnum;
+import com.robo4j.brick.client.io.ClientException;
+import com.robo4j.http.HttpMessage;
+import com.robo4j.http.HttpMethod;
+import com.robo4j.http.HttpVersion;
+import com.robo4j.brick.logging.SimpleLoggingUtil;
 import com.robo4j.brick.util.ConstantUtil;
-import com.robo4j.commons.unit.DefaultUnit;
-import com.robo4j.lego.control.LegoEngine;
-import com.robo4j.lego.control.LegoSensor;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -37,6 +36,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
@@ -49,16 +49,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Miro Kopecky (@miragemiko)
  * @since 28.02.2016
  */
-public class RequestProcessorCallable implements Callable<String> {
+public class RequestProcessorCallable implements Callable<RequestStatusEnum> {
 
+    private static final String NEW_LINE = "\n";
     private static final int METHOD_KEY_POSITION = 0, URI_VALUE_POSITION = 1, VERSION_POSITION = 2, HTTP_HEADER_SEP = 9;
     private final RequestProcessorFactory processorFactory;
     private Socket connection;
 
-    public RequestProcessorCallable(Socket connection, Map<String, LegoEngine> engineCache,
-                                    Map<String, LegoSensor> sensorCache, Map<String, DefaultUnit> unitCache) {
+    public RequestProcessorCallable(Socket connection) {
         this.connection = connection;
-        this.processorFactory = RequestProcessorFactory.getInstance(engineCache, sensorCache, unitCache);
+        this.processorFactory = RequestProcessorFactory.getInstance();
     }
 
     private static String correctLine(String line){
@@ -66,9 +66,15 @@ public class RequestProcessorCallable implements Callable<String> {
     }
 
     @Override
-    public String call() throws IOException {
+    public RequestStatusEnum call() throws IOException{
+
+        if(Objects.isNull(connection)){
+//            SimpleLoggingUtil.debug(RequestProcessorCallable.class, "ONLY INNER AGENT ACTIVATION");
+            processorFactory.activateInner();
+
+        }
         // for security checks
-        String result = HttpUtils.STRING_EMPTY;
+        RequestStatusEnum result = RequestStatusEnum.NONE;
         try(final Writer out =  new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
             final BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))){
 
@@ -101,17 +107,34 @@ public class RequestProcessorCallable implements Callable<String> {
                     case GET:
                         processorResult = processorFactory.processGet(httpMessage);
                         out.write(processorResult.getMessage());
-                        result = processorResult.getStatus();
+                        result = convertToResult(processorResult);
                         break;
                     case POST:
                         processorResult = processorFactory.processPost(httpMessage, in);
+                        SimpleLoggingUtil.debug(getClass(), "POST: " + processorResult);
+
+                        out.write("HTTP/1.1 200 OK\n");
+                        Map<String, String> responseValues = new HashMap<>();
+//                        responseValues.put("Transfer-Encoding", "UTF-8");
+//                        responseValues.put("Connection", "closed");
+//                        responseValues.put("Server", "Robo4j-brick");
+//                        responseValues.put("Content-Type", "text/html");
+                        responseValues.put("Content-Length", String.valueOf(processorResult.getMessage().length()));
+                        responseValues.forEach((k,v) -> {
+                            try {
+                                out.write(k + ": " + v + NEW_LINE);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                        out.write(NEW_LINE);
                         out.write(processorResult.getMessage());
-                        result = processorResult.getStatus();
+                        result = convertToResult(processorResult);
                         break;
                     case HEAD:
                     case PUT:
                         out.write("something more");
-                        result = ConstantUtil.ACTIVE;
+                        result = RequestStatusEnum.ACTIVE;
                         break;
                     case DELETE:
                     case CONNECT:
@@ -120,26 +143,44 @@ public class RequestProcessorCallable implements Callable<String> {
                     default:
                         processorResult = processorFactory.processDefault(httpMessage);
                         out.write(processorResult.getMessage());
-                        result = processorResult.getStatus();
+                        result = convertToResult(processorResult);
                         break;
                 }
                 out.flush();
             }
             return result;
         } catch (IOException | InterruptedException ex){
-            System.err.println("Error talking to " + connection.getRemoteSocketAddress() + " ex= " + ex);
+            SimpleLoggingUtil.print(RequestProcessorCallable.class,
+                    "Error talking to " + connection.getRemoteSocketAddress() + " ex= " + ex);
         } finally {
 
             try {
-                System.out.println("SOCKET CLOSED");
+                SimpleLoggingUtil.print(RequestProcessorCallable.class, "SOCKET CLOSED");
 
                 connection.close();
             } catch (IOException e) {
-                System.err.println("Error Closing Connection to " + connection.getRemoteSocketAddress() + " : " + e);
+                SimpleLoggingUtil.print(RequestProcessorCallable.class,
+                        "Error Closing Connection to " + connection.getRemoteSocketAddress() + " : " + e);
             }
         }
 
         return result;
+
+    }
+
+    //Private Methods
+    private RequestStatusEnum convertToResult(ProcessorResult processorResult){
+        switch (processorResult.getType()){
+            case GENERAL:
+                SimpleLoggingUtil.debug(getClass(), "convertToResult: GENERAL");
+                return processorResult.getStatus().equals(RequestUnitStatusEnum.STOP) ?
+                       RequestStatusEnum.EXIT : RequestStatusEnum.ACTIVE;
+            case UNIT:
+                SimpleLoggingUtil.debug(getClass(), "convertToResult: UNIT");
+                return RequestStatusEnum.ACTIVE;
+            default:
+                throw new ClientException("no such request response result: " + processorResult);
+        }
 
     }
 

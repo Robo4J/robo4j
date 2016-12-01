@@ -1,34 +1,41 @@
 /*
- * Copyright (C) 2016. Miroslav Kopecky
- * This RequestProcessorFactory.java is part of robo4j.
+ * Copyright (C)  2016. Miroslav Kopecky
+ * This RequestProcessorFactory.java  is part of robo4j.
  *
- *     robo4j is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
+ *  robo4j is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *     robo4j is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
+ *  robo4j is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *     You should have received a copy of the GNU General Public License
- *     along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
- *
+ *  You should have received a copy of the GNU General Public License
+ *  along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.robo4j.brick.client.request;
 
 
+import com.robo4j.brick.bus.CommandSerialBus;
 import com.robo4j.brick.client.agent.BrickMainAgent;
 import com.robo4j.brick.client.command.CommandExecutor;
 import com.robo4j.brick.client.command.CommandProcessor;
-import com.robo4j.brick.client.http.HttpMessage;
+import com.robo4j.brick.client.enums.PageEnum;
+import com.robo4j.brick.client.enums.RequestCommandEnum;
+import com.robo4j.brick.client.enums.RequestUnitStatusEnum;
+import com.robo4j.brick.client.enums.RequestUnitTypeEnum;
 import com.robo4j.brick.client.http.HttpPageLoader;
-import com.robo4j.brick.client.http.HttpVersion;
 import com.robo4j.brick.client.util.ClientCommException;
 import com.robo4j.brick.client.util.HttpUtils;
+import com.robo4j.brick.dto.ClientCommandRequestDTO;
 import com.robo4j.brick.dto.ClientRequestDTO;
+import com.robo4j.brick.logging.SimpleLoggingUtil;
+import com.robo4j.brick.manager.RegistryManager;
+import com.robo4j.brick.service.HttpMessageService;
+import com.robo4j.brick.service.LcdService;
 import com.robo4j.brick.system.CommandProviderImpl;
 import com.robo4j.brick.util.ConstantUtil;
 import com.robo4j.commons.agent.AgentConsumer;
@@ -38,10 +45,14 @@ import com.robo4j.commons.agent.AgentStatusEnum;
 import com.robo4j.commons.agent.GenericAgent;
 import com.robo4j.commons.agent.ReceiverAgent;
 import com.robo4j.commons.concurrent.LegoThreadFactory;
+import com.robo4j.commons.control.RoboSystemConfig;
+import com.robo4j.commons.enums.RegistryTypeEnum;
 import com.robo4j.commons.http.RequestHeaderProcessor;
-import com.robo4j.commons.unit.DefaultUnit;
-import com.robo4j.lego.control.LegoEngine;
-import com.robo4j.lego.control.LegoSensor;
+import com.robo4j.commons.registry.RoboRegistry;
+import com.robo4j.commons.unit.BrainUnit;
+import com.robo4j.commons.unit.GenericUnit;
+import com.robo4j.http.HttpMessage;
+import com.robo4j.http.HttpVersion;
 import com.robo4j.page.PageParser;
 import org.json.simple.parser.ParseException;
 
@@ -49,10 +60,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -66,150 +79,244 @@ import java.util.stream.Collectors;
  * @author Miro Kopecky (@miragemiko)
  * @since 24.05.2016
  */
-final class RequestProcessorFactory {
+public final class RequestProcessorFactory {
 
     private static final int MAIN_FACTORY_AGENT = 0;
-    private static volatile RequestProcessorFactory INSTANCE;
+    private static volatile  RequestProcessorFactory INSTANCE;
     private volatile ExecutorService factoryExecutor;
     private volatile AtomicBoolean activeThread;
-    private volatile LinkedBlockingQueue<List<ClientRequestDTO>> commandQueue;
+    private volatile LinkedBlockingQueue<List<ClientCommandRequestDTO>> commandQueue;
     private final HttpPageLoader pageLoader;
     private final List<GenericAgent> agents;
+    private RegistryManager registryManager;
+    private RoboRegistry unitRegistry;
+    private LcdService lcdService;
+    private HttpMessageService convertService;
 
 
-    private RequestProcessorFactory(Map<String, LegoEngine> engineCache,
-                                    Map<String, LegoSensor> sensorCache,
-                                    Map<String, DefaultUnit> unitCache ){
+
+
+    private Map<String, RoboSystemConfig> roboSystemConfig;
+
+
+    @SuppressWarnings(value = "unchecked")
+    private RequestProcessorFactory(){
+
         this.pageLoader = new HttpPageLoader();
         this.factoryExecutor = Executors.newFixedThreadPool(ConstantUtil.PLATFORM_FACTORY,
                 new LegoThreadFactory(ConstantUtil.FACTORY_BUS));
 
         this.activeThread = new AtomicBoolean(true);
-        this.commandQueue = new LinkedBlockingQueue<>();
+        this.commandQueue = CommandSerialBus.getInstance().getQueue();
 
         this.agents = new LinkedList<>();
-        this.agents.add(MAIN_FACTORY_AGENT, getAgent(new CommandProcessor(activeThread, commandQueue),
-                new CommandExecutor(activeThread, new CommandProviderImpl(engineCache, sensorCache, unitCache))));
+        this.agents.add(MAIN_FACTORY_AGENT, getAgent(
+                new CommandProcessor(activeThread, commandQueue),
+                new CommandExecutor(activeThread, new CommandProviderImpl())));
+        this.registryManager = RegistryManager.getInstance();
+
+        //TODO :: should be changed
+        /* get active configuration */
+        this.unitRegistry = registryManager.getRegistryByType(RegistryTypeEnum.UNITS);
+        this.roboSystemConfig = new HashMap<>();
+        final RoboRegistry<RoboRegistry, RoboSystemConfig> engineRegistry = registryManager.getRegistryByType(RegistryTypeEnum.ENGINES);
+        final RoboRegistry<RoboRegistry, RoboSystemConfig> sensorsRegistry = registryManager.getRegistryByType(RegistryTypeEnum.SENSORS);
+        engineRegistry.getRegistry().entrySet()
+                .forEach(e -> roboSystemConfig.put(e.getKey(), e.getValue()));
+        sensorsRegistry.getRegistry().entrySet()
+                .forEach(e -> roboSystemConfig.put(e.getKey(), e.getValue()));
+
+
+        this.lcdService = (LcdService) registryManager.getItemByRegistry(RegistryTypeEnum.SERVICES, "lcdService");
+        this.convertService = (HttpMessageService) registryManager.getItemByRegistry(RegistryTypeEnum.SERVICES, "legoSetupService");
     }
 
-    static RequestProcessorFactory getInstance(Map<String, LegoEngine> engineCache,
-                                               Map<String, LegoSensor> sensorCache,
-                                               Map<String, DefaultUnit> unitCache){
+    public static RequestProcessorFactory getInstance(){
         if(INSTANCE == null){
             synchronized (RequestProcessorFactory.class){
                 if(INSTANCE == null){
-                    INSTANCE = new RequestProcessorFactory(engineCache, sensorCache, unitCache);
+                    INSTANCE = new RequestProcessorFactory();
                 }
             }
         }
         return INSTANCE;
     }
 
+    //TODO : improve registry
+    public void deactivate(){
+        activeThread.set(false);
+    }
 
+    /* default methods */
+    @SuppressWarnings(value = "unchecked")
+    ProcessorResult activateInner(){
+
+        final RoboRegistry<RoboRegistry, RoboSystemConfig> unitRegistry = registryManager.getRegistryByType(RegistryTypeEnum.UNITS);
+        unitRegistry.getRegistry().entrySet().stream()
+                .map(Map.Entry::getValue)
+                .map(GenericUnit.class::cast)
+                .filter(u -> u.initLogic().isEmpty())
+                .forEach(u -> u.init(null));
+
+        lcdService.printText("FRONT HAND INIT");
+        return new ProcessorResult(RequestUnitTypeEnum.UNIT, RequestUnitStatusEnum.ACTIVE, "AGENT_INTERNAL_INIT");
+    }
 
     ProcessorResult processGet(final HttpMessage httpMessage) throws IOException, InterruptedException {
-        String result = ConstantUtil.ACTIVE;
+        RequestUnitStatusEnum result = RequestUnitStatusEnum.ACTIVE;
         final StringBuilder message = new StringBuilder(ConstantUtil.EMPTY_STRING);
         final String generatedMessage;
         if(HttpVersion.containsValue(httpMessage.getVersion())){
             final URI uri  = httpMessage.getUri();
-            final List<String> paths = Arrays.asList(httpMessage.getUri().getPath().split(ConstantUtil.getHttpSeparator(12))).stream()
+            final List<String> paths = Arrays.stream(httpMessage.getUri().getPath().split(ConstantUtil.getHttpSeparator(12)))
                     .filter(e -> !e.isEmpty())
                     .collect(Collectors.toList());
+
             if(paths.size() > ConstantUtil.DEFAULT_VALUE && ConstantUtil.availablePaths.containsAll(paths)){
-                switch (paths.get(ConstantUtil.DEFAULT_VALUE).toLowerCase()){
-                    case ConstantUtil.STATUS:
+
+                final PageEnum page = PageEnum.getPageEnumByName(paths.get(ConstantUtil.DEFAULT_VALUE).toLowerCase());
+                switch (page){
+                    case STATUS:
                         final ReceiverAgent receiverAgent = (ReceiverAgent)agents.get(MAIN_FACTORY_AGENT);
-                        generatedMessage = getStatusWebPage(receiverAgent.getCache().toString());
+                        generatedMessage = getWebPageByEnum(page, receiverAgent.getCache().toString());
                         message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));  // send a MIME header
                         message.append(generatedMessage);
                         break;
-                    case ConstantUtil.EXIT:
+                    case EXIT:
+                        //TODO: // FIXME: 13/11/2016 need to be changed
                         activeThread.set(false);
-                        generatedMessage = pageLoader.getWebPage(HttpUtils.PAGE_EXIT);
+                        generatedMessage = pageLoader.getWebPage(page.getPage());
                         message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));  // send a MIME header
                         message.append(generatedMessage);
-                        result = ConstantUtil.EXIT;
+                        result = RequestUnitStatusEnum.STOP;
+                        factoryExecutor.shutdown();
+                        break;
+                    case SETUP:
+                        final String data = roboSystemConfig.entrySet().stream()
+                                .map(convertService::messageByRoboSystemConfig)
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.joining());
+                        generatedMessage = getWebPageByEnum(page, convertService.createTable(data));
+                        message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));
+                        message.append(generatedMessage);
+                        break;
                     default:
                         break;
                 }
             } else if(uri != null && uri.getQuery() != null && !uri.getQuery().isEmpty()){
-                final List<ClientRequestDTO> resultList = HttpUtils.parseURIQuery(uri.getQuery(), ConstantUtil.HTTP_QUERY_SEP);
+                final List<ClientCommandRequestDTO> resultList = HttpUtils.parseURIQuery(uri.getQuery(), ConstantUtil.HTTP_QUERY_SEP);
                 commandQueue.put(resultList);
                 addAgentMessage(AgentStatusEnum.REQUEST_GET, resultList.toString());
-                generatedMessage = getSuccessWebPage(resultList.toString());
+                generatedMessage = getWebPageByEnum(PageEnum.SUCCESS, resultList.toString());
                 message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));  // send a MIME header
                 message.append(generatedMessage);
             } else {
-                generatedMessage =  pageLoader.getWebPage(HttpUtils.PAGE_WELCOME);
+                generatedMessage = pageLoader.getWebPage(PageEnum.WELCOME.getPage());
                 message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));  // send a MIME header
                 message.append(generatedMessage);
             }
 
         } else {
             activeThread.set(false);
-            generatedMessage = pageLoader.getWebPage(HttpUtils.PAGE_ERROR);
+            generatedMessage = pageLoader.getWebPage(PageEnum.ERROR.getPage());
             message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_NOT_ALLOWED, generatedMessage.length()));
             message.append(generatedMessage);
-            result = ConstantUtil.EXIT;
+            result = RequestUnitStatusEnum.STOP;
         }
-        return new ProcessorResult(result, message.toString());
+        return new ProcessorResult(RequestUnitTypeEnum.UNIT, result, message.toString());
     }
 
+
     ProcessorResult processPost(final HttpMessage httpMessage, final BufferedReader in){
-        final String status;
+        RequestUnitStatusEnum status = null;
+        boolean takenAction = false;
 
         char[] buffer = new char[RequestHeaderProcessor.getContentLength(httpMessage.getHeader())];
         if(buffer.length != ConstantUtil.DEFAULT_VALUE){
             try {
                 in.read(buffer);
-                final List<ClientRequestDTO> resultList = HttpUtils.transformToCommands(String.valueOf(buffer));
-                if(resultList.size() > ConstantUtil.DEFAULT_VALUE){
-                    addAgentMessage(AgentStatusEnum.REQUEST_POST, resultList.toString());
-                    commandQueue.put(resultList);
-                    status = ConstantUtil.ACTIVE;
-                } else {
-                    status = ConstantUtil.EXIT;
+
+                final ClientRequestDTO parsedRequest = HttpUtils.transformToCommands(String.valueOf(buffer));
+
+                /* POST input parser: commands, brainUnits */
+                if(parsedRequest.getCommands().size() > ConstantUtil.DEFAULT_VALUE){
+                    addAgentMessage(AgentStatusEnum.REQUEST_POST, parsedRequest.getCommands().toString());
+                    SimpleLoggingUtil.debug(getClass(), "commands request: " + parsedRequest.getCommands());
+                    commandQueue.put(parsedRequest.getCommands());
+                    status = RequestUnitStatusEnum.ACTIVE;
+                    takenAction = true;
                 }
+
+                if(parsedRequest.getUnits().size() > ConstantUtil.DEFAULT_VALUE){
+                    parsedRequest.getUnits()
+                            .forEach(u -> {
+                                RoboSystemConfig du = unitRegistry.getByName(u.getName());
+                                if(du instanceof BrainUnit){
+                                    ((BrainUnit)du).setActive(u.getActive());
+                                    if(!u.getActive()){
+                                        try {
+                                            commandQueue.put(Collections.singletonList(new ClientCommandRequestDTO(RequestCommandEnum.STOP)));
+                                        } catch (InterruptedException e) {
+                                            SimpleLoggingUtil.error(getClass(), "BrainUnit: " + " no stop");
+                                        }
+                                    }
+                                }
+                            });
+
+                    status = RequestUnitStatusEnum.ACTIVE;
+                    takenAction = true;
+                    SimpleLoggingUtil.debug(getClass(), "POST UNITS  takenAction: " + takenAction + " status: " + status);
+                }
+
+                if(!takenAction){
+                    SimpleLoggingUtil.error(getClass(), "POST IS BROKEN: " + parsedRequest);
+                }
+
             } catch (IOException | ParseException | InterruptedException e) {
-                throw new ClientCommException("POST request issue");
+                throw new ClientCommException("POST request issue:", e);
             }
-        } else {
-            status = ConstantUtil.EXIT;
         }
 
-        return new ProcessorResult(status, "No Information about POST");
+        ProcessorResult result = parserProcessorResult(status, takenAction);
+        SimpleLoggingUtil.debug(getClass(), "POST result = " + result);
+        return result;
     }
 
-    ProcessorResult processDefault(final HttpMessage httpMessage) throws IOException {
+    private ProcessorResult parserProcessorResult(RequestUnitStatusEnum status, boolean takenAction){
+        return new ProcessorResult(RequestUnitTypeEnum.UNIT, takenAction ? status: RequestUnitStatusEnum.STOP,
+                "No Information about POST");
+    }
 
-        final StringBuilder message = new StringBuilder(pageLoader.getWebPage(HttpUtils.PAGE_ERROR));
+    public void processInternalCommand(final ClientCommandRequestDTO clientCommandRequestDTO){
+        try {
+            commandQueue.put(Collections.singletonList(clientCommandRequestDTO));
+        } catch (InterruptedException e) {
+            throw new ClientCommException("InternalCommand issue:", e);
+        }
+    }
+
+    ProcessorResult processDefault(final HttpMessage httpMessage) throws IOException{
+
+        final StringBuilder message = new StringBuilder(pageLoader.getWebPage(PageEnum.ERROR.getPage()));
         if(HttpVersion.containsValue(httpMessage.getVersion())){
             message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_NOT, message.length()));  // send a MIME header
         } else {
             message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_NOT_ALLOWED, message.length()));
         }
 
-        return new ProcessorResult(ConstantUtil.EXIT, message.toString());
+        return new ProcessorResult(RequestUnitTypeEnum.UNIT, RequestUnitStatusEnum.STOP, message.toString());
     }
 
 
     //Private Methods
-    private String getSuccessWebPage(final String input) throws IOException {
-        final Map<String, String > valuesMap = new HashMap<>();
-        valuesMap.put(HttpUtils.HTTP_COMMAND, input);
-        return PageParser.parseAndReplace(
-                pageLoader.getWebPage(HttpUtils.PAGE_SUCCESS),
-                valuesMap);
-    }
+    private String getWebPageByEnum(final PageEnum page, final String input) throws IOException {
+        final Map<String, String> valueMap = new HashMap<>();
 
-    private String getStatusWebPage(final String input) throws IOException {
-        final Map<String, String> valuesMap = new HashMap<>();
-        valuesMap.put(HttpUtils.HTTP_AGENT_CACHE, input);
-        return PageParser.parseAndReplace(
-                pageLoader.getWebPage(HttpUtils.PAGE_STATUS),
-                valuesMap);
+        if(Objects.nonNull(page.getVariables())){
+            page.getVariables().forEach(e -> valueMap.put(e, input));
+        }
 
+        return PageParser.parseAndReplace(pageLoader.getWebPage(page.getPage()), valueMap);
     }
 
     private void addAgentMessage(final AgentStatusEnum type, final String message){

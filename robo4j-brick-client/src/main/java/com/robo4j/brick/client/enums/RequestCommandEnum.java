@@ -1,20 +1,19 @@
 /*
- * Copyright (C) 2016. Miroslav Kopecky
- * This RequestCommandEnum.java is part of robo4j.
+ * Copyright (C)  2016. Miroslav Kopecky
+ * This RequestCommandEnum.java  is part of robo4j.
  *
- *     robo4j is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
+ *  robo4j is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *     robo4j is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
+ *  robo4j is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *     You should have received a copy of the GNU General Public License
- *     along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
- *
+ *  You should have received a copy of the GNU General Public License
+ *  along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.robo4j.brick.client.enums;
@@ -22,11 +21,13 @@ package com.robo4j.brick.client.enums;
 import com.robo4j.commons.command.CommandTargetEnum;
 import com.robo4j.commons.command.CommandTypeEnum;
 import com.robo4j.commons.command.RoboUnitCommand;
-import com.robo4j.commons.enums.LegoSystemEnum;
+import com.robo4j.commons.enums.RoboHardwareEnum;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import static com.robo4j.commons.command.CommandTargetEnum.FRONT_UNIT;
 import static com.robo4j.commons.command.CommandTargetEnum.HAND_UNIT;
 import static com.robo4j.commons.command.CommandTargetEnum.PLATFORM;
 import static com.robo4j.commons.command.CommandTargetEnum.SYSTEM;
@@ -37,7 +38,7 @@ import static com.robo4j.commons.command.CommandTargetEnum.SYSTEM;
  * @author Miro Kopecky (@miragemiko)
  * @since 09.06.2016
  */
-public enum RequestCommandEnum implements RoboUnitCommand, LegoSystemEnum<CommandTypeEnum> {
+public enum RequestCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum> {
 
     //@formatter:on
     EXIT            (0, SYSTEM, "exit"),
@@ -45,7 +46,10 @@ public enum RequestCommandEnum implements RoboUnitCommand, LegoSystemEnum<Comman
     RIGHT           (2, PLATFORM, "right"),
     LEFT            (3, PLATFORM, "left"),
     BACK            (4, PLATFORM, "back"),
-    HAND            (5, HAND_UNIT, "hand"),
+    STOP            (5, PLATFORM, "stop"),
+    HAND            (6, HAND_UNIT, "hand"),
+    FRONT_LEFT      (7, FRONT_UNIT, "front_left"),
+    FRONT_RIGHT     (8, FRONT_UNIT, "front_right"),
     ;
     //@formatter:off
     private int code;
@@ -80,7 +84,7 @@ public enum RequestCommandEnum implements RoboUnitCommand, LegoSystemEnum<Comman
 
     public static RequestCommandEnum getRequestValue(String name){
         if(codeToLegoCommandCodeMapping == null){
-            initMapping();
+            codeToLegoCommandCodeMapping = initMapping();
         }
         return codeToLegoCommandCodeMapping.entrySet().stream()
                 .filter(e -> e.getValue().getName().equals(name))
@@ -90,7 +94,7 @@ public enum RequestCommandEnum implements RoboUnitCommand, LegoSystemEnum<Comman
 
     public static RequestCommandEnum getRequestCommand(CommandTargetEnum target, String name){
         if(codeToLegoCommandCodeMapping == null){
-            initMapping();
+            codeToLegoCommandCodeMapping = initMapping();
         }
 
         return codeToLegoCommandCodeMapping.entrySet().stream()
@@ -101,11 +105,8 @@ public enum RequestCommandEnum implements RoboUnitCommand, LegoSystemEnum<Comman
     }
 
     //Private Methods
-    private static void initMapping(){
-        codeToLegoCommandCodeMapping = new HashMap<>();
-        for(RequestCommandEnum ct: values()){
-            codeToLegoCommandCodeMapping.put(ct.getCode(), ct);
-        }
+    private static Map<Integer, RequestCommandEnum> initMapping(){
+        return Arrays.stream(values()).collect(Collectors.toMap(RequestCommandEnum::getCode, e -> e));
     }
 
 

@@ -1,7 +1,0 @@
-command-line section...
-COMMAND THE ROBOT
-BridgeCommandProducer INIT
-BridgeCommandConsumer INIT
-BridgeCommandProducer READY and IN CYCLE
-AGENT ACTIVE = [AgentStatus{status=AgentStatusEnum{code=1, def='active'}, messages=[]}]
-WRITE YOUR COMMAND

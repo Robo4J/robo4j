@@ -1,20 +1,19 @@
 /*
- * Copyright (C) 2016. Miroslav Kopecky
- * This CoreBusQueue.java is part of robo4j.
+ * Copyright (C)  2016. Miroslav Kopecky
+ * This CoreBusQueue.java  is part of robo4j.
  *
- *     robo4j is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
+ *  robo4j is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- *     robo4j is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
+ *  robo4j is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *     You should have received a copy of the GNU General Public License
- *     along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
- *
+ *  You should have received a copy of the GNU General Public License
+ *  along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.robo4j.commons.concurrent;
@@ -32,7 +31,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  *
  *
- * Created by miroslavkopecky on 03/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 03.04.2016
  */
 public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends TransferSignal>>
         extends PriorityBlockingQueue<TransferType> implements TransferQueue<TransferType> {
@@ -50,6 +50,10 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
     /* used to consumer blocking */
     private Condition conditionTrans;
 
+    //TODO :: remove this -> because then it will become extremely  fast
+    private Condition conditionElement;
+
+
     /* setup for platform bus */
     private int awaitSeconds;
 
@@ -59,6 +63,9 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
         lock = new ReentrantLock();
         transfer = new LinkedBlockingQueue<>();
         conditionTrans = lock.newCondition();
+
+        //TODO :: remove this
+        conditionElement = lock.newCondition();
 
         this.awaitSeconds = awaitSeconds;
     }
@@ -86,8 +93,10 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
         try {
             if(counter.get() != 0){
                 put(e);
+                conditionElement.signalAll();
             } else {
                 transfer.add(e);
+                conditionElement.signalAll();
             }
         } finally {
             lock.unlock();
@@ -105,6 +114,7 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
             else {
                 put(e);
                 result = true;
+                conditionElement.signalAll();
             }
         } finally {
             lock.unlock();
@@ -120,8 +130,10 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
             if(counter.get() != 0){
                 put(e);
                 result = true;
+                conditionElement.signalAll();
             } else {
                 transfer.add(e);
+                conditionElement.signalAll();
             }
         } finally {
             lock.unlock();
@@ -165,13 +177,14 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
                 result = super.take();
                 lock.lock();
                 awaitCycle++;
+//                System.out.println("TAKE HOLD CONSUMER  awaitCycle= " + awaitCycle);
             }
             conditionTrans.signalAll();
             synchronized (result){
                 result.notifyAll();
             }
         } catch (InterruptedException e){
-            System.out.println("TAKE error= " + e);
+//            System.out.println("TAKE error= " + e);
         } finally {
             counter.decrementAndGet();
             lock.unlock();
@@ -190,14 +203,18 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
         try {
             int awaitCycle = 0;
             while (Objects.isNull(result) && active.get()){
-                conditionTrans.await(awaitSeconds, TimeUnit.SECONDS);
+//                conditionTrans.await(awaitSeconds, TimeUnit.SECONDS);
+//                System.out.println("PEEK HOLD CONSUMER start");
+                conditionElement.await();
                 lock.unlock();
                 result = peekCommand();
                 lock.lock();
                 awaitCycle++;
+//                System.out.println("PEEK HOLD CONSUMER awaitCycle= " + awaitCycle);
             }
             conditionTrans.signalAll();
         } catch (InterruptedException e) {
+//            System.out.println("PEEK error= " + e);
         } finally {
             lock.unlock();
         }

@@ -1,7 +1,0 @@
-Robo4j.io command-line interface info
-options numbers:
-1. show help
-2. available commands
-3. save new command
-4. run command-line
-5. exit"
