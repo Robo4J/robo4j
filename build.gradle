@@ -12,7 +12,7 @@ repositories {
     mavenLocal()
 }
 
-project("robo4j-brick-client"){
+project("robo4j-core"){
     description = "Robo4j-Brick-Client"
 
     group 'com.robo4j'
