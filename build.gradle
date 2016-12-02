@@ -31,6 +31,7 @@ project("robo4j-core"){
 
     dependencies {
         compile(project(":robo4j-page"))
+        compile(project(":robo4j-lego"))
         compile(project(":robo4j-http"))
         compile "com.googlecode.json-simple:json-simple:${jsonVersion}"
         testCompile "junit:junit:${junitVersion}@jar"
