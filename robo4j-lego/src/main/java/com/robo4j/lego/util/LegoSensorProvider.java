@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  * @since 26.11.2016
  */
 @RoboProvider(value = "sensorProvider")
-public class LegoSensorBaseProvider<Type extends LegoSensor> implements BaseRegistryProvider<BaseSensor, Type> {
+public class LegoSensorProvider<Type extends LegoSensor> implements BaseRegistryProvider<BaseSensor, Type> {
 
     @Override
     public BaseSensor create(LegoSensor sensor) {

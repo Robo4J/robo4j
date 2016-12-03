@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  * @since 26.11.2016
  */
 @RoboProvider(value = "engineProvider")
-public final class LegoEngineBaseProvider<Type extends LegoEngine>  implements BaseRegistryProvider<RegulatedMotor, Type>{
+public final class LegoEngineProvider<Type extends LegoEngine>  implements BaseRegistryProvider<RegulatedMotor, Type>{
     private static final int DEFAULT_SPEED = 300;
 
     @Override

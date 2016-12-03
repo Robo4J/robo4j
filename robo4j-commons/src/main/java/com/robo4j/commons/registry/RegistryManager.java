@@ -94,7 +94,4 @@ public final class RegistryManager<RegistryType extends RoboRegistry, ConfigType
                 .map(RegistryTypeEnum::getName)
                 .collect(Collectors.toList());
     }
-
-
-
 }
