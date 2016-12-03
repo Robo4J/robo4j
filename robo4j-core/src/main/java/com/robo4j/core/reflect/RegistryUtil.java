@@ -25,10 +25,10 @@ package com.robo4j.core.reflect;
 
 import com.robo4j.commons.enums.RegistryTypeEnum;
 import com.robo4j.commons.registry.RoboRegistry;
-import com.robo4j.lego.registry.EngineRegistry;
-import com.robo4j.lego.registry.SensorRegistry;
-import com.robo4j.lego.registry.SystemServiceRegistry;
-import com.robo4j.lego.registry.UnitRegistry;
+import com.robo4j.commons.registry.EngineRegistry;
+import com.robo4j.commons.registry.SensorRegistry;
+import com.robo4j.commons.registry.SystemServiceRegistry;
+import com.robo4j.commons.registry.UnitRegistry;
 
 import java.util.Collections;
 import java.util.HashMap;

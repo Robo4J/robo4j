@@ -16,15 +16,10 @@
  *  along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.lego.registry;
+package com.robo4j.commons.registry;
 
+import com.robo4j.commons.enums.RegistryTypeEnum;
 import com.robo4j.commons.motor.GenericMotor;
-import com.robo4j.commons.registry.BaseRegistryProvider;
-import com.robo4j.commons.registry.RoboRegistry;
-import com.robo4j.lego.control.LegoEngine;
-import com.robo4j.lego.motor.LegoEngineWrapper;
-import com.robo4j.lego.util.LegoEngineBaseProvider;
-import lejos.robotics.RegulatedMotor;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,16 +33,17 @@ import java.util.stream.Collectors;
  * @since 28.09.2016
  */
 public final class EngineRegistry implements RoboRegistry<EngineRegistry, GenericMotor> {
-
+    private static final String PROVIDER_NAME = "engineProvider";
     private static volatile EngineRegistry INSTANCE;
     private Map<String, GenericMotor> engines;
     private AtomicBoolean active;
-    private final BaseRegistryProvider<RegulatedMotor, LegoEngine> provider;
+    private final BaseRegistryProvider provider;
 
     private EngineRegistry(){
         this.engines = new HashMap<>();
         this.active = new AtomicBoolean(false);
-        this.provider = new LegoEngineBaseProvider<>();
+        this.provider = (BaseRegistryProvider)RegistryManager
+                .getInstance().getItemByRegistry(RegistryTypeEnum.PROVIDER, PROVIDER_NAME);
     }
 
     public static EngineRegistry getInstance(){
@@ -62,8 +58,8 @@ public final class EngineRegistry implements RoboRegistry<EngineRegistry, Generi
     }
 
     @Override
-    public EngineRegistry build(Map<String, GenericMotor> services) {
-        engines.putAll(services);
+    public EngineRegistry build(Map<String, GenericMotor> engines) {
+        engines.putAll(engines);
         return this;
     }
 
@@ -103,15 +99,7 @@ public final class EngineRegistry implements RoboRegistry<EngineRegistry, Generi
     @SuppressWarnings(value = "unchecked")
     private boolean activateEngines(){
         boolean result = true;
-        engines.entrySet()
-                .forEach(e -> {
-                    GenericMotor le = e.getValue();
-                    /* always instance of regulated motor */
-                    if(le instanceof LegoEngineWrapper){
-                        RegulatedMotor rm = provider.create((LegoEngine) le);
-                        ((LegoEngineWrapper) le).setUnit(rm);
-                    }
-                });
+        this.engines = provider.activate(engines);
         this.active.set(result);
         return result;
     }

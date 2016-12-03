@@ -16,15 +16,10 @@
  *  along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.lego.registry;
+package com.robo4j.commons.registry;
 
-import com.robo4j.commons.registry.BaseRegistryProvider;
-import com.robo4j.commons.registry.RoboRegistry;
+import com.robo4j.commons.enums.RegistryTypeEnum;
 import com.robo4j.commons.sensor.GenericSensor;
-import com.robo4j.lego.control.LegoSensor;
-import com.robo4j.lego.sensor.LegoSensorWrapper;
-import com.robo4j.lego.util.LegoSensorBaseProvider;
-import lejos.hardware.sensor.BaseSensor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,16 +30,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @since 28.09.2016
  */
 public final class SensorRegistry implements RoboRegistry<SensorRegistry, GenericSensor> {
-
+    private static final String PROVIDER_NAME = "sensorProvider";
     private static volatile SensorRegistry INSTANCE;
     private AtomicBoolean activate;
     private Map<String, GenericSensor> sensors;
-    private final BaseRegistryProvider<BaseSensor, LegoSensor> provider;
+    private final BaseRegistryProvider provider;
 
     private SensorRegistry(){
         this.sensors = new HashMap<>();
         this.activate = new AtomicBoolean(false);
-        this.provider = new LegoSensorBaseProvider<>();
+        this.provider = (BaseRegistryProvider)RegistryManager
+                .getInstance().getItemByRegistry(RegistryTypeEnum.PROVIDER, PROVIDER_NAME);
     }
 
     public static SensorRegistry getInstance(){
@@ -92,15 +88,7 @@ public final class SensorRegistry implements RoboRegistry<SensorRegistry, Generi
     @SuppressWarnings(value = "unchecked")
     private boolean activateSensors(){
         boolean result = true;
-        sensors.entrySet()
-                .forEach(e -> {
-                    GenericSensor gs = e.getValue();
-                    if(gs instanceof LegoSensorWrapper){
-                        BaseSensor bs = provider.create((LegoSensor)gs);
-                        ((LegoSensorWrapper)gs).setUnit(bs);
-                    }
-                });
-
+        this.sensors = provider.activate(sensors);
         this.activate.set(result);
         return result;
     }

@@ -18,14 +18,20 @@
 
 package com.robo4j.lego.util;
 
+import com.robo4j.commons.annotation.RoboProvider;
+import com.robo4j.commons.motor.GenericMotor;
 import com.robo4j.commons.registry.BaseRegistryProvider;
 import com.robo4j.lego.control.LegoEngine;
 import com.robo4j.lego.exception.LegoException;
+import com.robo4j.lego.motor.LegoEngineWrapper;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.robotics.RegulatedMotor;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Provider is responsible for providing Engine
@@ -33,11 +39,12 @@ import lejos.robotics.RegulatedMotor;
  * @author Miro Kopecky (@miragemiko)
  * @since 26.11.2016
  */
-public final class LegoEngineBaseProvider<Type extends LegoEngine> implements BaseRegistryProvider<RegulatedMotor, Type>{
+@RoboProvider(value = "engineProvider")
+public final class LegoEngineBaseProvider<Type extends LegoEngine>  implements BaseRegistryProvider<RegulatedMotor, Type>{
     private static final int DEFAULT_SPEED = 300;
 
     @Override
-    public RegulatedMotor create(final Type engine) {
+    public RegulatedMotor create(final LegoEngine engine) {
         final RegulatedMotor result;
         switch (engine.getEngine()){
             case LARGE:
@@ -54,6 +61,23 @@ public final class LegoEngineBaseProvider<Type extends LegoEngine> implements Ba
         }
         result.setSpeed(DEFAULT_SPEED);
         return  result;
+    }
+
+
+
+    @SuppressWarnings(value = "unchecked")
+    @Override
+    public Map<String, Type> activate(Map<String, Type> engines){
+        return engines.entrySet().stream()
+                .peek(e -> {
+                    GenericMotor le = e.getValue();
+                    /* always instance of regulated motor */
+                    if(le instanceof LegoEngineWrapper){
+                        RegulatedMotor rm = create((LegoEngineWrapper) le);
+                        ((LegoEngineWrapper) le).setUnit(rm);
+                    }
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
 }

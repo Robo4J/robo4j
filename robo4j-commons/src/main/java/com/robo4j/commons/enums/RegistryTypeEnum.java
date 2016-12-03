@@ -29,6 +29,7 @@ public enum RegistryTypeEnum {
     SENSORS             (2, "sensors"),
     UNITS               (3, "units"),
     SERVICES            (4, "services"),
+    PROVIDER            (5, "providers"),
     ;
     //@formatter:off
 

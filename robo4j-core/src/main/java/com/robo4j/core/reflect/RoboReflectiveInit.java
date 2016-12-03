@@ -18,8 +18,10 @@
 
 package com.robo4j.core.reflect;
 
+import com.robo4j.commons.annotation.RoboProvider;
+import com.robo4j.commons.registry.BaseRegistryProvider;
 import com.robo4j.core.client.io.ClientException;
-import com.robo4j.core.manager.RegistryManager;
+import com.robo4j.commons.registry.RegistryManager;
 import com.robo4j.commons.annotation.RoboEngine;
 import com.robo4j.commons.annotation.RoboSensor;
 import com.robo4j.commons.annotation.RoboUnit;
@@ -50,7 +52,8 @@ class RoboReflectiveInit {
                 Stream<Class<?>> engines,
                 Stream<Class<?>> sensors,
                 Stream<Class<?>> units,
-                Stream<Class<?>> services) {
+                Stream<Class<?>> services,
+                Stream<Class<?>> providers) {
 
         /* initiation of all caches used at the run time */
 
@@ -59,6 +62,7 @@ class RoboReflectiveInit {
             registryManager.initRegistry(RegistryTypeEnum.SENSORS, initSensorCache(sensors));
             registryManager.initRegistry(RegistryTypeEnum.UNITS, initUnitCache(units));
             registryManager.initRegistry(RegistryTypeEnum.SERVICES, initServiceCache(services));
+            registryManager.initRegistry(RegistryTypeEnum.PROVIDER, initProviderCache(providers));
         }
 
     }
@@ -140,5 +144,21 @@ class RoboReflectiveInit {
         }
     }
 
+    @SuppressWarnings(value = "unchecked")
+    private<ProviderType extends BaseRegistryProvider> Map<String, ProviderType> initProviderCache(Stream<Class<?>> providers) {
+        try{
+            final Map<String, ProviderType> result = new HashMap<>();
+            for (Iterator<?> iterator = providers.iterator(); iterator.hasNext();){
+                Class<?> clazz = (Class<?>) iterator.next();
+                if(clazz.isAnnotationPresent(RoboProvider.class)){
+                    RoboProvider anno = clazz.getAnnotation(RoboProvider.class);
+                    result.put(anno.value(), (ProviderType)clazz.newInstance());
+                }
+            }
+            return result;
+        } catch (InstantiationException | IllegalAccessException e){
+            throw new ClientException("SERVICE PROVIDER PROBLEM", e);
+        }
+    }
 
 }

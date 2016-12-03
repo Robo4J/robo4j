@@ -1,6 +1,6 @@
 /*
  * Copyright (C)  2016. Miroslav Kopecky
- * This BaseRegistryProvider.java  is part of robo4j.
+ * This RoboProvider.java  is part of robo4j.
  *
  *  robo4j is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,18 +16,24 @@
  *  along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.commons.registry;
+package com.robo4j.commons.annotation;
 
-import java.util.Map;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * @author Miro Kopecky (@miragemiko)
- * @since 26.11.2016
+ * RoboProvider is responsible for registering
+ * hardware unit types and its initiation to the eco-system
+ *
+ * Created by miroslavkopecky on 03/12/2016.
  */
-public interface BaseRegistryProvider<Output, Input>  {
-
-    Output create(final Input type);
-
-    Map<String, Input> activate(Map<String, Input> engines);
-
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@RoboSystem
+public @interface RoboProvider {
+    String value();
 }

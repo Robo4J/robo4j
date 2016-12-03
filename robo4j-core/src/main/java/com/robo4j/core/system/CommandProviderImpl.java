@@ -21,7 +21,7 @@ package com.robo4j.core.system;
 import com.robo4j.core.client.enums.RequestCommandEnum;
 import com.robo4j.core.client.io.ClientException;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.manager.RegistryManager;
+import com.robo4j.commons.registry.RegistryManager;
 import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.commons.agent.AgentConsumer;
 import com.robo4j.commons.agent.AgentProducer;

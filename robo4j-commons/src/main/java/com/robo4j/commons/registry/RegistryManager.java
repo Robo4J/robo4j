@@ -16,11 +16,10 @@
  *  along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core.manager;
+package com.robo4j.commons.registry;
 
 import com.robo4j.commons.control.RoboSystemConfig;
 import com.robo4j.commons.enums.RegistryTypeEnum;
-import com.robo4j.commons.registry.RoboRegistry;
 
 import java.util.Arrays;
 import java.util.HashMap;

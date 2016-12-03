@@ -18,9 +18,12 @@
 
 package com.robo4j.lego.util;
 
+import com.robo4j.commons.annotation.RoboProvider;
 import com.robo4j.commons.registry.BaseRegistryProvider;
+import com.robo4j.commons.sensor.GenericSensor;
 import com.robo4j.lego.control.LegoSensor;
 import com.robo4j.lego.exception.LegoException;
+import com.robo4j.lego.sensor.LegoSensorWrapper;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.sensor.BaseSensor;
 import lejos.hardware.sensor.EV3ColorSensor;
@@ -28,14 +31,18 @@ import lejos.hardware.sensor.EV3GyroSensor;
 import lejos.hardware.sensor.EV3TouchSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
 /**
  * @author Miro Kopecky (@miragemiko)
  * @since 26.11.2016
  */
+@RoboProvider(value = "sensorProvider")
 public class LegoSensorBaseProvider<Type extends LegoSensor> implements BaseRegistryProvider<BaseSensor, Type> {
 
     @Override
-    public BaseSensor create(Type sensor) {
+    public BaseSensor create(LegoSensor sensor) {
         System.out.println("INIT sensor: " + sensor);
         switch (sensor.getSensor()){
             case COLOR:
@@ -49,5 +56,19 @@ public class LegoSensorBaseProvider<Type extends LegoSensor> implements BaseRegi
             default:
                 throw new LegoException("Lego sensor not supported: " + sensor);
         }
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    @Override
+    public Map<String, Type> activate(Map<String, Type> sensors){
+        return sensors.entrySet().stream()
+                .peek(e -> {
+                    GenericSensor gs = e.getValue();
+                    if(gs instanceof LegoSensorWrapper){
+                        BaseSensor bs = create((LegoSensor)gs);
+                        ((LegoSensorWrapper)gs).setUnit(bs);
+                    }
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

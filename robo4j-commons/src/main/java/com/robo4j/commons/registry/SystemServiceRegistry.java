@@ -16,9 +16,8 @@
  *  along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.lego.registry;
+package com.robo4j.commons.registry;
 
-import com.robo4j.commons.registry.RoboRegistry;
 import com.robo4j.commons.service.GenericService;
 
 import java.util.HashMap;

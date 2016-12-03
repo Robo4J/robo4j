@@ -18,8 +18,9 @@
 
 package com.robo4j.core.reflect;
 
+import com.robo4j.commons.annotation.RoboProvider;
 import com.robo4j.core.client.ClientHTTPExecutor;
-import com.robo4j.core.manager.RegistryManager;
+import com.robo4j.commons.registry.RegistryManager;
 import com.robo4j.commons.annotation.RoboEngine;
 import com.robo4j.commons.annotation.RoboSensor;
 import com.robo4j.commons.annotation.RoboUnit;
@@ -47,7 +48,8 @@ public abstract class AbstractClient<FutureType>  {
                 scan.getClassesByAnnotation(RoboEngine.class),
                 scan.getClassesByAnnotation(RoboSensor.class),
                 scan.getClassesByAnnotation(RoboUnit.class),
-                scan.getClassesByAnnotation(RoboService.class)
+                scan.getClassesByAnnotation(RoboService.class),
+                scan.getClassesByAnnotation(RoboProvider.class)
         );
         active.set(true);
     }
