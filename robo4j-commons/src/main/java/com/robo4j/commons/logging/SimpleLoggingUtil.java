@@ -16,7 +16,7 @@
  *  along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core.logging;
+package com.robo4j.commons.logging;
 
 import java.time.LocalDate;
 

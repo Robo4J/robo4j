@@ -19,6 +19,7 @@
 package com.robo4j.core.reflect;
 
 import com.robo4j.commons.annotation.RoboProvider;
+import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.commons.registry.BaseRegistryProvider;
 import com.robo4j.core.client.io.ClientException;
 import com.robo4j.commons.registry.RegistryManager;
@@ -35,6 +36,10 @@ import com.robo4j.commons.unit.GenericUnit;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 /**
@@ -48,22 +53,52 @@ class RoboReflectiveInit {
 
     @SuppressWarnings(value = "unchecked")
     RoboReflectiveInit(
-                RegistryManager registryManager,
-                Stream<Class<?>> engines,
-                Stream<Class<?>> sensors,
-                Stream<Class<?>> units,
-                Stream<Class<?>> services,
-                Stream<Class<?>> providers) {
+            Stream<Class<?>> engines,
+            Stream<Class<?>> sensors,
+            Stream<Class<?>> units,
+            Stream<Class<?>> services,
+            Stream<Class<?>> providers
+    ) {
 
         /* initiation of all caches used at the run time */
+        ExecutorService executors = Executors.newFixedThreadPool(RegistryUtil.registry.size());
+        Future<Map<String, GenericMotor>> futureEngineCache = executors.submit(() -> initEngineCache(engines));
+        Future<Map<String, GenericSensor> > futureSensorsCache = executors.submit(() ->initSensorCache(sensors));
+        Future<Map<String, GenericUnit>> futureUnitsCache = executors.submit(() -> initUnitCache(units));
+        Future<Map<String, GenericService>> futureServicesCache = executors.submit(() -> initServiceCache(services));
+        Future<Map<String, BaseRegistryProvider>> futureProviderCache = executors.submit(() -> initProviderCache(providers));
 
-        if(registryManager.isActive()){
-            registryManager.initRegistry(RegistryTypeEnum.ENGINES, initEngineCache(engines));
-            registryManager.initRegistry(RegistryTypeEnum.SENSORS, initSensorCache(sensors));
-            registryManager.initRegistry(RegistryTypeEnum.UNITS, initUnitCache(units));
-            registryManager.initRegistry(RegistryTypeEnum.SERVICES, initServiceCache(services));
-            registryManager.initRegistry(RegistryTypeEnum.PROVIDER, initProviderCache(providers));
+        try {
+            final Map<String, GenericMotor> initEngines = futureEngineCache.get();
+            final Map<String, GenericSensor> initSensors = futureSensorsCache.get();
+            final Map<String, GenericUnit> initUnits = futureUnitsCache.get();
+            final Map<String, GenericService> initServices =futureServicesCache.get();
+            final Map<String, BaseRegistryProvider> initProviders = futureProviderCache.get();
+            RegistryManager registryManager = RegistryManager.getInstance().addAll(RegistryUtil.registry);
+            if(initEngines != null &&
+                    initSensors != null &&
+                    initUnits != null &&
+                    initServices != null &&
+                    initProviders != null){
+
+                if(registryManager.isActive()){
+                    registryManager.initRegistry(RegistryTypeEnum.PROVIDER, futureProviderCache.get());
+                    registryManager.initRegistry(RegistryTypeEnum.ENGINES, futureEngineCache.get());
+                    registryManager.initRegistry(RegistryTypeEnum.SENSORS, futureSensorsCache.get());
+                    registryManager.initRegistry(RegistryTypeEnum.UNITS, futureUnitsCache.get());
+                    registryManager.initRegistry(RegistryTypeEnum.SERVICES, futureServicesCache.get());
+                } else {
+                    SimpleLoggingUtil.debug(getClass(),"InitRegistry failed");
+                }
+
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new ClientException("CACHE GENERAL INIT ISSUE ", e);
+        } finally {
+            executors.shutdown();
+            SimpleLoggingUtil.debug(getClass(), "executors down");
         }
+
 
     }
 
@@ -80,6 +115,7 @@ class RoboReflectiveInit {
                 Class<?> clazz = (Class<?>) iterator.next();
                 if(clazz.isAnnotationPresent(RoboEngine.class)){
                     RoboEngine anno = clazz.getAnnotation(RoboEngine.class);
+                    SimpleLoggingUtil.debug(getClass(), "ref->engine= " + anno.value());
                     result.put(anno.value(), (EngineType) clazz.newInstance());
                 }
             }
@@ -99,6 +135,7 @@ class RoboReflectiveInit {
                 Class<?> clazz = (Class<?>) iterator.next();
                 if(clazz.isAnnotationPresent(RoboSensor.class)){
                     RoboSensor anno = clazz.getAnnotation(RoboSensor.class);
+                    SimpleLoggingUtil.debug(getClass(), "ref->sensor= " + anno.value());
                     result.put(anno.value(), (SensorType) clazz.newInstance());
                 }
             }
@@ -118,6 +155,7 @@ class RoboReflectiveInit {
                 Class<?> clazz = (Class<?>) iterator.next();
                 if(clazz.isAnnotationPresent(RoboUnit.class)){
                     RoboUnit anno = clazz.getAnnotation(RoboUnit.class);
+                    SimpleLoggingUtil.debug(getClass(), "ref->unit= " + anno.value());
                     result.put(anno.value(), (UnitType) clazz.newInstance());
                 }
             }
@@ -135,6 +173,7 @@ class RoboReflectiveInit {
                 Class<?> clazz = (Class<?>) iterator.next();
                 if(clazz.isAnnotationPresent(RoboService.class)){
                     RoboService anno = clazz.getAnnotation(RoboService.class);
+                    SimpleLoggingUtil.debug(getClass(), "ref->service= " + anno.value());
                     result.put(anno.value(), (ServiceType)clazz.newInstance());
                 }
             }
@@ -153,6 +192,7 @@ class RoboReflectiveInit {
                 if(clazz.isAnnotationPresent(RoboProvider.class)){
                     RoboProvider anno = clazz.getAnnotation(RoboProvider.class);
                     result.put(anno.value(), (ProviderType)clazz.newInstance());
+                    SimpleLoggingUtil.debug(getClass(), "ref->provider= " + anno.value());
                 }
             }
             return result;
@@ -160,5 +200,6 @@ class RoboReflectiveInit {
             throw new ClientException("SERVICE PROVIDER PROBLEM", e);
         }
     }
+
 
 }

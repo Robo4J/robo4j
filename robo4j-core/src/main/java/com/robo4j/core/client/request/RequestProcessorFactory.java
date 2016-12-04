@@ -32,7 +32,7 @@ import com.robo4j.core.client.util.ClientCommException;
 import com.robo4j.core.client.util.HttpUtils;
 import com.robo4j.core.dto.ClientCommandRequestDTO;
 import com.robo4j.core.dto.ClientRequestDTO;
-import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.commons.registry.RegistryManager;
 import com.robo4j.core.service.HttpMessageService;
 import com.robo4j.core.service.LcdService;

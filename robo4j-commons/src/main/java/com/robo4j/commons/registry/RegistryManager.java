@@ -38,7 +38,7 @@ public final class RegistryManager<RegistryType extends RoboRegistry, ConfigType
     private static final List<RegistryTypeEnum> list = Arrays.asList(RegistryTypeEnum.values());
     private static volatile RegistryManager INSTANCE;
     private AtomicBoolean active;
-    private Map<RegistryTypeEnum, RoboRegistry> registries;
+    private volatile Map<RegistryTypeEnum, RoboRegistry> registries;
 
     private RegistryManager(){
         this.registries = new HashMap<>();

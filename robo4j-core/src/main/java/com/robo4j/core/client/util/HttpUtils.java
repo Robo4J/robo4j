@@ -23,7 +23,7 @@ import com.robo4j.core.dto.ClientCommandRequestDTO;
 import com.robo4j.core.dto.ClientRequestDTO;
 import com.robo4j.core.dto.ClientUnitRequestDTO;
 import com.robo4j.core.dto.HttpRequestElementDTO;
-import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.commons.command.CommandTargetEnum;
 import org.json.simple.JSONArray;

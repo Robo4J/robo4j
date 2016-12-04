@@ -19,7 +19,7 @@
 package com.robo4j.core.reflect;
 
 import com.robo4j.core.client.util.ClientClassLoader;
-import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.core.util.StreamUtils;
 
@@ -41,6 +41,7 @@ import java.util.zip.ZipInputStream;
  * @author Miro Kopecky (@miragemiko)
  * @since 30.11.2016
  */
+@SuppressWarnings(value = "unchecked")
 public final class RoboReflectionScan {
     private static final String FILE = "file:";
     private static final String SUFFIX = ".class";
@@ -107,6 +108,7 @@ public final class RoboReflectionScan {
         }
         return this;
     }
+
 
     private RoboReflectionScan initClassesTest(){
 

@@ -24,6 +24,7 @@ import com.robo4j.commons.sensor.GenericSensor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 /**
  * @author Miro Kopecky (@miragemiko)
@@ -34,13 +35,12 @@ public final class SensorRegistry implements RoboRegistry<SensorRegistry, Generi
     private static volatile SensorRegistry INSTANCE;
     private AtomicBoolean activate;
     private Map<String, GenericSensor> sensors;
-    private final BaseRegistryProvider provider;
+    private BaseRegistryProvider provider;
 
     private SensorRegistry(){
         this.sensors = new HashMap<>();
         this.activate = new AtomicBoolean(false);
-        this.provider = (BaseRegistryProvider)RegistryManager
-                .getInstance().getItemByRegistry(RegistryTypeEnum.PROVIDER, PROVIDER_NAME);
+        this.provider = null;
     }
 
     public static SensorRegistry getInstance(){
@@ -54,13 +54,10 @@ public final class SensorRegistry implements RoboRegistry<SensorRegistry, Generi
         return INSTANCE;
     }
 
-
     @Override
-    public SensorRegistry build(Map<String, GenericSensor> services) {
-        services.entrySet().forEach(entry -> {
-                    this.sensors.put(entry.getKey(), entry.getValue());
-                }
-        );
+    public SensorRegistry build(Map<String, GenericSensor> sensors) {
+        this.sensors = sensors.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        this.provider = activateProvider();
         return this;
     }
 
@@ -76,7 +73,7 @@ public final class SensorRegistry implements RoboRegistry<SensorRegistry, Generi
 
     @Override
     public boolean activate() {
-        return !(sensors == null || sensors.isEmpty()) && activateSensors();
+        return !(sensors == null || sensors.isEmpty()) && provider != null && activateSensors();
     }
 
     @Override
@@ -92,4 +89,10 @@ public final class SensorRegistry implements RoboRegistry<SensorRegistry, Generi
         this.activate.set(result);
         return result;
     }
+
+    private BaseRegistryProvider activateProvider() {
+        return (BaseRegistryProvider)RegistryManager
+                .getInstance().getItemByRegistry(RegistryTypeEnum.PROVIDER, PROVIDER_NAME);
+    }
+
 }

@@ -44,7 +44,6 @@ public abstract class AbstractClient<FutureType>  {
         active = new AtomicBoolean(false);
         executor = new ClientHTTPExecutor();
         new RoboReflectiveInit(
-                RegistryManager.getInstance().addAll(RegistryUtil.registry),
                 scan.getClassesByAnnotation(RoboEngine.class),
                 scan.getClassesByAnnotation(RoboSensor.class),
                 scan.getClassesByAnnotation(RoboUnit.class),

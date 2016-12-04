@@ -37,13 +37,12 @@ public final class EngineRegistry implements RoboRegistry<EngineRegistry, Generi
     private static volatile EngineRegistry INSTANCE;
     private Map<String, GenericMotor> engines;
     private AtomicBoolean active;
-    private final BaseRegistryProvider provider;
+    private BaseRegistryProvider provider;
 
     private EngineRegistry(){
         this.engines = new HashMap<>();
         this.active = new AtomicBoolean(false);
-        this.provider = (BaseRegistryProvider)RegistryManager
-                .getInstance().getItemByRegistry(RegistryTypeEnum.PROVIDER, PROVIDER_NAME);
+        this.provider = null;
     }
 
     public static EngineRegistry getInstance(){
@@ -59,7 +58,8 @@ public final class EngineRegistry implements RoboRegistry<EngineRegistry, Generi
 
     @Override
     public EngineRegistry build(Map<String, GenericMotor> engines) {
-        engines.putAll(engines);
+        this.engines.putAll(engines);
+        this.provider = activateProvider();
         return this;
     }
 
@@ -77,7 +77,7 @@ public final class EngineRegistry implements RoboRegistry<EngineRegistry, Generi
 
     @Override
     public boolean activate(){
-        return !(engines == null || engines.isEmpty()) && activateEngines();
+        return !(engines == null || engines.isEmpty()) && provider != null && activateEngines() ;
     }
 
     @Override
@@ -91,11 +91,6 @@ public final class EngineRegistry implements RoboRegistry<EngineRegistry, Generi
     }
 
     //Private Method
-
-    /**
-     *
-     * @return
-     */
     @SuppressWarnings(value = "unchecked")
     private boolean activateEngines(){
         boolean result = true;
@@ -104,4 +99,8 @@ public final class EngineRegistry implements RoboRegistry<EngineRegistry, Generi
         return result;
     }
 
+    private BaseRegistryProvider activateProvider() {
+        return (BaseRegistryProvider)RegistryManager
+                .getInstance().getItemByRegistry(RegistryTypeEnum.PROVIDER, PROVIDER_NAME);
+    }
 }

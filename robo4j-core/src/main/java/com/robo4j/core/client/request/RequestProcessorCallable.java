@@ -25,7 +25,7 @@ import com.robo4j.core.client.io.ClientException;
 import com.robo4j.http.HttpMessage;
 import com.robo4j.http.HttpMethod;
 import com.robo4j.http.HttpVersion;
-import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
 
 import java.io.BufferedOutputStream;

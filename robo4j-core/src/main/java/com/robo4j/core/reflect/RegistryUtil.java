@@ -24,6 +24,7 @@
 package com.robo4j.core.reflect;
 
 import com.robo4j.commons.enums.RegistryTypeEnum;
+import com.robo4j.commons.registry.ProviderRegistry;
 import com.robo4j.commons.registry.RoboRegistry;
 import com.robo4j.commons.registry.EngineRegistry;
 import com.robo4j.commons.registry.SensorRegistry;
@@ -47,6 +48,7 @@ public final class RegistryUtil {
             put(RegistryTypeEnum.SENSORS, SensorRegistry.getInstance());
             put(RegistryTypeEnum.UNITS, UnitRegistry.getInstance());
             put(RegistryTypeEnum.SERVICES, SystemServiceRegistry.getInstance());
+            put(RegistryTypeEnum.PROVIDER, ProviderRegistry.getInstance());
         }
     });
 }

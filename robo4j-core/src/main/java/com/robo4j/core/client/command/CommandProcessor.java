@@ -21,7 +21,7 @@ package com.robo4j.core.client.command;
 import com.robo4j.core.bus.ClientBusQueue;
 import com.robo4j.core.client.enums.RequestCommandEnum;
 import com.robo4j.core.dto.ClientCommandRequestDTO;
-import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.commons.agent.AgentProducer;
 import com.robo4j.commons.command.GenericCommand;
