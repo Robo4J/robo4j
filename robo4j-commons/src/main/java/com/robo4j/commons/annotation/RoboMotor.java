@@ -35,6 +35,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @RoboSystem
-public  @interface RoboEngine {
+public  @interface RoboMotor {
     String value();
 }

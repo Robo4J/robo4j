@@ -23,7 +23,7 @@ import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.commons.registry.BaseRegistryProvider;
 import com.robo4j.core.client.io.ClientException;
 import com.robo4j.commons.registry.RegistryManager;
-import com.robo4j.commons.annotation.RoboEngine;
+import com.robo4j.commons.annotation.RoboMotor;
 import com.robo4j.commons.annotation.RoboSensor;
 import com.robo4j.commons.annotation.RoboUnit;
 import com.robo4j.commons.annotation.RoboService;
@@ -113,8 +113,8 @@ class RoboReflectiveInit {
             for (Iterator<?> iterator =
                  engines.iterator(); iterator.hasNext();){
                 Class<?> clazz = (Class<?>) iterator.next();
-                if(clazz.isAnnotationPresent(RoboEngine.class)){
-                    RoboEngine anno = clazz.getAnnotation(RoboEngine.class);
+                if(clazz.isAnnotationPresent(RoboMotor.class)){
+                    RoboMotor anno = clazz.getAnnotation(RoboMotor.class);
                     SimpleLoggingUtil.debug(getClass(), "ref->engine= " + anno.value());
                     result.put(anno.value(), (EngineType) clazz.newInstance());
                 }
