@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by miroslavkopecky on 11/06/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 11.06.2016
  */
 public class PageParserTest {
 

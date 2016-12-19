@@ -24,7 +24,8 @@ import java.util.List;
 /**
  * Agent status is communication between Agent and the rest of the application
  *
- * Created by miroslavkopecky on 30/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 29.05.2016
  */
 public class AgentStatus<AgentMessage> {
 

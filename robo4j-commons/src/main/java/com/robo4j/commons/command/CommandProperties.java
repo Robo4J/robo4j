@@ -19,7 +19,8 @@
 package com.robo4j.commons.command;
 
 /**
- * Created by miroslavkopecky on 10/06/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 10.06.2016
  */
 public interface CommandProperties {
 

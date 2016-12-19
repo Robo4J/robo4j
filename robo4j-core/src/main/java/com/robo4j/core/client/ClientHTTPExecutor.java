@@ -32,7 +32,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by miroslavkopecky on 28/02/16.
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 28.02.2016

@@ -29,7 +29,8 @@ import java.lang.annotation.Target;
  * Annotation is used to configure specific engine
  * connected to the robo platform
  *
- * Created by miroslavkopecky on 04/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 04.05.2016
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

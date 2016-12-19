@@ -22,7 +22,8 @@ import java.util.concurrent.ExecutorService;
 
 /**
  * Interface to Any
- * Created by miroslavkopecky on 22/06/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 29.05.2016
  */
 public interface DefaultAgent extends GenericAgent {
 

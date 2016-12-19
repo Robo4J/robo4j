@@ -25,7 +25,9 @@ import java.util.concurrent.ArrayBlockingQueue;
  *
  * AgentCache keeps order
  *
- * Created by miroslavkopecky on 29/05/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 29.05.2016
+ *
  */
 public class AgentCache<AgentMessage extends AgentStatus> extends ArrayBlockingQueue<AgentMessage> {
 

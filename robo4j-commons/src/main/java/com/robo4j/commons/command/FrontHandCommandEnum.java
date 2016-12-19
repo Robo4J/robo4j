@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by miroslavkopecky on 27/04/16.
+ * @author Miro Kopecky (@miragemiko)
+ * @since 27.04.2016
  */
 public enum FrontHandCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum> {
 
