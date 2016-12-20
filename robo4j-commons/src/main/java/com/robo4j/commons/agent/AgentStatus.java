@@ -27,10 +27,10 @@ import java.util.List;
  * @author Miro Kopecky (@miragemiko)
  * @since 29.05.2016
  */
-public class AgentStatus<AgentMessage> {
+public class AgentStatus<T> {
 
     private AgentStatusEnum status;
-    private List<AgentMessage> messages;
+    private List<T> messages;
 
     public AgentStatus(AgentStatusEnum status) {
         this.status = status;
@@ -41,11 +41,11 @@ public class AgentStatus<AgentMessage> {
         return status;
     }
 
-    public void addMessage(AgentMessage message){
+    public void addMessage(T message){
         messages.add(message);
     }
 
-    public List<AgentMessage> getMessages() {
+    public List<T> getMessages() {
         return messages;
     }
 
