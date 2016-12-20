@@ -37,5 +37,8 @@ import java.lang.annotation.Target;
 @Documented
 @RoboSystem
 public  @interface RoboMotor {
-    String value();
+	/**
+	 * @return the unique id of the RoboMotor.
+	 */
+    String id();
 }

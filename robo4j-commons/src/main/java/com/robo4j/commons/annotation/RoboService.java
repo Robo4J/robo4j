@@ -35,5 +35,8 @@ import java.lang.annotation.Target;
 @Documented
 @RoboSystem
 public @interface RoboService {
-    String value() default "";
+	/**
+	 * @return the unique id of the RoboService.
+	 */
+    String id() default "";
 }

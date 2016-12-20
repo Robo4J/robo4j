@@ -36,7 +36,10 @@ import java.lang.annotation.Target;
 @Documented
 @RoboSystem
 public @interface RoboUnit {
-    String value();
+	/**
+	 * @return the unique id of the RoboUnit.
+	 */
+    String id();
     String system();
     String[] producer();
     String[] consumer();

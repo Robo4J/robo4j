@@ -34,5 +34,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface RoboSystem {
-    String value() default "";
+	/**
+	 * @return the unique id of the RoboSystem.
+	 */
+    String id() default "";
 }

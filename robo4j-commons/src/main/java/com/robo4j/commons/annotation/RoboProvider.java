@@ -36,5 +36,8 @@ import java.lang.annotation.Target;
 @Documented
 @RoboSystem
 public @interface RoboProvider {
-    String value();
+	/**
+	 * @return the unique id of the RoboProvider.
+	 */
+    String id();
 }

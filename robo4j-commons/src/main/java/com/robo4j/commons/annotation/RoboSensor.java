@@ -36,5 +36,8 @@ import java.lang.annotation.Target;
 @Documented
 @RoboSystem
 public @interface RoboSensor {
-    String value() default "";
+	/**
+	 * @return the unique id of the RoboSensor.
+	 */
+    String id() default "";
 }
