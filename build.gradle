@@ -89,7 +89,7 @@ project("robo4j-lego"){
     }
 
     dependencies {
-        provided "lejos:ev3classes:${lejosVersion}@jar"
+        compile "lejos:ev3classes:${lejosVersion}@jar"
         compile(project(":robo4j-commons"))
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"

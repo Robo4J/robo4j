@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  * @author Miro Kopecky (@miragemiko)
  * @since 26.11.2016
  */
-@RoboProvider(value = "engineProvider")
+@RoboProvider(id = "engineProvider")
 public final class LegoEngineProvider<Type extends LegoEngine>  implements BaseRegistryProvider<RegulatedMotor, Type>{
     private static final int DEFAULT_SPEED = 300;
 

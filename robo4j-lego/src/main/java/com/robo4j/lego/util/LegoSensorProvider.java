@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  * @author Miro Kopecky (@miragemiko)
  * @since 26.11.2016
  */
-@RoboProvider(value = "sensorProvider")
+@RoboProvider(id = "sensorProvider")
 public class LegoSensorProvider<Type extends LegoSensor> implements BaseRegistryProvider<BaseSensor, Type> {
 
     @Override
