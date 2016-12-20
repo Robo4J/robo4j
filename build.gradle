@@ -63,6 +63,38 @@ project("robo4j-commons"){
     }
 }
 
+project("robo4j-hw-rpi"){
+    description = "Robo4j-RaspberryPi/Arduino"
+
+    group 'com.robo4j'
+    version "${robo4jVersion}"
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'maven'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "file://Users/miroslavkopecky/.m2/repository")
+            }
+        }
+    }
+
+    dependencies {
+        compile "com.pi4j:pi4j-core:${pi4jVersion}"
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+}
+
 project("robo4j-lego"){
     description = "Robo4j-Lego"
 
@@ -170,8 +202,8 @@ project("robo4j-rpi"){
     }
 
     dependencies {
+        compile(project(":robo4j-hw-rpi"))
         compile(project(":robo4j-commons"))
-        compile "com.pi4j:pi4j-core:${pi4jVersion}"
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
