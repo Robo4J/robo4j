@@ -43,7 +43,6 @@ public class LegoSensorProvider<Type extends LegoSensor> implements BaseRegistry
 
     @Override
     public BaseSensor create(LegoSensor sensor) {
-        System.out.println("INIT sensor: " + sensor);
         switch (sensor.getSensor()){
             case COLOR:
                 return new EV3ColorSensor(LocalEV3.get().getPort(sensor.getPort().getType()));

@@ -102,8 +102,6 @@ class RoboReflectiveInit {
 
     }
 
-
-
     //Private Methods
     @SuppressWarnings(value = "unchecked")
     private <EngineType extends GenericMotor> Map<String, EngineType> initEngineCache(Stream<Class<?>> engines){
