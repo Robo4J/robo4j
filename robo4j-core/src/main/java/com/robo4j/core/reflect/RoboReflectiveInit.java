@@ -113,8 +113,8 @@ class RoboReflectiveInit {
                 Class<?> clazz = (Class<?>) iterator.next();
                 if(clazz.isAnnotationPresent(RoboMotor.class)){
                     RoboMotor anno = clazz.getAnnotation(RoboMotor.class);
-                    SimpleLoggingUtil.debug(getClass(), "ref->engine= " + anno.value());
-                    result.put(anno.value(), (EngineType) clazz.newInstance());
+                    SimpleLoggingUtil.debug(getClass(), "ref->engine= " + anno.id());
+                    result.put(anno.id(), (EngineType) clazz.newInstance());
                 }
             }
             return result;
@@ -133,8 +133,8 @@ class RoboReflectiveInit {
                 Class<?> clazz = (Class<?>) iterator.next();
                 if(clazz.isAnnotationPresent(RoboSensor.class)){
                     RoboSensor anno = clazz.getAnnotation(RoboSensor.class);
-                    SimpleLoggingUtil.debug(getClass(), "ref->sensor= " + anno.value());
-                    result.put(anno.value(), (SensorType) clazz.newInstance());
+                    SimpleLoggingUtil.debug(getClass(), "ref->sensor= " + anno.id());
+                    result.put(anno.id(), (SensorType) clazz.newInstance());
                 }
             }
             return result;
@@ -153,8 +153,8 @@ class RoboReflectiveInit {
                 Class<?> clazz = (Class<?>) iterator.next();
                 if(clazz.isAnnotationPresent(RoboUnit.class)){
                     RoboUnit anno = clazz.getAnnotation(RoboUnit.class);
-                    SimpleLoggingUtil.debug(getClass(), "ref->unit= " + anno.value());
-                    result.put(anno.value(), (UnitType) clazz.newInstance());
+                    SimpleLoggingUtil.debug(getClass(), "ref->unit= " + anno.id());
+                    result.put(anno.id(), (UnitType) clazz.newInstance());
                 }
             }
             return result;
@@ -171,8 +171,8 @@ class RoboReflectiveInit {
                 Class<?> clazz = (Class<?>) iterator.next();
                 if(clazz.isAnnotationPresent(RoboService.class)){
                     RoboService anno = clazz.getAnnotation(RoboService.class);
-                    SimpleLoggingUtil.debug(getClass(), "ref->service= " + anno.value());
-                    result.put(anno.value(), (ServiceType)clazz.newInstance());
+                    SimpleLoggingUtil.debug(getClass(), "ref->service= " + anno.id());
+                    result.put(anno.id(), (ServiceType)clazz.newInstance());
                 }
             }
             return result;
@@ -189,8 +189,8 @@ class RoboReflectiveInit {
                 Class<?> clazz = (Class<?>) iterator.next();
                 if(clazz.isAnnotationPresent(RoboProvider.class)){
                     RoboProvider anno = clazz.getAnnotation(RoboProvider.class);
-                    result.put(anno.value(), (ProviderType)clazz.newInstance());
-                    SimpleLoggingUtil.debug(getClass(), "ref->provider= " + anno.value());
+                    result.put(anno.id(), (ProviderType)clazz.newInstance());
+                    SimpleLoggingUtil.debug(getClass(), "ref->provider= " + anno.id());
                 }
             }
             return result;
