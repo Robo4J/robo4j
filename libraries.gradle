@@ -17,4 +17,5 @@ ext {
     apacheCollectionsVersion="4.1"
     apacheCollectionsExecVersion="1.3"
     mockitoAllVersion="1.10.19"
+    pi4jVersion="1.1"
 }
