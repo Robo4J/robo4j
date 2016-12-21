@@ -3,3 +3,4 @@ gradlew.bat
 robo4j-core/src/test/
 robo4j-line/src/test/
 licence.idea
+!/licence.idea
