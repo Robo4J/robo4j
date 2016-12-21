@@ -37,6 +37,15 @@ public class RpiDevice implements Closeable {
     public RpiDevice() {
     }
 
+    public void setBus(I2CBus bus) {
+        this.bus = bus;
+    }
+
+
+    public void setDevice(int address) throws IOException {
+        this.device = bus.getDevice(address);
+    }
+
     @Override
     public void close() throws IOException {
         bus.close();

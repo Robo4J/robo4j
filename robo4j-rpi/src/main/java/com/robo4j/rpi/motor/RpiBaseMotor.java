@@ -19,8 +19,6 @@
 
 package com.robo4j.rpi.motor;
 
-import com.pi4j.io.i2c.I2CBus;
-import com.pi4j.io.i2c.I2CFactory;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.rpi.util.RpiMotorUtil;
 
@@ -38,15 +36,8 @@ public abstract class RpiBaseMotor extends RpiDevice implements RpiMotor {
     protected int speed;
     protected boolean running;
 
-    public RpiBaseMotor(int address, byte port, int speed) {
-        try {
-            this.address = address;
-            this.bus = I2CFactory.getInstance(I2CBus.BUS_1);
-            this.device = bus.getDevice(address);
-
-        } catch (IOException | I2CFactory.UnsupportedBusNumberException e) {
-            throw new RpiMotorException("wrong: ", e);
-        }
+    public RpiBaseMotor( int address, byte port, int speed) {
+        this.address = address;
         this.port = port;
         this.speed = speed;
         this.running = false;
@@ -75,6 +66,11 @@ public abstract class RpiBaseMotor extends RpiDevice implements RpiMotor {
     @Override
     public byte getPort() {
         return port;
+    }
+
+    @Override
+    public int getAddress() {
+        return address;
     }
 
     @Override

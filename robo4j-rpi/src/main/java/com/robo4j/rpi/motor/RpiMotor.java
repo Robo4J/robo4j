@@ -34,4 +34,6 @@ public interface RpiMotor extends GenericMotor {
 
     byte getPort();
 
+    int getAddress();
+
 }
