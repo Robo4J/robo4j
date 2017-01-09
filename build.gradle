@@ -2,6 +2,7 @@ group 'com.robo4j'
 
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'eclipse'
 
 apply from: 'libraries.gradle'
 
@@ -20,6 +21,7 @@ project("robo4j-core"){
 
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'eclipse'
     apply plugin: 'maven'
 
     sourceCompatibility = 1.8
@@ -48,6 +50,7 @@ project("robo4j-commons"){
 
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'eclipse'
     apply plugin: 'maven'
 
     sourceCompatibility = 1.8
@@ -71,6 +74,7 @@ project("robo4j-hw-rpi"){
 
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'eclipse'
     apply plugin: 'maven'
 
     sourceCompatibility = 1.8
@@ -103,6 +107,7 @@ project("robo4j-lego"){
 
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'eclipse'
     apply plugin: 'maven'
 
     sourceCompatibility = 1.8
@@ -137,6 +142,7 @@ project("robo4j-http"){
 
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'eclipse'
     apply plugin: 'maven'
 
     sourceCompatibility = 1.8
@@ -160,6 +166,7 @@ project("robo4j-page"){
 
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'eclipse'
     apply plugin: 'maven'
 
     sourceCompatibility = 1.8
@@ -184,6 +191,7 @@ project("robo4j-rpi"){
 
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'eclipse'
     apply plugin: 'maven'
 
     sourceCompatibility = 1.8
