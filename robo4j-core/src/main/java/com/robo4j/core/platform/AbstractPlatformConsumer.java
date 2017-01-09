@@ -19,11 +19,11 @@
 
 package com.robo4j.core.platform;
 
-import com.robo4j.commons.motor.GenericMotor;
-import com.robo4j.commons.motor.MotorRotationEnum;
-
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
+import com.robo4j.commons.motor.GenericMotor;
+import com.robo4j.commons.motor.MotorRotationEnum;
 
 /**
  * @author Miro Kopecky (@miragemiko)
@@ -31,31 +31,31 @@ import java.util.concurrent.Future;
  */
 public abstract class AbstractPlatformConsumer {
 
-    private static final int DEFAULT_1 = 1;
-    private static final int DEFAULT_0 = 0;
+	private static final int DEFAULT_1 = 1;
+	private static final int DEFAULT_0 = 0;
 
-    abstract public Future<Boolean> runEngine(GenericMotor engine, MotorRotationEnum rotation);
+	abstract public Future<Boolean> runEngine(GenericMotor engine, MotorRotationEnum rotation);
 
-    protected boolean executeTurn(GenericMotor... engines){
-        GenericMotor rOne = engines[DEFAULT_0];
-        GenericMotor rTwo = engines[DEFAULT_1];
-        Future<Boolean> first = runEngine(rOne, MotorRotationEnum.BACKWARD);
-        Future<Boolean> second = runEngine(rTwo, MotorRotationEnum.FORWARD);
-        try {
-            return first.get() && second.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new ClientPlatformException("executeTurnByCycles error: ", e);
-        }
-    }
+	protected boolean executeTurn(GenericMotor... engines) {
+		GenericMotor rOne = engines[DEFAULT_0];
+		GenericMotor rTwo = engines[DEFAULT_1];
+		Future<Boolean> first = runEngine(rOne, MotorRotationEnum.BACKWARD);
+		Future<Boolean> second = runEngine(rTwo, MotorRotationEnum.FORWARD);
+		try {
+			return first.get() && second.get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new ClientPlatformException("executeTurnByCycles error: ", e);
+		}
+	}
 
-    protected boolean executeBothEngines(MotorRotationEnum rotation, GenericMotor... engines){
-        Future<Boolean> engineLeft = runEngine(engines[DEFAULT_0], rotation);
-        Future<Boolean> engineRight = runEngine(engines[DEFAULT_1], rotation);
+	protected boolean executeBothEngines(MotorRotationEnum rotation, GenericMotor... engines) {
+		Future<Boolean> engineLeft = runEngine(engines[DEFAULT_0], rotation);
+		Future<Boolean> engineRight = runEngine(engines[DEFAULT_1], rotation);
 
-        try {
-            return engineLeft.get() && engineRight.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new ClientPlatformException("BothEnginesByCycles error: ", e);
-        }
-    }
+		try {
+			return engineLeft.get() && engineRight.get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new ClientPlatformException("BothEnginesByCycles error: ", e);
+		}
+	}
 }

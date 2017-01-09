@@ -18,14 +18,14 @@
 
 package com.robo4j.core.client.agent;
 
+import java.util.concurrent.ExecutorService;
+
 import com.robo4j.commons.agent.AgentCache;
 import com.robo4j.commons.agent.AgentConsumer;
 import com.robo4j.commons.agent.AgentProducer;
 import com.robo4j.commons.agent.AgentStatus;
 import com.robo4j.commons.agent.AgentStatusEnum;
 import com.robo4j.commons.agent.ReceiverAgent;
-
-import java.util.concurrent.ExecutorService;
 
 /**
  * MainBrick agent responsible for handling incoming command and moving them to
@@ -36,38 +36,38 @@ import java.util.concurrent.ExecutorService;
  */
 public class BrickMainAgent implements ReceiverAgent {
 
-    private final AgentCache<AgentStatus> cache;
-    private final ExecutorService executor;
-    private final AgentProducer producer;
-    private final AgentConsumer consumer;
+	private final AgentCache<AgentStatus> cache;
+	private final ExecutorService executor;
+	private final AgentProducer producer;
+	private final AgentConsumer consumer;
 
-    @SuppressWarnings(value = "unchecked")
-    public BrickMainAgent(ExecutorService executor, AgentProducer producer, AgentConsumer consumer) {
-        this.cache = new AgentCache();
-        this.executor = executor;
-        this.producer = producer;
-        this.consumer = consumer;
-        consumer.setMessageQueue(producer.getMessageQueue());
-    }
+	@SuppressWarnings(value = "unchecked")
+	public BrickMainAgent(ExecutorService executor, AgentProducer producer, AgentConsumer consumer) {
+		this.cache = new AgentCache();
+		this.executor = executor;
+		this.producer = producer;
+		this.consumer = consumer;
+		consumer.setMessageQueue(producer.getMessageQueue());
+	}
 
-    @Override
-    public AgentStatus activate(){
+	@Override
+	public AgentStatus activate() {
 
-        executor.execute((Runnable) producer);
-        executor.execute((Runnable) consumer);
+		executor.execute((Runnable) producer);
+		executor.execute((Runnable) consumer);
 
-        final AgentStatus result = new AgentStatus<String>(AgentStatusEnum.ACTIVE);
-        cache.put(result);
-        return result;
-    }
+		final AgentStatus result = new AgentStatus<String>(AgentStatusEnum.ACTIVE);
+		cache.put(result);
+		return result;
+	}
 
-    @Override
-    public AgentCache<AgentStatus> getCache() {
-        return cache;
-    }
+	@Override
+	public AgentCache<AgentStatus> getCache() {
+		return cache;
+	}
 
-    @Override
-    public void addStatus(AgentStatus status){
-        this.cache.put(status);
-    }
+	@Override
+	public void addStatus(AgentStatus status) {
+		this.cache.put(status);
+	}
 }

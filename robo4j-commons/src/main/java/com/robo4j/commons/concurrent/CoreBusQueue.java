@@ -35,203 +35,207 @@ import java.util.concurrent.locks.ReentrantLock;
  * @since 03.04.2016
  */
 public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends TransferSignal>>
-        extends PriorityBlockingQueue<TransferType> implements TransferQueue<TransferType> {
+		extends PriorityBlockingQueue<TransferType> implements TransferQueue<TransferType> {
 
-    //Class can be serialized/deserialized at runtime. Sender/Receiver class loading
-    private static final long serialVersionUID = 22L;
-    private static final int INIT_COUNTER = 0;
-    private static final boolean INIT_BUS = true;
+	// Class can be serialized/deserialized at runtime. Sender/Receiver class
+	// loading
+	private static final long serialVersionUID = 22L;
+	private static final int INIT_COUNTER = 0;
+	private static final boolean INIT_BUS = true;
 
-    /* Holding the number of consumers - currently consumer should be only ONE */
-    private AtomicInteger counter;
-    private AtomicBoolean active;
-    private LinkedBlockingQueue<TransferType> transfer;
-    private ReentrantLock lock;
-    /* used to consumer blocking */
-    private Condition conditionTrans;
+	/*
+	 * Holding the number of consumers - currently consumer should be only ONE
+	 */
+	private AtomicInteger counter;
+	private AtomicBoolean active;
+	private LinkedBlockingQueue<TransferType> transfer;
+	private ReentrantLock lock;
+	/* used to consumer blocking */
+	private Condition conditionTrans;
 
-    //TODO :: remove this -> because then it will become extremely  fast
-    private Condition conditionElement;
+	// TODO :: remove this -> because then it will become extremely fast
+	private Condition conditionElement;
 
+	/* setup for platform bus */
+	private int awaitSeconds;
 
-    /* setup for platform bus */
-    private int awaitSeconds;
+	public CoreBusQueue(int awaitSeconds) {
+		counter = new AtomicInteger(INIT_COUNTER);
+		active = new AtomicBoolean(INIT_BUS);
+		lock = new ReentrantLock();
+		transfer = new LinkedBlockingQueue<>();
+		conditionTrans = lock.newCondition();
 
-    public CoreBusQueue(int awaitSeconds){
-        counter = new AtomicInteger(INIT_COUNTER);
-        active = new AtomicBoolean(INIT_BUS);
-        lock = new ReentrantLock();
-        transfer = new LinkedBlockingQueue<>();
-        conditionTrans = lock.newCondition();
+		// TODO :: remove this
+		conditionElement = lock.newCondition();
 
-        //TODO :: remove this
-        conditionElement = lock.newCondition();
+		this.awaitSeconds = awaitSeconds;
+	}
 
-        this.awaitSeconds = awaitSeconds;
-    }
+	public boolean isActive() {
+		return active.get();
+	}
 
-    public boolean isActive(){
-        return active.get();
-    }
+	public void setActive() {
+		active.set(true);
+	}
 
-    public void setActive(){
-        active.set(true);
-    }
+	public void deactivate() {
+		this.active.set(false);
+	}
 
-    public void deactivate(){
-        this.active.set(false);
-    }
+	/**
+	 * Busy Spin
+	 * 
+	 * @param e
+	 *            - command
+	 * @throws InterruptedException
+	 */
+	@Override
+	public void transfer(TransferType e) throws InterruptedException {
+		lock.lock();
+		try {
+			if (counter.get() != 0) {
+				put(e);
+				conditionElement.signalAll();
+			} else {
+				transfer.add(e);
+				conditionElement.signalAll();
+			}
+		} finally {
+			lock.unlock();
+		}
 
-    /**
-     * Busy Spin
-     * @param e - command
-     * @throws InterruptedException
-     */
-    @Override
-    public void transfer(TransferType e) throws InterruptedException {
-        lock.lock();
-        try {
-            if(counter.get() != 0){
-                put(e);
-                conditionElement.signalAll();
-            } else {
-                transfer.add(e);
-                conditionElement.signalAll();
-            }
-        } finally {
-            lock.unlock();
-        }
+	}
 
-    }
+	@Override
+	public boolean tryTransfer(TransferType e) {
+		boolean result = false;
+		lock.lock();
+		try {
+			if (counter.get() == 0)
+				result = false;
+			else {
+				put(e);
+				result = true;
+				conditionElement.signalAll();
+			}
+		} finally {
+			lock.unlock();
+		}
+		return result;
+	}
 
-    @Override
-    public boolean tryTransfer(TransferType e) {
-        boolean result = false;
-        lock.lock();
-        try{
-            if(counter.get() == 0)
-                result = false;
-            else {
-                put(e);
-                result = true;
-                conditionElement.signalAll();
-            }
-        } finally {
-            lock.unlock();
-        }
-        return result;
-    }
+	@Override
+	public boolean tryTransfer(TransferType e, long timeout, TimeUnit unit) throws InterruptedException {
+		lock.lock();
+		boolean result = false;
+		try {
+			if (counter.get() != 0) {
+				put(e);
+				result = true;
+				conditionElement.signalAll();
+			} else {
+				transfer.add(e);
+				conditionElement.signalAll();
+			}
+		} finally {
+			lock.unlock();
+		}
+		return result;
+	}
 
-    @Override
-    public boolean tryTransfer(TransferType e, long timeout, TimeUnit unit) throws InterruptedException {
-        lock.lock();
-        boolean result = false;
-        try{
-            if(counter.get() != 0){
-                put(e);
-                result = true;
-                conditionElement.signalAll();
-            } else {
-                transfer.add(e);
-                conditionElement.signalAll();
-            }
-        } finally {
-            lock.unlock();
-        }
-        return result;
-    }
+	/*
+	 * Method queue waits for consumer
+	 */
+	@Override
+	public boolean hasWaitingConsumer() {
+		return counter.get() != 0;
+	}
 
-    /*
-     * Method queue waits for consumer
-     */
-    @Override
-    public boolean hasWaitingConsumer() {
-        return counter.get() != 0;
-    }
+	/*
+	 * Method returns the number of waiting consumers
+	 */
+	@Override
+	public int getWaitingConsumerCount() {
+		return counter.get();
+	}
 
-    /*
-     * Method returns the number of waiting consumers
-     */
-    @Override
-    public int getWaitingConsumerCount() {
-        return counter.get();
-    }
+	/*
+	 * returns the first element in queue or is blocked if the queue is empty If
+	 * there is the commend in "transfer", it takes the 1st element and wake up
+	 * thread that is waiting for the command else, or it takes 1st element for
+	 * the queue or is blocked util there is one command int the queue
+	 */
 
-    /*
-     * returns the first element in queue or is blocked if the queue is empty
-     * If there is the commend in "transfer", it takes the 1st element and wake up thread
-     * that is waiting for the command else, or it takes 1st element for the queue or is
-     * blocked util there is one command int the queue
-     */
+	@Override
+	public TransferType take() throws InterruptedException {
+		lock.lock();
+		TransferType result = transfer.poll();
+		try {
+			counter.incrementAndGet();
+			int awaitCycle = 0;
+			while (Objects.isNull(result) && active.get()) {
+				conditionTrans.await(awaitSeconds, TimeUnit.SECONDS);
+				lock.unlock();
+				result = super.take();
+				lock.lock();
+				awaitCycle++;
+				// System.out.println("TAKE HOLD CONSUMER awaitCycle= " +
+				// awaitCycle);
+			}
+			conditionTrans.signalAll();
+			synchronized (result) {
+				result.notifyAll();
+			}
+		} catch (InterruptedException e) {
+			// System.out.println("TAKE error= " + e);
+		} finally {
+			counter.decrementAndGet();
+			lock.unlock();
+		}
 
-    @Override
-    public TransferType take() throws InterruptedException {
-        lock.lock();
-        TransferType result = transfer.poll();
-        try{
-            counter.incrementAndGet();
-            int awaitCycle = 0;
-            while (Objects.isNull(result) && active.get()){
-                conditionTrans.await(awaitSeconds, TimeUnit.SECONDS);
-                lock.unlock();
-                result = super.take();
-                lock.lock();
-                awaitCycle++;
-//                System.out.println("TAKE HOLD CONSUMER  awaitCycle= " + awaitCycle);
-            }
-            conditionTrans.signalAll();
-            synchronized (result){
-                result.notifyAll();
-            }
-        } catch (InterruptedException e){
-//            System.out.println("TAKE error= " + e);
-        } finally {
-            counter.decrementAndGet();
-            lock.unlock();
-        }
+		return result;
+	}
 
-        return result;
-    }
+	/*
+	 * Retrieves but does not remove, the head or result null
+	 */
+	@Override
+	public TransferType peek() {
+		lock.lock();
+		TransferType result = peekCommand();
+		try {
+			int awaitCycle = 0;
+			while (Objects.isNull(result) && active.get()) {
+				// conditionTrans.await(awaitSeconds, TimeUnit.SECONDS);
+				// System.out.println("PEEK HOLD CONSUMER start");
+				conditionElement.await();
+				lock.unlock();
+				result = peekCommand();
+				lock.lock();
+				awaitCycle++;
+				// System.out.println("PEEK HOLD CONSUMER awaitCycle= " +
+				// awaitCycle);
+			}
+			conditionTrans.signalAll();
+		} catch (InterruptedException e) {
+			// System.out.println("PEEK error= " + e);
+		} finally {
+			lock.unlock();
+		}
+		return result;
+	}
 
-    /*
-     * Retrieves but does not remove, the head or result null
-     */
-    @Override
-    public TransferType peek() {
-        lock.lock();
-        TransferType result = peekCommand();
-        try {
-            int awaitCycle = 0;
-            while (Objects.isNull(result) && active.get()){
-//                conditionTrans.await(awaitSeconds, TimeUnit.SECONDS);
-//                System.out.println("PEEK HOLD CONSUMER start");
-                conditionElement.await();
-                lock.unlock();
-                result = peekCommand();
-                lock.lock();
-                awaitCycle++;
-//                System.out.println("PEEK HOLD CONSUMER awaitCycle= " + awaitCycle);
-            }
-            conditionTrans.signalAll();
-        } catch (InterruptedException e) {
-//            System.out.println("PEEK error= " + e);
-        } finally {
-            lock.unlock();
-        }
-        return result;
-    }
+	protected TransferType peekCommand() {
+		TransferType commandMain = super.peek();
+		TransferType commandTrans = transfer.peek();
+		return Objects.nonNull(commandMain) ? commandMain : commandTrans;
+	}
 
-    protected TransferType peekCommand(){
-        TransferType commandMain = super.peek();
-        TransferType commandTrans = transfer.peek();
-        return Objects.nonNull(commandMain) ? commandMain : commandTrans;
-    }
-
-    @Override
-    public int size() {
-        return (super.size() + transfer.size());
-    }
-
-
+	@Override
+	public int size() {
+		return (super.size() + transfer.size());
+	}
 
 }

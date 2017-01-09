@@ -21,34 +21,33 @@ package com.robo4j.core.client.io;
 import java.io.InputStream;
 
 /**
- * InputStream resource for reading files
- * currently default web response
+ * InputStream resource for reading files currently default web response
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 23.05.2016
  */
-public class InputStreamResource implements Resource{
+public class InputStreamResource implements Resource {
 
-    private final InputStream source;
-    private boolean reading;
+	private final InputStream source;
+	private boolean reading;
 
-    public InputStreamResource(InputStream source){
-        this.source = source;
-        this.reading = false;
-    }
+	public InputStreamResource(InputStream source) {
+		this.source = source;
+		this.reading = false;
+	}
 
-    @Override
-    public boolean isReading() {
-        return reading;
-    }
+	@Override
+	public boolean isReading() {
+		return reading;
+	}
 
-    @Override
-    public InputStream getInputStream() {
-        if(!reading){
-            reading = true;
-            return source;
-        } else {
-            throw new ClientException("INPUT STREAM LOAD FAILURE");
-        }
-    }
+	@Override
+	public InputStream getInputStream() {
+		if (!reading) {
+			reading = true;
+			return source;
+		} else {
+			throw new ClientException("INPUT STREAM LOAD FAILURE");
+		}
+	}
 }

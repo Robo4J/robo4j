@@ -37,41 +37,40 @@ import java.util.stream.Collectors;
  */
 public final class FileLoader {
 
-    private static final String NEW_LINE = "\n";
-    private static final int POSITION_0 = 0;
+	private static final String NEW_LINE = "\n";
+	private static final int POSITION_0 = 0;
 
+	public static String loadFileToString(ClassLoader cl, final String filename, final String... dir) {
+		InputStream input = FileLoader.loadFile(cl, filename, dir);
+		assert input != null;
+		try (BufferedReader buffer = new BufferedReader(new InputStreamReader(input))) {
+			return buffer.lines().collect(Collectors.joining(NEW_LINE));
+		} catch (IOException e) {
+			throw new IllegalStateException("NO RESOURCE FILE = " + filename + " dir= " + dir);
+		}
+	}
 
-    public static String loadFileToString(ClassLoader cl, final String filename, final String... dir){
-        InputStream input = FileLoader.loadFile(cl, filename, dir);
-        assert input != null;
-        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(input))) {
-            return buffer.lines().collect(Collectors.joining(NEW_LINE));
-        } catch (IOException e){
-            throw new IllegalStateException("NO RESOURCE FILE = " + filename + " dir= " + dir);
-        }
-    }
+	public static InputStream loadFile(ClassLoader cl, final String filename, final String... dir) {
 
-    public static InputStream loadFile(ClassLoader cl, final String filename, final String... dir){
+		String path;
+		if (dir == null) {
+			path = Paths.get(filename).toString();
+		} else if (dir.length == 1) {
+			path = Paths.get(dir[POSITION_0], filename).toString();
+		} else {
+			String[] tmpDir = Arrays.copyOfRange(dir, 1, dir.length);
+			final List<String> dirs = new ArrayList<>(Arrays.asList(tmpDir));
+			dirs.add(filename);
+			path = Paths.get(dir[POSITION_0], concat(filename, dir)).toString();
+		}
 
-        String path;
-        if(dir == null){
-            path = Paths.get(filename).toString();
-        } else if (dir.length == 1 ){
-            path = Paths.get(dir[POSITION_0], filename).toString();
-        } else {
-            String[] tmpDir = Arrays.copyOfRange(dir, 1, dir.length);
-            final List<String> dirs = new ArrayList<>(Arrays.asList(tmpDir));
-            dirs.add(filename);
-            path =  Paths.get(dir[POSITION_0], concat(filename, dir)).toString();
-        }
+		return (path != null) ? cl.getResourceAsStream(path) : null;
+	}
 
-        return (path != null) ? cl.getResourceAsStream(path) : null;
-    }
-
-    private static String[] concat(String first, String... rest){
-        int total = rest.length + 1;
-        String[] result = Arrays.copyOf(rest, total);
-        result[rest.length] = first;
-       return result;
-    }
+	private static String[] concat(String first, String... rest) {
+		int total = rest.length + 1;
+		String[] result = Arrays.copyOf(rest, total);
+		result[rest.length] = first;
+		return result;
+	}
 }

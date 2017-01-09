@@ -20,8 +20,8 @@ package com.robo4j.commons.concurrent;
 
 /**
  *
- * Currently Marker interface
- * Signal represents Robot Platform or Sensor Information
+ * Currently Marker interface Signal represents Robot Platform or Sensor
+ * Information
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 14.04.2016

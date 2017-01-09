@@ -18,12 +18,12 @@
 
 package com.robo4j.core.client.request;
 
-import com.robo4j.core.dto.ClientCommandDTO;
-
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.robo4j.core.dto.ClientCommandDTO;
 
 /**
  *
@@ -32,33 +32,33 @@ import java.util.List;
  */
 public class RequestCommandDTOBuilder {
 
-    public static final class Builder<DTOObject extends ClientCommandDTO> {
+	public static final class Builder<DTOObject extends ClientCommandDTO> {
 
-        private final List<DTOObject> content;
+		private final List<DTOObject> content;
 
-        public Builder(){
-            this.content = new LinkedList<>();
-        }
+		public Builder() {
+			this.content = new LinkedList<>();
+		}
 
-        public Builder<DTOObject> add(DTOObject element){
-            this.content.add(element);
-            return this;
-        }
+		public Builder<DTOObject> add(DTOObject element) {
+			this.content.add(element);
+			return this;
+		}
 
-        public Builder<DTOObject> addAll(Iterable<DTOObject> elements){
-            Iterator<DTOObject> iterator = elements.iterator();
+		public Builder<DTOObject> addAll(Iterable<DTOObject> elements) {
+			Iterator<DTOObject> iterator = elements.iterator();
 
-            while(iterator.hasNext()) {
-                DTOObject element = iterator.next();
-                this.add(element);
-            }
-            return this;
-        }
+			while (iterator.hasNext()) {
+				DTOObject element = iterator.next();
+				this.add(element);
+			}
+			return this;
+		}
 
-        public List<DTOObject> build(){
-            return Collections.unmodifiableList(content);
-        }
+		public List<DTOObject> build() {
+			return Collections.unmodifiableList(content);
+		}
 
-    }
+	}
 
 }

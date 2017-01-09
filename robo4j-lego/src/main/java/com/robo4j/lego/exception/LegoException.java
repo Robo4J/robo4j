@@ -27,11 +27,11 @@ package com.robo4j.lego.exception;
  */
 public class LegoException extends RuntimeException {
 
-    public LegoException(String message) {
-        super(message);
-    }
+	public LegoException(String message) {
+		super(message);
+	}
 
-    public LegoException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public LegoException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

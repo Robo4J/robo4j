@@ -18,14 +18,14 @@
 
 package com.robo4j.core;
 
-import com.robo4j.commons.registry.RegistryManager;
-import com.robo4j.core.reflect.AbstractClient;
-import com.robo4j.core.reflect.RoboReflectionScan;
 import com.robo4j.commons.control.RoboSystemConfig;
 import com.robo4j.commons.enums.RegistryTypeEnum;
-import com.robo4j.commons.registry.RoboRegistry;
 import com.robo4j.commons.registry.EngineRegistry;
+import com.robo4j.commons.registry.RegistryManager;
+import com.robo4j.commons.registry.RoboRegistry;
 import com.robo4j.commons.registry.SensorRegistry;
+import com.robo4j.core.reflect.AbstractClient;
+import com.robo4j.core.reflect.RoboReflectionScan;
 
 /**
  * Main class needs to be initiated
@@ -35,31 +35,32 @@ import com.robo4j.commons.registry.SensorRegistry;
  */
 public class Robo4jBrick extends AbstractClient {
 
-    private boolean initiate;
-    public Robo4jBrick(Class<?> clazz, boolean test) {
-        super(new RoboReflectionScan(clazz).init(test));
-        this.initiate = false;
-    }
+	private boolean initiate;
 
-    public boolean init(){
-        this.initiate = active.get();
-        return initiate;
-    }
+	public Robo4jBrick(Class<?> clazz, boolean test) {
+		super(new RoboReflectionScan(clazz).init(test));
+		this.initiate = false;
+	}
 
-    public RegistryManager getRegistry(){
-        return  RegistryManager.getInstance();
-    }
+	public boolean init() {
+		this.initiate = active.get();
+		return initiate;
+	}
 
-    @SuppressWarnings(value = "unchecked")
-    public RoboRegistry<RoboRegistry, RoboSystemConfig> getRegistryByType(RegistryTypeEnum type){
-        return RegistryManager.getInstance().getRegistryByType(type);
-    }
+	public RegistryManager getRegistry() {
+		return RegistryManager.getInstance();
+	}
 
-    public boolean activateEngineRegistry(){
-        return EngineRegistry.getInstance().activate();
-    }
+	@SuppressWarnings(value = "unchecked")
+	public RoboRegistry<RoboRegistry, RoboSystemConfig> getRegistryByType(RegistryTypeEnum type) {
+		return RegistryManager.getInstance().getRegistryByType(type);
+	}
 
-    public boolean activateSensorRegistry(){
-        return SensorRegistry.getInstance().activate();
-    }
+	public boolean activateEngineRegistry() {
+		return EngineRegistry.getInstance().activate();
+	}
+
+	public boolean activateSensorRegistry() {
+		return SensorRegistry.getInstance().activate();
+	}
 }

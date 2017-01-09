@@ -18,18 +18,18 @@
 
 package com.robo4j.commons.agent;
 
-import com.robo4j.commons.command.RoboTypeCommand;
-
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
+import com.robo4j.commons.command.RoboTypeCommand;
+
 /**
  * ProcessAgent is currently designed for RoboFrontHand
  *
- * it contains command process method which takes
- * Function. The function has as the imput specific command type
+ * it contains command process method which takes Function. The function has as
+ * the imput specific command type
  *
  *
  * @author Miro Kopecky (@miragemiko)
@@ -37,76 +37,75 @@ import java.util.function.Function;
  */
 public class ProcessAgent<RoboCommand extends RoboTypeCommand> implements DefaultAgent {
 
-    private volatile AtomicBoolean active;
-    private final AgentCache<AgentStatus> cache;
-    private ExecutorService executor;
-    private String name;
-    private AgentProducer producer;
-    private AgentConsumer consumer;
+	private final AgentCache<AgentStatus> cache;
+	private volatile AtomicBoolean active;
+	private ExecutorService executor;
+	private String name;
+	private AgentProducer producer;
+	private AgentConsumer consumer;
 
+	public ProcessAgent() {
+		this.active = new AtomicBoolean(false);
+		this.cache = new AgentCache<>();
+	}
 
-    public ProcessAgent() {
-        this.active = new AtomicBoolean(false);
-        this.cache = new AgentCache<>();
-    }
+	public AgentStatus process(RoboCommand command, Function<RoboCommand, AgentStatus> function) {
+		if (Objects.nonNull(command)) {
+			final AgentStatus result = function.apply(command);
+			cache.put(result);
+			switch (result.getStatus()) {
+			case ACTIVE:
+				active.set(true);
+				break;
+			case OFFLINE:
+				active.set(false);
+				break;
+			default:
+				throw new AgentException("PROCESS agentStatus = " + result);
+			}
+			return result;
+		} else {
+			return null;
+		}
+	}
 
-    public AgentStatus process(RoboCommand command, Function<RoboCommand, AgentStatus> function){
-        if(Objects.nonNull(command)){
-            final AgentStatus result = function.apply(command);
-            cache.put(result);
-            switch (result.getStatus()){
-                case ACTIVE:
-                    active.set(true);
-                    break;
-                case OFFLINE:
-                    active.set(false);
-                    break;
-                default:
-                    throw new AgentException("PROCESS agentStatus = " + result);
-            }
-            return result;
-        } else {
-            return null;
-        }
-    }
+	@Override
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    @Override
-    public void setExecutor(ExecutorService executor) {
-        this.executor = executor;
-    }
+	public ExecutorService getExecutor() {
+		return executor;
+	}
 
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
+	@Override
+	public void setExecutor(ExecutorService executor) {
+		this.executor = executor;
+	}
 
-    @Override
-    public void setProducer(AgentProducer producer) {
-        this.producer = producer;
-    }
+	public AgentProducer getProducer() {
+		return producer;
+	}
 
-    @Override
-    public void setConsumer(AgentConsumer consumer) {
-        this.consumer = consumer;
-    }
+	@Override
+	public void setProducer(AgentProducer producer) {
+		this.producer = producer;
+	}
 
-    public ExecutorService getExecutor() {
-        return executor;
-    }
+	public AgentConsumer getConsumer() {
+		return consumer;
+	}
 
-    public AgentProducer getProducer() {
-        return producer;
-    }
+	@Override
+	public void setConsumer(AgentConsumer consumer) {
+		this.consumer = consumer;
+	}
 
-    public AgentConsumer getConsumer() {
-        return consumer;
-    }
+	public boolean getActive() {
+		return active.get();
+	}
 
-    public boolean getActive() {
-        return active.get();
-    }
-
-    public void setActive(boolean active) {
-        this.active.set(active);
-    }
+	public void setActive(boolean active) {
+		this.active.set(active);
+	}
 }

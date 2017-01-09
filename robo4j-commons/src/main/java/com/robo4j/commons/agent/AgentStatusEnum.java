@@ -25,59 +25,49 @@ import java.util.Map;
  * @author Miro Kopecky (@miragemiko)
  * @since 29.05.2016
  */
-public enum  AgentStatusEnum {
+public enum AgentStatusEnum {
 
-    //@formatter:off
-    READY           (0, "ready"),
-    ACTIVE          (1, "active"),
-    OFFLINE         (2, "offline"),
-    REQUEST_POST    (3, "request_post"),
-    REQUEST_GET     (4, "request_get")
-    ;
-    //@formatter:on
+	// @formatter:off
+	READY(0, "ready"), ACTIVE(1, "active"), OFFLINE(2, "offline"), REQUEST_POST(3, "request_post"), REQUEST_GET(4,
+			"request_get");
+	// @formatter:on
 
-    private int code;
-    private String def;
+	private volatile static Map<String, AgentStatusEnum> defToAgentStatusMapping;
+	private int code;
+	private String def;
 
-    private volatile static Map<String, AgentStatusEnum> defToAgentStatusMapping;
+	AgentStatusEnum(int code, String def) {
+		this.code = code;
+		this.def = def;
+	}
 
-    AgentStatusEnum(int code, String def) {
-        this.code = code;
-        this.def = def;
-    }
+	private static void initMapping() {
+		defToAgentStatusMapping = new HashMap<>();
+		for (AgentStatusEnum ct : values()) {
+			defToAgentStatusMapping.put(ct.getDef(), ct);
+		}
+	}
 
-    public Integer getCode() {
-        return code;
-    }
+	public static AgentStatusEnum getByState(String def) {
+		if (defToAgentStatusMapping == null)
+			initMapping();
+		return defToAgentStatusMapping.get(def);
+	}
 
-    public String getDesc() {
-        return def;
-    }
+	public Integer getCode() {
+		return code;
+	}
 
-    public String getDef() {
-        return def;
-    }
+	public String getDesc() {
+		return def;
+	}
 
+	public String getDef() {
+		return def;
+	}
 
-
-    private static void initMapping(){
-        defToAgentStatusMapping = new HashMap<>();
-        for(AgentStatusEnum ct: values()){
-            defToAgentStatusMapping.put(ct.getDef(), ct);
-        }
-    }
-
-    public static AgentStatusEnum getByState(String def){
-        if(defToAgentStatusMapping == null)
-            initMapping();
-        return defToAgentStatusMapping.get(def);
-    }
-
-    @Override
-    public String toString() {
-        return "AgentStatusEnum{" +
-                "code=" + code +
-                ", def='" + def + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "AgentStatusEnum{" + "code=" + code + ", def='" + def + '\'' + '}';
+	}
 }

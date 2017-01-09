@@ -24,11 +24,11 @@ package com.robo4j.core.client.io;
  */
 public class ClientException extends RuntimeException {
 
-    public ClientException(String message) {
-        super(message);
-    }
+	public ClientException(String message) {
+		super(message);
+	}
 
-    public ClientException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public ClientException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

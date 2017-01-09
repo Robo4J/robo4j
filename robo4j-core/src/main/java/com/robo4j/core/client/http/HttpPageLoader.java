@@ -18,15 +18,14 @@
 
 package com.robo4j.core.client.http;
 
-
-import com.robo4j.core.client.io.Resource;
-import com.robo4j.core.client.io.ResourceLoader;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
+
+import com.robo4j.core.client.io.Resource;
+import com.robo4j.core.client.io.ResourceLoader;
 
 /**
  *
@@ -37,17 +36,17 @@ import java.util.stream.Collectors;
  */
 public final class HttpPageLoader {
 
-    private static final String HTTP_PAGES_DIR = "webapp";
-    private final ResourceLoader resourceLoader;
+	private static final String HTTP_PAGES_DIR = "webapp";
+	private final ResourceLoader resourceLoader;
 
-    public HttpPageLoader() {
-        this.resourceLoader = new ResourceLoader();
-    }
+	public HttpPageLoader() {
+		this.resourceLoader = new ResourceLoader();
+	}
 
-    public String getWebPage(String name) throws IOException{
-        final Resource resource = resourceLoader.getInputStream(Paths.get(HTTP_PAGES_DIR, name).toString());
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
-            return reader.lines().collect(Collectors.joining());
-        }
-    }
+	public String getWebPage(String name) throws IOException {
+		final Resource resource = resourceLoader.getInputStream(Paths.get(HTTP_PAGES_DIR, name).toString());
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
+			return reader.lines().collect(Collectors.joining());
+		}
+	}
 }

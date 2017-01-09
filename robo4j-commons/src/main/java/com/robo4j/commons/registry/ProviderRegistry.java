@@ -29,53 +29,52 @@ import java.util.stream.Collectors;
  */
 public final class ProviderRegistry implements RoboRegistry<ProviderRegistry, BaseRegistryProvider> {
 
-    private static volatile ProviderRegistry INSTANCE;
-    private volatile Map<String, BaseRegistryProvider> providers;
-    private AtomicBoolean active;
+	private static volatile ProviderRegistry INSTANCE;
+	private volatile Map<String, BaseRegistryProvider> providers;
+	private AtomicBoolean active;
 
-    private ProviderRegistry(){
-        this.providers = new HashMap<>();
-        this.active = new AtomicBoolean(false);
-    }
+	private ProviderRegistry() {
+		this.providers = new HashMap<>();
+		this.active = new AtomicBoolean(false);
+	}
 
-    public static ProviderRegistry getInstance(){
-        if(INSTANCE == null){
-            synchronized (UnitRegistry.class){
-                if(INSTANCE == null){
-                    INSTANCE = new ProviderRegistry();
-                }
-            }
-        }
+	public static ProviderRegistry getInstance() {
+		if (INSTANCE == null) {
+			synchronized (UnitRegistry.class) {
+				if (INSTANCE == null) {
+					INSTANCE = new ProviderRegistry();
+				}
+			}
+		}
 
-        return INSTANCE;
-    }
+		return INSTANCE;
+	}
 
+	@Override
+	public ProviderRegistry build(Map<String, BaseRegistryProvider> providers) {
+		this.providers = providers.entrySet().stream()
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+		this.active.set(true);
+		return this;
+	}
 
-    @Override
-    public ProviderRegistry build(Map<String, BaseRegistryProvider> providers) {
-        this.providers = providers.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        this.active.set(true);
-        return this;
-    }
+	@Override
+	public BaseRegistryProvider getByName(String name) {
+		return this.providers.get(name);
+	}
 
-    @Override
-    public BaseRegistryProvider getByName(String name) {
-        return this.providers.get(name);
-    }
+	@Override
+	public Map<String, BaseRegistryProvider> getRegistry() {
+		return this.providers;
+	}
 
-    @Override
-    public Map<String, BaseRegistryProvider> getRegistry(){
-        return this.providers;
-    }
+	@Override
+	public boolean activate() {
+		return false;
+	}
 
-    @Override
-    public boolean activate() {
-        return false;
-    }
-
-    @Override
-    public boolean isActive() {
-        return active.get();
-    }
+	@Override
+	public boolean isActive() {
+		return active.get();
+	}
 }

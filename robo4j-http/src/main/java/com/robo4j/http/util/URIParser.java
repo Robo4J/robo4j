@@ -18,8 +18,6 @@
 
 package com.robo4j.http.util;
 
-import com.robo4j.http.dto.RequestDTO;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +27,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.robo4j.http.dto.RequestDTO;
+
 /**
  *
  * Parsing URL
@@ -37,33 +37,31 @@ import java.util.stream.Stream;
  * @since 17.10.2016
  */
 public final class URIParser {
-    private static final String HTTP_GET_AND ="&";
-    private static final String HTTP_GET_EQ ="=";
-    private static final int V_0=0;
-    private static final int V_1=1;
-    private static final int V_3=3;
-    private static final Pattern httpGetUriPattern = Pattern.compile("^/([a-z]+)(\\?)?(.*)");
+	private static final String HTTP_GET_AND = "&";
+	private static final String HTTP_GET_EQ = "=";
+	private static final int V_0 = 0;
+	private static final int V_1 = 1;
+	private static final int V_3 = 3;
+	private static final Pattern httpGetUriPattern = Pattern.compile("^/([a-z]+)(\\?)?(.*)");
 
-    //TODO: FIXME need to prepare also header
-    @SuppressWarnings(value = "unchecked")
-    public static RequestDTO parseGetUri(final List<String> paths, final String uri){
+	// TODO: FIXME need to prepare also header
+	@SuppressWarnings(value = "unchecked")
+	public static RequestDTO parseGetUri(final List<String> paths, final String uri) {
 
-        final Matcher mather = httpGetUriPattern.matcher(uri);
-        if(mather.matches()){
-            String path = mather.group(V_1);
-            String variables = mather.group(V_3);
-            return new RequestDTO(path, parseVariablesToMap(variables));
-        } else {
-            return new RequestDTO("", Collections.EMPTY_MAP);
-        }
+		final Matcher mather = httpGetUriPattern.matcher(uri);
+		if (mather.matches()) {
+			String path = mather.group(V_1);
+			String variables = mather.group(V_3);
+			return new RequestDTO(path, parseVariablesToMap(variables));
+		} else {
+			return new RequestDTO("", Collections.EMPTY_MAP);
+		}
 
-    }
+	}
 
-    //Private Methods
-    private static Map<String, String> parseVariablesToMap(String values){
-        return Stream.of(values.split(HTTP_GET_AND))
-                .map(e -> e.split(HTTP_GET_EQ))
-                .filter(e -> Arrays.asList(e).size() > 1)
-                .collect(Collectors.toMap(e -> e[V_0], e -> e[V_1]));
-    }
+	// Private Methods
+	private static Map<String, String> parseVariablesToMap(String values) {
+		return Stream.of(values.split(HTTP_GET_AND)).map(e -> e.split(HTTP_GET_EQ))
+				.filter(e -> Arrays.asList(e).size() > 1).collect(Collectors.toMap(e -> e[V_0], e -> e[V_1]));
+	}
 }

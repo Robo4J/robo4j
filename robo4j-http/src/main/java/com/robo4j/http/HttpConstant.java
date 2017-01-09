@@ -22,7 +22,7 @@ package com.robo4j.http;
  * @author Miro Kopecky (@miragemiko)
  * @since 18.10.2016
  */
-//TODO: FIME merge with HttpUtil
+// TODO: FIME merge with HttpUtil
 public final class HttpConstant {
-    public static final String HTTP_HEADER_OK = "HTTP/1.0 200 OK";
+	public static final String HTTP_HEADER_OK = "HTTP/1.0 200 OK";
 }

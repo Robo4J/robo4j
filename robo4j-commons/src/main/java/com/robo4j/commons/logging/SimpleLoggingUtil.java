@@ -23,20 +23,22 @@ import java.time.LocalDate;
 /**
  *
  * Simple class for logging
+ * 
  * @author Miro Kopecky (@miragemiko)
  * @since 19.07.2016
  */
 public final class SimpleLoggingUtil {
 
-    public static void print(Class<?> clazz, String message){
-//        System.out.println(LocalDate.now() + "-" + clazz.getSimpleName() + " : " + message);
-    }
+	public static void print(Class<?> clazz, String message) {
+		// System.out.println(LocalDate.now() + "-" + clazz.getSimpleName() + "
+		// : " + message);
+	}
 
-    public static void debug(Class<?> clazz, String message){
-        System.out.println(LocalDate.now() + ":DEBUG:" + clazz.getSimpleName() + " : " + message);
-    }
+	public static void debug(Class<?> clazz, String message) {
+		System.out.println(LocalDate.now() + ":DEBUG:" + clazz.getSimpleName() + " : " + message);
+	}
 
-    public static void error(Class<?> clazz, String message){
-        System.out.println(LocalDate.now() + ":ERROR:" + clazz.getSimpleName() + " : " + message);
-    }
+	public static void error(Class<?> clazz, String message) {
+		System.out.println(LocalDate.now() + ":ERROR:" + clazz.getSimpleName() + " : " + message);
+	}
 }

@@ -31,23 +31,22 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 public class AgentCache<AgentMessage extends AgentStatus> extends ArrayBlockingQueue<AgentMessage> {
 
-    private static final int FIXED_SIZE = 10;
+	private static final int FIXED_SIZE = 10;
 
-    public AgentCache(){
-        super(FIXED_SIZE);
-    }
+	public AgentCache() {
+		super(FIXED_SIZE);
+	}
 
-
-    @Override
-    public void put(AgentMessage o){
-        if(size() == FIXED_SIZE){
-            final AgentMessage removed = remove();
-        }
-        try {
-            super.put(o);
-        } catch (InterruptedException e) {
-            throw new AgentException("CACHE IS CORRUPTED NO SPACE");
-        }
-    }
+	@Override
+	public void put(AgentMessage o) {
+		if (size() == FIXED_SIZE) {
+			final AgentMessage removed = remove();
+		}
+		try {
+			super.put(o);
+		} catch (InterruptedException e) {
+			throw new AgentException("CACHE IS CORRUPTED NO SPACE");
+		}
+	}
 
 }

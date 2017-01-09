@@ -22,13 +22,17 @@ import java.util.concurrent.ExecutorService;
 
 /**
  * Interface to Any
+ * 
  * @author Miro Kopecky (@miragemiko)
  * @since 29.05.2016
  */
 public interface DefaultAgent extends GenericAgent {
 
-    void setExecutor(ExecutorService executor);
-    void setName(String name);
-    void setProducer(AgentProducer producer);
-    void setConsumer(AgentConsumer consumer);
+	void setExecutor(ExecutorService executor);
+
+	void setName(String name);
+
+	void setProducer(AgentProducer producer);
+
+	void setConsumer(AgentConsumer consumer);
 }

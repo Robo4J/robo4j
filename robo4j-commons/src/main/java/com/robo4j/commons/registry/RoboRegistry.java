@@ -18,9 +18,9 @@
 
 package com.robo4j.commons.registry;
 
-import com.robo4j.commons.control.RoboSystemConfig;
-
 import java.util.Map;
+
+import com.robo4j.commons.control.RoboSystemConfig;
 
 /**
  *
@@ -31,13 +31,13 @@ import java.util.Map;
  */
 public interface RoboRegistry<RegistryType extends RoboRegistry, ServiceType extends RoboSystemConfig> {
 
-    RegistryType build(Map<String, ServiceType> services);
+	RegistryType build(Map<String, ServiceType> services);
 
-    ServiceType getByName(String name);
+	ServiceType getByName(String name);
 
-    Map<String, ServiceType> getRegistry();
+	Map<String, ServiceType> getRegistry();
 
-    boolean activate();
+	boolean activate();
 
-    boolean isActive();
+	boolean isActive();
 }

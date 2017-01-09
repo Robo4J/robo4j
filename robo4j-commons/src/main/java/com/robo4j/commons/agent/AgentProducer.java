@@ -26,7 +26,7 @@ import com.robo4j.commons.concurrent.CoreBusQueue;
  * @author Miro Kopecky (@miragemiko)
  * @since 29.05.2016
  */
-public interface AgentProducer <TypeRoboQueue extends CoreBusQueue> extends GenericAgent {
+public interface AgentProducer<TypeRoboQueue extends CoreBusQueue> extends GenericAgent {
 
-    TypeRoboQueue getMessageQueue();
+	TypeRoboQueue getMessageQueue();
 }

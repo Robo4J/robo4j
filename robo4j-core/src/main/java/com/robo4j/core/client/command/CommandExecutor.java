@@ -18,21 +18,21 @@
 
 package com.robo4j.core.client.command;
 
-import com.robo4j.core.client.enums.RequestCommandEnum;
-import com.robo4j.core.client.io.ClientException;
-import com.robo4j.commons.logging.SimpleLoggingUtil;
-import com.robo4j.core.system.CommandProvider;
-import com.robo4j.core.util.ConstantUtil;
-import com.robo4j.commons.agent.AgentConsumer;
-import com.robo4j.commons.command.GenericCommand;
-import com.robo4j.commons.concurrent.CoreBusQueue;
-import com.robo4j.commons.concurrent.LegoThreadFactory;
-
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.robo4j.commons.agent.AgentConsumer;
+import com.robo4j.commons.command.GenericCommand;
+import com.robo4j.commons.concurrent.CoreBusQueue;
+import com.robo4j.commons.concurrent.LegoThreadFactory;
+import com.robo4j.commons.logging.SimpleLoggingUtil;
+import com.robo4j.core.client.enums.RequestCommandEnum;
+import com.robo4j.core.client.io.ClientException;
+import com.robo4j.core.system.CommandProvider;
+import com.robo4j.core.util.ConstantUtil;
 
 /**
  *
@@ -41,72 +41,68 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Miro Kopecky (@miragemiko)
  * @since 10.06.2016
  */
-public class CommandExecutor<QueueType extends CoreBusQueue> implements AgentConsumer, Runnable{
+public class CommandExecutor<QueueType extends CoreBusQueue> implements AgentConsumer, Runnable {
 
+	private volatile ExecutorService executorForCommands;
+	private volatile AtomicBoolean active;
+	private CommandProvider commandsProvider;
+	private QueueType commandsQueue;
 
-    private volatile ExecutorService executorForCommands;
-    private volatile AtomicBoolean active;
-    private CommandProvider commandsProvider;
-    private QueueType commandsQueue;
+	public CommandExecutor(AtomicBoolean active, CommandProvider commandsProvider) {
+		this.executorForCommands = Executors.newFixedThreadPool(ConstantUtil.PLATFORM_ENGINES,
+				new LegoThreadFactory(ConstantUtil.COMMAND_BUS));
+		this.commandsProvider = commandsProvider;
+		this.active = active;
+		SimpleLoggingUtil.print(CommandExecutor.class, "CONSUMER UP active= " + active);
+	}
 
+	@SuppressWarnings(value = "unchecked")
+	@Override
+	public void setMessageQueue(CoreBusQueue commandsQueue) {
+		this.commandsQueue = (QueueType) commandsQueue;
+		SimpleLoggingUtil.print(getClass(), "SET MESSAGE QUEUE= " + commandsQueue);
+	}
 
-    public CommandExecutor(AtomicBoolean active, CommandProvider commandsProvider) {
-        this.executorForCommands = Executors.newFixedThreadPool(ConstantUtil.PLATFORM_ENGINES,
-                new LegoThreadFactory(ConstantUtil.COMMAND_BUS));
-        this.commandsProvider = commandsProvider;
-        this.active = active;
-        SimpleLoggingUtil.print(CommandExecutor.class, "CONSUMER UP active= " + active);
-    }
+	@SuppressWarnings(value = "unchecked")
+	@Override
+	public void run() {
+		if (commandsQueue == null) {
+			throw new ClientException("ERROR: consumer queue");
+		}
 
-    @SuppressWarnings(value = "unchecked")
-    @Override
-    public void setMessageQueue(CoreBusQueue commandsQueue) {
-        this.commandsQueue = (QueueType) commandsQueue;
-        SimpleLoggingUtil.print(getClass(),"SET MESSAGE QUEUE= " + commandsQueue);
-    }
+		while (active.get() && commandsQueue.peek() != null) {
+			try {
+				GenericCommand<RequestCommandEnum> command = (GenericCommand) commandsQueue.take().getEntry();
+				SimpleLoggingUtil.debug(getClass(), "commandQueue: " + command);
+				Future<Boolean> moveFuture;
+				switch (command.getType()) {
+				case BACK:
+				case MOVE:
+				case RIGHT:
+				case LEFT:
+				case STOP:
+				case EXIT:
+				case HAND:
+				case FRONT_RIGHT:
+				case FRONT_LEFT:
+					moveFuture = executorForCommands.submit(() -> commandsProvider.process(command));
+					break;
+				default:
+					System.err.println("NO SUCH COMMAND= " + command);
+					throw new ClientException("NO SUCH COMMAND= " + command);
+				}
 
-
-    @SuppressWarnings(value = "unchecked")
-    @Override
-    public void run() {
-        if(commandsQueue == null){
-            throw new ClientException("ERROR: consumer queue");
-        }
-
-        while(active.get() && commandsQueue.peek() != null){
-            try {
-                GenericCommand<RequestCommandEnum> command =
-                        (GenericCommand) commandsQueue.take().getEntry();
-                SimpleLoggingUtil.debug(getClass(), "commandQueue: " + command);
-                Future<Boolean> moveFuture;
-                switch (command.getType()){
-                    case BACK:
-                    case MOVE:
-                    case RIGHT:
-                    case LEFT:
-                    case STOP:
-                    case EXIT:
-                    case HAND:
-                    case FRONT_RIGHT:
-                    case FRONT_LEFT:
-                        moveFuture = executorForCommands.submit(() -> commandsProvider.process(command));
-                        break;
-                    default:
-                        System.err.println("NO SUCH COMMAND= " + command);
-                        throw new ClientException("NO SUCH COMMAND= " + command);
-                }
-
-                boolean result = moveFuture.get();
-                SimpleLoggingUtil.print(getClass(), "CommandExecutor: " + result);
-//                if(!result){
-//                    throw new ClientException("ERROR ENGINE EXECUTION");
-//                }
-            } catch (InterruptedException | ExecutionException e) {
-                SimpleLoggingUtil.print(getClass(), "CommandExecutor e= " + e);
-                throw new ClientException("ERROR CONSUMER command execution, ", e);
-            }
-        }
-        executorForCommands.shutdown();
-    }
+				boolean result = moveFuture.get();
+				SimpleLoggingUtil.print(getClass(), "CommandExecutor: " + result);
+				// if(!result){
+				// throw new ClientException("ERROR ENGINE EXECUTION");
+				// }
+			} catch (InterruptedException | ExecutionException e) {
+				SimpleLoggingUtil.print(getClass(), "CommandExecutor e= " + e);
+				throw new ClientException("ERROR CONSUMER command execution, ", e);
+			}
+		}
+		executorForCommands.shutdown();
+	}
 
 }

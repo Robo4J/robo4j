@@ -18,19 +18,18 @@
 
 package com.robo4j.core.service;
 
-import com.robo4j.core.dto.SensorDTO;
 import com.robo4j.commons.service.GenericService;
+import com.robo4j.core.dto.SensorDTO;
 
 /**
- * Simple StorageService Interface
- * ->
+ * Simple StorageService Interface ->
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 14.10.2016
  */
 public interface StorageService extends GenericService {
 
-    SensorDTO store(SensorDTO data);
+	SensorDTO store(SensorDTO data);
 
-    void close();
+	void close();
 }

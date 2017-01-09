@@ -26,6 +26,6 @@ import com.robo4j.commons.control.RoboSystemConfig;
  */
 public interface GenericService extends RoboSystemConfig {
 
-    void init();
+	void init();
 
 }

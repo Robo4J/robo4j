@@ -18,7 +18,6 @@
 
 package com.robo4j.http;
 
-
 import java.net.URI;
 import java.util.Map;
 
@@ -29,49 +28,44 @@ import java.util.Map;
  * @author Miro Kopecky (@miragemiko)
  * @since 09.03.2016
  */
-public class HttpMessage implements Comparable<HttpMessage>{
+public class HttpMessage implements Comparable<HttpMessage> {
 
-    private final HttpMethod method;
-    private final URI uri;
-    private final HttpVersion version;
-    private final Map<String, String> header;
+	private final HttpMethod method;
+	private final URI uri;
+	private final HttpVersion version;
+	private final Map<String, String> header;
 
-    public HttpMessage(HttpMethod method, URI uri, HttpVersion version, Map<String, String> header) {
-        this.method = method;
-        this.uri = uri;
-        this.version = version;
-        this.header = header;
-    }
+	public HttpMessage(HttpMethod method, URI uri, HttpVersion version, Map<String, String> header) {
+		this.method = method;
+		this.uri = uri;
+		this.version = version;
+		this.header = header;
+	}
 
-    public HttpMethod getMethod() {
-        return method;
-    }
+	public HttpMethod getMethod() {
+		return method;
+	}
 
-    public URI getUri() {
-        return uri;
-    }
+	public URI getUri() {
+		return uri;
+	}
 
-    public HttpVersion getVersion() {
-        return version;
-    }
+	public HttpVersion getVersion() {
+		return version;
+	}
 
-    public Map<String, String> getHeader() {
-        return header;
-    }
+	public Map<String, String> getHeader() {
+		return header;
+	}
 
-    @Override
-    public int compareTo(HttpMessage o) {
-        return this.method.compareTo(o.method);
-    }
+	@Override
+	public int compareTo(HttpMessage o) {
+		return this.method.compareTo(o.method);
+	}
 
-
-    @Override
-    public String toString() {
-        return "HttpMessage{" +
-                "method=" + method +
-                ", uri=" + uri +
-                ", version=" + version +
-                ", header=" + header +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "HttpMessage{" + "method=" + method + ", uri=" + uri + ", version=" + version + ", header=" + header
+				+ '}';
+	}
 }

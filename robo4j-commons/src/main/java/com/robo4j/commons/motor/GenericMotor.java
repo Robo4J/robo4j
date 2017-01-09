@@ -26,17 +26,17 @@ import com.robo4j.commons.control.RoboSystemConfig;
  */
 public interface GenericMotor extends RoboSystemConfig {
 
-    void forward();
+	void forward();
 
-    void backward();
+	void backward();
 
-    void stop();
+	void stop();
 
-    void rotate(int val);
+	void rotate(int val);
 
-    boolean isMoving();
+	boolean isMoving();
 
-    void setSpeed(int speed);
+	void setSpeed(int speed);
 
-    void close();
+	void close();
 }

@@ -30,39 +30,31 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
  */
 public enum LegoSensorPortEnum implements RoboHardwareEnum<String>, RoboSystemConfig {
 
-    //@formatter:off
-    //       type   name
-    S1      ("S1", "Sensor S1"),
-    S2      ("S2", "Sensor S2"),
-    S3      ("S3", "Sensor S3"),
-    S4      ("S4", "Sensor S4"),
-    ;
-    //@formatter:on
+	// @formatter:off
+	// type name
+	S1("S1", "Sensor S1"), S2("S2", "Sensor S2"), S3("S3", "Sensor S3"), S4("S4", "Sensor S4"),;
+	// @formatter:on
 
-    private String type;
-    private String name;
+	private String type;
+	private String name;
 
-    LegoSensorPortEnum(String type, String name) {
-        this.type = type;
-        this.name = name;
-    }
+	LegoSensorPortEnum(String type, String name) {
+		this.type = type;
+		this.name = name;
+	}
 
-    @Override
-    public String getType() {
-        return type;
-    }
+	@Override
+	public String getType() {
+		return type;
+	}
 
-    @Override
-    public String getName() {
-        return name;
-    }
+	@Override
+	public String getName() {
+		return name;
+	}
 
-
-    @Override
-    public String toString() {
-        return "LegoSensorPortEnum{" +
-                "type='" + type + '\'' +
-                ", name='" + name + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "LegoSensorPortEnum{" + "type='" + type + '\'' + ", name='" + name + '\'' + '}';
+	}
 }

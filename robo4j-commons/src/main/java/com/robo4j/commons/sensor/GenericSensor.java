@@ -26,11 +26,12 @@ import com.robo4j.commons.control.RoboSystemConfig;
  */
 public interface GenericSensor extends RoboSystemConfig {
 
-    String getValue();
+	String getValue();
 
-    /* used to enable example lights*/
-    void enable();
-    void disable();
+	/* used to enable example lights */
+	void enable();
 
-    void close();
+	void disable();
+
+	void close();
 }

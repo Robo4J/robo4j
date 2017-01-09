@@ -18,11 +18,6 @@
 
 package com.robo4j.core.reflect;
 
-import com.robo4j.core.client.util.ClientClassLoader;
-import com.robo4j.commons.logging.SimpleLoggingUtil;
-import com.robo4j.core.util.ConstantUtil;
-import com.robo4j.core.util.StreamUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,122 +32,118 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import com.robo4j.commons.logging.SimpleLoggingUtil;
+import com.robo4j.core.client.util.ClientClassLoader;
+import com.robo4j.core.util.ConstantUtil;
+import com.robo4j.core.util.StreamUtils;
+
 /**
  * @author Miro Kopecky (@miragemiko)
  * @since 30.11.2016
  */
 @SuppressWarnings(value = "unchecked")
 public final class RoboReflectionScan {
-    private static final String FILE = "file:";
-    private static final String SUFFIX = ".class";
-    private static final String EXCLAMATION = "!";
-    private static final char SLASH = '/';
-    private static final char DOT = '.';
-    private final ClassLoader classLoader;
-    private final String packageName;
-    private List<Class<?>> classes;
+	private static final String FILE = "file:";
+	private static final String SUFFIX = ".class";
+	private static final String EXCLAMATION = "!";
+	private static final char SLASH = '/';
+	private static final char DOT = '.';
+	private final ClassLoader classLoader;
+	private final String packageName;
+	private List<Class<?>> classes;
 
-    public RoboReflectionScan(Class<?> clazz) {
-        String simpleClassName = DOT + clazz.getSimpleName();
-        String tmpName = clazz.getName().replace(simpleClassName, ConstantUtil.EMPTY_STRING);
-        this.packageName = tmpName.replace(DOT, File.separatorChar);
-        this.classLoader = ClientClassLoader.getInstance().getClassLoader();
+	public RoboReflectionScan(Class<?> clazz) {
+		String simpleClassName = DOT + clazz.getSimpleName();
+		String tmpName = clazz.getName().replace(simpleClassName, ConstantUtil.EMPTY_STRING);
+		this.packageName = tmpName.replace(DOT, File.separatorChar);
+		this.classLoader = ClientClassLoader.getInstance().getClassLoader();
 
-    }
+	}
 
-    public RoboReflectionScan init(boolean test){
-        return test ? initClassesTest() : initClasses();
-    }
+	public RoboReflectionScan init(boolean test) {
+		return test ? initClassesTest() : initClasses();
+	}
 
-    //Package Private
-    Stream<Class<?>> getClassesByAnnotation(Class<? extends Annotation> anno){
-        return classes.stream()
-                .filter(c -> c.isAnnotationPresent(anno));
-    }
+	// Package Private
+	Stream<Class<?>> getClassesByAnnotation(Class<? extends Annotation> anno) {
+		return classes.stream().filter(c -> c.isAnnotationPresent(anno));
+	}
 
-    //Private Methods
-    private RoboReflectionScan initClasses(){
-        try {
-            SimpleLoggingUtil.debug(getClass(), "package: " + packageName);
-            classes = new ArrayList<>();
-            StreamUtils.enumerationAsStream(classLoader.getResources(packageName), false)
-                    .map(url -> {
-                        try {
-                            String jarFile = url.getFile().split(EXCLAMATION)[ConstantUtil.DEFAULT_VALUE].replace(FILE, ConstantUtil.EMPTY_STRING);
-                            return new ZipInputStream(new FileInputStream(jarFile));
-                        } catch (FileNotFoundException e) {
-                            throw new RoboReflectException("error: " + e);
-                        }
-                    })
-                    .forEach(e -> {
-                        try {
-                            for (ZipEntry entry = e.getNextEntry(); entry != null; entry = e.getNextEntry()) {
-                                if (!entry.isDirectory() &&
-                                     entry.getName().contains(packageName) &&
-                                     entry.getName().endsWith(SUFFIX)) {
-                                    try {
-                                        String cName = entry.getName().replace(SLASH, DOT).replace(SUFFIX, ConstantUtil.EMPTY_STRING);
-                                        classes.add(classLoader.loadClass(cName));
-                                    } catch (ClassNotFoundException e1) {
-                                        throw  new RoboReflectException("error: " + e1);
-                                    }
-                                }
-                            }
-                        } catch (IOException e1) {
-                            throw new RoboReflectException("error forEach: " + e1);
-                        }
-                    });
+	// Private Methods
+	private RoboReflectionScan initClasses() {
+		try {
+			SimpleLoggingUtil.debug(getClass(), "package: " + packageName);
+			classes = new ArrayList<>();
+			StreamUtils.enumerationAsStream(classLoader.getResources(packageName), false).map(url -> {
+				try {
+					String jarFile = url.getFile().split(EXCLAMATION)[ConstantUtil.DEFAULT_VALUE].replace(FILE,
+							ConstantUtil.EMPTY_STRING);
+					return new ZipInputStream(new FileInputStream(jarFile));
+				} catch (FileNotFoundException e) {
+					throw new RoboReflectException("error: " + e);
+				}
+			}).forEach(e -> {
+				try {
+					for (ZipEntry entry = e.getNextEntry(); entry != null; entry = e.getNextEntry()) {
+						if (!entry.isDirectory() && entry.getName().contains(packageName)
+								&& entry.getName().endsWith(SUFFIX)) {
+							try {
+								String cName = entry.getName().replace(SLASH, DOT).replace(SUFFIX,
+										ConstantUtil.EMPTY_STRING);
+								classes.add(classLoader.loadClass(cName));
+							} catch (ClassNotFoundException e1) {
+								throw new RoboReflectException("error: " + e1);
+							}
+						}
+					}
+				} catch (IOException e1) {
+					throw new RoboReflectException("error forEach: " + e1);
+				}
+			});
 
-        } catch (IOException e) {
-            throw new RoboReflectException("initClasses:", e);
-        }
-        return this;
-    }
+		} catch (IOException e) {
+			throw new RoboReflectException("initClasses:", e);
+		}
+		return this;
+	}
 
+	private RoboReflectionScan initClassesTest() {
 
-    private RoboReflectionScan initClassesTest(){
+		try {
+			this.classes = StreamUtils.enumerationAsStream(classLoader.getResources(packageName), false)
+					.map(URL::getFile).map(File::new).map(f -> findClasses(f, packageName)).flatMap(List::stream)
+					.peek(c -> SimpleLoggingUtil.debug(getClass(), "cl: " + c.getName())).collect(Collectors.toList());
 
-        try {
-            this.classes = StreamUtils.enumerationAsStream(classLoader.getResources(packageName), false)
-                    .map(URL::getFile)
-                    .map(File::new)
-                    .map(f -> findClasses(f, packageName))
-                    .flatMap(List::stream)
-                    .peek(c -> SimpleLoggingUtil.debug(getClass(), "cl: " + c.getName()))
-                    .collect(Collectors.toList());
+		} catch (IOException e) {
+			throw new RoboReflectException("initClassesTest: " + e);
+		}
+		return this;
+	}
 
-        } catch (IOException e) {
-            throw new RoboReflectException("initClassesTest: " + e);
-        }
-        return this;
-    }
+	private List<Class<?>> findClasses(File dir, String path) {
+		return dir.exists() ? findClassesIntern(dir, path) : Collections.EMPTY_LIST;
+	}
 
-    private  List<Class<?>> findClasses(File dir, String path) {
-        return dir.exists() ? findClassesIntern(dir, path) : Collections.EMPTY_LIST;
-    }
+	private List<Class<?>> findClassesIntern(File dir, String path) {
+		List<Class<?>> result = new ArrayList<>();
+		File[] files = dir.listFiles();
+		assert files != null;
+		Stream.of(files).forEach(file -> {
+			if (file.isDirectory()) {
+				assert !file.getName().contains(String.valueOf(DOT));
+				result.addAll(findClassesIntern(file, path + DOT + file.getName()));
+			} else if (file.getName().endsWith(SUFFIX)) {
+				String tmpPath = path.replace(File.separatorChar, DOT);
+				try {
+					result.add(Class.forName(tmpPath + DOT + file.getName().substring(ConstantUtil.DEFAULT_VALUE,
+							file.getName().length() - SUFFIX.length())));
+				} catch (ClassNotFoundException e) {
+					throw new RoboReflectException("findClassesIntern", e);
+				}
+			}
 
-    private List<Class<?>> findClassesIntern(File dir, String path){
-        List<Class<?>> result = new ArrayList<>();
-        File[] files = dir.listFiles();
-        assert files != null;
-        Stream.of(files)
-                .forEach(file -> {
-                    if (file.isDirectory()) {
-                        assert !file.getName().contains(String.valueOf(DOT));
-                        result.addAll(findClassesIntern(file, path + DOT + file.getName()));
-                    } else if (file.getName().endsWith(SUFFIX)) {
-                        String tmpPath = path.replace(File.separatorChar, DOT);
-                        try {
-                            result.add(Class.forName(tmpPath + DOT + file.getName()
-                                    .substring(ConstantUtil.DEFAULT_VALUE, file.getName().length() - SUFFIX.length())));
-                        } catch (ClassNotFoundException e) {
-                            throw new RoboReflectException("findClassesIntern", e);
-                        }
-                    }
-
-                });
-        return result;
-    }
-
+		});
+		return result;
+	}
 
 }

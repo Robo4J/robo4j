@@ -26,20 +26,26 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Miro Kopecky (@miragemiko)
  * @since 13.04.2016
  */
-public class QueueFIFOEntry<FIFOTransferType extends Comparable<FIFOTransferType>>  implements Comparable<QueueFIFOEntry<FIFOTransferType>>, TransferSignal {
+public class QueueFIFOEntry<FIFOTransferType extends Comparable<FIFOTransferType>>
+		implements Comparable<QueueFIFOEntry<FIFOTransferType>>, TransferSignal {
 
-    private static final AtomicLong seq = new AtomicLong(0);
-    private final long seqNum;
-    private final FIFOTransferType entry;
-    public QueueFIFOEntry(FIFOTransferType entry) {
-        seqNum = seq.getAndIncrement();
-        this.entry = entry;
-    }
-    public FIFOTransferType getEntry() { return entry; }
-    public int compareTo(QueueFIFOEntry<FIFOTransferType> other) {
-        int res = entry.compareTo(other.entry);
-        if (res == 0 && other.entry != this.entry)
-            res = (seqNum < other.seqNum ? -1 : 1);
-        return res;
-    }
+	private static final AtomicLong seq = new AtomicLong(0);
+	private final long seqNum;
+	private final FIFOTransferType entry;
+
+	public QueueFIFOEntry(FIFOTransferType entry) {
+		seqNum = seq.getAndIncrement();
+		this.entry = entry;
+	}
+
+	public FIFOTransferType getEntry() {
+		return entry;
+	}
+
+	public int compareTo(QueueFIFOEntry<FIFOTransferType> other) {
+		int res = entry.compareTo(other.entry);
+		if (res == 0 && other.entry != this.entry)
+			res = (seqNum < other.seqNum ? -1 : 1);
+		return res;
+	}
 }

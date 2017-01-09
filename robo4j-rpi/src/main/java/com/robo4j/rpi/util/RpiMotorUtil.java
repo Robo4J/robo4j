@@ -25,11 +25,11 @@ package com.robo4j.rpi.util;
  */
 public final class RpiMotorUtil {
 
-    public static byte[] createCommand(int motor, int speed, int direction){
-        byte m = (byte)motor;
-        byte s = (byte)speed;
-        byte d = (byte)direction;
-        return new byte[]{ m, s, d};
-    }
+	public static byte[] createCommand(int motor, int speed, int direction) {
+		byte m = (byte) motor;
+		byte s = (byte) speed;
+		byte d = (byte) direction;
+		return new byte[] { m, s, d };
+	}
 
 }

@@ -18,10 +18,10 @@
 
 package com.robo4j.page;
 
-import org.junit.Test;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Test;
 
 /**
  * @author Miro Kopecky (@miragemiko)
@@ -29,15 +29,15 @@ import java.util.Map;
  */
 public class PageParserTest {
 
-    @Test
-    public void testParser(){
-        Map<String, String> map = new HashMap<>();
-        map.put("some", "AWESOME");
-        map.put("more", "MAGIC");
+	@Test
+	public void testParser() {
+		Map<String, String> map = new HashMap<>();
+		map.put("some", "AWESOME");
+		map.put("more", "MAGIC");
 
-        String sampleWeb = "THIS IS MAGIC= ${some} and ${more} and ${test}";
-        String result = PageParser.parseAndReplace(sampleWeb, map);
-        System.out. println("INPUT = " + sampleWeb);
-        System.out. println("RESULT = " + result);
-    }
+		String sampleWeb = "THIS IS MAGIC= ${some} and ${more} and ${test}";
+		String result = PageParser.parseAndReplace(sampleWeb, map);
+		System.out.println("INPUT = " + sampleWeb);
+		System.out.println("RESULT = " + result);
+	}
 }

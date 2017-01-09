@@ -29,22 +29,24 @@ import java.util.regex.Pattern;
  */
 public class PageParser {
 
-    private static final String BRACKET_START = "\\$\\{";
-    private static final String BRACKET_END = "\\}";
-    private static final Pattern pageValuePattern = Pattern.compile("("+BRACKET_START+"[a-z]+[0-9]?+"+BRACKET_END+")");
-    private static final String EMPTY = "";
+	private static final String BRACKET_START = "\\$\\{";
+	private static final String BRACKET_END = "\\}";
+	private static final Pattern pageValuePattern = Pattern
+			.compile("(" + BRACKET_START + "[a-z]+[0-9]?+" + BRACKET_END + ")");
+	private static final String EMPTY = "";
 
-    public static String  parseAndReplace(final String input, final Map<String, String> values) {
-        String result = input;
-        final Matcher matcherMain = pageValuePattern.matcher(result.trim());
-        int filledOut = 0;
-        while (matcherMain.find() && filledOut < values.size()){
+	public static String parseAndReplace(final String input, final Map<String, String> values) {
+		String result = input;
+		final Matcher matcherMain = pageValuePattern.matcher(result.trim());
+		int filledOut = 0;
+		while (matcherMain.find() && filledOut < values.size()) {
 
-            String group = matcherMain.group();
-            result  = result.replace(group, values.get(group.replaceAll(BRACKET_START,EMPTY).replaceAll(BRACKET_END, EMPTY)));
-            filledOut++;
-        }
-        return result;
-    }
+			String group = matcherMain.group();
+			result = result.replace(group,
+					values.get(group.replaceAll(BRACKET_START, EMPTY).replaceAll(BRACKET_END, EMPTY)));
+			filledOut++;
+		}
+		return result;
+	}
 
 }

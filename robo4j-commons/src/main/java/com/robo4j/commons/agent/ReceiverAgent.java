@@ -19,19 +19,19 @@
 package com.robo4j.commons.agent;
 
 /**
- * Agent contains only producer and consumer which are operates together
- * main function of the agent is activate. Then agent lives his life cycle.
- * Agent allows the access to his internal cache
+ * Agent contains only producer and consumer which are operates together main
+ * function of the agent is activate. Then agent lives his life cycle. Agent
+ * allows the access to his internal cache
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 05.07.2016
  */
 public interface ReceiverAgent extends GenericAgent {
 
-    AgentStatus activate();
+	AgentStatus activate();
 
-    AgentCache<AgentStatus> getCache();
+	AgentCache<AgentStatus> getCache();
 
-    void addStatus(AgentStatus status);
+	void addStatus(AgentStatus status);
 
 }

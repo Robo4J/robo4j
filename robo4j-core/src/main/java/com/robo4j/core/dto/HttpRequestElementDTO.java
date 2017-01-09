@@ -27,27 +27,24 @@ package com.robo4j.core.dto;
  */
 public class HttpRequestElementDTO {
 
-    private String name;
-    private Object value;
+	private String name;
+	private Object value;
 
-    public HttpRequestElementDTO(String name, Object value) {
-        this.name = name;
-        this.value = value;
-    }
+	public HttpRequestElementDTO(String name, Object value) {
+		this.name = name;
+		this.value = value;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public Object getValue() {
-        return value;
-    }
+	public Object getValue() {
+		return value;
+	}
 
-    @Override
-    public String toString() {
-        return "HttpRequestElementDTO{" +
-                "name='" + name + '\'' +
-                ", value='" + value + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "HttpRequestElementDTO{" + "name='" + name + '\'' + ", value='" + value + '\'' + '}';
+	}
 }

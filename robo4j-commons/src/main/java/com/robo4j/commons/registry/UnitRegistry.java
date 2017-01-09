@@ -18,11 +18,11 @@
 
 package com.robo4j.commons.registry;
 
-import com.robo4j.commons.unit.GenericUnit;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.robo4j.commons.unit.GenericUnit;
 
 /**
  * @author Miro Kopecky (@miragemiko)
@@ -30,55 +30,53 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public final class UnitRegistry implements RoboRegistry<UnitRegistry, GenericUnit> {
 
-    private static volatile UnitRegistry INSTANCE;
-    private volatile Map<String, GenericUnit> units;
-    private AtomicBoolean active;
+	private static volatile UnitRegistry INSTANCE;
+	private volatile Map<String, GenericUnit> units;
+	private AtomicBoolean active;
 
-    private UnitRegistry(){
-        this.units = new HashMap<>();
-        this.active = new AtomicBoolean(false);
-    }
+	private UnitRegistry() {
+		this.units = new HashMap<>();
+		this.active = new AtomicBoolean(false);
+	}
 
-    public static UnitRegistry getInstance(){
-        if(INSTANCE == null){
-            synchronized (UnitRegistry.class){
-                if(INSTANCE == null){
-                    INSTANCE = new UnitRegistry();
-                }
-            }
-        }
+	public static UnitRegistry getInstance() {
+		if (INSTANCE == null) {
+			synchronized (UnitRegistry.class) {
+				if (INSTANCE == null) {
+					INSTANCE = new UnitRegistry();
+				}
+			}
+		}
 
-        return INSTANCE;
-    }
+		return INSTANCE;
+	}
 
+	@Override
+	public UnitRegistry build(Map<String, GenericUnit> service) {
+		service.entrySet().forEach(entry -> {
+			this.units.put(entry.getKey(), entry.getValue());
+		});
+		this.active.set(true);
+		return this;
+	}
 
-    @Override
-    public UnitRegistry build(Map<String, GenericUnit> service) {
-        service.entrySet().forEach(entry -> {
-                    this.units.put(entry.getKey(), entry.getValue());
-                }
-        );
-        this.active.set(true);
-        return this;
-    }
+	@Override
+	public GenericUnit getByName(String name) {
+		return this.units.get(name);
+	}
 
-    @Override
-    public GenericUnit getByName(String name) {
-        return this.units.get(name);
-    }
+	@Override
+	public Map<String, GenericUnit> getRegistry() {
+		return this.units;
+	}
 
-    @Override
-    public Map<String, GenericUnit> getRegistry(){
-        return this.units;
-    }
+	@Override
+	public boolean activate() {
+		return false;
+	}
 
-    @Override
-    public boolean activate() {
-        return false;
-    }
-
-    @Override
-    public boolean isActive() {
-        return active.get();
-    }
+	@Override
+	public boolean isActive() {
+		return active.get();
+	}
 }

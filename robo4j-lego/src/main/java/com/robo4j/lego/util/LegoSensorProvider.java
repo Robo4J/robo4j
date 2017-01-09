@@ -18,21 +18,22 @@
 
 package com.robo4j.lego.util;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.robo4j.commons.annotation.RoboProvider;
 import com.robo4j.commons.registry.BaseRegistryProvider;
 import com.robo4j.commons.sensor.GenericSensor;
 import com.robo4j.lego.control.LegoSensor;
 import com.robo4j.lego.exception.LegoException;
 import com.robo4j.lego.sensor.LegoSensorWrapper;
+
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.sensor.BaseSensor;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3GyroSensor;
 import lejos.hardware.sensor.EV3TouchSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
-
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Miro Kopecky (@miragemiko)
@@ -41,33 +42,31 @@ import java.util.stream.Collectors;
 @RoboProvider(id = "sensorProvider")
 public class LegoSensorProvider<Type extends LegoSensor> implements BaseRegistryProvider<BaseSensor, Type> {
 
-    @Override
-    public BaseSensor create(LegoSensor sensor) {
-        switch (sensor.getSensor()){
-            case COLOR:
-                return new EV3ColorSensor(LocalEV3.get().getPort(sensor.getPort().getType()));
-            case GYRO:
-                return new EV3GyroSensor(LocalEV3.get().getPort(sensor.getPort().getType()));
-            case SONIC:
-                return new EV3UltrasonicSensor(LocalEV3.get().getPort(sensor.getPort().getType()));
-            case TOUCH:
-                return new EV3TouchSensor(LocalEV3.get().getPort(sensor.getPort().getType()));
-            default:
-                throw new LegoException("Lego sensor not supported: " + sensor);
-        }
-    }
+	@Override
+	public BaseSensor create(LegoSensor sensor) {
+		switch (sensor.getSensor()) {
+		case COLOR:
+			return new EV3ColorSensor(LocalEV3.get().getPort(sensor.getPort().getType()));
+		case GYRO:
+			return new EV3GyroSensor(LocalEV3.get().getPort(sensor.getPort().getType()));
+		case SONIC:
+			return new EV3UltrasonicSensor(LocalEV3.get().getPort(sensor.getPort().getType()));
+		case TOUCH:
+			return new EV3TouchSensor(LocalEV3.get().getPort(sensor.getPort().getType()));
+		default:
+			throw new LegoException("Lego sensor not supported: " + sensor);
+		}
+	}
 
-    @SuppressWarnings(value = "unchecked")
-    @Override
-    public Map<String, Type> activate(Map<String, Type> sensors){
-        return sensors.entrySet().stream()
-                .peek(e -> {
-                    GenericSensor gs = e.getValue();
-                    if(gs instanceof LegoSensorWrapper){
-                        BaseSensor bs = create((LegoSensor)gs);
-                        ((LegoSensorWrapper)gs).setUnit(bs);
-                    }
-                })
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
+	@SuppressWarnings(value = "unchecked")
+	@Override
+	public Map<String, Type> activate(Map<String, Type> sensors) {
+		return sensors.entrySet().stream().peek(e -> {
+			GenericSensor gs = e.getValue();
+			if (gs instanceof LegoSensorWrapper) {
+				BaseSensor bs = create((LegoSensor) gs);
+				((LegoSensorWrapper) gs).setUnit(bs);
+			}
+		}).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+	}
 }

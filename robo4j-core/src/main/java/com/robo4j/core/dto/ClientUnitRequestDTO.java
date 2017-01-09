@@ -24,34 +24,30 @@ package com.robo4j.core.dto;
  */
 public class ClientUnitRequestDTO {
 
-    private Long stamp;
-    private String name;
-    private Boolean active;
+	private Long stamp;
+	private String name;
+	private Boolean active;
 
-    public ClientUnitRequestDTO(String name, Boolean active) {
-        stamp = System.currentTimeMillis();
-        this.name = name;
-        this.active = active;
-    }
+	public ClientUnitRequestDTO(String name, Boolean active) {
+		stamp = System.currentTimeMillis();
+		this.name = name;
+		this.active = active;
+	}
 
-    public Long getStamp() {
-        return stamp;
-    }
+	public Long getStamp() {
+		return stamp;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public Boolean getActive() {
-        return active;
-    }
+	public Boolean getActive() {
+		return active;
+	}
 
-    @Override
-    public String toString() {
-        return "ClientUnitRequestDTO{" +
-                "stamp=" + stamp +
-                ", name='" + name + '\'' +
-                ", active=" + active +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "ClientUnitRequestDTO{" + "stamp=" + stamp + ", name='" + name + '\'' + ", active=" + active + '}';
+	}
 }

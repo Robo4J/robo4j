@@ -22,12 +22,12 @@ package com.robo4j.core.reflect;
  * @author Miro Kopecky (@miragemiko)
  * @since 30.11.2016
  */
-public class RoboReflectException extends RuntimeException{
-    public RoboReflectException(String message) {
-        super(message);
-    }
+public class RoboReflectException extends RuntimeException {
+	public RoboReflectException(String message) {
+		super(message);
+	}
 
-    public RoboReflectException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public RoboReflectException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

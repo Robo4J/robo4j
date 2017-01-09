@@ -26,5 +26,4 @@ import com.robo4j.commons.unit.GenericUnit;
  */
 public interface LegoUnit extends GenericUnit {
 
-
 }

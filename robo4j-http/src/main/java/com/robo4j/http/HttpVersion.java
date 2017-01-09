@@ -28,48 +28,43 @@ import java.util.Objects;
  */
 public enum HttpVersion {
 
-    //@formatter:off
-    HTTP_1_0    ("HTTP/1.0"),
-    HTTP_1_1    ("HTTP/1.1")
-    ;
-    //@formatter:on
+	// @formatter:off
+	HTTP_1_0("HTTP/1.0"), HTTP_1_1("HTTP/1.1");
+	// @formatter:on
 
-    private String value;
+	private volatile static Map<String, HttpVersion> valueToHttpVersion;
+	private String value;
 
-    private volatile static Map<String, HttpVersion> valueToHttpVersion;
+	HttpVersion(String value) {
+		this.value = value;
+	}
 
-    HttpVersion(String value) {
-        this.value = value;
-    }
+	// Utils Method
+	public static HttpVersion getByValue(String value) {
+		if (Objects.isNull(valueToHttpVersion)) {
+			iniMapping();
+		}
+		return valueToHttpVersion.get(value);
+	}
 
-    public String getValue() {
-        return value;
-    }
+	public static boolean containsValue(HttpVersion version) {
+		return valueToHttpVersion.containsValue(version);
+	}
 
-    //Utils Method
-    public static HttpVersion getByValue(String value){
-        if(Objects.isNull(valueToHttpVersion)){
-            iniMapping();
-        }
-        return valueToHttpVersion.get(value);
-    }
+	// Private Methods
+	private static void iniMapping() {
+		valueToHttpVersion = new HashMap<>();
+		for (HttpVersion version : values()) {
+			valueToHttpVersion.put(version.getValue(), version);
+		}
+	}
 
-    public static boolean containsValue(HttpVersion version){
-        return valueToHttpVersion.containsValue(version);
-    }
+	public String getValue() {
+		return value;
+	}
 
-    //Private Methods
-    private static void iniMapping(){
-        valueToHttpVersion = new HashMap<>();
-        for(HttpVersion version: values()){
-            valueToHttpVersion.put(version.getValue(), version);
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "HttpVersion{" +
-                "value='" + value + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "HttpVersion{" + "value='" + value + '\'' + '}';
+	}
 }

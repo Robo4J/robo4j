@@ -21,40 +21,36 @@ package com.robo4j.core.camera;
 import java.util.Arrays;
 
 /**
- * Camera DTO file
- * 1. contains image byte[]
- * 2. additional information -> preprocessing
+ * Camera DTO file 1. contains image byte[] 2. additional information ->
+ * preprocessing
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 11.10.2016
  */
 public class CameraDTO {
 
-    private byte[] source;
-    private String info;
+	private byte[] source;
+	private String info;
 
-    public CameraDTO(byte[] source, String info) {
-        this.source = source;
-        this.info = info;
-    }
+	public CameraDTO(byte[] source, String info) {
+		this.source = source;
+		this.info = info;
+	}
 
-    public byte[] getSource() {
-        return source;
-    }
+	public byte[] getSource() {
+		return source;
+	}
 
-    public String getInfo() {
-        return info;
-    }
+	public String getInfo() {
+		return info;
+	}
 
-    public void setInfo(String info) {
-        this.info = info;
-    }
+	public void setInfo(String info) {
+		this.info = info;
+	}
 
-    @Override
-    public String toString() {
-        return "CameraDTO{" +
-                "source=" + Arrays.toString(source) +
-                ", info='" + info + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "CameraDTO{" + "source=" + Arrays.toString(source) + ", info='" + info + '\'' + '}';
+	}
 }

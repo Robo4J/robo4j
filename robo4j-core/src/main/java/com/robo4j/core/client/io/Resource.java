@@ -29,7 +29,7 @@ import java.io.InputStream;
  */
 public interface Resource {
 
-    InputStream getInputStream();
+	InputStream getInputStream();
 
-    boolean isReading();
+	boolean isReading();
 }

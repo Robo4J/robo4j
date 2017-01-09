@@ -22,6 +22,7 @@ package com.robo4j.core.client.enums;
  * Request State used for the HTTP in
  *
  * //TODO: separate properly request status/result of the procedure status
+ * 
  * @see com.robo4j.core.client.request.ProcessorResult
  *
  * @author Miro Kopecky (@miragemiko)
@@ -29,35 +30,28 @@ package com.robo4j.core.client.enums;
  */
 public enum RequestUnitStatusEnum {
 
-    //formatter:off
-    STOP          (0, "stop"),
-    ACTIVE        (1, "active"),
-    STATUS        (2, "status"),
-    SETUP         (3, "setup"),
-    ;
-    //formatter:on
+	// formatter:off
+	STOP(0, "stop"), ACTIVE(1, "active"), STATUS(2, "status"), SETUP(3, "setup"),;
+	// formatter:on
 
-    private int code;
-    private String desc;
+	private int code;
+	private String desc;
 
-    RequestUnitStatusEnum(int code, String desc) {
-        this.code = code;
-        this.desc = desc;
-    }
+	RequestUnitStatusEnum(int code, String desc) {
+		this.code = code;
+		this.desc = desc;
+	}
 
-    public int getCode() {
-        return code;
-    }
+	public int getCode() {
+		return code;
+	}
 
-    public String getDesc() {
-        return desc;
-    }
+	public String getDesc() {
+		return desc;
+	}
 
-    @Override
-    public String toString() {
-        return "RequestUnitStatusEnum{" +
-                "code=" + code +
-                ", desc='" + desc + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "RequestUnitStatusEnum{" + "code=" + code + ", desc='" + desc + '\'' + '}';
+	}
 }

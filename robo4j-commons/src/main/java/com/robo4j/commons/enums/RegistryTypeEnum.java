@@ -24,37 +24,28 @@ package com.robo4j.commons.enums;
  */
 public enum RegistryTypeEnum {
 
-    //@formatter:on
-    ENGINES             (1, "engines"),
-    SENSORS             (2, "sensors"),
-    UNITS               (3, "units"),
-    SERVICES            (4, "services"),
-    PROVIDER            (5, "providers"),
-    ;
-    //@formatter:off
+	// @formatter:on
+	ENGINES(1, "engines"), SENSORS(2, "sensors"), UNITS(3, "units"), SERVICES(4, "services"), PROVIDER(5, "providers"),;
+	// @formatter:off
 
+	int id;
+	String name;
 
-    int id;
-    String name;
+	RegistryTypeEnum(int id, String name) {
+		this.id = id;
+		this.name = name;
+	}
 
-    RegistryTypeEnum(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public int getId() {
-        return id;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return "RegistryTypeEnum{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "RegistryTypeEnum{" + "id=" + id + ", name='" + name + '\'' + '}';
+	}
 }

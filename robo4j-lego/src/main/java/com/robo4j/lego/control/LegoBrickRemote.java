@@ -10,7 +10,7 @@ import com.robo4j.commons.control.RoboSystemConfig;
  */
 public interface LegoBrickRemote<RemoteBrick> extends RoboSystemConfig {
 
-    RemoteBrick getBrick();
+	RemoteBrick getBrick();
 
-    RemoteBrick getBrick(String address);
+	RemoteBrick getBrick(String address);
 }

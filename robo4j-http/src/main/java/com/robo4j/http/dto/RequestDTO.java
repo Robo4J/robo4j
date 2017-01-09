@@ -26,27 +26,24 @@ import java.util.Map;
  */
 public class RequestDTO {
 
-    private String path;
-    private Map<String, String> values;
+	private String path;
+	private Map<String, String> values;
 
-    public RequestDTO(String path, Map<String, String> values) {
-        this.path = path;
-        this.values = values;
-    }
+	public RequestDTO(String path, Map<String, String> values) {
+		this.path = path;
+		this.values = values;
+	}
 
-    public String getPath() {
-        return path;
-    }
+	public String getPath() {
+		return path;
+	}
 
-    public Map<String, String> getParameters() {
-        return values;
-    }
+	public Map<String, String> getParameters() {
+		return values;
+	}
 
-    @Override
-    public String toString() {
-        return "RequestDTO{" +
-                "path='" + path + '\'' +
-                ", values=" + values +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "RequestDTO{" + "path='" + path + '\'' + ", values=" + values + '}';
+	}
 }

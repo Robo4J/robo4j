@@ -18,10 +18,10 @@
 
 package com.robo4j.core.bus;
 
-import com.robo4j.core.dto.ClientCommandRequestDTO;
-
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import com.robo4j.core.dto.ClientCommandRequestDTO;
 
 /**
  * there is available only one CommandSerial bus
@@ -31,27 +31,26 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public final class CommandSerialBus {
 
-    private static volatile CommandSerialBus INSTANCE;
-    private volatile LinkedBlockingQueue<List<ClientCommandRequestDTO>> commandQueue;
+	private static volatile CommandSerialBus INSTANCE;
+	private volatile LinkedBlockingQueue<List<ClientCommandRequestDTO>> commandQueue;
 
+	private CommandSerialBus() {
+		commandQueue = new LinkedBlockingQueue<>();
+	}
 
-    private CommandSerialBus(){
-        commandQueue = new LinkedBlockingQueue<>();
-    }
+	public static CommandSerialBus getInstance() {
+		if (INSTANCE == null) {
+			synchronized (CommandSerialBus.class) {
+				if (INSTANCE == null) {
+					INSTANCE = new CommandSerialBus();
+				}
+			}
+		}
+		return INSTANCE;
+	}
 
-    public static CommandSerialBus getInstance(){
-        if(INSTANCE == null){
-            synchronized (CommandSerialBus.class){
-                if(INSTANCE == null){
-                    INSTANCE = new CommandSerialBus();
-                }
-            }
-        }
-        return INSTANCE;
-    }
-
-    public LinkedBlockingQueue<List<ClientCommandRequestDTO>> getQueue(){
-        return commandQueue;
-    }
+	public LinkedBlockingQueue<List<ClientCommandRequestDTO>> getQueue() {
+		return commandQueue;
+	}
 
 }

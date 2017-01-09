@@ -13,7 +13,7 @@ repositories {
     mavenLocal()
 }
 
-project("robo4j-core"){
+project("robo4j-core") {
     description = "Robo4j-Brick-Client"
 
     group 'com.robo4j'
@@ -42,7 +42,7 @@ project("robo4j-core"){
     }
 }
 
-project("robo4j-commons"){
+project("robo4j-commons") {
     description = "Robo4j-Commons"
 
     group 'com.robo4j'
@@ -66,7 +66,7 @@ project("robo4j-commons"){
     }
 }
 
-project("robo4j-hw-rpi"){
+project("robo4j-hw-rpi") {
     description = "Robo4j-RaspberryPi/Arduino"
 
     group 'com.robo4j'
@@ -99,7 +99,7 @@ project("robo4j-hw-rpi"){
     }
 }
 
-project("robo4j-lego"){
+project("robo4j-lego") {
     description = "Robo4j-Lego"
 
     group 'com.robo4j'
@@ -137,7 +137,7 @@ project("robo4j-lego"){
 }
 
 
-project("robo4j-http"){
+project("robo4j-http") {
     description = "Robo4j-Http"
 
     group 'com.robo4j'
@@ -161,7 +161,7 @@ project("robo4j-http"){
     }
 }
 
-project("robo4j-page"){
+project("robo4j-page") {
     description = "Robo4j-Page"
 
     group 'com.robo4j'
@@ -186,7 +186,7 @@ project("robo4j-page"){
 }
 
 
-project("robo4j-rpi"){
+project("robo4j-rpi") {
     description = "Robo4j-RaspberryPi/Arduino"
 
     group 'com.robo4j'

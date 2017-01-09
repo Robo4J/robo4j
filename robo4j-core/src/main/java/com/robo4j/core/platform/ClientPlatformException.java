@@ -25,11 +25,11 @@ package com.robo4j.core.platform;
  */
 public class ClientPlatformException extends RuntimeException {
 
-    public ClientPlatformException(String message) {
-        super(message);
-    }
+	public ClientPlatformException(String message) {
+		super(message);
+	}
 
-    public ClientPlatformException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public ClientPlatformException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

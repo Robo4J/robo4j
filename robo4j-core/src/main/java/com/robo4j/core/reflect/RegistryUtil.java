@@ -23,17 +23,17 @@
  */
 package com.robo4j.core.reflect;
 
-import com.robo4j.commons.enums.RegistryTypeEnum;
-import com.robo4j.commons.registry.ProviderRegistry;
-import com.robo4j.commons.registry.RoboRegistry;
-import com.robo4j.commons.registry.EngineRegistry;
-import com.robo4j.commons.registry.SensorRegistry;
-import com.robo4j.commons.registry.SystemServiceRegistry;
-import com.robo4j.commons.registry.UnitRegistry;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.robo4j.commons.enums.RegistryTypeEnum;
+import com.robo4j.commons.registry.EngineRegistry;
+import com.robo4j.commons.registry.ProviderRegistry;
+import com.robo4j.commons.registry.RoboRegistry;
+import com.robo4j.commons.registry.SensorRegistry;
+import com.robo4j.commons.registry.SystemServiceRegistry;
+import com.robo4j.commons.registry.UnitRegistry;
 
 /**
  * TODO: remove
@@ -42,13 +42,14 @@ import java.util.Map;
  */
 public final class RegistryUtil {
 
-    static final Map<RegistryTypeEnum, RoboRegistry> registry = Collections.unmodifiableMap(new HashMap<RegistryTypeEnum, RoboRegistry>(){
-        {
-            put(RegistryTypeEnum.ENGINES, EngineRegistry.getInstance());
-            put(RegistryTypeEnum.SENSORS, SensorRegistry.getInstance());
-            put(RegistryTypeEnum.UNITS, UnitRegistry.getInstance());
-            put(RegistryTypeEnum.SERVICES, SystemServiceRegistry.getInstance());
-            put(RegistryTypeEnum.PROVIDER, ProviderRegistry.getInstance());
-        }
-    });
+	static final Map<RegistryTypeEnum, RoboRegistry> registry = Collections
+			.unmodifiableMap(new HashMap<RegistryTypeEnum, RoboRegistry>() {
+				{
+					put(RegistryTypeEnum.ENGINES, EngineRegistry.getInstance());
+					put(RegistryTypeEnum.SENSORS, SensorRegistry.getInstance());
+					put(RegistryTypeEnum.UNITS, UnitRegistry.getInstance());
+					put(RegistryTypeEnum.SERVICES, SystemServiceRegistry.getInstance());
+					put(RegistryTypeEnum.PROVIDER, ProviderRegistry.getInstance());
+				}
+			});
 }

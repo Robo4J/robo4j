@@ -26,51 +26,51 @@ import java.util.concurrent.ExecutorService;
  * @author Miro Kopecky (@miragemiko)
  * @since 30.06.2016
  */
-public class ProcessAgentBuilder<AgentType extends DefaultAgent>  {
+public class ProcessAgentBuilder<AgentType extends DefaultAgent> {
 
-    private final AgentType agent;
-    private final ExecutorService executor;
-    private String name;
-    private AgentProducer producer;
-    private AgentConsumer consumer;
+	private final AgentType agent;
+	private final ExecutorService executor;
+	private String name;
+	private AgentProducer producer;
+	private AgentConsumer consumer;
 
-    @SuppressWarnings(value = "unchecked")
-    private ProcessAgentBuilder(ExecutorService executor){
-        try {
-            Class<ProcessAgent> clazz = ProcessAgent.class;
-            this.agent = (AgentType) clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new IllegalStateException("Missing DefaultAgent type class");
-        }
-        this.executor = executor;
-    }
+	@SuppressWarnings(value = "unchecked")
+	private ProcessAgentBuilder(ExecutorService executor) {
+		try {
+			Class<ProcessAgent> clazz = ProcessAgent.class;
+			this.agent = (AgentType) clazz.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new IllegalStateException("Missing DefaultAgent type class");
+		}
+		this.executor = executor;
+	}
 
-    public ProcessAgentBuilder<AgentType> setName(String name) {
-        this.name = name;
-        return this;
-    }
+	public static ProcessAgentBuilder<DefaultAgent> Builder(ExecutorService executor) {
+		return new ProcessAgentBuilder<>(executor);
+	}
 
-    public ProcessAgentBuilder<AgentType> setProducer(AgentProducer producer) {
-        this.producer = producer;
-        return this;
-    }
+	public ProcessAgentBuilder<AgentType> setName(String name) {
+		this.name = name;
+		return this;
+	}
 
-    public ProcessAgentBuilder<AgentType> setConsumer(AgentConsumer consumer) {
-        this.consumer = consumer;
-        return this;
-    }
+	public ProcessAgentBuilder<AgentType> setProducer(AgentProducer producer) {
+		this.producer = producer;
+		return this;
+	}
 
-    @SuppressWarnings(value = "unchecked")
-    public ProcessAgent build(){
-        agent.setExecutor(executor);
-        agent.setName(name);
-        agent.setProducer(producer);
-        agent.setConsumer(consumer);
-        return (ProcessAgent)agent;
-    }
+	public ProcessAgentBuilder<AgentType> setConsumer(AgentConsumer consumer) {
+		this.consumer = consumer;
+		return this;
+	}
 
-    public static ProcessAgentBuilder<DefaultAgent> Builder(ExecutorService executor){
-        return new ProcessAgentBuilder<>(executor);
-    }
+	@SuppressWarnings(value = "unchecked")
+	public ProcessAgent build() {
+		agent.setExecutor(executor);
+		agent.setName(name);
+		agent.setProducer(producer);
+		agent.setConsumer(consumer);
+		return (ProcessAgent) agent;
+	}
 
 }

@@ -24,6 +24,6 @@ package com.robo4j.commons.command;
  */
 public interface CommandProperties {
 
-    int getCyclesSpeed();
+	int getCyclesSpeed();
 
 }

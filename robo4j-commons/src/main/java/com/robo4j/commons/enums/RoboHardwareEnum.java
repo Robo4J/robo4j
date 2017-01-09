@@ -24,7 +24,7 @@ package com.robo4j.commons.enums;
  */
 public interface RoboHardwareEnum<Type> {
 
-    Type getType();
+	Type getType();
 
-    String getName();
+	String getName();
 }

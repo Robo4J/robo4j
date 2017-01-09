@@ -26,39 +26,32 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
  * @author Miro Kopecky (@miragemiko)
  * @since 04.05.2016
  */
-public enum  LegoAnalogPortEnum implements RoboHardwareEnum<String>, RoboSystemConfig {
+public enum LegoAnalogPortEnum implements RoboHardwareEnum<String>, RoboSystemConfig {
 
-    //@formatter:off
-    A ("A", "Analog A"),
-    B ("B", "Analog B"),
-    C ("C", "Analog C"),
-    D ("D", "Analog D"),
-    ;
-    //@formatter:on
+	// @formatter:off
+	A("A", "Analog A"), B("B", "Analog B"), C("C", "Analog C"), D("D", "Analog D"),;
+	// @formatter:on
 
-    private String type;
-    private String name;
+	private String type;
+	private String name;
 
-    LegoAnalogPortEnum(String type, String name) {
-        this.type = type;
-        this.name = name;
-    }
+	LegoAnalogPortEnum(String type, String name) {
+		this.type = type;
+		this.name = name;
+	}
 
-    @Override
-    public String getType() {
-        return type;
-    }
+	@Override
+	public String getType() {
+		return type;
+	}
 
-    @Override
-    public String getName() {
-        return name;
-    }
+	@Override
+	public String getName() {
+		return name;
+	}
 
-    @Override
-    public String toString() {
-        return "LegoAnalogPortEnum{" +
-                "type='" + type + '\'' +
-                ", name='" + name + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "LegoAnalogPortEnum{" + "type='" + type + '\'' + ", name='" + name + '\'' + '}';
+	}
 }

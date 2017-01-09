@@ -18,8 +18,8 @@
 
 package com.robo4j.core.client.command;
 
-import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.commons.command.CommandProperties;
+import com.robo4j.core.util.ConstantUtil;
 
 /**
  *
@@ -28,42 +28,41 @@ import com.robo4j.commons.command.CommandProperties;
  */
 public class ClientCommandProperties implements CommandProperties {
 
-    /* speed in cyclesSpeed */
-    private int cyclesSpeed;
+	/* speed in cyclesSpeed */
+	private int cyclesSpeed;
 
-    public ClientCommandProperties() {
-        this.cyclesSpeed = ConstantUtil.DEFAULT_ENGINE_SPEED;
-    }
+	public ClientCommandProperties() {
+		this.cyclesSpeed = ConstantUtil.DEFAULT_ENGINE_SPEED;
+	}
 
-    public ClientCommandProperties(int cyclesSpeed) {
-        this.cyclesSpeed = cyclesSpeed;
-    }
+	public ClientCommandProperties(int cyclesSpeed) {
+		this.cyclesSpeed = cyclesSpeed;
+	}
 
-    public int getCyclesSpeed() {
-        return cyclesSpeed;
-    }
+	public int getCyclesSpeed() {
+		return cyclesSpeed;
+	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof ClientCommandProperties))
+			return false;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ClientCommandProperties)) return false;
+		ClientCommandProperties that = (ClientCommandProperties) o;
 
-        ClientCommandProperties that = (ClientCommandProperties) o;
+		return cyclesSpeed == that.cyclesSpeed;
 
-        return cyclesSpeed == that.cyclesSpeed;
+	}
 
-    }
+	@Override
+	public int hashCode() {
+		return cyclesSpeed;
+	}
 
-    @Override
-    public int hashCode() {
-        return cyclesSpeed;
-    }
-
-    @Override
-    public String toString() {
-        return "ClientCommandProperties{" +
-                "cyclesSpeed=" + cyclesSpeed +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "ClientCommandProperties{" + "cyclesSpeed=" + cyclesSpeed + '}';
+	}
 }

@@ -29,10 +29,10 @@ import java.util.Map;
  */
 public final class RequestHeaderProcessor {
 
-    private static final String CONTENT_LENGHT = "Content-Length";
+	private static final String CONTENT_LENGHT = "Content-Length";
 
-    public static int getContentLength(final Map<String, String> header){
-        return Integer.valueOf(header.get(CONTENT_LENGHT).trim());
-    }
+	public static int getContentLength(final Map<String, String> header) {
+		return Integer.valueOf(header.get(CONTENT_LENGHT).trim());
+	}
 
 }

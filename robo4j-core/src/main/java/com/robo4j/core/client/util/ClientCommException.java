@@ -25,11 +25,11 @@ package com.robo4j.core.client.util;
  */
 public final class ClientCommException extends RuntimeException {
 
-    public ClientCommException(String message) {
-        super(message);
-    }
+	public ClientCommException(String message) {
+		super(message);
+	}
 
-    public ClientCommException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public ClientCommException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

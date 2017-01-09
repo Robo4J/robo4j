@@ -18,19 +18,19 @@
 
 package com.robo4j.core.client.enums;
 
-import com.robo4j.commons.command.CommandTargetEnum;
-import com.robo4j.commons.command.CommandTypeEnum;
-import com.robo4j.commons.command.RoboUnitCommand;
-import com.robo4j.commons.enums.RoboHardwareEnum;
+import static com.robo4j.commons.command.CommandTargetEnum.FRONT_UNIT;
+import static com.robo4j.commons.command.CommandTargetEnum.HAND_UNIT;
+import static com.robo4j.commons.command.CommandTargetEnum.PLATFORM;
+import static com.robo4j.commons.command.CommandTargetEnum.SYSTEM;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.robo4j.commons.command.CommandTargetEnum.FRONT_UNIT;
-import static com.robo4j.commons.command.CommandTargetEnum.HAND_UNIT;
-import static com.robo4j.commons.command.CommandTargetEnum.PLATFORM;
-import static com.robo4j.commons.command.CommandTargetEnum.SYSTEM;
+import com.robo4j.commons.command.CommandTargetEnum;
+import com.robo4j.commons.command.CommandTypeEnum;
+import com.robo4j.commons.command.RoboUnitCommand;
+import com.robo4j.commons.enums.RoboHardwareEnum;
 
 /**
  * Command types designed for Robo-Brick client
@@ -40,82 +40,65 @@ import static com.robo4j.commons.command.CommandTargetEnum.SYSTEM;
  */
 public enum RequestCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum> {
 
-    //@formatter:on
-    EXIT            (0, SYSTEM, "exit"),
-    MOVE            (1, PLATFORM, "move"),
-    RIGHT           (2, PLATFORM, "right"),
-    LEFT            (3, PLATFORM, "left"),
-    BACK            (4, PLATFORM, "back"),
-    STOP            (5, PLATFORM, "stop"),
-    HAND            (6, HAND_UNIT, "hand"),
-    FRONT_LEFT      (7, FRONT_UNIT, "front_left"),
-    FRONT_RIGHT     (8, FRONT_UNIT, "front_right"),
-    ;
-    //@formatter:off
-    private int code;
-    private CommandTargetEnum target;
-    private String name;
+	// @formatter:on
+	EXIT(0, SYSTEM, "exit"), MOVE(1, PLATFORM, "move"), RIGHT(2, PLATFORM, "right"), LEFT(3, PLATFORM, "left"), BACK(4,
+			PLATFORM, "back"), STOP(5, PLATFORM, "stop"), HAND(6, HAND_UNIT,
+					"hand"), FRONT_LEFT(7, FRONT_UNIT, "front_left"), FRONT_RIGHT(8, FRONT_UNIT, "front_right"),;
+	private volatile static Map<Integer, RequestCommandEnum> codeToLegoCommandCodeMapping;
+	// @formatter:off
+	private int code;
+	private CommandTargetEnum target;
+	private String name;
 
-    private volatile static Map<Integer, RequestCommandEnum> codeToLegoCommandCodeMapping;
+	RequestCommandEnum(int c, CommandTargetEnum target, String name) {
+		this.code = c;
+		this.target = target;
+		this.name = name;
+	}
 
-    RequestCommandEnum(int c, CommandTargetEnum target, String name){
-        this.code = c;
-        this.target = target;
-        this.name = name;
-    }
+	public static RequestCommandEnum getRequestValue(String name) {
+		if (codeToLegoCommandCodeMapping == null) {
+			codeToLegoCommandCodeMapping = initMapping();
+		}
+		return codeToLegoCommandCodeMapping.entrySet().stream().filter(e -> e.getValue().getName().equals(name))
+				.map(Map.Entry::getValue).reduce(null, (e1, e2) -> e2);
+	}
 
-    public int getCode() {
-        return code;
-    }
+	public static RequestCommandEnum getRequestCommand(CommandTargetEnum target, String name) {
+		if (codeToLegoCommandCodeMapping == null) {
+			codeToLegoCommandCodeMapping = initMapping();
+		}
 
-    @Override
-    public CommandTypeEnum getType() {
-        return CommandTypeEnum.DIRECT;
-    }
+		return codeToLegoCommandCodeMapping.entrySet().stream().map(Map.Entry::getValue)
+				.filter(v -> v.getTarget().equals(target)).filter(v -> v.getName().equals(name))
+				.reduce(null, (e1, e2) -> e2);
+	}
 
-    @Override
-    public String getName() {
-        return name;
-    }
+	// Private Methods
+	private static Map<Integer, RequestCommandEnum> initMapping() {
+		return Arrays.stream(values()).collect(Collectors.toMap(RequestCommandEnum::getCode, e -> e));
+	}
 
-    public CommandTargetEnum getTarget() {
-        return target;
-    }
+	public int getCode() {
+		return code;
+	}
 
-    public static RequestCommandEnum getRequestValue(String name){
-        if(codeToLegoCommandCodeMapping == null){
-            codeToLegoCommandCodeMapping = initMapping();
-        }
-        return codeToLegoCommandCodeMapping.entrySet().stream()
-                .filter(e -> e.getValue().getName().equals(name))
-                .map(Map.Entry::getValue)
-                .reduce(null, (e1, e2) -> e2);
-    }
+	@Override
+	public CommandTypeEnum getType() {
+		return CommandTypeEnum.DIRECT;
+	}
 
-    public static RequestCommandEnum getRequestCommand(CommandTargetEnum target, String name){
-        if(codeToLegoCommandCodeMapping == null){
-            codeToLegoCommandCodeMapping = initMapping();
-        }
+	@Override
+	public String getName() {
+		return name;
+	}
 
-        return codeToLegoCommandCodeMapping.entrySet().stream()
-                .map(Map.Entry::getValue)
-                .filter(v -> v.getTarget().equals(target))
-                .filter(v -> v.getName().equals(name))
-                .reduce(null, (e1, e2) -> e2);
-    }
+	public CommandTargetEnum getTarget() {
+		return target;
+	}
 
-    //Private Methods
-    private static Map<Integer, RequestCommandEnum> initMapping(){
-        return Arrays.stream(values()).collect(Collectors.toMap(RequestCommandEnum::getCode, e -> e));
-    }
-
-
-    @Override
-    public String toString() {
-        return "RequestCommandEnum{" +
-                "code=" + code +
-                ", target=" + target +
-                ", name='" + name + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "RequestCommandEnum{" + "code=" + code + ", target=" + target + ", name='" + name + '\'' + '}';
+	}
 }

@@ -18,9 +18,9 @@
 
 package com.robo4j.core.client.io;
 
-import com.robo4j.core.client.util.ClientClassLoader;
-
 import java.io.InputStream;
+
+import com.robo4j.core.client.util.ClientClassLoader;
 
 /**
  *
@@ -31,13 +31,13 @@ import java.io.InputStream;
  */
 public final class ResourceLoader {
 
-    public Resource getInputStream(String name){
-        final InputStream source = ClientClassLoader.getInstance().getResource(name);
-        if(source != null){
-            return new InputStreamResource(source);
-        } else {
-            throw new ClientException("RESOURCE LOADER FAILED");
-        }
-    }
+	public Resource getInputStream(String name) {
+		final InputStream source = ClientClassLoader.getInstance().getResource(name);
+		if (source != null) {
+			return new InputStreamResource(source);
+		} else {
+			throw new ClientException("RESOURCE LOADER FAILED");
+		}
+	}
 
 }

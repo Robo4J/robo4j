@@ -23,63 +23,66 @@ import com.robo4j.lego.control.LegoEngine;
 import com.robo4j.lego.enums.LegoAnalogPortEnum;
 import com.robo4j.lego.enums.LegoEngineEnum;
 import com.robo4j.lego.enums.LegoEnginePartEnum;
+
 import lejos.robotics.RegulatedMotor;
 
 /**
  * @author Miro Kopecky (@miragemiko)
  * @since 23.11.2016
  */
-public abstract class LegoEngineWrapper<MotorType extends RegulatedMotor> implements GenericMotor, LegoEngine{
+public abstract class LegoEngineWrapper<MotorType extends RegulatedMotor> implements GenericMotor, LegoEngine {
 
-    protected MotorType unit;
-    protected LegoAnalogPortEnum port;
-    protected LegoEngineEnum engine;
-    protected LegoEnginePartEnum part;
+	protected MotorType unit;
+	protected LegoAnalogPortEnum port;
+	protected LegoEngineEnum engine;
+	protected LegoEnginePartEnum part;
 
-    public abstract LegoAnalogPortEnum getPort();
-    public abstract LegoEngineEnum getEngine();
-    public abstract LegoEnginePartEnum getPart();
+	public abstract LegoAnalogPortEnum getPort();
 
-    public MotorType getUnit() {
-        return unit;
-    }
+	public abstract LegoEngineEnum getEngine();
 
-    public void setUnit(MotorType unit) {
-        this.unit = unit;
-    }
+	public abstract LegoEnginePartEnum getPart();
 
-    @Override
-    public void forward() {
-        unit.forward();
-    }
+	public MotorType getUnit() {
+		return unit;
+	}
 
-    @Override
-    public void backward() {
-        unit.backward();
-    }
+	public void setUnit(MotorType unit) {
+		this.unit = unit;
+	}
 
-    @Override
-    public void stop() {
-        unit.stop(true);
-    }
+	@Override
+	public void forward() {
+		unit.forward();
+	}
 
-    @Override
-    public void rotate(int val) {
-        unit.rotate(val);
-    }
+	@Override
+	public void backward() {
+		unit.backward();
+	}
 
-    @Override
-    public boolean isMoving() {
-        return unit.isMoving();
-    }
+	@Override
+	public void stop() {
+		unit.stop(true);
+	}
 
-    @Override
-    public void setSpeed(int speed) {
-        unit.setSpeed(speed);
-    }
+	@Override
+	public void rotate(int val) {
+		unit.rotate(val);
+	}
 
-    @Override
-    public void close() {
-        unit.close();
-    }
+	@Override
+	public boolean isMoving() {
+		return unit.isMoving();
+	}
+
+	@Override
+	public void setSpeed(int speed) {
+		unit.setSpeed(speed);
+	}
+
+	@Override
+	public void close() {
+		unit.close();
+	}
 }

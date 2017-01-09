@@ -24,11 +24,11 @@ package com.robo4j.rpi.motor;
  * @since 20.12.2016
  */
 public class RpiMotorException extends RuntimeException {
-    public RpiMotorException(String message) {
-        super(message);
-    }
+	public RpiMotorException(String message) {
+		super(message);
+	}
 
-    public RpiMotorException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public RpiMotorException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

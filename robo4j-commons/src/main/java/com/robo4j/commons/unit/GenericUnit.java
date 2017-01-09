@@ -18,16 +18,16 @@
 
 package com.robo4j.commons.unit;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.function.Function;
+
 import com.robo4j.commons.agent.AgentStatus;
 import com.robo4j.commons.agent.GenericAgent;
 import com.robo4j.commons.agent.ProcessAgent;
 import com.robo4j.commons.command.RoboUnitCommand;
 import com.robo4j.commons.control.RoboSystemConfig;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.function.Function;
 
 /**
  * GenericUnit is collection of intelligent agents
@@ -37,21 +37,24 @@ import java.util.function.Function;
  */
 public interface GenericUnit extends RoboSystemConfig {
 
-    void setExecutor(ExecutorService executor);
+	void setExecutor(ExecutorService executor);
 
-    boolean isActive();
+	boolean isActive();
 
-    Object init(Object input);
+	Object init(Object input);
 
-    Map<RoboUnitCommand, Function<ProcessAgent, AgentStatus>> initLogic();
+	Map<RoboUnitCommand, Function<ProcessAgent, AgentStatus>> initLogic();
 
-    List<GenericAgent> getAgents();
+	List<GenericAgent> getAgents();
 
-    boolean process(RoboUnitCommand command);
+	boolean process(RoboUnitCommand command);
 
-    String getUnitName();
-    String getSystemName();
-    String[] getProducerName();
-    String getConsumerName();
+	String getUnitName();
+
+	String getSystemName();
+
+	String[] getProducerName();
+
+	String getConsumerName();
 
 }

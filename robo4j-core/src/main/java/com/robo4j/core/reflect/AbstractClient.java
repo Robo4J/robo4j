@@ -18,45 +18,42 @@
 
 package com.robo4j.core.reflect;
 
-import com.robo4j.commons.annotation.RoboProvider;
-import com.robo4j.core.client.ClientHTTPExecutor;
-import com.robo4j.commons.annotation.RoboMotor;
-import com.robo4j.commons.annotation.RoboSensor;
-import com.robo4j.commons.annotation.RoboUnit;
-import com.robo4j.commons.annotation.RoboService;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.robo4j.commons.annotation.RoboMotor;
+import com.robo4j.commons.annotation.RoboProvider;
+import com.robo4j.commons.annotation.RoboSensor;
+import com.robo4j.commons.annotation.RoboService;
+import com.robo4j.commons.annotation.RoboUnit;
+import com.robo4j.core.client.ClientHTTPExecutor;
 
 /**
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 09.06.2016
  */
-public abstract class AbstractClient<FutureType>  {
+public abstract class AbstractClient<FutureType> {
 
-    private static ExecutorService executor;
-    protected AtomicBoolean active;
-    protected AbstractClient(RoboReflectionScan scan){
-        active = new AtomicBoolean(false);
-        executor = new ClientHTTPExecutor();
-        new RoboReflectiveInit(
-                scan.getClassesByAnnotation(RoboMotor.class),
-                scan.getClassesByAnnotation(RoboSensor.class),
-                scan.getClassesByAnnotation(RoboUnit.class),
-                scan.getClassesByAnnotation(RoboService.class),
-                scan.getClassesByAnnotation(RoboProvider.class)
-        );
-        active.set(true);
-    }
+	private static ExecutorService executor;
+	protected AtomicBoolean active;
 
-    public Future<FutureType> submit(Callable<FutureType> task){
-        return executor.submit(task);
-    }
+	protected AbstractClient(RoboReflectionScan scan) {
+		active = new AtomicBoolean(false);
+		executor = new ClientHTTPExecutor();
+		new RoboReflectiveInit(scan.getClassesByAnnotation(RoboMotor.class),
+				scan.getClassesByAnnotation(RoboSensor.class), scan.getClassesByAnnotation(RoboUnit.class),
+				scan.getClassesByAnnotation(RoboService.class), scan.getClassesByAnnotation(RoboProvider.class));
+		active.set(true);
+	}
 
-    public void end(){
-        executor.shutdown();
-    }
+	public Future<FutureType> submit(Callable<FutureType> task) {
+		return executor.submit(task);
+	}
+
+	public void end() {
+		executor.shutdown();
+	}
 }

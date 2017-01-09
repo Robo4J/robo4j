@@ -26,7 +26,7 @@ import com.robo4j.commons.concurrent.CoreBusQueue;
  */
 public class ClientBusQueue<TransferType> extends CoreBusQueue {
 
-    public ClientBusQueue(int awaitSeconds) {
-        super(awaitSeconds);
-    }
+	public ClientBusQueue(int awaitSeconds) {
+		super(awaitSeconds);
+	}
 }

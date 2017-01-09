@@ -25,5 +25,5 @@ package com.robo4j.commons.command;
  * @since 28.04.2016
  */
 public interface RoboCoreCommand extends RoboTypeCommand {
-    String getName();
+	String getName();
 }

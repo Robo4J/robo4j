@@ -18,9 +18,6 @@
 
 package com.robo4j.core.provider;
 
-import com.robo4j.core.client.io.ClientException;
-import com.robo4j.core.util.ConstantUtil;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,55 +28,58 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Exchanger;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.robo4j.core.client.io.ClientException;
+import com.robo4j.core.util.ConstantUtil;
+
 /**
  * @author Miro Kopecky (@miragemiko)
  * @since 15.10.2016
  */
-public class SimpleFileWriter implements Callable<Boolean>{
+public class SimpleFileWriter implements Callable<Boolean> {
 
-    private static final String FILE_NAME = "/home/root/lejos/samples/dataStorage.txt";
-    private AtomicBoolean active;
-    private Exchanger<String> exchanger;
-    private List<String> lines;
-    private Path storageFile;
+	private static final String FILE_NAME = "/home/root/lejos/samples/dataStorage.txt";
+	private AtomicBoolean active;
+	private Exchanger<String> exchanger;
+	private List<String> lines;
+	private Path storageFile;
 
-    public SimpleFileWriter(AtomicBoolean active, Exchanger<String> exchanger) {
-        this.active = active;
-        this.exchanger = exchanger;
-        this.lines = new LinkedList<>();
-        Path file = Paths.get(FILE_NAME);
-        try {
-            if(Files.exists(file)){
-                Files.delete(file);
-                storageFile = Files.createFile(file);
-            } else {
-                storageFile = Files.createFile(file);
+	public SimpleFileWriter(AtomicBoolean active, Exchanger<String> exchanger) {
+		this.active = active;
+		this.exchanger = exchanger;
+		this.lines = new LinkedList<>();
+		Path file = Paths.get(FILE_NAME);
+		try {
+			if (Files.exists(file)) {
+				Files.delete(file);
+				storageFile = Files.createFile(file);
+			} else {
+				storageFile = Files.createFile(file);
 
-            }
+			}
 
-        } catch (IOException e) {
-            throw new ClientException("StorageFile e1:", e);
-        }
-    }
+		} catch (IOException e) {
+			throw new ClientException("StorageFile e1:", e);
+		}
+	}
 
-    @Override
-    public Boolean call() throws Exception {
-        while (active.get()){
-            try {
-                final String data = exchanger.exchange(ConstantUtil.EMPTY_STRING);
-                if(!data.isEmpty()){
-                    lines.add(data);
-                }
-            } catch (InterruptedException e) {
-                throw new ClientException("SimpleWriter e:", e);
-            }
-        }
-        try {
-            Files.write(storageFile, lines);
-        } catch (IOException e) {
-            throw new ClientException("StorageFile store method e:", e);
-        }
-        return true;
-    }
+	@Override
+	public Boolean call() throws Exception {
+		while (active.get()) {
+			try {
+				final String data = exchanger.exchange(ConstantUtil.EMPTY_STRING);
+				if (!data.isEmpty()) {
+					lines.add(data);
+				}
+			} catch (InterruptedException e) {
+				throw new ClientException("SimpleWriter e:", e);
+			}
+		}
+		try {
+			Files.write(storageFile, lines);
+		} catch (IOException e) {
+			throw new ClientException("StorageFile store method e:", e);
+		}
+		return true;
+	}
 
 }

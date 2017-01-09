@@ -24,6 +24,6 @@ package com.robo4j.commons.command;
  * @author Miro Kopecky (@miragemiko)
  * @since 28.04.2016
  */
-public interface RoboTypeCommand <CommandType extends Enum<?>> {
-        CommandType getType();
+public interface RoboTypeCommand<CommandType extends Enum<?>> {
+	CommandType getType();
 }

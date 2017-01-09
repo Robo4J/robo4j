@@ -30,36 +30,30 @@ import java.util.List;
  */
 public final class ConstantUtil {
 
-    /**
-     * The HTTP separator characters. Defined in RFC 2616, section 2.2
-     */
-    private final static String HTTP_SEPARATORS = " ,;=()<>@:\\\"/[]?{}\t";
+	public static final String EMPTY_STRING = "";
+	public static final String EXIT = "exit";
+	public static final String ACTIVE = "active";
+	public static final String STATUS = "status";
+	public static final String SETUP = "setup";
+	public static final String COMMAND_BUS = "command-bus";
+	public static final String PROVIDER_BUS = "provider-bus";
+	public static final String FACTORY_BUS = "factory-bus";
+	public static final int DEFAULT_VALUE = 0;
+	public static final int PLATFORM_FACTORY = 10; /* Producer Consumer */
+	public static final int PLATFORM_ENGINES = 30;
+	public static final int DEFAULT_PRIORITY = 1;
+	public static final List<String> availablePaths = Arrays.asList(EXIT, STATUS, SETUP);
+	public static final int DEFAULT_ENGINE_SPEED = 300;
+	public final static String HTTP_QUERY_SEP = "&";
+	public final static String HTTP_EMPTY_SEP = "\\s+";
+	public static final String STORAGE_SERVICE = "storageService";
+	/**
+	 * The HTTP separator characters. Defined in RFC 2616, section 2.2
+	 */
+	private final static String HTTP_SEPARATORS = " ,;=()<>@:\\\"/[]?{}\t";
 
-    public static final String EMPTY_STRING = "";
-
-    public static final String EXIT = "exit";
-    public static final String ACTIVE = "active";
-    public static final String STATUS = "status";
-    public static final String SETUP = "setup";
-
-    public static final String COMMAND_BUS = "command-bus";
-    public static final String PROVIDER_BUS = "provider-bus";
-    public static final String FACTORY_BUS = "factory-bus";
-    public static final int DEFAULT_VALUE = 0;
-    public static final int PLATFORM_FACTORY = 10; /* Producer Consumer */
-    public static final int PLATFORM_ENGINES = 30;
-    public static final int DEFAULT_PRIORITY = 1;
-    public static final List<String> availablePaths = Arrays.asList(EXIT, STATUS, SETUP);
-
-    public static final int DEFAULT_ENGINE_SPEED = 300;
-    public final static String HTTP_QUERY_SEP = "&";
-    public final static String HTTP_EMPTY_SEP = "\\s+";
-    public static final String STORAGE_SERVICE = "storageService";
-
-
-    public static String getHttpSeparator(int position){
-        return Character
-                .toString(HTTP_SEPARATORS.charAt(position));
-    }
+	public static String getHttpSeparator(int position) {
+		return Character.toString(HTTP_SEPARATORS.charAt(position));
+	}
 
 }

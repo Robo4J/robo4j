@@ -18,11 +18,11 @@
 
 package com.robo4j.commons.command;
 
-import com.robo4j.commons.enums.RoboHardwareEnum;
-import com.robo4j.commons.util.CommandUtil;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import com.robo4j.commons.enums.RoboHardwareEnum;
+import com.robo4j.commons.util.CommandUtil;
 
 /**
  * Available command types accepted by Robot
@@ -32,57 +32,46 @@ import java.util.Map;
  */
 public enum CommandTypeEnum implements RoboHardwareEnum<Integer> {
 
+	// @formatter:off
+	BATCH(0, "B".concat(CommandUtil.getElementClose())), DIRECT(1, "D".concat(CommandUtil.getElementClose())), HAND(2,
+			"H".concat(CommandUtil.getElementClose())), COMPLEX(3,
+					"C".concat(CommandUtil.getElementClose())), ACTIVE(4, "A".concat(CommandUtil.getElementClose())),;
+	// @formatter:on
 
-    //@formatter:off
-    BATCH            (0, "B".concat(CommandUtil.getElementClose())),
-    DIRECT           (1, "D".concat(CommandUtil.getElementClose())),
-    HAND             (2, "H".concat(CommandUtil.getElementClose())),
-    COMPLEX          (3, "C".concat(CommandUtil.getElementClose())),
-    ACTIVE           (4, "A".concat(CommandUtil.getElementClose())),
-    ;
-    //@formatter:on
+	private volatile static Map<String, CommandTypeEnum> defToCommandTypeMapping;
+	private int code;
+	private String name;
 
-    private int code;
-    private String name;
+	CommandTypeEnum(int code, String name) {
+		this.code = code;
+		this.name = name;
+	}
 
-    private volatile static Map<String, CommandTypeEnum> defToCommandTypeMapping;
+	private static void initMapping() {
+		defToCommandTypeMapping = new HashMap<>();
+		for (CommandTypeEnum ct : values()) {
+			defToCommandTypeMapping.put(ct.getName(), ct);
+		}
+	}
 
-    CommandTypeEnum(int code, String name) {
-        this.code = code;
-        this.name = name;
-    }
+	public static CommandTypeEnum getByDefinition(String def) {
+		if (defToCommandTypeMapping == null)
+			initMapping();
+		return defToCommandTypeMapping.get(def);
+	}
 
-    @Override
-    public Integer getType() {
-        return code;
-    }
+	@Override
+	public Integer getType() {
+		return code;
+	}
 
-    @Override
-    public String getName() {
-        return name;
-    }
+	@Override
+	public String getName() {
+		return name;
+	}
 
-
-
-    private static void initMapping(){
-        defToCommandTypeMapping = new HashMap<>();
-        for(CommandTypeEnum ct: values()){
-            defToCommandTypeMapping.put(ct.getName(), ct);
-        }
-    }
-
-    public static CommandTypeEnum getByDefinition(String def){
-        if(defToCommandTypeMapping == null)
-            initMapping();
-        return defToCommandTypeMapping.get(def);
-    }
-
-
-    @Override
-    public String toString() {
-        return "CommandTypeEnum{" +
-                "code=" + code +
-                ", name='" + name + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "CommandTypeEnum{" + "code=" + code + ", name='" + name + '\'' + '}';
+	}
 }

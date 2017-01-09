@@ -28,103 +28,95 @@ import java.util.Map;
  */
 public enum LegoSensorEnum {
 
-    //@formatter:off
-    //type      id      mode        source                                        elements
-    /**
-     * Touch pressed 1 : free 0
-     */
-    TOUCH       (0,     "Touch",    "lejos.hardware.sensor.EV3TouchSensor",       1),
-    /**
-     * Returns an SampleProvider object representing the gyro sensor in angle
-     * mode. <br>
-     * In rate mode the sensor measures the orientation of the sensor in respect to
-     * its start position. A positive angle indicates a orientation to the left. A
-     * negative rate indicates a rotation to the right. Angles are expressed in
-     * degrees.<br>
-     */
-    GYRO        (1,     "Angle",    "lejos.hardware.sensor.EV3GyroSensor",         1),
+	// @formatter:off
+	// type id mode source elements
+	/**
+	 * Touch pressed 1 : free 0
+	 */
+	TOUCH(0, "Touch", "lejos.hardware.sensor.EV3TouchSensor", 1),
+	/**
+	 * Returns an SampleProvider object representing the gyro sensor in angle
+	 * mode. <br>
+	 * In rate mode the sensor measures the orientation of the sensor in respect
+	 * to its start position. A positive angle indicates a orientation to the
+	 * left. A negative rate indicates a rotation to the right. Angles are
+	 * expressed in degrees.<br>
+	 */
+	GYRO(1, "Angle", "lejos.hardware.sensor.EV3GyroSensor", 1),
 
-    /**
-     * size of the array is 3
-     */
-    COLOR       (2,     "RGB",      "lejos.hardware.sensor.EV3ColorSensor",        3),
+	/**
+	 * size of the array is 3
+	 */
+	COLOR(2, "RGB", "lejos.hardware.sensor.EV3ColorSensor", 3),
 
-    /**
-     * distance is measured in meter
-     */
-    SONIC       (3,     "Distance", "lejos.hardware.sensor.EV3UltrasonicSensor",  1);
-    //@formatter:on
+	/**
+	 * distance is measured in meter
+	 */
+	SONIC(3, "Distance", "lejos.hardware.sensor.EV3UltrasonicSensor", 1);
+	// @formatter:on
 
-    private int id;
-    private String mode;
-    private String source;
-    private int elements;
+	private volatile static Map<Integer, LegoSensorEnum> codeToSensorTypMapping;
+	private volatile static Map<String, LegoSensorEnum> codeToSensorSourceMapping;
+	private int id;
+	private String mode;
+	private String source;
+	private int elements;
 
+	LegoSensorEnum(final int id, final String mode, final String source, final int elements) {
+		this.id = id;
+		this.mode = mode;
+		this.source = source;
+		this.elements = elements;
+	}
 
+	public static LegoSensorEnum getById(int id) {
+		if (codeToSensorTypMapping == null) {
+			initMapping();
+		}
+		return codeToSensorTypMapping.get(id);
+	}
 
-    private volatile static Map<Integer, LegoSensorEnum> codeToSensorTypMapping;
-    private volatile static Map<String, LegoSensorEnum> codeToSensorSourceMapping;
+	public static LegoSensorEnum getBySource(int name) {
+		if (codeToSensorSourceMapping == null) {
+			initSourceMapping();
+		}
+		return codeToSensorSourceMapping.get(name);
+	}
 
-    LegoSensorEnum(final int id, final String mode, final String source, final int elements){
-        this.id = id;
-        this.mode = mode;
-        this.source = source;
-        this.elements = elements;
-    }
+	// Private Methods
+	private static void initMapping() {
+		codeToSensorTypMapping = new HashMap<>();
+		for (LegoSensorEnum cmd : values()) {
+			codeToSensorTypMapping.put(cmd.getId(), cmd);
+		}
+	}
 
-    public int getId() {
-        return id;
-    }
+	private static void initSourceMapping() {
+		codeToSensorSourceMapping = new HashMap<>();
+		for (LegoSensorEnum cmd : values()) {
+			codeToSensorSourceMapping.put(cmd.getSource(), cmd);
+		}
+	}
 
-    public String getMode() {
-        return mode;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public String getSource() {
-        return source;
-    }
+	public String getMode() {
+		return mode;
+	}
 
-    public int getElements(){
-        return elements;
-    }
+	public String getSource() {
+		return source;
+	}
 
-    public static LegoSensorEnum getById(int id){
-        if(codeToSensorTypMapping == null){
-            initMapping();
-        }
-        return codeToSensorTypMapping.get(id);
-    }
+	public int getElements() {
+		return elements;
+	}
 
-    public static LegoSensorEnum getBySource(int name){
-        if(codeToSensorSourceMapping == null){
-            initSourceMapping();
-        }
-        return codeToSensorSourceMapping.get(name);
-    }
-
-
-    @Override
-    public String toString() {
-        return "LegoSensorEnum=(" +
-                "Source='" + source + '\'' +
-                "Mode='" + mode + '\'' +
-                ')';
-    }
-
-    //Private Methods
-    private static void initMapping(){
-        codeToSensorTypMapping = new HashMap<>();
-        for(LegoSensorEnum cmd: values()){
-            codeToSensorTypMapping.put(cmd.getId(), cmd);
-        }
-    }
-
-    private static void initSourceMapping(){
-        codeToSensorSourceMapping = new HashMap<>();
-        for(LegoSensorEnum cmd: values()){
-            codeToSensorSourceMapping.put(cmd.getSource(), cmd);
-        }
-    }
-
+	@Override
+	public String toString() {
+		return "LegoSensorEnum=(" + "Source='" + source + '\'' + "Mode='" + mode + '\'' + ')';
+	}
 
 }

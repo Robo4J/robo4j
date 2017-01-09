@@ -28,7 +28,8 @@ import com.robo4j.core.client.enums.RequestCommandEnum;
  */
 public interface ClientCommandDTO {
 
-    RequestCommandEnum getType();
-    String getValue();
+	RequestCommandEnum getType();
+
+	String getValue();
 
 }

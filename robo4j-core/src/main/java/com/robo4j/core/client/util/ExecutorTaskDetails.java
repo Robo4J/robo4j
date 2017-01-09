@@ -22,35 +22,31 @@ import java.time.LocalDateTime;
 
 /**
  *
- * Following class stores start time and thread name.
- *  class is the Util class
+ * Following class stores start time and thread name. class is the Util class
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 28.02.2016
  */
 public final class ExecutorTaskDetails {
 
-    private String threadName;
-    private LocalDateTime localDateTime;
+	private String threadName;
+	private LocalDateTime localDateTime;
 
-    public ExecutorTaskDetails(String threadName, LocalDateTime localDateTime) {
-        this.threadName = threadName;
-        this.localDateTime = localDateTime;
-    }
+	public ExecutorTaskDetails(String threadName, LocalDateTime localDateTime) {
+		this.threadName = threadName;
+		this.localDateTime = localDateTime;
+	}
 
-    public String getThreadName() {
-        return threadName;
-    }
+	public String getThreadName() {
+		return threadName;
+	}
 
-    public LocalDateTime getLocalDateTime() {
-        return localDateTime;
-    }
+	public LocalDateTime getLocalDateTime() {
+		return localDateTime;
+	}
 
-    @Override
-    public String toString() {
-        return "ExecutorTaskDetails{" +
-                "threadName='" + threadName + '\'' +
-                ", localDateTime=" + localDateTime +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "ExecutorTaskDetails{" + "threadName='" + threadName + '\'' + ", localDateTime=" + localDateTime + '}';
+	}
 }

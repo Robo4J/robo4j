@@ -32,55 +32,51 @@ import java.util.stream.Collectors;
  */
 public enum PageEnum {
 
-    //@formatter:on
-    WELCOME           (0, "welcome", "welcome.html", null),
-    STATUS            (1, "status", "status.html", Collections.singletonList("cache")),
-    SUCCESS           (2, "success", "success.html", Collections.singletonList("command")),
-    ERROR             (3, "error", "error.html", null),
-    SETUP             (4, "setup", "setup.html", Collections.singletonList("setup")),
-    EXIT              (5, "exit", "exit.html", null),
-    ;
-    //@formatter:on
+	// @formatter:on
+	WELCOME(0, "welcome", "welcome.html", null), STATUS(1, "status", "status.html",
+			Collections.singletonList("cache")), SUCCESS(2, "success", "success.html",
+					Collections.singletonList("command")), ERROR(3, "error", "error.html", null), SETUP(4, "setup",
+							"setup.html", Collections.singletonList("setup")), EXIT(5, "exit", "exit.html", null),;
+	// @formatter:on
 
-    private int code;
-    private String name;
-    private String page;
-    private List<String> variables;
+	private volatile static Map<String, PageEnum> nameToPageMapping;
+	private int code;
+	private String name;
+	private String page;
+	private List<String> variables;
 
-    private volatile static Map<String, PageEnum> nameToPageMapping;
+	PageEnum(int code, String name, String page, List<String> variables) {
+		this.code = code;
+		this.name = name;
+		this.page = page;
+		this.variables = variables;
+	}
 
-    PageEnum(int code, String name, String page, List<String> variables) {
-        this.code = code;
-        this.name = name;
-        this.page = page;
-        this.variables = variables;
-    }
+	public static PageEnum getPageEnumByName(final String name) {
+		if (nameToPageMapping == null) {
+			nameToPageMapping = mappingInit();
+		}
+		return nameToPageMapping.get(name);
+	}
 
-    public int getCode() {
-        return code;
-    }
+	// Private Methods
+	private static Map<String, PageEnum> mappingInit() {
+		return Arrays.stream(values()).collect(Collectors.toMap(PageEnum::getName, e -> e));
+	}
 
-    public String getName() {
-        return name;
-    }
+	public int getCode() {
+		return code;
+	}
 
-    public String getPage() {
-        return page;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public List<String> getVariables() {
-        return variables;
-    }
+	public String getPage() {
+		return page;
+	}
 
-    public static PageEnum getPageEnumByName(final String name){
-        if(nameToPageMapping == null){
-            nameToPageMapping = mappingInit();
-        }
-        return nameToPageMapping.get(name);
-    }
-
-    //Private Methods
-    private static Map<String, PageEnum> mappingInit(){
-        return Arrays.stream(values()).collect(Collectors.toMap(PageEnum::getName, e -> e));
-    }
+	public List<String> getVariables() {
+		return variables;
+	}
 }

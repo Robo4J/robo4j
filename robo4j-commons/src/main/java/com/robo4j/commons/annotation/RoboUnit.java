@@ -39,8 +39,11 @@ public @interface RoboUnit {
 	/**
 	 * @return the unique id of the RoboUnit.
 	 */
-    String id();
-    String system();
-    String[] producer();
-    String[] consumer();
+	String id();
+
+	String system();
+
+	String[] producer();
+
+	String[] consumer();
 }

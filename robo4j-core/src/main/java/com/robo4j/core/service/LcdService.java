@@ -22,16 +22,15 @@ import com.robo4j.commons.service.GenericService;
 
 /**
  *
- * Interface class for LCD Service
- * LCD is provided by the System
+ * Interface class for LCD Service LCD is provided by the System
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 27.09.2016
  */
 public interface LcdService extends GenericService {
 
-    void printText(String text);
+	void printText(String text);
 
-    void printText(int line, String text);
+	void printText(int line, String text);
 
 }

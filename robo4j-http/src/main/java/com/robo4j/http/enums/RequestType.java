@@ -28,47 +28,40 @@ import java.util.stream.Collectors;
  */
 public enum RequestType {
 
-    //@formatter:off
-    NONE          (0, "none"),
-    HTTP          (1, "http"),
-    RAW           (2, "raw"),
-    ;
-    //@formatter:on
-    private int code;
-    private String name;
+	// @formatter:off
+	NONE(0, "none"), HTTP(1, "http"), RAW(2, "raw"),;
+	private volatile static Map<String, RequestType> defNameToTypeMapping;
+	// @formatter:on
+	private int code;
+	private String name;
 
-    RequestType(int code, String name) {
-        this.code = code;
-        this.name = name;
-    }
+	RequestType(int code, String name) {
+		this.code = code;
+		this.name = name;
+	}
 
-    private volatile static Map<String, RequestType> defNameToTypeMapping;
+	// Private Methods
+	private static Map<String, RequestType> initMapping() {
+		return Arrays.stream(values()).collect(Collectors.toMap(RequestType::getName, e -> e));
+	}
 
-    public int getCode() {
-        return code;
-    }
+	public static RequestType getByName(String name) {
+		if (defNameToTypeMapping == null) {
+			defNameToTypeMapping = initMapping();
+		}
+		return defNameToTypeMapping.get(name);
+	}
 
-    public String getName() {
-        return name;
-    }
+	public int getCode() {
+		return code;
+	}
 
-    //Private Methods
-    private static Map<String, RequestType> initMapping(){
-        return Arrays.stream(values()).collect(Collectors.toMap(RequestType::getName, e -> e));
-    }
+	public String getName() {
+		return name;
+	}
 
-    public static RequestType getByName(String name){
-        if(defNameToTypeMapping == null){
-            defNameToTypeMapping = initMapping();
-        }
-        return defNameToTypeMapping.get(name);
-    }
-
-    @Override
-    public String toString() {
-        return "RequestType{" +
-                "code=" + code +
-                ", name='" + name + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "RequestType{" + "code=" + code + ", name='" + name + '\'' + '}';
+	}
 }

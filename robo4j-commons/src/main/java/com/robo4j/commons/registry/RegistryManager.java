@@ -18,15 +18,15 @@
 
 package com.robo4j.commons.registry;
 
-import com.robo4j.commons.control.RoboSystemConfig;
-import com.robo4j.commons.enums.RegistryTypeEnum;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+
+import com.robo4j.commons.control.RoboSystemConfig;
+import com.robo4j.commons.enums.RegistryTypeEnum;
 
 /**
  *
@@ -35,63 +35,60 @@ import java.util.stream.Collectors;
  * @since 27.11.2016
  */
 public final class RegistryManager<RegistryType extends RoboRegistry, ConfigType extends RoboSystemConfig> {
-    private static final List<RegistryTypeEnum> list = Arrays.asList(RegistryTypeEnum.values());
-    private static volatile RegistryManager INSTANCE;
-    private AtomicBoolean active;
-    private volatile Map<RegistryTypeEnum, RoboRegistry> registries;
+	private static final List<RegistryTypeEnum> list = Arrays.asList(RegistryTypeEnum.values());
+	private static volatile RegistryManager INSTANCE;
+	private AtomicBoolean active;
+	private volatile Map<RegistryTypeEnum, RoboRegistry> registries;
 
-    private RegistryManager(){
-        this.registries = new HashMap<>();
-        this.active = new AtomicBoolean(false);
-    }
+	private RegistryManager() {
+		this.registries = new HashMap<>();
+		this.active = new AtomicBoolean(false);
+	}
 
-    public static RegistryManager getInstance(){
-        if(INSTANCE == null){
-            synchronized (RegistryManager.class){
-                if(INSTANCE == null){
-                    INSTANCE = new RegistryManager();
-                }
-            }
-        }
-        return INSTANCE;
-    }
+	public static RegistryManager getInstance() {
+		if (INSTANCE == null) {
+			synchronized (RegistryManager.class) {
+				if (INSTANCE == null) {
+					INSTANCE = new RegistryManager();
+				}
+			}
+		}
+		return INSTANCE;
+	}
 
-    public RegistryManager addAll(Map<RegistryTypeEnum, RoboRegistry> map){
-        registries.putAll(map);
-        return this;
-    }
-    public RoboRegistry add(RegistryTypeEnum type, RoboRegistry registry){
-        return registries.put(type, registry);
-    }
+	public RegistryManager addAll(Map<RegistryTypeEnum, RoboRegistry> map) {
+		registries.putAll(map);
+		return this;
+	}
 
-    public boolean isActive(){
-        if(!active.get()){
-            active.set(registries.entrySet().stream()
-                    .map(Map.Entry::getKey)
-                    .filter(list::contains)
-                    .count() == list.size());
-        }
-        return active.get();
-    }
+	public RoboRegistry add(RegistryTypeEnum type, RoboRegistry registry) {
+		return registries.put(type, registry);
+	}
 
-    @SuppressWarnings(value = "unchecked")
-    public  RegistryType initRegistry(RegistryTypeEnum name, Map<RegistryTypeEnum, ConfigType> types){
-        return (RegistryType)registries.get(name).build(types);
-    }
+	public boolean isActive() {
+		if (!active.get()) {
+			active.set(registries.entrySet().stream().map(Map.Entry::getKey).filter(list::contains).count() == list
+					.size());
+		}
+		return active.get();
+	}
 
-    public RoboSystemConfig getItemByRegistry(RegistryTypeEnum registry, String name){
-        return registries.get(registry).getByName(name);
-    }
+	@SuppressWarnings(value = "unchecked")
+	public RegistryType initRegistry(RegistryTypeEnum name, Map<RegistryTypeEnum, ConfigType> types) {
+		return (RegistryType) registries.get(name).build(types);
+	}
 
-    @SuppressWarnings(value = "unchecked")
-    public RoboRegistry<RoboRegistry, RoboSystemConfig> getRegistryByType(RegistryTypeEnum type){
-        return registries.get(type);
-    }
+	public RoboSystemConfig getItemByRegistry(RegistryTypeEnum registry, String name) {
+		return registries.get(registry).getByName(name);
+	}
 
-    public List<String> getRegistryNames(){
-        return registries.entrySet().stream()
-                .map(Map.Entry::getKey)
-                .map(RegistryTypeEnum::getName)
-                .collect(Collectors.toList());
-    }
+	@SuppressWarnings(value = "unchecked")
+	public RoboRegistry<RoboRegistry, RoboSystemConfig> getRegistryByType(RegistryTypeEnum type) {
+		return registries.get(type);
+	}
+
+	public List<String> getRegistryNames() {
+		return registries.entrySet().stream().map(Map.Entry::getKey).map(RegistryTypeEnum::getName)
+				.collect(Collectors.toList());
+	}
 }

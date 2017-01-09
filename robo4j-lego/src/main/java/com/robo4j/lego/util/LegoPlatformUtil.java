@@ -25,26 +25,27 @@ package com.robo4j.lego.util;
  * @since 09.07.2016
  */
 public final class LegoPlatformUtil {
-    private static final int CENTIMETER_CYCLES = 33;
-    private static final int ROTATION_CYCLES = 6;
-    private static final int DEFAULT_VALUE = 0;
+	private static final int CENTIMETER_CYCLES = 33;
+	private static final int ROTATION_CYCLES = 6;
+	private static final int DEFAULT_VALUE = 0;
 
-    /**
-     * Current adjustment for Angle and Distance
-     *
-     * @param value - value comes from command
-     * @return - number of cycles
-     */
-    public static int adjustPlatformCyclesByValue(boolean angle, String value){
-        final int number = Integer.valueOf(value);
-        return angle ? ROTATION_CYCLES * number : CENTIMETER_CYCLES * number;
-    }
+	private LegoPlatformUtil() {
+		// no instance
+	}
 
-    public static int adjustCyclesByValue(String value){
-        return value == null || value.isEmpty() ? DEFAULT_VALUE : Integer.valueOf(value);
-    }
+	/**
+	 * Current adjustment for Angle and Distance
+	 *
+	 * @param value
+	 *            - value comes from command
+	 * @return - number of cycles
+	 */
+	public static int adjustPlatformCyclesByValue(boolean angle, String value) {
+		final int number = Integer.valueOf(value);
+		return angle ? ROTATION_CYCLES * number : CENTIMETER_CYCLES * number;
+	}
 
-    private LegoPlatformUtil(){
-        //no instance
-    }
+	public static int adjustCyclesByValue(String value) {
+		return value == null || value.isEmpty() ? DEFAULT_VALUE : Integer.valueOf(value);
+	}
 }

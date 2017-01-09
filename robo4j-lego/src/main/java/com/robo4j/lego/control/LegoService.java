@@ -21,11 +21,11 @@ package com.robo4j.lego.control;
 import com.robo4j.commons.service.GenericService;
 
 /**
- * LegoService interface provides reference to the functionality provided by
- * the system as default
+ * LegoService interface provides reference to the functionality provided by the
+ * system as default
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 27.09.2016
  */
-public interface LegoService extends GenericService{
+public interface LegoService extends GenericService {
 }

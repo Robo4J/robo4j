@@ -25,8 +25,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation is used to configure specific
- * robo sensor connected to the platform
+ * Annotation is used to configure specific robo sensor connected to the
+ * platform
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 04.05.2016
@@ -39,5 +39,5 @@ public @interface RoboSensor {
 	/**
 	 * @return the unique id of the RoboSensor.
 	 */
-    String id() default "";
+	String id() default "";
 }

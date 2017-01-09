@@ -27,24 +27,24 @@ import com.robo4j.commons.command.CommandTypeEnum;
  */
 public final class CommandUtil {
 
-    private static final String COMMAND_TYPE_CLOSE = ":";
-    private static final int COMMAND_TYPE_END = 2;
-    private static final String COMMAND_TYPE_SPLITTER = ";";
+	private static final String COMMAND_TYPE_CLOSE = ":";
+	private static final int COMMAND_TYPE_END = 2;
+	private static final String COMMAND_TYPE_SPLITTER = ";";
 
-    public static CommandParsed getCommandType(String line){
-        final CommandTypeEnum result = CommandTypeEnum.getByDefinition(line.substring(0, COMMAND_TYPE_END));
-        if(result != null){
-            return new CommandParsed(result, line.substring(COMMAND_TYPE_END, line.length()));
-        } else {
-            return new  CommandParsed(CommandTypeEnum.DIRECT, "exit");
-        }
-    }
+	public static CommandParsed getCommandType(String line) {
+		final CommandTypeEnum result = CommandTypeEnum.getByDefinition(line.substring(0, COMMAND_TYPE_END));
+		if (result != null) {
+			return new CommandParsed(result, line.substring(COMMAND_TYPE_END, line.length()));
+		} else {
+			return new CommandParsed(CommandTypeEnum.DIRECT, "exit");
+		}
+	}
 
-    public static String getElementClose(){
-        return COMMAND_TYPE_CLOSE;
-    }
+	public static String getElementClose() {
+		return COMMAND_TYPE_CLOSE;
+	}
 
-    public static String[] getCommandsByTypes(final String line){
-        return line.trim().split(COMMAND_TYPE_SPLITTER);
-    }
+	public static String[] getCommandsByTypes(final String line) {
+		return line.trim().split(COMMAND_TYPE_SPLITTER);
+	}
 }

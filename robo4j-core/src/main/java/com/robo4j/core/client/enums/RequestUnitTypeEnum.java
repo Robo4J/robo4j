@@ -24,33 +24,28 @@ package com.robo4j.core.client.enums;
  */
 public enum RequestUnitTypeEnum {
 
-    //formatter:off
-    GENERAL       (0, "general"),
-    UNIT          (1, "unit"),
-    ;
-    //formatter:on
+	// formatter:off
+	GENERAL(0, "general"), UNIT(1, "unit"),;
+	// formatter:on
 
-    private int code;
-    private String desc;
+	private int code;
+	private String desc;
 
-    RequestUnitTypeEnum(int code, String desc) {
-        this.code = code;
-        this.desc = desc;
-    }
+	RequestUnitTypeEnum(int code, String desc) {
+		this.code = code;
+		this.desc = desc;
+	}
 
-    public int getCode() {
-        return code;
-    }
+	public int getCode() {
+		return code;
+	}
 
-    public String getDesc() {
-        return desc;
-    }
+	public String getDesc() {
+		return desc;
+	}
 
-    @Override
-    public String toString() {
-        return "RequestUnitTypeEnum{" +
-                "code=" + code +
-                ", desc='" + desc + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "RequestUnitTypeEnum{" + "code=" + code + ", desc='" + desc + '\'' + '}';
+	}
 }

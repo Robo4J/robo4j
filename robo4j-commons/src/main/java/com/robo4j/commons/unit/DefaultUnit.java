@@ -18,18 +18,18 @@
 
 package com.robo4j.commons.unit;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+
 import com.robo4j.commons.agent.AgentConsumer;
 import com.robo4j.commons.agent.AgentProducer;
 import com.robo4j.commons.agent.AgentStatus;
 import com.robo4j.commons.agent.GenericAgent;
 import com.robo4j.commons.agent.ProcessAgent;
 import com.robo4j.commons.command.RoboUnitCommand;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 
 /**
  * DefaultUnit represent basic structure of the RoboUnit annotated classes
@@ -39,23 +39,21 @@ import java.util.function.Function;
  */
 public abstract class DefaultUnit implements GenericUnit {
 
-    /* RoboUnit has been successfully activated */
-    protected volatile AtomicBoolean active;
+	/* RoboUnit has been successfully activated */
+	protected volatile AtomicBoolean active;
 
-    protected ExecutorService executorForAgents;
-    /*Each RoboUnit has RoboAgents */
-    protected List<GenericAgent> agents;
+	protected ExecutorService executorForAgents;
+	/* Each RoboUnit has RoboAgents */
+	protected List<GenericAgent> agents;
 
-    protected Map<RoboUnitCommand, Function<ProcessAgent, AgentStatus>> logic;
+	protected Map<RoboUnitCommand, Function<ProcessAgent, AgentStatus>> logic;
 
+	protected abstract GenericAgent createAgent(String name, AgentProducer producer, AgentConsumer consumer);
 
-    protected abstract GenericAgent createAgent(String name, AgentProducer producer, AgentConsumer consumer);
+	public abstract Map<RoboUnitCommand, Function<ProcessAgent, AgentStatus>> initLogic();
 
-    public abstract Map<RoboUnitCommand, Function<ProcessAgent, AgentStatus>> initLogic();
-
-    public List<GenericAgent> getAgents(){
-        return this.agents;
-    }
-
+	public List<GenericAgent> getAgents() {
+		return this.agents;
+	}
 
 }

@@ -18,11 +18,11 @@
 
 package com.robo4j.commons.registry;
 
-import com.robo4j.commons.service.GenericService;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.robo4j.commons.service.GenericService;
 
 /**
  * SystemRegistry is only one per JVM
@@ -32,55 +32,56 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public final class SystemServiceRegistry implements RoboRegistry<SystemServiceRegistry, GenericService> {
 
-    private static volatile SystemServiceRegistry INSTANCE;
-    private Map<String, GenericService> services;
-    private AtomicBoolean active;
+	private static volatile SystemServiceRegistry INSTANCE;
+	private Map<String, GenericService> services;
+	private AtomicBoolean active;
 
-    private SystemServiceRegistry(){
-        services = new HashMap<>();
-        active = new AtomicBoolean(false);
-    }
+	private SystemServiceRegistry() {
+		services = new HashMap<>();
+		active = new AtomicBoolean(false);
+	}
 
-    public static SystemServiceRegistry getInstance(){
-        if(INSTANCE == null){
-            synchronized (SystemServiceRegistry.class){
-                if(INSTANCE == null){
-                    INSTANCE = new SystemServiceRegistry();
-                }
-            }
-        }
-        return INSTANCE;
-    }
+	public static SystemServiceRegistry getInstance() {
+		if (INSTANCE == null) {
+			synchronized (SystemServiceRegistry.class) {
+				if (INSTANCE == null) {
+					INSTANCE = new SystemServiceRegistry();
+				}
+			}
+		}
+		return INSTANCE;
+	}
 
-    /**
-     * this method is expecte dot be called only during initialisation
-     * - in future it may change
-     * @param services
-     */
-    @Override
-    public SystemServiceRegistry build(Map<String, GenericService> services){
-        this.services.putAll(services);
-        this.active.set(true);
-        return this;
-    }
+	/**
+	 * this method is expecte dot be called only during initialisation - in
+	 * future it may change
+	 * 
+	 * @param services
+	 */
+	@Override
+	public SystemServiceRegistry build(Map<String, GenericService> services) {
+		this.services.putAll(services);
+		this.active.set(true);
+		return this;
+	}
 
-    @Override
-    public GenericService getByName(String name){
-        return services.get(name);
-    }
+	@Override
+	public GenericService getByName(String name) {
+		return services.get(name);
+	}
 
-    @Override
-    public Map<String, GenericService> getRegistry() {
-        return services;
-    }
+	@Override
+	public Map<String, GenericService> getRegistry() {
+		return services;
+	}
 
-    @Override
-    public boolean activate() {
-        return false;
-    }
+	@Override
+	public boolean activate() {
+		return false;
+	}
 
-    @Override
-    public boolean isActive() {
-        return active.get();
-    }
+	@Override
+	public boolean isActive() {
+		return active.get();
+	}
 }

@@ -18,18 +18,18 @@
 
 package com.robo4j.commons.registry;
 
-import com.robo4j.commons.control.RoboSystemConfig;
-
 import java.util.Map;
+
+import com.robo4j.commons.control.RoboSystemConfig;
 
 /**
  * @author Miro Kopecky (@miragemiko)
  * @since 26.11.2016
  */
-public interface BaseRegistryProvider<Output, Input>  extends RoboSystemConfig {
+public interface BaseRegistryProvider<Output, Input> extends RoboSystemConfig {
 
-    Output create(final Input type);
+	Output create(final Input type);
 
-    Map<String, Input> activate(Map<String, Input> engines);
+	Map<String, Input> activate(Map<String, Input> engines);
 
 }

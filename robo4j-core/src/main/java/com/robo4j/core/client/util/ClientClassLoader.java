@@ -29,31 +29,31 @@ import java.io.InputStream;
  */
 public final class ClientClassLoader {
 
-    private static volatile ClientClassLoader INSTANCE;
-    private volatile ClassLoader cl;
+	private static volatile ClientClassLoader INSTANCE;
+	private volatile ClassLoader cl;
 
-    private ClientClassLoader(){
-        cl =  Thread.currentThread().getContextClassLoader();
-    }
+	private ClientClassLoader() {
+		cl = Thread.currentThread().getContextClassLoader();
+	}
 
-    public static ClientClassLoader getInstance(){
-        if(INSTANCE == null){
-            synchronized (ClientClassLoader.class){
-                if(INSTANCE == null){
-                    INSTANCE = new ClientClassLoader();
-                }
-            }
-        }
-        return INSTANCE;
-    }
+	public static ClientClassLoader getInstance() {
+		if (INSTANCE == null) {
+			synchronized (ClientClassLoader.class) {
+				if (INSTANCE == null) {
+					INSTANCE = new ClientClassLoader();
+				}
+			}
+		}
+		return INSTANCE;
+	}
 
-    //Public Methods
-    public ClassLoader getClassLoader(){
-        return cl;
-    }
+	// Public Methods
+	public ClassLoader getClassLoader() {
+		return cl;
+	}
 
-    public InputStream getResource(final String name){
-        return cl.getResourceAsStream(name);
-    }
+	public InputStream getResource(final String name) {
+		return cl.getResourceAsStream(name);
+	}
 
 }

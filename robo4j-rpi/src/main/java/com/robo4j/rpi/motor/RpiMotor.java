@@ -19,7 +19,6 @@
 
 package com.robo4j.rpi.motor;
 
-
 import com.robo4j.commons.motor.GenericMotor;
 
 /**
@@ -28,12 +27,12 @@ import com.robo4j.commons.motor.GenericMotor;
  */
 public interface RpiMotor extends GenericMotor {
 
-    void setSpeed(int speed);
+	int getSpeed();
 
-    int getSpeed();
+	void setSpeed(int speed);
 
-    byte getPort();
+	byte getPort();
 
-    int getAddress();
+	int getAddress();
 
 }

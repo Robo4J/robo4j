@@ -26,37 +26,30 @@ package com.robo4j.commons.motor;
  */
 public enum MotorRotationEnum {
 
-    //@formatter:on
-    FORWARD            (0, 1,  "forward"),
-    STOP               (1, 0,  "stop"),
-    BACKWARD           (2, -1, "backward"),
-    ;
-    //@formatter:on
+	// @formatter:on
+	FORWARD(0, 1, "forward"), STOP(1, 0, "stop"), BACKWARD(2, -1, "backward"),;
+	// @formatter:on
 
-    private int id;
-    private int code;
-    private String decs;
+	private int id;
+	private int code;
+	private String decs;
 
-    MotorRotationEnum(int id, int code, String desc) {
-        this.id = id;
-        this.code = code;
-        this.decs = desc;
-    }
+	MotorRotationEnum(int id, int code, String desc) {
+		this.id = id;
+		this.code = code;
+		this.decs = desc;
+	}
 
-    public int getCode() {
-        return code;
-    }
+	public int getCode() {
+		return code;
+	}
 
-    public String getDecs() {
-        return decs;
-    }
+	public String getDecs() {
+		return decs;
+	}
 
-    @Override
-    public String toString() {
-        return "MotorRotationEnum{" +
-                "id=" + id +
-                ", code=" + code +
-                ", decs='" + decs + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "MotorRotationEnum{" + "id=" + id + ", code=" + code + ", decs='" + decs + '\'' + '}';
+	}
 }

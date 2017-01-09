@@ -19,11 +19,11 @@
 
 package com.robo4j.rpi.motor;
 
-import com.pi4j.io.i2c.I2CBus;
-import com.pi4j.io.i2c.I2CDevice;
-
 import java.io.Closeable;
 import java.io.IOException;
+
+import com.pi4j.io.i2c.I2CBus;
+import com.pi4j.io.i2c.I2CDevice;
 
 /**
  * @author Miro Kopecky (@miragemiko)
@@ -31,23 +31,22 @@ import java.io.IOException;
  */
 public class RpiDevice implements Closeable {
 
-    protected I2CBus bus;
-    protected I2CDevice device;
+	protected I2CBus bus;
+	protected I2CDevice device;
 
-    public RpiDevice() {
-    }
+	public RpiDevice() {
+	}
 
-    public void setBus(I2CBus bus) {
-        this.bus = bus;
-    }
+	public void setBus(I2CBus bus) {
+		this.bus = bus;
+	}
 
+	public void setDevice(int address) throws IOException {
+		this.device = bus.getDevice(address);
+	}
 
-    public void setDevice(int address) throws IOException {
-        this.device = bus.getDevice(address);
-    }
-
-    @Override
-    public void close() throws IOException {
-        bus.close();
-    }
+	@Override
+	public void close() throws IOException {
+		bus.close();
+	}
 }

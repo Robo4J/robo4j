@@ -27,22 +27,21 @@ import java.util.stream.StreamSupport;
 
 /**
  * Streams related utils
+ * 
  * @author Miro Kopecky (@miragemiko)
  * @since 30.11.2016
  */
 public final class StreamUtils {
 
-    public static <Type> Stream<Type> enumerationAsStream(Enumeration<Type> e, boolean parallel) {
-        return StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(
-                        new Iterator<Type>() {
-                            public Type next() {
-                                return e.nextElement();
-                            }
-                            public boolean hasNext() {
-                                return e.hasMoreElements();
-                            }
-                        },
-                        Spliterator.ORDERED), parallel);
-    }
+	public static <Type> Stream<Type> enumerationAsStream(Enumeration<Type> e, boolean parallel) {
+		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<Type>() {
+			public Type next() {
+				return e.nextElement();
+			}
+
+			public boolean hasNext() {
+				return e.hasMoreElements();
+			}
+		}, Spliterator.ORDERED), parallel);
+	}
 }

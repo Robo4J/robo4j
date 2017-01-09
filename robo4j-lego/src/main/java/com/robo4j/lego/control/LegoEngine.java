@@ -28,9 +28,11 @@ import com.robo4j.lego.enums.LegoEnginePartEnum;
  * @author Miro Kopecky (@miragemiko)
  * @since 05.05.2016
  */
-public interface LegoEngine extends GenericMotor{
+public interface LegoEngine extends GenericMotor {
 
-    LegoAnalogPortEnum getPort();
-    LegoEngineEnum getEngine();
-    LegoEnginePartEnum getPart();
+	LegoAnalogPortEnum getPort();
+
+	LegoEngineEnum getEngine();
+
+	LegoEnginePartEnum getPart();
 }

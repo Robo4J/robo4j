@@ -21,36 +21,31 @@ package com.robo4j.core.dto;
 import java.util.List;
 
 /**
- * Client Request DTO is holding information about
- * the parsed request
+ * Client Request DTO is holding information about the parsed request
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 06.11.2016
  */
 public class ClientRequestDTO {
 
-    private final List<ClientCommandRequestDTO> commands;
-    private final List<ClientUnitRequestDTO>  units;
+	private final List<ClientCommandRequestDTO> commands;
+	private final List<ClientUnitRequestDTO> units;
 
-    public ClientRequestDTO(List<ClientCommandRequestDTO> commands, List<ClientUnitRequestDTO> units) {
-        this.commands = commands;
-        this.units = units;
-    }
+	public ClientRequestDTO(List<ClientCommandRequestDTO> commands, List<ClientUnitRequestDTO> units) {
+		this.commands = commands;
+		this.units = units;
+	}
 
+	public List<ClientCommandRequestDTO> getCommands() {
+		return commands;
+	}
 
-    public List<ClientCommandRequestDTO> getCommands() {
-        return commands;
-    }
+	public List<ClientUnitRequestDTO> getUnits() {
+		return units;
+	}
 
-    public List<ClientUnitRequestDTO> getUnits() {
-        return units;
-    }
-
-    @Override
-    public String toString() {
-        return "ClientRequestDTO{" +
-                "commands=" + commands +
-                ", units=" + units +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "ClientRequestDTO{" + "commands=" + commands + ", units=" + units + '}';
+	}
 }

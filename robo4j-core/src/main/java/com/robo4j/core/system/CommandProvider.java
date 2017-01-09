@@ -18,17 +18,17 @@
 
 package com.robo4j.core.system;
 
-import com.robo4j.core.client.enums.RequestCommandEnum;
 import com.robo4j.commons.command.GenericCommand;
+import com.robo4j.core.client.enums.RequestCommandEnum;
 
 /**
- * RoboUnit doesn't included the definition of the process method.
- * Reason because process can be done by Agent without human input
+ * RoboUnit doesn't included the definition of the process method. Reason
+ * because process can be done by Agent without human input
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 10.06.2016
  */
 public interface CommandProvider {
 
-    boolean process(GenericCommand<RequestCommandEnum> command);
+	boolean process(GenericCommand<RequestCommandEnum> command);
 }

@@ -18,10 +18,6 @@
 
 package com.robo4j.core.client;
 
-
-import com.robo4j.core.client.io.ClientThreadFactory;
-import com.robo4j.core.client.util.ExecutorTaskDetails;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -31,73 +27,88 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.robo4j.core.client.io.ClientThreadFactory;
+import com.robo4j.core.client.util.ExecutorTaskDetails;
+
 /**
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 28.02.2016
  */
 public class ClientHTTPExecutor extends ThreadPoolExecutor {
-    private static final int NUM_THREADS = 5;
-    private static final long KEEP_ALIVE = 0L;
-    /**
-     * A HashMap to stor the start of the task being executed
-     */
-    private ConcurrentHashMap<String, ExecutorTaskDetails> startTimes;
+	private static final int NUM_THREADS = 5;
+	private static final long KEEP_ALIVE = 0L;
+	/**
+	 * A HashMap to stor the start of the task being executed
+	 */
+	private ConcurrentHashMap<String, ExecutorTaskDetails> startTimes;
 
-    public ClientHTTPExecutor(){
-        super(NUM_THREADS, NUM_THREADS, KEEP_ALIVE, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
-        startTimes = new ConcurrentHashMap<>();
-        this.setThreadFactory(new ClientThreadFactory("clientCenter"));
-    }
+	public ClientHTTPExecutor() {
+		super(NUM_THREADS, NUM_THREADS, KEEP_ALIVE, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+		startTimes = new ConcurrentHashMap<>();
+		this.setThreadFactory(new ClientThreadFactory("clientCenter"));
+	}
 
-    @Override
-    public void shutdown() {
-//        System.out.println("shutdown: Going to shutdown.");
-//        System.out.println("shutdown: Executed tasks: " + getCompletedTaskCount());
-//        System.out.println("shutdown: Running tasks: " + getActiveCount());
-//        System.out.println("shutdown: Pending tasks: " + getQueue().size());
-        super.shutdown();
-    }
+	private static long getMillsByLocalDateTime(LocalDateTime localDateTime) {
+		return localDateTime.toInstant(ZoneOffset.ofTotalSeconds(0)).toEpochMilli();
+	}
 
-    @Override
-    public List<Runnable> shutdownNow() {
-//        System.out.println("shutdownNow: Going to immediately shutdown.");
-//        System.out.println("shutdownNow: Executed tasks: " + getCompletedTaskCount());
-//        System.out.println("shutdownNow: Running tasks: " + getActiveCount());
-//        System.out.println("shutdownNow: Pending tasks: " + getQueue().size());
-        return super.shutdownNow();
-    }
+	@Override
+	public void shutdown() {
+		// System.out.println("shutdown: Going to shutdown.");
+		// System.out.println("shutdown: Executed tasks: " +
+		// getCompletedTaskCount());
+		// System.out.println("shutdown: Running tasks: " + getActiveCount());
+		// System.out.println("shutdown: Pending tasks: " + getQueue().size());
+		super.shutdown();
+	}
 
-    @Override
-    protected void beforeExecute(Thread t, Runnable r) {
-//        System.out.println("beforeExecute: A task is beginning: thread= " + t.getName() + " : " + r.hashCode());
-        ExecutorTaskDetails executorTaskDetails = new ExecutorTaskDetails(t.getName(), LocalDateTime.now());
-//        System.out.println("beforeExecute: executorTaskDetails= " + executorTaskDetails);
-        startTimes.put(String.valueOf(r.hashCode()), executorTaskDetails);
-//        System.out.println("beforeExecute: startTimes= " + startTimes);
-    }
-    private static long getMillsByLocalDateTime(LocalDateTime localDateTime){
-        return localDateTime.toInstant(ZoneOffset.ofTotalSeconds(0)).toEpochMilli();
-    }
-    @Override
-    protected void afterExecute(Runnable r, Throwable t) {
-        Future<?> result = (Future)r;
-//            System.out.println("afterExecute: *********************************");
-//            System.out.println("afterExecute: A task is finishing.");
-//            System.out.println("afterExecute: SleepTask Result= " + result.get());
-//            System.out.println("afterExecute: SleepTask Result hashCode= " + ((Future) r).get());
+	@Override
+	public List<Runnable> shutdownNow() {
+		// System.out.println("shutdownNow: Going to immediately shutdown.");
+		// System.out.println("shutdownNow: Executed tasks: " +
+		// getCompletedTaskCount());
+		// System.out.println("shutdownNow: Running tasks: " +
+		// getActiveCount());
+		// System.out.println("shutdownNow: Pending tasks: " +
+		// getQueue().size());
+		return super.shutdownNow();
+	}
 
-            ExecutorTaskDetails executorTaskDetails = startTimes.remove(String.valueOf(r.hashCode()));
-//            System.out.println("afterExecute: startTimes= " + startTimes);
-//            System.out.println("afterExecute: executorTaskDetails= " + executorTaskDetails);
+	@Override
+	protected void beforeExecute(Thread t, Runnable r) {
+		// System.out.println("beforeExecute: A task is beginning: thread= " +
+		// t.getName() + " : " + r.hashCode());
+		ExecutorTaskDetails executorTaskDetails = new ExecutorTaskDetails(t.getName(), LocalDateTime.now());
+		// System.out.println("beforeExecute: executorTaskDetails= " +
+		// executorTaskDetails);
+		startTimes.put(String.valueOf(r.hashCode()), executorTaskDetails);
+		// System.out.println("beforeExecute: startTimes= " + startTimes);
+	}
 
-            LocalDateTime startDate= executorTaskDetails.getLocalDateTime();
-            LocalDateTime finishDate = LocalDateTime.now();
-            long diff= getMillsByLocalDateTime(finishDate) - getMillsByLocalDateTime(startDate);
+	@Override
+	protected void afterExecute(Runnable r, Throwable t) {
+		Future<?> result = (Future) r;
+		// System.out.println("afterExecute:
+		// *********************************");
+		// System.out.println("afterExecute: A task is finishing.");
+		// System.out.println("afterExecute: SleepTask Result= " +
+		// result.get());
+		// System.out.println("afterExecute: SleepTask Result hashCode= " +
+		// ((Future) r).get());
 
-//            System.out.println("afterExecute: SleepTask Duration=  " + diff);
-//            System.out.println("afterExecute: *********************************");
+		ExecutorTaskDetails executorTaskDetails = startTimes.remove(String.valueOf(r.hashCode()));
+		// System.out.println("afterExecute: startTimes= " + startTimes);
+		// System.out.println("afterExecute: executorTaskDetails= " +
+		// executorTaskDetails);
 
+		LocalDateTime startDate = executorTaskDetails.getLocalDateTime();
+		LocalDateTime finishDate = LocalDateTime.now();
+		long diff = getMillsByLocalDateTime(finishDate) - getMillsByLocalDateTime(startDate);
 
-    }
+		// System.out.println("afterExecute: SleepTask Duration= " + diff);
+		// System.out.println("afterExecute:
+		// *********************************");
+
+	}
 }

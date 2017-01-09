@@ -28,10 +28,12 @@ import com.robo4j.lego.enums.LegoSensorPortEnum;
  * @author Miro Kopecky (@miragemiko)
  * @since 26.06.2016
  */
-public interface LegoSensor extends GenericSensor{
+public interface LegoSensor extends GenericSensor {
 
-    LegoSensorPortEnum getPort();
-    LegoSensorEnum getSensor();
-    LegoEnginePartEnum getPart();
+	LegoSensorPortEnum getPort();
+
+	LegoSensorEnum getSensor();
+
+	LegoEnginePartEnum getPart();
 
 }

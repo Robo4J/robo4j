@@ -18,81 +18,81 @@
 
 package com.robo4j.commons.registry;
 
-import com.robo4j.commons.enums.RegistryTypeEnum;
-import com.robo4j.commons.sensor.GenericSensor;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+
+import com.robo4j.commons.enums.RegistryTypeEnum;
+import com.robo4j.commons.sensor.GenericSensor;
 
 /**
  * @author Miro Kopecky (@miragemiko)
  * @since 28.09.2016
  */
 public final class SensorRegistry implements RoboRegistry<SensorRegistry, GenericSensor> {
-    private static final String PROVIDER_NAME = "sensorProvider";
-    private static volatile SensorRegistry INSTANCE;
-    private AtomicBoolean activate;
-    private Map<String, GenericSensor> sensors;
-    private BaseRegistryProvider provider;
+	private static final String PROVIDER_NAME = "sensorProvider";
+	private static volatile SensorRegistry INSTANCE;
+	private AtomicBoolean activate;
+	private Map<String, GenericSensor> sensors;
+	private BaseRegistryProvider provider;
 
-    private SensorRegistry(){
-        this.sensors = new HashMap<>();
-        this.activate = new AtomicBoolean(false);
-        this.provider = null;
-    }
+	private SensorRegistry() {
+		this.sensors = new HashMap<>();
+		this.activate = new AtomicBoolean(false);
+		this.provider = null;
+	}
 
-    public static SensorRegistry getInstance(){
-        if(INSTANCE == null){
-            synchronized (SensorRegistry.class){
-                if(INSTANCE == null){
-                    INSTANCE = new SensorRegistry();
-                }
-            }
-        }
-        return INSTANCE;
-    }
+	public static SensorRegistry getInstance() {
+		if (INSTANCE == null) {
+			synchronized (SensorRegistry.class) {
+				if (INSTANCE == null) {
+					INSTANCE = new SensorRegistry();
+				}
+			}
+		}
+		return INSTANCE;
+	}
 
-    @Override
-    public SensorRegistry build(Map<String, GenericSensor> sensors) {
-        this.sensors = sensors.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        this.provider = activateProvider();
-        return this;
-    }
+	@Override
+	public SensorRegistry build(Map<String, GenericSensor> sensors) {
+		this.sensors = sensors.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+		this.provider = activateProvider();
+		return this;
+	}
 
-    @Override
-    public GenericSensor getByName(String name) {
-        return sensors.get(name);
-    }
+	@Override
+	public GenericSensor getByName(String name) {
+		return sensors.get(name);
+	}
 
-    @Override
-    public Map<String, GenericSensor> getRegistry() {
-        return sensors;
-    }
+	@Override
+	public Map<String, GenericSensor> getRegistry() {
+		return sensors;
+	}
 
-    @Override
-    public boolean activate() {
-        return !(sensors == null || sensors.isEmpty()) && provider != null && activateSensors();
-    }
+	@Override
+	public boolean activate() {
+		return !(sensors == null || sensors.isEmpty()) && provider != null && activateSensors();
+	}
 
-    @Override
-    public boolean isActive() {
-        return false;
-    }
+	@Override
+	public boolean isActive() {
+		return false;
+	}
 
-    //Private Methods
-    @SuppressWarnings(value = "unchecked")
-    private boolean activateSensors(){
-        boolean result = true;
-        this.sensors = provider.activate(sensors);
-        this.activate.set(result);
-        return result;
-    }
+	// Private Methods
+	@SuppressWarnings(value = "unchecked")
+	private boolean activateSensors() {
+		boolean result = true;
+		this.sensors = provider.activate(sensors);
+		this.activate.set(result);
+		return result;
+	}
 
-    private BaseRegistryProvider activateProvider() {
-        return (BaseRegistryProvider)RegistryManager
-                .getInstance().getItemByRegistry(RegistryTypeEnum.PROVIDER, PROVIDER_NAME);
-    }
+	private BaseRegistryProvider activateProvider() {
+		return (BaseRegistryProvider) RegistryManager.getInstance().getItemByRegistry(RegistryTypeEnum.PROVIDER,
+				PROVIDER_NAME);
+	}
 
 }

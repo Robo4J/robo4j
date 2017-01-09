@@ -26,39 +26,33 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
  * @author Miro Kopecky (@miragemiko)
  * @since 04.05.2016
  */
-public enum  LegoEngineEnum implements RoboHardwareEnum<Character>, RoboSystemConfig {
+public enum LegoEngineEnum implements RoboHardwareEnum<Character>, RoboSystemConfig {
 
-    //@formatter:off
-    //          Type    name
-    NXT        ('N',    "NXTRegulatedMotor"),
-    LARGE      ('L',    "EV3LargeRegulatedMotor"),
-    MEDIUM     ('M',    "EV3MediumRegulatedMotor"),
-    ;
-    //@formatter:on
+	// @formatter:off
+	// Type name
+	NXT('N', "NXTRegulatedMotor"), LARGE('L', "EV3LargeRegulatedMotor"), MEDIUM('M', "EV3MediumRegulatedMotor"),;
+	// @formatter:on
 
-    private char type;
-    private String name;
+	private char type;
+	private String name;
 
-    LegoEngineEnum(char type, String name) {
-        this.type = type;
-        this.name = name;
-    }
+	LegoEngineEnum(char type, String name) {
+		this.type = type;
+		this.name = name;
+	}
 
-    @Override
-    public Character getType() {
-        return type;
-    }
+	@Override
+	public Character getType() {
+		return type;
+	}
 
-    @Override
-    public String getName() {
-        return name;
-    }
+	@Override
+	public String getName() {
+		return name;
+	}
 
-    @Override
-    public String toString() {
-        return "LegoEngineEnum{" +
-                "type=" + type +
-                ", name='" + name + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "LegoEngineEnum{" + "type=" + type + ", name='" + name + '\'' + '}';
+	}
 }

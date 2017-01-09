@@ -26,8 +26,8 @@ import java.lang.annotation.Target;
 
 /**
  *
- * Annotation is used to configure specific engine
- * connected to the robo platform
+ * Annotation is used to configure specific engine connected to the robo
+ * platform
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 04.05.2016
@@ -36,9 +36,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @RoboSystem
-public  @interface RoboMotor {
+public @interface RoboMotor {
 	/**
 	 * @return the unique id of the RoboMotor.
 	 */
-    String id();
+	String id();
 }

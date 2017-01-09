@@ -7,11 +7,13 @@ import org.junit.Test;
  */
 public class FileLoaderTest {
 
-    @Test
-    public void testFileLoader(){
-//        String filePath1 = FileLoader.loadFile(null, "magic.pdf", "pages", "advanced");
-//        String filePath2 = FileLoader.loadFile(null, "magic.pdf", "advanced");
-//        System.out.println("MAGIC1 = " + filePath1);
-//        System.out.println("MAGIC2 = " + filePath2);
-    }
+	@Test
+	public void testFileLoader() {
+		// String filePath1 = FileLoader.loadFile(null, "magic.pdf", "pages",
+		// "advanced");
+		// String filePath2 = FileLoader.loadFile(null, "magic.pdf",
+		// "advanced");
+		// System.out.println("MAGIC1 = " + filePath1);
+		// System.out.println("MAGIC2 = " + filePath2);
+	}
 }

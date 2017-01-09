@@ -19,17 +19,15 @@
 package com.robo4j.commons.unit;
 
 /**
- * Interface implemented by units that contains autonomous
- * behaviour definition
+ * Interface implemented by units that contains autonomous behaviour definition
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 06.11.2016
  */
 public interface BrainUnit {
 
-    boolean isActive();
+	boolean isActive();
 
-    void setActive(boolean state);
-
+	void setActive(boolean state);
 
 }

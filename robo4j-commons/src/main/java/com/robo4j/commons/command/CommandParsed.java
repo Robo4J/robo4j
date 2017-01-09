@@ -25,35 +25,32 @@ package com.robo4j.commons.command;
  */
 public class CommandParsed {
 
-    private CommandTypeEnum type;
-    private String line;
+	private CommandTypeEnum type;
+	private String line;
 
-    public CommandParsed(CommandTypeEnum type, String line) {
-        this.type = type;
-        this.line = line;
-    }
+	public CommandParsed(CommandTypeEnum type, String line) {
+		this.type = type;
+		this.line = line;
+	}
 
-    public CommandTypeEnum getType() {
-        return type;
-    }
+	public CommandTypeEnum getType() {
+		return type;
+	}
 
-    public void setType(CommandTypeEnum type) {
-        this.type = type;
-    }
+	public void setType(CommandTypeEnum type) {
+		this.type = type;
+	}
 
-    public String getLine() {
-        return line;
-    }
+	public String getLine() {
+		return line;
+	}
 
-    public void setLine(String line) {
-        this.line = line;
-    }
+	public void setLine(String line) {
+		this.line = line;
+	}
 
-    @Override
-    public String toString() {
-        return "CommandTypePersed{" +
-                "type=" + type +
-                ", line='" + line + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "CommandTypePersed{" + "type=" + type + ", line='" + line + '\'' + '}';
+	}
 }

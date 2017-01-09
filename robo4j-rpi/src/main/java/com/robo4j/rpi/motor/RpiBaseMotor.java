@@ -19,104 +19,104 @@
 
 package com.robo4j.rpi.motor;
 
+import java.io.IOException;
+
 import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.rpi.util.RpiMotorUtil;
-
-import java.io.IOException;
 
 /**
  * @author Miro Kopecky (@miragemiko)
  * @since 19.12.2016
  */
 public abstract class RpiBaseMotor extends RpiDevice implements RpiMotor {
-    private static final int MOVE = 22;
-    private static final int STOP = 11;
-    protected int address;
-    protected byte port;
-    protected int speed;
-    protected boolean running;
+	private static final int MOVE = 22;
+	private static final int STOP = 11;
+	protected int address;
+	protected byte port;
+	protected int speed;
+	protected boolean running;
 
-    public RpiBaseMotor( int address, byte port, int speed) {
-        this.address = address;
-        this.port = port;
-        this.speed = speed;
-        this.running = false;
+	public RpiBaseMotor(int address, byte port, int speed) {
+		this.address = address;
+		this.port = port;
+		this.speed = speed;
+		this.running = false;
 
-    }
+	}
 
-    @Override
-    public void close() {
-        try {
-            super.close();
-        } catch (IOException e) {
-            throw new RpiMotorException("close ", e);
-        }
-    }
+	@Override
+	public void close() {
+		try {
+			super.close();
+		} catch (IOException e) {
+			throw new RpiMotorException("close ", e);
+		}
+	}
 
-    @Override
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
+	@Override
+	public int getSpeed() {
+		return speed;
+	}
 
-    @Override
-    public int getSpeed() {
-        return speed;
-    }
+	@Override
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
 
-    @Override
-    public byte getPort() {
-        return port;
-    }
+	@Override
+	public byte getPort() {
+		return port;
+	}
 
-    @Override
-    public int getAddress() {
-        return address;
-    }
+	@Override
+	public int getAddress() {
+		return address;
+	}
 
-    @Override
-    public void forward(){
-        try {
-            device.write(RpiMotorUtil.createCommand(port, speed, 1));
-            int status = device.read();
-            SimpleLoggingUtil.debug(getClass(), "forward status: " + status);
-            running = status == MOVE;
-        } catch (IOException e) {
-            throw new RpiMotorException("forward ", e);
-        }
-    }
+	@Override
+	public void forward() {
+		try {
+			device.write(RpiMotorUtil.createCommand(port, speed, 1));
+			int status = device.read();
+			SimpleLoggingUtil.debug(getClass(), "forward status: " + status);
+			running = status == MOVE;
+		} catch (IOException e) {
+			throw new RpiMotorException("forward ", e);
+		}
+	}
 
-    @Override
-    public void backward() {
-        try {
-            device.write(RpiMotorUtil.createCommand(port, speed, 2));
-            int status = device.read();
-            SimpleLoggingUtil.debug(getClass(), "backward status: " + status);
-            running = status == MOVE;
-        } catch (IOException e) {
-            throw new RpiMotorException("backward ", e);
-        }
-    }
+	@Override
+	public void backward() {
+		try {
+			device.write(RpiMotorUtil.createCommand(port, speed, 2));
+			int status = device.read();
+			SimpleLoggingUtil.debug(getClass(), "backward status: " + status);
+			running = status == MOVE;
+		} catch (IOException e) {
+			throw new RpiMotorException("backward ", e);
+		}
+	}
 
-    @Override
-    public void stop() {
-        try {
-            device.write(RpiMotorUtil.createCommand(port, speed, 0));
-            int status = device.read();
-            SimpleLoggingUtil.debug(getClass(), "stop status: " + status);
-            running = status == STOP;
-        } catch (IOException e) {
-            throw new RpiMotorException("stop ", e);
-        }
-    }
+	@Override
+	public void stop() {
+		try {
+			device.write(RpiMotorUtil.createCommand(port, speed, 0));
+			int status = device.read();
+			SimpleLoggingUtil.debug(getClass(), "stop status: " + status);
+			running = status == STOP;
+		} catch (IOException e) {
+			throw new RpiMotorException("stop ", e);
+		}
+	}
 
-    @Override
-    public void rotate(int val) {
-        throw new RpiMotorException("rotate not implemented");
-    }
+	@Override
+	public void rotate(int val) {
+		throw new RpiMotorException("rotate not implemented");
+	}
 
-    @Override
-    public boolean isMoving() {
-        SimpleLoggingUtil.debug(getClass(), "isMoving: " + running);
-        return running;
-    }
+	@Override
+	public boolean isMoving() {
+		SimpleLoggingUtil.debug(getClass(), "isMoving: " + running);
+		return running;
+	}
 }

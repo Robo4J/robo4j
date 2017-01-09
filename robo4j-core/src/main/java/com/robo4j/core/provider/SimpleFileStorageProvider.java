@@ -18,15 +18,15 @@
 
 package com.robo4j.core.provider;
 
-import com.robo4j.core.client.io.ClientException;
-import com.robo4j.core.dto.SensorDTO;
-
 import java.util.concurrent.Exchanger;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.robo4j.core.client.io.ClientException;
+import com.robo4j.core.dto.SensorDTO;
 
 /**
  * Sensor Data are stored into the file
@@ -36,51 +36,51 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public final class SimpleFileStorageProvider {
 
-    private static volatile SimpleFileStorageProvider INSTANCE;
-    private volatile AtomicBoolean active;
-    private ExecutorService executor;
-    private Exchanger<String> exchanger;
-    private Future<Boolean> writerFuture;
+	private static volatile SimpleFileStorageProvider INSTANCE;
+	private volatile AtomicBoolean active;
+	private ExecutorService executor;
+	private Exchanger<String> exchanger;
+	private Future<Boolean> writerFuture;
 
-    private SimpleFileStorageProvider(){
-        this.executor = Executors.newSingleThreadExecutor();
-        this.exchanger = new Exchanger<>();
-        this.active = new AtomicBoolean(true);
-        writerFuture = executor.submit(new SimpleFileWriter(active, exchanger));
-    }
+	private SimpleFileStorageProvider() {
+		this.executor = Executors.newSingleThreadExecutor();
+		this.exchanger = new Exchanger<>();
+		this.active = new AtomicBoolean(true);
+		writerFuture = executor.submit(new SimpleFileWriter(active, exchanger));
+	}
 
-    public static SimpleFileStorageProvider getInstance(){
-        if(INSTANCE == null){
-            synchronized (SimpleFileStorageProvider.class){
-                if(INSTANCE == null){
-                    INSTANCE = new SimpleFileStorageProvider();
-                }
-            }
-        }
-        return INSTANCE;
-    }
+	public static SimpleFileStorageProvider getInstance() {
+		if (INSTANCE == null) {
+			synchronized (SimpleFileStorageProvider.class) {
+				if (INSTANCE == null) {
+					INSTANCE = new SimpleFileStorageProvider();
+				}
+			}
+		}
+		return INSTANCE;
+	}
 
-    public SensorDTO store(SensorDTO data){
-        try {
-            exchanger.exchange(data.toString());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return data;
-    }
+	public SensorDTO store(SensorDTO data) {
+		try {
+			exchanger.exchange(data.toString());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return data;
+	}
 
-    public void close(){
-        active.set(false);
-        try {
-            boolean state = writerFuture.get();
-            if(state){
-                executor.shutdown();
-            } else {
-                throw new ClientException("Simple File Storage Writer closing ISSUE ");
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new ClientException("Simple File Storage CLOSE: ", e);
-        }
-    }
+	public void close() {
+		active.set(false);
+		try {
+			boolean state = writerFuture.get();
+			if (state) {
+				executor.shutdown();
+			} else {
+				throw new ClientException("Simple File Storage Writer closing ISSUE ");
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			throw new ClientException("Simple File Storage CLOSE: ", e);
+		}
+	}
 
 }

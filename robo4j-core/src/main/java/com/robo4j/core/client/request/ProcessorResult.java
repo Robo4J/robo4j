@@ -29,34 +29,30 @@ import com.robo4j.core.client.enums.RequestUnitTypeEnum;
  */
 public final class ProcessorResult {
 
-    private RequestUnitTypeEnum type;
-    private RequestUnitStatusEnum status;
-    private String message;
+	private RequestUnitTypeEnum type;
+	private RequestUnitStatusEnum status;
+	private String message;
 
-    public ProcessorResult(RequestUnitTypeEnum type, RequestUnitStatusEnum status, String message) {
-        this.type = type;
-        this.status = status;
-        this.message = message;
-    }
+	public ProcessorResult(RequestUnitTypeEnum type, RequestUnitStatusEnum status, String message) {
+		this.type = type;
+		this.status = status;
+		this.message = message;
+	}
 
-    public RequestUnitTypeEnum getType() {
-        return type;
-    }
+	public RequestUnitTypeEnum getType() {
+		return type;
+	}
 
-    public RequestUnitStatusEnum getStatus() {
-        return status;
-    }
+	public RequestUnitStatusEnum getStatus() {
+		return status;
+	}
 
-    public String getMessage() {
-        return message;
-    }
+	public String getMessage() {
+		return message;
+	}
 
-    @Override
-    public String toString() {
-        return "ProcessorResult{" +
-                "type=" + type +
-                ", status=" + status +
-                ", message='" + message + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "ProcessorResult{" + "type=" + type + ", status=" + status + ", message='" + message + '\'' + '}';
+	}
 }

@@ -25,7 +25,7 @@ package com.robo4j.hw.rpi;
  */
 public class RpiHwMain {
 
-    public static void main(String[] args) {
-        System.out.println("RapsberryPi HardwarePackage");
-    }
+	public static void main(String[] args) {
+		System.out.println("RapsberryPi HardwarePackage");
+	}
 }

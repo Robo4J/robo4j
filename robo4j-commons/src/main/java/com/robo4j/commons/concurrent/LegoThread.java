@@ -22,65 +22,65 @@ import java.util.Date;
 
 /**
  *
- * Lego Thread stores the creation date, the start date and the finish date of the Thread. It provides a
- * method that calculates the execution time fo the thread. Overrides the toString method to return
- * information about the creationDate and the execution time of the thread
+ * Lego Thread stores the creation date, the start date and the finish date of
+ * the Thread. It provides a method that calculates the execution time fo the
+ * thread. Overrides the toString method to return information about the
+ * creationDate and the execution time of the thread
  *
  * @author Miro Kopecky (@miragemiko)
  * @since 03.04.2016
  */
 public class LegoThread extends Thread {
 
+	/**
+	 * Creation Date
+	 */
+	private Date creationDate;
 
-    /**
-     * Creation Date
-     */
-    private Date creationDate;
+	/**
+	 * Start date fo the thread
+	 */
+	private Date startDate;
 
-    /**
-     * Start date fo the thread
-     */
-    private Date startDate;
+	/**
+	 * Finish date of the thread
+	 */
+	private Date finishDate;
 
-    /**
-     * Finish date of the thread
-     */
-    private Date finishDate;
+	public LegoThread(Runnable target, String name) {
+		super(target, name);
+		setCreationDate();
+	}
 
-    public LegoThread(Runnable target, String name){
-        super(target, name);
-        setCreationDate();
-    }
+	@Override
+	public void run() {
+		setStartDate();
+		super.run();
+		setFinishDate();
+	}
 
-    @Override
-    public void run(){
-        setStartDate();
-        super.run();
-        setFinishDate();
-    }
+	public long getExecutionTime() {
+		return finishDate.getTime() - startDate.getTime();
+	}
 
-    public long getExecutionTime(){
-        return finishDate.getTime() - startDate.getTime();
-    }
+	public void setCreationDate() {
+		this.creationDate = new Date();
+	}
 
-    public void setCreationDate() {
-        this.creationDate = new Date();
-    }
+	public void setStartDate() {
+		this.startDate = new Date();
+	}
 
-    public void setStartDate() {
-        this.startDate = new Date();
-    }
+	public void setFinishDate() {
+		this.finishDate = new Date();
+	}
 
-    public void setFinishDate() {
-        this.finishDate = new Date();
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(getName());
-        builder.append(": ").append(" CreationDate= ").append(creationDate);
-        builder.append(" : Running Time= ").append(getExecutionTime()).append(" Milliseconds");
-        return builder.toString();
-    }
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(getName());
+		builder.append(": ").append(" CreationDate= ").append(creationDate);
+		builder.append(" : Running Time= ").append(getExecutionTime()).append(" Milliseconds");
+		return builder.toString();
+	}
 }

@@ -26,34 +26,28 @@ package com.robo4j.core.client.enums;
  */
 public enum RequestStatusEnum {
 
-    //formatter:off
-    NONE          (-1, "none"),
-    EXIT          (0, "exit"),
-    ACTIVE        (1, "active"),
-    ;
-    //formatter:on
+	// formatter:off
+	NONE(-1, "none"), EXIT(0, "exit"), ACTIVE(1, "active"),;
+	// formatter:on
 
-    private int code;
-    private String desc;
+	private int code;
+	private String desc;
 
-    RequestStatusEnum(int code, String desc) {
-        this.code = code;
-        this.desc = desc;
-    }
+	RequestStatusEnum(int code, String desc) {
+		this.code = code;
+		this.desc = desc;
+	}
 
-    public int getCode() {
-        return code;
-    }
+	public int getCode() {
+		return code;
+	}
 
-    public String getDesc() {
-        return desc;
-    }
+	public String getDesc() {
+		return desc;
+	}
 
-    @Override
-    public String toString() {
-        return "RequestStatusEnum{" +
-                "code=" + code +
-                ", desc='" + desc + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "RequestStatusEnum{" + "code=" + code + ", desc='" + desc + '\'' + '}';
+	}
 }

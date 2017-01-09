@@ -26,35 +26,31 @@ import java.time.LocalDateTime;
  */
 public class SensorDTO {
 
-    private final String timestamp;
-    private final String sensor;
-    private final String message;
+	private final String timestamp;
+	private final String sensor;
+	private final String message;
 
+	public SensorDTO(String sensor, String message) {
+		this.timestamp = LocalDateTime.now().toString();
+		this.sensor = sensor;
+		this.message = message;
+	}
 
-    public SensorDTO(String sensor, String message) {
-        this.timestamp = LocalDateTime.now().toString();
-        this.sensor = sensor;
-        this.message = message;
-    }
+	public String getTimestamp() {
+		return timestamp;
+	}
 
-    public String getTimestamp() {
-        return timestamp;
-    }
+	public String getSensor() {
+		return sensor;
+	}
 
-    public String getSensor() {
-        return sensor;
-    }
+	public String getMessage() {
+		return message;
+	}
 
-    public String getMessage() {
-        return message;
-    }
-
-    @Override
-    public String toString() {
-        return "SensorDTO{" +
-                "timestamp='" + timestamp + '\'' +
-                ", sensor='" + sensor + '\'' +
-                ", message='" + message + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "SensorDTO{" + "timestamp='" + timestamp + '\'' + ", sensor='" + sensor + '\'' + ", message='" + message
+				+ '\'' + '}';
+	}
 }

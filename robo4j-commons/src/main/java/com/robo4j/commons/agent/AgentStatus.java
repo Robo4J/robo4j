@@ -29,31 +29,28 @@ import java.util.List;
  */
 public class AgentStatus<T> {
 
-    private AgentStatusEnum status;
-    private List<T> messages;
+	private AgentStatusEnum status;
+	private List<T> messages;
 
-    public AgentStatus(AgentStatusEnum status) {
-        this.status = status;
-        this.messages = new LinkedList<>();
-    }
+	public AgentStatus(AgentStatusEnum status) {
+		this.status = status;
+		this.messages = new LinkedList<>();
+	}
 
-    public AgentStatusEnum getStatus(){
-        return status;
-    }
+	public AgentStatusEnum getStatus() {
+		return status;
+	}
 
-    public void addMessage(T message){
-        messages.add(message);
-    }
+	public void addMessage(T message) {
+		messages.add(message);
+	}
 
-    public List<T> getMessages() {
-        return messages;
-    }
+	public List<T> getMessages() {
+		return messages;
+	}
 
-    @Override
-    public String toString() {
-        return "AgentStatus{" +
-                "status=" + status +
-                ", messages=" + messages +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "AgentStatus{" + "status=" + status + ", messages=" + messages + '}';
+	}
 }

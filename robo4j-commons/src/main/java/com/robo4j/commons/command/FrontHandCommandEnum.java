@@ -18,10 +18,10 @@
 
 package com.robo4j.commons.command;
 
-import com.robo4j.commons.enums.RoboHardwareEnum;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import com.robo4j.commons.enums.RoboHardwareEnum;
 
 /**
  * @author Miro Kopecky (@miragemiko)
@@ -29,61 +29,55 @@ import java.util.Map;
  */
 public enum FrontHandCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum> {
 
-    //@formatter:off
-    EXIT            (0, "exit"),
-    COMMAND         (1, "command"),
-    ;
-    //@formatter:on
+	// @formatter:off
+	EXIT(0, "exit"), COMMAND(1, "command"),;
+	// @formatter:on
 
-    private int code;
-    private String name;
+	private volatile static Map<Integer, FrontHandCommandEnum> codeToLegoCommandTypeMapping;
+	private volatile static Map<String, FrontHandCommandEnum> codeToLegoCommandNameMapping;
+	private int code;
+	private String name;
 
-    private volatile static Map<Integer, FrontHandCommandEnum> codeToLegoCommandTypeMapping;
-    private volatile static Map<String, FrontHandCommandEnum> codeToLegoCommandNameMapping;
+	FrontHandCommandEnum(int c, String name) {
+		this.code = c;
+		this.name = name;
+	}
 
+	private static void initMapping() {
+		codeToLegoCommandTypeMapping = new HashMap<>();
+		codeToLegoCommandNameMapping = new HashMap<>();
+		for (FrontHandCommandEnum ct : values()) {
+			codeToLegoCommandTypeMapping.put(ct.getCode(), ct);
+			codeToLegoCommandNameMapping.put(ct.getName(), ct);
+		}
+	}
 
-    FrontHandCommandEnum(int c, String name){
-        this.code = c;
-        this.name = name;
-    }
+	public static FrontHandCommandEnum getCommand(int code) {
+		if (codeToLegoCommandTypeMapping == null)
+			initMapping();
 
-    private static void initMapping(){
-        codeToLegoCommandTypeMapping = new HashMap<>();
-        codeToLegoCommandNameMapping = new HashMap<>();
-        for(FrontHandCommandEnum ct: values()){
-            codeToLegoCommandTypeMapping.put(ct.getCode(), ct);
-            codeToLegoCommandNameMapping.put(ct.getName(), ct);
-        }
-    }
+		return codeToLegoCommandTypeMapping.get(code);
+	}
 
-    public int getCode() {
-        return code;
-    }
+	public static FrontHandCommandEnum getCommand(String code) {
+		if (codeToLegoCommandNameMapping == null)
+			initMapping();
 
-    @Override
-    public String getName() {
-        return name;
-    }
+		return codeToLegoCommandNameMapping.get(code);
+	}
 
-    @Override
-    public CommandTypeEnum getType() {
-        return CommandTypeEnum.HAND;
-    }
+	public int getCode() {
+		return code;
+	}
 
+	@Override
+	public String getName() {
+		return name;
+	}
 
-    public static FrontHandCommandEnum getCommand(int code){
-        if(codeToLegoCommandTypeMapping == null)
-            initMapping();
-
-        return codeToLegoCommandTypeMapping.get(code);
-    }
-
-    public static FrontHandCommandEnum getCommand(String code){
-        if(codeToLegoCommandNameMapping == null)
-            initMapping();
-
-        return codeToLegoCommandNameMapping.get(code);
-    }
-
+	@Override
+	public CommandTypeEnum getType() {
+		return CommandTypeEnum.HAND;
+	}
 
 }

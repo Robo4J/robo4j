@@ -23,33 +23,33 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Robo4j thread factory
-
+ * 
  * @author Miro Kopecky (@miragemiko)
  * @since 07.04.2016
  */
 public class LegoThreadFactory implements ThreadFactory {
 
-    /**
-     * Attribute to store the number of threads creates by the Factory
-     */
-    private AtomicInteger counter;
+	/**
+	 * Attribute to store the number of threads creates by the Factory
+	 */
+	private AtomicInteger counter;
 
-    /**
-     * Prefix to use in the name of the the threads create by the factory
-     */
-    private String prefix;
+	/**
+	 * Prefix to use in the name of the the threads create by the factory
+	 */
+	private String prefix;
 
-    /**
-     * Constructor that initiates attributes
-     */
-    public LegoThreadFactory(String prefix){
-        this.prefix = prefix;
-        counter = new AtomicInteger(1);
-    }
+	/**
+	 * Constructor that initiates attributes
+	 */
+	public LegoThreadFactory(String prefix) {
+		this.prefix = prefix;
+		counter = new AtomicInteger(1);
+	}
 
-    @Override
-    public Thread newThread(Runnable r) {
-        return new LegoThread(r, prefix + "-" + counter.getAndIncrement());
-    }
+	@Override
+	public Thread newThread(Runnable r) {
+		return new LegoThread(r, prefix + "-" + counter.getAndIncrement());
+	}
 
 }
