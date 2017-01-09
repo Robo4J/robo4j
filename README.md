@@ -13,6 +13,7 @@ See currnet [Robo4j documentation][]
 
 ## Building from Source
 The Robo4j framework uses a [Gradle][] building system
+note:: it's necessary to specify local maven repository in file _**libraries.gradle**_, variable: _mavenRepository_
 > **Note:** Ensure that you have JDK 8 configured properly in your IDE.
 
 ## Requirements
@@ -20,13 +21,14 @@ The Robo4j framework uses a [Gradle][] building system
 
 ## Staying in Touch
 Follow [@robo4j][] or authors: [@miragemiko] , [@hirt][]
-on Twitter. In-depth articles can be found at [Robo4j.io][] or [miragemiko blog][]
+on Twitter. In-depth articles can be found at [Robo4j.io][], [miragemiko blog] or [marcus blog][]
 
 ## License
 The Robo4j.io Framework is released under version 3.0 of the [General Public License][].
 
 [Robo4j.io]: http://www.robo4j.io
 [miragemiko blog]: http://www.miroslavkopecky.com
+[marcus blog]: http://hirt.se/blog/
 [General Public License]: http://www.gnu.org/licenses/gpl-3.0-standalone.html0
 [@robo4j]: https://twitter.com/robo4j
 [@miragemiko]: https://twitter.com/miragemiko
