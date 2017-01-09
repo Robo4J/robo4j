@@ -83,7 +83,7 @@ project("robo4j-hw-rpi"){
     uploadArchives {
         repositories {
             mavenDeployer {
-                repository(url: "file://Users/miroslavkopecky/.m2/repository")
+                repository(url: "${mavenRepository}")
             }
         }
     }
@@ -115,13 +115,13 @@ project("robo4j-lego"){
     uploadArchives {
         repositories {
             mavenDeployer {
-                repository(url: "file://Users/miroslavkopecky/.m2/repository")
+                repository(url: "${mavenRepository}")
             }
         }
     }
 
     dependencies {
-        compile "lejos:ev3classes:${lejosVersion}@jar"
+        compileOnly "lejos:ev3classes:${lejosVersion}"
         compile(project(":robo4j-commons"))
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
@@ -196,7 +196,7 @@ project("robo4j-rpi"){
     uploadArchives {
         repositories {
             mavenDeployer {
-                repository(url: "file://Users/miroslavkopecky/.m2/repository")
+                repository(url: "${mavenRepository}")
             }
         }
     }
