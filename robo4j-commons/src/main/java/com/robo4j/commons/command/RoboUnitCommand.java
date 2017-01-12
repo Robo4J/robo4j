@@ -1,5 +1,5 @@
 /*
- * Copyright (C)  2016. Miroslav Kopecky
+ * Copyright (C)  2016. Miroslav Wengner and Marcus Hirt
  * This RoboUnitCommand.java  is part of robo4j.
  *
  *  robo4j is free software: you can redistribute it and/or modify
