@@ -160,7 +160,7 @@ project("robo4j-math") {
     apply plugin: 'eclipse'
     apply plugin: 'maven'
 
-    sourceCompatibility = 1.8
+    sourceCompatibility = 1.7
 
     repositories {
         mavenCentral()
