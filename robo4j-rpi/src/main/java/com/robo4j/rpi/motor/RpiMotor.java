@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016. Miroslav Kopecky
+ * Copyright (C) 2016. Miroslav Wengner and Marcus Hirt
  * This RpiMotor.java  is part of robo4j.
  * module: robo4j-rpi
  *
