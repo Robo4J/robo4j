@@ -149,6 +149,30 @@ project("robo4j-lego") {
     }
 }
 
+project("robo4j-math") {
+    description = "Robo4j-Math"
+
+    group 'com.robo4j'
+    version "${robo4jVersion}"
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+}
+
 
 project("robo4j-http") {
     description = "Robo4j-Http"

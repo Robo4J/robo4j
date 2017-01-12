@@ -5,3 +5,15 @@ robo4j-line/src/test/
 licence.idea
 !/licence.idea
 *.bak
+robo4j-commons/src/main/resources/
+robo4j-commons/src/test/resources/
+robo4j-http/src/main/resources/
+robo4j-http/src/test/
+robo4j-hw-rpi/src/main/resources/
+robo4j-hw-rpi/src/test/
+robo4j-lego/src/main/resources/
+robo4j-lego/src/test/
+robo4j-page/src/main/resources/
+robo4j-page/src/test/resources/
+robo4j-rpi/src/main/resources/
+robo4j-rpi/src/test/
