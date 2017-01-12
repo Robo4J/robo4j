@@ -45,7 +45,7 @@ import com.robo4j.core.util.ConstantUtil;
  *
  * Basic Http constants and utils methods
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 23.05.2016
  */
 public final class HttpUtils {

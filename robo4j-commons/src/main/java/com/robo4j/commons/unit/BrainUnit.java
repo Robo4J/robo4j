@@ -21,7 +21,7 @@ package com.robo4j.commons.unit;
 /**
  * Interface implemented by units that contains autonomous behaviour definition
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 06.11.2016
  */
 public interface BrainUnit {

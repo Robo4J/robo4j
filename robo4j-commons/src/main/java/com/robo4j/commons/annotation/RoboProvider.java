@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * RoboProvider is responsible for registering hardware unit types and its
  * initiation to the eco-system
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 03.12.2016
  */
 @Target(ElementType.TYPE)

@@ -75,7 +75,7 @@ import com.robo4j.page.PageParser;
 /**
  * Request Factory Should be Singleton Request Factory looks like Unit
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 24.05.2016
  */
 public final class RequestProcessorFactory {

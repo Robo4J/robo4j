@@ -24,7 +24,7 @@ import com.robo4j.commons.service.GenericService;
  * LegoService interface provides reference to the functionality provided by the
  * system as default
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 27.09.2016
  */
 public interface LegoService extends GenericService {

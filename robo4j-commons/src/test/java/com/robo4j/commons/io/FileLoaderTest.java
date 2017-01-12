@@ -3,7 +3,8 @@ package com.robo4j.commons.io;
 import org.junit.Test;
 
 /**
- * Created by miroslavkopecky on 13/06/16.
+ * @author Miro Wengner (@miragemiko)
+ * @since 13.06.2016
  */
 public class FileLoaderTest {
 

@@ -23,7 +23,7 @@ import com.robo4j.core.util.ConstantUtil;
 
 /**
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 10.06.2016
  */
 public class ClientCommandProperties implements CommandProperties {

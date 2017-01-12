@@ -25,7 +25,7 @@ import com.robo4j.core.client.enums.RequestCommandEnum;
  * RoboUnit doesn't included the definition of the process method. Reason
  * because process can be done by Agent without human input
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 10.06.2016
  */
 public interface CommandProvider {

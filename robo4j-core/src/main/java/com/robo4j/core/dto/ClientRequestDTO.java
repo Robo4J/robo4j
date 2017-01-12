@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Client Request DTO is holding information about the parsed request
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 06.11.2016
  */
 public class ClientRequestDTO {

@@ -31,7 +31,7 @@ import com.robo4j.core.dto.SensorDTO;
 /**
  * Sensor Data are stored into the file
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 14.10.2016
  */
 public final class SimpleFileStorageProvider {

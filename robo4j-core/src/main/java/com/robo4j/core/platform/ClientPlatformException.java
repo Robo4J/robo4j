@@ -20,7 +20,7 @@
 package com.robo4j.core.platform;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 05.07.2016
  */
 public class ClientPlatformException extends RuntimeException {

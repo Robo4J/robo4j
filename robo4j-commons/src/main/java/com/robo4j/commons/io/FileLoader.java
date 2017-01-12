@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  *
  * Load file from resources as output stream
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 13.06.2016
  */
 public final class FileLoader {

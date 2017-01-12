@@ -21,7 +21,7 @@ package com.robo4j.commons.command;
 /**
  * Robot Unit Command is command abstraction used by unit
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 03.07.2016
  */
 public interface RoboUnitCommand extends RoboCoreCommand {

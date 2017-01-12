@@ -25,7 +25,7 @@ import java.util.List;
  *
  * Commonly used constants
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 09.06.2016
  */
 public final class ConstantUtil {

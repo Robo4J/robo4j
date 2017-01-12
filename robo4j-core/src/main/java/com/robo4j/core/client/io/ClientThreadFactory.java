@@ -22,7 +22,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 07.04.2016
  */
 public class ClientThreadFactory implements ThreadFactory {

@@ -32,7 +32,7 @@ import com.robo4j.core.client.util.ExecutorTaskDetails;
 
 /**
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 28.02.2016
  */
 public class ClientHTTPExecutor extends ThreadPoolExecutor {

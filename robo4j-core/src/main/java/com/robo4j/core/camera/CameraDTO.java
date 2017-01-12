@@ -24,7 +24,7 @@ import java.util.Arrays;
  * Camera DTO file 1. contains image byte[] 2. additional information ->
  * preprocessing
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 11.10.2016
  */
 public class CameraDTO {

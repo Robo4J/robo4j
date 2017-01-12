@@ -21,7 +21,7 @@ package com.robo4j.lego.util;
 /**
  * Utils helps to adjust command angle, movement
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 09.07.2016
  */
 public final class LegoPlatformUtil {

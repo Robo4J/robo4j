@@ -26,7 +26,7 @@ import com.robo4j.core.dto.ClientCommandRequestDTO;
 /**
  * there is available only one CommandSerial bus
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 30.10.2016
  */
 public final class CommandSerialBus {

@@ -24,7 +24,7 @@ import java.io.InputStream;
  *
  * interface represents resources
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 23.05.2016
  */
 public interface Resource {

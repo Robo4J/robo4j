@@ -23,7 +23,7 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
 
 /**
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 05.05.2016
  */
 public enum LegoEnginePartEnum implements RoboHardwareEnum<String>, RoboSystemConfig {

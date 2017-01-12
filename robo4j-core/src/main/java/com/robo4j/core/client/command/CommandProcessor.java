@@ -35,7 +35,7 @@ import com.robo4j.core.util.ConstantUtil;
  *
  * Command Processor is singleton Command Processor is producer
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 09.06.2016
  */
 public final class CommandProcessor implements AgentProducer, Runnable {

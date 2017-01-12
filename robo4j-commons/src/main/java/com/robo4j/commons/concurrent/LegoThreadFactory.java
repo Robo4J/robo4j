@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Robo4j thread factory
  * 
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 07.04.2016
  */
 public class LegoThreadFactory implements ThreadFactory {

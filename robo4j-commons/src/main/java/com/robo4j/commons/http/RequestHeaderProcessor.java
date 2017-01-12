@@ -24,7 +24,7 @@ import java.util.Map;
  *
  * helper class for processing HTTP requests
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 23.05.2016
  */
 public final class RequestHeaderProcessor {

@@ -25,7 +25,7 @@ import com.robo4j.lego.enums.LegoEnginePartEnum;
 
 /**
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 05.05.2016
  */
 public interface LegoEngine extends GenericMotor {

@@ -32,7 +32,7 @@ import com.robo4j.core.client.ClientHTTPExecutor;
 
 /**
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 09.06.2016
  */
 public abstract class AbstractClient<FutureType> {

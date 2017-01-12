@@ -21,7 +21,7 @@ package com.robo4j.core.client.enums;
 /**
  * Request Status is the resul done by the Request
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 13.11.2016
  */
 public enum RequestStatusEnum {

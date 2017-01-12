@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.robo4j.commons.unit.GenericUnit;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 28.09.2016
  */
 public final class UnitRegistry implements RoboRegistry<UnitRegistry, GenericUnit> {

@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 03.12.2016
  */
 public final class ProviderRegistry implements RoboRegistry<ProviderRegistry, BaseRegistryProvider> {

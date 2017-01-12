@@ -27,7 +27,7 @@ import com.robo4j.lego.enums.LegoSensorPortEnum;
 import lejos.hardware.sensor.BaseSensor;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 26.11.2016
  */
 public abstract class LegoSensorWrapper<SensorType extends BaseSensor> implements GenericSensor, LegoSensor {

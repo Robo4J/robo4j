@@ -27,7 +27,7 @@ import java.util.Date;
  * thread. Overrides the toString method to return information about the
  * creationDate and the execution time of the thread
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 03.04.2016
  */
 public class LegoThread extends Thread {

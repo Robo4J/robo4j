@@ -33,7 +33,7 @@ import com.robo4j.http.dto.RequestDTO;
  *
  * Parsing URL
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 17.10.2016
  */
 public final class URIParser {
