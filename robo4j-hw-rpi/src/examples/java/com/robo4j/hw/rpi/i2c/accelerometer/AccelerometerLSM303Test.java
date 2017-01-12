@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import com.robo4j.hw.rpi.geometry.Float3D;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
-import com.robo4j.hw.rpi.i2c.accelerometer.AccelerometerLSM303Device;
 
 /**
  * Example useful to check if your accelerometer is working properly.

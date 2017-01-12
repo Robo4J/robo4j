@@ -33,9 +33,11 @@ import com.robo4j.commons.util.CommandUtil;
 public enum CommandTypeEnum implements RoboHardwareEnum<Integer> {
 
 	// @formatter:off
-	BATCH(0, "B".concat(CommandUtil.getElementClose())), DIRECT(1, "D".concat(CommandUtil.getElementClose())), HAND(2,
-			"H".concat(CommandUtil.getElementClose())), COMPLEX(3,
-					"C".concat(CommandUtil.getElementClose())), ACTIVE(4, "A".concat(CommandUtil.getElementClose())),;
+	BATCH		(0, "B".concat(CommandUtil.getElementClose())),
+	DIRECT		(1, "D".concat(CommandUtil.getElementClose())),
+	HAND		(2, "H".concat(CommandUtil.getElementClose())),
+	COMPLEX		(3,	"C".concat(CommandUtil.getElementClose())),
+	ACTIVE		(4, "A".concat(CommandUtil.getElementClose())),;
 	// @formatter:on
 
 	private volatile static Map<String, CommandTypeEnum> defToCommandTypeMapping;

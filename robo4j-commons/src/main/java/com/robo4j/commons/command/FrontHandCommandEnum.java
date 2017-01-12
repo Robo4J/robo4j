@@ -30,7 +30,9 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
 public enum FrontHandCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum> {
 
 	// @formatter:off
-	EXIT(0, "exit"), COMMAND(1, "command"),;
+	EXIT(0, "exit"),
+	COMMAND(1, "command"),
+	;
 	// @formatter:on
 
 	private volatile static Map<Integer, FrontHandCommandEnum> codeToLegoCommandTypeMapping;

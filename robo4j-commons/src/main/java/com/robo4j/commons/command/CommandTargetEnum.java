@@ -32,7 +32,11 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
 public enum CommandTargetEnum implements RoboHardwareEnum<Integer> {
 
 	// @formatter:off
-	SYSTEM(0, "system"), PLATFORM(1, "platform"), HAND_UNIT(2, "hand_unit"), FRONT_UNIT(3, "front_unit"),;
+	SYSTEM			(0, "system"),
+	PLATFORM		(1, "platform"),
+	HAND_UNIT		(2, "hand_unit"),
+	FRONT_UNIT		(3, "front_unit"),
+	;
 	// @formatter:on
 
 	private volatile static Map<String, CommandTargetEnum> defToCommandTargetMapping;
