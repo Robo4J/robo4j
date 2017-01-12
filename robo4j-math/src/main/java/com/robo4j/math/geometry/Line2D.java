@@ -14,19 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.geometry;
+package com.robo4j.math.geometry;
 
 /**
- * 3D vector of ints.
- * 
+ * A line in two dimensions.
+ *  
  * @author Marcus Hirt
  */
-public class Int3D {
-	public int x;
-	public int y;
-	public int z;
+public class Line2D {
+	private final Point2D p1;
+	private final Point2D p2;
 	
-	public String toString() {
-		return "x:" + x + " y:" + y +  " z:" + z;
+	public Line2D(Point2D p1, Point2D p2) {
+		this.p1 = p1;
+		this.p2 = p2;
+	}
+
+	public Point2D getP1() {
+		return p1;
+	}
+
+	public Point2D getP2() {
+		return p2;
 	}
 }

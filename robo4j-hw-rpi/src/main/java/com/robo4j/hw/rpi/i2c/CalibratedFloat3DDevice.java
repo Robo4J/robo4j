@@ -2,7 +2,7 @@ package com.robo4j.hw.rpi.i2c;
 
 import java.io.IOException;
 
-import com.robo4j.hw.rpi.geometry.Float3D;
+import com.robo4j.math.geometry.Float3D;
 
 /**
  * Wrapper class for readable devices returning Float3D, allowing for calibration.
