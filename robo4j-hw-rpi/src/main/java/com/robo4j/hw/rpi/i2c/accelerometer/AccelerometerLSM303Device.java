@@ -3,9 +3,9 @@ package com.robo4j.hw.rpi.i2c.accelerometer;
 import java.io.IOException;
 
 import com.pi4j.io.i2c.I2CBus;
-import com.robo4j.hw.rpi.geometry.Float3D;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
+import com.robo4j.math.geometry.Float3D;
 
 /**
  * Abstraction for reading data from a LSM303 accelerometer, for example the one

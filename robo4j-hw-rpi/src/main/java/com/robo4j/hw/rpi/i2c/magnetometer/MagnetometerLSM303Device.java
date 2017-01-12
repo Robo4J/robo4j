@@ -19,9 +19,9 @@ package com.robo4j.hw.rpi.i2c.magnetometer;
 import java.io.IOException;
 
 import com.pi4j.io.i2c.I2CBus;
-import com.robo4j.hw.rpi.geometry.Float3D;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
+import com.robo4j.math.geometry.Float3D;
 
 /**
  * Represents a LSM303 magnetometer, for example the one on the Adafruit IMU

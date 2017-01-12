@@ -23,6 +23,7 @@ import java.io.IOException;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
+import com.robo4j.hw.rpi.i2c.bmp.BMP085Device.OperatingMode;
 
 /**
  * Abstraction to read a Bosch digital barometric pressure sensor (BMP085/BMP180).
