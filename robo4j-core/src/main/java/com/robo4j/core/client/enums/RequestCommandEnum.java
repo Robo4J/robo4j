@@ -40,12 +40,21 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
  */
 public enum RequestCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum> {
 
-	// @formatter:on
-	EXIT(0, SYSTEM, "exit"), MOVE(1, PLATFORM, "move"), RIGHT(2, PLATFORM, "right"), LEFT(3, PLATFORM, "left"), BACK(4,
-			PLATFORM, "back"), STOP(5, PLATFORM, "stop"), HAND(6, HAND_UNIT,
-					"hand"), FRONT_LEFT(7, FRONT_UNIT, "front_left"), FRONT_RIGHT(8, FRONT_UNIT, "front_right"),;
-	private volatile static Map<Integer, RequestCommandEnum> codeToLegoCommandCodeMapping;
 	// @formatter:off
+	EXIT		(0, 	SYSTEM, "exit"),
+	MOVE		(1, 	PLATFORM, "move"),
+	RIGHT		(2, 	PLATFORM, "right"),
+	LEFT		(3, 	PLATFORM, "left"),
+	BACK		(4, 	PLATFORM, "back"),
+	STOP		(5, 	PLATFORM, "stop"),
+	HAND		(6, 	HAND_UNIT,"hand"),
+	FRONT_LEFT	(7, FRONT_UNIT, "front_left"),
+	FRONT_RIGHT	(8, FRONT_UNIT, "front_right"),
+	;
+	// @formatter:on
+
+	private volatile static Map<Integer, RequestCommandEnum> codeToLegoCommandCodeMapping;
+
 	private int code;
 	private CommandTargetEnum target;
 	private String name;

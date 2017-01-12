@@ -29,7 +29,11 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
 public enum LegoAnalogPortEnum implements RoboHardwareEnum<String>, RoboSystemConfig {
 
 	// @formatter:off
-	A("A", "Analog A"), B("B", "Analog B"), C("C", "Analog C"), D("D", "Analog D"),;
+	A		("A", "Analog A"),
+	B		("B", "Analog B"),
+	C		("C", "Analog C"),
+	D		("D", "Analog D"),
+	;
 	// @formatter:on
 
 	private String type;
