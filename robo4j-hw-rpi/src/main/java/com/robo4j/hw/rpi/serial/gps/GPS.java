@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialFactory;
-import com.sun.istack.internal.logging.Logger;
 
 /**
  * Code to talk to the Adafruit "ultimate GPS" over the serial port.
@@ -138,7 +138,7 @@ public class GPS {
 				try {
 					str = readNext(builder);
 				} catch (IllegalStateException | IOException e) {
-					Logger.getLogger(GPS.class).log(Level.WARNING, "Error reading line", e);
+					Logger.getLogger(GPS.class.getName()).log(Level.WARNING, "Error reading line", e);
 				}
 				builder.setLength(0);
 				StringTokenizer st = new StringTokenizer(str, "\n", true);
