@@ -92,6 +92,19 @@ project("robo4j-hw-rpi") {
         }
     }
 
+    //create a single Jar with all dependencies
+    task fatJar(type: Jar) {
+        manifest {
+            attributes 'Implementation-Title': 'robo4j-hw-rpi',
+                    'Implementation-Version': version,
+                    'Main-Class': 'com.robo4j.hw.rpi.i2c.adafruitlcd.Demo'
+        }
+        //baseName = project.name + '-all'
+        baseName = 'robo4j-hw-rpi'
+        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+        with jar
+    }
+
     dependencies {
         compile "com.pi4j:pi4j-core:${pi4jVersion}"
         testCompile "junit:junit:${junitVersion}"
