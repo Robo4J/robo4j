@@ -1,4 +1,4 @@
-Copyright (C) $today.year. Miroslav Wengner and Marcus Hirt
+Copyright (C) $today.year. Miroslav Wengner, Marcus Hirt
 This $file.fileName  is part of robo4j.
 module: $module.name
 

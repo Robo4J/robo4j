@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016. Miroslav Wengner and Marcus Hirt
+ * Copyright (C) 2016. Miroslav Wengner, Marcus Hirt
  * This RpiHwMain.java  is part of robo4j.
  * module: robo4j-hw-rpi
  *

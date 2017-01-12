@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016. Miroslav Wengner and Marcus Hirt
+ * Copyright (C) 2016. Miroslav Wengner, Marcus Hirt
  * This AgentCache.java  is part of robo4j.
  * module: robo4j-commons_main
  *
