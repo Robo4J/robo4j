@@ -23,7 +23,7 @@ import com.robo4j.core.client.enums.RequestCommandEnum;
 /**
  * Transformed command interface
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 19.06.2016
  */
 public interface ClientCommandDTO {

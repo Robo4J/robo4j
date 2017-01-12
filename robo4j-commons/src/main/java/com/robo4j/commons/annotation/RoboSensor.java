@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * Annotation is used to configure specific robo sensor connected to the
  * platform
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 04.05.2016
  */
 @Target(ElementType.TYPE)

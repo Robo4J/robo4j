@@ -25,7 +25,7 @@ package com.robo4j.core.client.enums;
  * 
  * @see com.robo4j.core.client.request.ProcessorResult
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 13.11.2016
  */
 public enum RequestUnitStatusEnum {

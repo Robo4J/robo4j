@@ -27,7 +27,7 @@ import com.robo4j.commons.enums.RegistryTypeEnum;
 import com.robo4j.commons.sensor.GenericSensor;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 28.09.2016
  */
 public final class SensorRegistry implements RoboRegistry<SensorRegistry, GenericSensor> {

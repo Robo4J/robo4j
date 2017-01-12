@@ -26,7 +26,7 @@ import com.robo4j.commons.motor.GenericMotor;
 import com.robo4j.commons.motor.MotorRotationEnum;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 20.12.2016
  */
 public abstract class AbstractPlatformConsumer {

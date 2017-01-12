@@ -32,7 +32,7 @@ import com.robo4j.http.HttpMethod;
 import com.robo4j.http.HttpVersion;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 23.10.2016
  */
 public class GeneralUtil {

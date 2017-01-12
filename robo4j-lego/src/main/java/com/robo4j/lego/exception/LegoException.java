@@ -22,7 +22,7 @@ package com.robo4j.lego.exception;
  *
  * Exception related to the lego package
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 26.11.2016
  */
 public class LegoException extends RuntimeException {

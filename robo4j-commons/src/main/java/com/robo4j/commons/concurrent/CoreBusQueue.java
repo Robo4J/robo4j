@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  *
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 03.04.2016
  */
 public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends TransferSignal>>

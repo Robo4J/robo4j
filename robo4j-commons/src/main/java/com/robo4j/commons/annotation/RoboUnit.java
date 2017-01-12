@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  *
  * RoboUnit annotation represents the collection of 1..* Intelligent Agents
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 29.06.2016
  */
 @Target(ElementType.TYPE)

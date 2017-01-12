@@ -25,7 +25,7 @@ import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.rpi.util.RpiMotorUtil;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 19.12.2016
  */
 public abstract class RpiBaseMotor extends RpiDevice implements RpiMotor {

@@ -37,7 +37,7 @@ import lejos.robotics.RegulatedMotor;
 /**
  * Provider is responsible for providing Engine
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 26.11.2016
  */
 @RoboProvider(id = "engineProvider")

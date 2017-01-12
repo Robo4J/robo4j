@@ -20,7 +20,7 @@
 package com.robo4j.rpi.motor;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 17.12.2016
  */
 public abstract class RpiEngineWrapper {

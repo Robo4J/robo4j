@@ -34,7 +34,7 @@ import com.robo4j.commons.command.RoboUnitCommand;
 /**
  * DefaultUnit represent basic structure of the RoboUnit annotated classes
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 29.06.2016
  */
 public abstract class DefaultUnit implements GenericUnit {

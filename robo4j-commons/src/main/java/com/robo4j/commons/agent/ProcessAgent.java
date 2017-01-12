@@ -32,7 +32,7 @@ import com.robo4j.commons.command.RoboTypeCommand;
  * the imput specific command type
  *
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 30.06.2016
  */
 public class ProcessAgent<RoboCommand extends RoboTypeCommand> implements DefaultAgent {

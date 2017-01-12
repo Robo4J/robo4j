@@ -32,7 +32,7 @@ import com.robo4j.core.client.io.ClientException;
 import com.robo4j.core.util.ConstantUtil;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 15.10.2016
  */
 public class SimpleFileWriter implements Callable<Boolean> {

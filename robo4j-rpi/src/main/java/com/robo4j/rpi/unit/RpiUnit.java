@@ -20,7 +20,7 @@
 package com.robo4j.rpi.unit;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 17.12.2016
  */
 public interface RpiUnit {

@@ -27,7 +27,7 @@ import com.robo4j.lego.enums.LegoEnginePartEnum;
 import lejos.robotics.RegulatedMotor;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 23.11.2016
  */
 public abstract class LegoEngineWrapper<MotorType extends RegulatedMotor> implements GenericMotor, LegoEngine {

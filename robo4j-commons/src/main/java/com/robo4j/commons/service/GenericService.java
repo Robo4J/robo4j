@@ -21,7 +21,7 @@ package com.robo4j.commons.service;
 import com.robo4j.commons.control.RoboSystemConfig;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 27.11.2016
  */
 public interface GenericService extends RoboSystemConfig {

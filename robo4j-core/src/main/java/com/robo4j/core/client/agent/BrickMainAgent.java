@@ -31,7 +31,7 @@ import com.robo4j.commons.agent.ReceiverAgent;
  * MainBrick agent responsible for handling incoming command and moving them to
  * the desired destination (unit, agent)
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 10.06.2016
  */
 public class BrickMainAgent implements ReceiverAgent {

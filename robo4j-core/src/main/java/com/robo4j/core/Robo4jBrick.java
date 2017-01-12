@@ -30,7 +30,7 @@ import com.robo4j.core.reflect.RoboReflectionScan;
 /**
  * Main class needs to be initiated
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 30.11.2016
  */
 public class Robo4jBrick extends AbstractClient {

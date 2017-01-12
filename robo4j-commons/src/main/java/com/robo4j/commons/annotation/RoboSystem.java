@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 /**
  * Annotates generic system
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 21.04.2016
  */
 @Target(ElementType.TYPE)

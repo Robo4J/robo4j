@@ -21,7 +21,7 @@ package com.robo4j.http.dto;
 import java.util.Map;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 17.10.2016
  */
 public class RequestDTO {

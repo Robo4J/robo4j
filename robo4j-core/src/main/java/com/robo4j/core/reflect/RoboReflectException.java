@@ -19,7 +19,7 @@
 package com.robo4j.core.reflect;
 
 /**
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 30.11.2016
  */
 public class RoboReflectException extends RuntimeException {

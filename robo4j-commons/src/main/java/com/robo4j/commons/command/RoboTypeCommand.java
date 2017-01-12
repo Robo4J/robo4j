@@ -21,7 +21,7 @@ package com.robo4j.commons.command;
 /**
  * Maker Iterface to the command
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 28.04.2016
  */
 public interface RoboTypeCommand<CommandType extends Enum<?>> {

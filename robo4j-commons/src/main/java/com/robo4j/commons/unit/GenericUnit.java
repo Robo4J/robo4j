@@ -32,7 +32,7 @@ import com.robo4j.commons.control.RoboSystemConfig;
 /**
  * GenericUnit is collection of intelligent agents
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 28.06.2016
  */
 public interface GenericUnit extends RoboSystemConfig {

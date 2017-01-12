@@ -27,7 +27,7 @@ import com.robo4j.core.dto.ClientCommandDTO;
 
 /**
  *
- * @author Miro Kopecky (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  * @since 19.06.2016
  */
 public class RequestCommandDTOBuilder {
