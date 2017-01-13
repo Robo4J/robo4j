@@ -20,7 +20,7 @@
 package com.robo4j.hw.rpi;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 20.12.2016
  */
 public class RpiHwMain {

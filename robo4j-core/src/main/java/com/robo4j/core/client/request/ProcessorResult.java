@@ -24,7 +24,7 @@ import com.robo4j.core.client.enums.RequestUnitTypeEnum;
 /**
  * Result of HTTP Request processor
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 18.06.2016
  */
 public final class ProcessorResult {

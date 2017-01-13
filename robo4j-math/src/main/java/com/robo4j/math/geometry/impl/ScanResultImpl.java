@@ -1,22 +1,19 @@
 /*
- * Copyright (C) 2017. Miroslav Wengner, Marcus Hirt
- * This ScanResultImpl.java  is part of robo4j.
- * module: robo4j-math
- *
- * robo4j is free software: you can redistribute it and/or modify
+ * Copyright (C) 2014-2017, Miroslav Wengner, Marcus Hirt
+ * 
+ * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * robo4j is distributed in the hope that it will be useful,
+ * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
+ * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.robo4j.math.geometry.impl;
 
 import java.util.ArrayList;
@@ -24,13 +21,23 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.robo4.math.jfr.ScanPoint2DEvent;
 import com.robo4j.math.geometry.Point2D;
 import com.robo4j.math.geometry.ScanResult2D;
 
+/**
+ * The implementation of a scan result. This particular implementation will emit
+ * JFR events to help with the analysis of the recorded JFR data.
+ * 
+ * FIXME(Marcus/Jan 13, 2017): Will open source the JMC 5.5 plug-in for
+ * visualizing these.
+ * 
+ * @author Marcus Hirt
+ */
 public class ScanResultImpl implements ScanResult2D {
 	private static final PointComparator POINT_COMPARATOR = new PointComparator();
 	private static int SCANCOUNTER;
-	
+
 	private final List<Point2D> points;
 
 	private double maxX;
@@ -38,11 +45,11 @@ public class ScanResultImpl implements ScanResult2D {
 	private double maxY;
 	private double minY;
 	private int scanID;
-	
+
 	private Point2D farthestPoint;
 	private Point2D closestPoint;
 
-	private final ScanPointEvent scanPointEvent = new ScanPointEvent();
+	private final ScanPoint2DEvent scanPointEvent = new ScanPoint2DEvent();
 
 	public ScanResultImpl() {
 		this(70);
@@ -50,9 +57,9 @@ public class ScanResultImpl implements ScanResult2D {
 
 	public ScanResultImpl(int size) {
 		scanID = SCANCOUNTER++;
-		points = new ArrayList<>(size);
+		points = new ArrayList<Point2D>(size);
 	}
-	
+
 	public double getMaxX() {
 		return maxX;
 	}
@@ -72,7 +79,7 @@ public class ScanResultImpl implements ScanResult2D {
 	public int getScanID() {
 		return scanID;
 	}
-	
+
 	public void addPoint(Point2D p) {
 		if (p.getRange() < 0.05) {
 			return;
@@ -132,7 +139,7 @@ public class ScanResultImpl implements ScanResult2D {
 	public Point2D getFarthestPoint() {
 		return farthestPoint;
 	}
-	
+
 	public void sort() {
 		Collections.sort(points, POINT_COMPARATOR);
 	}

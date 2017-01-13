@@ -24,7 +24,7 @@ import com.robo4j.core.dto.SensorDTO;
 /**
  * Simple StorageService Interface ->
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 14.10.2016
  */
 public interface StorageService extends GenericService {

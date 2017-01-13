@@ -26,7 +26,7 @@ import com.robo4j.core.client.util.ClientClassLoader;
  *
  * Class responsible for loading appropriate resources
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 23.05.2016
  */
 public final class ResourceLoader {

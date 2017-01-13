@@ -25,7 +25,7 @@ import com.robo4j.lego.control.LegoEngine;
 import com.robo4j.lego.control.LegoSensor;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 11.08.2016
  */
 public final class LegoSetupMessageUtil {

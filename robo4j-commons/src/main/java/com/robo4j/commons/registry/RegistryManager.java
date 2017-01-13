@@ -31,7 +31,7 @@ import com.robo4j.commons.enums.RegistryTypeEnum;
 /**
  *
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 27.11.2016
  */
 public final class RegistryManager<RegistryType extends RoboRegistry, ConfigType extends RoboSystemConfig> {

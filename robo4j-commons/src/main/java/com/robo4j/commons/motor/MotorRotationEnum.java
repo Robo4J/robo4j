@@ -21,7 +21,7 @@ package com.robo4j.commons.motor;
 /**
  * Enum is used to distinguished the movement direction
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 03.11.2016
  */
 public enum MotorRotationEnum {

@@ -23,7 +23,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * Builder
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 30.06.2016
  */
 public class ProcessAgentBuilder<AgentType extends DefaultAgent> {

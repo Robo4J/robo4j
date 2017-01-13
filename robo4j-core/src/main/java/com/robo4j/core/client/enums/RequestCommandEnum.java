@@ -35,7 +35,7 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
 /**
  * Command types designed for Robo-Brick client
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 09.06.2016
  */
 public enum RequestCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum> {

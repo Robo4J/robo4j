@@ -38,7 +38,7 @@ import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.core.util.StreamUtils;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 30.11.2016
  */
 @SuppressWarnings(value = "unchecked")

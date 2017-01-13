@@ -23,7 +23,7 @@ package com.robo4j.commons.agent;
  * function of the agent is activate. Then agent lives his life cycle. Agent
  * allows the access to his internal cache
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 05.07.2016
  */
 public interface ReceiverAgent extends GenericAgent {

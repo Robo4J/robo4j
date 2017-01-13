@@ -21,7 +21,7 @@ package com.robo4j.commons.motor;
 import com.robo4j.commons.control.RoboSystemConfig;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 23.11.2016
  */
 public interface GenericMotor extends RoboSystemConfig {

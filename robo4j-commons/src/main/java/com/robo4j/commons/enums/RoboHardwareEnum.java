@@ -19,7 +19,7 @@
 package com.robo4j.commons.enums;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 04.05.2016
  */
 public interface RoboHardwareEnum<Type> {

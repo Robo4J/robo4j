@@ -19,7 +19,7 @@
 package com.robo4j.core.client.enums;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 13.11.2016
  */
 public enum RequestUnitTypeEnum {

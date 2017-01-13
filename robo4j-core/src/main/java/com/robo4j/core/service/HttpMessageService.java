@@ -26,7 +26,7 @@ import com.robo4j.commons.service.GenericService;
 /**
  *
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 28.11.2016
  */
 public interface HttpMessageService extends GenericService {

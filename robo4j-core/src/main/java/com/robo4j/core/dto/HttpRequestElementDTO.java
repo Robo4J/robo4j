@@ -22,7 +22,7 @@ package com.robo4j.core.dto;
  *
  * Element extracted from the POST or GET HTTP request
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 06.11.2016
  */
 public class HttpRequestElementDTO {

@@ -27,7 +27,7 @@ import com.robo4j.commons.util.CommandUtil;
 /**
  * Available command types accepted by Robot
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 24.06.2016
  */
 public enum CommandTypeEnum implements RoboHardwareEnum<Integer> {

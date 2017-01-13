@@ -38,7 +38,7 @@ import com.robo4j.core.util.ConstantUtil;
  *
  * Command Executor is the consumer of command produced by Command Processor
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 10.06.2016
  */
 public class CommandExecutor<QueueType extends CoreBusQueue> implements AgentConsumer, Runnable {

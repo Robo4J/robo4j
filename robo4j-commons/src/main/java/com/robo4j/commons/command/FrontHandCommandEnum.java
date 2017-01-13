@@ -24,7 +24,7 @@ import java.util.Map;
 import com.robo4j.commons.enums.RoboHardwareEnum;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 27.04.2016
  */
 public enum FrontHandCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum> {

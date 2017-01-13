@@ -20,7 +20,7 @@ package com.robo4j.commons.control;
 
 /**
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 23.04.2016
  */
 public interface RoboSystemConfig {

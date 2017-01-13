@@ -21,7 +21,7 @@ package com.robo4j.commons.sensor;
 import com.robo4j.commons.control.RoboSystemConfig;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 26.11.2016
  */
 public interface GenericSensor extends RoboSystemConfig {

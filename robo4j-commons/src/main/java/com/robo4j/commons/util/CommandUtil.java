@@ -22,7 +22,7 @@ import com.robo4j.commons.command.CommandParsed;
 import com.robo4j.commons.command.CommandTypeEnum;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 24.04.2016
  */
 public final class CommandUtil {

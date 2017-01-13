@@ -5,7 +5,7 @@ import com.robo4j.commons.control.RoboSystemConfig;
 /**
  * RemoteEV3 - specific lego system
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 24.04.2016
  */
 public interface LegoBrickRemote<RemoteBrick> extends RoboSystemConfig {
