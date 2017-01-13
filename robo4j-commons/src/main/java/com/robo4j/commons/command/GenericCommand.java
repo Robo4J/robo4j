@@ -21,7 +21,7 @@ package com.robo4j.commons.command;
 import com.robo4j.commons.concurrent.TransferSignal;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 10.06.2016
  */
 public class GenericCommand<EnumType extends Enum<?>>

@@ -45,7 +45,7 @@ import com.robo4j.core.client.io.ClientException;
 /**
  * Initial implementation of robo-client reflection usage
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 16.06.2016
  */
 

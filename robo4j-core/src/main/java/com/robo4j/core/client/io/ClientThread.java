@@ -27,7 +27,7 @@ import java.util.Date;
  * thread. Overrides the toString method to return information about the
  * creationDate and the execution time of the thread
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 26.09.2016
  */
 public class ClientThread extends Thread {

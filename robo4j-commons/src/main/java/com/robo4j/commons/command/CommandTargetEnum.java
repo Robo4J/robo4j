@@ -26,7 +26,7 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
 /**
  * Command Target helps with particular command destination
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 05.07.2016
  */
 public enum CommandTargetEnum implements RoboHardwareEnum<Integer> {

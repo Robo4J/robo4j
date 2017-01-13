@@ -19,7 +19,7 @@
 package com.robo4j.http;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 18.10.2016
  */
 // TODO: FIME merge with HttpUtil

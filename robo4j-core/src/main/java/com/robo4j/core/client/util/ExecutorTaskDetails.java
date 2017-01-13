@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
  *
  * Following class stores start time and thread name. class is the Util class
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 28.02.2016
  */
 public final class ExecutorTaskDetails {

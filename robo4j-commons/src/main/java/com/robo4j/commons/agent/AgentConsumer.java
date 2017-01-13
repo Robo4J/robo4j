@@ -24,7 +24,7 @@ import com.robo4j.commons.concurrent.CoreBusQueue;
  *
  * Marker interface Agent Consumer
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 29.05.2016
  */
 public interface AgentConsumer<TypeRoboQueue extends CoreBusQueue> extends GenericAgent {

@@ -20,7 +20,7 @@
 package com.robo4j.math;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 13.01.2017
  */
 public class MainTest {

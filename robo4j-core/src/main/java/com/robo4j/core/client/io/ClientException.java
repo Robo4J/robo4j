@@ -19,7 +19,7 @@
 package com.robo4j.core.client.io;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 24.05.2016
  */
 public class ClientException extends RuntimeException {

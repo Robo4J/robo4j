@@ -20,7 +20,7 @@
 package com.robo4j.rpi.motor;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 20.12.2016
  */
 public class RpiMotorException extends RuntimeException {

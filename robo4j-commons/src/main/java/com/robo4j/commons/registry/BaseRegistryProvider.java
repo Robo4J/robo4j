@@ -23,7 +23,7 @@ import java.util.Map;
 import com.robo4j.commons.control.RoboSystemConfig;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 26.11.2016
  */
 public interface BaseRegistryProvider<Output, Input> extends RoboSystemConfig {

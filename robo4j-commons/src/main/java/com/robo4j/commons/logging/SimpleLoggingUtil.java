@@ -24,7 +24,7 @@ import java.time.LocalDate;
  *
  * Simple class for logging
  * 
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 19.07.2016
  */
 public final class SimpleLoggingUtil {

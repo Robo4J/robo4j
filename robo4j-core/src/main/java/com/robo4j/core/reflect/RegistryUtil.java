@@ -38,7 +38,7 @@ import com.robo4j.commons.registry.UnitRegistry;
 /**
  * TODO: remove
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 13.06.2016
  */
 public final class RegistryUtil {

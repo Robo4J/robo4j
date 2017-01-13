@@ -25,7 +25,7 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
  * Configuration interface
  *
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 19.06.2016
  */
 public enum LegoSensorPortEnum implements RoboHardwareEnum<String>, RoboSystemConfig {

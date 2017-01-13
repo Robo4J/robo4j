@@ -25,7 +25,7 @@ import java.util.concurrent.ArrayBlockingQueue;
  *
  * AgentCache keeps order
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 29.05.2016
  *
  */

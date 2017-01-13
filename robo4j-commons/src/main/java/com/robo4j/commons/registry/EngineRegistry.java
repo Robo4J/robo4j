@@ -29,7 +29,7 @@ import com.robo4j.commons.enums.RegistryTypeEnum;
 import com.robo4j.commons.motor.GenericMotor;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 28.09.2016
  */
 public final class EngineRegistry implements RoboRegistry<EngineRegistry, GenericMotor> {

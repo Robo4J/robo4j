@@ -53,7 +53,7 @@ import com.robo4j.core.util.ConstantUtil;
  *
  * Command Provider works like Unit Element Object
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 10.06.2016
  */
 public class CommandProviderImpl extends DefaultUnit implements CommandProvider {

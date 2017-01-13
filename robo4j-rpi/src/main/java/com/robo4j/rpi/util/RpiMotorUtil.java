@@ -20,7 +20,7 @@
 package com.robo4j.rpi.util;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 17.12.2016
  */
 public final class RpiMotorUtil {

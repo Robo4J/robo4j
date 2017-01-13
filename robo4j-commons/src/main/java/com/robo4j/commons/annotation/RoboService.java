@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 /**
  * SystemService is an annotation for the service provided as basic
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 26.09.2016
  */
 @Target(ElementType.TYPE)

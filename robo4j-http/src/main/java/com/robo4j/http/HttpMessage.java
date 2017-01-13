@@ -25,7 +25,7 @@ import java.util.Map;
  * Http request message is immutable
  *
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 09.03.2016
  */
 public class HttpMessage implements Comparable<HttpMessage> {

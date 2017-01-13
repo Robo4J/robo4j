@@ -19,7 +19,7 @@
 package com.robo4j.core.dto;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 06.11.2016
  */
 public class ClientUnitRequestDTO {

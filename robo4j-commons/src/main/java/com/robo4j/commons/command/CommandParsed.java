@@ -20,7 +20,7 @@ package com.robo4j.commons.command;
 
 /**
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 25.04.2016
  */
 public class CommandParsed {

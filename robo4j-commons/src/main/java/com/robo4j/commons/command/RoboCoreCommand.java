@@ -21,7 +21,7 @@ package com.robo4j.commons.command;
 /**
  * Marker interface for enums
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 28.04.2016
  */
 public interface RoboCoreCommand extends RoboTypeCommand {

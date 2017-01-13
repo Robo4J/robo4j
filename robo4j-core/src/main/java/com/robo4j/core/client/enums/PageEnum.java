@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 /**
  * Solution how to display web pages
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 10.08.2016
  */
 public enum PageEnum {

@@ -22,7 +22,7 @@ package com.robo4j.rpi.motor;
 import com.robo4j.commons.motor.GenericMotor;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 17.12.2016
  */
 public interface RpiMotor extends GenericMotor {

@@ -44,7 +44,7 @@ import com.robo4j.http.HttpVersion;
 /**
  * Responsible for handling incoming request
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 28.02.2016
  */
 public class RequestProcessorCallable implements Callable<RequestStatusEnum> {

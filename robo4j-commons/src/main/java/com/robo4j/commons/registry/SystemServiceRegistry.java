@@ -27,7 +27,7 @@ import com.robo4j.commons.service.GenericService;
 /**
  * SystemRegistry is only one per JVM
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 27.09.2016
  */
 public final class SystemServiceRegistry implements RoboRegistry<SystemServiceRegistry, GenericService> {

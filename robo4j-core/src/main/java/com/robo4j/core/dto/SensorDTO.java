@@ -21,7 +21,7 @@ package com.robo4j.core.dto;
 import java.time.LocalDateTime;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 12.10.2016
  */
 public class SensorDTO {

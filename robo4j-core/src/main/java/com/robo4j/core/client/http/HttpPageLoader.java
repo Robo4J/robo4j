@@ -31,7 +31,7 @@ import com.robo4j.core.client.io.ResourceLoader;
  *
  * Responsible for loading pages
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 23.05.2016
  */
 public final class HttpPageLoader {

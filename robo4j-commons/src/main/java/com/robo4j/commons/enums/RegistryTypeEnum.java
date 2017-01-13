@@ -19,7 +19,7 @@
 package com.robo4j.commons.enums;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 29.11.2016
  */
 public enum RegistryTypeEnum {

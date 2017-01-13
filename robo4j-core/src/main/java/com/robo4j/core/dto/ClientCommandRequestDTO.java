@@ -25,7 +25,7 @@ import com.robo4j.core.util.ConstantUtil;
  *
  * Client Request Holder for incoming requests Single instance
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 11.06.2016
  */
 public class ClientCommandRequestDTO implements ClientCommandDTO {

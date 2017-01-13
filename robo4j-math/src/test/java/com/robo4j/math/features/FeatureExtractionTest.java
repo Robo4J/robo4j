@@ -20,7 +20,7 @@
 package com.robo4j.math.features;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 13.01.2017
  */
 public class FeatureExtractionTest {

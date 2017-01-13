@@ -20,7 +20,7 @@ package com.robo4j.core.client.util;
 
 /**
  *
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 09.06.2016
  */
 public final class ClientCommException extends RuntimeException {

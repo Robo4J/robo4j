@@ -21,7 +21,7 @@ package com.robo4j.lego.control;
 import com.robo4j.commons.unit.GenericUnit;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 02.07.2016
  */
 public interface LegoUnit extends GenericUnit {

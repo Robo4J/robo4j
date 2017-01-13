@@ -24,7 +24,7 @@ import java.util.Map;
 import org.junit.Test;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 11.06.2016
  */
 public class PageParserTest {
