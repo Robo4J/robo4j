@@ -23,12 +23,12 @@ import java.util.List;
  * @author Marcus Hirt
  */
 public interface ScanResult2D {
-	public List<Point2D> getPoints();
-	public Point2D getNearestPoint();
-	public Point2D getFarthestPoint();
-	public double getMaxX();
-	public double getMinX();
-	public double getMaxY();
-	public double getMinY();
-	public int getScanID();
+	List<Point2D> getPoints();
+	Point2D getNearestPoint();
+	Point2D getFarthestPoint();
+	double getMaxX();
+	double getMinX();
+	double getMaxY();
+	double getMinY();
+	int getScanID();
 }
