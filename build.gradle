@@ -96,7 +96,7 @@ project("robo4j-hw-rpi") {
     sourceSets {
         main {
             java {
-                srcDirs = ['src/main/java', 'src/examples/java']
+                srcDirs = ['src/main/java', 'src/main/examples/java']
             }
             resources {
                 srcDirs = ['src/resources']
