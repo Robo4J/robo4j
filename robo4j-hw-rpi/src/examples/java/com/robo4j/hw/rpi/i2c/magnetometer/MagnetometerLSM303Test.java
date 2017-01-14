@@ -20,8 +20,7 @@ package com.robo4j.hw.rpi.i2c.magnetometer;
 
 import java.io.IOException;
 
-import com.robo4j.hw.rpi.geometry.Float3D;
-import com.robo4j.hw.rpi.i2c.magnetometer.MagnetometerLSM303Device;
+import com.robo4j.math.geometry.Float3D;
 
 /**
  * Sanity check every 500ms to see that data is being retrieved.
@@ -55,6 +54,9 @@ public class MagnetometerLSM303Test {
 		}
 	}
 
+
+	//Private Methods
+	//TODO:: maybe duplicate functionality
 	private static boolean updateMin(Float3D min, Float3D newVal) {
 		boolean isUpdated = false;
 

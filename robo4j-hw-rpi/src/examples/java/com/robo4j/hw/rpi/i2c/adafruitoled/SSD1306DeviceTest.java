@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.robo4j.hw.rpi.i2c.adafruitoled;
 
 import java.awt.Color;
@@ -38,8 +39,7 @@ import com.robo4j.hw.rpi.i2c.adafruitoled.SSD1306Device.OLEDVariant;
  * @author Marcus Hirt
  */
 public class SSD1306DeviceTest {
-	public static void main(String[] args) throws IOException,
-			InterruptedException {
+	public static void main(String[] args) throws IOException {
 		final SSD1306Device oled = new SSD1306Device(OLEDVariant.Type128x32,
 				RaspiPin.GPIO_25);
 
@@ -62,6 +62,7 @@ public class SSD1306DeviceTest {
 					oled.setEnabled(false);
 				} catch (IOException e1) {
 					e1.printStackTrace();
+				//TODO: is it possible ?
 				} finally {
 					System.exit(0);
 				}

@@ -20,8 +20,6 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
 import java.io.IOException;
 
-import com.robo4j.hw.rpi.i2c.adafruitlcd.ILCD;
-
 /**
  * Simply turns off and on the display a few times.
  * 

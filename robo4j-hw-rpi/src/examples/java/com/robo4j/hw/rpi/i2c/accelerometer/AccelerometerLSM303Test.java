@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016, Marcus Hirt
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -18,8 +18,8 @@ package com.robo4j.hw.rpi.i2c.accelerometer;
 
 import java.io.IOException;
 
-import com.robo4j.hw.rpi.geometry.Float3D;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
+import com.robo4j.math.geometry.Float3D;
 
 /**
  * Example useful to check if your accelerometer is working properly.

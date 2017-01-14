@@ -16,9 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.robo4j.hw.rpi.i2c.accelerometer;
 
-import com.robo4j.hw.rpi.geometry.Float3D;
+
+import com.robo4j.math.geometry.Float3D;
 
 /**
  * Helper class for gathering stats.

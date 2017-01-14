@@ -19,8 +19,6 @@
 package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
 import java.io.IOException;
-
-import com.robo4j.hw.rpi.i2c.adafruitlcd.ILCD;
 /**
  * This one really doesn't anything but clean up and exit.
  * 

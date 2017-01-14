@@ -16,10 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
 public class Util {
-	static final void sleep(int sleep) {
+	static void sleep(int sleep) {
 		try {
 			Thread.sleep(sleep);
 		} catch (InterruptedException e) {

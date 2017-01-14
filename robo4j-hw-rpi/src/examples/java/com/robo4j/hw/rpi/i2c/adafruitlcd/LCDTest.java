@@ -20,14 +20,12 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
 import java.io.IOException;
 
-import com.robo4j.hw.rpi.i2c.adafruitlcd.ILCD;
-
 /**
  * The interface for the demos.
  * 
  * @author Marcus Hirt
  */
 public interface LCDTest {
-	public String getName();
-	public void run(ILCD lcd) throws IOException;
+	String getName();
+	void run(ILCD lcd) throws IOException;
 }
