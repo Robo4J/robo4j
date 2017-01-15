@@ -37,7 +37,7 @@ import com.robo4j.commons.command.RoboUnitCommand;
  * @author Miroslav Wengner (@miragemiko)
  * @since 29.06.2016
  */
-public abstract class DefaultUnit implements GenericUnit {
+public abstract class DefaultUnit<InitUnitInterface> implements GenericUnit {
 
 	/* RoboUnit has been successfully activated */
 	protected volatile AtomicBoolean active;
@@ -56,4 +56,11 @@ public abstract class DefaultUnit implements GenericUnit {
 		return this.agents;
 	}
 
+
+	/**
+	 * Main RoboUnit initiation sequence
+	 * @param object initiation input
+	 * @return instanciated unit interface
+     */
+	public abstract InitUnitInterface init(Object object);
 }
