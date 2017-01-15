@@ -34,7 +34,7 @@ import org.json.simple.parser.ParseException;
 
 import com.robo4j.commons.command.CommandTargetEnum;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
-import com.robo4j.core.client.enums.RequestCommandEnum;
+import com.robo4j.commons.command.PlatformCommandEnum;
 import com.robo4j.core.dto.ClientCommandRequestDTO;
 import com.robo4j.core.dto.ClientRequestDTO;
 import com.robo4j.core.dto.ClientUnitRequestDTO;
@@ -138,7 +138,7 @@ public final class HttpUtils {
 			final String name = obj.get("name").toString();
 			final String value = obj.containsKey(HTTP_REQUEST_VALUE) ? obj.get(HTTP_REQUEST_VALUE).toString()
 					: ConstantUtil.EMPTY_STRING;
-			RequestCommandEnum command = RequestCommandEnum.getRequestCommand(CommandTargetEnum.getByName(target),
+			PlatformCommandEnum command = PlatformCommandEnum.getRequestCommand(CommandTargetEnum.getByName(target),
 					name);
 			if (obj.containsKey("speed")) {
 				final String speed = obj.get("speed").toString();

@@ -45,7 +45,7 @@ import com.robo4j.commons.registry.RegistryManager;
 import com.robo4j.commons.registry.RoboRegistry;
 import com.robo4j.commons.unit.DefaultUnit;
 import com.robo4j.commons.unit.GenericUnit;
-import com.robo4j.core.client.enums.RequestCommandEnum;
+import com.robo4j.commons.command.PlatformCommandEnum;
 import com.robo4j.core.client.io.ClientException;
 import com.robo4j.core.util.ConstantUtil;
 
@@ -60,7 +60,7 @@ public class CommandProviderImpl extends DefaultUnit implements CommandProvider 
 
 	private final List<GenericAgent> agents;
 	private final List<GenericUnit> units;
-	private volatile LinkedBlockingQueue<GenericCommand<RequestCommandEnum>> commandQueue;
+	private volatile LinkedBlockingQueue<GenericCommand<PlatformCommandEnum>> commandQueue;
 
 	// TODO: Provider should get access to the all registered unit
 	@SuppressWarnings(value = "unchecked")
@@ -104,7 +104,7 @@ public class CommandProviderImpl extends DefaultUnit implements CommandProvider 
 
 	@SuppressWarnings(value = "unchecked")
 	@Override
-	public boolean process(final GenericCommand<RequestCommandEnum> command) {
+	public boolean process(final GenericCommand<PlatformCommandEnum> command) {
 		SimpleLoggingUtil.debug(getClass(), "process: " + command);
 		switch (command.getType().getTarget()) {
 		case SYSTEM:
@@ -164,7 +164,7 @@ public class CommandProviderImpl extends DefaultUnit implements CommandProvider 
 
 	// Private Methods
 	/* currently system commad is executed as EXIT */
-	private boolean processSystemCommand(final GenericCommand<RequestCommandEnum> command) {
+	private boolean processSystemCommand(final GenericCommand<PlatformCommandEnum> command) {
 		switch (command.getType()) {
 		case EXIT:
 			SimpleLoggingUtil.print(getClass(), "EXIT COMMAND HAS BEEN CALLED");
@@ -177,25 +177,25 @@ public class CommandProviderImpl extends DefaultUnit implements CommandProvider 
 	}
 
 	@SuppressWarnings(value = "unchecked")
-	private boolean processPlatformCommand(final GenericCommand<RequestCommandEnum> command) {
+	private boolean processPlatformCommand(final GenericCommand<PlatformCommandEnum> command) {
 		// TODO : more generic, problem is name
 		SimpleLoggingUtil.print(getClass(), "getPlatform Unit units= " + units);
 		return processUnitByName("platform", command);
 	}
 
 	@SuppressWarnings(value = "unchecked")
-	private boolean processHandUnitCommand(final GenericCommand<RequestCommandEnum> command) {
+	private boolean processHandUnitCommand(final GenericCommand<PlatformCommandEnum> command) {
 		SimpleLoggingUtil.print(getClass(), "getFrontHand Unit units= " + units);
 		return processUnitByName("frontHand", command);
 
 	}
 
-	private boolean processFrontUnitCommand(final GenericCommand<RequestCommandEnum> command) {
+	private boolean processFrontUnitCommand(final GenericCommand<PlatformCommandEnum> command) {
 		SimpleLoggingUtil.debug(getClass(), "getFrontUnit Unit units= " + units);
 		return processUnitByName("frontUnit", command);
 	}
 
-	private boolean processUnitByName(final String name, final GenericCommand<RequestCommandEnum> command) {
+	private boolean processUnitByName(final String name, final GenericCommand<PlatformCommandEnum> command) {
 		Optional<GenericUnit> optUnit = units.stream().filter(u -> {
 			SimpleLoggingUtil.print(CommandProviderImpl.class, "processUnitByName " + u.getUnitName());
 			return u.getUnitName().contains(name);

@@ -30,9 +30,12 @@ package com.robo4j.core.client.enums;
  */
 public enum RequestUnitStatusEnum {
 
-	// formatter:off
-	STOP(0, "stop"), ACTIVE(1, "active"), STATUS(2, "status"), SETUP(3, "setup"),;
-	// formatter:on
+	//@formatter:off
+	STOP	(0, "stop"),
+	ACTIVE	(1, "active"),
+	STATUS	(2, "status"),
+	SETUP	(3, "setup"),;
+	//@formatter:on
 
 	private int code;
 	private String desc;

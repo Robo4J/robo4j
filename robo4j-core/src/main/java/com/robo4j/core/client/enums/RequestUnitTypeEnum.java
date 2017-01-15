@@ -24,9 +24,10 @@ package com.robo4j.core.client.enums;
  */
 public enum RequestUnitTypeEnum {
 
-	// formatter:off
-	GENERAL(0, "general"), UNIT(1, "unit"),;
-	// formatter:on
+	//@formatter:off
+	GENERAL	(0, "general"),
+	UNIT	(1, "unit"),;
+	//@formatter:on
 
 	private int code;
 	private String desc;

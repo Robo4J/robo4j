@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2017. Miroslav Wengner, Marcus Hirt
- * This RequestStatusEnum.java  is part of robo4j.
- * module: robo4j-core
+ * This AdafruitLcdCommandEnum.java  is part of robo4j.
+ * module: robo4j-commons
  *
  * robo4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,40 +17,11 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core.client.enums;
+package com.robo4j.commons.command;
 
 /**
- * Request Status is the resul done by the Request
- *
- * @author Miroslav Wengner (@miragemiko)
- * @since 13.11.2016
+ * @author Miro Wengner (@miragemiko)
+ * @since 15.01.2017
  */
-public enum RequestStatusEnum {
-
-	//@formatter:off
-	NONE	(-1, "none"),
-	EXIT	(0, "exit"),
-	ACTIVE	(1, "active"),;
-	//@formatter:on
-
-	private int code;
-	private String desc;
-
-	RequestStatusEnum(int code, String desc) {
-		this.code = code;
-		this.desc = desc;
-	}
-
-	public int getCode() {
-		return code;
-	}
-
-	public String getDesc() {
-		return desc;
-	}
-
-	@Override
-	public String toString() {
-		return "RequestStatusEnum{" + "code=" + code + ", desc='" + desc + '\'' + '}';
-	}
+public enum  AdafruitLcdCommandEnum {
 }

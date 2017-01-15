@@ -1,22 +1,23 @@
 /*
- * Copyright (C)  2016. Miroslav Wengner, Marcus Hirt
+ * Copyright (C) 2017. Miroslav Wengner, Marcus Hirt
  * This RequestCommandEnum.java  is part of robo4j.
+ * module: robo4j-commons
  *
- *  robo4j is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * robo4j is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  robo4j is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * robo4j is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core.client.enums;
+package com.robo4j.commons.command;
 
 import static com.robo4j.commons.command.CommandTargetEnum.FRONT_UNIT;
 import static com.robo4j.commons.command.CommandTargetEnum.HAND_UNIT;
@@ -27,9 +28,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.robo4j.commons.command.CommandTargetEnum;
-import com.robo4j.commons.command.CommandTypeEnum;
-import com.robo4j.commons.command.RoboUnitCommand;
 import com.robo4j.commons.enums.RoboHardwareEnum;
 
 /**
@@ -38,7 +36,7 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
  * @author Miroslav Wengner (@miragemiko)
  * @since 09.06.2016
  */
-public enum RequestCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum> {
+public enum PlatformCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum> {
 
 	// @formatter:off
 	EXIT		(0, 	SYSTEM, "exit"),
@@ -53,19 +51,19 @@ public enum RequestCommandEnum implements RoboUnitCommand, RoboHardwareEnum<Comm
 	;
 	// @formatter:on
 
-	private volatile static Map<Integer, RequestCommandEnum> codeToLegoCommandCodeMapping;
+	private volatile static Map<Integer, PlatformCommandEnum> codeToLegoCommandCodeMapping;
 
 	private int code;
 	private CommandTargetEnum target;
 	private String name;
 
-	RequestCommandEnum(int c, CommandTargetEnum target, String name) {
+	PlatformCommandEnum(int c, CommandTargetEnum target, String name) {
 		this.code = c;
 		this.target = target;
 		this.name = name;
 	}
 
-	public static RequestCommandEnum getRequestValue(String name) {
+	public static PlatformCommandEnum getRequestValue(String name) {
 		if (codeToLegoCommandCodeMapping == null) {
 			codeToLegoCommandCodeMapping = initMapping();
 		}
@@ -73,7 +71,7 @@ public enum RequestCommandEnum implements RoboUnitCommand, RoboHardwareEnum<Comm
 				.map(Map.Entry::getValue).reduce(null, (e1, e2) -> e2);
 	}
 
-	public static RequestCommandEnum getRequestCommand(CommandTargetEnum target, String name) {
+	public static PlatformCommandEnum getRequestCommand(CommandTargetEnum target, String name) {
 		if (codeToLegoCommandCodeMapping == null) {
 			codeToLegoCommandCodeMapping = initMapping();
 		}
@@ -84,8 +82,8 @@ public enum RequestCommandEnum implements RoboUnitCommand, RoboHardwareEnum<Comm
 	}
 
 	// Private Methods
-	private static Map<Integer, RequestCommandEnum> initMapping() {
-		return Arrays.stream(values()).collect(Collectors.toMap(RequestCommandEnum::getCode, e -> e));
+	private static Map<Integer, PlatformCommandEnum> initMapping() {
+		return Arrays.stream(values()).collect(Collectors.toMap(PlatformCommandEnum::getCode, e -> e));
 	}
 
 	public int getCode() {

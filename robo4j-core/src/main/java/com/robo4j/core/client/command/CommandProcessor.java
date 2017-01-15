@@ -27,7 +27,7 @@ import com.robo4j.commons.command.GenericCommand;
 import com.robo4j.commons.concurrent.QueueFIFOEntry;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.core.bus.ClientBusQueue;
-import com.robo4j.core.client.enums.RequestCommandEnum;
+import com.robo4j.commons.command.PlatformCommandEnum;
 import com.robo4j.core.dto.ClientCommandRequestDTO;
 import com.robo4j.core.util.ConstantUtil;
 
@@ -91,10 +91,10 @@ public final class CommandProcessor implements AgentProducer, Runnable {
 
 	// Private Methods
 	@SuppressWarnings(value = "unchecked")
-	private QueueFIFOEntry getCommand(RequestCommandEnum type, String value, String speed) {
+	private QueueFIFOEntry getCommand(PlatformCommandEnum type, String value, String speed) {
 		/* client command holding default values */
 		final ClientCommandProperties properties = new ClientCommandProperties(Integer.parseInt(speed));
-		final GenericCommand<RequestCommandEnum> command = new GenericCommand<>(properties, type, value,
+		final GenericCommand<PlatformCommandEnum> command = new GenericCommand<>(properties, type, value,
 				ConstantUtil.DEFAULT_PRIORITY);
 		return new QueueFIFOEntry<>(command);
 	}
