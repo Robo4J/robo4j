@@ -51,7 +51,7 @@ public enum PlatformCommandEnum implements RoboUnitCommand, RoboHardwareEnum<Com
 	;
 	// @formatter:on
 
-	private volatile static Map<Integer, PlatformCommandEnum> codeToLegoCommandCodeMapping;
+	private volatile static Map<Integer, PlatformCommandEnum> codeToPlatformCommandCodeMapping;
 
 	private int code;
 	private CommandTargetEnum target;
@@ -64,19 +64,19 @@ public enum PlatformCommandEnum implements RoboUnitCommand, RoboHardwareEnum<Com
 	}
 
 	public static PlatformCommandEnum getRequestValue(String name) {
-		if (codeToLegoCommandCodeMapping == null) {
-			codeToLegoCommandCodeMapping = initMapping();
+		if (codeToPlatformCommandCodeMapping == null) {
+			codeToPlatformCommandCodeMapping = initMapping();
 		}
-		return codeToLegoCommandCodeMapping.entrySet().stream().filter(e -> e.getValue().getName().equals(name))
+		return codeToPlatformCommandCodeMapping.entrySet().stream().filter(e -> e.getValue().getName().equals(name))
 				.map(Map.Entry::getValue).reduce(null, (e1, e2) -> e2);
 	}
 
 	public static PlatformCommandEnum getRequestCommand(CommandTargetEnum target, String name) {
-		if (codeToLegoCommandCodeMapping == null) {
-			codeToLegoCommandCodeMapping = initMapping();
+		if (codeToPlatformCommandCodeMapping == null) {
+			codeToPlatformCommandCodeMapping = initMapping();
 		}
 
-		return codeToLegoCommandCodeMapping.entrySet().stream().map(Map.Entry::getValue)
+		return codeToPlatformCommandCodeMapping.entrySet().stream().map(Map.Entry::getValue)
 				.filter(v -> v.getTarget().equals(target)).filter(v -> v.getName().equals(name))
 				.reduce(null, (e1, e2) -> e2);
 	}
