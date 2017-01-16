@@ -29,7 +29,7 @@ import com.robo4j.math.geometry.Point2D;
  * 
  * @author Marcus Hirt
  */
-@EventDefinition(path = "coffe/scan/scanpoint", name = "Scan Point 2D", description = "An instant event for a scanned point relative to the robot.", stacktrace = false, thread = true)
+@EventDefinition(path = "robo4j/scan/scanpoint2d", name = "Scan Point 2D", description = "An instant event for a scanned point relative to the robot.", stacktrace = false, thread = true)
 @SuppressWarnings("deprecation")
 public class ScanPoint2DEvent extends InstantEvent {
 	@ValueDefinition(name = "X", description = "X value of the point.")
