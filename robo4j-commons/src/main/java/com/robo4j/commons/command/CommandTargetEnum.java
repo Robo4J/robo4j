@@ -36,6 +36,7 @@ public enum CommandTargetEnum implements RoboHardwareEnum<Integer> {
 	PLATFORM		(1, "platform"),
 	HAND_UNIT		(2, "hand_unit"),
 	FRONT_UNIT		(3, "front_unit"),
+	LCD_UNIT		(4, "lcd_unit"),
 	;
 	// @formatter:on
 

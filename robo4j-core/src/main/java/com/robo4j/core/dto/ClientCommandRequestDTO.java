@@ -18,7 +18,7 @@
 
 package com.robo4j.core.dto;
 
-import com.robo4j.core.client.enums.RequestCommandEnum;
+import com.robo4j.commons.command.PlatformCommandEnum;
 import com.robo4j.core.util.ConstantUtil;
 
 /**
@@ -31,33 +31,33 @@ import com.robo4j.core.util.ConstantUtil;
 public class ClientCommandRequestDTO implements ClientCommandDTO {
 
 	private Long stamp;
-	private RequestCommandEnum type;
+	private PlatformCommandEnum type;
 	private String value;
 	private String speed;
 
 	public ClientCommandRequestDTO(String value) {
 		this.stamp = System.currentTimeMillis();
 		final String[] values = value.split(ConstantUtil.getHttpSeparator(3));
-		this.type = RequestCommandEnum.getRequestValue(values[ConstantUtil.DEFAULT_VALUE]);
+		this.type = PlatformCommandEnum.getRequestValue(values[ConstantUtil.DEFAULT_VALUE]);
 		this.value = values[1];
 		this.speed = "300";
 	}
 
-	public ClientCommandRequestDTO(RequestCommandEnum type) {
+	public ClientCommandRequestDTO(PlatformCommandEnum type) {
 		this.stamp = System.currentTimeMillis();
 		this.type = type;
 		this.value = "";
 		this.speed = "200";
 	}
 
-	public ClientCommandRequestDTO(RequestCommandEnum type, String value) {
+	public ClientCommandRequestDTO(PlatformCommandEnum type, String value) {
 		this.stamp = System.currentTimeMillis();
 		this.type = type;
 		this.value = value;
 		this.speed = "200";
 	}
 
-	public ClientCommandRequestDTO(RequestCommandEnum type, String value, String speed) {
+	public ClientCommandRequestDTO(PlatformCommandEnum type, String value, String speed) {
 		this.stamp = System.currentTimeMillis();
 		this.type = type;
 		this.value = value;
@@ -73,7 +73,7 @@ public class ClientCommandRequestDTO implements ClientCommandDTO {
 	}
 
 	@Override
-	public RequestCommandEnum getType() {
+	public PlatformCommandEnum getType() {
 		return type;
 	}
 

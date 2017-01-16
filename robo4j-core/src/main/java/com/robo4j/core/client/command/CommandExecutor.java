@@ -29,7 +29,7 @@ import com.robo4j.commons.command.GenericCommand;
 import com.robo4j.commons.concurrent.CoreBusQueue;
 import com.robo4j.commons.concurrent.LegoThreadFactory;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
-import com.robo4j.core.client.enums.RequestCommandEnum;
+import com.robo4j.commons.command.PlatformCommandEnum;
 import com.robo4j.core.client.io.ClientException;
 import com.robo4j.core.system.CommandProvider;
 import com.robo4j.core.util.ConstantUtil;
@@ -72,7 +72,7 @@ public class CommandExecutor<QueueType extends CoreBusQueue> implements AgentCon
 
 		while (active.get() && commandsQueue.peek() != null) {
 			try {
-				GenericCommand<RequestCommandEnum> command = (GenericCommand) commandsQueue.take().getEntry();
+				GenericCommand<PlatformCommandEnum> command = (GenericCommand) commandsQueue.take().getEntry();
 				SimpleLoggingUtil.debug(getClass(), "commandQueue: " + command);
 				Future<Boolean> moveFuture;
 				switch (command.getType()) {

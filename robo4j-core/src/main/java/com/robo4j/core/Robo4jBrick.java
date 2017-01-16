@@ -37,6 +37,14 @@ public class Robo4jBrick extends AbstractClient {
 
 	private boolean initiate;
 
+	/**
+	 * Entry instance
+	 *
+	 * @param clazz
+	 *            - init class
+	 * @param test
+	 *            - running on hardware (false) or test mode (true)
+	 */
 	public Robo4jBrick(Class<?> clazz, boolean test) {
 		super(new RoboReflectionScan(clazz).init(test));
 		this.initiate = false;

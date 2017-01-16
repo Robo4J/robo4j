@@ -18,7 +18,7 @@
 
 package com.robo4j.core.dto;
 
-import com.robo4j.core.client.enums.RequestCommandEnum;
+import com.robo4j.commons.command.PlatformCommandEnum;
 
 /**
  * Transformed command interface
@@ -28,7 +28,7 @@ import com.robo4j.core.client.enums.RequestCommandEnum;
  */
 public interface ClientCommandDTO {
 
-	RequestCommandEnum getType();
+	PlatformCommandEnum getType();
 
 	String getValue();
 
