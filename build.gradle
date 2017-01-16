@@ -14,7 +14,7 @@ repositories {
 }
 
 project("robo4j-core") {
-    description = "Robo4j-Brick-Client"
+    description = "Robo4J Core"
 
     group 'com.robo4j'
     version "${robo4jVersion}"
@@ -43,7 +43,7 @@ project("robo4j-core") {
 }
 
 project("robo4j-commons") {
-    description = "Robo4j-Commons"
+    description = "Robo4J Common"
 
     group 'com.robo4j'
     version "${robo4jVersion}"
@@ -67,7 +67,7 @@ project("robo4j-commons") {
 }
 
 project("robo4j-hw-rpi") {
-    description = "Robo4j-RaspberryPi/Arduino"
+    description = "Robo4J RaspberryPi Hardware"
 
     group 'com.robo4j'
     version "${robo4jVersion}"
@@ -127,7 +127,7 @@ project("robo4j-hw-rpi") {
 }
 
 project("robo4j-lego") {
-    description = "Robo4j-Lego"
+    description = "Robo4J Lego"
 
     group 'com.robo4j'
     version "${robo4jVersion}"
@@ -164,7 +164,7 @@ project("robo4j-lego") {
 }
 
 project("robo4j-math") {
-    description = "Robo4j-Math"
+    description = "Robo4J Math"
 
     group 'com.robo4j'
     version "${robo4jVersion}"
@@ -189,7 +189,7 @@ project("robo4j-math") {
 
 
 project("robo4j-http") {
-    description = "Robo4j-Http"
+    description = "Robo4j Http"
 
     group 'com.robo4j'
     version "${robo4jVersion}"
@@ -213,7 +213,7 @@ project("robo4j-http") {
 }
 
 project("robo4j-page") {
-    description = "Robo4j-Page"
+    description = "Robo4J Page"
 
     group 'com.robo4j'
     version "${robo4jVersion}"
@@ -238,7 +238,7 @@ project("robo4j-page") {
 
 
 project("robo4j-rpi") {
-    description = "Robo4j-RaspberryPi/Arduino"
+    description = "Robo4J Raspberry Pi"
 
     group 'com.robo4j'
     version "${robo4jVersion}"
