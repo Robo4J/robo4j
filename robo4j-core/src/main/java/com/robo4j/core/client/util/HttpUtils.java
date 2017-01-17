@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.robo4j.commons.command.AdafruitLcdCommandEnum;
+import com.robo4j.core.dto.ClientAdafruitLcdCommandRequestDTO;
+import com.robo4j.core.dto.ClientCommandDTO;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -35,7 +38,7 @@ import org.json.simple.parser.ParseException;
 import com.robo4j.commons.command.CommandTargetEnum;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.commons.command.PlatformCommandEnum;
-import com.robo4j.core.dto.ClientCommandRequestDTO;
+import com.robo4j.core.dto.ClientMotorCommandRequestDTO;
 import com.robo4j.core.dto.ClientRequestDTO;
 import com.robo4j.core.dto.ClientUnitRequestDTO;
 import com.robo4j.core.dto.HttpRequestElementDTO;
@@ -77,7 +80,8 @@ public final class HttpUtils {
 	public static ClientRequestDTO transformToCommands(final String buffer) throws ParseException {
 		final JSONParser parser = new JSONParser();
 		final JSONObject request = (JSONObject) parser.parse(String.valueOf(buffer));
-		final List<ClientCommandRequestDTO> commands = new LinkedList<>();
+		//TODO FIXME : change it
+		final List<ClientCommandDTO<?>> commands = new LinkedList<>();
 		final List<ClientUnitRequestDTO> units = new LinkedList<>();
 
 		// TODO :: need to do review
@@ -107,8 +111,8 @@ public final class HttpUtils {
 		return result;
 	}
 
-	public static List<ClientCommandRequestDTO> parseURIQuery(final String uriQuery, final String delimiter) {
-		return Arrays.stream(uriQuery.split(delimiter)).filter(e -> !e.isEmpty()).map(ClientCommandRequestDTO::new)
+	public static List<ClientCommandDTO<?>> parseURIQuery(final String uriQuery, final String delimiter) {
+		return Arrays.stream(uriQuery.split(delimiter)).filter(e -> !e.isEmpty()).map(ClientMotorCommandRequestDTO::new)
 				.collect(Collectors.toCollection(LinkedList::new));
 	}
 
@@ -129,23 +133,40 @@ public final class HttpUtils {
 		return result;
 	}
 
-	// TODO: can be standardised
+	// TODO: this need to be standardized and refactoring to make possible accept different kind of commands (by target)
 	@SuppressWarnings(value = "unchecked")
-	private static List<ClientCommandRequestDTO> parseJSONToCommandsArray(final JSONArray jsonArray) {
-		return (List<ClientCommandRequestDTO>) jsonArray.stream().map(e -> {
+	private static List<ClientCommandDTO<?>> parseJSONToCommandsArray(final JSONArray jsonArray) {
+		return (List<ClientCommandDTO<?>>) jsonArray.stream().map(e -> {
 			JSONObject obj = (JSONObject) e;
 			final String target = obj.get("target").toString();
+			CommandTargetEnum commandTarget = CommandTargetEnum.getByName(target);
 			final String name = obj.get("name").toString();
-			final String value = obj.containsKey(HTTP_REQUEST_VALUE) ? obj.get(HTTP_REQUEST_VALUE).toString()
-					: ConstantUtil.EMPTY_STRING;
-			PlatformCommandEnum command = PlatformCommandEnum.getRequestCommand(CommandTargetEnum.getByName(target),
-					name);
-			if (obj.containsKey("speed")) {
-				final String speed = obj.get("speed").toString();
-				return new ClientCommandRequestDTO(command, value, speed);
-			} else {
-				return new ClientCommandRequestDTO(command, value);
+
+			switch (commandTarget){
+				case LCD_UNIT:
+
+					AdafruitLcdCommandEnum lcdCommand = AdafruitLcdCommandEnum.getRequestValue(name);
+					SimpleLoggingUtil.debug(HttpUtils.class, "LCD Command: " + lcdCommand);
+					return new ClientAdafruitLcdCommandRequestDTO(lcdCommand);
+
+				case FRONT_UNIT:
+				case HAND_UNIT:
+				case SYSTEM:
+				case PLATFORM:
+				default:
+					final String value = obj.containsKey(HTTP_REQUEST_VALUE) ? obj.get(HTTP_REQUEST_VALUE).toString()
+							: ConstantUtil.EMPTY_STRING;
+					PlatformCommandEnum command = PlatformCommandEnum.getRequestCommand(CommandTargetEnum.getByName(target),
+							name);
+					if (obj.containsKey("speed")) {
+						final String speed = obj.get("speed").toString();
+						return new ClientMotorCommandRequestDTO(command, value, speed);
+					} else {
+						return new ClientMotorCommandRequestDTO(command, value);
+					}
 			}
+
+
 
 		}).collect(Collectors.toCollection(LinkedList::new));
 	}

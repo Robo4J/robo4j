@@ -25,9 +25,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.robo4j.commons.agent.AgentConsumer;
+import com.robo4j.commons.command.AdafruitLcdCommandEnum;
+import com.robo4j.commons.command.CommandTargetEnum;
 import com.robo4j.commons.command.GenericCommand;
 import com.robo4j.commons.concurrent.CoreBusQueue;
 import com.robo4j.commons.concurrent.LegoThreadFactory;
+import com.robo4j.commons.enums.RoboHardwareEnum;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.commons.command.PlatformCommandEnum;
 import com.robo4j.core.client.io.ClientException;
@@ -72,31 +75,22 @@ public class CommandExecutor<QueueType extends CoreBusQueue> implements AgentCon
 
 		while (active.get() && commandsQueue.peek() != null) {
 			try {
-				GenericCommand<PlatformCommandEnum> command = (GenericCommand) commandsQueue.take().getEntry();
-				SimpleLoggingUtil.debug(getClass(), "commandQueue: " + command);
-				Future<Boolean> moveFuture;
-				switch (command.getType()) {
-				case BACK:
-				case MOVE:
-				case RIGHT:
-				case LEFT:
-				case STOP:
-				case EXIT:
-				case HAND:
-				case FRONT_RIGHT:
-				case FRONT_LEFT:
-					moveFuture = executorForCommands.submit(() -> commandsProvider.process(command));
-					break;
-				default:
-					System.err.println("NO SUCH COMMAND= " + command);
-					throw new ClientException("NO SUCH COMMAND= " + command);
+				GenericCommand<? extends RoboHardwareEnum<?, CommandTargetEnum>> tmpCommand = (GenericCommand) commandsQueue.take().getEntry();
+
+				//TODO: nothing and simplify
+				if(tmpCommand.getType() instanceof PlatformCommandEnum){
+					Future<Boolean> moveFuture = executorForCommands.submit(() -> commandsProvider.process(tmpCommand));
+					boolean result = moveFuture.get();
+					SimpleLoggingUtil.print(getClass(), "CommandExecutor: " + result);
 				}
 
-				boolean result = moveFuture.get();
-				SimpleLoggingUtil.print(getClass(), "CommandExecutor: " + result);
-				// if(!result){
-				// throw new ClientException("ERROR ENGINE EXECUTION");
-				// }
+				if(tmpCommand.getType() instanceof AdafruitLcdCommandEnum){
+					SimpleLoggingUtil.debug(getClass(), "AdafruitLcdCommandEnum: " + tmpCommand);
+					Future<Boolean> moveFuture = executorForCommands.submit(() -> commandsProvider.process(tmpCommand));
+					boolean result = moveFuture.get();
+					SimpleLoggingUtil.print(getClass(), "CommandExecutor: " + result);
+				}
+
 			} catch (InterruptedException | ExecutionException e) {
 				SimpleLoggingUtil.print(getClass(), "CommandExecutor e= " + e);
 				throw new ClientException("ERROR CONSUMER command execution, ", e);

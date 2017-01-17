@@ -18,8 +18,10 @@
 
 package com.robo4j.core.system;
 
+import com.robo4j.commons.command.CommandTargetEnum;
 import com.robo4j.commons.command.GenericCommand;
 import com.robo4j.commons.command.PlatformCommandEnum;
+import com.robo4j.commons.enums.RoboHardwareEnum;
 
 /**
  * RoboUnit doesn't included the definition of the process method. Reason
@@ -30,5 +32,5 @@ import com.robo4j.commons.command.PlatformCommandEnum;
  */
 public interface CommandProvider {
 
-	boolean process(GenericCommand<PlatformCommandEnum> command);
+	boolean process(GenericCommand<? extends RoboHardwareEnum<?, CommandTargetEnum>> command);
 }

@@ -31,7 +31,7 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
  * @author Miro Wengner (@miragemiko)
  * @since 15.01.2017
  */
-public enum AdafruitLcdCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum> {
+public enum AdafruitLcdCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum, CommandTargetEnum> {
 
     // @formatter:off
 	EXIT		    (0, 	LCD_UNIT, "exit"),

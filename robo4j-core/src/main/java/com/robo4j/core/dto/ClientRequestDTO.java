@@ -28,15 +28,15 @@ import java.util.List;
  */
 public class ClientRequestDTO {
 
-	private final List<ClientCommandRequestDTO> commands;
+	private final List<ClientCommandDTO<?>> commands;
 	private final List<ClientUnitRequestDTO> units;
 
-	public ClientRequestDTO(List<ClientCommandRequestDTO> commands, List<ClientUnitRequestDTO> units) {
+	public ClientRequestDTO(List<ClientCommandDTO<?>> commands, List<ClientUnitRequestDTO> units) {
 		this.commands = commands;
 		this.units = units;
 	}
 
-	public List<ClientCommandRequestDTO> getCommands() {
+	public List<ClientCommandDTO<?>> getCommands() {
 		return commands;
 	}
 

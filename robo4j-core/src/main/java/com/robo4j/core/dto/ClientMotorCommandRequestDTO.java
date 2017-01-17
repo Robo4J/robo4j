@@ -28,14 +28,16 @@ import com.robo4j.core.util.ConstantUtil;
  * @author Miroslav Wengner (@miragemiko)
  * @since 11.06.2016
  */
-public class ClientCommandRequestDTO implements ClientCommandDTO {
+
+//TODO: FIXME refactor -> separate
+public class ClientMotorCommandRequestDTO implements ClientCommandDTO<PlatformCommandEnum> {
 
 	private Long stamp;
 	private PlatformCommandEnum type;
 	private String value;
 	private String speed;
 
-	public ClientCommandRequestDTO(String value) {
+	public ClientMotorCommandRequestDTO(String value) {
 		this.stamp = System.currentTimeMillis();
 		final String[] values = value.split(ConstantUtil.getHttpSeparator(3));
 		this.type = PlatformCommandEnum.getRequestValue(values[ConstantUtil.DEFAULT_VALUE]);
@@ -43,21 +45,21 @@ public class ClientCommandRequestDTO implements ClientCommandDTO {
 		this.speed = "300";
 	}
 
-	public ClientCommandRequestDTO(PlatformCommandEnum type) {
+	public ClientMotorCommandRequestDTO(PlatformCommandEnum type) {
 		this.stamp = System.currentTimeMillis();
 		this.type = type;
 		this.value = "";
 		this.speed = "200";
 	}
 
-	public ClientCommandRequestDTO(PlatformCommandEnum type, String value) {
+	public ClientMotorCommandRequestDTO(PlatformCommandEnum type, String value) {
 		this.stamp = System.currentTimeMillis();
 		this.type = type;
 		this.value = value;
 		this.speed = "200";
 	}
 
-	public ClientCommandRequestDTO(PlatformCommandEnum type, String value, String speed) {
+	public ClientMotorCommandRequestDTO(PlatformCommandEnum type, String value, String speed) {
 		this.stamp = System.currentTimeMillis();
 		this.type = type;
 		this.value = value;

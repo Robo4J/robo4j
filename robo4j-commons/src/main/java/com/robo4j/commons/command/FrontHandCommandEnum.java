@@ -27,7 +27,9 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
  * @author Miroslav Wengner (@miragemiko)
  * @since 27.04.2016
  */
-public enum FrontHandCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum> {
+
+//TODO: FIXME
+public enum FrontHandCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum, CommandTargetEnum> {
 
 	// @formatter:off
 	EXIT(0, "exit"),
@@ -72,9 +74,16 @@ public enum FrontHandCommandEnum implements RoboUnitCommand, RoboHardwareEnum<Co
 		return code;
 	}
 
+
+
 	@Override
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public CommandTargetEnum getTarget() {
+		return CommandTargetEnum.FRONT_UNIT;
 	}
 
 	@Override

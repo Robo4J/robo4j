@@ -22,9 +22,12 @@ package com.robo4j.commons.enums;
  * @author Miroslav Wengner (@miragemiko)
  * @since 04.05.2016
  */
-public interface RoboHardwareEnum<Type> {
+public interface RoboHardwareEnum<Type, TargetType> {
 
 	Type getType();
 
 	String getName();
+
+	TargetType getTarget();
+
 }

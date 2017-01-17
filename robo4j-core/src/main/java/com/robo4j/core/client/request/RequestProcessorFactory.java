@@ -34,6 +34,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import com.robo4j.core.dto.ClientCommandDTO;
 import org.json.simple.parser.ParseException;
 
 import com.robo4j.commons.agent.AgentConsumer;
@@ -62,7 +63,7 @@ import com.robo4j.core.client.enums.RequestUnitTypeEnum;
 import com.robo4j.core.client.http.HttpPageLoader;
 import com.robo4j.core.client.util.ClientCommException;
 import com.robo4j.core.client.util.HttpUtils;
-import com.robo4j.core.dto.ClientCommandRequestDTO;
+import com.robo4j.core.dto.ClientMotorCommandRequestDTO;
 import com.robo4j.core.dto.ClientRequestDTO;
 import com.robo4j.core.service.HttpMessageService;
 import com.robo4j.core.service.LcdService;
@@ -86,7 +87,7 @@ public final class RequestProcessorFactory {
 	private final List<GenericAgent> agents;
 	private volatile ExecutorService factoryExecutor;
 	private volatile AtomicBoolean activeThread;
-	private volatile LinkedBlockingQueue<List<ClientCommandRequestDTO>> commandQueue;
+	private volatile LinkedBlockingQueue<List<ClientCommandDTO<?>>> commandQueue;
 	private RegistryManager registryManager;
 	private RoboRegistry unitRegistry;
 	private LcdService lcdService;
@@ -171,20 +172,14 @@ public final class RequestProcessorFactory {
 				case STATUS:
 					final ReceiverAgent receiverAgent = (ReceiverAgent) agents.get(MAIN_FACTORY_AGENT);
 					generatedMessage = getWebPageByEnum(page, receiverAgent.getCache().toString());
-					message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length())); // send
-																												// a
-																												// MIME
-																												// header
+					message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));
 					message.append(generatedMessage);
 					break;
 				case EXIT:
 					// TODO: // FIXME: 13/11/2016 need to be changed
 					activeThread.set(false);
 					generatedMessage = pageLoader.getWebPage(page.getPage());
-					message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length())); // send
-																												// a
-																												// MIME
-																												// header
+					message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));
 					message.append(generatedMessage);
 					result = RequestUnitStatusEnum.STOP;
 					factoryExecutor.shutdown();
@@ -200,23 +195,19 @@ public final class RequestProcessorFactory {
 				default:
 					break;
 				}
+
+				//TODO: FIXME
 			} else if (uri != null && uri.getQuery() != null && !uri.getQuery().isEmpty()) {
-				final List<ClientCommandRequestDTO> resultList = HttpUtils.parseURIQuery(uri.getQuery(),
+				final List<ClientCommandDTO<?>> resultList = HttpUtils.parseURIQuery(uri.getQuery(),
 						ConstantUtil.HTTP_QUERY_SEP);
 				commandQueue.put(resultList);
 				addAgentMessage(AgentStatusEnum.REQUEST_GET, resultList.toString());
 				generatedMessage = getWebPageByEnum(PageEnum.SUCCESS, resultList.toString());
-				message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length())); // send
-																											// a
-																											// MIME
-																											// header
+				message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));
 				message.append(generatedMessage);
 			} else {
 				generatedMessage = pageLoader.getWebPage(PageEnum.WELCOME.getPage());
-				message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length())); // send
-																											// a
-																											// MIME
-																											// header
+				message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));
 				message.append(generatedMessage);
 			}
 
@@ -241,6 +232,8 @@ public final class RequestProcessorFactory {
 
 				final ClientRequestDTO parsedRequest = HttpUtils.transformToCommands(String.valueOf(buffer));
 
+				SimpleLoggingUtil.debug(getClass(), "ProcessPost: parsedRequest: " + parsedRequest);
+
 				/* POST input parser: commands, brainUnits */
 				if (parsedRequest.getCommands().size() > ConstantUtil.DEFAULT_VALUE) {
 					addAgentMessage(AgentStatusEnum.REQUEST_POST, parsedRequest.getCommands().toString());
@@ -258,7 +251,7 @@ public final class RequestProcessorFactory {
 							if (!u.getActive()) {
 								try {
 									commandQueue.put(Collections
-											.singletonList(new ClientCommandRequestDTO(PlatformCommandEnum.STOP)));
+											.singletonList(new ClientMotorCommandRequestDTO(PlatformCommandEnum.STOP)));
 								} catch (InterruptedException e) {
 									SimpleLoggingUtil.error(getClass(), "BrainUnit: " + " no stop");
 								}
@@ -291,9 +284,9 @@ public final class RequestProcessorFactory {
 				"No Information about POST");
 	}
 
-	public void processInternalCommand(final ClientCommandRequestDTO clientCommandRequestDTO) {
+	public void processInternalCommand(final ClientMotorCommandRequestDTO clientEngineCommandRequestDTO) {
 		try {
-			commandQueue.put(Collections.singletonList(clientCommandRequestDTO));
+			commandQueue.put(Collections.singletonList(clientEngineCommandRequestDTO));
 		} catch (InterruptedException e) {
 			throw new ClientCommException("InternalCommand issue:", e);
 		}
@@ -303,10 +296,7 @@ public final class RequestProcessorFactory {
 
 		final StringBuilder message = new StringBuilder(pageLoader.getWebPage(PageEnum.ERROR.getPage()));
 		if (HttpVersion.containsValue(httpMessage.getVersion())) {
-			message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_NOT, message.length())); // send
-																								// a
-																								// MIME
-																								// header
+			message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_NOT, message.length()));
 		} else {
 			message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_NOT_ALLOWED, message.length()));
 		}

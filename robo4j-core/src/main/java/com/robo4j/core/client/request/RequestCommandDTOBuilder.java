@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.robo4j.commons.command.PlatformCommandEnum;
 import com.robo4j.core.dto.ClientCommandDTO;
 
 /**
@@ -32,7 +33,7 @@ import com.robo4j.core.dto.ClientCommandDTO;
  */
 public class RequestCommandDTOBuilder {
 
-	public static final class Builder<DTOObject extends ClientCommandDTO> {
+	public static final class Builder<DTOObject extends ClientCommandDTO<PlatformCommandEnum>> {
 
 		private final List<DTOObject> content;
 

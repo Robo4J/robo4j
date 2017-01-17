@@ -28,11 +28,15 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
  * @author Miroslav Wengner (@miragemiko)
  * @since 19.06.2016
  */
-public enum LegoSensorPortEnum implements RoboHardwareEnum<String>, RoboSystemConfig {
+public enum LegoSensorPortEnum implements RoboHardwareEnum<String, LegoSensorPortEnum>, RoboSystemConfig {
 
 	// @formatter:off
 	// type name
-	S1("S1", "Sensor S1"), S2("S2", "Sensor S2"), S3("S3", "Sensor S3"), S4("S4", "Sensor S4"),;
+	S1		("S1", "Sensor S1"),
+	S2		("S2", "Sensor S2"),
+	S3		("S3", "Sensor S3"),
+	S4		("S4", "Sensor S4"),
+	;
 	// @formatter:on
 
 	private String type;
@@ -52,6 +56,12 @@ public enum LegoSensorPortEnum implements RoboHardwareEnum<String>, RoboSystemCo
 	public String getName() {
 		return name;
 	}
+
+	@Override
+	public LegoSensorPortEnum getTarget() {
+		return null;
+	}
+
 
 	@Override
 	public String toString() {

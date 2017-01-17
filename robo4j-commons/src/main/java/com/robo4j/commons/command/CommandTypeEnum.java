@@ -30,7 +30,9 @@ import com.robo4j.commons.util.CommandUtil;
  * @author Miroslav Wengner (@miragemiko)
  * @since 24.06.2016
  */
-public enum CommandTypeEnum implements RoboHardwareEnum<Integer> {
+
+//TODO: FIXME -> CommandTargetEnum remove
+public enum CommandTypeEnum implements RoboHardwareEnum<Integer, CommandTargetEnum> {
 
 	// @formatter:off
 	BATCH		(0, "B".concat(CommandUtil.getElementClose())),
@@ -71,6 +73,12 @@ public enum CommandTypeEnum implements RoboHardwareEnum<Integer> {
 	public String getName() {
 		return name;
 	}
+
+	@Override
+	public CommandTargetEnum getTarget() {
+		return null;
+	}
+
 
 	@Override
 	public String toString() {

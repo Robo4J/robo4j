@@ -23,12 +23,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.robo4j.commons.agent.AgentProducer;
+import com.robo4j.commons.command.AdafruitLcdCommandEnum;
 import com.robo4j.commons.command.GenericCommand;
 import com.robo4j.commons.concurrent.QueueFIFOEntry;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.core.bus.ClientBusQueue;
 import com.robo4j.commons.command.PlatformCommandEnum;
-import com.robo4j.core.dto.ClientCommandRequestDTO;
+import com.robo4j.core.dto.ClientAdafruitLcdCommandRequestDTO;
+import com.robo4j.core.dto.ClientCommandDTO;
+import com.robo4j.core.dto.ClientMotorCommandRequestDTO;
 import com.robo4j.core.util.ConstantUtil;
 
 /**
@@ -43,9 +46,9 @@ public final class CommandProcessor implements AgentProducer, Runnable {
 	private static final int AWAIT_SECONDS = 2;
 	private volatile AtomicBoolean active;
 	private volatile ClientBusQueue messageQueue;
-	private volatile LinkedBlockingQueue<List<ClientCommandRequestDTO>> inputQueue;
+	private volatile LinkedBlockingQueue<List<ClientCommandDTO<?>>> inputQueue;
 
-	public CommandProcessor(AtomicBoolean active, LinkedBlockingQueue<List<ClientCommandRequestDTO>> inputQueue) {
+	public CommandProcessor(AtomicBoolean active, LinkedBlockingQueue<List<ClientCommandDTO<?>>> inputQueue) {
 		messageQueue = new ClientBusQueue<QueueFIFOEntry<?>>(AWAIT_SECONDS);
 		this.active = active;
 		this.inputQueue = inputQueue;
@@ -63,21 +66,18 @@ public final class CommandProcessor implements AgentProducer, Runnable {
 		// TODO: improve this part separate
 		try {
 			while (active.get()) {
-				final List<ClientCommandRequestDTO> commandQueue = inputQueue.take();
-				for (ClientCommandRequestDTO element : commandQueue) {
-					switch (element.getType()) {
-					case EXIT:
-					case MOVE:
-					case BACK:
-					case LEFT:
-					case RIGHT:
-					case STOP:
-					case HAND:
-					case FRONT_LEFT:
-					case FRONT_RIGHT:
-						messageQueue.transfer(getCommand(element.getType(), element.getValue(), element.getSpeed()));
-						break;
-					default:
+				final List<ClientCommandDTO<?>> commandQueue = inputQueue.take();
+				for (ClientCommandDTO<?> element : commandQueue) {
+
+					if(element instanceof ClientMotorCommandRequestDTO){
+						ClientMotorCommandRequestDTO commandElement = (ClientMotorCommandRequestDTO) element;
+						messageQueue.transfer(getCommand(commandElement.getType(), element.getValue(), commandElement.getSpeed()));
+
+					}
+
+					if(element instanceof ClientAdafruitLcdCommandRequestDTO){
+						SimpleLoggingUtil.debug(getClass(), "ALMOST DONE: " + element);
+						messageQueue.transfer(getCommand(((ClientAdafruitLcdCommandRequestDTO) element).getType()));
 					}
 
 				}
@@ -95,6 +95,14 @@ public final class CommandProcessor implements AgentProducer, Runnable {
 		/* client command holding default values */
 		final ClientCommandProperties properties = new ClientCommandProperties(Integer.parseInt(speed));
 		final GenericCommand<PlatformCommandEnum> command = new GenericCommand<>(properties, type, value,
+				ConstantUtil.DEFAULT_PRIORITY);
+		return new QueueFIFOEntry<>(command);
+	}
+
+	@SuppressWarnings(value = "unchecked")
+	private QueueFIFOEntry getCommand(AdafruitLcdCommandEnum element){
+		final ClientCommandProperties properties = new ClientCommandProperties(0);
+		final GenericCommand<AdafruitLcdCommandEnum> command = new GenericCommand<>(properties, element, "",
 				ConstantUtil.DEFAULT_PRIORITY);
 		return new QueueFIFOEntry<>(command);
 	}

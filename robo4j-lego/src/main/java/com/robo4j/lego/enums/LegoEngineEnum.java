@@ -26,11 +26,14 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
  * @author Miroslav Wengner (@miragemiko)
  * @since 04.05.2016
  */
-public enum LegoEngineEnum implements RoboHardwareEnum<Character>, RoboSystemConfig {
+public enum LegoEngineEnum implements RoboHardwareEnum<Character, LegoEngineEnum>, RoboSystemConfig {
 
 	// @formatter:off
 	// Type name
-	NXT('N', "NXTRegulatedMotor"), LARGE('L', "EV3LargeRegulatedMotor"), MEDIUM('M', "EV3MediumRegulatedMotor"),;
+	NXT			('N', "NXTRegulatedMotor"),
+	LARGE		('L', "EV3LargeRegulatedMotor"),
+	MEDIUM		('M', "EV3MediumRegulatedMotor"),
+	;
 	// @formatter:on
 
 	private char type;
@@ -50,6 +53,12 @@ public enum LegoEngineEnum implements RoboHardwareEnum<Character>, RoboSystemCon
 	public String getName() {
 		return name;
 	}
+
+	@Override
+	public LegoEngineEnum getTarget() {
+		return null;
+	}
+
 
 	@Override
 	public String toString() {

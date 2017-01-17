@@ -26,12 +26,13 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
  * @author Miroslav Wengner (@miragemiko)
  * @since 05.05.2016
  */
-public enum LegoEnginePartEnum implements RoboHardwareEnum<String>, RoboSystemConfig {
+public enum LegoEnginePartEnum implements RoboHardwareEnum<String, LegoEnginePartEnum>, RoboSystemConfig {
 
-	// @formatter:off
-	NONE("NONE", "not assigned"), PLATFORM("PLATFORM", "Platform Engine to control direction"), HAND("HAND",
-			"Engine controls Lego Hand"),;
-	// @formatter:on
+	//@formatter:off
+	NONE			("NONE", "not assigned"),
+	PLATFORM		("PLATFORM", "Platform Engine to control direction"),
+	HAND			("HAND","Engine controls Lego Hand"),;
+	//@formatter:on
 
 	private String type;
 	private String name;
@@ -50,6 +51,12 @@ public enum LegoEnginePartEnum implements RoboHardwareEnum<String>, RoboSystemCo
 	public String getName() {
 		return name;
 	}
+
+	@Override
+	public LegoEnginePartEnum getTarget() {
+		return null;
+	}
+
 
 	@Override
 	public String toString() {

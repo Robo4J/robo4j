@@ -24,9 +24,14 @@ package com.robo4j.commons.enums;
  */
 public enum RegistryTypeEnum {
 
-	// @formatter:on
-	ENGINES(1, "engines"), SENSORS(2, "sensors"), UNITS(3, "units"), SERVICES(4, "services"), PROVIDER(5, "providers"),;
 	// @formatter:off
+	ENGINES		(1, "engines"),
+	SENSORS		(2, "sensors"),
+	UNITS		(3, "units"),
+	SERVICES	(4, "services"),
+	PROVIDER	(5, "providers"),
+	;
+	// @formatter:on
 
 	int id;
 	String name;

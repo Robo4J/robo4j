@@ -29,7 +29,7 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
  * @author Miroslav Wengner (@miragemiko)
  * @since 05.07.2016
  */
-public enum CommandTargetEnum implements RoboHardwareEnum<Integer> {
+public enum CommandTargetEnum implements RoboHardwareEnum<Integer, CommandTargetEnum> {
 
 	// @formatter:off
 	SYSTEM			(0, "system"),
@@ -71,6 +71,12 @@ public enum CommandTargetEnum implements RoboHardwareEnum<Integer> {
 	public String getName() {
 		return name;
 	}
+
+	@Override
+	public CommandTargetEnum getTarget() {
+		return this;
+	}
+
 
 	@Override
 	public String toString() {

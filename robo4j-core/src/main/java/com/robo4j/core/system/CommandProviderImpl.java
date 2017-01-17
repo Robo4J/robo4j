@@ -35,11 +35,15 @@ import com.robo4j.commons.agent.AgentStatus;
 import com.robo4j.commons.agent.GenericAgent;
 import com.robo4j.commons.agent.ProcessAgent;
 import com.robo4j.commons.agent.ProcessAgentBuilder;
+import com.robo4j.commons.command.AdafruitLcdCommandEnum;
+import com.robo4j.commons.command.CommandTargetEnum;
+import com.robo4j.commons.command.CommandTypeEnum;
 import com.robo4j.commons.command.GenericCommand;
 import com.robo4j.commons.command.RoboUnitCommand;
 import com.robo4j.commons.concurrent.LegoThreadFactory;
 import com.robo4j.commons.control.RoboSystemConfig;
 import com.robo4j.commons.enums.RegistryTypeEnum;
+import com.robo4j.commons.enums.RoboHardwareEnum;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.commons.registry.RegistryManager;
 import com.robo4j.commons.registry.RoboRegistry;
@@ -56,6 +60,7 @@ import com.robo4j.core.util.ConstantUtil;
  * @author Miroslav Wengner (@miragemiko)
  * @since 10.06.2016
  */
+@SuppressWarnings(value = "unchecked")
 public class CommandProviderImpl extends DefaultUnit implements CommandProvider {
 
 	private final List<GenericAgent> agents;
@@ -102,19 +107,25 @@ public class CommandProviderImpl extends DefaultUnit implements CommandProvider 
 		SimpleLoggingUtil.error(getClass(), "setExecutors Called");
 	}
 
+
+
+
 	@SuppressWarnings(value = "unchecked")
 	@Override
-	public boolean process(final GenericCommand<PlatformCommandEnum> command) {
+	public boolean process(final GenericCommand<? extends RoboHardwareEnum<?, CommandTargetEnum>> command) {
 		SimpleLoggingUtil.debug(getClass(), "process: " + command);
+
 		switch (command.getType().getTarget()) {
 		case SYSTEM:
-			return processSystemCommand(command);
+			return processSystemCommand((GenericCommand<PlatformCommandEnum>)command);
 		case PLATFORM:
-			return processPlatformCommand(command);
+			return processPlatformCommand((GenericCommand<PlatformCommandEnum>)command);
 		case HAND_UNIT:
-			return processHandUnitCommand(command);
+			return processHandUnitCommand((GenericCommand<PlatformCommandEnum>)command);
 		case FRONT_UNIT:
-			return processFrontUnitCommand(command);
+			return processFrontUnitCommand((GenericCommand<PlatformCommandEnum>)command);
+		case LCD_UNIT:
+			return processLcdUnitCommand((GenericCommand<AdafruitLcdCommandEnum>)command);
 		default:
 			throw new ClientException("no such command target= " + command);
 		}
@@ -195,7 +206,12 @@ public class CommandProviderImpl extends DefaultUnit implements CommandProvider 
 		return processUnitByName("frontUnit", command);
 	}
 
-	private boolean processUnitByName(final String name, final GenericCommand<PlatformCommandEnum> command) {
+	private boolean processLcdUnitCommand(final GenericCommand<AdafruitLcdCommandEnum> command){
+		SimpleLoggingUtil.debug(getClass(), "processLcdUnitCommand Unit units= " + units);
+		return processUnitByName("lcdUnit", command);
+	}
+
+	private boolean processUnitByName(final String name, final GenericCommand<?> command) {
 		Optional<GenericUnit> optUnit = units.stream().filter(u -> {
 			SimpleLoggingUtil.print(CommandProviderImpl.class, "processUnitByName " + u.getUnitName());
 			return u.getUnitName().contains(name);

@@ -36,7 +36,9 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
  * @author Miroslav Wengner (@miragemiko)
  * @since 09.06.2016
  */
-public enum PlatformCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum> {
+
+//TODO: FIXME -> needs to be changed simplified duplication
+public enum PlatformCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum, CommandTargetEnum> {
 
 	// @formatter:off
 	EXIT		(0, 	SYSTEM, "exit"),
@@ -46,6 +48,7 @@ public enum PlatformCommandEnum implements RoboUnitCommand, RoboHardwareEnum<Com
 	BACK		(4, 	PLATFORM, "back"),
 	STOP		(5, 	PLATFORM, "stop"),
 	HAND		(6, 	HAND_UNIT,"hand"),
+	//TODO: remove to separate class
 	FRONT_LEFT	(7, FRONT_UNIT, "front_left"),
 	FRONT_RIGHT	(8, FRONT_UNIT, "front_right"),
 	;
@@ -100,6 +103,7 @@ public enum PlatformCommandEnum implements RoboUnitCommand, RoboHardwareEnum<Com
 		return name;
 	}
 
+	@Override
 	public CommandTargetEnum getTarget() {
 		return target;
 	}

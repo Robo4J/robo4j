@@ -18,17 +18,15 @@
 
 package com.robo4j.core.dto;
 
-import com.robo4j.commons.command.PlatformCommandEnum;
-
 /**
  * Transformed command interface
  *
  * @author Miroslav Wengner (@miragemiko)
  * @since 19.06.2016
  */
-public interface ClientCommandDTO {
+public interface ClientCommandDTO<CommandEnum> {
 
-	PlatformCommandEnum getType();
+	CommandEnum getType();
 
 	String getValue();
 
