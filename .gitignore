@@ -1,6 +1,6 @@
-gradlew
-gradlew.bat
 licence.idea
 !/licence.idea
+/.gradle/
+/build/
 *.bak
 
