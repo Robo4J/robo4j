@@ -32,11 +32,13 @@ import java.util.stream.Collectors;
  */
 public enum PageEnum {
 
-	// @formatter:on
-	WELCOME(0, "welcome", "welcome.html", null), STATUS(1, "status", "status.html",
-			Collections.singletonList("cache")), SUCCESS(2, "success", "success.html",
-					Collections.singletonList("command")), ERROR(3, "error", "error.html", null), SETUP(4, "setup",
-							"setup.html", Collections.singletonList("setup")), EXIT(5, "exit", "exit.html", null),;
+	// @formatter:off
+	WELCOME		(0, "welcome", 	"welcome.html", 	null),
+	STATUS		(1, "status", 	"status.html", 		Collections.singletonList("cache")),
+	SUCCESS		(2, "success", 	"success.html", 	Collections.singletonList("command")),
+	ERROR		(3, "error", 	"error.html", 		null),
+	SETUP		(4, "setup",	"setup.html", 		Collections.singletonList("setup")),
+	EXIT		(5, "exit", 	"exit.html", 		null),;
 	// @formatter:on
 
 	private volatile static Map<String, PageEnum> nameToPageMapping;
