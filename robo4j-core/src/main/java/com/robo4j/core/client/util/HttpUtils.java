@@ -29,9 +29,11 @@ import java.util.stream.Collectors;
 
 import com.robo4j.commons.command.AdafruitLcdCommandEnum;
 import com.robo4j.commons.command.OneServoUnitCommandEnum;
+import com.robo4j.commons.command.SystemCommandEnum;
 import com.robo4j.core.dto.ClientAdafruitLcdCommandRequestDTO;
 import com.robo4j.core.dto.ClientCommandDTO;
 import com.robo4j.core.dto.ClientOneServoCommandRequestDTO;
+import com.robo4j.core.dto.ClientSystemRequestDTO;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -161,6 +163,7 @@ public final class HttpUtils {
 				case FRONT_UNIT:
 					return new ClientOneServoCommandRequestDTO(OneServoUnitCommandEnum.getCommand(name), value);
 				case SYSTEM:
+					return new ClientSystemRequestDTO(SystemCommandEnum.getCommand(name));
 				case HAND_UNIT:
 				default:
 					throw new ClientCommException("parseJson not implemented: " + commandTarget);

@@ -33,8 +33,8 @@ import java.util.stream.Collectors;
 public enum  SystemCommandEnum implements RoboUnitCommand, RoboHardwareEnumI<CommandTypeEnum>, RoboTargetEnumI<CommandTargetEnum> {
 
     // @formatter:off
-	INIT		(0,  "exit"),
-	EXIT		(1,  "init"),
+	EXIT		(0,  "exit"),
+    INIT		(1,  "init"),
     ;
     // @formatter:on
 
