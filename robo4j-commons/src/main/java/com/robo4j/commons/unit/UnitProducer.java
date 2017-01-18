@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2017. Miroslav Wengner, Marcus Hirt
- * This RegistryTypeEnum.java  is part of robo4j.
+ * This Producer.java  is part of robo4j.
  * module: robo4j-commons
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -17,42 +17,16 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.commons.registry;
+package com.robo4j.commons.unit;
+
+import com.robo4j.commons.control.RoboSystemConfig;
 
 /**
- * @author Miroslav Wengner (@miragemiko)
- * @since 29.11.2016
+ * @author Miro Wengner (@miragemiko)
+ * @since 18.01.2017
  */
-public enum RegistryTypeEnum {
+public interface UnitProducer extends RoboSystemConfig {
 
-	// @formatter:off
-	ENGINES			(1, "engines"),
-	SENSORS			(2, "sensors"),
-	UNITS			(3, "units"),
-	SERVICES		(4, "services"),
-	PROVIDER		(5, "providers"),
-	UNIT_PRODUCERS	(6, "producers"),
-	;
-	// @formatter:on
+    String getName();
 
-	int id;
-	String name;
-
-	RegistryTypeEnum(int id, String name) {
-		this.id = id;
-		this.name = name;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public String toString() {
-		return "RegistryTypeEnum{" + "id=" + id + ", name='" + name + '\'' + '}';
-	}
 }

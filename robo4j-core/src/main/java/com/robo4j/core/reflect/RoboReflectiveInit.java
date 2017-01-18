@@ -18,6 +18,7 @@
 
 package com.robo4j.core.reflect;
 
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -32,14 +33,16 @@ import com.robo4j.commons.annotation.RoboProvider;
 import com.robo4j.commons.annotation.RoboSensor;
 import com.robo4j.commons.annotation.RoboService;
 import com.robo4j.commons.annotation.RoboUnit;
-import com.robo4j.commons.registry.RegistryTypeEnum;
+import com.robo4j.commons.annotation.RoboUnitProducer;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.commons.motor.GenericMotor;
 import com.robo4j.commons.registry.BaseRegistryProvider;
 import com.robo4j.commons.registry.RegistryManager;
+import com.robo4j.commons.registry.RegistryTypeEnum;
 import com.robo4j.commons.sensor.GenericSensor;
 import com.robo4j.commons.service.GenericService;
 import com.robo4j.commons.unit.GenericUnit;
+import com.robo4j.commons.unit.UnitProducer;
 import com.robo4j.core.client.io.ClientException;
 
 /**
@@ -52,34 +55,44 @@ import com.robo4j.core.client.io.ClientException;
 class RoboReflectiveInit {
 
 	@SuppressWarnings(value = "unchecked")
-	RoboReflectiveInit(Stream<Class<?>> engines, Stream<Class<?>> sensors, Stream<Class<?>> units,
-			Stream<Class<?>> services, Stream<Class<?>> providers) {
+	RoboReflectiveInit(Map<Class<? extends Annotation>,  Stream<Class<?>>> coreMap) {
+
 
 		/* initiation of all caches used at the run time */
 		ExecutorService executors = Executors.newFixedThreadPool(RegistryUtil.registry.size());
-		Future<Map<String, GenericMotor>> futureEngineCache = executors.submit(() -> initEngineCache(engines));
-		Future<Map<String, GenericSensor>> futureSensorsCache = executors.submit(() -> initSensorCache(sensors));
-		Future<Map<String, GenericUnit>> futureUnitsCache = executors.submit(() -> initUnitCache(units));
-		Future<Map<String, GenericService>> futureServicesCache = executors.submit(() -> initServiceCache(services));
+		Future<Map<String, GenericMotor>> futureEngineCache =
+				executors.submit(() -> initEngineCache(coreMap.get(RoboMotor.class)));
+		Future<Map<String, GenericSensor>> futureSensorsCache =
+				executors.submit(() -> initSensorCache(coreMap.get(RoboSensor.class)));
+		Future<Map<String, UnitProducer>> futureUnitProducersCache =
+				executors.submit(() -> initUnitProducerCache(coreMap.get(RoboUnitProducer.class)));
+		Future<Map<String, GenericUnit>> futureUnitsCache =
+				executors.submit(() -> initUnitCache(coreMap.get(RoboUnit.class)));
+		Future<Map<String, GenericService>> futureServicesCache =
+				executors.submit(() -> initServiceCache(coreMap.get(RoboService.class)));
 		Future<Map<String, BaseRegistryProvider>> futureProviderCache = executors
-				.submit(() -> initProviderCache(providers));
+				.submit(() -> initProviderCache(coreMap.get(RoboProvider.class)));
 
 		try {
 			final Map<String, GenericMotor> initEngines = futureEngineCache.get();
 			final Map<String, GenericSensor> initSensors = futureSensorsCache.get();
+			final Map<String, UnitProducer> initUnitProducers = futureUnitProducersCache.get();
 			final Map<String, GenericUnit> initUnits = futureUnitsCache.get();
 			final Map<String, GenericService> initServices = futureServicesCache.get();
 			final Map<String, BaseRegistryProvider> initProviders = futureProviderCache.get();
 			RegistryManager registryManager = RegistryManager.getInstance().addAll(RegistryUtil.registry);
-			if (initEngines != null && initSensors != null && initUnits != null && initServices != null
-					&& initProviders != null) {
+			if (initEngines != null && initSensors != null && initUnitProducers != null
+					&&initUnits != null && initServices != null
+					&& initProviders != null ) {
 
 				if (registryManager.isActive()) {
+					//TODO: can be simplified
 					registryManager.initRegistry(RegistryTypeEnum.PROVIDER, futureProviderCache.get());
-					registryManager.initRegistry(RegistryTypeEnum.ENGINES, futureEngineCache.get());
-					registryManager.initRegistry(RegistryTypeEnum.SENSORS, futureSensorsCache.get());
-					registryManager.initRegistry(RegistryTypeEnum.UNITS, futureUnitsCache.get());
-					registryManager.initRegistry(RegistryTypeEnum.SERVICES, futureServicesCache.get());
+					registryManager.initRegistry(RegistryTypeEnum.ENGINES, initEngines);
+					registryManager.initRegistry(RegistryTypeEnum.SENSORS, initSensors);
+					registryManager.initRegistry(RegistryTypeEnum.UNIT_PRODUCERS, initUnitProducers);
+					registryManager.initRegistry(RegistryTypeEnum.UNITS, initUnits);
+					registryManager.initRegistry(RegistryTypeEnum.SERVICES, initServices);
 				} else {
 					SimpleLoggingUtil.debug(getClass(), "InitRegistry failed");
 				}
@@ -150,6 +163,25 @@ class RoboReflectiveInit {
 			return result;
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new ClientException("UNIT CACHE PROBLEM", e);
+		}
+	}
+
+	// TODO: FIMXE -> create logic to check hardware resources
+	@SuppressWarnings(value = "unchecked")
+	private <UnitProducerType extends UnitProducer> Map<String, UnitProducerType> initUnitProducerCache(Stream<Class<?>> producer){
+		try {
+			final Map<String, UnitProducerType> result = new HashMap<>();
+			for (Iterator<?> iterator = producer.iterator(); iterator.hasNext();) {
+				Class<?> clazz = (Class<?>) iterator.next();
+				if (clazz.isAnnotationPresent(RoboUnitProducer.class)) {
+					RoboUnitProducer anno = clazz.getAnnotation(RoboUnitProducer.class);
+					result.put(anno.id(), (UnitProducerType) clazz.newInstance());
+					SimpleLoggingUtil.debug(getClass(), "ref->unitProducer= " + anno.id());
+				}
+			}
+			return result;
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new ClientException("Producer CACHE PROBLEM", e);
 		}
 	}
 

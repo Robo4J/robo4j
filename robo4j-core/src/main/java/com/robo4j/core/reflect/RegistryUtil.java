@@ -27,12 +27,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.robo4j.commons.registry.RegistryTypeEnum;
 import com.robo4j.commons.registry.EngineRegistry;
 import com.robo4j.commons.registry.ProviderRegistry;
+import com.robo4j.commons.registry.RegistryTypeEnum;
 import com.robo4j.commons.registry.RoboRegistry;
 import com.robo4j.commons.registry.SensorRegistry;
 import com.robo4j.commons.registry.SystemServiceRegistry;
+import com.robo4j.commons.registry.UnitProducerRegistry;
 import com.robo4j.commons.registry.UnitRegistry;
 
 /**
@@ -48,6 +49,7 @@ public final class RegistryUtil {
 				{
 					put(RegistryTypeEnum.ENGINES, EngineRegistry.getInstance());
 					put(RegistryTypeEnum.SENSORS, SensorRegistry.getInstance());
+					put(RegistryTypeEnum.UNIT_PRODUCERS, UnitProducerRegistry.getInstance());
 					put(RegistryTypeEnum.UNITS, UnitRegistry.getInstance());
 					put(RegistryTypeEnum.SERVICES, SystemServiceRegistry.getInstance());
 					put(RegistryTypeEnum.PROVIDER, ProviderRegistry.getInstance());
