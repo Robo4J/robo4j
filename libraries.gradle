@@ -2,7 +2,7 @@ println "configure $project"
 
 ext {
 //    note::it's necessary to specify local maven repository
-    mavenRepository = "file://Users/miroslavkopecky/.m2/repository"
+    mavenRepository = ""
     robo4jVersion = "alfa-0.3"
     javassistVersion = "3.20.0-GA"
     guavaVersion = "19.0"
