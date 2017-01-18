@@ -104,8 +104,13 @@ public class RequestProcessorCallable implements Callable<RequestStatusEnum> {
 				switch (httpMethod) {
 				case GET:
 					processorResult = processorFactory.processGet(httpMessage);
+					if(processorResult.getStatus().equals(RequestUnitStatusEnum.STOP)){
+						result = RequestStatusEnum.EXIT;
+						SimpleLoggingUtil.debug(getClass(), "GET REQUEST EXIT SET");
+					} else {
+						result = convertToResult(processorResult);
+					}
 					out.write(processorResult.getMessage());
-					result = convertToResult(processorResult);
 					break;
 				case POST:
 					processorResult = processorFactory.processPost(httpMessage, in);

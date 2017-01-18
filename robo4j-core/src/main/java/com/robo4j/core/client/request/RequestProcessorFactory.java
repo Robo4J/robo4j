@@ -182,6 +182,7 @@ public final class RequestProcessorFactory {
 					message.append(HttpUtils.setHeader(HttpUtils.HTTP_HEADER_OK, generatedMessage.length()));
 					message.append(generatedMessage);
 					result = RequestUnitStatusEnum.STOP;
+					SimpleLoggingUtil.debug(getClass(), "GET EXIT IS THERE");
 					factoryExecutor.shutdown();
 					break;
 				case SETUP:
