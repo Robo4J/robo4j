@@ -85,12 +85,15 @@ class RoboReflectiveInit {
 					&&initUnits != null && initServices != null
 					&& initProviders != null ) {
 
+				SimpleLoggingUtil.debug(getClass(), "RegistryManager");
 				if (registryManager.isActive()) {
 					//TODO: can be simplified
+
 					registryManager.initRegistry(RegistryTypeEnum.PROVIDER, futureProviderCache.get());
 					registryManager.initRegistry(RegistryTypeEnum.ENGINES, initEngines);
 					registryManager.initRegistry(RegistryTypeEnum.SENSORS, initSensors);
 					registryManager.initRegistry(RegistryTypeEnum.UNIT_PRODUCERS, initUnitProducers);
+					SimpleLoggingUtil.debug(getClass(), "InitRegistry initUnitProducers DONE");
 					registryManager.initRegistry(RegistryTypeEnum.UNITS, initUnits);
 					registryManager.initRegistry(RegistryTypeEnum.SERVICES, initServices);
 				} else {
