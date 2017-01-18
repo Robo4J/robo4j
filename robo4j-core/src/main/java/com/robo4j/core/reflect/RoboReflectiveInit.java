@@ -32,7 +32,7 @@ import com.robo4j.commons.annotation.RoboProvider;
 import com.robo4j.commons.annotation.RoboSensor;
 import com.robo4j.commons.annotation.RoboService;
 import com.robo4j.commons.annotation.RoboUnit;
-import com.robo4j.commons.enums.RegistryTypeEnum;
+import com.robo4j.commons.registry.RegistryTypeEnum;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.commons.motor.GenericMotor;
 import com.robo4j.commons.registry.BaseRegistryProvider;

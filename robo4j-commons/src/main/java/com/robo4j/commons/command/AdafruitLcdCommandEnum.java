@@ -25,33 +25,32 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.robo4j.commons.enums.RoboHardwareEnum;
+import com.robo4j.commons.enums.RoboHardwareEnumI;
+import com.robo4j.commons.enums.RoboTargetEnumI;
 
 /**
  * @author Miro Wengner (@miragemiko)
  * @since 15.01.2017
  */
-public enum AdafruitLcdCommandEnum implements RoboUnitCommand, RoboHardwareEnum<CommandTypeEnum, CommandTargetEnum> {
+public enum AdafruitLcdCommandEnum implements RoboUnitCommand, RoboHardwareEnumI<CommandTypeEnum>, RoboTargetEnumI<CommandTargetEnum> {
 
     // @formatter:off
-	EXIT		    (0, 	LCD_UNIT, "exit"),
-	BUTTON_SET 		(1, 	LCD_UNIT, "button_set"),
-    BUTTON_RIGHT	(2, 	LCD_UNIT, "button_right"),
-    BUTTON_LEFT		(3, 	LCD_UNIT, "button_left"),
-    BUTTON_UP		(4, 	LCD_UNIT, "button_up"),
-    BUTTON_DOWN     (5, 	LCD_UNIT, "button_down"),
+	EXIT		    (0,     "exit"),
+	BUTTON_SET 		(1, 	"button_set"),
+    BUTTON_RIGHT	(2, 	"button_right"),
+    BUTTON_LEFT		(3, 	"button_left"),
+    BUTTON_UP		(4, 	"button_up"),
+    BUTTON_DOWN     (5, 	"button_down"),
 	;
 	// @formatter:on
 
     private volatile static Map<Integer, AdafruitLcdCommandEnum> codeToLcdCommandCodeMapping;
 
     private int code;
-    private CommandTargetEnum target;
     private String name;
 
-    AdafruitLcdCommandEnum(int c, CommandTargetEnum target, String name) {
+    AdafruitLcdCommandEnum(int c, String name) {
         this.code = c;
-        this.target = target;
         this.name = name;
     }
 
@@ -73,11 +72,6 @@ public enum AdafruitLcdCommandEnum implements RoboUnitCommand, RoboHardwareEnum<
                 .reduce(null, (e1, e2) -> e2);
     }
 
-    // Private Methods
-    private static Map<Integer, AdafruitLcdCommandEnum> initMapping() {
-        return Arrays.stream(values()).collect(Collectors.toMap(AdafruitLcdCommandEnum::getCode, e -> e));
-    }
-
     public int getCode() {
         return code;
     }
@@ -93,12 +87,18 @@ public enum AdafruitLcdCommandEnum implements RoboUnitCommand, RoboHardwareEnum<
     }
 
     public CommandTargetEnum getTarget() {
-        return target;
+        return LCD_UNIT;
     }
 
     @Override
     public String toString() {
-        return "AdafruitLcdCommandEnum{" + "code=" + code + ", target=" + target + ", name='" + name + '\'' + '}';
+        return "AdafruitLcdCommandEnum{" + "code=" + code + ", target=" + getTarget() + ", name='" + name + '\'' + '}';
     }
+
+    // Private Methods
+    private static Map<Integer, AdafruitLcdCommandEnum> initMapping() {
+        return Arrays.stream(values()).collect(Collectors.toMap(AdafruitLcdCommandEnum::getCode, e -> e));
+    }
+
 
 }

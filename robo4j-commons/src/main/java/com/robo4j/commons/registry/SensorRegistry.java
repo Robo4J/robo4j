@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import com.robo4j.commons.enums.RegistryTypeEnum;
 import com.robo4j.commons.sensor.GenericSensor;
 
 /**

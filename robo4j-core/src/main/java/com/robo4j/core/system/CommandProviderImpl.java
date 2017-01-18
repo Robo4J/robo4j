@@ -37,19 +37,19 @@ import com.robo4j.commons.agent.ProcessAgent;
 import com.robo4j.commons.agent.ProcessAgentBuilder;
 import com.robo4j.commons.command.AdafruitLcdCommandEnum;
 import com.robo4j.commons.command.CommandTargetEnum;
-import com.robo4j.commons.command.CommandTypeEnum;
 import com.robo4j.commons.command.GenericCommand;
 import com.robo4j.commons.command.RoboUnitCommand;
 import com.robo4j.commons.concurrent.LegoThreadFactory;
 import com.robo4j.commons.control.RoboSystemConfig;
-import com.robo4j.commons.enums.RegistryTypeEnum;
-import com.robo4j.commons.enums.RoboHardwareEnum;
+import com.robo4j.commons.enums.RoboTargetEnumI;
+import com.robo4j.commons.registry.RegistryTypeEnum;
+import com.robo4j.commons.enums.RoboHardwareEnumI;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.commons.registry.RegistryManager;
 import com.robo4j.commons.registry.RoboRegistry;
 import com.robo4j.commons.unit.DefaultUnit;
 import com.robo4j.commons.unit.GenericUnit;
-import com.robo4j.commons.command.PlatformCommandEnum;
+import com.robo4j.commons.command.PlatformUnitCommandEnum;
 import com.robo4j.core.client.io.ClientException;
 import com.robo4j.core.util.ConstantUtil;
 
@@ -65,7 +65,7 @@ public class CommandProviderImpl extends DefaultUnit implements CommandProvider 
 
 	private final List<GenericAgent> agents;
 	private final List<GenericUnit> units;
-	private volatile LinkedBlockingQueue<GenericCommand<PlatformCommandEnum>> commandQueue;
+	private volatile LinkedBlockingQueue<GenericCommand<PlatformUnitCommandEnum>> commandQueue;
 
 	// TODO: Provider should get access to the all registered unit
 	@SuppressWarnings(value = "unchecked")
@@ -112,18 +112,18 @@ public class CommandProviderImpl extends DefaultUnit implements CommandProvider 
 
 	@SuppressWarnings(value = "unchecked")
 	@Override
-	public boolean process(final GenericCommand<? extends RoboHardwareEnum<?, CommandTargetEnum>> command) {
+	public boolean process(final GenericCommand<? extends RoboTargetEnumI<CommandTargetEnum>> command) {
 		SimpleLoggingUtil.debug(getClass(), "process: " + command);
 
 		switch (command.getType().getTarget()) {
 		case SYSTEM:
-			return processSystemCommand((GenericCommand<PlatformCommandEnum>)command);
+			return processSystemCommand((GenericCommand<PlatformUnitCommandEnum>)command);
 		case PLATFORM:
-			return processPlatformCommand((GenericCommand<PlatformCommandEnum>)command);
+			return processPlatformCommand((GenericCommand<PlatformUnitCommandEnum>)command);
 		case HAND_UNIT:
-			return processHandUnitCommand((GenericCommand<PlatformCommandEnum>)command);
+			return processHandUnitCommand((GenericCommand<PlatformUnitCommandEnum>)command);
 		case FRONT_UNIT:
-			return processFrontUnitCommand((GenericCommand<PlatformCommandEnum>)command);
+			return processFrontUnitCommand((GenericCommand<PlatformUnitCommandEnum>)command);
 		case LCD_UNIT:
 			return processLcdUnitCommand((GenericCommand<AdafruitLcdCommandEnum>)command);
 		default:
@@ -175,7 +175,7 @@ public class CommandProviderImpl extends DefaultUnit implements CommandProvider 
 
 	// Private Methods
 	/* currently system commad is executed as EXIT */
-	private boolean processSystemCommand(final GenericCommand<PlatformCommandEnum> command) {
+	private boolean processSystemCommand(final GenericCommand<PlatformUnitCommandEnum> command) {
 		switch (command.getType()) {
 		case EXIT:
 			SimpleLoggingUtil.print(getClass(), "EXIT COMMAND HAS BEEN CALLED");
@@ -188,20 +188,20 @@ public class CommandProviderImpl extends DefaultUnit implements CommandProvider 
 	}
 
 	@SuppressWarnings(value = "unchecked")
-	private boolean processPlatformCommand(final GenericCommand<PlatformCommandEnum> command) {
+	private boolean processPlatformCommand(final GenericCommand<PlatformUnitCommandEnum> command) {
 		// TODO : more generic, problem is name
 		SimpleLoggingUtil.print(getClass(), "getPlatform Unit units= " + units);
 		return processUnitByName("platform", command);
 	}
 
 	@SuppressWarnings(value = "unchecked")
-	private boolean processHandUnitCommand(final GenericCommand<PlatformCommandEnum> command) {
+	private boolean processHandUnitCommand(final GenericCommand<PlatformUnitCommandEnum> command) {
 		SimpleLoggingUtil.print(getClass(), "getFrontHand Unit units= " + units);
 		return processUnitByName("frontHand", command);
 
 	}
 
-	private boolean processFrontUnitCommand(final GenericCommand<PlatformCommandEnum> command) {
+	private boolean processFrontUnitCommand(final GenericCommand<PlatformUnitCommandEnum> command) {
 		SimpleLoggingUtil.debug(getClass(), "getFrontUnit Unit units= " + units);
 		return processUnitByName("frontUnit", command);
 	}

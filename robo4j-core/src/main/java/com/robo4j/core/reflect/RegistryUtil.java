@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.robo4j.commons.enums.RegistryTypeEnum;
+import com.robo4j.commons.registry.RegistryTypeEnum;
 import com.robo4j.commons.registry.EngineRegistry;
 import com.robo4j.commons.registry.ProviderRegistry;
 import com.robo4j.commons.registry.RoboRegistry;

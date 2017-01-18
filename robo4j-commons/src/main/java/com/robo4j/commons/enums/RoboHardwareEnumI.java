@@ -19,15 +19,14 @@
 package com.robo4j.commons.enums;
 
 /**
+ * @param <EnumType> - type of Hardware where is used, standard usage if to specify commands
  * @author Miroslav Wengner (@miragemiko)
  * @since 04.05.2016
  */
-public interface RoboHardwareEnum<Type, TargetType> {
+public interface RoboHardwareEnumI<EnumType> {
 
-	Type getType();
+	EnumType getType();
 
 	String getName();
-
-	TargetType getTarget();
 
 }

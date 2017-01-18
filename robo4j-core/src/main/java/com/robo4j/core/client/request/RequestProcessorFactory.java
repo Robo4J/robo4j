@@ -45,7 +45,7 @@ import com.robo4j.commons.agent.GenericAgent;
 import com.robo4j.commons.agent.ReceiverAgent;
 import com.robo4j.commons.concurrent.LegoThreadFactory;
 import com.robo4j.commons.control.RoboSystemConfig;
-import com.robo4j.commons.enums.RegistryTypeEnum;
+import com.robo4j.commons.registry.RegistryTypeEnum;
 import com.robo4j.commons.http.RequestHeaderProcessor;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.commons.registry.RegistryManager;
@@ -57,7 +57,7 @@ import com.robo4j.core.client.agent.BrickMainAgent;
 import com.robo4j.core.client.command.CommandExecutor;
 import com.robo4j.core.client.command.CommandProcessor;
 import com.robo4j.core.client.enums.PageEnum;
-import com.robo4j.commons.command.PlatformCommandEnum;
+import com.robo4j.commons.command.PlatformUnitCommandEnum;
 import com.robo4j.core.client.enums.RequestUnitStatusEnum;
 import com.robo4j.core.client.enums.RequestUnitTypeEnum;
 import com.robo4j.core.client.http.HttpPageLoader;
@@ -251,7 +251,7 @@ public final class RequestProcessorFactory {
 							if (!u.getActive()) {
 								try {
 									commandQueue.put(Collections
-											.singletonList(new ClientMotorCommandRequestDTO(PlatformCommandEnum.STOP)));
+											.singletonList(new ClientMotorCommandRequestDTO(PlatformUnitCommandEnum.STOP)));
 								} catch (InterruptedException e) {
 									SimpleLoggingUtil.error(getClass(), "BrainUnit: " + " no stop");
 								}

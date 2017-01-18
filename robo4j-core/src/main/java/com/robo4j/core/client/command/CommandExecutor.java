@@ -30,9 +30,10 @@ import com.robo4j.commons.command.CommandTargetEnum;
 import com.robo4j.commons.command.GenericCommand;
 import com.robo4j.commons.concurrent.CoreBusQueue;
 import com.robo4j.commons.concurrent.LegoThreadFactory;
-import com.robo4j.commons.enums.RoboHardwareEnum;
+import com.robo4j.commons.enums.RoboHardwareEnumI;
+import com.robo4j.commons.enums.RoboTargetEnumI;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
-import com.robo4j.commons.command.PlatformCommandEnum;
+import com.robo4j.commons.command.PlatformUnitCommandEnum;
 import com.robo4j.core.client.io.ClientException;
 import com.robo4j.core.system.CommandProvider;
 import com.robo4j.core.util.ConstantUtil;
@@ -75,10 +76,11 @@ public class CommandExecutor<QueueType extends CoreBusQueue> implements AgentCon
 
 		while (active.get() && commandsQueue.peek() != null) {
 			try {
-				GenericCommand<? extends RoboHardwareEnum<?, CommandTargetEnum>> tmpCommand = (GenericCommand) commandsQueue.take().getEntry();
+				GenericCommand<? extends RoboTargetEnumI<CommandTargetEnum>> tmpCommand = (GenericCommand) commandsQueue.take().getEntry();
 
 				//TODO: nothing and simplify
-				if(tmpCommand.getType() instanceof PlatformCommandEnum){
+				//TODO: this can be removed
+				if(tmpCommand.getType() instanceof PlatformUnitCommandEnum){
 					Future<Boolean> moveFuture = executorForCommands.submit(() -> commandsProvider.process(tmpCommand));
 					boolean result = moveFuture.get();
 					SimpleLoggingUtil.print(getClass(), "CommandExecutor: " + result);

@@ -21,7 +21,7 @@ package com.robo4j.commons.command;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.robo4j.commons.enums.RoboHardwareEnum;
+import com.robo4j.commons.enums.RoboHardwareEnumI;
 import com.robo4j.commons.util.CommandUtil;
 
 /**
@@ -31,8 +31,8 @@ import com.robo4j.commons.util.CommandUtil;
  * @since 24.06.2016
  */
 
-//TODO: FIXME -> CommandTargetEnum remove
-public enum CommandTypeEnum implements RoboHardwareEnum<Integer, CommandTargetEnum> {
+//TODO : re-thing
+public enum CommandTypeEnum implements RoboHardwareEnumI<Integer> {
 
 	// @formatter:off
 	BATCH		(0, "B".concat(CommandUtil.getElementClose())),
@@ -73,12 +73,6 @@ public enum CommandTypeEnum implements RoboHardwareEnum<Integer, CommandTargetEn
 	public String getName() {
 		return name;
 	}
-
-	@Override
-	public CommandTargetEnum getTarget() {
-		return null;
-	}
-
 
 	@Override
 	public String toString() {

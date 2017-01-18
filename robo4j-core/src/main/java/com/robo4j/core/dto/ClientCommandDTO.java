@@ -26,7 +26,7 @@ package com.robo4j.core.dto;
  */
 public interface ClientCommandDTO<CommandEnum> {
 
-	CommandEnum getType();
+	CommandEnum getCommand();
 
 	String getValue();
 

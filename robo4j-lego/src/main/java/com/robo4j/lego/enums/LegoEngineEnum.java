@@ -19,14 +19,14 @@
 package com.robo4j.lego.enums;
 
 import com.robo4j.commons.control.RoboSystemConfig;
-import com.robo4j.commons.enums.RoboHardwareEnum;
+import com.robo4j.commons.enums.RoboHardwareEnumI;
 
 /**
  *
  * @author Miroslav Wengner (@miragemiko)
  * @since 04.05.2016
  */
-public enum LegoEngineEnum implements RoboHardwareEnum<Character, LegoEngineEnum>, RoboSystemConfig {
+public enum LegoEngineEnum implements RoboHardwareEnumI<Character>, RoboSystemConfig {
 
 	// @formatter:off
 	// Type name
@@ -53,12 +53,6 @@ public enum LegoEngineEnum implements RoboHardwareEnum<Character, LegoEngineEnum
 	public String getName() {
 		return name;
 	}
-
-	@Override
-	public LegoEngineEnum getTarget() {
-		return null;
-	}
-
 
 	@Override
 	public String toString() {

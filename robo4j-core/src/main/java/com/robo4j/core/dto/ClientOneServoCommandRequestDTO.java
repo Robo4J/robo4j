@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2017. Miroslav Wengner, Marcus Hirt
- * This ClientGenericCommandRequest.java  is part of robo4j.
+ * This ClientServoCommandRequestDTO.java  is part of robo4j.
  * module: robo4j-core
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -19,37 +19,37 @@
 
 package com.robo4j.core.dto;
 
-import com.robo4j.commons.command.AdafruitLcdCommandEnum;
+import com.robo4j.commons.command.OneServoUnitCommandEnum;
 
 /**
  * @author Miro Wengner (@miragemiko)
- * @since 16.01.2017
+ * @since 18.01.2017
  */
-public class ClientAdafruitLcdCommandRequestDTO implements ClientCommandDTO<AdafruitLcdCommandEnum> {
+public class ClientOneServoCommandRequestDTO implements ClientCommandDTO<OneServoUnitCommandEnum> {
 
     private Long stamp;
-    private AdafruitLcdCommandEnum type;
+    private OneServoUnitCommandEnum command;
+    private String value;
+    private String speed;
 
-    public ClientAdafruitLcdCommandRequestDTO(AdafruitLcdCommandEnum type) {
+    public ClientOneServoCommandRequestDTO(OneServoUnitCommandEnum command, String value) {
         this.stamp = System.currentTimeMillis();
-        this.type = type;
+        this.command = command;
+        this.value = value;
+        this.speed = "200";
+    }
+
+    public String getSpeed() {
+        return speed;
     }
 
     @Override
-    public AdafruitLcdCommandEnum getCommand() {
-        return type;
+    public OneServoUnitCommandEnum getCommand() {
+        return command;
     }
 
     @Override
     public String getValue() {
-        return "";
-    }
-
-    @Override
-    public String toString() {
-        return "ClientAdafruitLcdCommandRequestDTO{" +
-                "stamp=" + stamp +
-                ", type=" + type +
-                '}';
+        return value;
     }
 }

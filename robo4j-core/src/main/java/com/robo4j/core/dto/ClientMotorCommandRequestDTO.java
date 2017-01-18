@@ -18,7 +18,7 @@
 
 package com.robo4j.core.dto;
 
-import com.robo4j.commons.command.PlatformCommandEnum;
+import com.robo4j.commons.command.PlatformUnitCommandEnum;
 import com.robo4j.core.util.ConstantUtil;
 
 /**
@@ -30,38 +30,38 @@ import com.robo4j.core.util.ConstantUtil;
  */
 
 //TODO: FIXME refactor -> separate
-public class ClientMotorCommandRequestDTO implements ClientCommandDTO<PlatformCommandEnum> {
+public class ClientMotorCommandRequestDTO implements ClientCommandDTO<PlatformUnitCommandEnum> {
 
 	private Long stamp;
-	private PlatformCommandEnum type;
+	private PlatformUnitCommandEnum command;
 	private String value;
 	private String speed;
 
 	public ClientMotorCommandRequestDTO(String value) {
 		this.stamp = System.currentTimeMillis();
 		final String[] values = value.split(ConstantUtil.getHttpSeparator(3));
-		this.type = PlatformCommandEnum.getRequestValue(values[ConstantUtil.DEFAULT_VALUE]);
+		this.command = PlatformUnitCommandEnum.getCommand(values[ConstantUtil.DEFAULT_VALUE]);
 		this.value = values[1];
 		this.speed = "300";
 	}
 
-	public ClientMotorCommandRequestDTO(PlatformCommandEnum type) {
+	public ClientMotorCommandRequestDTO(PlatformUnitCommandEnum command) {
 		this.stamp = System.currentTimeMillis();
-		this.type = type;
+		this.command = command;
 		this.value = "";
 		this.speed = "200";
 	}
 
-	public ClientMotorCommandRequestDTO(PlatformCommandEnum type, String value) {
+	public ClientMotorCommandRequestDTO(PlatformUnitCommandEnum command, String value) {
 		this.stamp = System.currentTimeMillis();
-		this.type = type;
+		this.command = command;
 		this.value = value;
 		this.speed = "200";
 	}
 
-	public ClientMotorCommandRequestDTO(PlatformCommandEnum type, String value, String speed) {
+	public ClientMotorCommandRequestDTO(PlatformUnitCommandEnum command, String value, String speed) {
 		this.stamp = System.currentTimeMillis();
-		this.type = type;
+		this.command = command;
 		this.value = value;
 		this.speed = speed;
 	}
@@ -75,8 +75,8 @@ public class ClientMotorCommandRequestDTO implements ClientCommandDTO<PlatformCo
 	}
 
 	@Override
-	public PlatformCommandEnum getType() {
-		return type;
+	public PlatformUnitCommandEnum getCommand() {
+		return command;
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class ClientMotorCommandRequestDTO implements ClientCommandDTO<PlatformCo
 
 	@Override
 	public String toString() {
-		return "ClientCommandRequestDTO{" + "stamp=" + stamp + ", type=" + type + ", value='" + value + '\''
+		return "ClientCommandRequestDTO{" + "stamp=" + stamp + ", command=" + command + ", value='" + value + '\''
 				+ ", speed='" + speed + '\'' + '}';
 	}
 }

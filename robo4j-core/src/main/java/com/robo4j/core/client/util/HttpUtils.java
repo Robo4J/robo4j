@@ -28,8 +28,10 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.robo4j.commons.command.AdafruitLcdCommandEnum;
+import com.robo4j.commons.command.OneServoUnitCommandEnum;
 import com.robo4j.core.dto.ClientAdafruitLcdCommandRequestDTO;
 import com.robo4j.core.dto.ClientCommandDTO;
+import com.robo4j.core.dto.ClientOneServoCommandRequestDTO;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -37,7 +39,7 @@ import org.json.simple.parser.ParseException;
 
 import com.robo4j.commons.command.CommandTargetEnum;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
-import com.robo4j.commons.command.PlatformCommandEnum;
+import com.robo4j.commons.command.PlatformUnitCommandEnum;
 import com.robo4j.core.dto.ClientMotorCommandRequestDTO;
 import com.robo4j.core.dto.ClientRequestDTO;
 import com.robo4j.core.dto.ClientUnitRequestDTO;
@@ -142,34 +144,32 @@ public final class HttpUtils {
 			CommandTargetEnum commandTarget = CommandTargetEnum.getByName(target);
 			final String name = obj.get("name").toString();
 
+			final String value = obj.containsKey(HTTP_REQUEST_VALUE) ? obj.get(HTTP_REQUEST_VALUE).toString()
+					: ConstantUtil.EMPTY_STRING;
+
 			switch (commandTarget){
 				case LCD_UNIT:
-
-					AdafruitLcdCommandEnum lcdCommand = AdafruitLcdCommandEnum.getRequestValue(name);
-					SimpleLoggingUtil.debug(HttpUtils.class, "LCD Command: " + lcdCommand);
-					return new ClientAdafruitLcdCommandRequestDTO(lcdCommand);
-
-				case FRONT_UNIT:
-				case HAND_UNIT:
-				case SYSTEM:
+					SimpleLoggingUtil.debug(HttpUtils.class, "LCD Command: " + commandTarget);
+					return new ClientAdafruitLcdCommandRequestDTO(AdafruitLcdCommandEnum.getRequestValue(name));
 				case PLATFORM:
-				default:
-					final String value = obj.containsKey(HTTP_REQUEST_VALUE) ? obj.get(HTTP_REQUEST_VALUE).toString()
-							: ConstantUtil.EMPTY_STRING;
-					PlatformCommandEnum command = PlatformCommandEnum.getRequestCommand(CommandTargetEnum.getByName(target),
-							name);
 					if (obj.containsKey("speed")) {
 						final String speed = obj.get("speed").toString();
-						return new ClientMotorCommandRequestDTO(command, value, speed);
+						return new ClientMotorCommandRequestDTO(PlatformUnitCommandEnum.getCommand(name), value, speed);
 					} else {
-						return new ClientMotorCommandRequestDTO(command, value);
+						return new ClientMotorCommandRequestDTO(PlatformUnitCommandEnum.getCommand(name), value);
 					}
+				case FRONT_UNIT:
+					return new ClientOneServoCommandRequestDTO(OneServoUnitCommandEnum.getCommand(name), value);
+				case SYSTEM:
+				case HAND_UNIT:
+				default:
+					throw new ClientCommException("parseJson not implemented: " + commandTarget);
 			}
-
-
 
 		}).collect(Collectors.toCollection(LinkedList::new));
 	}
+
+
 
 	@SuppressWarnings(value = "unchecked")
 	private static List<ClientUnitRequestDTO> parseJSONToUnitsArrays(final JSONArray jsonArray) {

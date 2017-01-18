@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import com.robo4j.commons.control.RoboSystemConfig;
-import com.robo4j.commons.enums.RegistryTypeEnum;
 
 /**
  *

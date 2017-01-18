@@ -28,7 +28,7 @@ import com.robo4j.commons.command.GenericCommand;
 import com.robo4j.commons.concurrent.QueueFIFOEntry;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.core.bus.ClientBusQueue;
-import com.robo4j.commons.command.PlatformCommandEnum;
+import com.robo4j.commons.command.PlatformUnitCommandEnum;
 import com.robo4j.core.dto.ClientAdafruitLcdCommandRequestDTO;
 import com.robo4j.core.dto.ClientCommandDTO;
 import com.robo4j.core.dto.ClientMotorCommandRequestDTO;
@@ -71,13 +71,13 @@ public final class CommandProcessor implements AgentProducer, Runnable {
 
 					if(element instanceof ClientMotorCommandRequestDTO){
 						ClientMotorCommandRequestDTO commandElement = (ClientMotorCommandRequestDTO) element;
-						messageQueue.transfer(getCommand(commandElement.getType(), element.getValue(), commandElement.getSpeed()));
+						messageQueue.transfer(getCommand(commandElement.getCommand(), element.getValue(), commandElement.getSpeed()));
 
 					}
 
 					if(element instanceof ClientAdafruitLcdCommandRequestDTO){
 						SimpleLoggingUtil.debug(getClass(), "ALMOST DONE: " + element);
-						messageQueue.transfer(getCommand(((ClientAdafruitLcdCommandRequestDTO) element).getType()));
+						messageQueue.transfer(getCommand(((ClientAdafruitLcdCommandRequestDTO) element).getCommand()));
 					}
 
 				}
@@ -91,10 +91,10 @@ public final class CommandProcessor implements AgentProducer, Runnable {
 
 	// Private Methods
 	@SuppressWarnings(value = "unchecked")
-	private QueueFIFOEntry getCommand(PlatformCommandEnum type, String value, String speed) {
+	private QueueFIFOEntry getCommand(PlatformUnitCommandEnum type, String value, String speed) {
 		/* client command holding default values */
 		final ClientCommandProperties properties = new ClientCommandProperties(Integer.parseInt(speed));
-		final GenericCommand<PlatformCommandEnum> command = new GenericCommand<>(properties, type, value,
+		final GenericCommand<PlatformUnitCommandEnum> command = new GenericCommand<>(properties, type, value,
 				ConstantUtil.DEFAULT_PRIORITY);
 		return new QueueFIFOEntry<>(command);
 	}

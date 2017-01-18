@@ -19,7 +19,7 @@
 package com.robo4j.lego.enums;
 
 import com.robo4j.commons.control.RoboSystemConfig;
-import com.robo4j.commons.enums.RoboHardwareEnum;
+import com.robo4j.commons.enums.RoboHardwareEnumI;
 
 /**
  * Configuration interface
@@ -28,7 +28,7 @@ import com.robo4j.commons.enums.RoboHardwareEnum;
  * @author Miroslav Wengner (@miragemiko)
  * @since 19.06.2016
  */
-public enum LegoSensorPortEnum implements RoboHardwareEnum<String, LegoSensorPortEnum>, RoboSystemConfig {
+public enum LegoSensorPortEnum implements RoboHardwareEnumI<String>, RoboSystemConfig {
 
 	// @formatter:off
 	// type name
@@ -56,12 +56,6 @@ public enum LegoSensorPortEnum implements RoboHardwareEnum<String, LegoSensorPor
 	public String getName() {
 		return name;
 	}
-
-	@Override
-	public LegoSensorPortEnum getTarget() {
-		return null;
-	}
-
 
 	@Override
 	public String toString() {

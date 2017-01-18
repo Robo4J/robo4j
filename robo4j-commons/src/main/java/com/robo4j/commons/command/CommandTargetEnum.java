@@ -21,15 +21,16 @@ package com.robo4j.commons.command;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.robo4j.commons.enums.RoboHardwareEnum;
+import com.robo4j.commons.enums.RoboHardwareEnumI;
 
 /**
  * Command Target helps with particular command destination
  *
+ *
  * @author Miroslav Wengner (@miragemiko)
  * @since 05.07.2016
  */
-public enum CommandTargetEnum implements RoboHardwareEnum<Integer, CommandTargetEnum> {
+public enum CommandTargetEnum implements RoboHardwareEnumI<Integer> {
 
 	// @formatter:off
 	SYSTEM			(0, "system"),
@@ -71,12 +72,6 @@ public enum CommandTargetEnum implements RoboHardwareEnum<Integer, CommandTarget
 	public String getName() {
 		return name;
 	}
-
-	@Override
-	public CommandTargetEnum getTarget() {
-		return this;
-	}
-
 
 	@Override
 	public String toString() {
