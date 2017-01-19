@@ -18,19 +18,19 @@
 
 package com.robo4j.core;
 
+import java.util.Map;
+
 import com.robo4j.commons.control.RoboSystemConfig;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
-import com.robo4j.commons.registry.RegistryTypeEnum;
 import com.robo4j.commons.registry.EngineRegistry;
 import com.robo4j.commons.registry.RegistryManager;
+import com.robo4j.commons.registry.RegistryTypeEnum;
 import com.robo4j.commons.registry.RoboRegistry;
 import com.robo4j.commons.registry.SensorRegistry;
 import com.robo4j.commons.registry.UnitRegistry;
 import com.robo4j.core.client.request.RequestProcessorFactory;
 import com.robo4j.core.reflect.AbstractClient;
 import com.robo4j.core.reflect.RoboReflectionScan;
-
-import java.util.Map;
 
 /**
  * Main class needs to be initiated

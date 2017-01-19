@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.robo4j.core.dto.ClientCommandDTO;
-import com.robo4j.core.dto.ClientMotorCommandRequestDTO;
 
 /**
  * there is available only one CommandSerial bus

@@ -18,12 +18,12 @@
 
 package com.robo4j.commons.logging;
 
-import java.time.LocalDate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 /**
- *
- * Simple class for logging
+ * Simple toolkit for logging
  * 
  * @author Miroslav Wengner (@miragemiko)
  * @since 19.07.2016
@@ -33,20 +33,19 @@ public final class SimpleLoggingUtil {
 	private static final String EMPTY = "";
 
 	public static void print(Class<?> clazz, String message) {
-		// System.out.println(LocalDate.now() + "-" + clazz.getSimpleName() + "
-		// : " + message);
+		Logger.getLogger(clazz.getName()).log(Level.INFO, message);
 	}
 
 	public static void debug(Class<?> clazz, String message) {
-		System.out.println(LocalDate.now() + ":DEBUG:" + clazz.getSimpleName() + " : " + message);
+		Logger.getLogger(clazz.getName()).log(Level.FINER, message);
 	}
 
 	public static void debug(Class<?> clazz, String... message){
-		System.out.println(LocalDate.now() + ":DEBUG:" + clazz.getSimpleName() + " : " +
+		debug(clazz, clazz.getSimpleName() + " : " +
 				Stream.of(message).reduce(EMPTY,  (l, r) -> l.concat(SPACE).concat(r)));
 	}
 
 	public static void error(Class<?> clazz, String message) {
-		System.out.println(LocalDate.now() + ":ERROR:" + clazz.getSimpleName() + " : " + message);
+		Logger.getLogger(clazz.getName()).log(Level.SEVERE, message);
 	}
 }

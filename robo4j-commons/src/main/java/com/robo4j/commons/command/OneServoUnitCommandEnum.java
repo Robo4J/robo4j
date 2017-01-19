@@ -19,12 +19,12 @@
 
 package com.robo4j.commons.command;
 
-import com.robo4j.commons.enums.RoboHardwareEnumI;
-import com.robo4j.commons.enums.RoboTargetEnumI;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import com.robo4j.commons.enums.RoboHardwareEnumI;
+import com.robo4j.commons.enums.RoboTargetEnumI;
 
 /**
  * @pa
