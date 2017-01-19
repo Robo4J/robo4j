@@ -19,6 +19,7 @@
 package com.robo4j.commons.logging;
 
 import java.time.LocalDate;
+import java.util.stream.Stream;
 
 /**
  *
@@ -28,6 +29,8 @@ import java.time.LocalDate;
  * @since 19.07.2016
  */
 public final class SimpleLoggingUtil {
+	private static final String SPACE = " ";
+	private static final String EMPTY = "";
 
 	public static void print(Class<?> clazz, String message) {
 		// System.out.println(LocalDate.now() + "-" + clazz.getSimpleName() + "
@@ -36,6 +39,11 @@ public final class SimpleLoggingUtil {
 
 	public static void debug(Class<?> clazz, String message) {
 		System.out.println(LocalDate.now() + ":DEBUG:" + clazz.getSimpleName() + " : " + message);
+	}
+
+	public static void debug(Class<?> clazz, String... message){
+		System.out.println(LocalDate.now() + ":DEBUG:" + clazz.getSimpleName() + " : " +
+				Stream.of(message).reduce(EMPTY,  (l, r) -> l.concat(SPACE).concat(r)));
 	}
 
 	public static void error(Class<?> clazz, String message) {

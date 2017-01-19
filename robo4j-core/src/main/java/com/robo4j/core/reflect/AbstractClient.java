@@ -79,6 +79,10 @@ public abstract class AbstractClient<FutureType> {
 		return executor.submit(task);
 	}
 
+	public boolean isActive(){
+		return active.get();
+	}
+
 	public void end() {
 		executor.shutdown();
 	}
