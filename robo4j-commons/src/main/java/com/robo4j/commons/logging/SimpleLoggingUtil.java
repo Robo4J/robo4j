@@ -48,4 +48,8 @@ public final class SimpleLoggingUtil {
 	public static void error(Class<?> clazz, String message) {
 		Logger.getLogger(clazz.getName()).log(Level.SEVERE, message);
 	}
+
+	public static void error(Class<?> clazz, String string, Exception e) {
+		Logger.getLogger(clazz.getName()).log(Level.SEVERE, string, e);
+	}
 }
