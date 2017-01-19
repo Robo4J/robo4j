@@ -19,9 +19,9 @@
 package com.robo4j.core;
 
 import com.robo4j.commons.control.RoboSystemConfig;
-import com.robo4j.commons.registry.RegistryTypeEnum;
 import com.robo4j.commons.registry.EngineRegistry;
 import com.robo4j.commons.registry.RegistryManager;
+import com.robo4j.commons.registry.RegistryTypeEnum;
 import com.robo4j.commons.registry.RoboRegistry;
 import com.robo4j.commons.registry.SensorRegistry;
 import com.robo4j.core.reflect.AbstractClient;
