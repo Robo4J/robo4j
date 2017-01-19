@@ -60,10 +60,10 @@ public class Robo4jBrick extends AbstractClient {
 		this.initiate = active.get();
 		//@formatter:off
 		RequestProcessorFactory.getInstance();
-		UnitRegistry.getInstance().getRegistry().entrySet()
-				.stream()
-				.map(Map.Entry::getValue)
-				.forEach(e -> e.init(null));
+//		UnitRegistry.getInstance().getRegistry().entrySet()
+//				.stream()
+//				.map(Map.Entry::getValue)
+//				.forEach(e -> e.init(null));
 		//@formatter:on
 		return initiate;
 	}
