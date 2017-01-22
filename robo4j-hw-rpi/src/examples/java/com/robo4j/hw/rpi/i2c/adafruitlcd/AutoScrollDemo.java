@@ -20,7 +20,7 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
 import java.io.IOException;
 
-import com.robo4j.hw.rpi.i2c.adafruitlcd.ILCD;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 
 /**
  * Tests autoscroll. Check out the documentation for the HD44780 for more info
@@ -28,7 +28,7 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.ILCD;
  * 
  * @author Marcus Hirt
  */
-public class AutoScrollDemo implements LCDTest {
+public class AutoScrollDemo implements LCDDemo {
 
 	@Override
 	public String getName() {
@@ -36,7 +36,7 @@ public class AutoScrollDemo implements LCDTest {
 	}
 
 	@Override
-	public void run(ILCD lcd) throws IOException {
+	public void run(AdafruitLcd lcd) throws IOException {
 		lcd.clear();
 		lcd.setText("AutoScroll off:\n");
 		lcd.setCursorPosition(1, 0);

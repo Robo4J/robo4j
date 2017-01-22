@@ -21,7 +21,7 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
 import java.io.IOException;
 
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
-import com.robo4j.hw.rpi.i2c.adafruitlcd.ILCD;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 
 /**
  * This demo should cycle through the background colors. I only have the monochrome one,
@@ -29,7 +29,7 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.ILCD;
  * 
  * @author Marcus Hirt
  */
-public class ColorDemo implements LCDTest {
+public class ColorDemo implements LCDDemo {
 
 	@Override
 	public String getName() {
@@ -37,7 +37,7 @@ public class ColorDemo implements LCDTest {
 	}
 
 	@Override
-	public void run(ILCD lcd) throws IOException {
+	public void run(AdafruitLcd lcd) throws IOException {
 		lcd.clear();
 		lcd.setText("Color changes:");
 		Util.sleep(1000);

@@ -21,7 +21,7 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLCD;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd;
 
 /**
  * Enumeration of the Buttons on the LCD shield.
@@ -61,7 +61,7 @@ public enum Button {
 	 *            the input mask.
 	 * @return true if the button is pressed, false otherwise.
 	 * 
-	 * @see RealLCD#buttonsPressedBitmask()
+	 * @see RealLcd#buttonsPressedBitmask()
 	 */
 	public boolean isButtonPressed(int mask) {
 		return ((mask >> getPin()) & 1) > 0;
@@ -75,7 +75,7 @@ public enum Button {
 	 *            the input mask.
 	 * @return a set of the buttons pressed.
 	 * 
-	 * @see RealLCD#buttonsPressedBitmask()
+	 * @see RealLcd#buttonsPressedBitmask()
 	 */
 	public static Set<Button> getButtonsPressed(int mask) {
 		Set<Button> buttons = new HashSet<Button>();

@@ -21,33 +21,33 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
 import java.io.IOException;
 
 import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
-import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLCD;
-import com.robo4j.hw.rpi.i2c.adafruitlcd.mockup.MockupLCD;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.mockup.MockupLcd;
 /**
  * FIXME(Marcus/Dec 20, 2016): We should probably not let the mockup etc be part of the standard API.
  * Let's keep it clean?
  * 
  * @author Marcus Hirt
  */
-public final class LCDFactory {
+public final class LcdFactory {
 	/**
 	 * Set this system property to true to make the factory return a Swing mockup
 	 * instead of an i2c LCD device.
 	 */
 	public static final String SYSTEM_PROPERTY_MOCK = "com.robo4j.hw.rpi.i2c.adafruitlcd.mock";
 
-	public static ILCD createLCD() throws IOException, UnsupportedBusNumberException {
+	public static AdafruitLcd createLCD() throws IOException, UnsupportedBusNumberException {
 		if (Boolean.getBoolean(SYSTEM_PROPERTY_MOCK)) {
-			return new MockupLCD();
+			return new MockupLcd();
 		}
-		return new RealLCD();
+		return new RealLcd();
 	}
 
-	public static ILCD createLCD(int bus, int address) throws IOException, UnsupportedBusNumberException {
+	public static AdafruitLcd createLCD(int bus, int address) throws IOException, UnsupportedBusNumberException {
 		if (Boolean.getBoolean(SYSTEM_PROPERTY_MOCK)) {
-			return new MockupLCD(bus, address);
+			return new MockupLcd(bus, address);
 		}
-		return new RealLCD(bus, address);
+		return new RealLcd(bus, address);
 	}
 
 }

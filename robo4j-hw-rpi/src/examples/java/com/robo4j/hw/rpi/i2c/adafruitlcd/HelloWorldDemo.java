@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014-2017. Miroslav Wengner, Marcus Hirt
- * This ExitTest.java  is part of robo4j.
+ * This HelloWorldTest.java  is part of robo4j.
  * module: robo4j-hw-rpi
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -19,23 +19,25 @@
 package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
 import java.io.IOException;
+
+import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
+
 /**
- * This one really doesn't anything but clean up and exit.
+ * The mandatory Hello World!
  * 
  * @author Marcus Hirt
  */
-public class ExitTest implements LCDTest {
+public class HelloWorldDemo implements LCDDemo {
 
 	@Override
 	public String getName() {
-		return "<Exit>";
+		return "Hello World";
 	}
 
 	@Override
-	public void run(ILCD lcd) throws IOException {
+	public void run(AdafruitLcd lcd) throws IOException {
 		lcd.clear();
-		lcd.stop();
-		System.exit(0);
+		lcd.setText("Hello World!\nDone!");
 	}
 
 }

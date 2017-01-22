@@ -20,7 +20,7 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
 import java.io.IOException;
 
-import com.robo4j.hw.rpi.i2c.adafruitlcd.ILCD;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 
 /**
  * Plays around with the cursor a bit.
@@ -28,7 +28,7 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.ILCD;
  * @author Marcus Hirt
  *
  */
-public class CursorDemo implements LCDTest {
+public class CursorDemo implements LCDDemo {
 
 	@Override
 	public String getName() {
@@ -36,7 +36,7 @@ public class CursorDemo implements LCDTest {
 	}
 
 	@Override
-	public void run(ILCD lcd) throws IOException {
+	public void run(AdafruitLcd lcd) throws IOException {
 		lcd.clear();
 		lcd.setText("Cursor:\n");
 		lcd.setCursorPosition(1, 0);

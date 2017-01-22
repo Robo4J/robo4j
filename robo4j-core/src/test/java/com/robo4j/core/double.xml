@@ -1,0 +1,18 @@
+<!-- Erroneous Robo4J Unit Definition file for JUnit Tests -->
+<robo4j>
+	<roboUnit id="producer">
+		<class>com.robo4j.core.StringProducer</class>
+		<properties>
+			<property>
+				<key>target</key>
+				<value>consumer</value>
+			</property>
+		</properties>
+	</roboUnit>
+
+	<roboUnit id="producer">
+		<class>com.robo4j.core.StringConsumer</class>
+		<properties>
+		</properties>
+	</roboUnit>
+</robo4j>

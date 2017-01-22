@@ -38,7 +38,7 @@ import java.util.logging.Logger;
 public class ButtonPressedObserver {
 	private volatile boolean isRunning = false;
 	private final List<ButtonListener> buttonListeners = new LinkedList<ButtonListener>();
-	private final ILCD lcd;
+	private final AdafruitLcd lcd;
 	private final long [] buttonDownTimes = new long[Button.values().length];
 	private volatile Thread t;
 	
@@ -91,7 +91,7 @@ public class ButtonPressedObserver {
 
 	}
 
-	public ButtonPressedObserver(ILCD lcd) {
+	public ButtonPressedObserver(AdafruitLcd lcd) {
 		this.lcd = lcd;
 	}
 

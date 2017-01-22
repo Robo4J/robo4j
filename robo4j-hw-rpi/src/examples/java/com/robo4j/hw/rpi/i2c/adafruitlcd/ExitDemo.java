@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014-2017. Miroslav Wengner, Marcus Hirt
- * This LCDTest.java  is part of robo4j.
+ * This ExitTest.java  is part of robo4j.
  * module: robo4j-hw-rpi
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -19,13 +19,23 @@
 package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
 import java.io.IOException;
-
 /**
- * The interface for the demos.
+ * This one really doesn't anything but clean up and exit.
  * 
  * @author Marcus Hirt
  */
-public interface LCDTest {
-	String getName();
-	void run(ILCD lcd) throws IOException;
+public class ExitDemo implements LCDDemo {
+
+	@Override
+	public String getName() {
+		return "<Exit>";
+	}
+
+	@Override
+	public void run(AdafruitLcd lcd) throws IOException {
+		lcd.clear();
+		lcd.stop();
+		System.exit(0);
+	}
+
 }

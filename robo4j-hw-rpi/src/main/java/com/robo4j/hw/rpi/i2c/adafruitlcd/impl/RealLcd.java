@@ -20,13 +20,11 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd.impl;
 
 import java.io.IOException;
 
-import com.pi4j.io.i2c.I2CBus;
-import com.pi4j.io.i2c.I2CDevice;
-import com.pi4j.io.i2c.I2CFactory;
 import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
+import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Button;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
-import com.robo4j.hw.rpi.i2c.adafruitlcd.ILCD;
 
 /**
  * Javaification of the python script example for the Adafruit LCD shield. I
@@ -57,7 +55,7 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.ILCD;
  * 
  * @author Marcus Hirt
  */
-public class RealLCD implements ILCD {
+public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	public enum Direction {
 		LEFT, RIGHT;
 	}
@@ -112,7 +110,6 @@ public class RealLCD implements ILCD {
 
 	private static final int[] ROW_OFFSETS = new int[] { 0x00, 0x40, 0x14, 0x54 };
 
-	private final I2CDevice i2cDevice;
 	private int portA = 0x00;
 	private int portB = 0x00;
 	private int ddrB = 0x10;
@@ -121,13 +118,13 @@ public class RealLCD implements ILCD {
 	private int displayControl = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF;
 	private Color color = Color.WHITE;
 
-	public RealLCD() throws IOException, UnsupportedBusNumberException {
+	public RealLcd() throws IOException, UnsupportedBusNumberException {
 		// This seems to be the default for AdaFruit 1115.
-		this(I2CBus.BUS_1, 0x20);
+		this(AdafruitLcd.DEFAULT_BUS, AdafruitLcd.DEFAULT_ADDRESS);
 	}
-
-	public RealLCD(int bus, int address) throws IOException, UnsupportedBusNumberException {
-		i2cDevice = I2CFactory.getInstance(bus).getDevice(address);
+	
+	public RealLcd(int bus, int address) throws IOException, UnsupportedBusNumberException {
+		super(bus, address);
 		initialize();
 	}
 
@@ -335,14 +332,6 @@ public class RealLCD implements ILCD {
 				(byte) portB // OLATB
 		};
 		write(0, registers, 0, registers.length);
-	}
-
-	private void sleep(long time) {
-		try {
-			Thread.sleep(time);
-		} catch (InterruptedException e) {
-			// Don't care...
-		}
 	}
 
 	/* (non-Javadoc)

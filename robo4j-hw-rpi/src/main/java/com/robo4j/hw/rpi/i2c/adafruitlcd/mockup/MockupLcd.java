@@ -20,8 +20,8 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd.mockup;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -36,15 +36,15 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.Button;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonListener;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonPressedObserver;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
-import com.robo4j.hw.rpi.i2c.adafruitlcd.ILCD;
-import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLCD.Direction;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd.Direction;
 
 /**
  * Swing mockup for the LCD.
  * 
  * @author Marcus Hirt
  */
-public class MockupLCD implements ILCD {
+public class MockupLcd implements AdafruitLcd {
 	private static final int DDRAM_SIZE = 40;
 	private volatile int cursorColumn;
 	private volatile int cursorRow;
@@ -58,12 +58,12 @@ public class MockupLCD implements ILCD {
 	private JFrame frame;
 	private Color color = Color.WHITE;
 	
-	public MockupLCD() {
+	public MockupLcd() {
 		// This seems to be the default for AdaFruit 1115.
 		this(I2CBus.BUS_1, 0x20);
 	}
 
-	public MockupLCD(int bus, int address) {
+	public MockupLcd(int bus, int address) {
 		this.bus = bus;
 		this.address = address;
 		initialize();
@@ -169,7 +169,7 @@ public class MockupLCD implements ILCD {
 	}
 
 	public static void main(String[] args) {
-		final MockupLCD lcd = new MockupLCD();
+		final MockupLcd lcd = new MockupLcd();
 		lcd.clear();
 		lcd.setText("Hello World!\nDone!");
 		ButtonPressedObserver observer = new ButtonPressedObserver(lcd);
@@ -195,34 +195,21 @@ public class MockupLCD implements ILCD {
 
 	private Component createButton(String string, final int buttonMaskVal) {
 		JButton button = new JButton(string);
-		button.addMouseListener(new MouseListener() {
+		button.addMouseListener(new MouseAdapter() {
 			
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				MockupLCD.this.maskVal = MockupLCD.this.maskVal & ~buttonMaskVal;
+				MockupLcd.this.maskVal = MockupLcd.this.maskVal & ~buttonMaskVal;
 			}
 			
 			@Override
 			public void mousePressed(MouseEvent e) {
-				MockupLCD.this.maskVal = MockupLCD.this.maskVal | buttonMaskVal;
-			}
-			
-			@Override
-			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
+				MockupLcd.this.maskVal = MockupLcd.this.maskVal | buttonMaskVal;
+				try {
+					Thread.sleep(30);
+				} catch (InterruptedException e1) {
+					//
+				}
 			}
 		});
 		return button;

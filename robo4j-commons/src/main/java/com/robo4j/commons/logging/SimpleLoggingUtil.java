@@ -52,4 +52,8 @@ public final class SimpleLoggingUtil {
 	public static void error(Class<?> clazz, String string, Exception e) {
 		Logger.getLogger(clazz.getName()).log(Level.SEVERE, string, e);
 	}
+
+	public static void debug(Class<?> clazz, String message, Exception e) {
+		Logger.getLogger(clazz.getName()).log(Level.INFO, message, e);
+	}
 }

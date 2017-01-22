@@ -24,9 +24,12 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
  */
 import java.io.IOException;
 
-import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLCD.Direction;
+import com.pi4j.io.i2c.I2CBus;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd.Direction;
 
-public interface ILCD {
+public interface AdafruitLcd {
+	int DEFAULT_BUS = I2CBus.BUS_1;
+	int DEFAULT_ADDRESS = 0x20;
 
 	/**
 	 * Sets the text to display.

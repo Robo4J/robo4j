@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014-2017. Miroslav Wengner, Marcus Hirt
- * This HelloWorldTest.java  is part of robo4j.
+ * This ScrollTest.java  is part of robo4j.
  * module: robo4j-hw-rpi
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -20,24 +20,34 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
 import java.io.IOException;
 
-import com.robo4j.hw.rpi.i2c.adafruitlcd.ILCD;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd.Direction;
 
 /**
- * The mandatory Hello World!
+ * Scrolls the view area back and forth a few times. Check out the documentation
+ * for the HD44780 for more info on how the tiny (DDRAM) buffer is handled.
  * 
  * @author Marcus Hirt
  */
-public class HelloWorldTest implements LCDTest {
+public class ScrollDemo implements LCDDemo {
 
 	@Override
 	public String getName() {
-		return "Hello World";
+		return "Scroller";
 	}
 
 	@Override
-	public void run(ILCD lcd) throws IOException {
-		lcd.clear();
-		lcd.setText("Hello World!\nDone!");
+	public void run(AdafruitLcd lcd) throws IOException {
+		String message = "Running scroller. Be patient!\nBouncing this scroller once.";
+		lcd.setText(message);
+		for (int i = 0; i < 24; i++) {
+			Util.sleep(100);
+			lcd.scrollDisplay(Direction.LEFT);
+		}
+		for (int i = 0; i < 24; i++) {
+			Util.sleep(100);
+			lcd.scrollDisplay(Direction.RIGHT);
+		}
+		lcd.setText(1, "Done!             ");
 	}
-
 }

@@ -25,7 +25,7 @@ import java.io.IOException;
  * 
  * @author Marcus Hirt
  */
-public class DisplayDemo implements LCDTest {
+public class DisplayDemo implements LCDDemo {
 
 	@Override
 	public String getName() {
@@ -33,7 +33,7 @@ public class DisplayDemo implements LCDTest {
 	}
 
 	@Override
-	public void run(ILCD lcd) throws IOException {
+	public void run(AdafruitLcd lcd) throws IOException {
 		lcd.clear();
 		lcd.setText("Turning off/on\ndisplay 10 times!");
 		Util.sleep(1000);

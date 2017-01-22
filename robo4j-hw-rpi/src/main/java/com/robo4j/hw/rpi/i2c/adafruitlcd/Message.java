@@ -38,7 +38,7 @@ public class Message {
 				message = params[i];
 			}
 		}
-		ILCD lcd = LCDFactory.createLCD();
+		AdafruitLcd lcd = LcdFactory.createLCD();
 		lcd.setBacklight(color);
 		message = massage(message);
 		lcd.setText(message);
