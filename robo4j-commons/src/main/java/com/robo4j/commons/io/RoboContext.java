@@ -14,7 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
+package com.robo4j.commons.io;
+
+import com.robo4j.commons.enums.LifecycleState;
+import com.robo4j.commons.unit.RoboUnit;
 
 import java.util.concurrent.Future;
 

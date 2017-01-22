@@ -14,9 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
+package com.robo4j.core.system;
+
+import com.robo4j.commons.enums.LifecycleState;
+import com.robo4j.commons.io.RoboContext;
+import com.robo4j.commons.io.RoboResult;
+import com.robo4j.commons.logging.SimpleLoggingUtil;
+import com.robo4j.commons.unit.RoboUnit;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -32,13 +39,14 @@ import java.util.stream.Stream;
  */
 public class RoboSystem implements RoboContext {
 	public static final String ID_SYSTEM = "com.robo4j.core.system";
-	private volatile AtomicReference<LifecycleState> state = new AtomicReference<LifecycleState>(
+	private volatile AtomicReference<LifecycleState> state = new AtomicReference<>(
 			LifecycleState.UNINITIALIZED);
-	private final Map<String, RoboUnit<?>> units = new HashMap<String, RoboUnit<?>>();
+	private final Map<String, RoboUnit<?>> units = new HashMap<>();
 
-	private final RoboUnit<Object> systemUnit = new RoboUnit<Object>(this, ID_SYSTEM);
+	private final RoboUnit<Object> systemUnit = new RoboUnit<>(this, ID_SYSTEM);
 
 	public RoboSystem() {
+		SimpleLoggingUtil.debug(getClass(), "LOCALE= " + Locale.getDefault());
 		units.put(ID_SYSTEM, systemUnit);
 	}
 
@@ -104,7 +112,7 @@ public class RoboSystem implements RoboContext {
 	 * Sends a message on the system bus.
 	 * 
 	 * @param targetId
-	 * @param lcdMessage
+	 * @param message
 	 * @return the response.
 	 */
 	public Future<RoboResult<?>> sendMessage(String targetId, Object message) {

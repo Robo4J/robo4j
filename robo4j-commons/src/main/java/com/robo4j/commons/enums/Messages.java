@@ -14,31 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
+package com.robo4j.commons.enums;
+
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 /**
- * The result returned from a message.
+ * Localization.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RoboResult<T> {
-	// NOTE(Marcus/Jan 22, 2017): I don't think we should have a result of
-	// sending a message. Any results should be communicated as messages back to
-	// the sender.
-	private final RoboUnit<?> source;
-	private final T result;
+public class Messages {
+	private static final String BUNDLE_NAME = "messages"; //$NON-NLS-1$
 
-	public RoboResult(RoboUnit<?> source, T result) {
-		this.source = source;
-		this.result = result;
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+
+	private Messages() {
 	}
 
-	public T getResult() {
-		return result;
-	}
-
-	public RoboUnit<?> getSource() {
-		return source;
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
+		}
 	}
 }

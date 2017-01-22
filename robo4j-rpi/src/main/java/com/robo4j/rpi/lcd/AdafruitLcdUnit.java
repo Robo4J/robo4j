@@ -5,10 +5,10 @@ import java.util.Map;
 
 import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
 import com.robo4j.commons.annotation.Unit;
+import com.robo4j.commons.io.RoboResult;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboResult;
-import com.robo4j.core.RoboUnit;
+import com.robo4j.commons.io.RoboContext;
+import com.robo4j.commons.unit.RoboUnit;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.LcdFactory;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd.Direction;

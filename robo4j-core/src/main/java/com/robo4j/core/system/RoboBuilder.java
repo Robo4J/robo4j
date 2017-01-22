@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
+package com.robo4j.core.system;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +30,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import com.robo4j.commons.io.RoboContext;
+import com.robo4j.commons.unit.RoboUnit;
+import com.robo4j.core.RoboBuilderException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -42,12 +45,13 @@ import com.robo4j.commons.logging.SimpleLoggingUtil;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RoboBuilder {
+public final class RoboBuilder {
 	private final Set<RoboUnit<?>> units = new HashSet<>();
 	private final RoboSystem system = new RoboSystem();
 
 	// FIXME(Marcus/Jan 22, 2017): Move to memento style typed property trees
 	// and clean up parsing.
+	// TODO, FIXME : move away the internal class
 	private class RoboXMLHandler extends DefaultHandler {
 		private String currentId = "";
 		private String currentClassName = "";

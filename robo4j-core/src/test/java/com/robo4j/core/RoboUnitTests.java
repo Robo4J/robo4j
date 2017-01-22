@@ -16,6 +16,8 @@
  */
 package com.robo4j.core;
 
+import com.robo4j.commons.enums.LifecycleState;
+import com.robo4j.core.system.RoboSystem;
 import org.junit.Assert;
 import org.junit.Test;
 

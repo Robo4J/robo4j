@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
+package com.robo4j.commons.unit;
 
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -22,8 +22,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.robo4j.commons.enums.LifecycleState;
+import com.robo4j.commons.io.RoboContext;
+import com.robo4j.commons.io.RoboResult;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
-import com.robo4j.core.concurrency.RoboSingleThreadFactory;
+import com.robo4j.commons.concurrency.RoboSingleThreadFactory;
 
 /**
  * The core component. Subclass this to provide a messaging capable agent for a
@@ -89,7 +92,7 @@ public class RoboUnit<T> {
 	 * <p>
 	 * Default implementation sets state to {@link LifecycleState#STARTED}.
 	 */
-	protected void start() {
+	public void start() {
 		setState(LifecycleState.STARTED);
 	}
 
@@ -99,7 +102,7 @@ public class RoboUnit<T> {
 	 * <p>
 	 * Default implementation sets state to {@link LifecycleState#STOPPED}.
 	 */
-	protected void stop() {
+	public void stop() {
 		setState(LifecycleState.STOPPED);
 	}
 
@@ -110,7 +113,7 @@ public class RoboUnit<T> {
 	 * <p>
 	 * Default implementation sets state to {@link LifecycleState#SHUTDOWN}.
 	 */
-	protected void shutdown() {
+	public void shutdown() {
 		setState(LifecycleState.SHUTTING_DOWN);
 		outBox.shutdown();
 		try {

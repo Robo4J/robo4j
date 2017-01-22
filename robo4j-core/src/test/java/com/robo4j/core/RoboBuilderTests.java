@@ -17,6 +17,11 @@
  */
 package com.robo4j.core;
 
+import com.robo4j.commons.enums.LifecycleState;
+import com.robo4j.commons.io.RoboContext;
+import com.robo4j.commons.unit.RoboUnit;
+import com.robo4j.core.client.util.ClientClassLoader;
+import com.robo4j.core.system.RoboBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,13 +36,14 @@ public class RoboBuilderTests {
 	@Test
 	public void testParsingFile() throws RoboBuilderException {
 		RoboBuilder builder = new RoboBuilder();
-		builder.add(RoboBuilderTests.class.getResourceAsStream("test.xml"));
+		builder.add(ClientClassLoader.getInstance().getResource("test.xml"));
+//		builder.add(RoboBuilderTests.class.getResourceAsStream("test.xml"));
 		RoboContext context = builder.build();
 		Assert.assertEquals(context.getState(), LifecycleState.UNINITIALIZED);
 		context.start();
 		Assert.assertTrue(context.getState() == LifecycleState.STARTING || context.getState() == LifecycleState.STARTED);
 		
-		RoboUnit<?> roboUnit = context.getRoboUnit("producer");		
+		RoboUnit<?> roboUnit = context.getRoboUnit("producer");
 		Assert.assertTrue(roboUnit instanceof StringProducer);
 		
 		StringProducer producer = (StringProducer) roboUnit;
@@ -59,7 +65,7 @@ public class RoboBuilderTests {
 		RoboBuilder builder = new RoboBuilder();
 		boolean gotException = false;
 		try {
-			builder.add(RoboBuilderTests.class.getResourceAsStream("double.xml"));
+			builder.add(ClientClassLoader.getInstance().getResource("double.xml"));
 		} catch (RoboBuilderException e) {
 			gotException = true;
 		}

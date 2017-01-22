@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
+package com.robo4j.commons.enums;
 
 /**
  * Represents the life cycle of a RoboUnit.
@@ -50,7 +50,7 @@ public enum LifecycleState {
 	private final String localizedName;
 	private final String description;
 
-	private LifecycleState(Integer stateID, String localizedName, String description) {
+	LifecycleState(Integer stateID, String localizedName, String description) {
 		this.stateId = stateID;
 		this.localizedName = localizedName;
 		this.description = description;

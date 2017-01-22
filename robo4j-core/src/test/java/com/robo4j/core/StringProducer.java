@@ -16,6 +16,10 @@
  */
 package com.robo4j.core;
 
+import com.robo4j.commons.io.RoboContext;
+import com.robo4j.commons.io.RoboResult;
+import com.robo4j.commons.unit.RoboUnit;
+
 import java.util.Map;
 
 /**

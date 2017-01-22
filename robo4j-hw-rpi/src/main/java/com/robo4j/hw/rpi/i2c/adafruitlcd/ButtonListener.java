@@ -26,6 +26,7 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
  * 
  * @author Marcus Hirt
  */
+@FunctionalInterface
 public interface ButtonListener {
 	/**
 	 * Called when a button is pressed on the LCD shield.

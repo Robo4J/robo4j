@@ -24,6 +24,7 @@ import java.io.InputStream;
  *
  * Singleton instance of classLoader
  *
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 23.05.2016
  */
