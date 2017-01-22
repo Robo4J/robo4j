@@ -11,7 +11,7 @@ ext {
     googleCollectionsVersion = "1.0"
     log4jApiVersion = "2.1"
     lejosVersion = "9.1-SNAPSHOT"
-    junitVersion = "4.11"
+    junitVersion = "4.12"
     hamcrestAllVersion = "1.3"
     droneVersion = "1.3"
     apacheCommonsVersion = "3.4"
