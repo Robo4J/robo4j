@@ -18,7 +18,6 @@ package com.robo4j.hw.rpi.i2c;
 
 import java.io.IOException;
 import java.util.logging.Logger;
-import java.util.stream.IntStream;
 
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
