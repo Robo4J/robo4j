@@ -26,7 +26,7 @@ import java.util.ResourceBundle;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class Messages {
-	private static final String BUNDLE_NAME = "com.robo4j.core.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.robo4j.core.Messages"; //$NON-NLS-1$
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
