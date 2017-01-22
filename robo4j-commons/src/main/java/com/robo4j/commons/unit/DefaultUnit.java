@@ -34,6 +34,7 @@ import com.robo4j.commons.command.RoboUnitCommand;
 /**
  * DefaultUnit represent basic structure of the RoboUnit annotated classes
  *
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 29.06.2016
  */

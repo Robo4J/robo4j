@@ -20,6 +20,7 @@ package com.robo4j.commons.enums;
 
 /**
  * @param <EnumType> - type of Hardware where is used, standard usage if to specify commands
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 04.05.2016
  */

@@ -22,7 +22,8 @@ package com.robo4j.commons.enums;
 /**
  *
  * @param <TargetType> - specifies the target of a assignment example Hardware
- * @author Miro Wengner (@miragemiko)
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 18.01.2017
  */
 public interface RoboTargetEnumI<TargetType> {

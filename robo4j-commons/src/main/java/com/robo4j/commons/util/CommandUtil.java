@@ -22,6 +22,7 @@ import com.robo4j.commons.command.CommandParsed;
 import com.robo4j.commons.command.CommandTypeEnum;
 
 /**
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 24.04.2016
  */

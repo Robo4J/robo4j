@@ -27,7 +27,8 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.mockup.MockupLcd;
  * FIXME(Marcus/Dec 20, 2016): We should probably not let the mockup etc be part of the standard API.
  * Let's keep it clean?
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 public final class LcdFactory {
 	/**

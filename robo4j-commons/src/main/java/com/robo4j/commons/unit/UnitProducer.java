@@ -22,7 +22,8 @@ package com.robo4j.commons.unit;
 import com.robo4j.commons.control.RoboSystemConfig;
 
 /**
- * @author Miro Wengner (@miragemiko)
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  * @since 18.01.2017
  */
 public interface UnitProducer extends RoboSystemConfig {
