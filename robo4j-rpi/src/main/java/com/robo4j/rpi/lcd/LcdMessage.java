@@ -68,7 +68,7 @@ public class LcdMessage {
 	 */
 	@Override
 	public String toString() {
-		return String.format("Type: %s, Source: %s, Color: %s, Text: %s", type, source.toString(), color.toString(),
-				text);
+		return String.format("Type: %s, Source: %s, Color: %s, Text: %s", type, String.valueOf(source),
+				String.valueOf(color), text);
 	}
 }
