@@ -20,15 +20,16 @@ import com.robo4j.commons.unit.RoboUnit;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
 
 /**
+ * Message class that can be used to send messages to {@link AdafruitLcdUnit}s.
  * 
- * @author Marcus
+ * @author Marcus Hirt (@hirt)
  */
 public class LcdMessage {
 	private final RoboUnit<?> source;
 	private final Color color;
 	private final String text;
 	private final LcdMessageType type;
-	
+
 	public LcdMessage(String text) {
 		this(LcdMessageType.SET_TEXT, null, null, text);
 	}
@@ -36,7 +37,7 @@ public class LcdMessage {
 	public LcdMessage(String text, Color color) {
 		this(LcdMessageType.SET_TEXT, null, color, text);
 	}
-	
+
 	public LcdMessage(LcdMessageType type, RoboUnit<?> source, Color color, String text) {
 		this.type = type;
 		this.source = source;
@@ -55,16 +56,19 @@ public class LcdMessage {
 	public String getText() {
 		return text;
 	}
-	
+
 	public LcdMessageType getType() {
 		return type;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return String.format("Type: %s, Source: %s, Color: %s, Text: %s", type, source.toString(), color.toString(), text);
+		return String.format("Type: %s, Source: %s, Color: %s, Text: %s", type, source.toString(), color.toString(),
+				text);
 	}
 }

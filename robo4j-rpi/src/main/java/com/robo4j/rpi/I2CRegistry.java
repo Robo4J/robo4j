@@ -20,7 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Marcus
+ * Registry for I2C devices. Useful for sharing hardware between units.
+ * 
+ * @author Marcus Hirt (@hirt)
  */
 public class I2CRegistry {
 	private static Map<I2CEndPoint, Object> devices = new HashMap<>();
@@ -28,9 +30,9 @@ public class I2CRegistry {
 	public static Object getI2CDeviceByEndPoint(I2CEndPoint endPoint) {
 		return devices.get(endPoint);
 	}
-	
+
 	public static void registerI2CDevice(Object device, I2CEndPoint endPoint) {
 		devices.put(endPoint, device);
 	}
-	
+
 }

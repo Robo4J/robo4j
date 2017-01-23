@@ -16,6 +16,13 @@
  */
 package com.robo4j.rpi.lcd;
 
+/**
+ * Some types of messages known.
+ * 
+ * @author Marcus Hirt (@hirt)
+ */
 public enum LcdMessageType {
+	// FIXME(Marcus/Jan 23, 2017): If we go with Object, we can have
+	// different actual message types instead.
 	SET_TEXT, CLEAR, DISPLAY_ENABLE, STOP, SCROLL;
 }

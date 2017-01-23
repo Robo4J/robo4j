@@ -22,16 +22,17 @@ import com.robo4j.commons.io.RoboContext;
 import com.robo4j.commons.unit.RoboUnit;
 
 /**
+ * Helpful base class for {@link RoboUnit} units using the I2C protocol.
  * 
- * @author Marcus
+ * @author Marcus Hirt (@hirt)
  */
 public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
 	public final static String PROPERTY_KEY_BUS = "bus";
 	public final static String PROPERTY_KEY_ADDRESS = "address";
-	
+
 	private int bus;
 	private int address;
-	
+
 	/**
 	 * @param context
 	 * @param id
@@ -54,5 +55,5 @@ public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
 	public int getBus() {
 		return bus;
 	}
-	
+
 }

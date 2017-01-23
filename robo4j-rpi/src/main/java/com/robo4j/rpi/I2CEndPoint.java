@@ -16,6 +16,12 @@
  */
 package com.robo4j.rpi;
 
+/**
+ * Identifying an I2C device. Useful together with the {@link I2CRegistry} for
+ * sharing I2C hardware between units.
+ * 
+ * @author Marcus Hirt (@hirt)
+ */
 public final class I2CEndPoint {
 	private int bus;
 	private int address;
