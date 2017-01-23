@@ -16,7 +16,7 @@
  */
 package com.robo4j.rpi.lcd;
 
-import com.robo4j.commons.unit.RoboUnit;
+import com.robo4j.core.RoboUnit;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
 
 /**

@@ -18,8 +18,8 @@ package com.robo4j.rpi.lcd;
 
 import java.util.Map;
 
-import com.robo4j.commons.io.RoboContext;
-import com.robo4j.commons.unit.RoboUnit;
+import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboUnit;
 
 /**
  * Helpful base class for {@link RoboUnit} units using the I2C protocol.

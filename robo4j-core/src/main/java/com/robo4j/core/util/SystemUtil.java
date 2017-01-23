@@ -14,38 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
+package com.robo4j.core.util;
 
-import java.util.Map;
+import com.robo4j.core.RoboContext;
 
 /**
  * 
  * @author Marcus Hirt (@hirt)
- * @author Miroslav Wengner (@miragemiko)
  */
-public class StringProducer extends RoboUnit<String> {
-	private String target;
 
-	/**
-	 * @param context
-	 * @param id
-	 */
-	public StringProducer(RoboContext context, String id) {
-		super(context, id);
-	}
+public class SystemUtil {
 
-	public void sendRandomMessage() {
-		sendMessage(target, StringToolkit.getRandomMessage(10));
-	}
-
-	@Override
-	public RoboResult<?> onMessage(Object message) {
-		System.out.println("Should not send messages to the producer!");
-		return null;
-	}
-
-	@Override
-	public void initialize(Map<String, String> properties) throws Exception {
-		target = properties.get("target");
+	public static String getReport(RoboContext context) {
+		StringBuilder builder = new StringBuilder();
+		
+		return builder.toString();
 	}
 }

@@ -14,19 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.commons.unit;
+package com.robo4j.core;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.robo4j.commons.enums.LifecycleState;
-import com.robo4j.commons.io.RoboContext;
-import com.robo4j.commons.io.RoboResult;
-import com.robo4j.commons.logging.SimpleLoggingUtil;
 import com.robo4j.commons.concurrency.RoboSingleThreadFactory;
+import com.robo4j.commons.logging.SimpleLoggingUtil;
 
 /**
  * The core component. Subclass this to provide a messaging capable agent for a
@@ -133,10 +133,32 @@ public class RoboUnit<T> {
 		return state;
 	}
 
+	/**
+	 * It is considered good form to return the types that you can respond to.
+	 * This method should be overriden in subclasses. Note that it is allowed
+	 * for an agent to return the empty set. Returning null is not allowed.
+	 * 
+	 * @return the message types accepted by this unit.
+	 */
+	public Collection<Class<?>> getAcceptedMessageTypes() {
+		return Collections.emptySet();
+	}
+
+	/**
+	 * Changes the {@link LifecycleState}.
+	 * 
+	 * @param state
+	 *            the state to change to.
+	 * 
+	 * @see LifecycleState for allowable transitions.
+	 */
 	public void setState(LifecycleState state) {
 		this.state = state;
 	}
 
+	/**
+	 * @return true if the unit has methods that has not been processed yet.
+	 */
 	public boolean hasUnprocessedMessages() {
 		return messageQueue.size() > 0;
 	}

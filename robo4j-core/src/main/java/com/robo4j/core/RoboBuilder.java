@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.system;
+package com.robo4j.core;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,9 +30,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import com.robo4j.commons.io.RoboContext;
-import com.robo4j.commons.unit.RoboUnit;
-import com.robo4j.core.RoboBuilderException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
