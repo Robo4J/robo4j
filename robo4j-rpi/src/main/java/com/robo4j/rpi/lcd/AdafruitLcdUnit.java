@@ -18,11 +18,11 @@ import com.robo4j.rpi.I2CRegistry;
 @Unit
 public class AdafruitLcdUnit extends RoboUnit<String> {
 	private AdafruitLcd lcd;
-	
+
 	public AdafruitLcdUnit(RoboContext context, String id) {
 		super(context, id);
 	}
-	
+
 	static AdafruitLcd getLCD(int bus, int address) throws IOException, UnsupportedBusNumberException {
 		Object lcd = I2CRegistry.getI2CDeviceByEndPoint(new I2CEndPoint(bus, address));
 		if (lcd == null) {
@@ -44,12 +44,13 @@ public class AdafruitLcdUnit extends RoboUnit<String> {
 	@Override
 	public RoboResult<?> onMessage(Object message) {
 		try {
-			
-		if (message instanceof LcdMessage) {
-			processLcdMessage((LcdMessage) message);
-		} else if (message instanceof String) {
-			lcd.setText((String) message);
-		} 		} catch (Exception e) {
+
+			if (message instanceof LcdMessage) {
+				processLcdMessage((LcdMessage) message);
+			} else if (message instanceof String) {
+				lcd.setText((String) message);
+			}
+		} catch (Exception e) {
 			SimpleLoggingUtil.debug(getClass(), "Could not accept message" + message.toString(), e);
 		}
 
@@ -58,7 +59,7 @@ public class AdafruitLcdUnit extends RoboUnit<String> {
 
 	/**
 	 * @param message
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private void processLcdMessage(LcdMessage message) throws IOException {
 		switch (message.getType()) {
@@ -72,7 +73,7 @@ public class AdafruitLcdUnit extends RoboUnit<String> {
 			} else if (enablement.equals("false")) {
 				lcd.setDisplayEnabled(false);
 			} else {
-				SimpleLoggingUtil.error(getClass(), "Display enablement " + enablement + " is unknown");				
+				SimpleLoggingUtil.error(getClass(), "Display enablement " + enablement + " is unknown");
 			}
 			break;
 		case SCROLL:
@@ -80,7 +81,7 @@ public class AdafruitLcdUnit extends RoboUnit<String> {
 			if (direction.equals("left")) {
 				lcd.scrollDisplay(Direction.LEFT);
 			} else if (direction.equals("right")) {
-				lcd.scrollDisplay(Direction.RIGHT);				
+				lcd.scrollDisplay(Direction.RIGHT);
 			} else {
 				SimpleLoggingUtil.error(getClass(), "Scroll direction " + direction + " is unknown");
 			}
@@ -88,15 +89,15 @@ public class AdafruitLcdUnit extends RoboUnit<String> {
 		case SET_TEXT:
 			String text = message.getText();
 			if (text != null) {
-				lcd.setText(text);				
+				lcd.setText(text);
 			}
 			break;
 		case STOP:
 			lcd.stop();
 			break;
 		default:
-			SimpleLoggingUtil.error(getClass(), message.getType() + " not supported!");			
+			SimpleLoggingUtil.error(getClass(), message.getType() + " not supported!");
 			break;
-		}		
+		}
 	}
 }
