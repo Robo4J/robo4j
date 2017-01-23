@@ -16,13 +16,15 @@
  */
 package com.robo4j.core;
 
-import com.robo4j.commons.enums.Messages;
-
 /**
  * Represents the life cycle of a RoboUnit.
  * 
  * <p>
- * UNINITIALIZED -> STARTING -> STARTED -> STOPPING -> STOPPED -> SHUTDOWN
+ * UNINITIALIZED -> [INITIALIZED] -> STARTING -> STARTED -> STOPPING -> STOPPED
+ * -> SHUTDOWN
+ * <p>
+ * Components which do not have any initialization parameters can skip entering
+ * initialized. It is considered good form to self report when initialized.
  * <p>
  * Other valid transitions:
  * <p>
@@ -37,14 +39,15 @@ import com.robo4j.commons.enums.Messages;
  */
 public enum LifecycleState {
 	// @formatter:off
-	UNINITIALIZED(0, Messages.getString("LifecycleState.STATE_NAME_UNITIALIZED"), Messages.getString("LifecycleState.STATE_DESCRIPTION_UNITIALIZED")),  //$NON-NLS-1$ //$NON-NLS-2$
-	STARTING(1, Messages.getString("LifecycleState.STATE_NAME_STARTING"), Messages.getString("LifecycleState.STATE_DESCRIPTION_STARTING")),  //$NON-NLS-1$ //$NON-NLS-2$
-	STARTED(2, Messages.getString("LifecycleState.STATE_NAME_STARTED"), Messages.getString("LifecycleState.STATE_DESCRIPTION_STARTED")),  //$NON-NLS-1$ //$NON-NLS-2$
-	STOPPING(3, Messages.getString("LifecycleState.STATE_NAME_STOPPING"), Messages.getString("LifecycleState.STATE_DESCRIPTION_STOPPING")),  //$NON-NLS-1$ //$NON-NLS-2$
-	STOPPED(4, Messages.getString("LifecycleState.STATE_NAME_STOPPED"), Messages.getString("LifecycleState.STATE_DESCRIPTION_STOPPED")),  //$NON-NLS-1$ //$NON-NLS-2$
-	SHUTTING_DOWN(5, Messages.getString("LifecycleState.STATE_NAME_SHUTTING_DOWN"), Messages.getString("LifecycleState.STATE_DESCRIPTION_SHUTTING_DOWN")),  //$NON-NLS-1$ //$NON-NLS-2$
-	SHUTDOWN(6, Messages.getString("LifecycleState.STATE_NAME_SHUTDOWN"), Messages.getString("LifecycleState.STATE_DESCRIPTION_STOPPED")),  //$NON-NLS-1$ //$NON-NLS-2$
-	FAILED(7, Messages.getString("LifecycleState.STATE_NAME_FAILED"), Messages.getString("LifecycleState.STATE_DESCRIPTION_FAILED")), 
+	UNINITIALIZED(0, Messages.getString("LifecycleState.STATE_NAME_UNINITIALIZED"), Messages.getString("LifecycleState.STATE_DESCRIPTION_UNINITIALIZED")),  //$NON-NLS-1$ //$NON-NLS-2$
+	INITIALIZED(1, Messages.getString("LifecycleState.STATE_NAME_INITIALIZED"), Messages.getString("LifecycleState.STATE_DESCRIPTION_INITIALIZED")),  //$NON-NLS-1$ //$NON-NLS-2$
+	STARTING(2, Messages.getString("LifecycleState.STATE_NAME_STARTING"), Messages.getString("LifecycleState.STATE_DESCRIPTION_STARTING")),  //$NON-NLS-1$ //$NON-NLS-2$
+	STARTED(3, Messages.getString("LifecycleState.STATE_NAME_STARTED"), Messages.getString("LifecycleState.STATE_DESCRIPTION_STARTED")),  //$NON-NLS-1$ //$NON-NLS-2$
+	STOPPING(4, Messages.getString("LifecycleState.STATE_NAME_STOPPING"), Messages.getString("LifecycleState.STATE_DESCRIPTION_STOPPING")),  //$NON-NLS-1$ //$NON-NLS-2$
+	STOPPED(5, Messages.getString("LifecycleState.STATE_NAME_STOPPED"), Messages.getString("LifecycleState.STATE_DESCRIPTION_STOPPED")),  //$NON-NLS-1$ //$NON-NLS-2$
+	SHUTTING_DOWN(6, Messages.getString("LifecycleState.STATE_NAME_SHUTTING_DOWN"), Messages.getString("LifecycleState.STATE_DESCRIPTION_SHUTTING_DOWN")),  //$NON-NLS-1$ //$NON-NLS-2$
+	SHUTDOWN(7, Messages.getString("LifecycleState.STATE_NAME_SHUTDOWN"), Messages.getString("LifecycleState.STATE_DESCRIPTION_STOPPED")),  //$NON-NLS-1$ //$NON-NLS-2$
+	FAILED(8, Messages.getString("LifecycleState.STATE_NAME_FAILED"), Messages.getString("LifecycleState.STATE_DESCRIPTION_FAILED")), 
 	; //$NON-NLS-1$ //$NON-NLS-2$
 	// @formatter:on
 
@@ -66,9 +69,9 @@ public enum LifecycleState {
 	public Integer getStateId() {
 		return stateId;
 	}
-	
+
 	/**
-	 * @return the localized name of the  
+	 * @return the localized name of the
 	 */
 	public String getLocalizedName() {
 		return localizedName;
@@ -77,8 +80,10 @@ public enum LifecycleState {
 	public String getDescription() {
 		return description;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Enum#toString()
 	 */
 	@Override

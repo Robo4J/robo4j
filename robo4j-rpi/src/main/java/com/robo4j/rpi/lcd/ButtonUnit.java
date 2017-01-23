@@ -76,11 +76,11 @@ public class ButtonUnit extends RoboUnit<Object> {
 
 	@Override
 	public void initialize(Map<String, String> properties) throws Exception {
-		super.initialize(properties);
 		int bus = Integer.parseInt(properties.get("bus"));
 		int address = Integer.parseInt(properties.get("address"));
 		target = properties.get("target");
 		lcd = AdafruitLcdUnit.getLCD(bus, address);
+		setState(LifecycleState.INITIALIZED);
 	}
 
 	public void start() {

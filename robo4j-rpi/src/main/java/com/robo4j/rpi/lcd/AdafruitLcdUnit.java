@@ -22,6 +22,7 @@ import java.util.Map;
 import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
 import com.robo4j.commons.annotation.Unit;
 import com.robo4j.commons.logging.SimpleLoggingUtil;
+import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboResult;
 import com.robo4j.core.RoboUnit;
@@ -55,11 +56,11 @@ public class AdafruitLcdUnit extends RoboUnit<String> {
 
 	@Override
 	public void initialize(Map<String, String> properties) throws Exception {
-		super.initialize(properties);
 		int bus = Integer.parseInt(properties.get("bus"));
 		int address = Integer.parseInt(properties.get("address"));
 
 		lcd = getLCD(bus, address);
+		setState(LifecycleState.INITIALIZED);
 	}
 
 	@Override

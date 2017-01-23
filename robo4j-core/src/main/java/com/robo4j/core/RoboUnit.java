@@ -19,7 +19,6 @@ package com.robo4j.core;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -38,7 +37,7 @@ import com.robo4j.commons.logging.SimpleLoggingUtil;
 public class RoboUnit<T> {
 	private final RoboContext context;
 	private final String id;
-	private volatile LifecycleState state;
+	private volatile LifecycleState state = LifecycleState.UNINITIALIZED;
 
 	// TODO(Marcus/Jan 21, 2017): Should limit size of queue, should add
 	// monitoring.
@@ -83,6 +82,7 @@ public class RoboUnit<T> {
 	}
 
 	public void initialize(Map<String, String> properties) throws Exception {
+		setState(LifecycleState.INITIALIZED);
 	}
 
 	/**

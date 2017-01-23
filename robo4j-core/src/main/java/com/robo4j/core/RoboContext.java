@@ -16,6 +16,7 @@
  */
 package com.robo4j.core;
 
+import java.util.Collection;
 import java.util.concurrent.Future;
 
 /**
@@ -63,4 +64,9 @@ public interface RoboContext {
 	 * @return
 	 */
 	Future<RoboResult<?>> sendMessage(String target, Object message);
+
+	/**
+	 * @return the available units.
+	 */
+	Collection<RoboUnit<?>> getUnits();
 }

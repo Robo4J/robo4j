@@ -16,18 +16,35 @@
  */
 package com.robo4j.core.util;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboUnit;
 
 /**
+ * Some useful little utilities.
  * 
  * @author Marcus Hirt (@hirt)
  */
-
 public class SystemUtil {
+	public final static Comparator<RoboUnit<?>> ID_COMPARATOR = new Comparator<RoboUnit<?>>() {
+		@Override
+		public int compare(RoboUnit<?> o1, RoboUnit<?> o2) {
+			return o1.getId().compareTo(o2.getId());
+		}
+	};
 
-	public static String getReport(RoboContext context) {
+	public static String generateStateReport(RoboContext ctx) {
 		StringBuilder builder = new StringBuilder();
-		
+		List<RoboUnit<?>> units = new ArrayList<>(ctx.getUnits());
+		units.sort(ID_COMPARATOR);
+		builder.append("RoboSystem state " + ctx.getState().getLocalizedName());
+		builder.append("\n================================================\n");
+		for (RoboUnit<?> unit : units) {
+			builder.append(String.format("    %-25s   %13s\n", unit.getId(), unit.getState().getLocalizedName()));	
+		}
 		return builder.toString();
 	}
 }

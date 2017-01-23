@@ -47,5 +47,6 @@ public class StringProducer extends RoboUnit<String> {
 	@Override
 	public void initialize(Map<String, String> properties) throws Exception {
 		target = properties.get("target");
+		setState(LifecycleState.INITIALIZED);
 	}
 }

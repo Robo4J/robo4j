@@ -79,7 +79,7 @@ public final class RoboBuilder {
 					clearCurrentVariables();
 				} else {
 					try {
-						System.out.println("Loading " + currentClassName.trim() + " id=" + currentId);
+						SimpleLoggingUtil.debug(getClass(), "Loading " + currentClassName.trim() + " id=" + currentId);
 						@SuppressWarnings("unchecked")
 						Class<RoboUnit<?>> roboUnitClass = (Class<RoboUnit<?>>) Thread.currentThread()
 								.getContextClassLoader().loadClass(currentClassName.trim());

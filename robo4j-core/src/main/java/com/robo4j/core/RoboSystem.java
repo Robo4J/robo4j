@@ -18,6 +18,7 @@ package com.robo4j.core;
 
 import com.robo4j.commons.logging.SimpleLoggingUtil;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -35,8 +36,7 @@ import java.util.stream.Stream;
  */
 public class RoboSystem implements RoboContext {
 	public static final String ID_SYSTEM = "com.robo4j.core.system";
-	private volatile AtomicReference<LifecycleState> state = new AtomicReference<>(
-			LifecycleState.UNINITIALIZED);
+	private volatile AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
 	private final Map<String, RoboUnit<?>> units = new HashMap<>();
 
 	private final RoboUnit<Object> systemUnit = new RoboUnit<>(this, ID_SYSTEM);
@@ -125,5 +125,12 @@ public class RoboSystem implements RoboContext {
 	 */
 	public Future<RoboResult<?>> sendMessage(RoboUnit<?> target, Object message) {
 		return systemUnit.sendMessage(target, message);
+	}
+
+	/**
+	 * Returns all the units in the system.
+	 */
+	public Collection<RoboUnit<?>> getUnits() {
+		return units.values();
 	}
 }
