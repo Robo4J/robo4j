@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.robo4j.commons.logging.SimpleLoggingUtil;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 
 /**
  * @author Miro Wengner (@miragemiko)

@@ -19,7 +19,7 @@
 
 package com.robo4j.core.dto;
 
-import com.robo4j.commons.command.SystemCommandEnum;
+import com.robo4j.core.command.SystemCommandEnum;
 
 /**
  * @author Miro Wengner (@miragemiko)

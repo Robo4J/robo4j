@@ -18,7 +18,7 @@
 
 package com.robo4j.lego.motor;
 
-import com.robo4j.commons.motor.GenericMotor;
+import com.robo4j.core.motor.GenericMotor;
 import com.robo4j.lego.control.LegoEngine;
 import com.robo4j.lego.enums.LegoAnalogPortEnum;
 import com.robo4j.lego.enums.LegoEngineEnum;

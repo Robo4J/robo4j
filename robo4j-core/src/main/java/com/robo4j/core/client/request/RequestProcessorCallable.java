@@ -32,7 +32,7 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.robo4j.commons.logging.SimpleLoggingUtil;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.client.enums.RequestStatusEnum;
 import com.robo4j.core.client.enums.RequestUnitStatusEnum;
 import com.robo4j.core.client.io.ClientException;

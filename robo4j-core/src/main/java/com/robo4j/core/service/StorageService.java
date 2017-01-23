@@ -18,7 +18,6 @@
 
 package com.robo4j.core.service;
 
-import com.robo4j.commons.service.GenericService;
 import com.robo4j.core.dto.SensorDTO;
 
 /**

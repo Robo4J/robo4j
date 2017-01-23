@@ -18,7 +18,7 @@
 
 package com.robo4j.core.client.command;
 
-import com.robo4j.commons.command.CommandProperties;
+import com.robo4j.core.command.CommandProperties;
 import com.robo4j.core.util.ConstantUtil;
 
 /**

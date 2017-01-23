@@ -25,7 +25,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import com.robo4j.commons.logging.SimpleLoggingUtil;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.client.io.ClientException;
 import com.robo4j.core.client.io.ResourceLoader;
 

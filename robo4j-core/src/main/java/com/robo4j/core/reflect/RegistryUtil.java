@@ -27,14 +27,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.robo4j.commons.registry.EngineRegistry;
-import com.robo4j.commons.registry.ProviderRegistry;
-import com.robo4j.commons.registry.RegistryTypeEnum;
-import com.robo4j.commons.registry.RoboRegistry;
-import com.robo4j.commons.registry.SensorRegistry;
-import com.robo4j.commons.registry.SystemServiceRegistry;
-import com.robo4j.commons.registry.UnitProducerRegistry;
-import com.robo4j.commons.registry.UnitRegistry;
+import com.robo4j.core.registry.EngineRegistry;
+import com.robo4j.core.registry.ProviderRegistry;
+import com.robo4j.core.registry.RegistryTypeEnum;
+import com.robo4j.core.registry.RoboRegistry;
+import com.robo4j.core.registry.SensorRegistry;
+import com.robo4j.core.registry.SystemServiceRegistry;
+import com.robo4j.core.registry.UnitProducerRegistry;
+import com.robo4j.core.registry.UnitRegistry;
 
 /**
  * TODO: remove

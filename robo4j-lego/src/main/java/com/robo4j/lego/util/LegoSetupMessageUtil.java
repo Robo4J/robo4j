@@ -20,7 +20,7 @@ package com.robo4j.lego.util;
 
 import java.util.Map;
 
-import com.robo4j.commons.control.RoboSystemConfig;
+import com.robo4j.core.control.RoboSystemConfig;
 import com.robo4j.lego.control.LegoEngine;
 import com.robo4j.lego.control.LegoSensor;
 

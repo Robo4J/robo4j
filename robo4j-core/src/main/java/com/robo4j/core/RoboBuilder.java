@@ -34,7 +34,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.robo4j.commons.logging.SimpleLoggingUtil;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 
 /**
  * Builds a RoboSystem from various different sources.

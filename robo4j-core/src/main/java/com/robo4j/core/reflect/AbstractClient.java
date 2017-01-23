@@ -30,12 +30,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
-import com.robo4j.commons.annotation.RoboMotor;
-import com.robo4j.commons.annotation.RoboProvider;
-import com.robo4j.commons.annotation.RoboSensor;
-import com.robo4j.commons.annotation.RoboService;
-import com.robo4j.commons.annotation.RoboUnit;
-import com.robo4j.commons.annotation.RoboUnitProducer;
+import com.robo4j.core.annotation.RoboMotor;
+import com.robo4j.core.annotation.RoboProvider;
+import com.robo4j.core.annotation.RoboSensor;
+import com.robo4j.core.annotation.RoboService;
+import com.robo4j.core.annotation.RoboUnit;
+import com.robo4j.core.annotation.RoboUnitProducer;
 import com.robo4j.core.client.ClientHTTPExecutor;
 
 /**

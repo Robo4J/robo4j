@@ -32,12 +32,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.robo4j.commons.command.AdafruitLcdCommandEnum;
-import com.robo4j.commons.command.CommandTargetEnum;
-import com.robo4j.commons.command.OneServoUnitCommandEnum;
-import com.robo4j.commons.command.PlatformUnitCommandEnum;
-import com.robo4j.commons.command.SystemCommandEnum;
-import com.robo4j.commons.logging.SimpleLoggingUtil;
+import com.robo4j.core.command.AdafruitLcdCommandEnum;
+import com.robo4j.core.command.CommandTargetEnum;
+import com.robo4j.core.command.OneServoUnitCommandEnum;
+import com.robo4j.core.command.PlatformUnitCommandEnum;
+import com.robo4j.core.command.SystemCommandEnum;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.dto.ClientAdafruitLcdCommandRequestDTO;
 import com.robo4j.core.dto.ClientCommandDTO;
 import com.robo4j.core.dto.ClientMotorCommandRequestDTO;

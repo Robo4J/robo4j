@@ -16,7 +16,7 @@
  */
 package com.robo4j.core;
 
-import com.robo4j.commons.logging.SimpleLoggingUtil;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 
 import java.util.Collection;
 import java.util.HashMap;

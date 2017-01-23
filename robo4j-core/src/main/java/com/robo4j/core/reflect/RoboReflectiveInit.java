@@ -28,21 +28,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
-import com.robo4j.commons.annotation.RoboMotor;
-import com.robo4j.commons.annotation.RoboProvider;
-import com.robo4j.commons.annotation.RoboSensor;
-import com.robo4j.commons.annotation.RoboService;
-import com.robo4j.commons.annotation.RoboUnit;
-import com.robo4j.commons.annotation.RoboUnitProducer;
-import com.robo4j.commons.logging.SimpleLoggingUtil;
-import com.robo4j.commons.motor.GenericMotor;
-import com.robo4j.commons.registry.BaseRegistryProvider;
-import com.robo4j.commons.registry.RegistryManager;
-import com.robo4j.commons.registry.RegistryTypeEnum;
-import com.robo4j.commons.sensor.GenericSensor;
-import com.robo4j.commons.service.GenericService;
-import com.robo4j.commons.unit.GenericUnit;
-import com.robo4j.commons.unit.UnitProducer;
+import com.robo4j.core.annotation.RoboMotor;
+import com.robo4j.core.annotation.RoboProvider;
+import com.robo4j.core.annotation.RoboSensor;
+import com.robo4j.core.annotation.RoboService;
+import com.robo4j.core.annotation.RoboUnit;
+import com.robo4j.core.annotation.RoboUnitProducer;
+import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.motor.GenericMotor;
+import com.robo4j.core.registry.BaseRegistryProvider;
+import com.robo4j.core.registry.RegistryManager;
+import com.robo4j.core.registry.RegistryTypeEnum;
+import com.robo4j.core.sensor.GenericSensor;
+import com.robo4j.core.service.GenericService;
+import com.robo4j.core.unit.GenericUnit;
+import com.robo4j.core.unit.UnitProducer;
 import com.robo4j.core.client.io.ClientException;
 
 /**

@@ -18,8 +18,6 @@
 
 package com.robo4j.core.service;
 
-import com.robo4j.commons.service.GenericService;
-
 /**
  *
  * Interface class for LCD Service LCD is provided by the System

@@ -33,36 +33,11 @@ project("robo4j-core") {
 
     dependencies {
         compile(project(":robo4j-page"))
-        compile(project(":robo4j-commons"))
         compile(project(":robo4j-http"))
         compile "com.googlecode.json-simple:json-simple:${jsonVersion}"
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
         testCompile "org.mockito:mockito-all:${mockitoAllVersion}@jar"
-    }
-}
-
-project("robo4j-commons") {
-    description = "Robo4J Common"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
-
-    sourceCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
-    dependencies {
-        testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 }
 
@@ -157,7 +132,7 @@ project("robo4j-lego") {
 
     dependencies {
         compileOnly "lejos:ev3classes:${lejosVersion}"
-        compile(project(":robo4j-commons"))
+        compile(project(":robo4j-core"))
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
@@ -237,7 +212,7 @@ project("robo4j-page") {
 }
 
 
-project("robo4j-rpi") {
+project("robo4j-units-rpi") {
     description = "Robo4J Raspberry Pi"
 
     group 'com.robo4j'
@@ -265,7 +240,7 @@ project("robo4j-rpi") {
 
     dependencies {
         compile(project(":robo4j-hw-rpi"))
-        compile(project(":robo4j-commons"))
+        compile(project(":robo4j-core"))
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }

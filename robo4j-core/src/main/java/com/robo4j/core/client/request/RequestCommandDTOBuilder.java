@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.robo4j.commons.command.PlatformUnitCommandEnum;
+import com.robo4j.core.command.PlatformUnitCommandEnum;
 import com.robo4j.core.dto.ClientCommandDTO;
 
 /**

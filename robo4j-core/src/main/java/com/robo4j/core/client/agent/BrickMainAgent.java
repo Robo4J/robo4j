@@ -20,12 +20,12 @@ package com.robo4j.core.client.agent;
 
 import java.util.concurrent.ExecutorService;
 
-import com.robo4j.commons.agent.AgentCache;
-import com.robo4j.commons.agent.AgentConsumer;
-import com.robo4j.commons.agent.AgentProducer;
-import com.robo4j.commons.agent.AgentStatus;
-import com.robo4j.commons.agent.AgentStatusEnum;
-import com.robo4j.commons.agent.ReceiverAgent;
+import com.robo4j.core.agent.AgentCache;
+import com.robo4j.core.agent.AgentConsumer;
+import com.robo4j.core.agent.AgentProducer;
+import com.robo4j.core.agent.AgentStatus;
+import com.robo4j.core.agent.AgentStatusEnum;
+import com.robo4j.core.agent.ReceiverAgent;
 
 /**
  * MainBrick agent responsible for handling incoming command and moving them to

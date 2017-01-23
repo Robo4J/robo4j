@@ -1,6 +1,6 @@
 package com.robo4j.lego.control;
 
-import com.robo4j.commons.control.RoboSystemConfig;
+import com.robo4j.core.control.RoboSystemConfig;
 
 /**
  * RemoteEV3 - specific lego system

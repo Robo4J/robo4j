@@ -18,7 +18,7 @@
 
 package com.robo4j.core.dto;
 
-import com.robo4j.commons.command.PlatformUnitCommandEnum;
+import com.robo4j.core.command.PlatformUnitCommandEnum;
 import com.robo4j.core.util.ConstantUtil;
 
 /**

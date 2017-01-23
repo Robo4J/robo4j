@@ -18,7 +18,7 @@
 
 package com.robo4j.core.bus;
 
-import com.robo4j.commons.concurrent.CoreBusQueue;
+import com.robo4j.core.concurrent.CoreBusQueue;
 
 /**
  * @author Miroslav Wengner (@miragemiko)

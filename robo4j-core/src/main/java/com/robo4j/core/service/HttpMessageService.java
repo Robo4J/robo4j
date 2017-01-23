@@ -20,8 +20,7 @@ package com.robo4j.core.service;
 
 import java.util.Map;
 
-import com.robo4j.commons.control.RoboSystemConfig;
-import com.robo4j.commons.service.GenericService;
+import com.robo4j.core.control.RoboSystemConfig;
 
 /**
  *

@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.robo4j.commons.agent.AgentProducer;
-import com.robo4j.commons.command.AdafruitLcdCommandEnum;
-import com.robo4j.commons.command.GenericCommand;
-import com.robo4j.commons.command.PlatformUnitCommandEnum;
-import com.robo4j.commons.concurrent.QueueFIFOEntry;
-import com.robo4j.commons.logging.SimpleLoggingUtil;
+import com.robo4j.core.agent.AgentProducer;
+import com.robo4j.core.command.AdafruitLcdCommandEnum;
+import com.robo4j.core.command.GenericCommand;
+import com.robo4j.core.command.PlatformUnitCommandEnum;
+import com.robo4j.core.concurrent.QueueFIFOEntry;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.bus.ClientBusQueue;
 import com.robo4j.core.dto.ClientAdafruitLcdCommandRequestDTO;
 import com.robo4j.core.dto.ClientCommandDTO;

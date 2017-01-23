@@ -19,7 +19,7 @@
 
 package com.robo4j.core.dto;
 
-import com.robo4j.commons.command.AdafruitLcdCommandEnum;
+import com.robo4j.core.command.AdafruitLcdCommandEnum;
 
 /**
  * @author Miro Wengner (@miragemiko)

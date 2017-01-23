@@ -18,8 +18,8 @@
 
 package com.robo4j.lego.enums;
 
-import com.robo4j.commons.control.RoboSystemConfig;
-import com.robo4j.commons.enums.RoboHardwareEnumI;
+import com.robo4j.core.control.RoboSystemConfig;
+import com.robo4j.core.enums.RoboHardwareEnumI;
 
 /**
  * Configuration interface

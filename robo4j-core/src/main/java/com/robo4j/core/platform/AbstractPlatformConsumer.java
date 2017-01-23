@@ -22,8 +22,8 @@ package com.robo4j.core.platform;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import com.robo4j.commons.motor.GenericMotor;
-import com.robo4j.commons.motor.MotorRotationEnum;
+import com.robo4j.core.motor.GenericMotor;
+import com.robo4j.core.motor.MotorRotationEnum;
 
 /**
  * @author Miroslav Wengner (@miragemiko)

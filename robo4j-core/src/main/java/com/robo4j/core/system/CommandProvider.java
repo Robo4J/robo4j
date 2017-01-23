@@ -18,9 +18,9 @@
 
 package com.robo4j.core.system;
 
-import com.robo4j.commons.command.CommandTargetEnum;
-import com.robo4j.commons.command.GenericCommand;
-import com.robo4j.commons.enums.RoboTargetEnumI;
+import com.robo4j.core.command.CommandTargetEnum;
+import com.robo4j.core.command.GenericCommand;
+import com.robo4j.core.enums.RoboTargetEnumI;
 
 /**
  * RoboUnit doesn't included the definition of the process method. Reason

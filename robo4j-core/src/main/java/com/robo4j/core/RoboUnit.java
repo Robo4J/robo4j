@@ -24,8 +24,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.robo4j.commons.concurrency.RoboSingleThreadFactory;
-import com.robo4j.commons.logging.SimpleLoggingUtil;
+import com.robo4j.core.concurrent.RoboSingleThreadFactory;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 
 /**
  * The core component. Subclass this to provide a messaging capable agent for a
