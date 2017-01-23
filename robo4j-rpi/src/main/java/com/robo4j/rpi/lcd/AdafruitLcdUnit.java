@@ -108,9 +108,11 @@ public class AdafruitLcdUnit extends RoboUnit<String> {
 			}
 			break;
 		case SET_TEXT:
-			String text = message.getText();
-			if (text != null) {
-				lcd.setText(text);
+			if (message.getColor() != null) {
+				lcd.setBacklight(message.getColor());
+			}
+			if (message.getText() != null) {
+				lcd.setText(message.getText());
 			}
 			break;
 		case STOP:
