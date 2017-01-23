@@ -51,11 +51,13 @@ public final class RoboBuilder {
 
 	// FIXME(Marcus/Jan 22, 2017): Move to memento style typed property trees
 	// and clean up parsing.
-	// TODO, FIXME : move away the internal class
+	// TODO, FIXME (Miro/Jan 23, 2017) : do we need inner class ?
 	private class RoboXMLHandler extends DefaultHandler {
 		private String currentId = "";
 		private String currentClassName = "";
-		private Map<String, String> currentProperties;
+
+		// TODO, FIXME (Miro/Jan 22, 2017) : do we want to have null map ?, empty is better in streams
+		private Map<String, String> currentProperties = null;
 		private String currentKey = "";
 		private String currentValue = "";
 		private String lastElement = "";
@@ -63,6 +65,7 @@ public final class RoboBuilder {
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes)
 				throws SAXException {
+			// TODO, FIXME (Miro/Jan 22, 2017) : enum
 			switch (qName) {
 			case "roboUnit":
 				currentId = attributes.getValue("id");
@@ -76,13 +79,14 @@ public final class RoboBuilder {
 
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
+			// TODO, FIXME (Miro/Jan 22, 2017) : enum
 			switch (qName) {
 			case "roboUnit":
 				if (!verifyUnit()) {
 					clearCurrentVariables();
 				} else {
 					try {
-						System.out.println("Loading " + currentClassName.trim() + " id=" + currentId);
+						SimpleLoggingUtil.debug(getClass(), "Loading " + currentClassName.trim() + " id=" + currentId);
 						@SuppressWarnings("unchecked")
 						Class<RoboUnit<?>> roboUnitClass = (Class<RoboUnit<?>>) Thread.currentThread()
 								.getContextClassLoader().loadClass(currentClassName.trim());
@@ -164,21 +168,21 @@ public final class RoboBuilder {
 
 	/**
 	 * Adds a Robo4J unit to the builder.
-	 * 
+	 *
 	 * @param unit
 	 *            an initialized Robo4J unit. Must be initialized (see
 	 *            {@link RoboUnit#initialize(Map)}) before added.
-	 * 
+	 *
 	 * @return the builder.
 	 * @throws RoboBuilderException
-	 * 
+	 *
 	 * @see RoboUnit#initialize(java.util.Map)
 	 */
 	public RoboBuilder add(RoboUnit<?> unit) throws RoboBuilderException {
 		internalAddUnit(unit);
 		return this;
 	}
-	
+
 	/**
 	 * Instantiates a RoboUnit from the provided class using the provided id and
 	 * adds it. No initialization ({@link RoboUnit#initialize(Map)} will take

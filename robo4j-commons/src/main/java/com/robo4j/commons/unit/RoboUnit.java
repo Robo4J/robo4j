@@ -71,15 +71,13 @@ public class RoboUnit<T> {
 
 	public Future<RoboResult<?>> sendMessage(final String targetId, Object message) {
 		// FIXME(Marcus/Jan 22, 2017): Possibly remove this variant.
-		return outBox.submit(() -> {
-			return (RoboResult<?>) context.getRoboUnit(targetId).onMessage(message);
-		});
+		return outBox.submit(() ->
+			context.getRoboUnit(targetId).onMessage(message)
+		);
 	}
 
 	public Future<RoboResult<?>> sendMessage(final RoboUnit<?> target, Object message) {
-		return outBox.submit(() -> {
-			return (RoboResult<?>) target.onMessage(message);
-		});
+		return outBox.submit(() -> target.onMessage(message));
 	}
 
 	public void initialize(Map<String, String> properties) throws Exception {
