@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.rpi.lcd;
+package com.robo4j.units.rpi.lcd;
 
 import java.util.Map;
 

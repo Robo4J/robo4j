@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.rpi.lcd;
+package com.robo4j.units.rpi.lcd;
 
 import java.io.IOException;
 import java.util.Map;
@@ -29,8 +29,8 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.LcdFactory;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd.Direction;
-import com.robo4j.rpi.I2CEndPoint;
-import com.robo4j.rpi.I2CRegistry;
+import com.robo4j.units.rpi.I2CEndPoint;
+import com.robo4j.units.rpi.I2CRegistry;
 
 /**
  * A {@link RoboUnit} for the Adafruit 16x2 character LCD shield.

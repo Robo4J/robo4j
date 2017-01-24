@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Wengner, Marcus Hirt
- * This RpiMotorException.java  is part of robo4j.
+ * This RpiUnit.java  is part of robo4j.
  * module: robo4j-rpi
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -17,18 +17,11 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.rpi.motor;
+package com.robo4j.units.rpi.unit;
 
 /**
  * @author Miroslav Wengner (@miragemiko)
- * @since 20.12.2016
+ * @since 17.12.2016
  */
-public class RpiMotorException extends RuntimeException {
-	public RpiMotorException(String message) {
-		super(message);
-	}
-
-	public RpiMotorException(String message, Throwable cause) {
-		super(message, cause);
-	}
+public interface RpiUnit {
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016. Miroslav Wengner, Marcus Hirt
- * This RpiMotorUtil.java  is part of robo4j.
+ * This RpiEngineWrapper.java  is part of robo4j.
  * module: robo4j-rpi
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -17,19 +17,11 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.rpi.util;
+package com.robo4j.units.rpi.motor;
 
 /**
  * @author Miroslav Wengner (@miragemiko)
  * @since 17.12.2016
  */
-public final class RpiMotorUtil {
-
-	public static byte[] createCommand(int motor, int speed, int direction) {
-		byte m = (byte) motor;
-		byte s = (byte) speed;
-		byte d = (byte) direction;
-		return new byte[] { m, s, d };
-	}
-
+public abstract class RpiEngineWrapper {
 }

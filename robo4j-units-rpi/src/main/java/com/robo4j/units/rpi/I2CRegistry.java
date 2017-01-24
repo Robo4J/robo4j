@@ -14,15 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.rpi.lcd;
+package com.robo4j.units.rpi;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Some types of messages known.
+ * Registry for I2C devices. Useful for sharing hardware between units.
  * 
  * @author Marcus Hirt (@hirt)
  */
-public enum LcdMessageType {
-	// FIXME(Marcus/Jan 23, 2017): If we go with Object, we can have
-	// different actual message types instead.
-	SET_TEXT, CLEAR, DISPLAY_ENABLE, STOP, SCROLL;
+public class I2CRegistry {
+	private static Map<I2CEndPoint, Object> devices = new HashMap<>();
+
+	public static Object getI2CDeviceByEndPoint(I2CEndPoint endPoint) {
+		return devices.get(endPoint);
+	}
+
+	public static void registerI2CDevice(Object device, I2CEndPoint endPoint) {
+		devices.put(endPoint, device);
+	}
+
 }
