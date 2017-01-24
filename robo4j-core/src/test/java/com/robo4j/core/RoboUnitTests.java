@@ -41,7 +41,26 @@ public class RoboUnitTests {
 		for (int i = 0; i < 10; i++) {
 			producer.sendRandomMessage();
 		}
-		producer.shutdown();
+		system.shutdown();
 		Assert.assertEquals(10, consumer.getReceivedMessages().size());		
+	}
+	
+	
+	@Test
+	public void testReferences() throws Exception {
+		RoboSystem system = new RoboSystem();
+		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+		StringConsumer consumer = new StringConsumer(system, "consumer");
+		system.addUnits(consumer);
+		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+		system.start();
+		
+		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
+
+		RoboReference<?> ref = system.getReference(consumer.getId());
+		consumer.sendMessage("Lalalala");
+		ref.sendMessage("Lalala");
+		system.shutdown();
+		Assert.assertEquals(2, consumer.getReceivedMessages().size());		
 	}
 }

@@ -20,12 +20,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import com.robo4j.core.concurrent.RoboSingleThreadFactory;
-import com.robo4j.core.logging.SimpleLoggingUtil;
 
 /**
  * The core component. Subclass this to provide a messaging capable agent for a
@@ -34,15 +28,11 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RoboUnit<T> {
+public class RoboUnit<T> implements RoboReference<T> {
 	private final RoboContext context;
 	private final String id;
 	private volatile LifecycleState state = LifecycleState.UNINITIALIZED;
-
-	// TODO(Marcus/Jan 21, 2017): Should limit size of queue, should add
-	// monitoring.
-	private final ThreadPoolExecutor outBox;
-	private final LinkedBlockingQueue<Runnable> messageQueue = new LinkedBlockingQueue<>();
+	private RoboReference<T> reference;
 
 	/**
 	 * Either provide id up front
@@ -50,9 +40,9 @@ public class RoboUnit<T> {
 	public RoboUnit(RoboContext context, String id) {
 		this.context = context;
 		this.id = id;
-
-		outBox = new ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, messageQueue,
-				new RoboSingleThreadFactory("Robo4J Unit " + id, true));
+		if (context instanceof RoboSystem) { 
+			reference = ((RoboSystem)context).getReference(this);
+		}
 	}
 
 	public String getId() {
@@ -63,22 +53,16 @@ public class RoboUnit<T> {
 		return context;
 	}
 
-	// FIXME(Marcus/Jan 21, 2017): Should be typed to T.
-	public RoboResult<?> onMessage(Object message) {
+	/**
+	 * Should be overridden in subclasses to define the behaviour of the unit.
+	 * 
+	 * @param message
+	 *            the message received by this unit.
+	 * 
+	 * @return the unit specific result from the call.
+	 */
+	public <R> RoboResult<T, R> onMessage(Object message) {
 		return null;
-	}
-
-	public Future<RoboResult<?>> sendMessage(final String targetId, Object message) {
-		// FIXME(Marcus/Jan 22, 2017): Possibly remove this variant.
-		return outBox.submit(() -> {
-			return (RoboResult<?>) context.getRoboUnit(targetId).onMessage(message);
-		});
-	}
-
-	public Future<RoboResult<?>> sendMessage(final RoboUnit<?> target, Object message) {
-		return outBox.submit(() -> {
-			return (RoboResult<?>) target.onMessage(message);
-		});
 	}
 
 	public void initialize(Map<String, String> properties) throws Exception {
@@ -114,13 +98,6 @@ public class RoboUnit<T> {
 	 * Default implementation sets state to {@link LifecycleState#SHUTDOWN}.
 	 */
 	public void shutdown() {
-		setState(LifecycleState.SHUTTING_DOWN);
-		outBox.shutdown();
-		try {
-			outBox.awaitTermination(2, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			SimpleLoggingUtil.debug(getClass(), "Failed waiting for termination", e);
-		}
 		setState(LifecycleState.SHUTDOWN);
 	}
 
@@ -156,13 +133,6 @@ public class RoboUnit<T> {
 		this.state = state;
 	}
 
-	/**
-	 * @return true if the unit has methods that has not been processed yet.
-	 */
-	public boolean hasUnprocessedMessages() {
-		return messageQueue.size() > 0;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -191,5 +161,21 @@ public class RoboUnit<T> {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+
+	/**
+	 * Sends a message to this unit.
+	 */
+	@Override
+	public <R> Future<RoboResult<T, R>> sendMessage(Object message) {
+		return reference.sendMessage(message);
+	}
+	
+	public RoboReference<T> internalGetReference() {
+		if (reference == null) {
+			return getContext().getReference(getId());
+		} else {
+			return reference;
+		}
 	}
 }

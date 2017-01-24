@@ -63,10 +63,10 @@ public class AdafruitLcdUnit extends RoboUnit<String> {
 		setState(LifecycleState.INITIALIZED);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public RoboResult<?> onMessage(Object message) {
+	public RoboResult<String, ?> onMessage(Object message) {
 		try {
-
 			if (message instanceof LcdMessage) {
 				processLcdMessage((LcdMessage) message);
 			} else if (message instanceof String) {

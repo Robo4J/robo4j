@@ -16,7 +16,7 @@
  */
 package com.robo4j.units.rpi.lcd;
 
-import com.robo4j.core.RoboUnit;
+import com.robo4j.core.RoboReference;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
 
 /**
@@ -25,7 +25,7 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
  * @author Marcus Hirt (@hirt)
  */
 public class LcdMessage {
-	private final RoboUnit<?> source;
+	private final RoboReference<?> source;
 	private final Color color;
 	private final String text;
 	private final LcdMessageType type;
@@ -38,14 +38,14 @@ public class LcdMessage {
 		this(LcdMessageType.SET_TEXT, null, color, text);
 	}
 
-	public LcdMessage(LcdMessageType type, RoboUnit<?> source, Color color, String text) {
+	public LcdMessage(LcdMessageType type, RoboReference<?> source, Color color, String text) {
 		this.type = type;
 		this.source = source;
 		this.color = color;
 		this.text = text;
 	}
 
-	public RoboUnit<?> getSource() {
+	public RoboReference<?> getSource() {
 		return source;
 	}
 

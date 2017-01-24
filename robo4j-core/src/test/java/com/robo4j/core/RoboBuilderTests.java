@@ -19,6 +19,9 @@ package com.robo4j.core;
 
 import com.robo4j.core.client.util.ClientClassLoader;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,7 +34,7 @@ import org.junit.Test;
 public class RoboBuilderTests {
 
 	@Test
-	public void testParsingFile() throws RoboBuilderException {
+	public void testParsingFile() throws RoboBuilderException, InterruptedException, ExecutionException {
 		RoboBuilder builder = new RoboBuilder();
 		builder.add(ClientClassLoader.getInstance().getResource("test.xml"));
 //		builder.add(RoboBuilderTests.class.getResourceAsStream("test.xml"));
@@ -40,20 +43,19 @@ public class RoboBuilderTests {
 		context.start();
 		Assert.assertTrue(context.getState() == LifecycleState.STARTING || context.getState() == LifecycleState.STARTED);
 		
-		RoboUnit<?> roboUnit = context.getRoboUnit("producer");
-		Assert.assertTrue(roboUnit instanceof StringProducer);
-		
-		StringProducer producer = (StringProducer) roboUnit;
-		
-		roboUnit = context.getRoboUnit("consumer");		
-		Assert.assertTrue(roboUnit instanceof StringConsumer);
-		StringConsumer consumer = (StringConsumer) roboUnit; 
+		RoboReference<String> producer = context.getReference("producer");
+		Assert.assertNotNull(producer);
+				
+		RoboReference<String> consumer = context.getReference("consumer");		
+		Assert.assertNotNull(consumer);
 		
 		for (int i = 0; i < 10; i++) {
-			producer.sendRandomMessage();
+			Future<RoboResult<String, Integer>> result = producer.sendMessage("sendRandomMessage");
+			Assert.assertNull(result.get());
 		}
-		producer.shutdown();
-		Assert.assertEquals(10, consumer.getReceivedMessages().size());		
+		Future<RoboResult<String, Integer>> result = consumer.sendMessage("getNumberOfSentMessages");
+		context.shutdown();
+		Assert.assertEquals(10, (int)result.get().getResult());		
 
 	}
 

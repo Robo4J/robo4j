@@ -35,12 +35,17 @@ public class StringProducer extends RoboUnit<String> {
 	}
 
 	public void sendRandomMessage() {
-		sendMessage(target, StringToolkit.getRandomMessage(10));
+		getContext().getReference(target).sendMessage(StringToolkit.getRandomMessage(10));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public RoboResult<?> onMessage(Object message) {
-		System.out.println("Should not send messages to the producer!");
+	public RoboResult<String, Integer> onMessage(Object message) {
+		if (message.equals("sendRandomMessage")) {
+			sendRandomMessage();
+		} else {
+			System.out.println("Do not understand " + message);
+		}
 		return null;
 	}
 

@@ -17,7 +17,6 @@
 package com.robo4j.core;
 
 import java.util.Collection;
-import java.util.concurrent.Future;
 
 /**
  * The execution context available for a unit. Contains a simple lookup service,
@@ -53,17 +52,7 @@ public interface RoboContext {
 	 * @param id
 	 * @return
 	 */
-	RoboUnit<?> getRoboUnit(String id);
-
-	/**
-	 * Sends a message on the system bus.
-	 * 
-	 * @param target
-	 *            the target to send the message to.
-	 * @param message
-	 * @return
-	 */
-	Future<RoboResult<?>> sendMessage(String target, Object message);
+	<T> RoboReference<T> getReference(String id);
 
 	/**
 	 * @return the available units.

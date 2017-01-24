@@ -22,23 +22,23 @@ package com.robo4j.core;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RoboResult<T> {
+public class RoboResult<T, R> {
 	// NOTE(Marcus/Jan 22, 2017): I don't think we should have a result of
 	// sending a message. Any results should be communicated as messages back to
 	// the sender.
-	private final RoboUnit<?> source;
-	private final T result;
+	private final RoboReference<T> source;
+	private final R result;
 
-	public RoboResult(RoboUnit<?> source, T result) {
+	public RoboResult(RoboReference<T> source, R result) {
 		this.source = source;
 		this.result = result;
 	}
 
-	public T getResult() {
+	public R getResult() {
 		return result;
 	}
 
-	public RoboUnit<?> getSource() {
+	public RoboReference<T> getSource() {
 		return source;
 	}
 }

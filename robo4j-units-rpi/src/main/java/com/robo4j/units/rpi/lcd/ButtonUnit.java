@@ -22,6 +22,7 @@ import java.util.Map;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Button;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonListener;
@@ -84,6 +85,7 @@ public class ButtonUnit extends RoboUnit<Object> {
 	}
 
 	public void start() {
+		final RoboReference<String> targetRef = getContext().getReference(target);
 		setState(LifecycleState.STARTING);
 		observer = new ButtonPressedObserver(lcd);
 		buttonListener = (Button button) -> {
@@ -91,19 +93,19 @@ public class ButtonUnit extends RoboUnit<Object> {
 				try {
 					switch (button) {
 					case UP:
-						sendMessage(target, Messages.UP);
+						targetRef.sendMessage(Messages.UP);
 						break;
 					case DOWN:
-						sendMessage(target, Messages.DOWN);
+						targetRef.sendMessage(Messages.DOWN);
 						break;
 					case RIGHT:
-						sendMessage(target, Messages.LEFT);
+						targetRef.sendMessage(Messages.LEFT);
 						break;
 					case LEFT:
-						sendMessage(target, Messages.RIGHT);
+						targetRef.sendMessage(Messages.RIGHT);
 						break;
 					case SELECT:
-						sendMessage(target, Messages.SELECT);
+						targetRef.sendMessage(Messages.SELECT);
 						break;
 					default:
 						lcd.clear();
