@@ -41,6 +41,7 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
  */
 public class RoboSystem implements RoboContext {
 	public static final String ID_SYSTEM = "com.robo4j.core.system";
+	private static final int DEFAULT_THREAD_POOL_SIZE = 4;
 	private volatile AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
 	private final Map<String, RoboUnit<?>> units = new HashMap<>();
 	private final Map<RoboUnit<?>, RoboReference<?>> referenceCache = new WeakHashMap<>();
@@ -66,13 +67,17 @@ public class RoboSystem implements RoboContext {
 	}
 	
 	public RoboSystem() {
+		this(DEFAULT_THREAD_POOL_SIZE);
+	}
+	
+	public RoboSystem(int threadPoolSize) {
 		units.put(ID_SYSTEM, systemUnit);
-		systemExecutor = new ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, workQueue,
+		systemExecutor = new ThreadPoolExecutor(1, threadPoolSize, 10, TimeUnit.SECONDS, workQueue,
 				new RoboSingleThreadFactory("Robo4J System " + uid, true));
 	}
 
-	public RoboSystem(Set<RoboUnit<?>> unitSet) {
-		this();
+	public RoboSystem(int threadPoolSize, Set<RoboUnit<?>> unitSet) {
+		this(threadPoolSize);
 		addToMap(unitSet);
 	}
 
