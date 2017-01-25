@@ -19,6 +19,7 @@ package com.robo4j.units.rpi.lcd;
 import java.io.IOException;
 import java.util.Map;
 
+import com.robo4j.core.command.AdafruitLcdCommandEnum;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
@@ -39,34 +40,6 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
  * @since 17.12.2016
  */
 public class ButtonUnit extends RoboUnit<Object> {
-	public static enum Messages {
-		UP("U"), DOWN("D"), LEFT("L"), RIGHT("R"), SELECT("S");
-
-		private String command;
-
-		private Messages(String command) {
-			this.command = command;
-		}
-
-		public String getMessage() {
-			return command;
-		}
-
-		public Messages fromCommand(String command) {
-			switch (command) {
-			case "U":
-				return UP;
-			case "D":
-				return DOWN;
-			case "L":
-				return LEFT;
-			case "R":
-				return RIGHT;
-			default:
-				return SELECT;
-			}
-		}
-	}
 
 	private AdafruitLcd lcd;
 	private ButtonPressedObserver observer;
@@ -96,19 +69,19 @@ public class ButtonUnit extends RoboUnit<Object> {
 				try {
 					switch (button) {
 					case UP:
-						targetRef.sendMessage(Messages.UP);
+						targetRef.sendMessage(AdaruitButtonPlateEnum.UP);
 						break;
 					case DOWN:
-						targetRef.sendMessage(Messages.DOWN);
+						targetRef.sendMessage(AdaruitButtonPlateEnum.DOWN);
 						break;
 					case RIGHT:
-						targetRef.sendMessage(Messages.LEFT);
+						targetRef.sendMessage(AdaruitButtonPlateEnum.LEFT);
 						break;
 					case LEFT:
-						targetRef.sendMessage(Messages.RIGHT);
+						targetRef.sendMessage(AdaruitButtonPlateEnum.RIGHT);
 						break;
 					case SELECT:
-						targetRef.sendMessage(Messages.SELECT);
+						targetRef.sendMessage(AdaruitButtonPlateEnum.SELECT);
 						break;
 					default:
 						lcd.clear();
