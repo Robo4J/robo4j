@@ -1,4 +1,4 @@
-package com.robo4j.rpi.lcd;
+package com.robo4j.units.rpi.lcd;
 
 import com.robo4j.core.enums.RoboHardwareEnumI;
 
@@ -12,7 +12,7 @@ import java.util.Map;
  * @author Marcus Hirt (@hirt)
  * @since 24.01.2017
  */
-//TODO: miro -> replace enum in Button unit
+//TODO: replace enum in Button unit
 public enum AdaruitButtonPlateEnum implements RoboHardwareEnumI<Integer> {
 
     // @formatter:off
