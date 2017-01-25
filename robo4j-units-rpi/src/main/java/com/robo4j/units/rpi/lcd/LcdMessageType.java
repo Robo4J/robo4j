@@ -14,48 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
-
-import java.util.Collection;
+package com.robo4j.units.rpi.lcd;
 
 /**
- * The execution context available for a unit. Contains a simple lookup service,
- * and life cycle management.
- *
+ * Some types of messages known.
+ * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
+ * @since 17.12.2016
  */
-public interface RoboContext {
-	/**
-	 * @return the state of the system.
-	 */
-	LifecycleState getState();
-
-	/**
-	 * Shuts the entire system down. There is no return from this.
-	 */
-	void shutdown();
-
-	/**
-	 * Stops the system. Can be started again with start.
-	 */
-	void stop();
-
-	/**
-	 * Starts the system. Can be stopped again with stop.
-	 */
-	void start();
-
-	/**
-	 * Returns a reference to a specific RoboUnit.
-	 * 
-	 * @param id
-	 * @return
-	 */
-	<T> RoboReference<T> getReference(String id);
-
-	/**
-	 * @return the available units.
-	 */
-	Collection<RoboUnit<?>> getUnits();
+public enum LcdMessageType {
+	// FIXME(Marcus/Jan 23, 2017): If we go with Object, we can have
+	// different actual message types instead.
+	SET_TEXT, CLEAR, DISPLAY_ENABLE, STOP, SCROLL;
 }

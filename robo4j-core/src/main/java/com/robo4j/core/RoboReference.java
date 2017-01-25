@@ -14,17 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.rpi.lcd;
+package com.robo4j.core;
 
 /**
- * Some types of messages known.
- * 
+ * Reference to a RoboUnit.
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
- * @since 17.12.2016
  */
-public enum LcdMessageType {
-	// FIXME(Marcus/Jan 23, 2017): If we go with Object, we can have
-	// different actual message types instead.
-	SET_TEXT, CLEAR, DISPLAY_ENABLE, STOP, SCROLL;
+import java.util.concurrent.Future;
+
+public interface RoboReference<T> {
+	/**
+	 * Sends a message to this RoboUnit.
+	 * 
+	 * @param message
+	 *            the message to send.
+	 * @return the RoboUnit specific response.
+	 */
+	<R> Future<RoboResult<T, R>> sendMessage(Object message);
 }

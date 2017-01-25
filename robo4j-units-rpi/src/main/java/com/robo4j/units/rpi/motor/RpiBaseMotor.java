@@ -17,12 +17,12 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.rpi.motor;
+package com.robo4j.units.rpi.motor;
 
 import java.io.IOException;
 
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.rpi.util.RpiMotorUtil;
+import com.robo4j.units.rpi.util.RpiMotorUtil;
 
 /**
  * @author Miroslav Wengner (@miragemiko)

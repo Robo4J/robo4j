@@ -14,47 +14,49 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.rpi;
+package com.robo4j.units.rpi.lcd;
+
+import java.util.Map;
+
+import com.robo4j.core.LifecycleState;
+import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboUnit;
 
 /**
- * Identifying an I2C device. Useful together with the {@link I2CRegistry} for
- * sharing I2C hardware between units.
+ * Helpful base class for {@link RoboUnit} units using the I2C protocol.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 17.12.2016
  */
-public final class I2CEndPoint {
+public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
+	public final static String PROPERTY_KEY_BUS = "bus";
+	public final static String PROPERTY_KEY_ADDRESS = "address";
+
 	private int bus;
 	private int address;
 
-	public I2CEndPoint(int bus, int address) {
-		this.bus = bus;
-		this.address = address;
+	/**
+	 * @param context
+	 * @param id
+	 */
+	public I2CRoboUnit(RoboContext context, String id) {
+		super(context, id);
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + address;
-		result = prime * result + bus;
-		return result;
+	public void initialize(Map<String, String> properties) throws Exception {
+		bus = Integer.parseInt(properties.get("bus"));
+		address = Integer.parseInt(properties.get("address"));
+		setState(LifecycleState.INITIALIZED);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		I2CEndPoint other = (I2CEndPoint) obj;
-		if (address != other.address)
-			return false;
-		if (bus != other.bus)
-			return false;
-		return true;
+	public int getAddress() {
+		return address;
 	}
+
+	public int getBus() {
+		return bus;
+	}
+
 }

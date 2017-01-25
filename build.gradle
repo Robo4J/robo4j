@@ -52,7 +52,7 @@ project("robo4j-hw-rpi") {
     apply plugin: 'eclipse'
     apply plugin: 'maven'
 
-    sourceCompatibility = 1.7
+    sourceCompatibility = 1.8
 
     repositories {
         mavenCentral()
@@ -149,7 +149,7 @@ project("robo4j-math") {
     apply plugin: 'eclipse'
     apply plugin: 'maven'
 
-    sourceCompatibility = 1.7
+    sourceCompatibility = 1.8
 
     repositories {
         mavenCentral()
@@ -245,11 +245,3 @@ project("robo4j-units-rpi") {
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 }
-
-
-
-
-
-
-
-

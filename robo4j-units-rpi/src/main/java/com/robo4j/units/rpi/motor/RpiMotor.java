@@ -17,7 +17,7 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.rpi.motor;
+package com.robo4j.units.rpi.motor;
 
 import com.robo4j.core.motor.GenericMotor;
 
