@@ -34,6 +34,8 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
  * the LCD.
  * 
  * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 17.12.2016
  */
 public class ButtonUnit extends RoboUnit<Object> {
 	public static enum Messages {
@@ -83,6 +85,7 @@ public class ButtonUnit extends RoboUnit<Object> {
 		setState(LifecycleState.INITIALIZED);
 	}
 
+	@Override
 	public void start() {
 		setState(LifecycleState.STARTING);
 		observer = new ButtonPressedObserver(lcd);

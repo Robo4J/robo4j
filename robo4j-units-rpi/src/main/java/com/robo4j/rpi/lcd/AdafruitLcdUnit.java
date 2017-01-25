@@ -36,6 +36,9 @@ import com.robo4j.rpi.I2CRegistry;
  * A {@link RoboUnit} for the Adafruit 16x2 character LCD shield.
  * 
  * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 17.12.2016
+ *
  */
 @Unit
 public class AdafruitLcdUnit extends RoboUnit<String> {

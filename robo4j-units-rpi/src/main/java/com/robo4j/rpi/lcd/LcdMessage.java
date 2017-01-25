@@ -23,6 +23,8 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
  * Message class that can be used to send messages to {@link AdafruitLcdUnit}s.
  * 
  * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 17.12.2016
  */
 public class LcdMessage {
 	private final RoboUnit<?> source;

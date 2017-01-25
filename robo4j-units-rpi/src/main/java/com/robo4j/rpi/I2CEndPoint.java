@@ -21,6 +21,8 @@ package com.robo4j.rpi;
  * sharing I2C hardware between units.
  * 
  * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 17.12.2016
  */
 public final class I2CEndPoint {
 	private int bus;

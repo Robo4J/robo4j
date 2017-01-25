@@ -20,6 +20,8 @@ package com.robo4j.rpi.lcd;
  * Some types of messages known.
  * 
  * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 17.12.2016
  */
 public enum LcdMessageType {
 	// FIXME(Marcus/Jan 23, 2017): If we go with Object, we can have

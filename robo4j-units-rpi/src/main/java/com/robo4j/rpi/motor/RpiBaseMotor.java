@@ -26,6 +26,7 @@ import com.robo4j.rpi.util.RpiMotorUtil;
 
 /**
  * @author Miroslav Wengner (@miragemiko)
+ * @author Marcus Hirt (@hirt)
  * @since 19.12.2016
  */
 public abstract class RpiBaseMotor extends RpiDevice implements RpiMotor {

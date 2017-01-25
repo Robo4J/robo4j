@@ -27,6 +27,7 @@ import com.pi4j.io.i2c.I2CDevice;
 
 /**
  * @author Miroslav Wengner (@miragemiko)
+ * @author Marcus Hirt (@hirt)
  * @since 19.12.2016
  */
 public class RpiDevice implements Closeable {

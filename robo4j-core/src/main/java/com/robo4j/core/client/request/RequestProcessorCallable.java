@@ -44,6 +44,7 @@ import com.robo4j.http.HttpVersion;
 /**
  * Responsible for handling incoming request
  *
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 28.02.2016
  */

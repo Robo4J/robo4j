@@ -20,6 +20,7 @@
 package com.robo4j.rpi.util;
 
 /**
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 17.12.2016
  */

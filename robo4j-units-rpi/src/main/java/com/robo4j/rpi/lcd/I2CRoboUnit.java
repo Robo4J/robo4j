@@ -26,6 +26,8 @@ import com.robo4j.core.RoboUnit;
  * Helpful base class for {@link RoboUnit} units using the I2C protocol.
  * 
  * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 17.12.2016
  */
 public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
 	public final static String PROPERTY_KEY_BUS = "bus";

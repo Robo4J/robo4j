@@ -23,6 +23,7 @@ import com.robo4j.core.motor.GenericMotor;
 
 /**
  * @author Miroslav Wengner (@miragemiko)
+ * @author Marcus Hirt (@hirt)
  * @since 17.12.2016
  */
 public interface RpiMotor extends GenericMotor {

@@ -23,6 +23,8 @@ import java.util.Map;
  * Registry for I2C devices. Useful for sharing hardware between units.
  * 
  * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 17.12.2016
  */
 public class I2CRegistry {
 	private static Map<I2CEndPoint, Object> devices = new HashMap<>();

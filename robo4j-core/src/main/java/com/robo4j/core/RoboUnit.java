@@ -35,6 +35,9 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboUnit<T> {
+	private static final int CORE_POOL_SIZE = 1;
+	public static final int MAXIMUM_POOL_SIZE = 1;
+	public static final int KEEP_ALIVE_TIME = 10;
 	private final RoboContext context;
 	private final String id;
 	private volatile LifecycleState state = LifecycleState.UNINITIALIZED;
@@ -51,7 +54,8 @@ public class RoboUnit<T> {
 		this.context = context;
 		this.id = id;
 
-		outBox = new ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, messageQueue,
+		outBox = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE,
+				KEEP_ALIVE_TIME, TimeUnit.SECONDS, messageQueue,
 				new RoboSingleThreadFactory("Robo4J Unit " + id, true));
 	}
 
@@ -70,15 +74,11 @@ public class RoboUnit<T> {
 
 	public Future<RoboResult<?>> sendMessage(final String targetId, Object message) {
 		// FIXME(Marcus/Jan 22, 2017): Possibly remove this variant.
-		return outBox.submit(() -> {
-			return (RoboResult<?>) context.getRoboUnit(targetId).onMessage(message);
-		});
+		return outBox.submit(() -> context.getRoboUnit(targetId).onMessage(message));
 	}
 
 	public Future<RoboResult<?>> sendMessage(final RoboUnit<?> target, Object message) {
-		return outBox.submit(() -> {
-			return (RoboResult<?>) target.onMessage(message);
-		});
+		return outBox.submit(() -> target.onMessage(message));
 	}
 
 	public void initialize(Map<String, String> properties) throws Exception {
