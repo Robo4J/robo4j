@@ -22,7 +22,6 @@ package com.robo4j.core.unit;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.request.RoboRequestCallable;
 import com.robo4j.core.client.request.RoboRequestFactory;
 import com.robo4j.core.logging.SimpleLoggingUtil;
@@ -43,7 +42,7 @@ import java.util.concurrent.Future;
  * @author Miro Wengner (@miragemiko)
  * @since 24.01.2017
  */
-public class HttpUnit extends RoboUnit<Object>{
+public class HttpUnit extends RoboUnit<Object> {
 
     private Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
     private int port;

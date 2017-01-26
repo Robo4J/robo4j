@@ -16,6 +16,8 @@
  */
 package com.robo4j.core;
 
+import com.robo4j.core.unit.RoboUnit;
+
 import java.util.ArrayList;
 import java.util.List;
 

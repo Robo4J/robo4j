@@ -20,7 +20,7 @@ import java.util.Map;
 
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboUnit;
+import com.robo4j.core.unit.RoboUnit;
 
 /**
  * Helpful base class for {@link RoboUnit} units using the I2C protocol.

@@ -18,8 +18,6 @@
 
 package com.robo4j.lego.control;
 
-import com.robo4j.core.unit.GenericUnit;
-
 /**
  * @author Miroslav Wengner (@miragemiko)
  * @since 02.07.2016

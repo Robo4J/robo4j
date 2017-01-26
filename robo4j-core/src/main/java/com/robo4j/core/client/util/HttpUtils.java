@@ -20,33 +20,11 @@
 package com.robo4j.core.client.util;
 
 import com.robo4j.core.client.request.RoboBasicMapEntry;
-import com.robo4j.core.command.AdafruitLcdCommandEnum;
-import com.robo4j.core.command.CommandTargetEnum;
-import com.robo4j.core.command.OneServoUnitCommandEnum;
-import com.robo4j.core.command.PlatformUnitCommandEnum;
-import com.robo4j.core.command.SystemCommandEnum;
-import com.robo4j.core.dto.ClientAdafruitLcdCommandRequestDTO;
-import com.robo4j.core.dto.ClientCommandDTO;
-import com.robo4j.core.dto.ClientMotorCommandRequestDTO;
-import com.robo4j.core.dto.ClientOneServoCommandRequestDTO;
-import com.robo4j.core.dto.ClientRequestDTO;
-import com.robo4j.core.dto.ClientSystemRequestDTO;
-import com.robo4j.core.dto.ClientUnitRequestDTO;
-import com.robo4j.core.dto.HttpRequestElementDTO;
-import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -81,57 +59,9 @@ public final class HttpUtils {
 				.append("Content-type: text/html; charset=utf-8").append(NEXT_LINE).append(NEXT_LINE).toString();
 	}
 
-
 	public static String correctLine(String line) {
 		return line == null ? ConstantUtil.EMPTY_STRING : line;
 	}
-
-	/**
-	 * Parsing received buffer to the list of ClientRequestCommands
-	 */
-	public static ClientRequestDTO transformToCommands(final String buffer) throws ParseException {
-		final JSONParser parser = new JSONParser();
-		final JSONObject request = (JSONObject) parser.parse(String.valueOf(buffer));
-		//TODO FIXME : change it
-		final List<ClientCommandDTO<?>> commands = new LinkedList<>();
-		final List<ClientUnitRequestDTO> units = new LinkedList<>();
-
-		// TODO :: need to do review
-		SimpleLoggingUtil.debug(HttpUtils.class, "Request:: " + request);
-		getValidCommandElements(request).forEach(e -> {
-			switch (e.getName()) {
-			case HTTP_GENERAL:
-				SimpleLoggingUtil.debug(HttpUtils.class, "http_general: " + request.get(HTTP_GENERAL));
-				break;
-			case HTTP_COMMAND:
-				commands.addAll(parseURIQuery(request.get(HTTP_COMMAND).toString(),
-						ConstantUtil.getHttpSeparator(POST_COMMAND_SEP)));
-				break;
-			case HTTP_COMMANDS:
-				commands.addAll(parseJSONToCommandsArray((JSONArray) request.get(HTTP_COMMANDS)));
-				break;
-			case HTTP_UNITS:
-				units.addAll(parseJSONToUnitsArrays((JSONArray) request.get(HTTP_UNITS)));
-				SimpleLoggingUtil.debug(HttpUtils.class, "Update Units: " + units);
-				break;
-			default:
-				break;
-			}
-		});
-		final ClientRequestDTO result = new ClientRequestDTO(commands, units);
-		SimpleLoggingUtil.debug(HttpUtils.class, "transformToCommand: " + result);
-		return result;
-	}
-
-	public static List<ClientCommandDTO<?>> parseURIQuery(final String uriQuery, final String delimiter) {
-		//@formatter:off
-		return Stream.of(uriQuery.split(delimiter))
-				.filter(e -> !e.isEmpty())
-				.map(ClientMotorCommandRequestDTO::new)
-				.collect(Collectors.toCollection(LinkedList::new));
-		//@formatter:on
-	}
-
 
 	public static Map<String, String> parseURIQueryToMap(final String uriQuery, final String delimiter) {
 		//@formatter:off
@@ -142,72 +72,5 @@ public final class HttpUtils {
 		//@formatter:on
 	}
 
-
-	// Private Methods
-
-
-	/* commands array is preferred way to address commands */
-	private static List<HttpRequestElementDTO> getValidCommandElements(final JSONObject request) {
-		final List<HttpRequestElementDTO> result = new ArrayList<>();
-		if (request.containsKey(HTTP_COMMAND) && !request.get(HTTP_COMMAND).toString().isEmpty()) {
-			result.add(new HttpRequestElementDTO(HTTP_COMMAND, request.get(HTTP_COMMAND).toString()));
-		}
-		if (request.containsKey(HTTP_COMMANDS) && !((JSONArray) request.get(HTTP_COMMANDS)).isEmpty()) {
-			result.add(new HttpRequestElementDTO(HTTP_COMMANDS, request.get(HTTP_COMMANDS)));
-		}
-		if (request.containsKey(HTTP_UNITS) && !((JSONArray) request.get(HTTP_UNITS)).isEmpty()) {
-			result.add(new HttpRequestElementDTO(HTTP_UNITS, request.get(HTTP_UNITS)));
-		}
-
-		return result;
-	}
-
-	// TODO: this need to be standardized and refactoring to make possible accept different kind of commands (by target)
-	@SuppressWarnings(value = "unchecked")
-	private static List<ClientCommandDTO<?>> parseJSONToCommandsArray(final JSONArray jsonArray) {
-		return (List<ClientCommandDTO<?>>) jsonArray.stream().map(e -> {
-			JSONObject obj = (JSONObject) e;
-			final String target = obj.get("target").toString();
-			CommandTargetEnum commandTarget = CommandTargetEnum.getByName(target);
-			final String name = obj.get("name").toString();
-
-			final String value = obj.containsKey(HTTP_REQUEST_VALUE) ? obj.get(HTTP_REQUEST_VALUE).toString()
-					: ConstantUtil.EMPTY_STRING;
-
-			switch (commandTarget){
-				case LCD_UNIT:
-					SimpleLoggingUtil.debug(HttpUtils.class, "LCD Command: " + commandTarget);
-					return new ClientAdafruitLcdCommandRequestDTO(AdafruitLcdCommandEnum.getRequestValue(name));
-				case PLATFORM:
-					if (obj.containsKey("speed")) {
-						final String speed = obj.get("speed").toString();
-						return new ClientMotorCommandRequestDTO(PlatformUnitCommandEnum.getCommand(name), value, speed);
-					} else {
-						return new ClientMotorCommandRequestDTO(PlatformUnitCommandEnum.getCommand(name), value);
-					}
-				case FRONT_UNIT:
-					return new ClientOneServoCommandRequestDTO(OneServoUnitCommandEnum.getCommand(name), value);
-				case SYSTEM:
-					return new ClientSystemRequestDTO(SystemCommandEnum.getCommand(name));
-				case HAND_UNIT:
-				default:
-					throw new ClientCommException("parseJson not implemented: " + commandTarget);
-			}
-
-		}).collect(Collectors.toCollection(LinkedList::new));
-	}
-
-
-
-	@SuppressWarnings(value = "unchecked")
-	private static List<ClientUnitRequestDTO> parseJSONToUnitsArrays(final JSONArray jsonArray) {
-		return (List<ClientUnitRequestDTO>) jsonArray.stream().map(e -> {
-			JSONObject obj = (JSONObject) e;
-			final String name = obj.get("name").toString();
-			final Boolean active = Objects.nonNull(obj.get("active")) ? Boolean.valueOf(obj.get("active").toString())
-					: false;
-			return new ClientUnitRequestDTO(name, active);
-		}).collect(Collectors.toList());
-	}
 
 }

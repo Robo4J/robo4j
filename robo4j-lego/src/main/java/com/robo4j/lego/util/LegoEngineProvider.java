@@ -22,8 +22,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.robo4j.core.annotation.RoboProvider;
-import com.robo4j.core.motor.GenericMotor;
-import com.robo4j.core.registry.BaseRegistryProvider;
 import com.robo4j.lego.control.LegoEngine;
 import com.robo4j.lego.exception.LegoException;
 import com.robo4j.lego.motor.LegoEngineWrapper;

@@ -25,7 +25,7 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboUnit;
+import com.robo4j.core.unit.RoboUnit;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Button;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonListener;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonPressedObserver;

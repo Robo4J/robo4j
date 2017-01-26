@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2016. Miroslav Wengner, Marcus Hirt
- * This RpiEngineWrapper.java  is part of robo4j.
- * module: robo4j-rpi
+ * Copyright (C) 2017. Miroslav Wengner, Marcus Hirt
+ * This TransferSignal.java  is part of robo4j.
+ * module: robo4j-core
  *
  * robo4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,15 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.rpi.motor;
+package com.robo4j.core.concurrency;
 
 /**
+ *
+ * Currently Marker interface Signal represents Robot Platform or Sensor
+ * Information
+ *
  * @author Miroslav Wengner (@miragemiko)
- * @author Marcus Hirt (@hirt)
- * @since 17.12.2016
+ * @since 14.04.2016
  */
-public abstract class RpiEngineWrapper {
+public interface TransferSignal {
 }

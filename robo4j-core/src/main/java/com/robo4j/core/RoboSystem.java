@@ -29,8 +29,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-import com.robo4j.core.concurrent.RoboThreadFactory;
+import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.unit.RoboUnit;
 
 /**
  * Contains RoboUnits, RoboUnit lookup, a system level life cycle and a known
@@ -167,7 +168,7 @@ public class RoboSystem implements RoboContext {
 	}
 	
 	// NOTE(Marcus/Jan 24, 2017): We're only making sure that the reference is around, no more, no less.
-	<T> RoboReference<T> getReference(RoboUnit<T> roboUnit) {
+	public <T> RoboReference<T> getReference(RoboUnit<T> roboUnit) {
 		@SuppressWarnings("unchecked")
 		RoboReference<T> reference = (RoboReference<T>) referenceCache.get(roboUnit);
 		if (reference == null) {

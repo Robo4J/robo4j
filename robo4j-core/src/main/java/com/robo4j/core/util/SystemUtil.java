@@ -21,7 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboUnit;
+import com.robo4j.core.unit.RoboUnit;
 
 /**
  * Some useful little utilities.

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2017. Miroslav Wengner, Marcus Hirt
- * This RequestStatusEnum.java  is part of robo4j.
+ * This RoboRequestFactoryI.java  is part of robo4j.
  * module: robo4j-core
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -17,40 +17,16 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core.client.enums;
+package com.robo4j.core.client.request;
+
+import com.robo4j.http.HttpMessage;
 
 /**
- * Request Status is the resul done by the Request
- *
- * @author Miroslav Wengner (@miragemiko)
- * @since 13.11.2016
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 25.01.2017
  */
-public enum RequestStatusEnum {
+public interface DefaultRequestFactory<ResponseType> {
 
-	//@formatter:off
-	NONE	(-1, "none"),
-	EXIT	(0, "exit"),
-	ACTIVE	(1, "active"),;
-	//@formatter:on
-
-	private int code;
-	private String desc;
-
-	RequestStatusEnum(int code, String desc) {
-		this.code = code;
-		this.desc = desc;
-	}
-
-	public int getCode() {
-		return code;
-	}
-
-	public String getDesc() {
-		return desc;
-	}
-
-	@Override
-	public String toString() {
-		return "RequestStatusEnum{" + "code=" + code + ", desc='" + desc + '\'' + '}';
-	}
+      ResponseType processGet(final HttpMessage httpMessage);
 }

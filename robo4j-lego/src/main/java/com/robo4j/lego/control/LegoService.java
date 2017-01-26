@@ -18,8 +18,6 @@
 
 package com.robo4j.lego.control;
 
-import com.robo4j.core.service.GenericService;
-
 /**
  * LegoService interface provides reference to the functionality provided by the
  * system as default

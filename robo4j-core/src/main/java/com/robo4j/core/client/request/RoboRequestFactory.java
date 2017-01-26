@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  * @author Miro Wengner (@miragemiko)
  * @since 25.01.2017
  */
-public class RoboRequestFactory implements RoboRequestFactoryI<String>{
+public class RoboRequestFactory implements DefaultRequestFactory<String> {
 
     private static volatile RoboRequestFactory INSTANCE;
 

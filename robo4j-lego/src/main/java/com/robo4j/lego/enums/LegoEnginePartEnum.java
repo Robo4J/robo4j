@@ -18,7 +18,6 @@
 
 package com.robo4j.lego.enums;
 
-import com.robo4j.core.control.RoboSystemConfig;
 import com.robo4j.core.enums.RoboHardwareEnumI;
 
 /**
@@ -26,7 +25,7 @@ import com.robo4j.core.enums.RoboHardwareEnumI;
  * @author Miroslav Wengner (@miragemiko)
  * @since 05.05.2016
  */
-public enum LegoEnginePartEnum implements RoboHardwareEnumI<String>, RoboSystemConfig {
+public enum LegoEnginePartEnum implements RoboHardwareEnumI<String> {
 
 	//@formatter:off
 	NONE			("NONE", "not assigned"),

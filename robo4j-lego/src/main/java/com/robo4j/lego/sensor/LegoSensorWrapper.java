@@ -18,7 +18,6 @@
 
 package com.robo4j.lego.sensor;
 
-import com.robo4j.core.sensor.GenericSensor;
 import com.robo4j.lego.control.LegoSensor;
 import com.robo4j.lego.enums.LegoEnginePartEnum;
 import com.robo4j.lego.enums.LegoSensorEnum;
