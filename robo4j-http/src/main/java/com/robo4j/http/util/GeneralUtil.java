@@ -32,6 +32,8 @@ import com.robo4j.http.HttpMethod;
 import com.robo4j.http.HttpVersion;
 
 /**
+ *
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 23.10.2016
  */

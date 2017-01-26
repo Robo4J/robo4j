@@ -25,6 +25,7 @@ import java.util.Map;
  * Http request message is immutable
  *
  *
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 09.03.2016
  */
