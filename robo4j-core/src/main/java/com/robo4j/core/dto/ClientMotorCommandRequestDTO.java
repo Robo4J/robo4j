@@ -1,5 +1,5 @@
 /*
- * Copyright (C)  2016. Miroslav Wengner, Marcus Hirt
+ * Copyright (C) 2016, 2017. Miroslav Wengner, Marcus Hirt
  * This ClientCommandRequestDTO.java  is part of robo4j.
  *
  *  robo4j is free software: you can redistribute it and/or modify
