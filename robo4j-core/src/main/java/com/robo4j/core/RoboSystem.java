@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-import com.robo4j.core.concurrent.RoboSingleThreadFactory;
+import com.robo4j.core.concurrent.RoboThreadFactory;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 
 /**
@@ -77,8 +77,8 @@ public class RoboSystem implements RoboContext {
 	
 	public RoboSystem(int threadPoolSize) {
 		units.put(ID_SYSTEM, systemUnit);
-		systemExecutor = new ThreadPoolExecutor(1, threadPoolSize, 10, TimeUnit.SECONDS, workQueue,
-				new RoboSingleThreadFactory("Robo4J System " + uid, true));
+		systemExecutor = new ThreadPoolExecutor(threadPoolSize, threadPoolSize, 10, TimeUnit.SECONDS, workQueue,
+				new RoboThreadFactory("Robo4J System ", true));
 	}
 
 	public RoboSystem(int threadPoolSize, Set<RoboUnit<?>> unitSet) {
@@ -175,5 +175,12 @@ public class RoboSystem implements RoboContext {
 			referenceCache.put(roboUnit, reference);
 		}
 		return reference;		
+	}
+	
+	/**
+	 * @return the unique id of this {@link RoboSystem}.
+	 */
+	public String getId() {
+		return uid;
 	}
 }

@@ -18,17 +18,18 @@
 package com.robo4j.core.concurrent;
 
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Miroslav Wengner (@miragemiko)
  * @author Marcus
  * @since 07.04.2016
  */
-public class RoboSingleThreadFactory implements ThreadFactory {
+public class RoboThreadFactory implements ThreadFactory {
 	/**
 	 * Prefix to use in the name of the the threads create by the factory
 	 */
-	private String name;
+	private String prefix;
 
 	/**
 	 * If true, will create daemon threads.
@@ -36,15 +37,21 @@ public class RoboSingleThreadFactory implements ThreadFactory {
 	private boolean daemon;
 
 	/**
+	 * The thread number - as suffix.
+	 */
+	private final AtomicInteger threadNumber = new AtomicInteger(1);
+
+	/**
 	 * Constructor that initiates attributes
 	 */
-	public RoboSingleThreadFactory(String name, boolean daemon) {
-		this.name = name;
+	public RoboThreadFactory(String prefix, boolean daemon) {
+		this.prefix = prefix;
 		this.daemon = daemon;
 	}
 
 	@Override
 	public Thread newThread(Runnable r) {
+		String name = prefix + threadNumber.getAndIncrement();
 		Thread thread = new Thread(r, name);
 		thread.setDaemon(daemon);
 		return thread;
