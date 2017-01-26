@@ -76,7 +76,7 @@ public final class RoboReflectionScan {
 			classes = new ArrayList<>();
 			StreamUtils.enumerationAsStream(classLoader.getResources(packageName), false).map(url -> {
 				try {
-					String jarFile = url.getFile().split(EXCLAMATION)[ConstantUtil.DEFAULT_VALUE].replace(FILE,
+					String jarFile = url.getFile().split(EXCLAMATION)[ConstantUtil.DEFAULT_VALUE_0].replace(FILE,
 							ConstantUtil.EMPTY_STRING);
 					return new ZipInputStream(new FileInputStream(jarFile));
 				} catch (FileNotFoundException e) {
@@ -135,7 +135,7 @@ public final class RoboReflectionScan {
 			} else if (file.getName().endsWith(SUFFIX)) {
 				String tmpPath = path.replace(File.separatorChar, DOT);
 				try {
-					result.add(Class.forName(tmpPath + DOT + file.getName().substring(ConstantUtil.DEFAULT_VALUE,
+					result.add(Class.forName(tmpPath + DOT + file.getName().substring(ConstantUtil.DEFAULT_VALUE_0,
 							file.getName().length() - SUFFIX.length())));
 				} catch (ClassNotFoundException e) {
 					throw new RoboReflectException("findClassesIntern", e);

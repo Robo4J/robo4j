@@ -165,9 +165,9 @@ public final class RequestProcessorFactory {
 					.stream(httpMessage.getUri().getPath().split(ConstantUtil.getHttpSeparator(12)))
 					.filter(e -> !e.isEmpty()).collect(Collectors.toList());
 
-			if (paths.size() > ConstantUtil.DEFAULT_VALUE && ConstantUtil.availablePaths.containsAll(paths)) {
+			if (paths.size() > ConstantUtil.DEFAULT_VALUE_0 && ConstantUtil.availablePaths.containsAll(paths)) {
 
-				final PageEnum page = PageEnum.getPageEnumByName(paths.get(ConstantUtil.DEFAULT_VALUE).toLowerCase());
+				final PageEnum page = PageEnum.getPageEnumByName(paths.get(ConstantUtil.DEFAULT_VALUE_0).toLowerCase());
 				switch (page) {
 				case STATUS:
 					final ReceiverAgent receiverAgent = (ReceiverAgent) agents.get(MAIN_FACTORY_AGENT);
@@ -227,7 +227,7 @@ public final class RequestProcessorFactory {
 		boolean takenAction = false;
 
 		char[] buffer = new char[RequestHeaderProcessor.getContentLength(httpMessage.getHeader())];
-		if (buffer.length != ConstantUtil.DEFAULT_VALUE) {
+		if (buffer.length != ConstantUtil.DEFAULT_VALUE_0) {
 			try {
 				in.read(buffer);
 
@@ -236,7 +236,7 @@ public final class RequestProcessorFactory {
 				SimpleLoggingUtil.debug(getClass(), "ProcessPost: parsedRequest: " + parsedRequest);
 
 				/* POST input parser: commands, brainUnits */
-				if (parsedRequest.getCommands().size() > ConstantUtil.DEFAULT_VALUE) {
+				if (parsedRequest.getCommands().size() > ConstantUtil.DEFAULT_VALUE_0) {
 					addAgentMessage(AgentStatusEnum.REQUEST_POST, parsedRequest.getCommands().toString());
 					SimpleLoggingUtil.debug(getClass(), "commands request: " + parsedRequest.getCommands());
 					commandQueue.put(parsedRequest.getCommands());
@@ -244,7 +244,7 @@ public final class RequestProcessorFactory {
 					takenAction = true;
 				}
 
-				if (parsedRequest.getUnits().size() > ConstantUtil.DEFAULT_VALUE) {
+				if (parsedRequest.getUnits().size() > ConstantUtil.DEFAULT_VALUE_0) {
 					parsedRequest.getUnits().forEach(u -> {
 						RoboSystemConfig du = unitRegistry.getByName(u.getName());
 						if (du instanceof BrainUnit) {

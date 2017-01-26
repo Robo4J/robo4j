@@ -38,7 +38,8 @@ public final class ConstantUtil {
 	public static final String COMMAND_BUS = "command-bus";
 	public static final String PROVIDER_BUS = "provider-bus";
 	public static final String FACTORY_BUS = "factory-bus";
-	public static final int DEFAULT_VALUE = 0;
+	public static final int DEFAULT_VALUE_0 = 0;
+	public static final int DEFAULT_VALUE_1 = 1;
 	public static final int PLATFORM_FACTORY = 10; /* Producer Consumer */
 	public static final int PLATFORM_ENGINES = 30;
 	public static final int DEFAULT_PRIORITY = 1;

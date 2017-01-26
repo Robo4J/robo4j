@@ -1,43 +1,30 @@
 /*
- * Copyright (C)  2016. Miroslav Wengner, Marcus Hirt
+ * Copyright (C) 2016-2017. Miroslav Wengner, Marcus Hirt
  * This HttpUtils.java  is part of robo4j.
+ * module: robo4j-core
  *
- *  robo4j is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * robo4j is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  robo4j is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * robo4j is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.robo4j.core.client.util;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
+import com.robo4j.core.client.request.RoboBasicMapEntry;
 import com.robo4j.core.command.AdafruitLcdCommandEnum;
 import com.robo4j.core.command.CommandTargetEnum;
 import com.robo4j.core.command.OneServoUnitCommandEnum;
 import com.robo4j.core.command.PlatformUnitCommandEnum;
 import com.robo4j.core.command.SystemCommandEnum;
-import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.dto.ClientAdafruitLcdCommandRequestDTO;
 import com.robo4j.core.dto.ClientCommandDTO;
 import com.robo4j.core.dto.ClientMotorCommandRequestDTO;
@@ -46,12 +33,28 @@ import com.robo4j.core.dto.ClientRequestDTO;
 import com.robo4j.core.dto.ClientSystemRequestDTO;
 import com.robo4j.core.dto.ClientUnitRequestDTO;
 import com.robo4j.core.dto.HttpRequestElementDTO;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
  * Basic Http constants and utils methods
  *
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 23.05.2016
  */
@@ -76,6 +79,11 @@ public final class HttpUtils {
 				.append(LocalDateTime.now()).append(NEXT_LINE).append("Server: robo4j-client").append(NEXT_LINE)
 				.append("Content-length: ").append(length).append(NEXT_LINE)
 				.append("Content-type: text/html; charset=utf-8").append(NEXT_LINE).append(NEXT_LINE).toString();
+	}
+
+
+	public static String correctLine(String line) {
+		return line == null ? ConstantUtil.EMPTY_STRING : line;
 	}
 
 	/**
@@ -116,11 +124,28 @@ public final class HttpUtils {
 	}
 
 	public static List<ClientCommandDTO<?>> parseURIQuery(final String uriQuery, final String delimiter) {
-		return Arrays.stream(uriQuery.split(delimiter)).filter(e -> !e.isEmpty()).map(ClientMotorCommandRequestDTO::new)
+		//@formatter:off
+		return Stream.of(uriQuery.split(delimiter))
+				.filter(e -> !e.isEmpty())
+				.map(ClientMotorCommandRequestDTO::new)
 				.collect(Collectors.toCollection(LinkedList::new));
+		//@formatter:on
 	}
 
+
+	public static Map<String, String> parseURIQueryToMap(final String uriQuery, final String delimiter) {
+		//@formatter:off
+		return Stream.of(uriQuery.split(delimiter))
+				.filter(e -> !e.isEmpty())
+				.map(RoboBasicMapEntry::new)
+				.collect(Collectors.toMap(RoboBasicMapEntry::getKey, RoboBasicMapEntry::getValue));
+		//@formatter:on
+	}
+
+
 	// Private Methods
+
+
 	/* commands array is preferred way to address commands */
 	private static List<HttpRequestElementDTO> getValidCommandElements(final JSONObject request) {
 		final List<HttpRequestElementDTO> result = new ArrayList<>();

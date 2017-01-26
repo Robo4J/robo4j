@@ -40,7 +40,7 @@ public class ClientMotorCommandRequestDTO implements ClientCommandDTO<PlatformUn
 	public ClientMotorCommandRequestDTO(String value) {
 		this.stamp = System.currentTimeMillis();
 		final String[] values = value.split(ConstantUtil.getHttpSeparator(3));
-		this.command = PlatformUnitCommandEnum.getCommand(values[ConstantUtil.DEFAULT_VALUE]);
+		this.command = PlatformUnitCommandEnum.getCommand(values[ConstantUtil.DEFAULT_VALUE_0]);
 		this.value = values[1];
 		this.speed = "300";
 	}

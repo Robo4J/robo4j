@@ -24,7 +24,8 @@ import java.util.stream.Stream;
 
 /**
  * Simple toolkit for logging
- * 
+ *
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 19.07.2016
  */
@@ -37,7 +38,7 @@ public final class SimpleLoggingUtil {
 	}
 
 	public static void debug(Class<?> clazz, String message) {
-		Logger.getLogger(clazz.getName()).log(Level.FINER, message);
+		Logger.getLogger(clazz.getName()).log(Level.FINE, message);
 	}
 
 	public static void debug(Class<?> clazz, String... message){
