@@ -59,9 +59,7 @@ public class HttpUnit extends RoboUnit<Object>{
         target = properties.get("target");
         port = Integer.valueOf(properties.get("port"));
         executor = Executors.newCachedThreadPool();
-        setState(LifecycleState.INITIALIZED);
-        SimpleLoggingUtil.debug(getClass(), "initiate");
-
+        super.initialize(properties);
     }
 
     @Override

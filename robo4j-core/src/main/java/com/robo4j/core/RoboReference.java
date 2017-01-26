@@ -16,6 +16,7 @@
  */
 package com.robo4j.core;
 
+import java.util.Map;
 /**
  * Reference to a RoboUnit.
  *
@@ -33,4 +34,9 @@ public interface RoboReference<T> {
 	 * @return the RoboUnit specific response.
 	 */
 	<R> Future<RoboResult<T, R>> sendMessage(Object message);
+	
+	/**
+	 * FIXME: This will have to change!
+	 */
+	Map<String, String> getConfiguration();
 }

@@ -33,7 +33,8 @@ public class RoboUnit<T> implements RoboReference<T> {
 	private final String id;
 	private volatile LifecycleState state = LifecycleState.UNINITIALIZED;
 	private RoboReference<T> reference;
-
+	private Map<String, String> configuration;
+	
 	/**
 	 * Either provide id up front
 	 */
@@ -66,7 +67,12 @@ public class RoboUnit<T> implements RoboReference<T> {
 	}
 
 	public void initialize(Map<String, String> properties) throws Exception {
+		setConfiguration(properties);
 		setState(LifecycleState.INITIALIZED);
+	}
+
+	protected void setConfiguration(Map<String, String> configuration) {
+		this.configuration = configuration;
 	}
 
 	/**
@@ -177,5 +183,10 @@ public class RoboUnit<T> implements RoboReference<T> {
 		} else {
 			return reference;
 		}
+	}
+
+	@Override
+	public Map<String, String> getConfiguration() {
+		return configuration;
 	}
 }

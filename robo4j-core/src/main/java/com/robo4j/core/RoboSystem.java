@@ -64,6 +64,11 @@ public class RoboSystem implements RoboContext {
 		public Future<RoboResult<T, ?>> sendMessage(final Object message) {
 			return systemExecutor.submit(() -> unit.onMessage(message));
 		}
+
+		@Override
+		public Map<String, String> getConfiguration() {
+			return unit.getConfiguration();
+		}
 	}
 	
 	public RoboSystem() {
