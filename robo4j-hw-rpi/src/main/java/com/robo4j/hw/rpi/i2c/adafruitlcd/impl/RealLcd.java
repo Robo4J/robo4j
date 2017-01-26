@@ -253,7 +253,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setText(java.lang.String)
 	 */
 	@Override
-	public void setText(String s) throws IOException {
+	public synchronized void setText(String s) throws IOException {
 		String[] str = s.split("\n");
 		for (int i = 0; i < str.length; i++) {
 			setText(i, str[i]);
@@ -264,7 +264,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setText(int, java.lang.String)
 	 */
 	@Override
-	public void setText(int row, String string) throws IOException {
+	public synchronized void setText(int row, String string) throws IOException {
 		setCursorPosition(row, 0);
 		internalWrite(string);
 	}
@@ -295,7 +295,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setCursorPosition(int, int)
 	 */
 	@Override
-	public void setCursorPosition(int row, int column) throws IOException {
+	public synchronized void setCursorPosition(int row, int column) throws IOException {
 		write(LCD_SETDDRAMADDR | (column + ROW_OFFSETS[row]));
 	}
 
@@ -338,7 +338,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#clear()
 	 */
 	@Override
-	public void clear() throws IOException {
+	public synchronized void clear() throws IOException {
 		write(LCD_CLEARDISPLAY);
 	}
 
@@ -346,7 +346,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#home()
 	 */
 	@Override
-	public void home() throws IOException {
+	public synchronized void home() throws IOException {
 		write(LCD_RETURNHOME);
 	}
 
@@ -354,7 +354,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setCursorEnabled(boolean)
 	 */
 	@Override
-	public void setCursorEnabled(boolean enable) throws IOException {
+	public synchronized void setCursorEnabled(boolean enable) throws IOException {
 		if (enable) {
 			displayControl |= LCD_CURSORON;
 			write(LCD_DISPLAYCONTROL | displayControl);
@@ -368,7 +368,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#isCursorEnabled()
 	 */
 	@Override
-	public boolean isCursorEnabled() {
+	public synchronized boolean isCursorEnabled() {
 		return (displayControl & LCD_CURSORON) > 0;
 	}
 
@@ -376,7 +376,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setDisplayEnabled(boolean)
 	 */
 	@Override
-	public void setDisplayEnabled(boolean enable) throws IOException {
+	public synchronized void setDisplayEnabled(boolean enable) throws IOException {
 		if (enable) {
 			displayControl |= LCD_DISPLAYON;
 			write(LCD_DISPLAYCONTROL | displayControl);
@@ -390,7 +390,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#isDisplayEnabled()
 	 */
 	@Override
-	public boolean isDisplayEnabled() {
+	public synchronized boolean isDisplayEnabled() {
 		return (displayControl & LCD_DISPLAYON) > 0;
 	}
 
@@ -398,7 +398,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setBlinkEnabled(boolean)
 	 */
 	@Override
-	public void setBlinkEnabled(boolean enable) throws IOException {
+	public synchronized void setBlinkEnabled(boolean enable) throws IOException {
 		if (enable) {
 			displayControl |= LCD_BLINKON;
 			write(LCD_DISPLAYCONTROL | displayControl);
@@ -412,7 +412,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#isBlinkEnabled()
 	 */
 	@Override
-	public boolean isBlinkEnabled() {
+	public synchronized boolean isBlinkEnabled() {
 		return (displayControl & LCD_BLINKON) > 0;
 	}
 
@@ -420,7 +420,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setBacklight(se.hirt.pi.adafruitlcd.LCD.Color)
 	 */
 	@Override
-	public void setBacklight(Color color) throws IOException {
+	public synchronized void setBacklight(Color color) throws IOException {
 		int c = ~color.getValue();
 		portA = (portA & 0x3F) | ((c & 0x03) << 6);
 		portB = (portB & 0xFE) | ((c & 0x04) >> 2);
@@ -434,7 +434,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#scrollDisplay(se.hirt.pi.adafruitlcd.LCD.Direction)
 	 */
 	@Override
-	public void scrollDisplay(Direction direction) throws IOException {
+	public synchronized void scrollDisplay(Direction direction) throws IOException {
 		if (direction == Direction.LEFT) {
 			displayShift = LCD_DISPLAYMOVE | LCD_MOVELEFT;
 			write(LCD_CURSORSHIFT | displayShift);
@@ -448,7 +448,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setTextFlowDirection(se.hirt.pi.adafruitlcd.LCD.Direction)
 	 */
 	@Override
-	public void setTextFlowDirection(Direction direction) throws IOException {
+	public synchronized void setTextFlowDirection(Direction direction) throws IOException {
 		if (direction == Direction.LEFT) {
 			// This is for text that flows right to left
 			displayMode &= ~LCD_ENTRYLEFT;
@@ -464,7 +464,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setAutoScrollEnabled(boolean)
 	 */
 	@Override
-	public void setAutoScrollEnabled(boolean enable) throws IOException {
+	public synchronized void setAutoScrollEnabled(boolean enable) throws IOException {
 		if (enable) {
 			// This will 'right justify' text from the cursor
 			displayMode |= LCD_ENTRYSHIFTINCREMENT;
@@ -480,7 +480,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	 * @see se.hirt.pi.adafruitlcd.ILCD#isAutoScrollEnabled()
 	 */
 	@Override
-	public boolean isAutoScrollEnabled() {
+	public synchronized boolean isAutoScrollEnabled() {
 		return (displayControl & LCD_ENTRYSHIFTINCREMENT) > 0;
 	}
 
@@ -511,7 +511,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	}
 
 	@Override
-	public void reset() throws IOException {
+	public synchronized void reset() throws IOException {
 		initialize();
 	}
 }
