@@ -20,8 +20,6 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
 import java.io.IOException;
 
-import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
-
 /**
  * Tests autoscroll. Check out the documentation for the HD44780 for more info
  * on how the buffer is handled.
