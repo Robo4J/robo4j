@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017. Miroslav Wengner, Marcus Hirt
+ * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
  * This QueueFIFOEntry.java  is part of robo4j.
  * module: robo4j-core
  *
@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * keep order in the queue
  *
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 13.04.2016
  */

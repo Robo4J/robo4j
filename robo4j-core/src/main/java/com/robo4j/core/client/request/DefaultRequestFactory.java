@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2017. Miroslav Wengner, Marcus Hirt
- * This RoboRequestFactoryI.java  is part of robo4j.
+ * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
+ * This DefaultRequestFactory.java  is part of robo4j.
  * module: robo4j-core
  *
  * robo4j is free software: you can redistribute it and/or modify

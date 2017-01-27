@@ -27,6 +27,7 @@ import java.util.Set;
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
+ * @since 10.01.2017
  */
 class DefaultConfiguration implements Configuration {
 	private final Map<String, Object> settings = new HashMap<>();

@@ -36,6 +36,7 @@ package com.robo4j.core;
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
+ * @since 09.01.2017
  */
 public enum LifecycleState {
 	// @formatter:off

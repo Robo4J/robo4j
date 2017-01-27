@@ -42,6 +42,7 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
+ * @since 09.01.2017
  */
 public final class RoboBuilder {
 	private final Set<RoboUnit<?>> units = new HashSet<>();

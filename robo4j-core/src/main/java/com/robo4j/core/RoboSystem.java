@@ -39,6 +39,7 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
+ * @since 09.01.2017
  */
 public class RoboSystem implements RoboContext {
 	public static final String ID_SYSTEM = "com.robo4j.core.system";

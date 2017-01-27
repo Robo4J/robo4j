@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016, 2017. Miroslav Wengner, Marcus Hirt
+ * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
  * This HttpUtils.java  is part of robo4j.
  * module: robo4j-core
  *

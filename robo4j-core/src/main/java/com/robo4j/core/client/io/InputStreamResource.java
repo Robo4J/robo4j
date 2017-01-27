@@ -23,6 +23,7 @@ import java.io.InputStream;
 /**
  * InputStream resource for reading files currently default web response
  *
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 23.05.2016
  */

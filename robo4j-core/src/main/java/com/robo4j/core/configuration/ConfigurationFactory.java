@@ -21,6 +21,7 @@ package com.robo4j.core.configuration;
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
+ * @since 10.01.2017
  */
 public class ConfigurationFactory {
 	public static Configuration createEmptyConfiguration() {

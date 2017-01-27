@@ -19,6 +19,7 @@
 package com.robo4j.core.client.io;
 
 /**
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 24.05.2016
  */

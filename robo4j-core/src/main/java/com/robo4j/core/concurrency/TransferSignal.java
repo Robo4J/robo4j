@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017. Miroslav Wengner, Marcus Hirt
+ * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
  * This TransferSignal.java  is part of robo4j.
  * module: robo4j-core
  *
@@ -24,6 +24,7 @@ package com.robo4j.core.concurrency;
  * Currently Marker interface Signal represents Robot Platform or Sensor
  * Information
  *
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 14.04.2016
  */

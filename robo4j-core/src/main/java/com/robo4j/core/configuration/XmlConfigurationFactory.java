@@ -33,6 +33,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * Factory for creating configurations from XML and vice versa.
  * 
  * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 20.01.2017
  */
 public class XmlConfigurationFactory {
 	public static final String ELEMENT_CONFIG = "config";

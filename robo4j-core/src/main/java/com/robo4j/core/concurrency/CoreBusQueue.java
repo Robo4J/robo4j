@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017. Miroslav Wengner, Marcus Hirt
+ * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
  * This CoreBusQueue.java  is part of robo4j.
  * module: robo4j-core
  *
@@ -33,6 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  *
  *
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 03.04.2016
  */

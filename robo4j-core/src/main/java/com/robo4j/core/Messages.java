@@ -24,6 +24,7 @@ import java.util.ResourceBundle;
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
+ * @since 09.01.2017
  */
 public class Messages {
 	private static final String BUNDLE_NAME = "messages"; //$NON-NLS-1$
