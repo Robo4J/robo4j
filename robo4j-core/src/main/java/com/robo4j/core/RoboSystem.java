@@ -32,7 +32,6 @@ import java.util.stream.Stream;
 import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.unit.RoboUnit;
 
 /**
  * Contains RoboUnits, RoboUnit lookup, a system level life cycle and a known

@@ -17,17 +17,12 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core.unit;
+package com.robo4j.core;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.Future;
 
-import com.robo4j.core.LifecycleState;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboResult;
-import com.robo4j.core.RoboSystem;
 import com.robo4j.core.configuration.Configuration;
 
 /**
@@ -191,7 +186,10 @@ public class RoboUnit<T> implements RoboReference<T> {
 		return String.format("%s [id=%s]", getClass().getName(), getId());
 	}
 
-	public RoboReference<T> internalGetReference() {
+	/**
+	 * @return a RoboReference. Internal use only.
+	 */
+	RoboReference<T> internalGetReference() {
 		if (reference == null) {
 			return getContext().getReference(getId());
 		} else {

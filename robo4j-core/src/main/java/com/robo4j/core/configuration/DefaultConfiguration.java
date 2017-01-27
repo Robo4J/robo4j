@@ -21,7 +21,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Default implementation of a Robo4J Unit.
+ * Default implementation of a {@link Configuration}.
+ * 
+ * <p>Internal Use Only</p>
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

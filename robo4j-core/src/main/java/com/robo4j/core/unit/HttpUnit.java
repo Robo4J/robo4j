@@ -32,6 +32,7 @@ import java.util.concurrent.Future;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
+import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.request.RoboRequestCallable;
 import com.robo4j.core.client.request.RoboRequestFactory;
 import com.robo4j.core.configuration.Configuration;

@@ -36,7 +36,6 @@ import org.xml.sax.helpers.DefaultHandler;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.XmlConfigurationFactory;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.unit.RoboUnit;
 
 /**
  * Builds a RoboSystem from various different sources.

@@ -17,7 +17,6 @@
 package com.robo4j.core;
 
 import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.unit.RoboUnit;
 
 /**
  * 
