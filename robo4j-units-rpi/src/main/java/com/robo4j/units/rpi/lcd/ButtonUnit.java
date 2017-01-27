@@ -20,6 +20,7 @@ package com.robo4j.units.rpi.lcd;
 
 import java.io.IOException;
 
+import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
@@ -51,10 +52,17 @@ public class ButtonUnit extends I2CRoboUnit<Object> {
 	}
 
 	@Override
-	public void initialize(Configuration configuration) throws Exception {
-		super.initialize(configuration);
-		target = configuration.getString("target");
-		lcd = AdafruitLcdUnit.getLCD(getBus(), getAddress());
+	public void onInitialization(Configuration configuration) throws ConfigurationException {
+		super.onInitialization(configuration);
+		target = configuration.getString("target", null);
+		if (target == null) {
+			throw ConfigurationException.createMissingConfigNameException("target");
+		}
+		try {
+			lcd = AdafruitLcdUnit.getLCD(getBus(), getAddress());
+		} catch (IOException e) {
+			throw new ConfigurationException("Could not initialize LCD shield", e);
+		}
 		setState(LifecycleState.INITIALIZED);
 	}
 

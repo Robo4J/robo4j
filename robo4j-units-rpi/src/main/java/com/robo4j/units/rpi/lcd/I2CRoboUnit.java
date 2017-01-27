@@ -16,6 +16,7 @@
  */
 package com.robo4j.units.rpi.lcd;
 
+import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
@@ -28,11 +29,13 @@ import com.robo4j.core.configuration.Configuration;
  * @since 17.12.2016
  */
 public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
+	// For all Raspberry Pi's except the first model, this is always the case.
+	private static final int _DEFAULT_BUS = 1;
 	public final static String PROPERTY_KEY_BUS = "bus";
 	public final static String PROPERTY_KEY_ADDRESS = "address";
 
-	private int bus;
-	private int address;
+	private Integer bus;
+	private Integer address;
 
 	/**
 	 * @param context
@@ -43,9 +46,12 @@ public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
 	}
 
 	@Override
-	public void initialize(Configuration configuration) throws Exception {
-		bus = configuration.getInt("bus");
-		address = configuration.getInt("address");
+	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		bus = configuration.getInteger("bus", _DEFAULT_BUS);
+		address = configuration.getInteger("address", null);
+		if (address == null) {
+			throw ConfigurationException.createMissingConfigNameException("address");
+		}
 	}
 
 	public int getAddress() {

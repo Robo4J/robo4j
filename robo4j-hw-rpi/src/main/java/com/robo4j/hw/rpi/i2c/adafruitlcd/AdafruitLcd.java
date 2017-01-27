@@ -24,11 +24,12 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
  */
 import java.io.IOException;
 
-import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd.Direction;
 
 public interface AdafruitLcd {
-	int DEFAULT_BUS = I2CBus.BUS_1;
+	// Not using the Pi4J bus specification here, since we may not be able to
+	// load the class (we can run with a mock up).
+	int DEFAULT_BUS = 1;
 	int DEFAULT_ADDRESS = 0x20;
 
 	/**

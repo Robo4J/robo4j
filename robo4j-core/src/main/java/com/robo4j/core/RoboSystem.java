@@ -52,8 +52,6 @@ public class RoboSystem implements RoboContext {
 	private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
 	private final String uid = UUID.randomUUID().toString();
 	
-	private final RoboUnit<Object> systemUnit = new RoboUnit<>(this, ID_SYSTEM);
-
 	private class ReferenceImplementation<T> implements RoboReference<T> {
 		private final RoboUnit<T> unit;
 
@@ -78,7 +76,6 @@ public class RoboSystem implements RoboContext {
 	}
 	
 	public RoboSystem(int threadPoolSize) {
-		units.put(ID_SYSTEM, systemUnit);
 		systemExecutor = new ThreadPoolExecutor(threadPoolSize, threadPoolSize, 10, TimeUnit.SECONDS, workQueue,
 				new RoboThreadFactory("Robo4J System ", true));
 	}

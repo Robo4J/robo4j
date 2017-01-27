@@ -50,8 +50,11 @@ public class StringProducer extends RoboUnit<String> {
 	}
 
 	@Override
-	public void initialize(Configuration configuration) throws Exception {
-		target = configuration.getString("target");
-		setState(LifecycleState.INITIALIZED);
+	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		target = configuration.getString("target", null);
+		if (target == null) {
+			throw ConfigurationException.createMissingConfigNameException("target");
+		}
 	}
+
 }

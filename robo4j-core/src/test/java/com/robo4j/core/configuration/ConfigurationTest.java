@@ -28,17 +28,17 @@ public class ConfigurationTest {
 	@Test
 	public void testBasicConfiguration() {
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setInt("MyInt", 1);
+		config.setInteger("MyInt", 1);
 		config.setLong("MyLong", 2L);
 		config.setFloat("MyFloat", 1.0f);
 		config.setDouble("MyDouble", 2.0);
 		config.setString("MyString", "toodiloo");
 		
-		Assert.assertEquals(1, config.getInt("MyInt"));
-		Assert.assertEquals(2, config.getLong("MyLong"));
-		Assert.assertEquals(1.0f, config.getFloat("MyFloat"), 0.000000001f);
-		Assert.assertEquals(2.0, config.getDouble("MyDouble"), 0.000000001f);
-		Assert.assertEquals("toodiloo", config.getString("MyString"));
+		Assert.assertEquals(1, (int) config.getInteger("MyInt", -1));
+		Assert.assertEquals(2L, (long) config.getLong("MyLong", -1L));
+		Assert.assertEquals(1.0f, config.getFloat("MyFloat", -1f), 0.000000001f);
+		Assert.assertEquals(2.0, config.getDouble("MyDouble", -1.0), 0.000000001f);
+		Assert.assertEquals("toodiloo", config.getString("MyString", "nope"));
 	}
 	
 	@Test
@@ -49,7 +49,7 @@ public class ConfigurationTest {
 		// Children have their own namespace
 		config.setDouble("sub", 2.0);
 
-		Assert.assertEquals(2.0, config.getDouble("sub"), 0.000000001f);
-		Assert.assertEquals("child", config.getChildConfiguration("sub").getString("c"));
+		Assert.assertEquals(2.0, config.getDouble("sub", null), 0.000000001f);
+		Assert.assertEquals("child", config.getChildConfiguration("sub").getString("c", null));
 	}
 }

@@ -32,7 +32,7 @@ import com.robo4j.core.configuration.Configuration;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RoboUnit<T> implements RoboReference<T> {
+public abstract class RoboUnit<T> implements RoboReference<T> {
 	private final RoboContext context;
 	private final String id;
 	private volatile LifecycleState state = LifecycleState.UNINITIALIZED;
@@ -70,10 +70,21 @@ public class RoboUnit<T> implements RoboReference<T> {
 		return null;
 	}
 
-	public void initialize(Configuration configuration) throws Exception {
+	/**
+	 * If initializing the unit programmatically, call unit with the proper
+	 * configuration.
+	 * 
+	 * @param configuration
+	 *            the configuration to use.
+	 * @throws Exception
+	 */
+	public void initialize(Configuration configuration) throws ConfigurationException {
 		setConfiguration(configuration);
+		onInitialization(configuration);
 		setState(LifecycleState.INITIALIZED);
 	}
+
+	protected abstract void onInitialization(Configuration configuration) throws ConfigurationException;
 
 	protected void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
@@ -190,6 +201,7 @@ public class RoboUnit<T> implements RoboReference<T> {
 	 * @return a RoboReference. Internal use only.
 	 */
 	RoboReference<T> internalGetReference() {
+		// NOTE(Marcus/Jan 27, 2017): Can we avoid this?
 		if (reference == null) {
 			return getContext().getReference(getId());
 		} else {

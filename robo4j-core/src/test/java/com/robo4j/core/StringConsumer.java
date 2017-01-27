@@ -19,6 +19,8 @@ package com.robo4j.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.robo4j.core.configuration.Configuration;
+
 /**
  * 
  * @author Marcus Hirt (@hirt)
@@ -48,5 +50,10 @@ public class StringConsumer extends RoboUnit<String> {
 		String str = (String) message;
 		receivedMessages.add(str);
 		return new RoboResult<String, Integer>(this, receivedMessages.size());
+	}
+
+	@Override
+	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		
 	}	
 }

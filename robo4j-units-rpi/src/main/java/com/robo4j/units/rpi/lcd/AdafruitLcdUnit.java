@@ -18,8 +18,7 @@ package com.robo4j.units.rpi.lcd;
 
 import java.io.IOException;
 
-import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
-import com.robo4j.core.LifecycleState;
+import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboResult;
 import com.robo4j.core.RoboUnit;
@@ -46,20 +45,19 @@ public class AdafruitLcdUnit extends I2CRoboUnit<String> {
 		super(context, id);
 	}
 
-	static AdafruitLcd getLCD(int bus, int address) throws IOException, UnsupportedBusNumberException {
+	static AdafruitLcd getLCD(int bus, int address) throws IOException {
 		Object lcd = I2CRegistry.getI2CDeviceByEndPoint(new I2CEndPoint(bus, address));
 		if (lcd == null) {
-			lcd = LcdFactory.createLCD(bus, address);
+			try {
+				lcd = LcdFactory.createLCD(bus, address);
+				// Note that we cannot catch hardware specific exceptions here,
+				// since they will be loaded when we run as mocked.
+			} catch (Exception e) {
+				throw new IOException(e);
+			}
 			I2CRegistry.registerI2CDevice(lcd, new I2CEndPoint(bus, address));
 		}
 		return (AdafruitLcd) lcd;
-	}
-
-	@Override
-	public void initialize(Configuration configuration) throws Exception {
-		super.initialize(configuration);
-		lcd = getLCD(getBus(), getAddress());
-		setState(LifecycleState.INITIALIZED);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -121,6 +119,16 @@ public class AdafruitLcdUnit extends I2CRoboUnit<String> {
 		default:
 			SimpleLoggingUtil.error(getClass(), message.getType() + " not supported!");
 			break;
+		}
+	}
+
+	@Override
+	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		super.onInitialization(configuration);
+		try {
+			lcd = getLCD(getBus(), getAddress());
+		} catch (IOException e) {
+			throw new ConfigurationException("Could not initialize LCD", e);
 		}
 	}
 }

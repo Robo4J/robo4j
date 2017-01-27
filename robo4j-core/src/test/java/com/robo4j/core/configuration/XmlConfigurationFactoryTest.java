@@ -31,7 +31,7 @@ public class XmlConfigurationFactoryTest {
 		config.setString("firstString", "S1");
 		config.setString("secondString", "S2");
 		Configuration child = config.createChildConfiguration("child");
-		child.setInt("int", 1);
+		child.setInteger("int", 1);
 		child.setFloat("float", 1.0f);
 		String xml = XmlConfigurationFactory.toXml(config);
 		System.out.println(xml);

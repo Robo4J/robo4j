@@ -101,7 +101,7 @@ public class XmlConfigurationFactory {
 				currentConfig.setString(currentName, currentValue);
 				break;
 			case TYPE_INT:
-				currentConfig.setInt(currentName, Integer.parseInt(currentValue));
+				currentConfig.setInteger(currentName, Integer.parseInt(currentValue));
 				break;
 			case TYPE_FLOAT:
 				currentConfig.setFloat(currentName, Float.parseFloat(currentValue));
@@ -157,7 +157,7 @@ public class XmlConfigurationFactory {
 		String indent = getIndentation(level);
 		builder.append(String.format("%s<%s %s=\"%s\">\n", indent, ELEMENT_CONFIG, ATTRIBUTE_NAME, name));
 		for (String valueName : configuration.getValueNames()) {
-			writeValue(builder, valueName, configuration.getValue(valueName), level + 1);
+			writeValue(builder, valueName, configuration.getValue(valueName, null), level + 1);
 		}
 		for (String childName : configuration.getChildNames()) {
 			write(builder, configuration.getChildConfiguration(childName), childName, level + 1);

@@ -46,18 +46,19 @@ class DefaultConfiguration implements Configuration {
 	}
 
 	@Override
-	public double getDouble(String name) {
-		return (double) settings.get(name);
+	public Double getDouble(String name, Double defaultValue) {
+		return (Double) getVal(name, defaultValue);
+	}
+
+
+	@Override
+	public Long getLong(String name, Long defaultValue ) {
+		return (Long) getVal(name, defaultValue);	
 	}
 
 	@Override
-	public long getLong(String name) {
-		return (long) settings.get(name);
-	}
-
-	@Override
-	public String getString(String name) {
-		return (String) settings.get(name);
+	public String getString(String name, String defaultValue) {
+		return (String) getVal(name, defaultValue);	
 	}
 
 	@Override
@@ -66,33 +67,33 @@ class DefaultConfiguration implements Configuration {
 	}
 
 	@Override
-	public void setLong(String name, long l) {
+	public void setLong(String name, Long l) {
 		settings.put(name, l);
 	}
 
 	@Override
-	public void setDouble(String name, double d) {
+	public void setDouble(String name, Double d) {
 		settings.put(name, d);
 	}
 
 	@Override
-	public void setInt(String name, int i) {
+	public void setInteger(String name, Integer i) {
 		settings.put(name, i);
 	}
 
 	@Override
-	public void setFloat(String name, float f) {
+	public void setFloat(String name, Float f) {
 		settings.put(name, f);
 	}
 
 	@Override
-	public int getInt(String name) {
-		return (int) settings.get(name);
+	public Integer getInteger(String name, Integer defaultValue) {
+		return (Integer) getVal(name, defaultValue);	
 	}
 
 	@Override
-	public float getFloat(String name) {
-		return (float) settings.get(name);
+	public Float getFloat(String name, Float defaultValue ) {
+		return (Float) getVal(name, defaultValue);
 	}
 
 	@Override
@@ -106,17 +107,17 @@ class DefaultConfiguration implements Configuration {
 	}
 
 	@Override
-	public Object getValue(String name) {
-		return settings.get(name);
+	public Object getValue(String name, Object defaultValue) {
+		return getVal(name, defaultValue);
 	}
 
 	@Override
-	public boolean getBoolean(String name) {
-		return (boolean) settings.get(name);
+	public Boolean getBoolean(String name, Boolean defaultValue) {
+		return (Boolean) getVal(name, defaultValue);
 	}
 
 	@Override
-	public void setBoolean(String name, boolean b) {
+	public void setBoolean(String name, Boolean b) {
 		settings.put(name, b);
 	}
 
@@ -151,4 +152,11 @@ class DefaultConfiguration implements Configuration {
 		return true;
 	}
 
+	private Object getVal(String name, Object defaultValue) {
+		Object val = settings.get(name);
+		if (val == null) {
+			return defaultValue;
+		}
+		return val;
+	}
 }

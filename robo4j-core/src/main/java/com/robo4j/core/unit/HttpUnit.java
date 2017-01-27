@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
@@ -44,22 +45,14 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
  * @since 24.01.2017
  */
 public class HttpUnit extends RoboUnit<Object> {
-
+	private static final int _DEFAULT_PORT = 8042;
 	private Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
-	private int port;
+	private Integer port;
 	private String target;
 	private ExecutorService executor;
 
 	public HttpUnit(RoboContext context, String id) {
 		super(context, id);
-	}
-
-	@Override
-	public void initialize(Configuration configuration) throws Exception {
-		target = configuration.getString("target");
-		port = configuration.getInt("port");
-		executor = Executors.newCachedThreadPool();
-		super.initialize(configuration);
 	}
 
 	@Override
@@ -86,6 +79,16 @@ public class HttpUnit extends RoboUnit<Object> {
 		} catch (InterruptedException | ExecutionException | IOException e) {
 			SimpleLoggingUtil.print(getClass(), "SERVER CLOSED");
 		}
+	}
+
+	@Override
+	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		target = configuration.getString("target", null);
+		port = configuration.getInteger("port", _DEFAULT_PORT);
+		if (target == null) {
+			throw ConfigurationException.createMissingConfigNameException("target");
+		}
+		executor = Executors.newCachedThreadPool();
 	}
 
 }

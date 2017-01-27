@@ -31,19 +31,19 @@ public interface Configuration {
 
 	Set<String> getChildNames();
 
-	boolean getBoolean(String name);
-	double getDouble(String name);
-	float getFloat(String string);
-	int getInt(String string);
-	long getLong(String name);
-	String getString(String name);
-	Object getValue(String name);
+	Boolean getBoolean(String name, Boolean defaultValue);
+	Double getDouble(String name, Double defaultValue);
+	Float getFloat(String string, Float defaultValue);
+	Integer getInteger(String string, Integer defaultValue);
+	Long getLong(String name, Long defaultValue);
+	String getString(String name, String defaultValue);
+	Object getValue(String name, Object defaultValue);
 	
 	Set<String> getValueNames();
-	void setBoolean(String name, boolean b);
-	void setDouble(String string, double d);
-	void setFloat(String string, float f);
-	void setInt(String string, int i);
-	void setLong(String string, long l);
+	void setBoolean(String name, Boolean b);
+	void setDouble(String string, Double d);
+	void setFloat(String string, Float f);
+	void setInteger(String string, Integer i);
+	void setLong(String string, Long l);
 	void setString(String string, String s);
 }
