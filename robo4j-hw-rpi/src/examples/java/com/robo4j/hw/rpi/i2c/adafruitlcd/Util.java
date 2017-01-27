@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2017. Miroslav Wengner, Marcus Hirt
+ * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
  * This Util.java  is part of robo4j.
  * module: robo4j-hw-rpi
  *
@@ -19,6 +19,12 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
+/**
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
+ */
 public class Util {
 	static void sleep(int sleep) {
 		try {

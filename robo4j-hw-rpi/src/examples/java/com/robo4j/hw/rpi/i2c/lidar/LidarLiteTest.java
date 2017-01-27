@@ -26,7 +26,9 @@ import com.robo4j.hw.rpi.i2c.lidar.LidarLiteDevice;
  * This example will repeatedly acquire the range with the LidarLite. Good for
  * testing that it works.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public class LidarLiteTest {
 	public static void main(String[] args) throws IOException, InterruptedException {

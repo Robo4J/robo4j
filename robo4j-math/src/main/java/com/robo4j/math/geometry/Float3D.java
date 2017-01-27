@@ -19,7 +19,9 @@ package com.robo4j.math.geometry;
 /**
  * 3D vector of floats.
  *  
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public class Float3D {
 	public float x;

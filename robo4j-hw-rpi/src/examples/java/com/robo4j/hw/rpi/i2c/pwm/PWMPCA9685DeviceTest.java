@@ -30,7 +30,9 @@ import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
  * 
  * ___DO NOT RUN THIS EXAMPLE WITH SERVOS ON CHANNEL 2 and 3!___ 
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public class PWMPCA9685DeviceTest {
 	// The internetz says 50Hz is the standard PWM frequency for operating RC servos.  

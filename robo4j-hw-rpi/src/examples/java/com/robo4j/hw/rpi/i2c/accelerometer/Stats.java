@@ -25,7 +25,9 @@ import com.robo4j.math.geometry.Float3D;
 /**
  * Helper class for gathering stats.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 06.03.2016
  */
 public class Stats {
 	private Float3D min = new Float3D();

@@ -27,7 +27,9 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd.Direction;
  * Scrolls the view area back and forth a few times. Check out the documentation
  * for the HD44780 for more info on how the tiny (DDRAM) buffer is handled.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public class ScrollDemo implements LCDDemo {
 

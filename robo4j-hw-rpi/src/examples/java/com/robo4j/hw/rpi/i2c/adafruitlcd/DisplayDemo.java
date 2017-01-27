@@ -23,7 +23,9 @@ import java.io.IOException;
 /**
  * Simply turns off and on the display a few times.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public class DisplayDemo implements LCDDemo {
 

@@ -26,7 +26,9 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
  * Tests autoscroll. Check out the documentation for the HD44780 for more info
  * on how the buffer is handled.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 06.03.2016
  */
 public class AutoScrollDemo implements LCDDemo {
 

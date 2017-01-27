@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 /**
  *
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 11.06.2016
  */

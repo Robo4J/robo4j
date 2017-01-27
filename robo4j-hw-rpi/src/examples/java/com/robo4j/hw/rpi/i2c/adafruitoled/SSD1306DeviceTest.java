@@ -36,7 +36,9 @@ import com.robo4j.hw.rpi.i2c.adafruitoled.SSD1306Device.OLEDVariant;
  * Example which prints Hello World and draws a little. It also shows the image
  * in a JFrame, so that it is easy to know what to expect.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public class SSD1306DeviceTest {
 	public static void main(String[] args) throws IOException {

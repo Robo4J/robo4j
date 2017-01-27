@@ -22,7 +22,9 @@ import java.io.IOException;
 /**
  * This one really doesn't anything but clean up and exit.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public class ExitDemo implements LCDDemo {
 

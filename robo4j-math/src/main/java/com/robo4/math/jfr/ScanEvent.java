@@ -24,7 +24,9 @@ import com.oracle.jrockit.jfr.ValueDefinition;
 /**
  * The JFR event definition for a full scan event.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 @SuppressWarnings("deprecation")
 @EventDefinition(path = "robo4j/overview/scanevent", name = "Scan", description = "An event for a full scan.", stacktrace = false, thread = true) 

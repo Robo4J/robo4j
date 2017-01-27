@@ -27,7 +27,9 @@ import com.robo4j.hw.rpi.i2c.gyro.GyroL3GD20Device.Sensitivity;
  * Simple example which repeatedly reads the gyro. Good for checking that your
  * gyro is working.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public class GyroL3GD20Test {
 

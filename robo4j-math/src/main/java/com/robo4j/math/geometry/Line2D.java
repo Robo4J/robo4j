@@ -19,7 +19,9 @@ package com.robo4j.math.geometry;
 /**
  * A line in two dimensions.
  *  
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public class Line2D {
 	private final Point2D p1;

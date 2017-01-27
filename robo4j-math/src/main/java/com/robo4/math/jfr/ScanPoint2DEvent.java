@@ -27,7 +27,9 @@ import com.robo4j.math.geometry.Point2D;
  * FIXME(Marcus/Jan 13, 2017): When we start supporting JDK 9, we will simply have a multiversion JAR with
  * overrides.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 @EventDefinition(path = "robo4j/scan/scanpoint2d", name = "Scan Point 2D", description = "An instant event for a scanned point relative to the robot.", stacktrace = false, thread = true)
 @SuppressWarnings("deprecation")

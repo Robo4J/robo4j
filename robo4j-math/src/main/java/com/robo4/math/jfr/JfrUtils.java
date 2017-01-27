@@ -29,7 +29,9 @@ import com.oracle.jrockit.jfr.Producer;
 /**
  * Toolkit with helper methods for JDK7 and 8.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 @SuppressWarnings({ "deprecation" })
 public class JfrUtils {

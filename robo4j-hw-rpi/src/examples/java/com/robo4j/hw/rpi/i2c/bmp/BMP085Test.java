@@ -27,7 +27,9 @@ import com.robo4j.hw.rpi.i2c.bmp.BMP085Device.OperatingMode;
  * Repeatedly reads and displays the temperature (in C), pressure (in hPa) and
  * barometric altitude (in m). Good example to test that your BMP device is working.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public class BMP085Test {
 	public static void main(String[] args) throws IOException, InterruptedException {

@@ -20,7 +20,9 @@ import java.util.List;
 /**
  * The results from a 2D scan.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public interface ScanResult2D {
 	List<Point2D> getPoints();

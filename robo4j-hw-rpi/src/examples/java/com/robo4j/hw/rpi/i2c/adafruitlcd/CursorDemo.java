@@ -25,7 +25,9 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 /**
  * Plays around with the cursor a bit.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  *
  */
 public class CursorDemo implements LCDDemo {

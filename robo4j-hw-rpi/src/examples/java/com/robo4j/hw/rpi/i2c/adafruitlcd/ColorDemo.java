@@ -28,6 +28,8 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
  * so I really can't tell if this works. :)
  * 
  * @author Marcus Hirt
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public class ColorDemo implements LCDDemo {
 

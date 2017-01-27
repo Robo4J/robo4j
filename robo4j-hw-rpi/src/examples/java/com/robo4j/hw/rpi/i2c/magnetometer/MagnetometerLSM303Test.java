@@ -25,7 +25,9 @@ import com.robo4j.math.geometry.Float3D;
 /**
  * Sanity check every 500ms to see that data is being retrieved.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public class MagnetometerLSM303Test {
 	// FIXME(Marcus/Dec 5, 2016): Verify that this one works.

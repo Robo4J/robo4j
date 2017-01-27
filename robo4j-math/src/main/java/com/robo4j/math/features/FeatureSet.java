@@ -24,7 +24,9 @@ import com.robo4j.math.geometry.Line2D;
 /**
  * The features found when doing a feature extraction pass.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public class FeatureSet {
 	private final List<Line2D> lines;

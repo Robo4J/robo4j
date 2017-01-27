@@ -32,7 +32,9 @@ import com.robo4j.math.geometry.ScanResult2D;
  * FIXME(Marcus/Jan 13, 2017): Will open source the JMC 5.5 plug-in for
  * visualizing these.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public class ScanResultImpl implements ScanResult2D {
 	private static final PointComparator POINT_COMPARATOR = new PointComparator();

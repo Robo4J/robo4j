@@ -28,7 +28,9 @@ import com.robo4j.hw.rpi.serial.gps.VelocityEvent;
 /**
  * Listens for GPS event and prints them to stdout as they come.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ * @since 04.01.2017
  */
 public class GPSTest {
 	public static void main(String[] args) throws InterruptedException, IOException {
