@@ -23,13 +23,17 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  * @since 18.10.2016
  */
 public enum RequestType {
 
 	// @formatter:off
-	NONE(0, "none"), HTTP(1, "http"), RAW(2, "raw"),;
+	NONE	(0, "none"),
+	HTTP	(1, "http"),
+	RAW(2, "raw"),
+	;
 	private volatile static Map<String, RequestType> defNameToTypeMapping;
 	// @formatter:on
 	private int code;
