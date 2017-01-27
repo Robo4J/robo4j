@@ -17,13 +17,13 @@
 package com.robo4j.units.rpi.lcd;
 
 import java.io.IOException;
-import java.util.Map;
 
 import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
-import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboResult;
+import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.unit.RoboUnit;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.LcdFactory;
@@ -39,7 +39,7 @@ import com.robo4j.units.rpi.I2CRegistry;
  * @since 17.12.2016
  *
  */
-public class AdafruitLcdUnit extends RoboUnit<String> {
+public class AdafruitLcdUnit extends I2CRoboUnit<String> {
 	private AdafruitLcd lcd;
 
 	public AdafruitLcdUnit(RoboContext context, String id) {
@@ -56,11 +56,9 @@ public class AdafruitLcdUnit extends RoboUnit<String> {
 	}
 
 	@Override
-	public void initialize(Map<String, String> properties) throws Exception {
-		int bus = Integer.parseInt(properties.get("bus"));
-		int address = Integer.parseInt(properties.get("address"));
-
-		lcd = getLCD(bus, address);
+	public void initialize(Configuration configuration) throws Exception {
+		super.initialize(configuration);
+		lcd = getLCD(getBus(), getAddress());
 		setState(LifecycleState.INITIALIZED);
 	}
 

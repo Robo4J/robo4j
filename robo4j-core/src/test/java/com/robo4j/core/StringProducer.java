@@ -16,9 +16,8 @@
  */
 package com.robo4j.core;
 
+import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.unit.RoboUnit;
-
-import java.util.Map;
 
 /**
  * 
@@ -52,8 +51,8 @@ public class StringProducer extends RoboUnit<String> {
 	}
 
 	@Override
-	public void initialize(Map<String, String> properties) throws Exception {
-		target = properties.get("target");
+	public void initialize(Configuration configuration) throws Exception {
+		target = configuration.getString("target");
 		setState(LifecycleState.INITIALIZED);
 	}
 }

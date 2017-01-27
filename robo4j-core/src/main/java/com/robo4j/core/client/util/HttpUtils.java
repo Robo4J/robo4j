@@ -41,16 +41,7 @@ public final class HttpUtils {
 	public static final String HTTP_HEADER_OK = "HTTP/1.0 200 OK";
 	public static final String HTTP_HEADER_NOT = "HTTP/1.0 501 Not Implemented";
 	public static final String HTTP_HEADER_NOT_ALLOWED = "HTTP/1.0 405 Method Not Allowed";
-	/* command represent command line order */
-	private static final String HTTP_COMMAND = "command";
-	/* commands represent list of commands */
-	private static final String HTTP_COMMANDS = "commands";
-	private static final String HTTP_UNITS = "units";
-	private static final String HTTP_GENERAL = "general";
-
-	private static final String HTTP_REQUEST_VALUE = "value";
 	private static final String NEXT_LINE = "\r\n";
-	private static final int POST_COMMAND_SEP = 2;
 
 	public static String setHeader(String responseCode, int length) throws IOException {
 		return new StringBuilder(ConstantUtil.EMPTY_STRING).append(responseCode).append(NEXT_LINE).append("Date: ")
@@ -71,6 +62,5 @@ public final class HttpUtils {
 				.collect(Collectors.toMap(RoboBasicMapEntry::getKey, RoboBasicMapEntry::getValue));
 		//@formatter:on
 	}
-
 
 }

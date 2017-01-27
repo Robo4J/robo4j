@@ -14,30 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
+package com.robo4j.core.configuration;
+
+import java.util.Set;
 
 /**
- * Reference to a RoboUnit.
- *
+ * The configuration for a RoboUnit.
+ * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-import java.util.concurrent.Future;
+public interface Configuration {
+	Configuration createChildConfiguration(String name);
+	Configuration getChildConfiguration(String name);
 
-import com.robo4j.core.configuration.Configuration;
+	Set<String> getChildNames();
 
-public interface RoboReference<T> {
-	/**
-	 * Sends a message to this RoboUnit.
-	 * 
-	 * @param message
-	 *            the message to send.
-	 * @return the RoboUnit specific response.
-	 */
-	<R> Future<RoboResult<T, R>> sendMessage(Object message);
+	boolean getBoolean(String name);
+	double getDouble(String name);
+	float getFloat(String string);
+	int getInt(String string);
+	long getLong(String name);
+	String getString(String name);
+	Object getValue(String name);
 	
-	/**
-	 * FIXME: This will have to change!
-	 */
-	Configuration getConfiguration();
+	Set<String> getValueNames();
+	void setBoolean(String name, boolean b);
+	void setDouble(String string, double d);
+	void setFloat(String string, float f);
+	void setInt(String string, int i);
+	void setLong(String string, long l);
+	void setString(String string, String s);
 }

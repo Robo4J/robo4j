@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -30,12 +29,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import com.robo4j.core.unit.RoboUnit;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.configuration.XmlConfigurationFactory;
 import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.unit.RoboUnit;
 
 /**
  * Builds a RoboSystem from various different sources.
@@ -47,16 +48,12 @@ public final class RoboBuilder {
 	private final Set<RoboUnit<?>> units = new HashSet<>();
 	private final RoboSystem system = new RoboSystem();
 
-	// FIXME(Marcus/Jan 22, 2017): Move to memento style typed property trees
-	// and clean up parsing.
-	// TODO, FIXME : move away the internal class
 	private class RoboXMLHandler extends DefaultHandler {
 		private String currentId = "";
 		private String currentClassName = "";
-		private Map<String, String> currentProperties;
-		private String currentKey = "";
-		private String currentValue = "";
+		private String currentConfiguration = "";
 		private String lastElement = "";
+		private boolean configState = false;
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes)
@@ -65,17 +62,26 @@ public final class RoboBuilder {
 			case "roboUnit":
 				currentId = attributes.getValue("id");
 				break;
-			case "properties":
-				currentProperties = new HashMap<>();
+			case XmlConfigurationFactory.ELEMENT_CONFIG:
+				currentConfiguration = "";
+				configState = true;
 				break;
 			}
 			lastElement = qName;
+			if (configState) {
+				currentConfiguration += String.format("<%s %s>", qName, toString(attributes));
+			}
+		}
+
+		private Object toString(Attributes attributes) {
+			return String.format("%s=\"%s\" %s=\"%s\"", XmlConfigurationFactory.ATTRIBUTE_NAME,
+					attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_NAME), XmlConfigurationFactory.ATTRIBUTE_TYPE,
+					attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_TYPE));
 		}
 
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
-			switch (qName) {
-			case "roboUnit":
+			if (qName.equals("roboUnit")) {
 				if (!verifyUnit()) {
 					clearCurrentVariables();
 				} else {
@@ -84,44 +90,26 @@ public final class RoboBuilder {
 						@SuppressWarnings("unchecked")
 						Class<RoboUnit<?>> roboUnitClass = (Class<RoboUnit<?>>) Thread.currentThread()
 								.getContextClassLoader().loadClass(currentClassName.trim());
-						internalAddUnit(instantiateAndInitialize(roboUnitClass, currentId.trim(), currentProperties));
+						Configuration config = currentConfiguration.trim().equals("") ? null
+								: XmlConfigurationFactory.fromXml(currentConfiguration);
+						internalAddUnit(instantiateAndInitialize(roboUnitClass, currentId.trim(), config));
 					} catch (Exception e) {
 						throw new SAXException("Failed to parse robo unit", e);
 					}
 					clearCurrentVariables();
 				}
-				break;
-			case "property":
-				if (!validateProperty()) {
-					clearCurrentProperty();
-				} else {
-					currentProperties.put(currentKey.trim(), currentValue.trim());
-				}
-				clearCurrentProperty();
+				configState = false;
 			}
-		}
-
-		private boolean validateProperty() {
-			if (currentKey.isEmpty()) {
-				SimpleLoggingUtil.error(getClass(), "Error parsing unit property, no key. ID=" + currentId);
-				return false;
-			} else if (currentValue.isEmpty()) {
-				SimpleLoggingUtil.error(getClass(), "Error parsing unit property, no value. ID=" + currentId);
-				return false;
+			if (configState) {
+				currentConfiguration += String.format("</%s>", qName);
 			}
-			return true;
 		}
 
 		private void clearCurrentVariables() {
 			currentId = "";
 			currentClassName = "";
-			currentProperties = null;
-			clearCurrentProperty();
-		}
-
-		public void clearCurrentProperty() {
-			currentKey = "";
-			currentValue = "";
+			currentConfiguration = null;
+			currentConfiguration = "";
 		}
 
 		private boolean verifyUnit() {
@@ -137,14 +125,14 @@ public final class RoboBuilder {
 
 		@Override
 		public void characters(char[] ch, int start, int length) throws SAXException {
+			if (configState) {
+				currentConfiguration += toString(ch, start, length);
+			}
 			// NOTE(Marcus/Jan 22, 2017): Seems these can be called repeatedly
 			// for a single text() node.
 			switch (lastElement) {
-			case "key":
-				currentKey += toString(ch, start, length);
-				break;
-			case "value":
-				currentValue += toString(ch, start, length);
+			case XmlConfigurationFactory.ELEMENT_CONFIG:
+				currentConfiguration += toString(ch, start, length);
 				break;
 			case "class":
 				currentClassName += toString(ch, start, length);
@@ -157,7 +145,6 @@ public final class RoboBuilder {
 		private String toString(char[] data, int offset, int count) {
 			return String.valueOf(data, offset, count);
 		}
-
 	}
 
 	/**
@@ -176,7 +163,7 @@ public final class RoboBuilder {
 		internalAddUnit(unit);
 		return this;
 	}
-	
+
 	/**
 	 * Instantiates a RoboUnit from the provided class using the provided id and
 	 * adds it. No initialization ({@link RoboUnit#initialize(Map)} will take
@@ -196,19 +183,20 @@ public final class RoboBuilder {
 	}
 
 	/**
-	 * Instantiates a RoboUnit from the provided class using the provided id, initializes it and
-	 * adds it. 
+	 * Instantiates a RoboUnit from the provided class using the provided id,
+	 * initializes it and adds it.
 	 * 
 	 * @param clazz
 	 *            the class to use.
 	 * @param id
-	 *            the id for the instatiated RoboUnit.
+	 *            the id for the instantiated RoboUnit.
 	 * @return the builder, for chaining.
 	 * @throws RoboBuilderException
 	 *             if the creation or adding of the unit failed.
 	 */
-	public RoboBuilder add(Class<RoboUnit<?>> clazz, Map<String, String> properties, String id) throws RoboBuilderException {
-		internalAddUnit(instantiateAndInitialize(clazz, id,  properties));
+	public RoboBuilder add(Class<RoboUnit<?>> clazz, Configuration configuration, String id)
+			throws RoboBuilderException {
+		internalAddUnit(instantiateAndInitialize(clazz, id, configuration));
 		return this;
 	}
 
@@ -242,7 +230,7 @@ public final class RoboBuilder {
 		}
 		return this;
 	}
-	
+
 	// FIXME(Marcus/Jan 22, 2017): Implement.
 	public RoboBuilder add(ClassLoader loader) throws RoboBuilderException {
 		throw new UnsupportedOperationException("Not yet supported");
@@ -262,7 +250,7 @@ public final class RoboBuilder {
 		}
 		units.add(unit);
 	}
-		
+
 	private RoboUnit<?> instantiateRoboUnit(Class<RoboUnit<?>> clazz, String id) throws RoboBuilderException {
 		try {
 			Constructor<RoboUnit<?>> constructor = clazz.getConstructor(RoboContext.class, String.class);
@@ -272,13 +260,13 @@ public final class RoboBuilder {
 			throw new RoboBuilderException("Could not instantiate robo unit.", e);
 		}
 	}
-	
-	private RoboUnit<?> instantiateAndInitialize(Class<RoboUnit<?>> clazz, String id, Map<String, String> properties)
+
+	private RoboUnit<?> instantiateAndInitialize(Class<RoboUnit<?>> clazz, String id, Configuration configuration)
 			throws RoboBuilderException {
 		RoboUnit<?> unit = instantiateRoboUnit(clazz, id);
-		if (properties != null && !properties.isEmpty()) {
+		if (configuration != null) {
 			try {
-				unit.initialize(properties);
+				unit.initialize(configuration);
 			} catch (Exception e) {
 				throw new RoboBuilderException("Error initializing RoboUnit", e);
 			}

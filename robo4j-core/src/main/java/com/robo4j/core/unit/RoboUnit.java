@@ -19,16 +19,16 @@
 
 package com.robo4j.core.unit;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.Future;
+
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboResult;
 import com.robo4j.core.RoboSystem;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.Future;
+import com.robo4j.core.configuration.Configuration;
 
 /**
  * The core component. Subclass this to provide a messaging capable agent for a
@@ -42,8 +42,8 @@ public class RoboUnit<T> implements RoboReference<T> {
 	private final String id;
 	private volatile LifecycleState state = LifecycleState.UNINITIALIZED;
 	private RoboReference<T> reference;
-	private Map<String, String> configuration;
-	
+	private Configuration configuration;
+
 	/**
 	 * Either provide id up front
 	 */
@@ -51,7 +51,7 @@ public class RoboUnit<T> implements RoboReference<T> {
 		this.context = context;
 		this.id = id;
 		if (context instanceof RoboSystem) {
-			reference = ((RoboSystem)context).getReference(this);
+			reference = ((RoboSystem) context).getReference(this);
 		}
 	}
 
@@ -75,12 +75,12 @@ public class RoboUnit<T> implements RoboReference<T> {
 		return null;
 	}
 
-	public void initialize(Map<String, String> properties) throws Exception {
-		setConfiguration(properties);
+	public void initialize(Configuration configuration) throws Exception {
+		setConfiguration(configuration);
 		setState(LifecycleState.INITIALIZED);
 	}
 
-	protected void setConfiguration(Map<String, String> configuration) {
+	protected void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
 	}
 
@@ -148,14 +148,9 @@ public class RoboUnit<T> implements RoboReference<T> {
 		this.state = state;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
-	public String toString() {
-		return String.format("%s [id=%s]", getClass().getName(), getId());
+	public Configuration getConfiguration() {
+		return configuration;
 	}
 
 	@Override
@@ -185,17 +180,22 @@ public class RoboUnit<T> implements RoboReference<T> {
 	public <R> Future<RoboResult<T, R>> sendMessage(Object message) {
 		return reference.sendMessage(message);
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return String.format("%s [id=%s]", getClass().getName(), getId());
+	}
+
 	public RoboReference<T> internalGetReference() {
 		if (reference == null) {
 			return getContext().getReference(getId());
 		} else {
 			return reference;
 		}
-	}
-
-	@Override
-	public Map<String, String> getConfiguration() {
-		return configuration;
 	}
 }

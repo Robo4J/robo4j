@@ -19,23 +19,23 @@
 
 package com.robo4j.core.unit;
 
-import com.robo4j.core.LifecycleState;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.client.request.RoboRequestCallable;
-import com.robo4j.core.client.request.RoboRequestFactory;
-import com.robo4j.core.logging.SimpleLoggingUtil;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.EnumSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import com.robo4j.core.LifecycleState;
+import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboReference;
+import com.robo4j.core.client.request.RoboRequestCallable;
+import com.robo4j.core.client.request.RoboRequestFactory;
+import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -44,48 +44,47 @@ import java.util.concurrent.Future;
  */
 public class HttpUnit extends RoboUnit<Object> {
 
-    private Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
-    private int port;
-    private String target;
-    private ExecutorService executor;
+	private Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
+	private int port;
+	private String target;
+	private ExecutorService executor;
 
-    public HttpUnit(RoboContext context, String id){
-        super(context, id);
-    }
+	public HttpUnit(RoboContext context, String id) {
+		super(context, id);
+	}
 
-    @Override
-    public void initialize(Map<String, String> properties) throws Exception {
-        target = properties.get("target");
-        port = Integer.valueOf(properties.get("port"));
-        executor = Executors.newCachedThreadPool();
-        super.initialize(properties);
-    }
+	@Override
+	public void initialize(Configuration configuration) throws Exception {
+		target = configuration.getString("target");
+		port = configuration.getInt("port");
+		executor = Executors.newCachedThreadPool();
+		super.initialize(configuration);
+	}
 
-    @Override
-    public void start(){
-        setState(LifecycleState.STARTING);
-        final RoboReference<String> targetRef = getContext().getReference(target);
-        executor.execute(() -> server(targetRef));
-        setState(LifecycleState.STARTED);
+	@Override
+	public void start() {
+		setState(LifecycleState.STARTING);
+		final RoboReference<String> targetRef = getContext().getReference(target);
+		executor.execute(() -> server(targetRef));
+		setState(LifecycleState.STARTED);
 
-    }
+	}
 
-    //Private Methods
-    private void server(final RoboReference<String> targetRef){
-        try (ServerSocket server = new ServerSocket(port)) {
-            setState(LifecycleState.STARTED);
-            SimpleLoggingUtil.debug(getClass(), "started port: " + port);
-            while (activeStates.contains(getState())) {
-                Socket request = server.accept();
-                Future<String> result = executor.submit(new RoboRequestCallable(request, new RoboRequestFactory()));
-                SimpleLoggingUtil.debug(getClass(), "RESULT result: " + result.get());
-                targetRef.sendMessage(result.get());
-            }
-            setState(LifecycleState.STOPPED);
-        } catch (InterruptedException | ExecutionException | IOException e) {
-            SimpleLoggingUtil.print(getClass(), "SERVER CLOSED");
-        }
-    }
-
+	// Private Methods
+	private void server(final RoboReference<String> targetRef) {
+		try (ServerSocket server = new ServerSocket(port)) {
+			setState(LifecycleState.STARTED);
+			SimpleLoggingUtil.debug(getClass(), "started port: " + port);
+			while (activeStates.contains(getState())) {
+				Socket request = server.accept();
+				Future<String> result = executor.submit(new RoboRequestCallable(request, new RoboRequestFactory()));
+				SimpleLoggingUtil.debug(getClass(), "RESULT result: " + result.get());
+				targetRef.sendMessage(result.get());
+			}
+			setState(LifecycleState.STOPPED);
+		} catch (InterruptedException | ExecutionException | IOException e) {
+			SimpleLoggingUtil.print(getClass(), "SERVER CLOSED");
+		}
+	}
 
 }

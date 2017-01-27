@@ -14,30 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
+package com.robo4j.core.configuration;
 
 /**
- * Reference to a RoboUnit.
- *
+ * Factory for creating empty configurations.
+ * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-import java.util.concurrent.Future;
-
-import com.robo4j.core.configuration.Configuration;
-
-public interface RoboReference<T> {
-	/**
-	 * Sends a message to this RoboUnit.
-	 * 
-	 * @param message
-	 *            the message to send.
-	 * @return the RoboUnit specific response.
-	 */
-	<R> Future<RoboResult<T, R>> sendMessage(Object message);
-	
-	/**
-	 * FIXME: This will have to change!
-	 */
-	Configuration getConfiguration();
+public class ConfigurationFactory {
+	public static Configuration createEmptyConfiguration() {
+		return new DefaultConfiguration();
+	}
 }

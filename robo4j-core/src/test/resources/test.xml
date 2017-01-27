@@ -2,17 +2,12 @@
 <robo4j>
 	<roboUnit id="producer">
 		<class>com.robo4j.core.StringProducer</class>
-		<properties>
-			<property>
-				<key>target</key>
-				<value>consumer</value>
-			</property>
-		</properties>
+		<config name="com.robo4j.core.root">
+			<value name="target" type="String">consumer</value>
+		</config>
 	</roboUnit>
 
 	<roboUnit id="consumer">
 		<class>com.robo4j.core.StringConsumer</class>
-		<properties>
-		</properties>
 	</roboUnit>
 </robo4j>

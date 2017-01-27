@@ -19,17 +19,17 @@
 package com.robo4j.units.rpi.lcd;
 
 import java.io.IOException;
-import java.util.Map;
 
-import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
+import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.unit.RoboUnit;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Button;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonListener;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonPressedObserver;
-import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 
 /**
  * A {@link RoboUnit} for the button part of the Adafruit 16x2 character LCD
@@ -40,8 +40,7 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
  * @author Miroslav Wengner (@miragemiko)
  * @since 17.12.2016
  */
-public class ButtonUnit extends RoboUnit<Object> {
-
+public class ButtonUnit extends I2CRoboUnit<Object> {
 	private AdafruitLcd lcd;
 	private ButtonPressedObserver observer;
 	private String target;
@@ -52,11 +51,10 @@ public class ButtonUnit extends RoboUnit<Object> {
 	}
 
 	@Override
-	public void initialize(Map<String, String> properties) throws Exception {
-		int bus = Integer.parseInt(properties.get("bus"));
-		int address = Integer.parseInt(properties.get("address"));
-		target = properties.get("target");
-		lcd = AdafruitLcdUnit.getLCD(bus, address);
+	public void initialize(Configuration configuration) throws Exception {
+		super.initialize(configuration);
+		target = configuration.getString("target");
+		lcd = AdafruitLcdUnit.getLCD(getBus(), getAddress());
 		setState(LifecycleState.INITIALIZED);
 	}
 

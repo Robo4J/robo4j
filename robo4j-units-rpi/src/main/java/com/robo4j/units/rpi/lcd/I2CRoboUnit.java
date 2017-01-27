@@ -16,10 +16,8 @@
  */
 package com.robo4j.units.rpi.lcd;
 
-import java.util.Map;
-
-import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
+import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.unit.RoboUnit;
 
 /**
@@ -45,10 +43,9 @@ public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
 	}
 
 	@Override
-	public void initialize(Map<String, String> properties) throws Exception {
-		bus = Integer.parseInt(properties.get("bus"));
-		address = Integer.parseInt(properties.get("address"));
-		setState(LifecycleState.INITIALIZED);
+	public void initialize(Configuration configuration) throws Exception {
+		bus = configuration.getInt("bus");
+		address = configuration.getInt("address");
 	}
 
 	public int getAddress() {

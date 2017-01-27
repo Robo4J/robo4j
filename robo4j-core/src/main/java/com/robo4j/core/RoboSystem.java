@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import com.robo4j.core.concurrency.RoboThreadFactory;
+import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.unit.RoboUnit;
 
@@ -67,7 +68,7 @@ public class RoboSystem implements RoboContext {
 		}
 
 		@Override
-		public Map<String, String> getConfiguration() {
+		public Configuration getConfiguration() {
 			return unit.getConfiguration();
 		}
 	}

@@ -176,13 +176,11 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
 		TransferType result = transfer.poll();
 		try {
 			counter.incrementAndGet();
-			int awaitCycle = 0;
 			while (Objects.isNull(result) && active.get()) {
 				conditionTrans.await(awaitSeconds, TimeUnit.SECONDS);
 				lock.unlock();
 				result = super.take();
 				lock.lock();
-				awaitCycle++;
 				// System.out.println("TAKE HOLD CONSUMER awaitCycle= " +
 				// awaitCycle);
 			}
@@ -208,7 +206,6 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
 		lock.lock();
 		TransferType result = peekCommand();
 		try {
-			int awaitCycle = 0;
 			while (Objects.isNull(result) && active.get()) {
 				// conditionTrans.await(awaitSeconds, TimeUnit.SECONDS);
 				// System.out.println("PEEK HOLD CONSUMER start");
@@ -216,7 +213,6 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
 				lock.unlock();
 				result = peekCommand();
 				lock.lock();
-				awaitCycle++;
 				// System.out.println("PEEK HOLD CONSUMER awaitCycle= " +
 				// awaitCycle);
 			}
