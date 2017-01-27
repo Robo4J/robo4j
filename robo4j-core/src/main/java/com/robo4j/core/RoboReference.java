@@ -16,6 +16,10 @@
  */
 package com.robo4j.core;
 
+import java.util.concurrent.Future;
+
+import com.robo4j.core.configuration.Configuration;
+
 /**
  * Reference to a RoboUnit.
  *
@@ -23,10 +27,6 @@ package com.robo4j.core;
  * @author Miroslav Wengner (@miragemiko)
  * @since 09.01.2017
  */
-import java.util.concurrent.Future;
-
-import com.robo4j.core.configuration.Configuration;
-
 public interface RoboReference<T> {
 	/**
 	 * Sends a message to this RoboUnit.
@@ -38,7 +38,7 @@ public interface RoboReference<T> {
 	<R> Future<RoboResult<T, R>> sendMessage(Object message);
 	
 	/**
-	 * FIXME: This will have to change!
+	 * @return the configuration.
 	 */
 	Configuration getConfiguration();
 }
