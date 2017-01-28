@@ -33,13 +33,13 @@ import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.robotics.RegulatedMotor;
 
 /**
- * Provider is responsible for providing Engine
+ * Provider is responsible for providing Motor
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  * @since 26.11.2016
  */
-public final class LegoEngineProvider<Type extends LegoMotor> implements RegistryProvider<RegulatedMotor, Type> {
+public final class LegoMotorProvider<Type extends LegoMotor> implements RegistryProvider<RegulatedMotor, Type> {
 	private static final int DEFAULT_SPEED = 300;
 
 	@Override
