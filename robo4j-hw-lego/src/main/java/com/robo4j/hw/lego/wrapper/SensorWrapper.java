@@ -30,7 +30,7 @@ import lejos.hardware.sensor.BaseSensor;
  * @author Miro Wengner (@miragemiko)
  * @since 26.11.2016
  */
-public abstract class LegoSensorWrapper<Sensor extends BaseSensor> implements LegoSensor {
+public abstract class SensorWrapper<Sensor extends BaseSensor> implements LegoSensor {
 
 	protected Sensor sensor;
 	protected DigitalPortEnum port;

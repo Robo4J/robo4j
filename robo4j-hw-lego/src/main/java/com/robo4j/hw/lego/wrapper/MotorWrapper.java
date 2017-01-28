@@ -32,7 +32,7 @@ import lejos.robotics.RegulatedMotor;
  * @author Miro Wengner (@miragemiko)
  * @since 23.11.2016
  */
-public abstract class LegoMotorWrapper<Motor extends RegulatedMotor> implements LegoMotor {
+public abstract class MotorWrapper<Motor extends RegulatedMotor> implements LegoMotor {
 
 	protected Motor motor;
 	protected AnalogPortEnum port;

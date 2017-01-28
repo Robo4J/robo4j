@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 import com.robo4j.hw.lego.LegoException;
 import com.robo4j.hw.lego.LegoMotor;
-import com.robo4j.hw.lego.wrapper.LegoMotorWrapper;
+import com.robo4j.hw.lego.wrapper.MotorWrapper;
 
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
@@ -39,7 +39,7 @@ import lejos.robotics.RegulatedMotor;
  * @author Miro Wengner (@miragemiko)
  * @since 26.11.2016
  */
-public final class LegoMotorProvider<Type extends LegoMotor> implements RegistryProvider<RegulatedMotor, Type> {
+public final class MotorProvider<Type extends LegoMotor> implements RegistryProvider<RegulatedMotor, Type> {
 	private static final int DEFAULT_SPEED = 300;
 
 	@Override
@@ -68,9 +68,9 @@ public final class LegoMotorProvider<Type extends LegoMotor> implements Registry
 		return engines.entrySet().stream().peek(e -> {
 			LegoMotor le = e.getValue();
 			/* always instance of regulated motor */
-			if (le instanceof LegoMotorWrapper) {
-				RegulatedMotor rm = create((LegoMotorWrapper) le);
-				((LegoMotorWrapper) le).setMotor(rm);
+			if (le instanceof MotorWrapper) {
+				RegulatedMotor rm = create((MotorWrapper) le);
+				((MotorWrapper) le).setMotor(rm);
 			}
 		}).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
