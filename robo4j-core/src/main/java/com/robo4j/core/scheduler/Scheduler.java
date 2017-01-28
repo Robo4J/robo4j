@@ -73,5 +73,23 @@ public interface Scheduler {
 	 */
 	<T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval, TimeUnit unit,
 			int numberOfInvocations);
-
+	
+	/**
+	 * Schedules a message to the target. Will run the message until cancelled.
+	 * 
+	 * @param target
+	 *            the reference to schedule the reference to.
+	 * @param message
+	 *            the message to send.
+	 * @param delay
+	 *            the time to delay first execution
+	 * @param period
+	 *            the period between successive executions
+	 * @param unit
+	 *            the time unit of the initialDelay and period parameters
+	 * @return a ScheduledFuture representing pending completion of the task,
+	 *         and whose get() method will throw an exception upon completing
+	 *         the number of invocations.
+	 */
+	<T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval, TimeUnit unit);
 }

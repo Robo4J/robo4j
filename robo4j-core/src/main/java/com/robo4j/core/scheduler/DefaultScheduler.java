@@ -80,4 +80,16 @@ public class DefaultScheduler implements Scheduler {
 			FinalInvocationListener listener) {
 		return new ScheduledMessageWrapper<>(context, reference, numberOfInvocations, message, listener);
 	}
+
+	@Override
+	public <T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval,
+			TimeUnit unit) {
+		return executor.scheduleAtFixedRate(new Runnable() {
+			@Override
+			public void run() {
+				target.sendMessage(message);
+			}
+
+		}, delay, interval, unit);
+	}
 }
