@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This LegoMotor.java  is part of robo4j.
+ * This LegoSensor.java  is part of robo4j.
  * module: robo4j-hw-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -19,33 +19,21 @@
 
 package com.robo4j.hw.lego;
 
-import com.robo4j.hw.lego.enums.AnalogPortEnum;
-import com.robo4j.hw.lego.enums.MotorTypeEnum;
+
+import com.robo4j.hw.lego.enums.DigitalPortEnum;
+import com.robo4j.hw.lego.enums.SensorTypeEnum;
 
 /**
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 05.05.2016
+ * @since 26.06.2016
  */
-public interface LegoMotor {
+public interface LegoSensor {
 
-	AnalogPortEnum getPort();
+	DigitalPortEnum getPort();
 
-	MotorTypeEnum getMotorType();
+	SensorTypeEnum getSensorType();
 
-	void forward();
-
-	void backward();
-
-	void stop();
-
-	void rotate(int val);
-
-	boolean isMoving();
-
-	void setSpeed(int speed);
-
-	void close();
 
 }

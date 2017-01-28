@@ -20,7 +20,7 @@
 package com.robo4j.hw.lego.wrapper;
 
 import com.robo4j.hw.lego.LegoMotor;
-import com.robo4j.hw.lego.enums.LegoAnalogPortEnum;
+import com.robo4j.hw.lego.enums.AnalogPortEnum;
 
 import com.robo4j.hw.lego.enums.MotorTypeEnum;
 import lejos.robotics.RegulatedMotor;
@@ -35,54 +35,54 @@ import lejos.robotics.RegulatedMotor;
 public abstract class LegoMotorWrapper<Motor extends RegulatedMotor> implements LegoMotor {
 
 	protected Motor motor;
-	protected LegoAnalogPortEnum port;
+	protected AnalogPortEnum port;
 	protected MotorTypeEnum motorType;
 
-	public abstract LegoAnalogPortEnum getPort();
+	public abstract AnalogPortEnum getPort();
 
 	public abstract MotorTypeEnum getMotorType();
 
 
 	public Motor getMotor() {
-		return unit;
+		return motor;
 	}
 
 	public void setMotor(Motor unit) {
-		this.unit = unit;
+		this.motor = unit;
 	}
 
 	@Override
 	public void forward() {
-		unit.forward();
+		motor.forward();
 	}
 
 	@Override
 	public void backward() {
-		unit.backward();
+		motor.backward();
 	}
 
 	@Override
 	public void stop() {
-		unit.stop(true);
+		motor.stop(true);
 	}
 
 	@Override
 	public void rotate(int val) {
-		unit.rotate(val);
+		motor.rotate(val);
 	}
 
 	@Override
 	public boolean isMoving() {
-		return unit.isMoving();
+		return motor.isMoving();
 	}
 
 	@Override
 	public void setSpeed(int speed) {
-		unit.setSpeed(speed);
+		motor.setSpeed(speed);
 	}
 
 	@Override
 	public void close() {
-		unit.close();
+		motor.close();
 	}
 }

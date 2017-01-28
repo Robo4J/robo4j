@@ -1,32 +1,35 @@
 /*
- * Copyright (C)  2016. Miroslav Wengner, Marcus Hirt
+ * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
  * This LegoSensorEnum.java  is part of robo4j.
+ * module: robo4j-hw-lego
  *
- *  robo4j is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * robo4j is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  robo4j is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * robo4j is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.lego.enums;
+package com.robo4j.hw.lego.enums;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Available Lego Sensors
  *
- * @author Miroslav Wengner (@miragemiko)
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
  * @since 15.02.2016
  */
-public enum LegoSensorEnum {
+public enum SensorTypeEnum {
 
 	// @formatter:off
 	// type id mode source elements
@@ -55,28 +58,28 @@ public enum LegoSensorEnum {
 	SONIC(3, "Distance", "lejos.hardware.sensor.EV3UltrasonicSensor", 1);
 	// @formatter:on
 
-	private volatile static Map<Integer, LegoSensorEnum> codeToSensorTypMapping;
-	private volatile static Map<String, LegoSensorEnum> codeToSensorSourceMapping;
+	private volatile static Map<Integer, SensorTypeEnum> codeToSensorTypMapping;
+	private volatile static Map<String, SensorTypeEnum> codeToSensorSourceMapping;
 	private int id;
 	private String mode;
 	private String source;
 	private int elements;
 
-	LegoSensorEnum(final int id, final String mode, final String source, final int elements) {
+	SensorTypeEnum(final int id, final String mode, final String source, final int elements) {
 		this.id = id;
 		this.mode = mode;
 		this.source = source;
 		this.elements = elements;
 	}
 
-	public static LegoSensorEnum getById(int id) {
+	public static SensorTypeEnum getById(int id) {
 		if (codeToSensorTypMapping == null) {
 			initMapping();
 		}
 		return codeToSensorTypMapping.get(id);
 	}
 
-	public static LegoSensorEnum getBySource(int name) {
+	public static SensorTypeEnum getBySource(int name) {
 		if (codeToSensorSourceMapping == null) {
 			initSourceMapping();
 		}
@@ -86,14 +89,14 @@ public enum LegoSensorEnum {
 	// Private Methods
 	private static void initMapping() {
 		codeToSensorTypMapping = new HashMap<>();
-		for (LegoSensorEnum cmd : values()) {
+		for (SensorTypeEnum cmd : values()) {
 			codeToSensorTypMapping.put(cmd.getId(), cmd);
 		}
 	}
 
 	private static void initSourceMapping() {
 		codeToSensorSourceMapping = new HashMap<>();
-		for (LegoSensorEnum cmd : values()) {
+		for (SensorTypeEnum cmd : values()) {
 			codeToSensorSourceMapping.put(cmd.getSource(), cmd);
 		}
 	}
@@ -116,7 +119,11 @@ public enum LegoSensorEnum {
 
 	@Override
 	public String toString() {
-		return "LegoSensorEnum=(" + "Source='" + source + '\'' + "Mode='" + mode + '\'' + ')';
+		return "SensorEnum{" +
+				"id=" + id +
+				", mode='" + mode + '\'' +
+				", source='" + source + '\'' +
+				", elements=" + elements +
+				'}';
 	}
-
 }

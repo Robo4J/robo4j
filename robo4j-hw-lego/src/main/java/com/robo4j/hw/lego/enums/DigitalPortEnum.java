@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This LegoAnalogPortEnum.java  is part of robo4j.
+ * This LegoSensorPortEnum.java  is part of robo4j.
  * module: robo4j-hw-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -19,34 +19,31 @@
 
 package com.robo4j.hw.lego.enums;
 
-
 import com.robo4j.hw.lego.ILegoHardware;
 
 /**
+ * Configuration interface
+ *
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 04.05.2016
+ * @since 19.06.2016
  */
-public enum LegoAnalogPortEnum implements ILegoHardware<String> {
+public enum DigitalPortEnum implements ILegoHardware<String> {
 
 	// @formatter:off
-	A		("A", "Analog A"),
-	B		("B", "Analog B"),
-	C		("C", "Analog C"),
-	D		("D", "Analog D"),
+	// type name
+	S1		("S1", "Sensor S1"),
+	S2		("S2", "Sensor S2"),
+	S3		("S3", "Sensor S3"),
+	S4		("S4", "Sensor S4"),
 	;
 	// @formatter:on
 
 	private String type;
 	private String name;
 
-	/**
-	 *
-	 * @param type - define Analog LegoMindstorm port
-	 * @param name - description
-     */
-	LegoAnalogPortEnum(String type, String name) {
+	DigitalPortEnum(String type, String name) {
 		this.type = type;
 		this.name = name;
 	}
@@ -63,6 +60,6 @@ public enum LegoAnalogPortEnum implements ILegoHardware<String> {
 
 	@Override
 	public String toString() {
-		return "LegoAnalogPortEnum{" + "type='" + type + '\'' + ", name='" + name + '\'' + '}';
+		return "LegoDigitalPortEnum{" + "type='" + type + '\'' + ", name='" + name + '\'' + '}';
 	}
 }

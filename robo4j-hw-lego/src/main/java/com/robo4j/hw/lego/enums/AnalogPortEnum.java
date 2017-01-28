@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This LegoEngineEnum.java  is part of robo4j.
+ * This LegoAnalogPortEnum.java  is part of robo4j.
  * module: robo4j-hw-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -19,35 +19,41 @@
 
 package com.robo4j.hw.lego.enums;
 
+
 import com.robo4j.hw.lego.ILegoHardware;
 
 /**
- * Available Lego Motors
+ * Analog Lego Brick
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  * @since 04.05.2016
  */
-public enum MotorTypeEnum implements ILegoHardware<Character> {
+public enum AnalogPortEnum implements ILegoHardware<String> {
 
 	// @formatter:off
-	// Type name
-	NXT			('N', "NXTRegulatedMotor"),
-	LARGE		('L', "EV3LargeRegulatedMotor"),
-	MEDIUM		('M', "EV3MediumRegulatedMotor"),
+	A		("A", "Analog A"),
+	B		("B", "Analog B"),
+	C		("C", "Analog C"),
+	D		("D", "Analog D"),
 	;
 	// @formatter:on
 
-	private char type;
+	private String type;
 	private String name;
 
-	MotorTypeEnum(char type, String name) {
+	/**
+	 *
+	 * @param type - define Analog LegoMindstorm port
+	 * @param name - description
+     */
+	AnalogPortEnum(String type, String name) {
 		this.type = type;
 		this.name = name;
 	}
 
 	@Override
-	public Character getType() {
+	public String getType() {
 		return type;
 	}
 
@@ -58,9 +64,6 @@ public enum MotorTypeEnum implements ILegoHardware<Character> {
 
 	@Override
 	public String toString() {
-		return "MotorTypeEnum{" +
-				"type=" + type +
-				", name='" + name + '\'' +
-				'}';
+		return "AnalogPortEnum{" + "type='" + type + '\'' + ", name='" + name + '\'' + '}';
 	}
 }

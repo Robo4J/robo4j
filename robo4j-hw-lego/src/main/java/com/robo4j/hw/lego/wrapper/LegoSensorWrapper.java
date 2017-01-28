@@ -19,35 +19,32 @@
 
 package com.robo4j.hw.lego.wrapper;
 
-import com.robo4j.lego.control.LegoSensor;
-import com.robo4j.lego.enums.LegoEnginePartEnum;
-import com.robo4j.lego.enums.LegoSensorEnum;
-import com.robo4j.lego.enums.LegoSensorPortEnum;
+import com.robo4j.hw.lego.LegoSensor;
+import com.robo4j.hw.lego.enums.DigitalPortEnum;
+import com.robo4j.hw.lego.enums.SensorTypeEnum;
 
 import lejos.hardware.sensor.BaseSensor;
 
 /**
- * @author Miroslav Wengner (@miragemiko)
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
  * @since 26.11.2016
  */
-public abstract class LegoSensorWrapper<SensorType extends BaseSensor> implements GenericSensor, LegoSensor {
+public abstract class LegoSensorWrapper<Sensor extends BaseSensor> implements LegoSensor {
 
-	protected SensorType unit;
-	protected LegoSensorPortEnum port;
-	protected LegoSensorEnum sensor;
-	protected LegoEnginePartEnum part;
+	protected Sensor sensor;
+	protected DigitalPortEnum port;
+	protected SensorTypeEnum sensorType;
 
-	public abstract LegoSensorPortEnum getPort();
+	public abstract DigitalPortEnum getPort();
 
-	public abstract LegoSensorEnum getSensor();
+	public abstract SensorTypeEnum getSensorType();
 
-	public abstract LegoEnginePartEnum getPart();
-
-	public SensorType getUnit() {
-		return unit;
+	public Sensor getSensor() {
+		return sensor;
 	}
 
-	public void setUnit(SensorType unit) {
-		this.unit = unit;
+	public void setSensor(Sensor sensor) {
+		this.sensor = sensor;
 	}
 }
