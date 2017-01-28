@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
+import com.robo4j.core.RoboUnit;
 import com.robo4j.core.concurrency.RoboThreadFactory;
 
 /**
@@ -87,9 +88,20 @@ public class DefaultScheduler implements Scheduler {
 		return executor.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
-				target.sendMessage(message);
+				sendMessage(target, message);
 			}
 
 		}, delay, interval, unit);
+	}
+	
+	static void sendMessage(final RoboReference<?> reference, final Object message) {
+		// Performance optimization - let the scheduling thread deliver the message directly
+		// if this is robo unit implementation, instead of enqueuing it with the message
+		// executor.
+		if (reference instanceof RoboUnit) {
+			((RoboUnit<?>) reference).onMessage(message);
+		} else {
+			reference.sendMessage(message);
+		}
 	}
 }

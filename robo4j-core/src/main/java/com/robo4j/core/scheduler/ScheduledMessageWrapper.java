@@ -71,6 +71,6 @@ class ScheduledMessageWrapper<T> implements Runnable {
 	}
 
 	private void sendMessage() {
-		reference.sendMessage(message);
+		DefaultScheduler.sendMessage(reference, message);
 	}
 }
