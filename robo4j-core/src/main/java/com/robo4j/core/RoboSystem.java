@@ -44,24 +44,25 @@ import com.robo4j.core.scheduler.Scheduler;
  * @since 09.01.2017
  */
 public class RoboSystem implements RoboContext {
-	public static final String ID_SYSTEM = "com.robo4j.core.system";
 	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
+	private static final int TERMINATION_TIMEOUT = 2;
+	private static final int KEEP_ALIVE_TIME = 10;
 	private volatile AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
 	private final Map<String, RoboUnit<?>> units = new HashMap<>();
 	private final Map<RoboUnit<?>, RoboReference<?>> referenceCache = new WeakHashMap<>();
-	
+
 	private final ThreadPoolExecutor systemExecutor;
 	private final Scheduler scheduler = new DefaultScheduler(this);
 	private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
 	private final String uid = UUID.randomUUID().toString();
-	
+
 	private class ReferenceImplementation<T> implements RoboReference<T> {
 		private final RoboUnit<T> unit;
 
 		public ReferenceImplementation(RoboUnit<T> unit) {
 			this.unit = unit;
 		}
-		
+
 		@SuppressWarnings("unchecked")
 		@Override
 		public Future<RoboResult<T, ?>> sendMessage(final Object message) {
@@ -73,14 +74,14 @@ public class RoboSystem implements RoboContext {
 			return unit.getConfiguration();
 		}
 	}
-	
+
 	public RoboSystem() {
 		this(DEFAULT_THREAD_POOL_SIZE);
 	}
-	
+
 	public RoboSystem(int threadPoolSize) {
-		systemExecutor = new ThreadPoolExecutor(threadPoolSize, threadPoolSize, 10, TimeUnit.SECONDS, workQueue,
-				new RoboThreadFactory("Robo4J System ", true));
+		systemExecutor = new ThreadPoolExecutor(threadPoolSize, threadPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
+				workQueue, new RoboThreadFactory("Robo4J System ", true));
 	}
 
 	public RoboSystem(int threadPoolSize, Set<RoboUnit<?>> unitSet) {
@@ -128,7 +129,7 @@ public class RoboSystem implements RoboContext {
 	public void shutdown() {
 		stop();
 		try {
-			systemExecutor.awaitTermination(2, TimeUnit.SECONDS);
+			systemExecutor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			SimpleLoggingUtil.error(getClass(), "Was interrupted when shutting down.", e);
 		}
@@ -153,12 +154,13 @@ public class RoboSystem implements RoboContext {
 	 * 
 	 * @param id
 	 * 
-	 * @return returns the reference to the specified RoboUnit. The reference can be kept and 
+	 * @return returns the reference to the specified RoboUnit. The reference
+	 *         can be kept and
 	 */
 	public <T> RoboReference<T> getReference(String id) {
 		@SuppressWarnings("unchecked")
 		RoboUnit<T> roboUnit = (RoboUnit<T>) units.get(id);
-		if (roboUnit == null) {			
+		if (roboUnit == null) {
 			return null;
 		}
 		return getReference(roboUnit);
@@ -167,8 +169,9 @@ public class RoboSystem implements RoboContext {
 	private <T> RoboReference<T> createReference(RoboUnit<T> roboUnit) {
 		return new ReferenceImplementation<>(roboUnit);
 	}
-	
-	// NOTE(Marcus/Jan 24, 2017): We're only making sure that the reference is around, no more, no less.
+
+	// NOTE(Marcus/Jan 24, 2017): We're only making sure that the reference is
+	// around, no more, no less.
 	public <T> RoboReference<T> getReference(RoboUnit<T> roboUnit) {
 		@SuppressWarnings("unchecked")
 		RoboReference<T> reference = (RoboReference<T>) referenceCache.get(roboUnit);
@@ -176,9 +179,9 @@ public class RoboSystem implements RoboContext {
 			reference = createReference(roboUnit);
 			referenceCache.put(roboUnit, reference);
 		}
-		return reference;		
+		return reference;
 	}
-	
+
 	/**
 	 * @return the unique id of this {@link RoboSystem}.
 	 */
