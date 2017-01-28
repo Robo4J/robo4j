@@ -29,6 +29,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import com.pi4j.io.i2c.I2CBus;
@@ -57,7 +58,9 @@ public class MockupLcd implements AdafruitLcd {
 	private final JTextArea textArea = new JTextArea(2, 16);
 	private JFrame frame;
 	private Color color = Color.WHITE;
-	
+	private String text;
+	private int currentScroll;
+
 	public MockupLcd() {
 		// This seems to be the default for AdaFruit 1115.
 		this(I2CBus.BUS_1, 0x20);
@@ -96,12 +99,12 @@ public class MockupLcd implements AdafruitLcd {
 		for (int i = 0; i < s.length() && cursorColumn < DDRAM_SIZE; i++) {
 			buffer[cursorColumn++] = s.charAt(i);
 		}
+		text = s;
 		textArea.setText(createStringFromBuffers());
 	}
 
 	private String createStringFromBuffers() {
-		return String.format("%16s\n%16s", new String(FIRST_ROW), new String(
-				SECOND_ROW));
+		return String.format("%16s\n%16s", new String(FIRST_ROW), new String(SECOND_ROW));
 	}
 
 	public void setCursorPosition(int row, int column) {
@@ -116,7 +119,7 @@ public class MockupLcd implements AdafruitLcd {
 
 	public void clear() {
 		Arrays.fill(FIRST_ROW, (char) 0);
-		Arrays.fill(SECOND_ROW, (char) 0);		
+		Arrays.fill(SECOND_ROW, (char) 0);
 	}
 
 	public void home() {
@@ -148,6 +151,49 @@ public class MockupLcd implements AdafruitLcd {
 	}
 
 	public void scrollDisplay(Direction direction) {
+		String data = text;
+		if (direction == Direction.LEFT) {
+			currentScroll--;
+		} else {
+			currentScroll++;
+		}
+		final String toSet = scroll(data, currentScroll);
+
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				textArea.setText(toSet);
+			}
+		});
+	}
+
+	private String scroll(String data, int currentScroll) {
+		for (int i = 0; i < Math.abs(currentScroll); i++) {
+			if (currentScroll < 0) {
+				data = goLeft(data);
+			} else {
+				data = goRight(data);
+			}
+		}
+		return data;
+	}
+
+	private static String goLeft(String data) {
+		data = data.substring(1);
+		int nlIndex = data.indexOf("\n");
+		if (nlIndex == -1) {
+			return data;
+		}
+		return data.substring(0, nlIndex) + data.substring(nlIndex + 2);
+	}
+
+	private static String goRight(String data) {
+		data = " " + data;
+		int nlIndex = data.indexOf("\n");
+		if (nlIndex == -1) {
+			return data;
+		}
+		return data.substring(0, nlIndex) + " " + data.substring(nlIndex + 1);
 	}
 
 	public void setTextFlowDirection(Direction direction) {
@@ -196,12 +242,12 @@ public class MockupLcd implements AdafruitLcd {
 	private Component createButton(String string, final int buttonMaskVal) {
 		JButton button = new JButton(string);
 		button.addMouseListener(new MouseAdapter() {
-			
+
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				MockupLcd.this.maskVal = MockupLcd.this.maskVal & ~buttonMaskVal;
 			}
-			
+
 			@Override
 			public void mousePressed(MouseEvent e) {
 				MockupLcd.this.maskVal = MockupLcd.this.maskVal | buttonMaskVal;
@@ -223,6 +269,6 @@ public class MockupLcd implements AdafruitLcd {
 	@Override
 	public void reset() throws IOException {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

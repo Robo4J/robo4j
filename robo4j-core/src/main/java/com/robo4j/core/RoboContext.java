@@ -18,6 +18,8 @@ package com.robo4j.core;
 
 import java.util.Collection;
 
+import com.robo4j.core.scheduler.Scheduler;
+
 /**
  * The execution context available for a unit. Contains a simple lookup service,
  * and life cycle management.
@@ -59,4 +61,9 @@ public interface RoboContext {
 	 * @return the available units.
 	 */
 	Collection<RoboUnit<?>> getUnits();
+
+	/**
+	 * @return the system scheduler.
+	 */
+	Scheduler getScheduler();
 }

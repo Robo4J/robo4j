@@ -32,6 +32,8 @@ import java.util.stream.Stream;
 import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.scheduler.DefaultScheduler;
+import com.robo4j.core.scheduler.Scheduler;
 
 /**
  * Contains RoboUnits, RoboUnit lookup, a system level life cycle and a known
@@ -43,12 +45,13 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
  */
 public class RoboSystem implements RoboContext {
 	public static final String ID_SYSTEM = "com.robo4j.core.system";
-	private static final int DEFAULT_THREAD_POOL_SIZE = 4;
+	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
 	private volatile AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
 	private final Map<String, RoboUnit<?>> units = new HashMap<>();
 	private final Map<RoboUnit<?>, RoboReference<?>> referenceCache = new WeakHashMap<>();
 	
 	private final ThreadPoolExecutor systemExecutor;
+	private final Scheduler scheduler = new DefaultScheduler(this);
 	private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
 	private final String uid = UUID.randomUUID().toString();
 	
@@ -181,5 +184,10 @@ public class RoboSystem implements RoboContext {
 	 */
 	public String getId() {
 		return uid;
+	}
+
+	@Override
+	public Scheduler getScheduler() {
+		return scheduler;
 	}
 }
