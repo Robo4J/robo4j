@@ -59,6 +59,14 @@ project("robo4j-hw-lego") {
         mavenLocal()
     }
 
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        flatDir {
+            dirs 'libs'
+        }
+    }
+
     uploadArchives {
         repositories {
             mavenDeployer {

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This LegoHwTest.java  is part of robo4j.
+ * This LegoMotor.java  is part of robo4j.
  * module: robo4j-hw-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -19,14 +19,33 @@
 
 package com.robo4j.hw.lego;
 
+import com.robo4j.hw.lego.enums.LegoAnalogPortEnum;
+import com.robo4j.hw.lego.enums.MotorTypeEnum;
+
 /**
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 28.01.2017
+ * @since 05.05.2016
  */
-public class LegoHwTest {
+public interface LegoMotor {
 
-    public static void main(String[] args) {
-        System.out.println("Under construction");
-    }
+	LegoAnalogPortEnum getPort();
+
+	MotorTypeEnum getMotorType();
+
+	void forward();
+
+	void backward();
+
+	void stop();
+
+	void rotate(int val);
+
+	boolean isMoving();
+
+	void setSpeed(int speed);
+
+	void close();
+
 }
