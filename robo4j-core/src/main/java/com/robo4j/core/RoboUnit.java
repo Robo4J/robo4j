@@ -50,10 +50,16 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 		}
 	}
 
+	/**
+	 * @return the {@link RoboSystem} unique identifier for this unit.
+	 */
 	public String getId() {
 		return id;
 	}
 
+	/**
+	 * @return the {@link RoboContext} associated with this unit.
+	 */
 	public RoboContext getContext() {
 		return context;
 	}
@@ -75,7 +81,7 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	 * configuration.
 	 * 
 	 * @param configuration
-	 *            the configuration to use.
+	 *            the {@link Configuration} provided.
 	 * @throws Exception
 	 */
 	public void initialize(Configuration configuration) throws ConfigurationException {
@@ -84,11 +90,15 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 		setState(LifecycleState.INITIALIZED);
 	}
 
+	/**
+	 * Should be implemented by subclasses to do the actual Unit specific part
+	 * of the initialization.
+	 * 
+	 * @param configuration
+	 *            the {@link Configuration} provided.
+	 * @throws ConfigurationException
+	 */
 	protected abstract void onInitialization(Configuration configuration) throws ConfigurationException;
-
-	protected void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
-	}
 
 	/**
 	 * Should be overridden in subclasses which need to do some initialization
@@ -207,5 +217,9 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 		} else {
 			return reference;
 		}
+	}
+
+	private void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
 	}
 }
