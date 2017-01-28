@@ -29,7 +29,9 @@ import com.robo4j.math.geometry.Float3D;
  * Represents a LSM303 magnetometer, for example the one on the Adafruit IMU
  * breakout board.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 // FIXME(Marcus/Dec 5, 2016): Verify that this one works.
 public class MagnetometerLSM303Device extends AbstractI2CDevice implements ReadableDevice<Float3D> {

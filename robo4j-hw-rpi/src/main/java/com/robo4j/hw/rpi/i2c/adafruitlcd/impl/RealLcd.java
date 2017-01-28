@@ -53,7 +53,9 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
  * 
  * For more examples, check out the se.hirt.adafruitlcd.test package.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	public enum Direction {

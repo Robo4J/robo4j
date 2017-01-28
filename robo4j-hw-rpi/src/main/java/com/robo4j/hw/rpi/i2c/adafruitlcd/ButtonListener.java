@@ -24,7 +24,9 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
  * 
  * @see ButtonPressedObserver
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 @FunctionalInterface
 public interface ButtonListener {

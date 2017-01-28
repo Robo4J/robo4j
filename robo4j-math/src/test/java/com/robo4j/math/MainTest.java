@@ -17,7 +17,8 @@
 package com.robo4j.math;
 
 /**
- * @author Miroslav Wengner (@miragemiko)
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
  * @since 13.01.2017
  */
 public class MainTest {

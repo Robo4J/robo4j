@@ -23,7 +23,9 @@ import java.io.IOException;
 /**
  * A device which provides a readable value.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  *
  * @param <E>
  *            the kind of data which can be read from the device.

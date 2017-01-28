@@ -43,7 +43,9 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd.Direction;
 /**
  * Swing mockup for the LCD.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public class MockupLcd implements AdafruitLcd {
 	private static final int DDRAM_SIZE = 40;

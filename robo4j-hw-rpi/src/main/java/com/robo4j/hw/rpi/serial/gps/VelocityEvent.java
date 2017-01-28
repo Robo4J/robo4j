@@ -22,7 +22,9 @@ package com.robo4j.hw.rpi.serial.gps;
 /**
  * An event describing heading and speed relative to the ground.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public final class VelocityEvent extends GPSEvent {
 	private float trueTrackMadeGood = Float.NaN;

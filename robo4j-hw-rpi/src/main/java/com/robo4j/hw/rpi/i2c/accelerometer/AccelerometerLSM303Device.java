@@ -30,7 +30,9 @@ import com.robo4j.math.geometry.Float3D;
  * Abstraction for reading data from a LSM303 accelerometer, for example the one
  * on the Adafruit IMU breakout board.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public class AccelerometerLSM303Device extends AbstractI2CDevice implements ReadableDevice<Float3D> {
 	public static final float GRAVITY_ZURICH = 9.807f;

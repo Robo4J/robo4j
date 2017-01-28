@@ -23,7 +23,9 @@ package com.robo4j.hw.rpi.serial.gps;
  * 
  * @see GPS
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public interface GPSListener {
 	/**

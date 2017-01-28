@@ -26,7 +26,9 @@ import java.util.TimeZone;
 /**
  * A GPS event describing position data.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public final class PositionEvent extends GPSEvent {
 	private Date time;

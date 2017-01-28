@@ -21,7 +21,9 @@ package com.robo4j.hw.rpi.serial.gps;
 /**
  * A 2D location on earth.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public final class Location {
 	private static final String STR_DEGREE = "\u00B0";

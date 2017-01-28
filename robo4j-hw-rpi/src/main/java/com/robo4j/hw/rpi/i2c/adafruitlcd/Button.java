@@ -26,7 +26,9 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd;
 /**
  * Enumeration of the Buttons on the LCD shield.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public enum Button {
 

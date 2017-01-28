@@ -21,7 +21,9 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
 /**
  * The various colors that can be used if you have one of the multi-colored variants.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public enum Color {
 	OFF(0x00), RED(0x01), GREEN(0x02), BLUE(0x04), YELLOW(RED.getValue()

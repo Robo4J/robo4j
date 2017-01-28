@@ -36,7 +36,9 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
  * Support for SSD1306 devices over I2C. A good example is the Adafruit 128x64
  * (or 128x32) monochrome OLED.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public class SSD1306Device extends AbstractI2CDevice {
 	private final static byte CHARGE_PUMP_VALUE_ENABLE = 0x14;

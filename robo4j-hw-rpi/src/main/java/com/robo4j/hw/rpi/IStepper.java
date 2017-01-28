@@ -23,7 +23,9 @@ import java.io.IOException;
 /**
  * The interface for a stepper motor.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public interface IStepper {
 	/**

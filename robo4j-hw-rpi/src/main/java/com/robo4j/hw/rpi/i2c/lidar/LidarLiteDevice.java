@@ -26,7 +26,9 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 /**
  * Abstraction for the Garmin/PulsedLight LidarLite device.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public final class LidarLiteDevice extends AbstractI2CDevice {
 	private static final int REGISTER_COMMAND = 0x0;

@@ -22,6 +22,11 @@ import java.io.IOException;
 
 import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
 
+/**
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
+ */
 public class Message {
 	private static final String COLOR_PREFIX = "-c";
 	

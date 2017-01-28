@@ -29,7 +29,9 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 /**
  * Abstraction to read a Bosch digital barometric pressure sensor (BMP085/BMP180).
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public final class BMP085Device extends AbstractI2CDevice {
 	private static final int PRESSURE_SEA_LEVEL = 101325;

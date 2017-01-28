@@ -32,7 +32,9 @@ import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
  * Motor controller for the Pololu H-bridge motor controller based on
  * Freescale's MC33926.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public class PololuMC33926HBridgeEngine implements IMotor {
 	public enum Direction {

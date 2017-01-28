@@ -27,7 +27,9 @@ import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
 /**
  * Abstract super class for I2C devices.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public abstract class AbstractI2CDevice {
 	private final int bus;

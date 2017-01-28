@@ -29,7 +29,9 @@ import com.robo4j.math.geometry.Float3D;
  * Abstraction to read angular change from a L3GD20 Gyro, for example the Gyro 
  * available on the Adafruit 10DOF breakout board.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public class GyroL3GD20Device extends AbstractI2CDevice implements
 		ReadableDevice<Float3D> {

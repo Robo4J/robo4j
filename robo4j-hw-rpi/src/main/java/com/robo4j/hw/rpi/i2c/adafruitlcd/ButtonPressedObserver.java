@@ -33,7 +33,9 @@ import java.util.logging.Logger;
  * of the input pins. Note that such changes require an update to the LCD class
  * as well.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public class ButtonPressedObserver {
 	private volatile boolean isRunning = false;

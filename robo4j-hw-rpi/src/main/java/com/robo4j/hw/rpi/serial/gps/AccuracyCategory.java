@@ -23,7 +23,9 @@ package com.robo4j.hw.rpi.serial.gps;
  * A user friendly categorization of dilution of precision.
  * http://en.wikipedia.org/wiki/Dilution_of_precision_(GPS)
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public enum AccuracyCategory {
 	//@formatter:off

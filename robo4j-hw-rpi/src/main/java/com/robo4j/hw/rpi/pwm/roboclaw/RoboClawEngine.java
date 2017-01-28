@@ -27,7 +27,9 @@ import com.robo4j.hw.rpi.i2c.pwm.Servo;
 /**
  * A RoboClaw engine controller, controlled with a standard servo PWM signal.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public class RoboClawEngine implements IMotor {
 	private final String name;

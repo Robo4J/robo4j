@@ -28,7 +28,8 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.mockup.MockupLcd;
  * Let's keep it clean?
  * 
  * @author Marcus Hirt (@hirt)
- * @author Miroslav Wengner (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public final class LcdFactory {
 	/**

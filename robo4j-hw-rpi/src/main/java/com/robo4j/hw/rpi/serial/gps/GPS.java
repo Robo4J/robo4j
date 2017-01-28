@@ -32,7 +32,9 @@ import com.pi4j.io.serial.SerialFactory;
  * Code to talk to the Adafruit "ultimate GPS" over the serial port.
  * FIXME(Marcus/Dec 5, 2016): Should perhaps be moved to type specific package / MTK3339 
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public class GPS {
 	/** 

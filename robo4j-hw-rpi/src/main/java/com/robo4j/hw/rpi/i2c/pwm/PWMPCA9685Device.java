@@ -28,6 +28,7 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
  * an Adafruit 16 channel I2C PWM driver breakout board.
  * 
  * @author Marcus Hirt
+ * @author Miro Wengner (@miragemiko)
  */
 //Not using all commands - yet.
 @SuppressWarnings("unused")

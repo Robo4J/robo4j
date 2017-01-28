@@ -25,7 +25,9 @@ import com.robo4j.math.geometry.Float3D;
 /**
  * Wrapper class for readable devices returning Float3D, allowing for calibration.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 public class CalibratedFloat3DDevice implements ReadableDevice<Float3D> {
 	private final Float3D centerOffsets; 

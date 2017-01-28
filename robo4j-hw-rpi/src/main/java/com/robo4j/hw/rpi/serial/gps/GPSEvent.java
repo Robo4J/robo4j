@@ -21,7 +21,9 @@ package com.robo4j.hw.rpi.serial.gps;
 /**
  * Abstract super class for event classes.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 abstract class GPSEvent {
 	public static final float INVALID_VALUE = Float.NaN;

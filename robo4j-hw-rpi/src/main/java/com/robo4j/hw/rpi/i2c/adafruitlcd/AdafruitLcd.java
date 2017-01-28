@@ -21,6 +21,10 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
 /**
  * The interface for an LCD.
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ * @since 01.11.2016
  */
 import java.io.IOException;
 

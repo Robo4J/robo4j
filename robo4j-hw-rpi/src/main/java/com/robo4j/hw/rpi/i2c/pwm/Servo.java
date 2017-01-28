@@ -31,6 +31,7 @@ import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
  * must be reset.
  * 
  * @author Marcus Hirt
+ * @author Miro Wengner (@miragemiko)
  */
 public class Servo {
 	private static final int TRIM_STEPS = 200;

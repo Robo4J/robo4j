@@ -1,4 +1,4 @@
-# robo4j-rpi
+# robo4j-hw-rpi
 Hardware abstractions for the raspberry pi.
 
 These hardware abstractions make it easier to develop for the Raspberry Pi. They can be used stand-alone, or together with the Robo4J framework. 
