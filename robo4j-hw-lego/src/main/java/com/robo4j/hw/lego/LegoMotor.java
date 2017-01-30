@@ -32,7 +32,7 @@ public interface LegoMotor {
 
 	AnalogPortEnum getPort();
 
-	MotorTypeEnum getMotorType();
+	MotorTypeEnum getType();
 
 	void forward();
 

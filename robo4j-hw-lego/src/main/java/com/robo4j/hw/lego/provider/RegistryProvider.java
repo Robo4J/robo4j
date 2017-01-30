@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This LegoSensorWrapper.java  is part of robo4j.
+ * This RegistryProvider.java  is part of robo4j.
  * module: robo4j-hw-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -17,45 +17,18 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.lego.wrapper;
+package com.robo4j.hw.lego.provider;
 
-import com.robo4j.hw.lego.LegoSensor;
-import com.robo4j.hw.lego.enums.DigitalPortEnum;
-import com.robo4j.hw.lego.enums.SensorTypeEnum;
-
-import lejos.hardware.sensor.BaseSensor;
+import java.util.Map;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  * @since 26.11.2016
  */
-public class SensorWrapper<Sensor extends BaseSensor> implements LegoSensor {
+public interface RegistryProvider<Output, Input>  {
 
-	protected Sensor sensor;
-	protected DigitalPortEnum port;
-	protected SensorTypeEnum sensorType;
+	Output create(final Input type);
 
-	public SensorWrapper(DigitalPortEnum port, SensorTypeEnum sensorType) {
-		this.port = port;
-		this.sensorType = sensorType;
-	}
-
-	@Override
-	public SensorTypeEnum getType() {
-		return sensorType;
-	}
-
-	@Override
-	public DigitalPortEnum getPort() {
-		return port;
-	}
-
-	public Sensor getSensor() {
-		return sensor;
-	}
-
-	public void setSensor(Sensor sensor) {
-		this.sensor = sensor;
-	}
+	Map<String, Input> activate(Map<String, Input> engines);
 }

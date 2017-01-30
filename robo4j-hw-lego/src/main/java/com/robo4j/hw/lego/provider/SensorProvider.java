@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This LegoSensorProvider.java  is part of robo4j.
- * module: robo4j-units-lego
+ * This SensorProvider.java  is part of robo4j.
+ * module: robo4j-hw-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.lego;
+package com.robo4j.hw.lego.provider;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,7 +42,7 @@ public class SensorProvider<Type extends LegoSensor> implements RegistryProvider
 
 	@Override
 	public BaseSensor create(LegoSensor sensor) {
-		switch (sensor.getSensorType()) {
+		switch (sensor.getType()) {
 		case COLOR:
 			return new EV3ColorSensor(LocalEV3.get().getPort(sensor.getPort().getType()));
 		case GYRO:

@@ -33,7 +33,7 @@ public interface LegoSensor {
 
 	DigitalPortEnum getPort();
 
-	SensorTypeEnum getSensorType();
+	SensorTypeEnum getType();
 
 
 }

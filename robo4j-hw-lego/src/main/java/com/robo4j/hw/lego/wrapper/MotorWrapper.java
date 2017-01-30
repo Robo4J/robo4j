@@ -32,16 +32,26 @@ import lejos.robotics.RegulatedMotor;
  * @author Miro Wengner (@miragemiko)
  * @since 23.11.2016
  */
-public abstract class MotorWrapper<Motor extends RegulatedMotor> implements LegoMotor {
+public class MotorWrapper<Motor extends RegulatedMotor> implements LegoMotor {
 
 	protected Motor motor;
 	protected AnalogPortEnum port;
-	protected MotorTypeEnum motorType;
+	protected MotorTypeEnum type;
 
-	public abstract AnalogPortEnum getPort();
+	public MotorWrapper(AnalogPortEnum port, MotorTypeEnum type) {
+		this.port = port;
+		this.type = type;
+	}
 
-	public abstract MotorTypeEnum getMotorType();
+	@Override
+	public AnalogPortEnum getPort() {
+		return port;
+	}
 
+	@Override
+	public MotorTypeEnum getType() {
+		return type;
+	}
 
 	public Motor getMotor() {
 		return motor;
@@ -80,6 +90,7 @@ public abstract class MotorWrapper<Motor extends RegulatedMotor> implements Lego
 	public void setSpeed(int speed) {
 		motor.setSpeed(speed);
 	}
+
 
 	@Override
 	public void close() {

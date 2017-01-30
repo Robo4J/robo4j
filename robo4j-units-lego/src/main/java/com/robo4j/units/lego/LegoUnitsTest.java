@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This BaseRegistryProvider.java  is part of robo4j.
+ * This LegoUnitsTest.java  is part of robo4j.
  * module: robo4j-units-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -19,16 +19,13 @@
 
 package com.robo4j.units.lego;
 
-import java.util.Map;
-
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 26.11.2016
+ * @since 29.01.2017
  */
-public interface RegistryProvider<Output, Input>  {
-
-	Output create(final Input type);
-
-	Map<String, Input> activate(Map<String, Input> engines);
+public class LegoUnitsTest {
+    public static void main(String[] args) {
+        System.out.println("under construction!");
+    }
 }

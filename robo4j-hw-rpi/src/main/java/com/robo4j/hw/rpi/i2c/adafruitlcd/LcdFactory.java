@@ -25,6 +25,7 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.mockup.MockupLcd;
 /**
  * FIXME(Marcus/Dec 20, 2016): We should probably not let the mockup etc be part of the standard API.
+ * FIXME(Miro/Jan 29, 2017): we should move it to the test
  * Let's keep it clean?
  * 
  * @author Marcus Hirt (@hirt)
@@ -36,7 +37,7 @@ public final class LcdFactory {
 	 * Set this system property to true to make the factory return a Swing mockup
 	 * instead of an i2c LCD device.
 	 */
-	public static final String SYSTEM_PROPERTY_MOCK = "com.robo4j.hw.rpi.i2c.adafruitlcd.mock";
+	private  static final String SYSTEM_PROPERTY_MOCK = "com.robo4j.hw.rpi.i2c.adafruitlcd.mock";
 
 	public static AdafruitLcd createLCD() throws IOException, UnsupportedBusNumberException {
 		if (Boolean.getBoolean(SYSTEM_PROPERTY_MOCK)) {

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This LegoEngineProvider.java  is part of robo4j.
- * module: robo4j-units-lego
+ * This MotorProvider.java  is part of robo4j.
+ * module: robo4j-hw-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.lego;
+package com.robo4j.hw.lego.provider;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,12 +40,13 @@ import lejos.robotics.RegulatedMotor;
  * @since 26.11.2016
  */
 public final class MotorProvider<Type extends LegoMotor> implements RegistryProvider<RegulatedMotor, Type> {
+
 	private static final int DEFAULT_SPEED = 300;
 
 	@Override
 	public RegulatedMotor create(final LegoMotor engine) {
 		final RegulatedMotor result;
-		switch (engine.getMotorType()) {
+		switch (engine.getType()) {
 		case LARGE:
 			result = new EV3LargeRegulatedMotor(LocalEV3.get().getPort(engine.getPort().getType()));
 			break;
