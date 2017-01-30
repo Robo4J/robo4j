@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.robo4.math.jfr.ScanPoint2DEvent;
+import com.robo4j.math.jfr.ScanPoint2DEvent;
 import com.robo4j.math.geometry.Point2D;
 import com.robo4j.math.geometry.ScanResult2D;
 

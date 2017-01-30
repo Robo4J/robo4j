@@ -56,7 +56,7 @@ public enum LegoPlatformMessageType implements RoboHardwareEnumI<Integer> {
         return Stream.of(values())
                 .collect(Collectors.toMap(LegoPlatformMessageType::getType, e -> e));
     }
-    public static LegoPlatformMessageType getByName(String text) {
+    public static LegoPlatformMessageType getByText(String text) {
         if (internMapByType == null)
             internMapByType = initMapping();
         return internMapByType.entrySet().stream()

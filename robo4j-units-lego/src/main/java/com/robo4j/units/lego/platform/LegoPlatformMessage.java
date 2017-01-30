@@ -34,7 +34,7 @@ public class LegoPlatformMessage {
     private final LegoPlatformMessageType type;
 
     public LegoPlatformMessage(String text){
-        this(null, LegoPlatformMessageType.getByName(text));
+        this(null, LegoPlatformMessageType.getByText(text));
     }
 
     public LegoPlatformMessage(LegoPlatformMessageType type) {
@@ -48,7 +48,7 @@ public class LegoPlatformMessage {
 
     public LegoPlatformMessage(RoboReference<?> source, String text) {
         this.source = source;
-        this.type = LegoPlatformMessageType.getByName(text);
+        this.type = LegoPlatformMessageType.getByText(text);
     }
 
     public RoboReference<?> getSource(){
