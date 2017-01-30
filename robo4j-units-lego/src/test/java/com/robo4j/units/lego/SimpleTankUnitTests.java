@@ -19,11 +19,13 @@
 
 package com.robo4j.units.lego;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.robo4j.core.RoboSystem;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.units.lego.platform.LegoPlatformMessage;
-import org.junit.Test;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -39,7 +41,11 @@ public class SimpleTankUnitTests {
         Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
         tank.onInitialization(config);
-        tank.onMessage(new LegoPlatformMessage("stop"));
+        Assert.assertTrue((Boolean)tank.onMessage(new LegoPlatformMessage("right")).getResult());
+        Assert.assertTrue((Boolean)tank.onMessage(new LegoPlatformMessage("left")).getResult());
+        Assert.assertTrue((Boolean)tank.onMessage(new LegoPlatformMessage("move")).getResult());
+        Assert.assertTrue((Boolean)tank.onMessage(new LegoPlatformMessage("back")).getResult());
+        Assert.assertFalse((Boolean)tank.onMessage(new LegoPlatformMessage("stop")).getResult());
         tank.shutdown();
 
     }
