@@ -19,12 +19,9 @@
 
 package com.robo4j.hw.lego.provider;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import com.robo4j.hw.lego.LegoException;
-import com.robo4j.hw.lego.LegoMotor;
-import com.robo4j.hw.lego.wrapper.MotorWrapper;
+import com.robo4j.hw.lego.enums.AnalogPortEnum;
+import com.robo4j.hw.lego.enums.MotorTypeEnum;
 
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
@@ -39,41 +36,29 @@ import lejos.robotics.RegulatedMotor;
  * @author Miro Wengner (@miragemiko)
  * @since 26.11.2016
  */
-public final class MotorProvider<Type extends LegoMotor> implements RegistryProvider<RegulatedMotor, Type> {
+public final class MotorProvider implements IProvider<RegulatedMotor, AnalogPortEnum, MotorTypeEnum> {
 
 	private static final int DEFAULT_SPEED = 300;
 
 	@Override
-	public RegulatedMotor create(final LegoMotor engine) {
+	public RegulatedMotor create(final AnalogPortEnum port, final MotorTypeEnum type) {
 		final RegulatedMotor result;
-		switch (engine.getType()) {
+		switch (type) {
 		case LARGE:
-			result = new EV3LargeRegulatedMotor(LocalEV3.get().getPort(engine.getPort().getType()));
+			result = new EV3LargeRegulatedMotor(LocalEV3.get().getPort(port.getType()));
 			break;
 		case MEDIUM:
-			result = new EV3MediumRegulatedMotor(LocalEV3.get().getPort(engine.getPort().getType()));
+			result = new EV3MediumRegulatedMotor(LocalEV3.get().getPort(port.getType()));
 			break;
 		case NXT:
-			result = new NXTRegulatedMotor(LocalEV3.get().getPort(engine.getPort().getType()));
+			result = new NXTRegulatedMotor(LocalEV3.get().getPort(port.getType()));
 			break;
 		default:
-			throw new LegoException("Lego engine not supported: " + engine);
+			throw new LegoException("Lego engine not supported: " + port + " type: " + type);
 		}
 		result.setSpeed(DEFAULT_SPEED);
 		return result;
 	}
 
-	@SuppressWarnings(value = "unchecked")
-	@Override
-	public Map<String, Type> activate(Map<String, Type> engines) {
-		return engines.entrySet().stream().peek(e -> {
-			LegoMotor le = e.getValue();
-			/* always instance of regulated motor */
-			if (le instanceof MotorWrapper) {
-				RegulatedMotor rm = create((MotorWrapper) le);
-				((MotorWrapper) le).setMotor(rm);
-			}
-		}).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-	}
 
 }

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This RegistryProvider.java  is part of robo4j.
- * module: robo4j-hw-lego
+ * This LegoUnitException.java  is part of robo4j.
+ * module: robo4j-units-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,21 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.lego.provider;
-
-import java.util.Map;
+package com.robo4j.units.lego;
 
 /**
+ * Default RoboUnit Exception
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 26.11.2016
+ * @since 30.01.2017
  */
-public interface RegistryProvider<Output, Input>  {
+public class LegoUnitException extends RuntimeException{
+    public LegoUnitException(String message) {
+        super(message);
+    }
 
-	Output create(final Input type);
-
-	Map<String, Input> activate(Map<String, Input> engines);
+    public LegoUnitException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

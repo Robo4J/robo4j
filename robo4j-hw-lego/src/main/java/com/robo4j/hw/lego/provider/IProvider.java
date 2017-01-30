@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This LegoUnitsTest.java  is part of robo4j.
- * module: robo4j-units-lego
+ * This RegistryProvider.java  is part of robo4j.
+ * module: robo4j-hw-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,14 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.lego;
+package com.robo4j.hw.lego.provider;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 29.01.2017
+ * @since 26.11.2016
  */
-public class LegoUnitsTest {
-    public static void main(String[] args) {
-        System.out.println("under construction!");
-    }
+public interface IProvider<Output, Input1, Input2>  {
+
+	Output create(final Input1 type, final Input2 input2);
 }

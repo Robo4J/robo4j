@@ -23,9 +23,11 @@ import com.robo4j.core.enums.RoboHardwareEnumI;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- *
+ * Adafruit Button Plat possible control buttons
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -43,48 +45,44 @@ public enum AdafruitButtonPlateEnum implements RoboHardwareEnumI<Integer> {
 	// @formatter:on
 
     private volatile static Map<Integer, AdafruitButtonPlateEnum> defToCommandTargetMapping;
-    private int code;
+    private int type;
     private String name;
     private String text;
 
-    AdafruitButtonPlateEnum(int code, String name, String text) {
-        this.code = code;
+    AdafruitButtonPlateEnum(int type, String name, String text) {
+        this.type = type;
         this.name = name;
         this.text = text;
     }
 
-    private static void initMapping() {
-        defToCommandTargetMapping = new HashMap<>();
-        for (AdafruitButtonPlateEnum ct : values()) {
-            defToCommandTargetMapping.put(ct.getType(), ct);
-        }
+    private static Map<Integer, AdafruitButtonPlateEnum> initMapping() {
+        return Stream.of(values()).collect(Collectors.toMap(AdafruitButtonPlateEnum::getType, e -> e));
     }
 
+    //@formatter:off
     public static AdafruitButtonPlateEnum getByName(String def) {
         if (defToCommandTargetMapping == null)
-            initMapping();
-        //@formatter:off
+            defToCommandTargetMapping = initMapping();
+
         return defToCommandTargetMapping.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .filter(e -> e.getName().equals(def.toUpperCase()))
                 .findFirst().get();
-        //@formatter:on
     }
 
     public static AdafruitButtonPlateEnum getByText(String text) {
         if (defToCommandTargetMapping == null)
-            initMapping();
-        //@formatter:off
+            defToCommandTargetMapping = initMapping();
         return defToCommandTargetMapping.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .filter(e -> e.getText().equals(text))
                 .findFirst().get();
-        //@formatter:on
     }
+    //@formatter:on
 
     @Override
     public Integer getType() {
-        return code;
+        return type;
     }
 
     @Override
@@ -99,7 +97,7 @@ public enum AdafruitButtonPlateEnum implements RoboHardwareEnumI<Integer> {
     @Override
     public String toString() {
         return "AdaruitButtonPlateEnum{" +
-                "code=" + code +
+                "type=" + type +
                 ", name='" + name + '\'' +
                 '}';
     }

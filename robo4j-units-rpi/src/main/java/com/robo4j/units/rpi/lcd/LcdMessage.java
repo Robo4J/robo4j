@@ -40,6 +40,7 @@ public class LcdMessage {
 		this(LcdMessageType.SET_TEXT, null, color, text);
 	}
 
+	// TODO : we should probably start with source
 	public LcdMessage(LcdMessageType type, RoboReference<?> source, Color color, String text) {
 		this.type = type;
 		this.source = source;

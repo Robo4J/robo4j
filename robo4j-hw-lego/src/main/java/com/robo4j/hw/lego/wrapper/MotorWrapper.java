@@ -38,7 +38,8 @@ public class MotorWrapper<Motor extends RegulatedMotor> implements LegoMotor {
 	protected AnalogPortEnum port;
 	protected MotorTypeEnum type;
 
-	public MotorWrapper(AnalogPortEnum port, MotorTypeEnum type) {
+	public MotorWrapper(Motor motor, AnalogPortEnum port, MotorTypeEnum type) {
+		this.motor = motor;
 		this.port = port;
 		this.type = type;
 	}

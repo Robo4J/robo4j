@@ -19,9 +19,10 @@
 package com.robo4j.http;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The HTTP request methods
@@ -95,7 +96,7 @@ public enum HttpMethod implements Comparator<HttpMethod> {
 	CONNECT("CONNECT");
 	// @formatter:on
 
-	private volatile static Map<String, HttpMethod> nameToHttpMethod;
+	private volatile static Map<String, HttpMethod> mapByName;
 	private final String name;
 
 	HttpMethod(String name) {
@@ -104,18 +105,15 @@ public enum HttpMethod implements Comparator<HttpMethod> {
 
 	// Utils Method
 	public static HttpMethod getByName(String name) {
-		if (Objects.isNull(nameToHttpMethod)) {
-			iniMapping();
+		if (Objects.isNull(mapByName)) {
+			mapByName = iniMapping();
 		}
-		return nameToHttpMethod.get(name);
+		return mapByName.get(name);
 	}
 
 	// Private Methods
-	private static void iniMapping() {
-		nameToHttpMethod = new HashMap<>();
-		for (HttpMethod method : values()) {
-			nameToHttpMethod.put(method.getName(), method);
-		}
+	private static Map<String, HttpMethod> iniMapping() {
+		return Stream.of(values()).collect(Collectors.toMap(HttpMethod::getName, e -> e));
 	}
 
 	public String getName() {
