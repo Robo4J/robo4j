@@ -71,8 +71,12 @@ public class RoboRequestFactory implements DefaultRequestFactory<String> {
                         ConstantUtil.HTTP_QUERY_SEP);
                 SimpleLoggingUtil.debug(getClass(), "queryValues: " + queryValues);
 
+
+                //TODO miro -> this must be redesign/improved to be more generic
                 switch (queryValues.get("type")){
                     case "lcd":
+                        return queryValues.get("command");
+                    case "tank":
                         return queryValues.get("command");
                     default:
 
