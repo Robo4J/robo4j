@@ -25,6 +25,8 @@ import com.robo4j.hw.lego.enums.SensorTypeEnum;
 
 /**
  *
+ * Basic functionality of any LegoMindstorm Sensor
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  * @since 26.06.2016
@@ -34,6 +36,5 @@ public interface LegoSensor {
 	DigitalPortEnum getPort();
 
 	SensorTypeEnum getType();
-
 
 }

@@ -44,4 +44,10 @@ public class SimpleTankUnitMock extends SimpleTankUnit {
         super.leftMotor = new MotorTestWrapper(AnalogPortEnum.B,
                 MotorTypeEnum.NXT);
     }
+
+    @Override
+    public void shutdown() {
+        super.shutdown();
+        System.out.println("executor is down");
+    }
 }

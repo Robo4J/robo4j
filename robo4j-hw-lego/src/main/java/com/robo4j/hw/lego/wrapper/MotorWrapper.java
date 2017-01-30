@@ -27,7 +27,7 @@ import com.robo4j.hw.lego.provider.MotorProvider;
 import lejos.robotics.RegulatedMotor;
 
 /**
- * Wrapper for the Lego Motor
+ * Wrapper for any LegoMindstorm Motor
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)

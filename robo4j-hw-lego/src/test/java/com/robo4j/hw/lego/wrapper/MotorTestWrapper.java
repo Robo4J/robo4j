@@ -24,7 +24,7 @@ import com.robo4j.hw.lego.enums.AnalogPortEnum;
 import com.robo4j.hw.lego.enums.MotorTypeEnum;
 
 /**
- * Class uses for lego testing
+ * Simple LegoMindstorm Mock Motor
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -92,5 +92,15 @@ public class MotorTestWrapper implements LegoMotor {
     public void close() {
         moving = false;
         System.out.println(String.format("MotorTest.close port:%s, type: %s, moving: %b ", port, type, moving));
+    }
+
+    @Override
+    public String toString() {
+        return "MotorTestWrapper{" +
+                "port=" + port +
+                ", type=" + type +
+                ", moving=" + moving +
+                ", speed=" + speed +
+                '}';
     }
 }

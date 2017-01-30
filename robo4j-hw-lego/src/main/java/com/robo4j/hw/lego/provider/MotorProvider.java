@@ -38,6 +38,7 @@ import lejos.robotics.RegulatedMotor;
  */
 public final class MotorProvider implements IProvider<RegulatedMotor, AnalogPortEnum, MotorTypeEnum> {
 
+	//TODO: FIXME (miro) -> new handling of the default speed
 	private static final int DEFAULT_SPEED = 300;
 
 	@Override

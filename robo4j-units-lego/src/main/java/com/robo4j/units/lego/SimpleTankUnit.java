@@ -91,7 +91,6 @@ public class SimpleTankUnit extends RoboUnit<String> {
         }
 		if(executor.isShutdown()){
 			SimpleLoggingUtil.debug(getClass(), "executor is down");
-			System.out.println("executor is down");
 		}
         super.shutdown();
 	}

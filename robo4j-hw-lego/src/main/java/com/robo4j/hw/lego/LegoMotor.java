@@ -23,6 +23,7 @@ import com.robo4j.hw.lego.enums.AnalogPortEnum;
 import com.robo4j.hw.lego.enums.MotorTypeEnum;
 
 /**
+ * Basic functionality of the LegoMindstorm Motor
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)

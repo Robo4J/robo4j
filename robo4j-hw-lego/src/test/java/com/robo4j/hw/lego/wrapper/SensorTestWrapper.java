@@ -24,8 +24,7 @@ import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
 
 /**
- * Mock Class for Lego Sensor
- *
+ * Simple LegoMindstorm Mock Sensor
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -55,4 +54,6 @@ public class SensorTestWrapper implements LegoSensor {
 	public String toString() {
 		return "SensorTestWrapper{" + "port=" + port + ", type=" + type + '}';
 	}
+
+
 }

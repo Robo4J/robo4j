@@ -37,11 +37,6 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
  */
 public class SensorProvider implements IProvider<BaseSensor, DigitalPortEnum, SensorTypeEnum> {
 
-//	DigitalPortEnum getPort();
-
-//	SensorTypeEnum getType();
-
-
 	@Override
 	public BaseSensor create(DigitalPortEnum port, SensorTypeEnum type) {
 		switch (type) {

@@ -26,6 +26,8 @@ import com.robo4j.hw.lego.enums.SensorTypeEnum;
 import lejos.hardware.sensor.BaseSensor;
 
 /**
+ * Wrapper for any LegoMindstorm sensor
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  * @since 26.11.2016

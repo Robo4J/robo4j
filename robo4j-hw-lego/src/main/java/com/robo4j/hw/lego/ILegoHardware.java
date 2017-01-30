@@ -20,7 +20,7 @@
 package com.robo4j.hw.lego;
 
 /**
- * generic interface for lego hardware
+ * generic interface for LegoMindstorm hardware
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
