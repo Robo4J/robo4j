@@ -59,8 +59,8 @@ public class SimpleTankUnit extends RoboUnit<String> {
 	private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
 	private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
 			KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue, new RoboThreadFactory("Robo4J Lego Platform ", true));
-	private volatile LegoMotor rightMotor;
-	private volatile LegoMotor leftMotor;
+	protected volatile LegoMotor rightMotor;
+	protected volatile LegoMotor leftMotor;
 
 	public SimpleTankUnit(RoboContext context, String id) {
 		super(context, id);
@@ -82,7 +82,12 @@ public class SimpleTankUnit extends RoboUnit<String> {
 		setState(LifecycleState.SHUTTING_DOWN);
 		rightMotor.close();
 		leftMotor.close();
-		super.shutdown();
+        try {
+            executor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            SimpleLoggingUtil.error(getClass(), "termination failed");
+        }
+        super.shutdown();
 		System.out.println("LegoTankUnit shutdown");
 	}
 
@@ -90,9 +95,9 @@ public class SimpleTankUnit extends RoboUnit<String> {
 	@SuppressWarnings("unchecked")
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		MotorProvider motorProvider = new MotorProvider();
-		rightMotor = new MotorWrapper(motorProvider.create(AnalogPortEnum.C, MotorTypeEnum.NXT), AnalogPortEnum.C,
+		rightMotor = new MotorWrapper(motorProvider, AnalogPortEnum.C,
 				MotorTypeEnum.NXT);
-		leftMotor = new MotorWrapper(motorProvider.create(AnalogPortEnum.B, MotorTypeEnum.NXT), AnalogPortEnum.B,
+		leftMotor = new MotorWrapper(motorProvider, AnalogPortEnum.B,
 				MotorTypeEnum.NXT);
 
 	}

@@ -55,20 +55,21 @@ public class MotorTestWrapper implements LegoMotor {
 
     @Override
     public void forward() {
-        System.out.println("forward");
         moving = true;
+        System.out.println(String.format("MotorTest.forward port:%s, type: %s, moving: %b ", port, type, moving));
     }
 
     @Override
     public void backward() {
-        System.out.println("backward");
         moving = true;
+        System.out.println(String.format("MotorTest.backward port:%s, type: %s, moving: %b ", port, type, moving));
     }
 
     @Override
     public void stop() {
-        System.out.println("stop");
         moving = false;
+        System.out.println(String.format("MotorTest.stop port:%s, type: %s, moving: %b ", port, type, moving));
+
     }
 
     @Override
@@ -89,6 +90,7 @@ public class MotorTestWrapper implements LegoMotor {
 
     @Override
     public void close() {
-        System.out.println("close");
+        moving = false;
+        System.out.println(String.format("MotorTest.close port:%s, type: %s, moving: %b ", port, type, moving));
     }
 }

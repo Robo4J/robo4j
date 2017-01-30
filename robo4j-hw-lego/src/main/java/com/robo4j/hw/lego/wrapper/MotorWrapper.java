@@ -23,6 +23,7 @@ import com.robo4j.hw.lego.LegoMotor;
 import com.robo4j.hw.lego.enums.AnalogPortEnum;
 
 import com.robo4j.hw.lego.enums.MotorTypeEnum;
+import com.robo4j.hw.lego.provider.MotorProvider;
 import lejos.robotics.RegulatedMotor;
 
 /**
@@ -37,6 +38,13 @@ public class MotorWrapper<Motor extends RegulatedMotor> implements LegoMotor {
 	protected Motor motor;
 	protected AnalogPortEnum port;
 	protected MotorTypeEnum type;
+
+	@SuppressWarnings("unchecked")
+	public MotorWrapper(MotorProvider provider,  AnalogPortEnum port, MotorTypeEnum type) {
+		this.motor = (Motor)provider.create(port, type);
+		this.port = port;
+		this.type = type;
+	}
 
 	public MotorWrapper(Motor motor, AnalogPortEnum port, MotorTypeEnum type) {
 		this.motor = motor;
