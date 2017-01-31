@@ -22,6 +22,10 @@ package com.robo4j.hw.lego.enums;
 
 import com.robo4j.hw.lego.ILegoHardware;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * Analog Lego Brick
  *
@@ -39,6 +43,7 @@ public enum AnalogPortEnum implements ILegoHardware<String> {
 	;
 	// @formatter:on
 
+	private volatile static Map<String, AnalogPortEnum> internMapByType;
 	private String type;
 	private String name;
 
@@ -52,6 +57,13 @@ public enum AnalogPortEnum implements ILegoHardware<String> {
 		this.name = name;
 	}
 
+	public static AnalogPortEnum getByType(String type) {
+		if (internMapByType == null) {
+			internMapByType = initMapping();
+		}
+		return internMapByType.get(type);
+	}
+
 	@Override
 	public String getType() {
 		return type;
@@ -61,6 +73,12 @@ public enum AnalogPortEnum implements ILegoHardware<String> {
 	public String getName() {
 		return name;
 	}
+
+	// Private Methods
+	private static Map<String, AnalogPortEnum> initMapping() {
+		return Stream.of(values()).collect(Collectors.toMap(AnalogPortEnum::getType, e -> e));
+	}
+
 
 	@Override
 	public String toString() {

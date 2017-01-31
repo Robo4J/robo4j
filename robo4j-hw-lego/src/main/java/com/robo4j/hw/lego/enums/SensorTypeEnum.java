@@ -21,6 +21,8 @@ package com.robo4j.hw.lego.enums;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Available Lego Sensors
@@ -58,8 +60,7 @@ public enum SensorTypeEnum {
 	SONIC(3, "Distance", "lejos.hardware.sensor.EV3UltrasonicSensor", 1);
 	// @formatter:on
 
-	private volatile static Map<Integer, SensorTypeEnum> codeToSensorTypMapping;
-	private volatile static Map<String, SensorTypeEnum> codeToSensorSourceMapping;
+	private volatile static Map<Integer, SensorTypeEnum> internMapById;
 	private int id;
 	private String mode;
 	private String source;
@@ -73,33 +74,25 @@ public enum SensorTypeEnum {
 	}
 
 	public static SensorTypeEnum getById(int id) {
-		if (codeToSensorTypMapping == null) {
-			initMapping();
+		if (internMapById == null) {
+			internMapById = initMapping();
 		}
-		return codeToSensorTypMapping.get(id);
+		return internMapById.get(id);
 	}
 
-	public static SensorTypeEnum getBySource(int name) {
-		if (codeToSensorSourceMapping == null) {
-			initSourceMapping();
+	//@formatter:off
+	public static SensorTypeEnum getBySource(String source) {
+		if (internMapById == null) {
+			internMapById = initMapping();
 		}
-		return codeToSensorSourceMapping.get(name);
-	}
 
-	// Private Methods
-	private static void initMapping() {
-		codeToSensorTypMapping = new HashMap<>();
-		for (SensorTypeEnum cmd : values()) {
-			codeToSensorTypMapping.put(cmd.getId(), cmd);
-		}
+		return internMapById.entrySet().stream()
+				.filter(e -> e.getValue().getSource().equals(source))
+				.map(Map.Entry::getValue)
+				.findFirst()
+				.get();
 	}
-
-	private static void initSourceMapping() {
-		codeToSensorSourceMapping = new HashMap<>();
-		for (SensorTypeEnum cmd : values()) {
-			codeToSensorSourceMapping.put(cmd.getSource(), cmd);
-		}
-	}
+	//@formatter:on
 
 	public int getId() {
 		return id;
@@ -116,6 +109,12 @@ public enum SensorTypeEnum {
 	public int getElements() {
 		return elements;
 	}
+
+	// Private Methods
+	private static Map<Integer, SensorTypeEnum> initMapping() {
+		return Stream.of(values()).collect(Collectors.toMap(SensorTypeEnum::getId, e -> e));
+	}
+
 
 	@Override
 	public String toString() {

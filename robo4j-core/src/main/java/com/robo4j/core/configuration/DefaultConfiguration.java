@@ -23,7 +23,9 @@ import java.util.Set;
 /**
  * Default implementation of a {@link Configuration}.
  * 
- * <p>Internal Use Only</p>
+ * <p>
+ * Internal Use Only
+ * </p>
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -50,19 +52,28 @@ class DefaultConfiguration implements Configuration {
 		return (Double) getVal(name, defaultValue);
 	}
 
-
 	@Override
-	public Long getLong(String name, Long defaultValue ) {
-		return (Long) getVal(name, defaultValue);	
+	public Long getLong(String name, Long defaultValue) {
+		return (Long) getVal(name, defaultValue);
 	}
 
 	@Override
 	public String getString(String name, String defaultValue) {
-		return (String) getVal(name, defaultValue);	
+		return (String) getVal(name, defaultValue);
 	}
 
 	@Override
 	public void setString(String name, String s) {
+		settings.put(name, s);
+	}
+
+	@Override
+	public Character getCharacter(String name, Character defaultValue) {
+		return (Character) getVal(name, defaultValue);
+	}
+
+	@Override
+	public void setCharacter(String name, Character s) {
 		settings.put(name, s);
 	}
 
@@ -88,11 +99,11 @@ class DefaultConfiguration implements Configuration {
 
 	@Override
 	public Integer getInteger(String name, Integer defaultValue) {
-		return (Integer) getVal(name, defaultValue);	
+		return (Integer) getVal(name, defaultValue);
 	}
 
 	@Override
-	public Float getFloat(String name, Float defaultValue ) {
+	public Float getFloat(String name, Float defaultValue) {
 		return (Float) getVal(name, defaultValue);
 	}
 

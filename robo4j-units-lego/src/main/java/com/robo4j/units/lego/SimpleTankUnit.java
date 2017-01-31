@@ -51,6 +51,9 @@ import com.robo4j.units.lego.platform.MotorRotationEnum;
  */
 public class SimpleTankUnit extends RoboUnit<String> {
 
+	private static final String DEFAULT_MOTOR_LEFT = "B";
+	private static final String DEFAULT_MOTOR_RIGHT = "C";
+	private static final Character DEFAULT_MOTOR_TYPE = 'N';
 	private static final int DEFAULT_1 = 1;
 	private static final int DEFAULT_0 = 0;
 	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
@@ -97,11 +100,16 @@ public class SimpleTankUnit extends RoboUnit<String> {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		String leftMotorPort = configuration.getString("leftMotorPort", DEFAULT_MOTOR_LEFT);
+		Character leftMotorType = configuration.getCharacter("leftMotorType", DEFAULT_MOTOR_TYPE);
+		String rightMotorPort = configuration.getString("rightMotorPort", DEFAULT_MOTOR_RIGHT);
+		Character rightMotorType = configuration.getCharacter("rightMotorType", DEFAULT_MOTOR_TYPE);
+
 		MotorProvider motorProvider = new MotorProvider();
-		rightMotor = new MotorWrapper(motorProvider, AnalogPortEnum.C,
-				MotorTypeEnum.NXT);
-		leftMotor = new MotorWrapper(motorProvider, AnalogPortEnum.B,
-				MotorTypeEnum.NXT);
+		rightMotor = new MotorWrapper(motorProvider, AnalogPortEnum.getByType(rightMotorPort),
+				MotorTypeEnum.getByType(rightMotorType));
+		leftMotor = new MotorWrapper(motorProvider, AnalogPortEnum.getByType(leftMotorPort),
+				MotorTypeEnum.getByType(leftMotorType));
 
 	}
 

@@ -21,6 +21,10 @@ package com.robo4j.hw.lego.enums;
 
 import com.robo4j.hw.lego.ILegoHardware;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * Available Lego Motors
  *
@@ -38,12 +42,20 @@ public enum MotorTypeEnum implements ILegoHardware<Character> {
 	;
 	// @formatter:on
 
+	private volatile static Map<Character, MotorTypeEnum> internMapByType;
 	private char type;
 	private String name;
 
 	MotorTypeEnum(char type, String name) {
 		this.type = type;
 		this.name = name;
+	}
+
+	public static MotorTypeEnum getByType(Character type) {
+		if (internMapByType == null) {
+			internMapByType = initMapping();
+		}
+		return internMapByType.get(type);
 	}
 
 	@Override
@@ -55,6 +67,12 @@ public enum MotorTypeEnum implements ILegoHardware<Character> {
 	public String getName() {
 		return name;
 	}
+
+	// Private Methods
+	private static Map<Character, MotorTypeEnum> initMapping() {
+		return Stream.of(values()).collect(Collectors.toMap(MotorTypeEnum::getType, e -> e));
+	}
+
 
 	@Override
 	public String toString() {

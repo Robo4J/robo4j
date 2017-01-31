@@ -21,6 +21,10 @@ package com.robo4j.hw.lego.enums;
 
 import com.robo4j.hw.lego.ILegoHardware;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * Configuration interface
  *
@@ -40,12 +44,20 @@ public enum DigitalPortEnum implements ILegoHardware<String> {
 	;
 	// @formatter:on
 
+	private volatile static Map<String, DigitalPortEnum> internMapByType;
 	private String type;
 	private String name;
 
 	DigitalPortEnum(String type, String name) {
 		this.type = type;
 		this.name = name;
+	}
+
+	public static DigitalPortEnum getByType(String type) {
+		if (internMapByType == null) {
+			internMapByType = initMapping();
+		}
+		return internMapByType.get(type);
 	}
 
 	@Override
@@ -57,6 +69,12 @@ public enum DigitalPortEnum implements ILegoHardware<String> {
 	public String getName() {
 		return name;
 	}
+
+	// Private Methods
+	private static Map<String, DigitalPortEnum> initMapping() {
+		return Stream.of(values()).collect(Collectors.toMap(DigitalPortEnum::getType, e -> e));
+	}
+
 
 	@Override
 	public String toString() {

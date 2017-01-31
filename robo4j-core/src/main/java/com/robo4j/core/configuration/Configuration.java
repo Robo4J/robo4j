@@ -37,6 +37,7 @@ public interface Configuration {
 	Integer getInteger(String string, Integer defaultValue);
 	Long getLong(String name, Long defaultValue);
 	String getString(String name, String defaultValue);
+	Character getCharacter(String name, Character character);
 	Object getValue(String name, Object defaultValue);
 	
 	Set<String> getValueNames();
@@ -45,5 +46,6 @@ public interface Configuration {
 	void setFloat(String string, Float f);
 	void setInteger(String string, Integer i);
 	void setLong(String string, Long l);
+	void setCharacter(String string, Character c);
 	void setString(String string, String s);
 }
