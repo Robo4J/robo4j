@@ -60,6 +60,7 @@ public class BrickButtonsUnit extends RoboUnit<String> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		setState(LifecycleState.UNINITIALIZED);
 		target = configuration.getString("target", null);
 		if (target == null) {
 			throw ConfigurationException.createMissingConfigNameException("target");
@@ -76,7 +77,7 @@ public class BrickButtonsUnit extends RoboUnit<String> {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(PlateButtonI::getKey, PlateButtonI::getValue));
         //@formatter:on
-
+		setState(LifecycleState.INITIALIZED);
 	}
 
 	@Override

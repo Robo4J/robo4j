@@ -100,6 +100,7 @@ public class SimpleTankUnit extends RoboUnit<String> {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		setState(LifecycleState.INITIALIZED);
 		String leftMotorPort = configuration.getString("leftMotorPort", DEFAULT_MOTOR_LEFT);
 		Character leftMotorType = configuration.getCharacter("leftMotorType", DEFAULT_MOTOR_TYPE);
 		String rightMotorPort = configuration.getString("rightMotorPort", DEFAULT_MOTOR_RIGHT);
@@ -110,7 +111,7 @@ public class SimpleTankUnit extends RoboUnit<String> {
 				MotorTypeEnum.getByType(rightMotorType));
 		leftMotor = new MotorWrapper(motorProvider, AnalogPortEnum.getByType(leftMotorPort),
 				MotorTypeEnum.getByType(leftMotorType));
-
+		setState(LifecycleState.INITIALIZED);
 	}
 
 	// Private Methods

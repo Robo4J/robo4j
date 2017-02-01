@@ -64,17 +64,18 @@ public class HttpUnit extends RoboUnit<Object> {
 		final RoboReference<String> targetRef = getContext().getReference(target);
 		executor.execute(() -> server(targetRef));
 		setState(LifecycleState.STARTED);
-
 	}
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		setState(LifecycleState.UNINITIALIZED);
 		target = configuration.getString("target", null);
 		port = configuration.getInteger("port", _DEFAULT_PORT);
 		if (target == null) {
 			throw ConfigurationException.createMissingConfigNameException("target");
 		}
 		executor = Executors.newCachedThreadPool();
+		setState(LifecycleState.INITIALIZED);
 	}
 
 	@Override
