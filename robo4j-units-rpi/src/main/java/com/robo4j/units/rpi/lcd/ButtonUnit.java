@@ -118,6 +118,7 @@ public class ButtonUnit extends I2CRoboUnit<Object> {
 		}
 	}
 
+	// TODO: Probably Supplier
 	private void handleException(IOException e) {
 		setState(LifecycleState.STOPPING);
 		shutdown();

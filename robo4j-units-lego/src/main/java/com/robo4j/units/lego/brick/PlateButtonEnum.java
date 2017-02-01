@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This LegoPlatformMessageType.java  is part of robo4j.
+ * This PlateButtonEnum.java  is part of robo4j.
  * module: robo4j-units-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -17,9 +17,10 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.lego.platform;
+package com.robo4j.units.lego.brick;
 
-import com.robo4j.core.enums.RoboHardwareEnumI;
+import com.robo4j.hw.lego.ILegoHardware;
+import com.robo4j.units.lego.platform.LegoPlatformMessageType;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,44 +29,39 @@ import java.util.stream.Stream;
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 30.01.2017
+ * @since 31.01.2017
  */
-public enum LegoPlatformMessageType implements RoboHardwareEnumI<Integer> {
+public enum  PlateButtonEnum implements ILegoHardware<Integer> {
 
     //@formatter:off
-    STOP        (0, "stop"),
-    MOVE        (1, "move"),
-    BACK        (2, "back"),
-    LEFT        (3, "left"),
-    RIGHT       (4, "right")
+    UP              (0, "up", LegoPlatformMessageType.MOVE),
+    ENTER           (1, "enter", LegoPlatformMessageType.STOP),
+    DOWN            (2, "down", LegoPlatformMessageType.BACK),
+    RIGHT           (3, "right", LegoPlatformMessageType.RIGHT),
+    LEFT            (4, "left", LegoPlatformMessageType.LEFT),
+    ESCAPE          (5, "escape", null),
     ;
 
-
     //@formatter:on
+    private volatile static Map<Integer, PlateButtonEnum> internMapByType;
 
-    private volatile static Map<Integer, LegoPlatformMessageType> internMapByType;
-    private Integer type;
+    private int type;
     private String name;
+    private LegoPlatformMessageType message;
 
-    LegoPlatformMessageType(int type, String name) {
+    PlateButtonEnum(int type, String name, LegoPlatformMessageType message) {
         this.type = type;
         this.name = name;
+        this.message = message;
     }
 
-    //@formatter:off
-    private static Map<Integer, LegoPlatformMessageType> initMapping() {
-        return Stream.of(values())
-                .collect(Collectors.toMap(LegoPlatformMessageType::getType, e -> e));
-    }
-    public static LegoPlatformMessageType getByText(String text) {
-        if (internMapByType == null)
+    public static PlateButtonEnum getByType(Integer type) {
+        if (internMapByType == null) {
             internMapByType = initMapping();
-        return internMapByType.entrySet().stream()
-                .map(Map.Entry::getValue)
-                .filter(e -> e.getName().equals(text))
-                .findFirst().get();
+        }
+        return internMapByType.get(type);
     }
-    //@formatter:on
+
 
     @Override
     public Integer getType() {
@@ -77,9 +73,18 @@ public enum LegoPlatformMessageType implements RoboHardwareEnumI<Integer> {
         return name;
     }
 
+    public LegoPlatformMessageType getMessage() {
+        return message;
+    }
+
+    // Private Methods
+    private static Map<Integer, PlateButtonEnum> initMapping() {
+        return Stream.of(values()).collect(Collectors.toMap(PlateButtonEnum::getType, e -> e));
+    }
+
     @Override
     public String toString() {
-        return "LegoPlatformMessageType{" +
+        return "PlateButtonEnum{" +
                 "type=" + type +
                 ", name='" + name + '\'' +
                 '}';

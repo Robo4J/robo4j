@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
@@ -45,6 +46,7 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
  * @since 24.01.2017
  */
 public class HttpUnit extends RoboUnit<Object> {
+	private static final int TERMINATION_TIMEOUT = 2;
 	private static final int _DEFAULT_PORT = 8042;
 	private Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
 	private Integer port;
@@ -89,6 +91,21 @@ public class HttpUnit extends RoboUnit<Object> {
 			throw ConfigurationException.createMissingConfigNameException("target");
 		}
 		executor = Executors.newCachedThreadPool();
+	}
+
+	@Override
+	public void shutdown() {
+		setState(LifecycleState.SHUTTING_DOWN);
+		try {
+			executor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
+			executor.shutdown();
+		} catch (InterruptedException e) {
+			SimpleLoggingUtil.error(getClass(), "termination failed");
+		}
+		if (executor.isShutdown()) {
+			SimpleLoggingUtil.debug(getClass(), "executor is down");
+		}
+		super.shutdown();
 	}
 
 }

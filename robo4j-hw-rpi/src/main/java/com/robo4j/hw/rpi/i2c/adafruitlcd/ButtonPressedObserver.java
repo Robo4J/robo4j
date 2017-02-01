@@ -37,6 +37,7 @@ import java.util.logging.Logger;
  * @author Miro Wengner (@miragemiko)
  * @since 01.11.2016
  */
+//TODO, FIXME -> we should remove thread sleep
 public class ButtonPressedObserver {
 	private volatile boolean isRunning = false;
 	private final List<ButtonListener> buttonListeners = new LinkedList<ButtonListener>();
@@ -124,6 +125,7 @@ public class ButtonPressedObserver {
 		}
 	}
 
+	//TODO, FIXME: do not randomly threads use executor
 	public void startButtonMonitor() {
 		isRunning = true;
 		t = new Thread(new ButtonChecker(), "Button Checker");
