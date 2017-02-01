@@ -30,10 +30,16 @@ import com.robo4j.core.RoboUnit;
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
- *  @since 08.01.2017
+ * @since 08.01.2017
  *
  */
-public class SystemUtil {
+public final class SystemUtil {
+	private static final String BREAK = "\n";
+
+	private SystemUtil() {
+		//no instances
+	}
+
 	public final static Comparator<RoboUnit<?>> ID_COMPARATOR = new Comparator<RoboUnit<?>>() {
 		@Override
 		public int compare(RoboUnit<?> o1, RoboUnit<?> o2) {
@@ -45,10 +51,13 @@ public class SystemUtil {
 		StringBuilder builder = new StringBuilder();
 		List<RoboUnit<?>> units = new ArrayList<>(ctx.getUnits());
 		units.sort(ID_COMPARATOR);
-		builder.append("RoboSystem state " + ctx.getState().getLocalizedName());
-		builder.append("\n================================================\n");
+		builder.append("RoboSystem state ")
+				.append(ctx.getState().getLocalizedName())
+				.append("\n================================================")
+				.append(BREAK);
 		for (RoboUnit<?> unit : units) {
-			builder.append(String.format("    %-25s   %13s\n", unit.getId(), unit.getState().getLocalizedName()));	
+			builder.append(String.format("    %-25s   %13s", unit.getId(), unit.getState().getLocalizedName()))
+				.append(BREAK);
 		}
 		return builder.toString();
 	}

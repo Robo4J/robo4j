@@ -53,19 +53,17 @@ public class BrickButtonsUnit extends RoboUnit<String> {
         }
     }
 
+    //TODO, FIXME do it configurable
     @Override
     public void start() {
         final RoboReference<String> targetRef = getContext().getReference(target);
         setState(LifecycleState.STARTING);
-
         Button.LEFT.addKeyListener(new ButtonListener(targetRef, PlateButtonEnum.RIGHT, 1));
         Button.RIGHT.addKeyListener(new ButtonListener(targetRef, PlateButtonEnum.LEFT, 1));
         Button.UP.addKeyListener(new ButtonListener(targetRef, PlateButtonEnum.DOWN, 1));
         Button.DOWN.addKeyListener(new ButtonListener(targetRef, PlateButtonEnum.UP, 1));
-        Button.ESCAPE.addKeyListener(new ButtonListener(targetRef, PlateButtonEnum.ESCAPE, 2));
         Button.ENTER.addKeyListener(new ButtonListener(targetRef, PlateButtonEnum.ENTER, 2));
-
-        super.start();
+        setState(LifecycleState.STARTED);
     }
 
     @Override

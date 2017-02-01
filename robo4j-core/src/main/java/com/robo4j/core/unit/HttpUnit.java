@@ -41,17 +41,19 @@ import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 
 /**
+ * Http Unit represents REST end-point
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  * @since 24.01.2017
  */
 public class HttpUnit extends RoboUnit<Object> {
-	private static final int TERMINATION_TIMEOUT = 2;
 	private static final int _DEFAULT_PORT = 8042;
 	private Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
 	private Integer port;
 	private String target;
 	private ExecutorService executor;
+	private ServerSocket server;
 
 	public HttpUnit(RoboContext context, String id) {
 		super(context, id);
@@ -68,8 +70,9 @@ public class HttpUnit extends RoboUnit<Object> {
 
 	// Private Methods
 	private void server(final RoboReference<String> targetRef) {
-		try (ServerSocket server = new ServerSocket(port)) {
+		try {
 			setState(LifecycleState.STARTED);
+			server = new ServerSocket(port);
 			SimpleLoggingUtil.debug(getClass(), "started port: " + port);
 			while (activeStates.contains(getState())) {
 				Socket request = server.accept();
@@ -79,7 +82,7 @@ public class HttpUnit extends RoboUnit<Object> {
 			}
 			setState(LifecycleState.STOPPED);
 		} catch (InterruptedException | ExecutionException | IOException e) {
-			SimpleLoggingUtil.print(getClass(), "SERVER CLOSED");
+			SimpleLoggingUtil.debug(getClass(), "SERVER CLOSED");
 		}
 	}
 
@@ -97,15 +100,20 @@ public class HttpUnit extends RoboUnit<Object> {
 	public void shutdown() {
 		setState(LifecycleState.SHUTTING_DOWN);
 		try {
-			executor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
-			executor.shutdown();
-		} catch (InterruptedException e) {
-			SimpleLoggingUtil.error(getClass(), "termination failed");
+			if(server != null){
+				System.out.println("http server close");
+				server.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		executor.shutdownNow();
 		if (executor.isShutdown()) {
-			SimpleLoggingUtil.debug(getClass(), "executor is down");
+			System.out.println("http executor is down");
 		}
-		super.shutdown();
+
+		setState(LifecycleState.SHUTDOWN);
+		System.out.println("http shutdown");
 	}
 
 }
