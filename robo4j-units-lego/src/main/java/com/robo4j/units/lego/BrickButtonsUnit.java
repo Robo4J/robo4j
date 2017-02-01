@@ -94,11 +94,6 @@ public class BrickButtonsUnit extends RoboUnit<String> {
 		setState(LifecycleState.STARTED);
 	}
 
-	@Override
-	public void shutdown() {
-		super.shutdown();
-	}
-
     //Private Methods
     private BiFunction<PlateButtonEnum, Key, PlateButtonI> mapButton(){
         return (PlateButtonEnum plateButton, Key legoButton) -> new PlateButtonI() {
