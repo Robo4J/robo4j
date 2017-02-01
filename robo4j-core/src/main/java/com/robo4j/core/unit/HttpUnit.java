@@ -101,19 +101,13 @@ public class HttpUnit extends RoboUnit<Object> {
 		setState(LifecycleState.SHUTTING_DOWN);
 		try {
 			if(server != null){
-				System.out.println("http server close");
 				server.close();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			SimpleLoggingUtil.error(getClass(), "server problem: ", e);
 		}
 		executor.shutdownNow();
-		if (executor.isShutdown()) {
-			System.out.println("http executor is down");
-		}
-
 		setState(LifecycleState.SHUTDOWN);
-		System.out.println("http shutdown");
 	}
 
 }

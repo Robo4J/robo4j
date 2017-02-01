@@ -23,6 +23,8 @@ import com.robo4j.hw.lego.ILegoHardware;
 import com.robo4j.units.lego.platform.LegoPlatformMessageType;
 
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,6 +62,31 @@ public enum  PlateButtonEnum implements ILegoHardware<Integer> {
             internMapByType = initMapping();
         }
         return internMapByType.get(type);
+    }
+
+    public static PlateButtonEnum getByName(String name) {
+        if (internMapByType == null) {
+            internMapByType = initMapping();
+        }
+        //@formatter:off
+        return internMapByType.entrySet().stream()
+                .map(Map.Entry::getValue)
+                .filter(b -> b.getName().equals(name))
+                .findFirst()
+                .get();
+        //@formatter:on
+    }
+
+    public static Set<String> getButtonNames(){
+        if(internMapByType == null){
+            internMapByType = initMapping();
+        }
+        //@formatter:off
+        return internMapByType.entrySet().stream()
+                .map(Map.Entry::getValue)
+                .map(PlateButtonEnum::getName)
+                .collect(Collectors.toSet());
+        //@formatter:on
     }
 
 

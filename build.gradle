@@ -37,7 +37,6 @@ project("robo4j-core") {
         compile "com.googlecode.json-simple:json-simple:${jsonVersion}"
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
-        testCompile "org.mockito:mockito-all:${mockitoAllVersion}@jar"
     }
 }
 
