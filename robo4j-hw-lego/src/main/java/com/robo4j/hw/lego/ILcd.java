@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This LegoMotor.java  is part of robo4j.
+ * This ILcd.java  is part of robo4j.
  * module: robo4j-hw-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -19,34 +19,19 @@
 
 package com.robo4j.hw.lego;
 
-import com.robo4j.hw.lego.enums.AnalogPortEnum;
-import com.robo4j.hw.lego.enums.MotorTypeEnum;
-
 /**
- * Basic functionality of the LegoMindstorm Motor
+ * Generic interface for Lego Mindstorm LCD
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 05.05.2016
+ * @since 01.02.2017
  */
-public interface LegoMotor {
+public interface ILcd {
 
-	AnalogPortEnum getPort();
+    void initiate();
 
-	MotorTypeEnum getType();
+    void printText(int line, String text);
 
-	void forward();
-
-	void backward();
-
-	void stop();
-
-	void rotate(int val);
-
-	boolean isMoving();
-
-	void setSpeed(int speed);
-
-	void close();
+    void printText(String text);
 
 }

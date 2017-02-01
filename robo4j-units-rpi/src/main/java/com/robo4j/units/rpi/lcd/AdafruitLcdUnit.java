@@ -72,7 +72,6 @@ public class AdafruitLcdUnit extends I2CRoboUnit<String> {
 		} catch (Exception e) {
 			SimpleLoggingUtil.debug(getClass(), "Could not accept message" + message.toString(), e);
 		}
-
 		return super.onMessage(message);
 	}
 
@@ -86,23 +85,20 @@ public class AdafruitLcdUnit extends I2CRoboUnit<String> {
 			lcd.clear();
 			break;
 		case DISPLAY_ENABLE:
-			String enablement = message.getText();
-			if (enablement.equals("true")) {
-				lcd.setDisplayEnabled(true);
-			} else if (enablement.equals("false")) {
-				lcd.setDisplayEnabled(false);
-			} else {
-				SimpleLoggingUtil.error(getClass(), "Display enablement " + enablement + " is unknown");
-			}
+			final boolean disen = Boolean.valueOf(message.getText().trim());
+			lcd.setDisplayEnabled(disen);
 			break;
 		case SCROLL:
-			String direction = message.getText();
-			if (direction.equals("left")) {
-				lcd.scrollDisplay(Direction.LEFT);
-			} else if (direction.equals("right")) {
-				lcd.scrollDisplay(Direction.RIGHT);
-			} else {
-				SimpleLoggingUtil.error(getClass(), "Scroll direction " + direction + " is unknown");
+			switch (message.getText().trim()){
+				case "left":
+					lcd.scrollDisplay(Direction.LEFT);
+					break;
+				case "right":
+					lcd.scrollDisplay(Direction.RIGHT);
+					break;
+				default:
+					SimpleLoggingUtil.error(getClass(), "Scroll direction " + message.getText() + " is unknown");
+					break;
 			}
 			break;
 		case SET_TEXT:

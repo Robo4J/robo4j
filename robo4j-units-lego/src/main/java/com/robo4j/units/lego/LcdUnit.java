@@ -22,9 +22,10 @@ package com.robo4j.units.lego;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
+import com.robo4j.hw.lego.ILcd;
+import com.robo4j.hw.lego.wrapper.LcdWrapper;
 
 /**
  * Lego Mindstorm Brick LCD unit
@@ -35,7 +36,7 @@ import com.robo4j.core.configuration.Configuration;
  */
 public class LcdUnit extends RoboUnit<Object> {
 
-    private String target;
+    private ILcd lcd;
 
     public LcdUnit(RoboContext context, String id) {
         super(context, id);
@@ -44,18 +45,16 @@ public class LcdUnit extends RoboUnit<Object> {
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
         setState(LifecycleState.UNINITIALIZED);
-        target = configuration.getString("target", null);
-        if (target == null) {
-            throw ConfigurationException.createMissingConfigNameException("target");
-        }
-
+        lcd = configuration.getValue("test_lcd", null) == null ?
+                new LcdWrapper() : (ILcd)configuration.getValue("test_lcd", null);
         setState(LifecycleState.INITIALIZED);
     }
 
     @Override
     public void start() {
         setState(LifecycleState.STARTING);
-        final RoboReference<String> targetRef = getContext().getReference(target);
+        lcd.initiate();
+        lcd.printText("Press Escape to quit!");
 
         setState(LifecycleState.STARTED);
     }

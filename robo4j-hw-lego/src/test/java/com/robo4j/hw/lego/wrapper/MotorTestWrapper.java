@@ -19,7 +19,7 @@
 
 package com.robo4j.hw.lego.wrapper;
 
-import com.robo4j.hw.lego.LegoMotor;
+import com.robo4j.hw.lego.ILegoMotor;
 import com.robo4j.hw.lego.enums.AnalogPortEnum;
 import com.robo4j.hw.lego.enums.MotorTypeEnum;
 
@@ -30,7 +30,7 @@ import com.robo4j.hw.lego.enums.MotorTypeEnum;
  * @author Miro Wengner (@miragemiko)
  * @since 29.01.2017
  */
-public class MotorTestWrapper implements LegoMotor {
+public class MotorTestWrapper implements ILegoMotor {
 
     private final AnalogPortEnum port;
     private final MotorTypeEnum type;

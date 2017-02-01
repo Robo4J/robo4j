@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This SensorTestWrapper.java  is part of robo4j.
+ * This LegoMotor.java  is part of robo4j.
  * module: robo4j-hw-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -17,43 +17,36 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.lego.wrapper;
+package com.robo4j.hw.lego;
 
-import com.robo4j.hw.lego.ILegoSensor;
-import com.robo4j.hw.lego.enums.DigitalPortEnum;
-import com.robo4j.hw.lego.enums.SensorTypeEnum;
+import com.robo4j.hw.lego.enums.AnalogPortEnum;
+import com.robo4j.hw.lego.enums.MotorTypeEnum;
 
 /**
- * Simple LegoMindstorm Mock Sensor
+ * Basic functionality of the LegoMindstorm Motor
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 29.01.2017
+ * @since 05.05.2016
  */
-public class SensorTestWrapper implements ILegoSensor {
+public interface ILegoMotor {
 
-	private final DigitalPortEnum port;
-	private final SensorTypeEnum type;
+	AnalogPortEnum getPort();
 
-	public SensorTestWrapper(DigitalPortEnum port, SensorTypeEnum type) {
-		this.port = port;
-		this.type = type;
-	}
+	MotorTypeEnum getType();
 
-	@Override
-	public DigitalPortEnum getPort() {
-		return port;
-	}
+	void forward();
 
-	@Override
-	public SensorTypeEnum getType() {
-		return type;
-	}
+	void backward();
 
-	@Override
-	public String toString() {
-		return "SensorTestWrapper{" + "port=" + port + ", type=" + type + '}';
-	}
+	void stop();
 
+	void rotate(int val);
+
+	boolean isMoving();
+
+	void setSpeed(int speed);
+
+	void close();
 
 }

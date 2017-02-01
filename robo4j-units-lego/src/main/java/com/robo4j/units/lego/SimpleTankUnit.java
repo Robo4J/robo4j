@@ -34,7 +34,7 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.hw.lego.LegoMotor;
+import com.robo4j.hw.lego.ILegoMotor;
 import com.robo4j.hw.lego.enums.AnalogPortEnum;
 import com.robo4j.hw.lego.enums.MotorTypeEnum;
 import com.robo4j.hw.lego.provider.MotorProvider;
@@ -62,8 +62,8 @@ public class SimpleTankUnit extends RoboUnit<String> {
 	private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
 	private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
 			KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue, new RoboThreadFactory("Robo4J Lego Platform ", true));
-	protected volatile LegoMotor rightMotor;
-	protected volatile LegoMotor leftMotor;
+	protected volatile ILegoMotor rightMotor;
+	protected volatile ILegoMotor leftMotor;
 
 	public SimpleTankUnit(RoboContext context, String id) {
 		super(context, id);
@@ -101,6 +101,8 @@ public class SimpleTankUnit extends RoboUnit<String> {
 	@SuppressWarnings("unchecked")
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.INITIALIZED);
+
+		// TODO, FIXME testing phase can be defined as getValue and object
 		String leftMotorPort = configuration.getString("leftMotorPort", DEFAULT_MOTOR_LEFT);
 		Character leftMotorType = configuration.getCharacter("leftMotorType", DEFAULT_MOTOR_TYPE);
 		String rightMotorPort = configuration.getString("rightMotorPort", DEFAULT_MOTOR_RIGHT);
@@ -137,9 +139,9 @@ public class SimpleTankUnit extends RoboUnit<String> {
 		return new RoboResult<>(this, result);
 	}
 
-	private boolean executeTurn(LegoMotor... motors) {
-		LegoMotor rOne = motors[DEFAULT_0];
-		LegoMotor rTwo = motors[DEFAULT_1];
+	private boolean executeTurn(ILegoMotor... motors) {
+		ILegoMotor rOne = motors[DEFAULT_0];
+		ILegoMotor rTwo = motors[DEFAULT_1];
 		Future<Boolean> first = runEngine(rOne, MotorRotationEnum.BACKWARD);
 		Future<Boolean> second = runEngine(rTwo, MotorRotationEnum.FORWARD);
 		try {
@@ -149,7 +151,7 @@ public class SimpleTankUnit extends RoboUnit<String> {
 		}
 	}
 
-	protected boolean executeBothEngines(MotorRotationEnum rotation, LegoMotor... motors) {
+	protected boolean executeBothEngines(MotorRotationEnum rotation, ILegoMotor... motors) {
 		Future<Boolean> motorLeft = runEngine(motors[DEFAULT_0], rotation);
 		Future<Boolean> motorRight = runEngine(motors[DEFAULT_1], rotation);
 
@@ -160,7 +162,7 @@ public class SimpleTankUnit extends RoboUnit<String> {
 		}
 	}
 
-	private Future<Boolean> runEngine(LegoMotor motor, MotorRotationEnum rotation) {
+	private Future<Boolean> runEngine(ILegoMotor motor, MotorRotationEnum rotation) {
 		return executor.submit(() -> {
 			switch (rotation) {
 			case FORWARD:
@@ -180,7 +182,7 @@ public class SimpleTankUnit extends RoboUnit<String> {
 		});
 	}
 
-	private boolean executeBothEnginesStop(LegoMotor... motors) {
+	private boolean executeBothEnginesStop(ILegoMotor... motors) {
 		Future<Boolean> motorLeft = executeEngineStop(motors[DEFAULT_0]);
 		Future<Boolean> motorRight = executeEngineStop(motors[DEFAULT_1]);
 		try {
@@ -190,7 +192,7 @@ public class SimpleTankUnit extends RoboUnit<String> {
 		}
 	}
 
-	private Future<Boolean> executeEngineStop(LegoMotor motor) {
+	private Future<Boolean> executeEngineStop(ILegoMotor motor) {
 		return executor.submit(() -> {
 			motor.stop();
 			return motor.isMoving();

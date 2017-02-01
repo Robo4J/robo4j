@@ -19,7 +19,7 @@
 
 package com.robo4j.hw.lego.wrapper;
 
-import com.robo4j.hw.lego.LegoSensor;
+import com.robo4j.hw.lego.ILegoSensor;
 import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
 
@@ -32,7 +32,7 @@ import lejos.hardware.sensor.BaseSensor;
  * @author Miro Wengner (@miragemiko)
  * @since 26.11.2016
  */
-public class SensorWrapper<Sensor extends BaseSensor> implements LegoSensor {
+public class SensorWrapper<Sensor extends BaseSensor> implements ILegoSensor {
 
 	protected Sensor sensor;
 	protected DigitalPortEnum port;

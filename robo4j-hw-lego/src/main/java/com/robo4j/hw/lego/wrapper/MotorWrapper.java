@@ -19,7 +19,7 @@
 
 package com.robo4j.hw.lego.wrapper;
 
-import com.robo4j.hw.lego.LegoMotor;
+import com.robo4j.hw.lego.ILegoMotor;
 import com.robo4j.hw.lego.enums.AnalogPortEnum;
 
 import com.robo4j.hw.lego.enums.MotorTypeEnum;
@@ -33,7 +33,7 @@ import lejos.robotics.RegulatedMotor;
  * @author Miro Wengner (@miragemiko)
  * @since 23.11.2016
  */
-public class MotorWrapper<Motor extends RegulatedMotor> implements LegoMotor {
+public class MotorWrapper<Motor extends RegulatedMotor> implements ILegoMotor {
 
 	protected Motor motor;
 	protected AnalogPortEnum port;

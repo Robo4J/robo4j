@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This LegoSensor.java  is part of robo4j.
+ * This LcdTestWrapper.java  is part of robo4j.
  * module: robo4j-hw-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -17,24 +17,29 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.lego;
+package com.robo4j.hw.lego.wrapper;
 
-
-import com.robo4j.hw.lego.enums.DigitalPortEnum;
-import com.robo4j.hw.lego.enums.SensorTypeEnum;
+import com.robo4j.hw.lego.ILcd;
 
 /**
- *
- * Basic functionality of any LegoMindstorm Sensor
- *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 26.06.2016
+ * @since 01.02.2017
  */
-public interface LegoSensor {
+public class LcdTestWrapper implements ILcd {
 
-	DigitalPortEnum getPort();
+    @Override
+    public void initiate() {
+        System.out.println(getClass().getSimpleName() + ":initiate");
+    }
 
-	SensorTypeEnum getType();
+    @Override
+    public void printText(int line, String text) {
+        System.out.println(getClass().getSimpleName() + ":printText line: " + line + ", text: " + text);
+    }
 
+    @Override
+    public void printText(String text) {
+        System.out.println(getClass().getSimpleName() + ":printText = " + text);
+    }
 }

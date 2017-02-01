@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This SensorTestWrapper.java  is part of robo4j.
+ * This LegoSensor.java  is part of robo4j.
  * module: robo4j-hw-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -17,43 +17,24 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.lego.wrapper;
+package com.robo4j.hw.lego;
 
-import com.robo4j.hw.lego.ILegoSensor;
+
 import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
 
 /**
- * Simple LegoMindstorm Mock Sensor
+ *
+ * Basic functionality of any LegoMindstorm Sensor
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 29.01.2017
+ * @since 26.06.2016
  */
-public class SensorTestWrapper implements ILegoSensor {
+public interface ILegoSensor {
 
-	private final DigitalPortEnum port;
-	private final SensorTypeEnum type;
+	DigitalPortEnum getPort();
 
-	public SensorTestWrapper(DigitalPortEnum port, SensorTypeEnum type) {
-		this.port = port;
-		this.type = type;
-	}
-
-	@Override
-	public DigitalPortEnum getPort() {
-		return port;
-	}
-
-	@Override
-	public SensorTypeEnum getType() {
-		return type;
-	}
-
-	@Override
-	public String toString() {
-		return "SensorTestWrapper{" + "port=" + port + ", type=" + type + '}';
-	}
-
+	SensorTypeEnum getType();
 
 }
