@@ -28,7 +28,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
@@ -68,6 +67,30 @@ public class HttpUnit extends RoboUnit<Object> {
 
 	}
 
+	@Override
+	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		target = configuration.getString("target", null);
+		port = configuration.getInteger("port", _DEFAULT_PORT);
+		if (target == null) {
+			throw ConfigurationException.createMissingConfigNameException("target");
+		}
+		executor = Executors.newCachedThreadPool();
+	}
+
+	@Override
+	public void shutdown() {
+		setState(LifecycleState.SHUTTING_DOWN);
+		try {
+			if (server != null) {
+				server.close();
+			}
+		} catch (IOException e) {
+			SimpleLoggingUtil.error(getClass(), "server problem: ", e);
+		}
+		executor.shutdownNow();
+		setState(LifecycleState.SHUTDOWN);
+	}
+
 	// Private Methods
 	private void server(final RoboReference<String> targetRef) {
 		try {
@@ -84,30 +107,6 @@ public class HttpUnit extends RoboUnit<Object> {
 		} catch (InterruptedException | ExecutionException | IOException e) {
 			SimpleLoggingUtil.debug(getClass(), "SERVER CLOSED");
 		}
-	}
-
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		target = configuration.getString("target", null);
-		port = configuration.getInteger("port", _DEFAULT_PORT);
-		if (target == null) {
-			throw ConfigurationException.createMissingConfigNameException("target");
-		}
-		executor = Executors.newCachedThreadPool();
-	}
-
-	@Override
-	public void shutdown() {
-		setState(LifecycleState.SHUTTING_DOWN);
-		try {
-			if(server != null){
-				server.close();
-			}
-		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "server problem: ", e);
-		}
-		executor.shutdownNow();
-		setState(LifecycleState.SHUTDOWN);
 	}
 
 }

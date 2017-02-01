@@ -32,7 +32,7 @@ public class ConfigurationException extends Exception {
 	}
 	
 	public static ConfigurationException createMissingConfigNameException(String configName) {
-		return new ConfigurationException(String.format("Unit requires target %s to be configured.", configName));
+		return new ConfigurationException(String.format("Unit requires %s to be configured.", configName));
 	}
 	
 }
