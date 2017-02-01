@@ -22,6 +22,7 @@ package com.robo4j.units.lego;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboResult;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.hw.lego.ILcd;
@@ -36,10 +37,28 @@ import com.robo4j.hw.lego.wrapper.LcdWrapper;
  */
 public class LcdUnit extends RoboUnit<Object> {
 
+    private static final String CONSTANT_CLEAR = "clear";
     private ILcd lcd;
 
     public LcdUnit(RoboContext context, String id) {
         super(context, id);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public  RoboResult<Object, ?> onMessage(Object message) {
+
+        String lcdMessage = message.toString();
+        switch (lcdMessage){
+            case CONSTANT_CLEAR:
+                lcd.initiate();
+                break;
+            default:
+                lcd.printText(lcdMessage);
+                break;
+        }
+
+        return super.onMessage(message);
     }
 
     @Override
@@ -55,9 +74,12 @@ public class LcdUnit extends RoboUnit<Object> {
         setState(LifecycleState.STARTING);
         lcd.initiate();
         lcd.printText("Press Escape to quit!");
-
         setState(LifecycleState.STARTED);
     }
 
-
+    @Override
+    public void shutdown() {
+        lcd.printText("System is going down...");
+        super.shutdown();
+    }
 }
