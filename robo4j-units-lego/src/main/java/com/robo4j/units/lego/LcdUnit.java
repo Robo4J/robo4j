@@ -36,9 +36,8 @@ import com.robo4j.hw.lego.wrapper.LcdWrapper;
  * @since 01.02.2017
  */
 public class LcdUnit extends RoboUnit<Object> {
-
     private static final String CONSTANT_CLEAR = "clear";
-    private ILcd lcd;
+    protected ILcd lcd;
 
     public LcdUnit(RoboContext context, String id) {
         super(context, id);
@@ -64,8 +63,7 @@ public class LcdUnit extends RoboUnit<Object> {
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
         setState(LifecycleState.UNINITIALIZED);
-        lcd = configuration.getValue("test_lcd", null) == null ?
-                new LcdWrapper() : (ILcd)configuration.getValue("test_lcd", null);
+        lcd = new LcdWrapper();
         setState(LifecycleState.INITIALIZED);
     }
 

@@ -27,5 +27,18 @@ package com.robo4j.units.lego.util;
  * @since 01.02.2017
  */
 public class BrickUtils {
+
+    /* identifies Lego Brick Mindstorm buttons */
     public static final String PREFIX_BUTTON = "button_";
+
+    /* identifies test resources */
+    private static final String PREFIX_TEST = "test_";
+
+    public static String getButton(String name){
+        return PREFIX_BUTTON.concat(name).toLowerCase();
+    }
+
+    public static String getTestResource(String name){
+        return PREFIX_TEST.concat(name).toLowerCase();
+    }
 }

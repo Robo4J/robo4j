@@ -51,9 +51,6 @@ import com.robo4j.units.lego.platform.MotorRotationEnum;
  */
 public class SimpleTankUnit extends RoboUnit<String> {
 
-	private static final String DEFAULT_MOTOR_LEFT = "B";
-	private static final String DEFAULT_MOTOR_RIGHT = "C";
-	private static final Character DEFAULT_MOTOR_TYPE = 'N';
 	private static final int DEFAULT_1 = 1;
 	private static final int DEFAULT_0 = 0;
 	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
@@ -62,6 +59,9 @@ public class SimpleTankUnit extends RoboUnit<String> {
 	private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
 	private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
 			KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue, new RoboThreadFactory("Robo4J Lego Platform ", true));
+	protected static final String DEFAULT_MOTOR_LEFT = "B";
+	protected static final String DEFAULT_MOTOR_RIGHT = "C";
+	protected static final Character DEFAULT_MOTOR_TYPE = 'N';
 	protected volatile ILegoMotor rightMotor;
 	protected volatile ILegoMotor leftMotor;
 
@@ -102,7 +102,6 @@ public class SimpleTankUnit extends RoboUnit<String> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.INITIALIZED);
 
-		// TODO, FIXME testing phase can be defined as getValue and object
 		String leftMotorPort = configuration.getString("leftMotorPort", DEFAULT_MOTOR_LEFT);
 		Character leftMotorType = configuration.getCharacter("leftMotorType", DEFAULT_MOTOR_TYPE);
 		String rightMotorPort = configuration.getString("rightMotorPort", DEFAULT_MOTOR_RIGHT);

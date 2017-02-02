@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This LcdTestWrapper.java  is part of robo4j.
- * module: robo4j-hw-lego
+ * This SensorTestWrapper.java  is part of robo4j.
+ * module: robo4j-units-lego-test
  *
  * robo4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,27 +19,41 @@
 
 package com.robo4j.hw.lego.wrapper;
 
-import com.robo4j.hw.lego.ILcd;
+import com.robo4j.hw.lego.ILegoSensor;
+import com.robo4j.hw.lego.enums.DigitalPortEnum;
+import com.robo4j.hw.lego.enums.SensorTypeEnum;
 
 /**
+ * Simple LegoMindstorm Mock Sensor
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 01.02.2017
+ * @since 29.01.2017
  */
-public class LcdTestWrapper implements ILcd {
+public class SensorTestWrapper implements ILegoSensor {
 
-    @Override
-    public void initiate() {
-        System.out.println(getClass().getSimpleName() + ":initiate");
-    }
+	private final DigitalPortEnum port;
+	private final SensorTypeEnum type;
 
-    @Override
-    public void printText(int line, String text) {
-        System.out.println(getClass().getSimpleName() + ":printText line: " + line + ", text: " + text);
-    }
+	public SensorTestWrapper(DigitalPortEnum port, SensorTypeEnum type) {
+		this.port = port;
+		this.type = type;
+	}
 
-    @Override
-    public void printText(String text) {
-        System.out.println(getClass().getSimpleName() + ":printText = " + text);
-    }
+	@Override
+	public DigitalPortEnum getPort() {
+		return port;
+	}
+
+	@Override
+	public SensorTypeEnum getType() {
+		return type;
+	}
+
+	@Override
+	public String toString() {
+		return "SensorTestWrapper{" + "port=" + port + ", type=" + type + '}';
+	}
+
+
 }

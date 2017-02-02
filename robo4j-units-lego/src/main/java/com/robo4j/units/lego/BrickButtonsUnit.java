@@ -70,7 +70,7 @@ public class BrickButtonsUnit extends RoboUnit<String> {
         /* initiate button plate */
         buttons = availablePlateButtons.stream()
                 .map(lb -> {
-                    String bPropName = configuration.getString(BrickUtils.PREFIX_BUTTON.concat(lb.getName().toLowerCase()), null);
+                    String bPropName = configuration.getString(BrickUtils.getButton(lb.getName()), null);
                     PlateButtonEnum plateB = PlateButtonEnum.getByName(bPropName);
                     return (bPropName == null || plateB == null) ? null : mapButton().apply(plateB, lb);
                 })

@@ -154,43 +154,6 @@ project("robo4j-hw-rpi") {
     }
 }
 
-//project("robo4j-lego") {
-//    description = "Robo4J Lego"
-//
-//    group 'com.robo4j'
-//    version "${robo4jVersion}"
-//
-//    apply plugin: 'java'
-//    apply plugin: 'idea'
-//    apply plugin: 'eclipse'
-//    apply plugin: 'maven'
-//
-//    sourceCompatibility = 1.8
-//
-//    repositories {
-//        mavenCentral()
-//        mavenLocal()
-//        flatDir {
-//            dirs 'libs'
-//        }
-//    }
-//
-//    uploadArchives {
-//        repositories {
-//            mavenDeployer {
-//                repository(url: "${mavenRepository}")
-//            }
-//        }
-//    }
-//
-//    dependencies {
-//        compileOnly "lejos:ev3classes:${lejosVersion}"
-//        compile(project(":robo4j-core"))
-//        testCompile "junit:junit:${junitVersion}"
-//        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
-//    }
-//}
-
 project("robo4j-math") {
     description = "Robo4J Math"
 
@@ -292,6 +255,41 @@ project("robo4j-units-lego") {
 
     dependencies {
         compile(project(":robo4j-hw-lego"))
+        compile(project(":robo4j-core"))
+        testCompile(project(":robo4j-units-lego-test"))
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+}
+
+project("robo4j-units-lego-test") {
+    description = "Robo4J Lego Test Abstractions"
+
+    group 'com.robo4j'
+    version "${robo4jVersion}"
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "${mavenRepository}")
+            }
+        }
+    }
+
+    dependencies {
+        compile(project(":robo4j-units-lego"))
         compile(project(":robo4j-core"))
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"

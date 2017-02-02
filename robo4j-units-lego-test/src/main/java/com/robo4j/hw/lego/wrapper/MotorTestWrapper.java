@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
  * This MotorTestWrapper.java  is part of robo4j.
- * module: robo4j-hw-lego
+ * module: robo4j-units-lego-test
  *
  * robo4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
