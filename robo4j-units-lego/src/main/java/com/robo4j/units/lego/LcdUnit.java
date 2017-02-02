@@ -36,48 +36,48 @@ import com.robo4j.hw.lego.wrapper.LcdWrapper;
  * @since 01.02.2017
  */
 public class LcdUnit extends RoboUnit<Object> {
-    private static final String CONSTANT_CLEAR = "clear";
-    protected ILcd lcd;
+	private static final String CONSTANT_CLEAR = "clear";
+	protected ILcd lcd;
 
-    public LcdUnit(RoboContext context, String id) {
-        super(context, id);
-    }
+	public LcdUnit(RoboContext context, String id) {
+		super(context, id);
+	}
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public  RoboResult<Object, ?> onMessage(Object message) {
+	@Override
+	@SuppressWarnings("unchecked")
+	public RoboResult<Object, ?> onMessage(Object message) {
 
-        String lcdMessage = message.toString();
-        switch (lcdMessage){
-            case CONSTANT_CLEAR:
-                lcd.initiate();
-                break;
-            default:
-                lcd.printText(lcdMessage);
-                break;
-        }
+		String lcdMessage = message.toString();
+		switch (lcdMessage) {
+		case CONSTANT_CLEAR:
+			lcd.initiate();
+			break;
+		default:
+			lcd.printText(lcdMessage);
+			break;
+		}
 
-        return super.onMessage(message);
-    }
+		return super.onMessage(message);
+	}
 
-    @Override
-    protected void onInitialization(Configuration configuration) throws ConfigurationException {
-        setState(LifecycleState.UNINITIALIZED);
-        lcd = new LcdWrapper();
-        setState(LifecycleState.INITIALIZED);
-    }
+	@Override
+	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		setState(LifecycleState.UNINITIALIZED);
+		lcd = new LcdWrapper();
+		setState(LifecycleState.INITIALIZED);
+	}
 
-    @Override
-    public void start() {
-        setState(LifecycleState.STARTING);
-        lcd.initiate();
-        lcd.printText("Press Escape to quit!");
-        setState(LifecycleState.STARTED);
-    }
+	@Override
+	public void start() {
+		setState(LifecycleState.STARTING);
+		lcd.initiate();
+		lcd.printText("Press Escape to quit!");
+		setState(LifecycleState.STARTED);
+	}
 
-    @Override
-    public void shutdown() {
-        lcd.printText("System is going down...");
-        super.shutdown();
-    }
+	@Override
+	public void shutdown() {
+		lcd.printText("System is going down...");
+		super.shutdown();
+	}
 }
