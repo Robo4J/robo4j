@@ -41,7 +41,6 @@ public class SimpleTankTestUnit extends SimpleTankUnit {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
         setState(LifecycleState.INITIALIZED);
 

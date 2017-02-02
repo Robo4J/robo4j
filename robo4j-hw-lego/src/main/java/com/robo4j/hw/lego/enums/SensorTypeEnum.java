@@ -19,7 +19,6 @@
 
 package com.robo4j.hw.lego.enums;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

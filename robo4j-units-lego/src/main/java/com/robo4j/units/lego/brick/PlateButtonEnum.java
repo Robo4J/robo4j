@@ -19,14 +19,13 @@
 
 package com.robo4j.units.lego.brick;
 
-import com.robo4j.hw.lego.ILegoHardware;
-import com.robo4j.units.lego.platform.LegoPlatformMessageType;
-
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.robo4j.hw.lego.ILegoHardware;
+import com.robo4j.units.lego.platform.LegoPlatformMessageType;
 
 /**
  * @author Marcus Hirt (@hirt)
