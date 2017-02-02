@@ -61,9 +61,6 @@ project("robo4j-hw-lego") {
     repositories {
         mavenCentral()
         mavenLocal()
-//        flatDir {
-//            dirs 'libs'
-//        }
     }
 
     uploadArchives {
@@ -81,13 +78,13 @@ project("robo4j-hw-lego") {
                 srcDirs = ['src/main/java', 'src/examples/java']
             }
             resources {
-                srcDirs = ['src/resources']
+                srcDirs = ['src/main/resources', 'src/examples/resources']
             }
         }
     }
 
     dependencies {
-        compile files('libs/ev3classes-9.2-SNAPSHOT.jar')
+        compile fileTree(dir: 'libs', include: 'ev3classes-9.1.jar')
         compile(project(":robo4j-math"))
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
