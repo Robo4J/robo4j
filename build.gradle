@@ -40,59 +40,59 @@ project("robo4j-core") {
     }
 }
 
-//project("robo4j-hw-lego") {
-//    description = "Robo4J Lego Hardware"
-//
-//    group 'com.robo4j'
-//    version "${robo4jVersion}"
-//
-//    apply plugin: 'java'
-//    apply plugin: 'idea'
-//    apply plugin: 'eclipse'
-//    apply plugin: 'maven'
-//
-//    sourceCompatibility = 1.8
-//
-//    repositories {
-//        mavenCentral()
-//        mavenLocal()
-//    }
-//
-//    repositories {
-//        mavenCentral()
-//        mavenLocal()
+project("robo4j-hw-lego") {
+    description = "Robo4J Lego Hardware"
+
+    group 'com.robo4j'
+    version "${robo4jVersion}"
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
 //        flatDir {
 //            dirs 'libs'
 //        }
-//    }
-//
-//    uploadArchives {
-//        repositories {
-//            mavenDeployer {
-//                repository(url: "${mavenRepository}")
-//            }
-//        }
-//    }
-//
-//    //sources
-//    sourceSets {
-//        main {
-//            java {
-//                srcDirs = ['src/main/java', 'src/examples/java']
-//            }
-//            resources {
-//                srcDirs = ['src/resources']
-//            }
-//        }
-//    }
-//
-//    dependencies {
-//        compile "lejos:ev3classes:${lejosVersion}@jar"
-//        compile(project(":robo4j-math"))
-//        testCompile "junit:junit:${junitVersion}"
-//        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
-//    }
-//}
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "${mavenRepository}")
+            }
+        }
+    }
+
+    //sources
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java', 'src/examples/java']
+            }
+            resources {
+                srcDirs = ['src/resources']
+            }
+        }
+    }
+
+    dependencies {
+        compile files('libs/ev3classes-9.2-SNAPSHOT.jar')
+        compile(project(":robo4j-math"))
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+}
 
 project("robo4j-hw-rpi") {
     description = "Robo4J RaspberryPi Hardware"
@@ -227,74 +227,74 @@ project("robo4j-page") {
     }
 }
 
-//project("robo4j-units-lego") {
-//    description = "Robo4J Lego Abstractions"
-//
-//    group 'com.robo4j'
-//    version "${robo4jVersion}"
-//
-//    apply plugin: 'java'
-//    apply plugin: 'idea'
-//    apply plugin: 'eclipse'
-//    apply plugin: 'maven'
-//
-//    sourceCompatibility = 1.8
-//
-//    repositories {
-//        mavenCentral()
-//        mavenLocal()
-//    }
-//
-//    uploadArchives {
-//        repositories {
-//            mavenDeployer {
-//                repository(url: "${mavenRepository}")
-//            }
-//        }
-//    }
-//
-//    dependencies {
-//        compile(project(":robo4j-hw-lego"))
-//        compile(project(":robo4j-core"))
-//        testCompile(project(":robo4j-units-lego-test"))
-//        testCompile "junit:junit:${junitVersion}"
-//        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
-//    }
-//}
+project("robo4j-units-lego") {
+    description = "Robo4J Lego Abstractions"
 
-//project("robo4j-units-lego-test") {
-//    description = "Robo4J Lego Test Abstractions"
-//
-//    group 'com.robo4j'
-//    version "${robo4jVersion}"
-//
-//    apply plugin: 'java'
-//    apply plugin: 'idea'
-//    apply plugin: 'eclipse'
-//    apply plugin: 'maven'
-//
-//    sourceCompatibility = 1.8
-//
-//    repositories {
-//        mavenCentral()
-//        mavenLocal()
-//    }
-//
-//    uploadArchives {
-//        repositories {
-//            mavenDeployer {
-//                repository(url: "${mavenRepository}")
-//            }
-//        }
-//    }
-//
-//    dependencies {
-//        compile(project(":robo4j-units-lego"))
-//        compile(project(":robo4j-core"))
-//        testCompile "junit:junit:${junitVersion}"
-//        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
-//    }
-//}
+    group 'com.robo4j'
+    version "${robo4jVersion}"
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "${mavenRepository}")
+            }
+        }
+    }
+
+    dependencies {
+        compile(project(":robo4j-hw-lego"))
+        compile(project(":robo4j-core"))
+        testCompile(project(":robo4j-units-lego-test"))
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+}
+
+project("robo4j-units-lego-test") {
+    description = "Robo4J Lego Test Abstractions"
+
+    group 'com.robo4j'
+    version "${robo4jVersion}"
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "${mavenRepository}")
+            }
+        }
+    }
+
+    dependencies {
+        compile(project(":robo4j-units-lego"))
+        compile(project(":robo4j-core"))
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+}
 
 project("robo4j-units-rpi") {
     description = "Robo4J Raspberry Pi"
