@@ -75,10 +75,10 @@ project("robo4j-hw-lego") {
     sourceSets {
         main {
             java {
-                srcDirs = ['src/main/java', 'src/examples/java']
+                srcDirs = ['src/main/java', 'src/examples/java', 'src/test/java']
             }
             resources {
-                srcDirs = ['src/main/resources', 'src/examples/resources']
+                srcDirs = ['src/main/resources', 'src/test/resources']
             }
         }
     }
@@ -116,19 +116,6 @@ project("robo4j-hw-rpi") {
             }
         }
     }
-
-    //sources
-    sourceSets {
-        main {
-            java {
-                srcDirs = ['src/main/java', 'src/examples/java']
-            }
-            resources {
-                srcDirs = ['src/resources']
-            }
-        }
-    }
-
 
     //create a single Jar with all dependencies
     task fatJar(type: Jar) {
