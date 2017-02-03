@@ -20,6 +20,7 @@
 package com.robo4j.units.lego.platform;
 
 import com.robo4j.core.RoboReference;
+import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
 
 /**
  * Lego Platform message
@@ -31,31 +32,31 @@ import com.robo4j.core.RoboReference;
 public class LegoPlatformMessage {
 
     private final RoboReference<?> source;
-    private final LegoPlatformMessageType type;
+    private final LegoPlatformMessageTypeEnum type;
 
     public LegoPlatformMessage(String text){
-        this(null, LegoPlatformMessageType.getByText(text));
+        this(null, LegoPlatformMessageTypeEnum.getByText(text));
     }
 
-    public LegoPlatformMessage(LegoPlatformMessageType type) {
+    public LegoPlatformMessage(LegoPlatformMessageTypeEnum type) {
         this(null, type);
     }
 
-    public LegoPlatformMessage(RoboReference<?> source, LegoPlatformMessageType type) {
+    public LegoPlatformMessage(RoboReference<?> source, LegoPlatformMessageTypeEnum type) {
         this.source = source;
         this.type = type;
     }
 
     public LegoPlatformMessage(RoboReference<?> source, String text) {
         this.source = source;
-        this.type = LegoPlatformMessageType.getByText(text);
+        this.type = LegoPlatformMessageTypeEnum.getByText(text);
     }
 
     public RoboReference<?> getSource(){
         return source;
     }
 
-    public LegoPlatformMessageType getType(){
+    public LegoPlatformMessageTypeEnum getType(){
         return type;
     }
 

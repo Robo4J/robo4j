@@ -32,13 +32,12 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
+import com.robo4j.hw.lego.enums.ButtonTypeEnum;
 import com.robo4j.units.lego.brick.ButtonListener;
 import com.robo4j.units.lego.brick.PlateButtonEnum;
-
 import com.robo4j.units.lego.brick.PlateButtonI;
-import com.robo4j.units.lego.util.BrickUtils;
-import lejos.hardware.Button;
-import lejos.hardware.Key;
+import com.robo4j.hw.lego.util.BrickUtils;
+import lejos.hardware.KeyListener;
 
 /**
  * Lego Mindstorm Brick button plate
@@ -50,9 +49,9 @@ import lejos.hardware.Key;
 public class BrickButtonsUnit extends RoboUnit<String> {
 	private static final int COLOR_GREEN = 1;
 	private String target;
-	private List<Key> availablePlateButtons = Arrays.asList(Button.LEFT, Button.RIGHT, Button.UP, Button.DOWN,
-			Button.ENTER);
-	private Map<PlateButtonEnum, Key> buttons;
+	private List<ButtonTypeEnum> availablePlateButtons = Arrays.asList(ButtonTypeEnum.LEFT, ButtonTypeEnum.RIGHT,
+			ButtonTypeEnum.UP, ButtonTypeEnum.DOWN, ButtonTypeEnum.ENTER);
+	private Map<PlateButtonEnum, ButtonTypeEnum> buttons;
 
 	public BrickButtonsUnit(RoboContext context, String id) {
 		super(context, id);
@@ -88,24 +87,25 @@ public class BrickButtonsUnit extends RoboUnit<String> {
 		//@formatter:off
         buttons.entrySet().stream()
                 .forEach(e ->
-                    e.getValue().addKeyListener(new ButtonListener(targetRef, e.getKey(), COLOR_GREEN))
+                    e.getValue().getType()
+							.addKeyListener((KeyListener) new ButtonListener(targetRef, e.getKey(), COLOR_GREEN))
                 );
         //@formatter:on
 		setState(LifecycleState.STARTED);
 	}
 
-    //Private Methods
-    private BiFunction<PlateButtonEnum, Key, PlateButtonI> mapButton(){
-        return (PlateButtonEnum plateButton, Key legoButton) -> new PlateButtonI() {
-            @Override
-            public PlateButtonEnum getKey() {
-                return plateButton;
-            }
+	// Private Methods
+	private BiFunction<PlateButtonEnum, ButtonTypeEnum, PlateButtonI> mapButton() {
+		return (PlateButtonEnum plateButton, ButtonTypeEnum legoButton) -> new PlateButtonI() {
+			@Override
+			public PlateButtonEnum getKey() {
+				return plateButton;
+			}
 
-            @Override
-            public Key getValue() {
-                return legoButton;
-            }
-        };
-    }
+			@Override
+			public ButtonTypeEnum getValue() {
+				return legoButton;
+			}
+		};
+	}
 }

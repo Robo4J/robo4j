@@ -19,7 +19,7 @@
 
 package com.robo4j.units.lego.brick;
 
-import lejos.hardware.Key;
+import com.robo4j.hw.lego.enums.ButtonTypeEnum;
 
 /**
  * Plate button works as the interface of binding LegoMindstorm Hardware button with Robo4J abstraction
@@ -32,6 +32,6 @@ import lejos.hardware.Key;
 public interface PlateButtonI {
 
     PlateButtonEnum getKey();
-    Key getValue();
+    ButtonTypeEnum getValue();
 
 }

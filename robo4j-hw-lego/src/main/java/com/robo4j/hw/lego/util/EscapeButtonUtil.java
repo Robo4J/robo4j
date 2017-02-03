@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This BrickUtils.java  is part of robo4j.
- * module: robo4j-units-lego
+ * This EscapeButtonUtil.java  is part of robo4j.
+ * module: robo4j-hw-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,28 +17,24 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.lego.util;
+package com.robo4j.hw.lego.util;
+
+import com.robo4j.hw.lego.wrapper.ButtonWrapper;
+import lejos.hardware.Button;
+import lejos.hardware.Key;
 
 /**
- * Some useful Lego Mindstorm brick utils
- *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 01.02.2017
+ * @since 02.02.2017
  */
-public class BrickUtils {
+public final class EscapeButtonUtil {
 
-    /* identifies Lego Brick Mindstorm buttons */
-    public static final String PREFIX_BUTTON = "button_";
+    @SuppressWarnings("unchecked")
+    private static final ButtonWrapper<Key> escape = new ButtonWrapper(Button.ESCAPE);
 
-    /* identifies test resources */
-    private static final String PREFIX_TEST = "test_";
-
-    public static String getButton(String name){
-        return PREFIX_BUTTON.concat(name).toLowerCase();
+    public static void waitForPressAndRelease(){
+        escape.waitForPressAndRelease();
     }
 
-    public static String getTestResource(String name){
-        return PREFIX_TEST.concat(name).toLowerCase();
-    }
 }

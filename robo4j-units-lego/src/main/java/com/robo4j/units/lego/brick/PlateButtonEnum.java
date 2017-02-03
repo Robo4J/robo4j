@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.robo4j.hw.lego.ILegoHardware;
-import com.robo4j.units.lego.platform.LegoPlatformMessageType;
+import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -35,11 +35,11 @@ import com.robo4j.units.lego.platform.LegoPlatformMessageType;
 public enum  PlateButtonEnum implements ILegoHardware<Integer> {
 
     //@formatter:off
-    UP              (0, "up", LegoPlatformMessageType.MOVE),
-    ENTER           (1, "enter", LegoPlatformMessageType.STOP),
-    DOWN            (2, "down", LegoPlatformMessageType.BACK),
-    RIGHT           (3, "right", LegoPlatformMessageType.RIGHT),
-    LEFT            (4, "left", LegoPlatformMessageType.LEFT),
+    UP              (0, "up", LegoPlatformMessageTypeEnum.MOVE),
+    ENTER           (1, "enter", LegoPlatformMessageTypeEnum.STOP),
+    DOWN            (2, "down", LegoPlatformMessageTypeEnum.BACK),
+    RIGHT           (3, "right", LegoPlatformMessageTypeEnum.RIGHT),
+    LEFT            (4, "left", LegoPlatformMessageTypeEnum.LEFT),
     ESCAPE          (5, "escape", null),
     ;
 
@@ -48,9 +48,9 @@ public enum  PlateButtonEnum implements ILegoHardware<Integer> {
 
     private int type;
     private String name;
-    private LegoPlatformMessageType message;
+    private LegoPlatformMessageTypeEnum message;
 
-    PlateButtonEnum(int type, String name, LegoPlatformMessageType message) {
+    PlateButtonEnum(int type, String name, LegoPlatformMessageTypeEnum message) {
         this.type = type;
         this.name = name;
         this.message = message;
@@ -99,7 +99,7 @@ public enum  PlateButtonEnum implements ILegoHardware<Integer> {
         return name;
     }
 
-    public LegoPlatformMessageType getMessage() {
+    public LegoPlatformMessageTypeEnum getMessage() {
         return message;
     }
 

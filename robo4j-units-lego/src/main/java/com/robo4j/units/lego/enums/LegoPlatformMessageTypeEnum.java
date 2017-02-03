@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This LegoPlatformMessageType.java  is part of robo4j.
+ * This LegoPlatformMessageTypeEnum.java  is part of robo4j.
  * module: robo4j-units-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.lego.platform;
+package com.robo4j.units.lego.enums;
 
 import com.robo4j.core.enums.RoboHardwareEnumI;
 
@@ -30,7 +30,7 @@ import java.util.stream.Stream;
  * @author Miro Wengner (@miragemiko)
  * @since 30.01.2017
  */
-public enum LegoPlatformMessageType implements RoboHardwareEnumI<Integer> {
+public enum LegoPlatformMessageTypeEnum implements RoboHardwareEnumI<Integer> {
 
     //@formatter:off
     STOP        (0, "stop"),
@@ -43,21 +43,21 @@ public enum LegoPlatformMessageType implements RoboHardwareEnumI<Integer> {
 
     //@formatter:on
 
-    private volatile static Map<Integer, LegoPlatformMessageType> internMapByType;
+    private volatile static Map<Integer, LegoPlatformMessageTypeEnum> internMapByType;
     private Integer type;
     private String name;
 
-    LegoPlatformMessageType(int type, String name) {
+    LegoPlatformMessageTypeEnum(int type, String name) {
         this.type = type;
         this.name = name;
     }
 
     //@formatter:off
-    private static Map<Integer, LegoPlatformMessageType> initMapping() {
+    private static Map<Integer, LegoPlatformMessageTypeEnum> initMapping() {
         return Stream.of(values())
-                .collect(Collectors.toMap(LegoPlatformMessageType::getType, e -> e));
+                .collect(Collectors.toMap(LegoPlatformMessageTypeEnum::getType, e -> e));
     }
-    public static LegoPlatformMessageType getByText(String text) {
+    public static LegoPlatformMessageTypeEnum getByText(String text) {
         if (internMapByType == null)
             internMapByType = initMapping();
         return internMapByType.entrySet().stream()
