@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2017. Miroslav Wengner, Marcus Hirt
- * This HttpUnit.java  is part of robo4j.
+ * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
+ * This HttpNonUnit.java  is part of robo4j.
  * module: robo4j-core
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -20,8 +20,9 @@
 package com.robo4j.core.unit;
 
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.InetSocketAddress;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -43,26 +44,27 @@ import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 
 /**
- * Blocking Http Unit provides REST end-point
+ * Non-Blocking Http Unit provides REST end-point
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 24.01.2017
+ * @since 03.02.2017
  */
-//TODO: should be removed
-public class HttpUnit extends RoboUnit<Object> {
+
+// TODO : simplify the interface and
+public class HttpNonUnit extends RoboUnit<Object> {
+
 	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
-	private static final int TERMINATION_TIMEOUT = 2;
 	private static final int KEEP_ALIVE_TIME = 10;
 	private static final int _DEFAULT_PORT = 8042;
-	private final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
+	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
 	private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
 	private Integer port;
 	private String target;
 	private ExecutorService executor;
-	private ServerSocket server;
+	private ServerSocketChannel server;
 
-	public HttpUnit(RoboContext context, String id) {
+	public HttpNonUnit(RoboContext context, String id) {
 		super(context, id);
 	}
 
@@ -74,7 +76,6 @@ public class HttpUnit extends RoboUnit<Object> {
 		setState(LifecycleState.STARTED);
 	}
 
-	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
 		target = configuration.getString("target", null);
@@ -83,7 +84,7 @@ public class HttpUnit extends RoboUnit<Object> {
 			throw ConfigurationException.createMissingConfigNameException("target");
 		}
 		executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE, KEEP_ALIVE_TIME,
-				TimeUnit.SECONDS, workQueue, new RoboThreadFactory("Robo4J Http Unit ", true));
+				TimeUnit.SECONDS, workQueue, new RoboThreadFactory("Robo4J HttpNon ", true));
 		setState(LifecycleState.INITIALIZED);
 	}
 
@@ -97,6 +98,7 @@ public class HttpUnit extends RoboUnit<Object> {
 		} catch (IOException e) {
 			SimpleLoggingUtil.error(getClass(), "server problem: ", e);
 		}
+
 		executor.shutdownNow();
 		setState(LifecycleState.SHUTDOWN);
 	}
@@ -104,18 +106,21 @@ public class HttpUnit extends RoboUnit<Object> {
 	// Private Methods
 	private void server(final RoboReference<String> targetRef) {
 		try {
-			server = new ServerSocket(port);
+			server = ServerSocketChannel.open();
+			server.socket().bind(new InetSocketAddress(port));
 			SimpleLoggingUtil.debug(getClass(), "started port: " + port);
 			while (activeStates.contains(getState())) {
-				Socket request = server.accept();
-				Future<String> result = executor.submit(new RoboRequestCallable(request, new RoboRequestFactory()));
-				SimpleLoggingUtil.debug(getClass(), "RESULT result: " + result.get());
+				SocketChannel requestChannel = server.accept();
+				Future<String> result = executor
+						.submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestFactory()));
 				targetRef.sendMessage(result.get());
+				requestChannel.close();
 			}
-			setState(LifecycleState.STOPPED);
+
 		} catch (InterruptedException | ExecutionException | IOException e) {
 			SimpleLoggingUtil.error(getClass(), "SERVER CLOSED");
 		}
+		SimpleLoggingUtil.debug(getClass(), "stopped port: " + port);
+		setState(LifecycleState.STOPPED);
 	}
-
 }
