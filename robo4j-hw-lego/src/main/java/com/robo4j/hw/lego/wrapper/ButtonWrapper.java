@@ -21,6 +21,7 @@ package com.robo4j.hw.lego.wrapper;
 
 import com.robo4j.hw.lego.IButton;
 import lejos.hardware.Key;
+import lejos.hardware.KeyListener;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -38,5 +39,15 @@ public class ButtonWrapper<ButtonKey extends Key> implements IButton {
 	@Override
 	public void waitForPressAndRelease() {
 		buttonKey.waitForPressAndRelease();
+	}
+
+	@Override
+	public void addKeyListener(KeyListener listener) {
+		buttonKey.addKeyListener(listener);
+	}
+
+	@Override
+	public String getName() {
+		return buttonKey.getName();
 	}
 }

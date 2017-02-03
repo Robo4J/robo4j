@@ -19,6 +19,8 @@
 
 package com.robo4j.hw.lego;
 
+import lejos.hardware.KeyListener;
+
 /**
  * Methods expoced to the outside
  *
@@ -28,4 +30,8 @@ package com.robo4j.hw.lego;
  */
 public interface IButton {
     void waitForPressAndRelease();
+
+    void addKeyListener(KeyListener listener);
+
+    String getName();
 }

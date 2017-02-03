@@ -46,6 +46,7 @@ public class LcdWrapper<LcdType extends GraphicsLCD> implements ILcd {
         lcd = (LcdType)BrickFinder.getDefault().getGraphicsLCD();
     }
 
+    //TODO: miro -> make it more generic to setup
     @Override
     public void initiate() {
         lcd.clear();
