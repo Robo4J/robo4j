@@ -63,15 +63,14 @@ public class RoboSystem implements RoboContext {
 			this.unit = unit;
 		}
 
-		@SuppressWarnings("unchecked")
-		@Override
-		public Future<RoboResult<T, ?>> sendMessage(final Object message) {
-			return systemExecutor.submit(() -> unit.onMessage(message));
-		}
-
 		@Override
 		public Configuration getConfiguration() {
 			return unit.getConfiguration();
+		}
+
+		@Override
+		public <R> Future<RoboResult<T, R>> sendMessage(T message) {
+			return systemExecutor.submit(() -> unit.onMessage(message));
 		}
 	}
 

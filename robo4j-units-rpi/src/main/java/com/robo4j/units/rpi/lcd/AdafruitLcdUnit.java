@@ -38,7 +38,7 @@ import com.robo4j.units.rpi.I2CRegistry;
  * @since 17.12.2016
  *
  */
-public class AdafruitLcdUnit extends I2CRoboUnit<String> {
+public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	private AdafruitLcd lcd;
 
 	public AdafruitLcdUnit(RoboContext context, String id) {
@@ -60,14 +60,11 @@ public class AdafruitLcdUnit extends I2CRoboUnit<String> {
 		return (AdafruitLcd) lcd;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public RoboResult<String, ?> onMessage(Object message) {
+	public RoboResult<LcdMessage, Object> onMessage(LcdMessage message) {
 		try {
 			if (message instanceof LcdMessage) {
 				processLcdMessage((LcdMessage) message);
-			} else if (message instanceof String) {
-				lcd.setText((String) message);
 			}
 		} catch (Exception e) {
 			SimpleLoggingUtil.debug(getClass(), "Could not accept message" + message.toString(), e);

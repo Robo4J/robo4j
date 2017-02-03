@@ -93,13 +93,13 @@ public class DefaultScheduler implements Scheduler {
 
 		}, delay, interval, unit);
 	}
-	
-	static void sendMessage(final RoboReference<?> reference, final Object message) {
-		// Performance optimization - let the scheduling thread deliver the message directly
-		// if this is robo unit implementation, instead of enqueuing it with the message
-		// executor.
+
+	static <T> void sendMessage(final RoboReference<T> reference, final T message) {
+		// Performance optimization - let the scheduling thread deliver the
+		// message directly if this is robo unit implementation, instead of
+		// enqueuing it with the message executor.
 		if (reference instanceof RoboUnit) {
-			((RoboUnit<?>) reference).onMessage(message);
+			((RoboUnit<T>) reference).onMessage(message);
 		} else {
 			reference.sendMessage(message);
 		}

@@ -40,7 +40,7 @@ public class StringProducer extends RoboUnit<String> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public RoboResult<String, Integer> onMessage(Object message) {
+	public RoboResult<String, Integer> onMessage(String message) {
 		if (message.equals("sendRandomMessage")) {
 			sendRandomMessage();
 		} else {

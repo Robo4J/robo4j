@@ -19,12 +19,11 @@
 
 package com.robo4j.units.rpi.lcd;
 
-import com.robo4j.core.enums.RoboHardwareEnumI;
-
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.robo4j.core.enums.RoboHardwareEnumI;
 
 /**
  * Adafruit Button Plat possible control buttons

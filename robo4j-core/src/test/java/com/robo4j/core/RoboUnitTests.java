@@ -62,7 +62,7 @@ public class RoboUnitTests {
 		
 		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 
-		RoboReference<?> ref = system.getReference(consumer.getId());
+		RoboReference<String> ref = system.getReference(consumer.getId());
 		consumer.sendMessage("Lalalala");
 		ref.sendMessage("Lalala");
 		system.shutdown();

@@ -72,7 +72,7 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	 * 
 	 * @return the unit specific result from the call.
 	 */
-	public <R> RoboResult<T, R> onMessage(Object message) {
+	public <R> RoboResult<T, R> onMessage(T message) {
 		return null;
 	}
 
@@ -193,7 +193,7 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	 * Sends a message to this unit.
 	 */
 	@Override
-	public <R> Future<RoboResult<T, R>> sendMessage(Object message) {
+	public <R> Future<RoboResult<T, R>> sendMessage(T message) {
 		return reference.sendMessage(message);
 	}
 

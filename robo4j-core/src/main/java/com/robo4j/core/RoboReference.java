@@ -35,7 +35,7 @@ public interface RoboReference<T> {
 	 *            the message to send.
 	 * @return the RoboUnit specific response.
 	 */
-	<R> Future<RoboResult<T, R>> sendMessage(Object message);
+	<R> Future<RoboResult<T, R>> sendMessage(T message);
 	
 	/**
 	 * @return the configuration.

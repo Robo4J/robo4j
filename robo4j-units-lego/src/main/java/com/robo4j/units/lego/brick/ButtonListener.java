@@ -20,6 +20,8 @@
 package com.robo4j.units.lego.brick;
 
 import com.robo4j.core.RoboReference;
+import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
+
 import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
@@ -32,25 +34,25 @@ import lejos.hardware.KeyListener;
  */
 public class ButtonListener implements KeyListener {
 
-    private static final int OFF = 0;
-    private final RoboReference<String> target;
-    private final PlateButtonEnum button;
-    private final int color;
+	private static final int OFF = 0;
+	private final RoboReference<LegoPlatformMessageTypeEnum> target;
+	private final PlateButtonEnum button;
+	private final int color;
 
-    public ButtonListener(final RoboReference<String> target, PlateButtonEnum button, int color) {
-        this.target = target;
-        this.button = button;
-        this.color = color;
-    }
+	public ButtonListener(final RoboReference<LegoPlatformMessageTypeEnum> target, PlateButtonEnum button, int color) {
+		this.target = target;
+		this.button = button;
+		this.color = color;
+	}
 
-    @Override
-    public void keyPressed(Key key) {
-        Button.LEDPattern(color);
-        target.sendMessage(button.getMessage());
-    }
+	@Override
+	public void keyPressed(Key key) {
+		Button.LEDPattern(color);
+		target.sendMessage(button.getMessage());
+	}
 
-    @Override
-    public void keyReleased(Key key) {
-        Button.LEDPattern(OFF);
-    }
+	@Override
+	public void keyReleased(Key key) {
+		Button.LEDPattern(OFF);
+	}
 }

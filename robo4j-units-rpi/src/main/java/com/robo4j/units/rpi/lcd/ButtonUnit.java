@@ -68,7 +68,7 @@ public class ButtonUnit extends I2CRoboUnit<Object> {
 
 	@Override
 	public void start() {
-		final RoboReference<String> targetRef = getContext().getReference(target);
+		final RoboReference<AdafruitButtonPlateEnum> targetRef = getContext().getReference(target);
 		setState(LifecycleState.STARTING);
 		observer = new ButtonPressedObserver(lcd);
 		buttonListener = (Button button) -> {

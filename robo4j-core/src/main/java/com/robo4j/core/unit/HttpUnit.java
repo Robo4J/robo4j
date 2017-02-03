@@ -52,7 +52,7 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
 //TODO: should be removed
 public class HttpUnit extends RoboUnit<Object> {
 	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
-	private static final int TERMINATION_TIMEOUT = 2;
+	// private static final int TERMINATION_TIMEOUT = 2;
 	private static final int KEEP_ALIVE_TIME = 10;
 	private static final int _DEFAULT_PORT = 8042;
 	private final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);

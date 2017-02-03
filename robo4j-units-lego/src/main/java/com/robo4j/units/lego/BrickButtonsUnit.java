@@ -37,6 +37,7 @@ import com.robo4j.hw.lego.util.BrickUtils;
 import com.robo4j.units.lego.brick.ButtonListener;
 import com.robo4j.units.lego.brick.PlateButtonEnum;
 import com.robo4j.units.lego.brick.PlateButtonI;
+import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
 
 import lejos.hardware.KeyListener;
 
@@ -83,7 +84,7 @@ public class BrickButtonsUnit extends RoboUnit<String> {
 	@Override
 	public void start() {
 		setState(LifecycleState.STARTING);
-		final RoboReference<String> targetRef = getContext().getReference(target);
+		final RoboReference<LegoPlatformMessageTypeEnum> targetRef = getContext().getReference(target);
 
 		//@formatter:off
         buttons.entrySet().stream()

@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboResult;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.concurrency.RoboThreadFactory;
@@ -49,7 +50,7 @@ import com.robo4j.units.lego.platform.MotorRotationEnum;
  * @author Miro Wengner (@miragemiko)
  * @since 30.01.2017
  */
-public class SimpleTankUnit extends RoboUnit<String> {
+public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements RoboReference<LegoPlatformMessage> {
 
 	private static final int DEFAULT_1 = 1;
 	private static final int DEFAULT_0 = 0;
@@ -69,15 +70,9 @@ public class SimpleTankUnit extends RoboUnit<String> {
 		super(context, id);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public RoboResult<String, ?> onMessage(Object message) {
-
-		if (message instanceof LegoPlatformMessage) {
-			return processPlatformMessage((LegoPlatformMessage) message);
-		}
-
-		return super.onMessage(message);
+	public RoboResult<LegoPlatformMessage, Boolean> onMessage(LegoPlatformMessage message) {
+		return processPlatformMessage(message);
 	}
 
 	@Override
@@ -85,20 +80,19 @@ public class SimpleTankUnit extends RoboUnit<String> {
 		setState(LifecycleState.SHUTTING_DOWN);
 		rightMotor.close();
 		leftMotor.close();
-        try {
-            executor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
+		try {
+			executor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
 			executor.shutdown();
-        } catch (InterruptedException e) {
-            SimpleLoggingUtil.error(getClass(), "termination failed");
-        }
-		if(executor.isShutdown()){
+		} catch (InterruptedException e) {
+			SimpleLoggingUtil.error(getClass(), "termination failed");
+		}
+		if (executor.isShutdown()) {
 			SimpleLoggingUtil.debug(getClass(), "executor is down");
 		}
 		setState(LifecycleState.SHUTDOWN);
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.INITIALIZED);
 
@@ -116,7 +110,8 @@ public class SimpleTankUnit extends RoboUnit<String> {
 	}
 
 	// Private Methods
-	private RoboResult<String, ?> processPlatformMessage(LegoPlatformMessage message) {
+	private RoboResult<LegoPlatformMessage, Boolean> processPlatformMessage(
+			LegoPlatformMessage message) {
 		switch (message.getType()) {
 		case STOP:
 			return createResult(executeBothEnginesStop(rightMotor, leftMotor));
@@ -134,8 +129,8 @@ public class SimpleTankUnit extends RoboUnit<String> {
 		}
 	}
 
-	private RoboResult<String, ?> createResult(boolean result){
-		return new RoboResult<>(this, result);
+	private RoboResult<LegoPlatformMessage, Boolean> createResult(boolean result) {
+		return new RoboResult<LegoPlatformMessage, Boolean>(this, Boolean.valueOf(result));
 	}
 
 	private boolean executeTurn(ILegoMotor... motors) {
