@@ -85,7 +85,7 @@ public class DefaultScheduler implements Scheduler {
 	@Override
 	public <T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval,
 			TimeUnit unit) {
-		return executor.scheduleAtFixedRate( () -> 	sendMessage(target, message), delay, interval, unit);
+		return executor.scheduleAtFixedRate( () -> sendMessage(target, message), delay, interval, unit);
 	}
 
 	static <T> void sendMessage(final RoboReference<T> reference, final T message) {
