@@ -23,7 +23,10 @@ import com.robo4j.hw.lego.ILegoSensor;
 import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
 
+import com.robo4j.hw.lego.provider.SensorProvider;
 import lejos.hardware.sensor.BaseSensor;
+import lejos.hardware.sensor.EV3UltrasonicSensor;
+import lejos.robotics.SampleProvider;
 
 /**
  * Wrapper for any LegoMindstorm sensor
@@ -38,7 +41,15 @@ public class SensorWrapper<Sensor extends BaseSensor> implements ILegoSensor {
 	protected DigitalPortEnum port;
 	protected SensorTypeEnum sensorType;
 
-	public SensorWrapper(DigitalPortEnum port, SensorTypeEnum sensorType) {
+	@SuppressWarnings("unchecked")
+	public SensorWrapper(SensorProvider provider, DigitalPortEnum port, SensorTypeEnum sensorType) {
+		this.sensor = (Sensor) provider.create(port, sensorType);
+		this.port = port;
+		this.sensorType = sensorType;
+	}
+
+	public SensorWrapper(Sensor sensor, DigitalPortEnum port, SensorTypeEnum sensorType) {
+		this.sensor = sensor;
 		this.port = port;
 		this.sensorType = sensorType;
 	}
@@ -53,6 +64,27 @@ public class SensorWrapper<Sensor extends BaseSensor> implements ILegoSensor {
 		return port;
 	}
 
+	@Override
+	public String getData(){
+		StringBuilder sb = new StringBuilder();
+		SampleProvider sp;
+		if(sensor instanceof EV3UltrasonicSensor){
+			sp = ((EV3UltrasonicSensor)sensor).getDistanceMode();
+			final int sampleSize = sp.sampleSize();
+			float[] samples = new float[sampleSize];
+			for (int i = 0; i < sampleSize; i++) {
+				sp.fetchSample(samples, i);
+				sb.append(samples[i]).append(",");
+			}
+		}
+		return sb.toString();
+	}
+
+	@Override
+	public void close() {
+		sensor.close();
+	}
+
 	public Sensor getSensor() {
 		return sensor;
 	}
@@ -60,4 +92,5 @@ public class SensorWrapper<Sensor extends BaseSensor> implements ILegoSensor {
 	public void setSensor(Sensor sensor) {
 		this.sensor = sensor;
 	}
+
 }

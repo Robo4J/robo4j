@@ -53,15 +53,12 @@ import com.robo4j.units.lego.utils.LegoUtils;
  */
 public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements RoboReference<LegoPlatformMessage> {
 
-	private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
-	private final ExecutorService executor = new ThreadPoolExecutor(LegoUtils.DEFAULT_THREAD_POOL_SIZE,
-			LegoUtils.DEFAULT_THREAD_POOL_SIZE, LegoUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
-			new RoboThreadFactory("Robo4J Lego Platform ", true));
-	protected static final String DEFAULT_MOTOR_LEFT = "B";
-	protected static final String DEFAULT_MOTOR_RIGHT = "C";
-	protected static final Character DEFAULT_MOTOR_TYPE = 'N';
+	/* test visible  */
 	protected volatile ILegoMotor rightMotor;
 	protected volatile ILegoMotor leftMotor;
+	private ExecutorService executor = new ThreadPoolExecutor(LegoUtils.DEFAULT_THREAD_POOL_SIZE, LegoUtils.DEFAULT_THREAD_POOL_SIZE,
+			LegoUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
+			new RoboThreadFactory("Robo4J Lego Platform ", true));
 
 	public SimpleTankUnit(RoboContext context, String id) {
 		super(context, id);
@@ -105,18 +102,19 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	 */
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		setState(LifecycleState.INITIALIZED);
+		setState(LifecycleState.UNINITIALIZED);
 
-		String leftMotorPort = configuration.getString("leftMotorPort", DEFAULT_MOTOR_LEFT);
-		Character leftMotorType = configuration.getCharacter("leftMotorType", DEFAULT_MOTOR_TYPE);
-		String rightMotorPort = configuration.getString("rightMotorPort", DEFAULT_MOTOR_RIGHT);
-		Character rightMotorType = configuration.getCharacter("rightMotorType", DEFAULT_MOTOR_TYPE);
+		String leftMotorPort = configuration.getString("leftMotorPort", AnalogPortEnum.B.getType());
+		Character leftMotorType = configuration.getCharacter("leftMotorType", MotorTypeEnum.NXT.getType());
+		String rightMotorPort = configuration.getString("rightMotorPort", AnalogPortEnum.C.getType());
+		Character rightMotorType = configuration.getCharacter("rightMotorType", MotorTypeEnum.NXT.getType());
 
 		MotorProvider motorProvider = new MotorProvider();
 		rightMotor = new MotorWrapper(motorProvider, AnalogPortEnum.getByType(rightMotorPort),
 				MotorTypeEnum.getByType(rightMotorType));
 		leftMotor = new MotorWrapper(motorProvider, AnalogPortEnum.getByType(leftMotorPort),
 				MotorTypeEnum.getByType(leftMotorType));
+
 		setState(LifecycleState.INITIALIZED);
 	}
 
@@ -155,7 +153,7 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 		}
 	}
 
-	protected boolean executeBothEngines(MotorRotationEnum rotation, ILegoMotor... motors) {
+	private boolean executeBothEngines(MotorRotationEnum rotation, ILegoMotor... motors) {
 		Future<Boolean> motorLeft = runEngine(motors[LegoUtils.DEFAULT_0], rotation);
 		Future<Boolean> motorRight = runEngine(motors[LegoUtils.DEFAULT_1], rotation);
 

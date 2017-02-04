@@ -44,10 +44,10 @@ public class SimpleTankTestUnit extends SimpleTankUnit {
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
         setState(LifecycleState.INITIALIZED);
 
-        String leftMotorPort = configuration.getString("leftMotorPort", DEFAULT_MOTOR_LEFT);
-        Character leftMotorType = configuration.getCharacter("leftMotorType", DEFAULT_MOTOR_TYPE);
-        String rightMotorPort = configuration.getString("rightMotorPort", DEFAULT_MOTOR_RIGHT);
-        Character rightMotorType = configuration.getCharacter("rightMotorType", DEFAULT_MOTOR_TYPE);
+        String leftMotorPort = configuration.getString("leftMotorPort", AnalogPortEnum.B.getType());
+        Character leftMotorType = configuration.getCharacter("leftMotorType", MotorTypeEnum.NXT.getType());
+        String rightMotorPort = configuration.getString("rightMotorPort", AnalogPortEnum.C.getType());
+        Character rightMotorType = configuration.getCharacter("rightMotorType", MotorTypeEnum.NXT.getType());
 
         rightMotor = new MotorTestWrapper(AnalogPortEnum.getByType(rightMotorPort), MotorTypeEnum.getByType(rightMotorType));
         leftMotor = new MotorTestWrapper(AnalogPortEnum.getByType(leftMotorPort), MotorTypeEnum.getByType(leftMotorType));

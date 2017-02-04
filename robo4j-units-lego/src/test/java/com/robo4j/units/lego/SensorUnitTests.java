@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This SimpleTankUnitTests.java  is part of robo4j.
+ * This SensorUnitTests.java  is part of robo4j.
  * module: robo4j-units-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -25,28 +25,26 @@ import org.junit.Test;
 import com.robo4j.core.RoboSystem;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
-import com.robo4j.units.lego.platform.LegoPlatformMessage;
+import com.robo4j.hw.lego.enums.SensorTypeEnum;
+import com.robo4j.units.lego.sensor.LegoSensorMessage;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 30.01.2017
+ * @since 04.02.2017
  */
-public class SimpleTankUnitTests {
+public class SensorUnitTests {
 
     @Test
     public void simpleTankUnitMockTest() throws Exception {
         RoboSystem system = new RoboSystem();
-        SimpleTankUnitMock tank  = new SimpleTankUnitMock(system, "tank");
+        BasicSonicSensorUnitMock sonicUnit  = new BasicSonicSensorUnitMock(system, "sonicSensor");
         Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
-        tank.onInitialization(config);
-        Assert.assertTrue(tank.onMessage(new LegoPlatformMessage("right")).getResult());
-        Assert.assertTrue(tank.onMessage(new LegoPlatformMessage("left")).getResult());
-        Assert.assertTrue(tank.onMessage(new LegoPlatformMessage("move")).getResult());
-        Assert.assertTrue(tank.onMessage(new LegoPlatformMessage("back")).getResult());
-        Assert.assertFalse(tank.onMessage(new LegoPlatformMessage("stop")).getResult());
-        tank.shutdown();
+        sonicUnit.onInitialization(config);
+        Assert.assertEquals("data", sonicUnit.onMessage(new LegoSensorMessage(SensorTypeEnum.SONIC, "data")).getResult());
+
+        sonicUnit.shutdown();
 
     }
 

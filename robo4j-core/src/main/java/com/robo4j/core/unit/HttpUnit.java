@@ -58,10 +58,11 @@ public class HttpUnit extends RoboUnit<Object> {
 	private static final int KEEP_ALIVE_TIME = 10;
 	private static final int _DEFAULT_PORT = 8042;
 	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
-	private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
+	private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
+			KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
+			new RoboThreadFactory("Robo4J HttpUnit ", true));
 	private Integer port;
 	private String target;
-	private ExecutorService executor;
 	private ServerSocketChannel server;
 
 	public HttpUnit(RoboContext context, String id) {
@@ -81,7 +82,7 @@ public class HttpUnit extends RoboUnit<Object> {
 	 * @param configuration
 	 *            the {@link Configuration} provided.
 	 * @throws ConfigurationException
-     */
+	 */
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
 		target = configuration.getString("target", null);
@@ -89,8 +90,6 @@ public class HttpUnit extends RoboUnit<Object> {
 		if (target == null) {
 			throw ConfigurationException.createMissingConfigNameException("target");
 		}
-		executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE, KEEP_ALIVE_TIME,
-				TimeUnit.SECONDS, workQueue, new RoboThreadFactory("Robo4J HttpNon ", true));
 		setState(LifecycleState.INITIALIZED);
 	}
 
@@ -112,8 +111,10 @@ public class HttpUnit extends RoboUnit<Object> {
 	// Private Methods
 	/**
 	 * Start non-blocking socket server on http protocol
-	 * @param targetRef - reference to the target queue
-     */
+	 * 
+	 * @param targetRef
+	 *            - reference to the target queue
+	 */
 	private void server(final RoboReference<String> targetRef) {
 		try {
 			server = ServerSocketChannel.open();

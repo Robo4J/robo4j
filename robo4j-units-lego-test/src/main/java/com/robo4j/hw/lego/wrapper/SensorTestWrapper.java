@@ -51,9 +51,19 @@ public class SensorTestWrapper implements ILegoSensor {
 	}
 
 	@Override
+	public String getData() {
+		System.out.println(String.format("SensorTest.getData port:%s, type: %s", port, type));
+		return "data";
+	}
+
+	@Override
+	public void close() {
+		System.out.println(String.format("SensorTest.close port:%s, type: %s", port, type));
+	}
+
+	@Override
 	public String toString() {
 		return "SensorTestWrapper{" + "port=" + port + ", type=" + type + '}';
 	}
-
 
 }

@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 public enum DigitalPortEnum implements ILegoHardware<String> {
 
 	// @formatter:off
-	// type name
+	// 		type    name
 	S1		("S1", "Sensor S1"),
 	S2		("S2", "Sensor S2"),
 	S3		("S3", "Sensor S3"),

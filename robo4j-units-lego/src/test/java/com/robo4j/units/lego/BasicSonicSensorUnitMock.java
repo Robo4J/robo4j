@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This LegoSensor.java  is part of robo4j.
- * module: robo4j-hw-lego
+ * This SonicSensorUnitMock.java  is part of robo4j.
+ * module: robo4j-units-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,28 +17,35 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.lego;
+package com.robo4j.units.lego;
 
-
+import com.robo4j.core.ConfigurationException;
+import com.robo4j.core.RoboContext;
+import com.robo4j.core.configuration.Configuration;
 import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
+import com.robo4j.hw.lego.wrapper.SensorTestWrapper;
 
 /**
- *
- * Basic functionality of any LegoMindstorm Sensor
- *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 26.06.2016
+ * @since 04.02.2017
  */
-public interface ILegoSensor {
+public class BasicSonicSensorUnitMock extends BasicSonicUnit {
 
-	DigitalPortEnum getPort();
+    public BasicSonicSensorUnitMock(RoboContext context, String id) {
+        super(context, id);
+    }
 
-	SensorTypeEnum getType();
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        super.sensor = new SensorTestWrapper(DigitalPortEnum.S3, SensorTypeEnum.SONIC);
+        System.out.println("on initialization");
+    }
 
-	String getData();
-
-	void close();
-
+    @Override
+    public void shutdown() {
+        super.shutdown();
+        System.out.println("executor is down");
+    }
 }
