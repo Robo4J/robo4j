@@ -22,8 +22,8 @@ package com.robo4j.hw.lego.wrapper;
 import com.robo4j.hw.lego.ILegoSensor;
 import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
-
 import com.robo4j.hw.lego.provider.SensorProvider;
+
 import lejos.hardware.sensor.BaseSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.robotics.SampleProvider;
@@ -65,12 +65,12 @@ public class SensorWrapper<Sensor extends BaseSensor> implements ILegoSensor {
 	}
 
 	@Override
-	public String getData(){
+	public String getData() {
 		StringBuilder sb = new StringBuilder();
 		SampleProvider sp;
-		if(sensor instanceof EV3UltrasonicSensor){
+		if (sensor instanceof EV3UltrasonicSensor) {
 			((EV3UltrasonicSensor) sensor).enable();
-			sp = ((EV3UltrasonicSensor)sensor).getDistanceMode();
+			sp = ((EV3UltrasonicSensor) sensor).getDistanceMode();
 			final int sampleSize = sp.sampleSize();
 			float[] samples = new float[sampleSize];
 			for (int i = 0; i < sampleSize; i++) {
@@ -84,6 +84,7 @@ public class SensorWrapper<Sensor extends BaseSensor> implements ILegoSensor {
 
 	@Override
 	public void close() {
+		((EV3UltrasonicSensor) sensor).disable();
 		sensor.close();
 	}
 
