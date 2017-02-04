@@ -37,7 +37,7 @@ public enum SensorTypeEnum {
 	/**
 	 * Touch pressed 1 : free 0
 	 */
-	TOUCH(0, "Touch", "lejos.hardware.sensor.EV3TouchSensor", 1),
+	TOUCH		(0, "Touch", "lejos.hardware.sensor.EV3TouchSensor", 1),
 	/**
 	 * Returns an SampleProvider object representing the gyro sensor in angle
 	 * mode. <br>
@@ -46,17 +46,17 @@ public enum SensorTypeEnum {
 	 * left. A negative rate indicates a rotation to the right. Angles are
 	 * expressed in degrees.<br>
 	 */
-	GYRO(1, "Angle", "lejos.hardware.sensor.EV3GyroSensor", 1),
+	GYRO		(1, "Angle", "lejos.hardware.sensor.EV3GyroSensor", 1),
 
 	/**
 	 * size of the array is 3
 	 */
-	COLOR(2, "RGB", "lejos.hardware.sensor.EV3ColorSensor", 3),
+	COLOR		(2, "RGB", "lejos.hardware.sensor.EV3ColorSensor", 3),
 
 	/**
 	 * distance is measured in meter
 	 */
-	SONIC(3, "Distance", "lejos.hardware.sensor.EV3UltrasonicSensor", 1);
+	SONIC		(3, "Distance", "lejos.hardware.sensor.EV3UltrasonicSensor", 1);
 	// @formatter:on
 
 	private volatile static Map<Integer, SensorTypeEnum> internMapById;
@@ -114,14 +114,9 @@ public enum SensorTypeEnum {
 		return Stream.of(values()).collect(Collectors.toMap(SensorTypeEnum::getId, e -> e));
 	}
 
-
 	@Override
 	public String toString() {
-		return "SensorEnum{" +
-				"id=" + id +
-				", mode='" + mode + '\'' +
-				", source='" + source + '\'' +
-				", elements=" + elements +
-				'}';
+		return "SensorEnum{" + "id=" + id + ", mode='" + mode + '\'' + ", source='" + source + '\'' + ", elements="
+				+ elements + '}';
 	}
 }

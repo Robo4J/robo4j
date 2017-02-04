@@ -52,7 +52,7 @@ public class ButtonUnit extends I2CRoboUnit<Object> {
 	}
 
 	@Override
-	public void onInitialization(Configuration configuration) throws ConfigurationException {
+	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		super.onInitialization(configuration);
 		target = configuration.getString("target", null);
 		if (target == null) {

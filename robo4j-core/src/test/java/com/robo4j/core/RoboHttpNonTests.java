@@ -21,7 +21,7 @@ package com.robo4j.core;
 
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
-import com.robo4j.core.unit.HttpNonUnit;
+import com.robo4j.core.unit.HttpUnit;
 import com.robo4j.core.util.SystemUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class RoboHttpNonTests {
         RoboSystem system = new RoboSystem();
         Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
-        HttpNonUnit http = new HttpNonUnit(system, "http");
+        HttpUnit http = new HttpUnit(system, "http");
         config.setString("target", "request_consumer");
         config.setInteger("port", PORT);
         http.initialize(config);

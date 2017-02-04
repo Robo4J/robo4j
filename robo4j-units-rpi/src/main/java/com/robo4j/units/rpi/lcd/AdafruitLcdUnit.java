@@ -88,6 +88,22 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	}
 
 	/**
+	 *
+	 * @param configuration
+	 *            - unit configurtion
+	 * @throws ConfigurationException
+	 */
+	@Override
+	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		super.onInitialization(configuration);
+		try {
+			lcd = getLCD(getBus(), getAddress());
+		} catch (IOException e) {
+			throw new ConfigurationException("Could not initialize LCD", e);
+		}
+	}
+
+	/**
 	 * @param message
 	 *            accepted message type
 	 * @throws IOException
@@ -132,19 +148,4 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 		}
 	}
 
-	/**
-	 *
-	 * @param configuration
-	 *            - unit configurtion
-	 * @throws ConfigurationException
-	 */
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		super.onInitialization(configuration);
-		try {
-			lcd = getLCD(getBus(), getAddress());
-		} catch (IOException e) {
-			throw new ConfigurationException("Could not initialize LCD", e);
-		}
-	}
 }

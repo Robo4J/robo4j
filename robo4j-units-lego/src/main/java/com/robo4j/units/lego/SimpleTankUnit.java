@@ -42,6 +42,7 @@ import com.robo4j.hw.lego.provider.MotorProvider;
 import com.robo4j.hw.lego.wrapper.MotorWrapper;
 import com.robo4j.units.lego.platform.LegoPlatformMessage;
 import com.robo4j.units.lego.platform.MotorRotationEnum;
+import com.robo4j.units.lego.utils.LegoUtils;
 
 /**
  * Lego Mindstorm tank platform consist from two engines
@@ -52,14 +53,10 @@ import com.robo4j.units.lego.platform.MotorRotationEnum;
  */
 public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements RoboReference<LegoPlatformMessage> {
 
-	private static final int DEFAULT_1 = 1;
-	private static final int DEFAULT_0 = 0;
-	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
-	private static final int TERMINATION_TIMEOUT = 2;
-	private static final int KEEP_ALIVE_TIME = 10;
 	private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
-	private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
-			KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue, new RoboThreadFactory("Robo4J Lego Platform ", true));
+	private final ExecutorService executor = new ThreadPoolExecutor(LegoUtils.DEFAULT_THREAD_POOL_SIZE,
+			LegoUtils.DEFAULT_THREAD_POOL_SIZE, LegoUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
+			new RoboThreadFactory("Robo4J Lego Platform ", true));
 	protected static final String DEFAULT_MOTOR_LEFT = "B";
 	protected static final String DEFAULT_MOTOR_RIGHT = "C";
 	protected static final Character DEFAULT_MOTOR_TYPE = 'N';
@@ -89,7 +86,7 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 		rightMotor.close();
 		leftMotor.close();
 		try {
-			executor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
+			executor.awaitTermination(LegoUtils.TERMINATION_TIMEOUT, TimeUnit.SECONDS);
 			executor.shutdown();
 		} catch (InterruptedException e) {
 			SimpleLoggingUtil.error(getClass(), "termination failed");
@@ -147,8 +144,8 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	}
 
 	private boolean executeTurn(ILegoMotor... motors) {
-		ILegoMotor rOne = motors[DEFAULT_0];
-		ILegoMotor rTwo = motors[DEFAULT_1];
+		ILegoMotor rOne = motors[LegoUtils.DEFAULT_0];
+		ILegoMotor rTwo = motors[LegoUtils.DEFAULT_1];
 		Future<Boolean> first = runEngine(rOne, MotorRotationEnum.BACKWARD);
 		Future<Boolean> second = runEngine(rTwo, MotorRotationEnum.FORWARD);
 		try {
@@ -159,8 +156,8 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	}
 
 	protected boolean executeBothEngines(MotorRotationEnum rotation, ILegoMotor... motors) {
-		Future<Boolean> motorLeft = runEngine(motors[DEFAULT_0], rotation);
-		Future<Boolean> motorRight = runEngine(motors[DEFAULT_1], rotation);
+		Future<Boolean> motorLeft = runEngine(motors[LegoUtils.DEFAULT_0], rotation);
+		Future<Boolean> motorRight = runEngine(motors[LegoUtils.DEFAULT_1], rotation);
 
 		try {
 			return motorLeft.get() && motorRight.get();
@@ -190,8 +187,8 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	}
 
 	private boolean executeBothEnginesStop(ILegoMotor... motors) {
-		Future<Boolean> motorLeft = executeEngineStop(motors[DEFAULT_0]);
-		Future<Boolean> motorRight = executeEngineStop(motors[DEFAULT_1]);
+		Future<Boolean> motorLeft = executeEngineStop(motors[LegoUtils.DEFAULT_0]);
+		Future<Boolean> motorRight = executeEngineStop(motors[LegoUtils.DEFAULT_1]);
 		try {
 			return motorLeft.get() && motorRight.get();
 		} catch (InterruptedException | ExecutionException e) {
