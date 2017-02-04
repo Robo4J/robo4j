@@ -314,10 +314,15 @@ project("robo4j-units-rpi") {
     }
 }
 
+/* global settings */
 configure(allprojects) { project ->
     group = "com.robo4j"
 
     compileJava.options*.compilerArgs = [
              "-Xlint:deprecation", "-Xlint:unchecked"
+    ]
+
+    compileTestJava.options*.compilerArgs = [
+            "-Xlint:deprecation", "-Xlint:unchecked"
     ]
 }
