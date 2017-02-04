@@ -59,6 +59,12 @@ public class BrickButtonsUnit extends RoboUnit<String> {
 		super(context, id);
 	}
 
+	/**
+	 *
+	 * @param configuration
+	 *            the {@link Configuration} provided.
+	 * @throws ConfigurationException
+	 */
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);

@@ -313,3 +313,11 @@ project("robo4j-units-rpi") {
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 }
+
+configure(allprojects) { project ->
+    group = "com.robo4j"
+
+    compileJava.options*.compilerArgs = [
+             "-Xlint:deprecation", "-Xlint:unchecked"
+    ]
+}

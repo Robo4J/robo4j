@@ -45,6 +45,15 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 		super(context, id);
 	}
 
+	/**
+	 *
+	 * @param bus
+	 *            used bus
+	 * @param address
+	 *            desired address
+	 * @return
+	 * @throws IOException
+	 */
 	static AdafruitLcd getLCD(int bus, int address) throws IOException {
 		Object lcd = I2CRegistry.getI2CDeviceByEndPoint(new I2CEndPoint(bus, address));
 		if (lcd == null) {
@@ -60,12 +69,18 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 		return (AdafruitLcd) lcd;
 	}
 
+	/**
+	 *
+	 * @param message
+	 *            the message received by this unit.
+	 *
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public RoboResult<LcdMessage, Object> onMessage(LcdMessage message) {
 		try {
-			if (message instanceof LcdMessage) {
-				processLcdMessage((LcdMessage) message);
-			}
+			processLcdMessage(message);
 		} catch (Exception e) {
 			SimpleLoggingUtil.debug(getClass(), "Could not accept message" + message.toString(), e);
 		}
@@ -74,6 +89,7 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 
 	/**
 	 * @param message
+	 *            accepted message type
 	 * @throws IOException
 	 */
 	private void processLcdMessage(LcdMessage message) throws IOException {
@@ -86,16 +102,17 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 			lcd.setDisplayEnabled(disen);
 			break;
 		case SCROLL:
-			switch (message.getText().trim()){
-				case "left":
-					lcd.scrollDisplay(Direction.LEFT);
-					break;
-				case "right":
-					lcd.scrollDisplay(Direction.RIGHT);
-					break;
-				default:
-					SimpleLoggingUtil.error(getClass(), "Scroll direction " + message.getText() + " is unknown");
-					break;
+			// TODO: consider enum as the constant
+			switch (message.getText().trim()) {
+			case "left":
+				lcd.scrollDisplay(Direction.LEFT);
+				break;
+			case "right":
+				lcd.scrollDisplay(Direction.RIGHT);
+				break;
+			default:
+				SimpleLoggingUtil.error(getClass(), "Scroll direction " + message.getText() + " is unknown");
+				break;
 			}
 			break;
 		case SET_TEXT:
@@ -115,6 +132,12 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 		}
 	}
 
+	/**
+	 *
+	 * @param configuration
+	 *            - unit configurtion
+	 * @throws ConfigurationException
+	 */
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		super.onInitialization(configuration);

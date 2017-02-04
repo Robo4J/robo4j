@@ -70,6 +70,14 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 		super(context, id);
 	}
 
+	/**
+	 *
+	 * @param message
+	 *            the message received by this unit.
+	 *
+	 * @return result
+	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public RoboResult<LegoPlatformMessage, Boolean> onMessage(LegoPlatformMessage message) {
 		return processPlatformMessage(message);
@@ -92,6 +100,12 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 		setState(LifecycleState.SHUTDOWN);
 	}
 
+	/**
+	 *
+	 * @param configuration
+	 *            the {@link Configuration} provided.
+	 * @throws ConfigurationException
+	 */
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.INITIALIZED);
@@ -110,8 +124,7 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	}
 
 	// Private Methods
-	private RoboResult<LegoPlatformMessage, Boolean> processPlatformMessage(
-			LegoPlatformMessage message) {
+	private RoboResult<LegoPlatformMessage, Boolean> processPlatformMessage(LegoPlatformMessage message) {
 		switch (message.getType()) {
 		case STOP:
 			return createResult(executeBothEnginesStop(rightMotor, leftMotor));
@@ -130,7 +143,7 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	}
 
 	private RoboResult<LegoPlatformMessage, Boolean> createResult(boolean result) {
-		return new RoboResult<LegoPlatformMessage, Boolean>(this, Boolean.valueOf(result));
+		return new RoboResult<>(this, result);
 	}
 
 	private boolean executeTurn(ILegoMotor... motors) {
