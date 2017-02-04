@@ -76,7 +76,6 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	 *
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public RoboResult<LcdMessage, Object> onMessage(LcdMessage message) {
 		try {
