@@ -29,9 +29,7 @@ import lejos.hardware.Key;
  * @since 02.02.2017
  */
 public final class EscapeButtonUtil {
-
-    @SuppressWarnings("unchecked")
-    private static final ButtonWrapper<Key> escape = new ButtonWrapper(Button.ESCAPE);
+    private static final ButtonWrapper<Key> escape = new ButtonWrapper<Key>(Button.ESCAPE);
 
     public static void waitForPressAndRelease(){
         escape.waitForPressAndRelease();
