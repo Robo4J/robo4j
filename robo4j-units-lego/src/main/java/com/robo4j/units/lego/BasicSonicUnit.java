@@ -72,7 +72,7 @@ public class BasicSonicUnit extends RoboUnit<LegoSensorMessage> {
 			SimpleLoggingUtil.error(getClass(), "onMessage", e);
 			result = "";
 		}
-//		getContext().getReference(target).sendMessage(result);
+		getContext().getReference(target).sendMessage(result);
 		return new RoboResult<>(this, result);
 	}
 

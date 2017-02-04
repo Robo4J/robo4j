@@ -21,10 +21,12 @@ package com.robo4j.units.lego;
 
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboResult;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
 import com.robo4j.hw.lego.wrapper.SensorTestWrapper;
+import com.robo4j.units.lego.sensor.LegoSensorMessage;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -44,8 +46,16 @@ public class BasicSonicSensorUnitMock extends BasicSonicUnit {
     }
 
     @Override
+    public RoboResult<LegoSensorMessage, String> onMessage(LegoSensorMessage message) {
+        System.out.println("onMessage : " + message);
+        return new RoboResult<>(this, message.getValue());
+    }
+
+    @Override
     public void shutdown() {
         super.shutdown();
         System.out.println("executor is down");
     }
+
+
 }

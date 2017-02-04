@@ -69,6 +69,7 @@ public class SensorWrapper<Sensor extends BaseSensor> implements ILegoSensor {
 		StringBuilder sb = new StringBuilder();
 		SampleProvider sp;
 		if(sensor instanceof EV3UltrasonicSensor){
+			((EV3UltrasonicSensor) sensor).enable();
 			sp = ((EV3UltrasonicSensor)sensor).getDistanceMode();
 			final int sampleSize = sp.sampleSize();
 			float[] samples = new float[sampleSize];
@@ -76,6 +77,7 @@ public class SensorWrapper<Sensor extends BaseSensor> implements ILegoSensor {
 				sp.fetchSample(samples, i);
 				sb.append(samples[i]).append(",");
 			}
+			((EV3UltrasonicSensor) sensor).disable();
 		}
 		return sb.toString();
 	}

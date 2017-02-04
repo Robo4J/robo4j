@@ -42,7 +42,7 @@ public class SensorUnitTests {
         Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
         sonicUnit.onInitialization(config);
-        Assert.assertEquals("data", sonicUnit.onMessage(new LegoSensorMessage(SensorTypeEnum.SONIC, "data")).getResult());
+        Assert.assertEquals("magic", sonicUnit.onMessage(new LegoSensorMessage(SensorTypeEnum.SONIC, "magic")).getResult());
 
         sonicUnit.shutdown();
 
