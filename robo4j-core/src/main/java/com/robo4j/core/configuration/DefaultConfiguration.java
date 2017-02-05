@@ -131,6 +131,14 @@ class DefaultConfiguration implements Configuration {
 		settings.put(name, b);
 	}
 
+	private Object getVal(String name, Object defaultValue) {
+		Object val = settings.get(name);
+		if (val == null) {
+			return defaultValue;
+		}
+		return val;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -162,11 +170,4 @@ class DefaultConfiguration implements Configuration {
 		return true;
 	}
 
-	private Object getVal(String name, Object defaultValue) {
-		Object val = settings.get(name);
-		if (val == null) {
-			return defaultValue;
-		}
-		return val;
-	}
 }

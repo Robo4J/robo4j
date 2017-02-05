@@ -71,12 +71,6 @@ public final class RoboBuilder {
 			}
 		}
 
-		private Object toString(Attributes attributes) {
-			return String.format("%s=\"%s\" %s=\"%s\"", XmlConfigurationFactory.ATTRIBUTE_NAME,
-					attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_NAME), XmlConfigurationFactory.ATTRIBUTE_TYPE,
-					attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_TYPE));
-		}
-
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
 			if (qName.equals("roboUnit")) {
@@ -103,24 +97,6 @@ public final class RoboBuilder {
 			}
 		}
 
-		private void clearCurrentVariables() {
-			currentId = "";
-			currentClassName = "";
-			currentConfiguration = null;
-			currentConfiguration = "";
-		}
-
-		private boolean verifyUnit() {
-			if (currentId.isEmpty()) {
-				SimpleLoggingUtil.error(getClass(), "Error parsing unit, no ID");
-				return false;
-			} else if (currentClassName.isEmpty()) {
-				SimpleLoggingUtil.error(getClass(), "Error parsing unit, no class name for " + currentId);
-				return false;
-			}
-			return true;
-		}
-
 		@Override
 		public void characters(char[] ch, int start, int length) throws SAXException {
 			if (configState) {
@@ -138,6 +114,31 @@ public final class RoboBuilder {
 			default:
 				break;
 			}
+		}
+
+		// Private Methods
+		private Object toString(Attributes attributes) {
+			return String.format("%s=\"%s\" %s=\"%s\"", XmlConfigurationFactory.ATTRIBUTE_NAME,
+					attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_NAME), XmlConfigurationFactory.ATTRIBUTE_TYPE,
+					attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_TYPE));
+		}
+
+		private void clearCurrentVariables() {
+			currentId = "";
+			currentClassName = "";
+			currentConfiguration = null;
+			currentConfiguration = "";
+		}
+
+		private boolean verifyUnit() {
+			if (currentId.isEmpty()) {
+				SimpleLoggingUtil.error(getClass(), "Error parsing unit, no ID");
+				return false;
+			} else if (currentClassName.isEmpty()) {
+				SimpleLoggingUtil.error(getClass(), "Error parsing unit, no class name for " + currentId);
+				return false;
+			}
+			return true;
 		}
 
 		private String toString(char[] data, int offset, int count) {

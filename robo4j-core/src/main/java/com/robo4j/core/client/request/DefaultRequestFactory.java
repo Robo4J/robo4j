@@ -19,6 +19,7 @@ package com.robo4j.core.client.request;
 import com.robo4j.http.HttpMessage;
 
 /**
+ * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public interface DefaultRequestFactory<ResponseType> {

@@ -1,0 +1,36 @@
+<!--
+  ~ Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
+  ~ This http_get.xml  is part of robo4j.
+  ~ module: robo4j-core
+  ~
+  ~ robo4j is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ robo4j is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<!-- Robo4J Http Unit GET Request Definition file for JUnit Tests -->
+
+<robo4j>
+    <roboUnit id="http">
+        <class>com.robo4j.core.unit.HttpUnit</class>
+        <config name="com.robo4j.core.root">
+            <value name="port" type="int">8025</value>
+            <value name="method" type="String">GET</value>
+            <value name="command" type="String">move,back,right,left</value>
+            <value name="target" type="String">request_consumer</value>
+        </config>
+    </roboUnit>
+
+    <roboUnit id="request_consumer">
+        <class>com.robo4j.core.StringConsumer</class>
+    </roboUnit>
+</robo4j>

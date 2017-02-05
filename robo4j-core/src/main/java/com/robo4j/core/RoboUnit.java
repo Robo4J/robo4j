@@ -166,6 +166,30 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 		return configuration;
 	}
 
+	/**
+	 * Sends a message to this unit.
+	 */
+	@Override
+	public <R> Future<RoboResult<T, R>> sendMessage(T message) {
+		return reference.sendMessage(message);
+	}
+
+	/**
+	 * @return a RoboReference. Internal use only.
+	 */
+	RoboReference<T> internalGetReference() {
+		// NOTE(Marcus/Jan 27, 2017): Can we avoid this?
+		if (reference == null) {
+			return getContext().getReference(getId());
+		} else {
+			return reference;
+		}
+	}
+
+	private void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
+	}
+
 	@Override
 	public int hashCode() {
 		return id.hashCode();
@@ -186,14 +210,6 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 		return true;
 	}
 
-	/**
-	 * Sends a message to this unit.
-	 */
-	@Override
-	public <R> Future<RoboResult<T, R>> sendMessage(T message) {
-		return reference.sendMessage(message);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -204,19 +220,4 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 		return String.format("%s [id=%s]", getClass().getName(), getId());
 	}
 
-	/**
-	 * @return a RoboReference. Internal use only.
-	 */
-	RoboReference<T> internalGetReference() {
-		// NOTE(Marcus/Jan 27, 2017): Can we avoid this?
-		if (reference == null) {
-			return getContext().getReference(getId());
-		} else {
-			return reference;
-		}
-	}
-
-	private void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
-	}
 }

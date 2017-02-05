@@ -29,7 +29,7 @@ import java.io.IOException;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RoboHttpNonTests {
+public class RoboHttpTests {
     private static final int PORT = 8025;
 
     @Test
