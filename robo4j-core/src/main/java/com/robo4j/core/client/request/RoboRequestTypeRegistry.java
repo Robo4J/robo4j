@@ -29,19 +29,19 @@ import java.util.Set;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class RoboRequestTypeProvider {
+public final class RoboRequestTypeRegistry {
 
-    private static volatile RoboRequestTypeProvider INSTANCE;
+    private static volatile RoboRequestTypeRegistry INSTANCE;
     private final Map<String, Set<RoboRequestElement>> pathValues = new HashMap<>();
 
-    public RoboRequestTypeProvider() {
+    public RoboRequestTypeRegistry() {
     }
 
-    public static RoboRequestTypeProvider getInstance() {
+    public static RoboRequestTypeRegistry getInstance() {
         if (INSTANCE == null) {
-            synchronized (RoboRequestTypeProvider.class) {
+            synchronized (RoboRequestTypeRegistry.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new RoboRequestTypeProvider();
+                    INSTANCE = new RoboRequestTypeRegistry();
                 }
             }
         }

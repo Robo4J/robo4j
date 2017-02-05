@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This RoboRequestElement.java  is part of robo4j.
+ * This HttpDynamicUnitTests.java  is part of robo4j.
  * module: robo4j-core
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -17,40 +17,28 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core.client.request;
+package com.robo4j.core.unit;
+
+import org.junit.Test;
 
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * RoboRequestElement type is immutable value
- * represent key -> command, value -> possible command values
- *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RoboRequestElement {
+public class HttpDynamicUnitTests {
 
-    private String key;
-    private Set<String> values;
+    @Test
+    public void test(){
 
-    public RoboRequestElement(String key, Set<String> values) {
-        this.key = key;
-        this.values = values;
-    }
+        String example = "magic,more,   super";
+        Set<String> result = Stream.of(example.split(","))
+                .map(String::trim)
+                .collect(Collectors.toSet());
 
-    public String getKey() {
-        return key;
-    }
-
-    public Set<String> getValues() {
-        return values;
-    }
-
-    @Override
-    public String toString() {
-        return "RoboRequestElement{" +
-                "key='" + key + '\'' +
-                ", values='" + values + '\'' +
-                '}';
+        System.out.println("magic: " + result);
     }
 }

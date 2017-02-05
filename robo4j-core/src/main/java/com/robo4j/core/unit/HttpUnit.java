@@ -52,13 +52,13 @@ public class HttpUnit extends RoboUnit<Object> {
 	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
 	private static final int KEEP_ALIVE_TIME = 10;
 	private static final int _DEFAULT_PORT = 8042;
-	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
-	private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
+	protected static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
+	protected final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
 			KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
 			new RoboThreadFactory("Robo4J HttpUnit ", true));
-	private Integer port;
-	private String target;
-	private ServerSocketChannel server;
+	protected Integer port;
+	protected String target;
+	protected ServerSocketChannel server;
 
 	public HttpUnit(RoboContext context, String id) {
 		super(context, id);
@@ -118,7 +118,7 @@ public class HttpUnit extends RoboUnit<Object> {
 			while (activeStates.contains(getState())) {
 				SocketChannel requestChannel = server.accept();
 				Future<String> result = executor
-						.submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestFactory()));
+						.submit(new RoboRequestCallable(requestChannel.socket(), RoboRequestFactory.getInstance()));
 				targetRef.sendMessage(result.get());
 				requestChannel.close();
 			}

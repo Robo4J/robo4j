@@ -45,11 +45,11 @@ public class RoboRequestCallable implements Callable<String> {
     private static final String DEFAULT_RESPONSE = "done";
     private static final int METHOD_KEY_POSITION = 0, URI_VALUE_POSITION = 1, VERSION_POSITION = 2, HTTP_HEADER_SEP = 9;
 
-    private RoboRequestFactory factory;
+    private DefaultRequestFactory factory;
     private Socket connection;
 
 
-    public RoboRequestCallable(Socket connection, RoboRequestFactory factory) {
+    public RoboRequestCallable(Socket connection, DefaultRequestFactory factory) {
         this.connection = connection;
         this.factory = factory;
     }
@@ -112,7 +112,9 @@ public class RoboRequestCallable implements Callable<String> {
              HttpVersion.getByValue(tokens[VERSION_POSITION]), params);
      switch (method){
          case GET:
-             return factory.processGet(httpMessage);
+
+             //TODO, FIXME refactor
+             return factory.processGet(httpMessage).toString();
          default:
              SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
              return null;

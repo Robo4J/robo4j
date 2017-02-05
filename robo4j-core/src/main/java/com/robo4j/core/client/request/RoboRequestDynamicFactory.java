@@ -20,9 +20,9 @@
 package com.robo4j.core.client.request;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,20 +43,16 @@ public class RoboRequestDynamicFactory implements DefaultRequestFactory<String>{
 
     private static final int PATH_ALLOWED = 0;
     private static volatile RoboRequestDynamicFactory INSTANCE;
-    private final Map<String, String> configuration;
-    private final String path;
 
-    public RoboRequestDynamicFactory(Map<String, String> configuration) {
-        this.configuration = configuration;
-        this.path = configuration.get("path");
+    public RoboRequestDynamicFactory() {
     }
 
     //TODO: FIXME -> refactor
-    public static RoboRequestDynamicFactory getInstance(Map<String, String> configuration) {
+    public static RoboRequestDynamicFactory getInstance() {
         if (INSTANCE == null) {
             synchronized (RoboRequestDynamicFactory.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new RoboRequestDynamicFactory(configuration);
+                    INSTANCE = new RoboRequestDynamicFactory();
                 }
             }
         }
@@ -73,16 +69,24 @@ public class RoboRequestDynamicFactory implements DefaultRequestFactory<String>{
                     .filter(e -> !e.isEmpty())
                     .collect(Collectors.toList());
             //@formatter:on
-            SimpleLoggingUtil.debug(getClass(), "path: " + paths);
 
-            if(path.equals(paths.get(PATH_ALLOWED))){
+            //TODO: support more paths
+            SimpleLoggingUtil.debug(getClass(), "path: " + paths);
+            String path = paths.get(PATH_ALLOWED);
+            System.out.println(getClass().getSimpleName() + " requested PATH: " + path);
+            Set<RoboRequestElement> pathValues = RoboRequestTypeRegistry.getInstance().getPathValues(paths.get(PATH_ALLOWED));
+            System.out.println(getClass().getSimpleName() + " requested pathValues : " + pathValues);
+
+            if(!pathValues.isEmpty()){
                 if(uri != null && uri.getQuery() != null && !uri.getQuery().isEmpty()){
                     final Map<String, String> queryValues = HttpUtils.parseURIQueryToMap(uri.getQuery(),
                             ConstantUtil.HTTP_QUERY_SEP);
-                    SimpleLoggingUtil.debug(getClass(), "queryValues: " + queryValues);
 
+                    Set<RoboRequestElement> availableCommands = RoboRequestTypeRegistry.getInstance().getPathValues(path);
+                    System.out.println(getClass().getSimpleName() + " queryValues: " + queryValues);
+                    System.out.println(getClass().getSimpleName() + " availableCommands: " + availableCommands);
 
-
+                    return "magic";
                 }
             }
 
