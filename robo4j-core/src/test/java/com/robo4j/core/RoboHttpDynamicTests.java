@@ -47,10 +47,15 @@ public class RoboHttpDynamicTests {
 
         HttpDynamicUnit httpDynamic = new HttpDynamicUnit(system, "http_dynamic");
         config.setString("target", "request_consumer");
-        config.setString("path", "test");
-        //TODO: we need to work on request design
-        config.setString("command", "right,left,up,down,enter");
         config.setInteger("port", PORT);
+
+        /* specific configuration */
+        config.setInteger("pathsNumber", 1);
+        config.setString("path_0", "test");
+        //TODO: we need to work on request design
+        config.setInteger("pathCommands_0", 1);
+        config.setString("commandName_0_0", "command");
+        config.setString("commandValues_0_0", "right,left,up,down,enter");
         httpDynamic.initialize(config);
 
         StringConsumer consumer = new StringConsumer(system, "request_consumer");

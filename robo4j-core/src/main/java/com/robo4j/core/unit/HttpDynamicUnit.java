@@ -27,6 +27,7 @@ import com.robo4j.core.client.request.RoboRequestCallable;
 import com.robo4j.core.client.request.RoboRequestDynamicFactory;
 import com.robo4j.core.client.request.RoboRequestElement;
 import com.robo4j.core.client.request.RoboRequestFactory;
+import com.robo4j.core.client.request.RoboRequestTypeRegistry;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 
@@ -93,7 +94,7 @@ public class HttpDynamicUnit extends HttpUnit {
                         .collect(Collectors.toSet());
 
                 elemenets.add(new RoboRequestElement(commandName, commandValues));
-
+                RoboRequestTypeRegistry.getInstance().addPathWithValues(path, elemenets);
             }
 
 
