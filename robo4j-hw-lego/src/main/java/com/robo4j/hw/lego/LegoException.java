@@ -25,7 +25,6 @@ package com.robo4j.hw.lego;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 26.11.2016
  */
 public class LegoException extends RuntimeException {
 

@@ -26,7 +26,6 @@ import lejos.hardware.KeyListener;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 02.02.2017
  */
 public interface IButton {
     void waitForPressAndRelease();

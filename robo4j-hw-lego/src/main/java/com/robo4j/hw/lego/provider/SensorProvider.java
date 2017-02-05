@@ -33,7 +33,6 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 26.11.2016
  */
 public class SensorProvider implements IProvider<BaseSensor, DigitalPortEnum, SensorTypeEnum> {
 

@@ -22,7 +22,6 @@ package com.robo4j.hw.lego.provider;
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 26.11.2016
  */
 public interface IProvider<Output, Input1, Input2>  {
 

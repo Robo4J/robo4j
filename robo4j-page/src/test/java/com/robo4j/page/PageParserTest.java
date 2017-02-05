@@ -25,7 +25,6 @@ import org.junit.Test;
 
 /**
  * @author Miroslav Wengner (@miragemiko)
- * @since 11.06.2016
  */
 public class PageParserTest {
 

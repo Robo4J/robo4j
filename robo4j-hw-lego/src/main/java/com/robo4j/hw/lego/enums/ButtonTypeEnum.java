@@ -32,7 +32,6 @@ import java.util.stream.Stream;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 03.02.2017
  */
 public enum ButtonTypeEnum implements ILegoHardware<Key> {
 

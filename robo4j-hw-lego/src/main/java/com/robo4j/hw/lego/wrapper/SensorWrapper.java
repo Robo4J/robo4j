@@ -33,7 +33,6 @@ import lejos.robotics.SampleProvider;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 26.11.2016
  */
 public class SensorWrapper<Sensor extends BaseSensor> implements ILegoSensor {
 

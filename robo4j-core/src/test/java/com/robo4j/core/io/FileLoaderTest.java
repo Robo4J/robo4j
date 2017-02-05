@@ -20,7 +20,6 @@ import org.junit.Test;
 
 /**
  * @author Miroslav Wengner (@miragemiko)
- * @since 13.06.2016
  */
 public class FileLoaderTest {
 

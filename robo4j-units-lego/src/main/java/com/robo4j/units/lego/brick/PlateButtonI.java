@@ -27,7 +27,6 @@ import com.robo4j.hw.lego.enums.ButtonTypeEnum;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 01.02.2017
  */
 public interface PlateButtonI {
 

@@ -34,7 +34,6 @@ import lejos.robotics.RegulatedMotor;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 26.11.2016
  */
 public final class MotorProvider implements IProvider<RegulatedMotor, AnalogPortEnum, MotorTypeEnum> {
 

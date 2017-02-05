@@ -27,7 +27,6 @@ import com.robo4j.hw.lego.enums.MotorTypeEnum;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 05.05.2016
  */
 public interface ILegoMotor {
 

@@ -26,7 +26,6 @@ import java.util.Objects;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
- * @since 06.03.2016
  */
 public enum HttpVersion {
 

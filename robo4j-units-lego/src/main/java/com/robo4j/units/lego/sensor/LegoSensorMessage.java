@@ -28,7 +28,6 @@ import com.robo4j.hw.lego.enums.SensorTypeEnum;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 04.02.2017
  */
 public class LegoSensorMessage {
 

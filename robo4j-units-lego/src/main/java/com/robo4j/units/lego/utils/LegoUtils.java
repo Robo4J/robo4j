@@ -24,7 +24,6 @@ package com.robo4j.units.lego.utils;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 04.02.2017
  */
 public final class LegoUtils {
 

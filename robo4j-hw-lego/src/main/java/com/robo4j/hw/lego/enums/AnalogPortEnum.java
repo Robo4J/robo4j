@@ -31,7 +31,6 @@ import java.util.stream.Stream;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 04.05.2016
  */
 public enum AnalogPortEnum implements ILegoHardware<String> {
 

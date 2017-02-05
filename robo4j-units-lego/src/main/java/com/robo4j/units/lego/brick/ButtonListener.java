@@ -30,7 +30,6 @@ import lejos.hardware.KeyListener;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 31.01.2017
  */
 public class ButtonListener implements KeyListener {
 

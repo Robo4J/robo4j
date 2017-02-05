@@ -30,7 +30,6 @@ import java.util.stream.Stream;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
- * @since 06.03.2016
  */
 public enum HttpMethod implements Comparator<HttpMethod> {
 

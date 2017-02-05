@@ -26,7 +26,6 @@ import lejos.hardware.Key;
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 02.02.2017
  */
 public final class EscapeButtonUtil {
     private static final ButtonWrapper<Key> escape = new ButtonWrapper<Key>(Button.ESCAPE);

@@ -24,7 +24,6 @@ package com.robo4j.hw.lego;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 28.01.2017
  */
 public interface ILegoHardware<Type> {
 

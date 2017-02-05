@@ -29,7 +29,6 @@ import lejos.hardware.lcd.GraphicsLCD;
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 01.02.2017
  */
 public class LcdWrapper<LcdType extends GraphicsLCD> implements ILcd {
     private static final String SYSTEM_NAME = "Robo4J.IO";

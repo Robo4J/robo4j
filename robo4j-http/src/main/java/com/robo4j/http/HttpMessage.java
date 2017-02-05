@@ -27,7 +27,6 @@ import java.util.Map;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
- * @since 09.03.2016
  */
 public class HttpMessage implements Comparable<HttpMessage> {
 

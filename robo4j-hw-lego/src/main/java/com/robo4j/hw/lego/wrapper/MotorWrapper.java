@@ -31,7 +31,6 @@ import lejos.robotics.RegulatedMotor;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 23.11.2016
  */
 public class MotorWrapper<Motor extends RegulatedMotor> implements ILegoMotor {
 

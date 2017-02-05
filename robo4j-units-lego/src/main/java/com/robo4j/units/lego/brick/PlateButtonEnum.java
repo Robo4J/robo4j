@@ -30,7 +30,6 @@ import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 31.01.2017
  */
 public enum  PlateButtonEnum implements ILegoHardware<Integer> {
 

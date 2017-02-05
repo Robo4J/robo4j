@@ -28,7 +28,6 @@ import java.util.stream.Stream;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 15.02.2016
  */
 public enum SensorTypeEnum {
 

@@ -24,7 +24,6 @@ package com.robo4j.hw.lego.util;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 01.02.2017
  */
 public class BrickUtils {
 

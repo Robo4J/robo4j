@@ -28,10 +28,8 @@ import java.util.stream.Stream;
 /**
  * Configuration interface
  *
- *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 19.06.2016
  */
 public enum DigitalPortEnum implements ILegoHardware<String> {
 
