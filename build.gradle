@@ -319,10 +319,10 @@ configure(allprojects) { project ->
     group = "com.robo4j"
 
     compileJava.options*.compilerArgs = [
-             "-Xlint:deprecation", "-Xlint:unchecked"
+             "-Xlint:deprecation", "-Xlint:unchecked", "-Xlint:rawtypes",
     ]
 
     compileTestJava.options*.compilerArgs = [
-            "-Xlint:deprecation", "-Xlint:unchecked"
+            "-Xlint:deprecation", "-Xlint:unchecked", "-Xlint:rawtypes",
     ]
 }
