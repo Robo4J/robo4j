@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2017, Miroslav Wengner, Marcus Hirt
+ * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
  * 
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
+ * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.robo4j.hw.rpi.i2c;
 
@@ -29,7 +29,6 @@ import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 01.11.2016
  */
 public abstract class AbstractI2CDevice {
 	private final int bus;

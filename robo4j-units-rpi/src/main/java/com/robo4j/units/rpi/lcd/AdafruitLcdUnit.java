@@ -89,7 +89,7 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	/**
 	 *
 	 * @param configuration
-	 *            - unit configurtion
+	 *            - unit configuration
 	 * @throws ConfigurationException
 	 */
 	@Override
