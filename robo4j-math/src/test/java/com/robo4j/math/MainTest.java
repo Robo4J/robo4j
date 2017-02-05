@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2017, Miroslav Wengner, Marcus Hirt
+ * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
  * 
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ package com.robo4j.math;
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 13.01.2017
  */
 public class MainTest {
 
