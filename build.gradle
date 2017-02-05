@@ -318,6 +318,18 @@ project("robo4j-units-rpi") {
         }
     }
 
+    //sources
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java', 'src/examples/java', 'src/test/java']
+            }
+            resources {
+                srcDirs = ['src/main/resources', 'src/test/resources']
+            }
+        }
+    }
+
     dependencies {
         compile(project(":robo4j-hw-rpi"))
         compile(project(":robo4j-core"))
