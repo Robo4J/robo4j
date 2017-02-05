@@ -323,6 +323,6 @@ configure(allprojects) { project ->
     ]
 
     compileTestJava.options*.compilerArgs = [
-            "-Xlint:deprecation", "-Xlint:unchecked"
+            "-Xlint:deprecation", "-Xlint:unchecked", "-Xlint:rawtypes",
     ]
 }
