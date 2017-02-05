@@ -110,9 +110,9 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 		Character rightMotorType = configuration.getCharacter("rightMotorType", MotorTypeEnum.NXT.getType());
 
 		MotorProvider motorProvider = new MotorProvider();
-		rightMotor = new MotorWrapper(motorProvider, AnalogPortEnum.getByType(rightMotorPort),
+		rightMotor = new MotorWrapper<>(motorProvider, AnalogPortEnum.getByType(rightMotorPort),
 				MotorTypeEnum.getByType(rightMotorType));
-		leftMotor = new MotorWrapper(motorProvider, AnalogPortEnum.getByType(leftMotorPort),
+		leftMotor = new MotorWrapper<>(motorProvider, AnalogPortEnum.getByType(leftMotorPort),
 				MotorTypeEnum.getByType(leftMotorType));
 
 		setState(LifecycleState.INITIALIZED);

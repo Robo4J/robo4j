@@ -27,6 +27,7 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.hw.lego.ILcd;
 import com.robo4j.hw.lego.wrapper.LcdWrapper;
+import lejos.hardware.lcd.GraphicsLCD;
 
 /**
  * Lego Mindstorm Brick LCD unit
@@ -60,10 +61,16 @@ public class LcdUnit extends RoboUnit<Object> {
 		return super.onMessage(message);
 	}
 
+	/**
+	 *
+	 * @param configuration
+	 *            the {@link Configuration} provided.
+	 * @throws ConfigurationException
+     */
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
-		lcd = new LcdWrapper();
+		lcd = new LcdWrapper<>();
 		setState(LifecycleState.INITIALIZED);
 	}
 
