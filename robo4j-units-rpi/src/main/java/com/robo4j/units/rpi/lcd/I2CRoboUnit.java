@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2017, Miroslav Wengner, Marcus Hirt
+ * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
  * 
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ import com.robo4j.core.configuration.Configuration;
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
- * @since 17.12.2016
  */
 public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
 	// For all Raspberry Pi's except the first model, this is always the case.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2017, Miroslav Wengner, Marcus Hirt
+ * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
  * 
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
- * @since 17.12.2016
  */
 public class LcdMessage {
 	private final RoboReference<?> source;

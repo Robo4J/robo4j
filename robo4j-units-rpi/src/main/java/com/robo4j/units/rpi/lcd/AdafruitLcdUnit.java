@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2017, Miroslav Wengner, Marcus Hirt
+ * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
  * 
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,8 +35,6 @@ import com.robo4j.units.rpi.I2CRegistry;
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
- * @since 17.12.2016
- *
  */
 public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	private AdafruitLcd lcd;
@@ -76,8 +74,6 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	 *
 	 * @return
 	 */
-
-	@SuppressWarnings("unchecked")
 	@Override
 	public RoboResult<LcdMessage, Object> onMessage(LcdMessage message) {
 		try {
