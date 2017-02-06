@@ -28,9 +28,8 @@ public class ServoUnitExample {
 	private static volatile boolean stop = false;
 	
 	public static void main(String[] args) throws RoboBuilderException {
-
 		RoboBuilder builder = new RoboBuilder();
-		builder.add(ServoUnitExample.class.getResourceAsStream("robo4j.xml"));
+		builder.add(ServoUnitExample.class.getClassLoader().getResourceAsStream("robo4j.xml"));
 		RoboContext ctx = builder.build();
 
 		RoboReference<Float> panRef = ctx.getReference("pan");
