@@ -63,6 +63,7 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 		try {
 			if (pwmDevice == null) {
 				pcaDevice = new PWMPCA9685Device(getBus(), getAddress());
+				I2CRegistry.registerI2CDevice(pcaDevice, new I2CEndPoint(getBus(), getAddress()));
 				pcaDevice.setPWMFrequency(50);
 			} else {
 				pcaDevice = (PWMPCA9685Device) pwmDevice;
