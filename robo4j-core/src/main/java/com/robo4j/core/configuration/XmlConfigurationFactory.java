@@ -39,6 +39,7 @@ public class XmlConfigurationFactory {
 	public static final String ELEMENT_CONFIG = "config";
 	public static final String ATTRIBUTE_NAME = "name";
 	public static final String ATTRIBUTE_TYPE = "type";
+	private static final String TYPE_BOOLEAN = "boolean";
 	private static final String TYPE_LONG = "long";
 	private static final String TYPE_DOUBLE = "double";
 	private static final String TYPE_FLOAT = "float";
@@ -111,6 +112,10 @@ public class XmlConfigurationFactory {
 			case TYPE_DOUBLE:
 				currentConfig.setDouble(currentName, Double.parseDouble(currentValue));
 				break;
+			case TYPE_BOOLEAN:
+				currentConfig.setBoolean(currentName, Boolean.parseBoolean(currentValue));
+				break;
+
 			}
 		}
 
