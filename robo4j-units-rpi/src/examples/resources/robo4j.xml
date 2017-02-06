@@ -18,7 +18,6 @@
 			<value name="address" type="int">0x40</value>
 			<value name="channel" type="int">1</value>
 			<value name="trim" type="float">-50</value>
-			<value name="inverted" type="booleam">true</value>
 		</config>
 	</roboUnit>
 </robo4j>
