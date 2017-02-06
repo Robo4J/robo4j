@@ -78,7 +78,7 @@ project("robo4j-hw-lego") {
                 srcDirs = ['src/main/java', 'src/examples/java', 'src/test/java']
             }
             resources {
-                srcDirs = ['src/main/resources', 'src/test/resources']
+                srcDirs = ['src/main/resources', 'src/examples/resources', 'src/test/resources']
             }
         }
     }
@@ -137,7 +137,7 @@ project("robo4j-hw-rpi") {
                 srcDirs = ['src/main/java', 'src/examples/java', 'src/test/java']
             }
             resources {
-                srcDirs = ['src/main/resources', 'src/test/resources']
+                srcDirs = ['src/main/resources', 'src/examples/resources', 'src/test/resources']
             }
         }
     }
@@ -325,7 +325,7 @@ project("robo4j-units-rpi") {
                 srcDirs = ['src/main/java', 'src/examples/java', 'src/test/java']
             }
             resources {
-                srcDirs = ['src/main/resources', 'src/test/resources']
+                srcDirs = ['src/main/resources', 'src/examples/resources', 'src/test/resources']
             }
         }
     }
