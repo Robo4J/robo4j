@@ -76,7 +76,7 @@ public class HttpDynamicUnit extends HttpUnit {
         target = configuration.getString("target", null);
         port = configuration.getInteger("port", _DEFAULT_PORT);
 
-        Integer pathsNumber = configuration.getInteger("pathsNumber", null);
+        Integer pathsNumber = configuration.getInteger("pathsNumber", 0);
         if (target == null && pathsNumber == null) {
             throw ConfigurationException.createMissingConfigNameException("target, pathsNumber");
         }

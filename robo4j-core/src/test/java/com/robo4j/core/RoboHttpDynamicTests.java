@@ -53,6 +53,7 @@ public class RoboHttpDynamicTests {
 		/* specific configuration */
 		config.setInteger("pathsNumber", 1);
 		config.setString("path_0", "test");
+		config.setString("method_0", "GET");
 		// TODO: we need to work on request design
 		config.setInteger("pathCommands_0", 1);
 		config.setString("commandName_0_0", "command");
