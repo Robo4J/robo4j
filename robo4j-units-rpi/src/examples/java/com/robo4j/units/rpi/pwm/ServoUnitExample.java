@@ -59,8 +59,8 @@ public class ServoUnitExample {
 					panRef.sendMessage(pan);
 					sleep(100);
 				}
+				panDirection *= -1;
 			}
-			panDirection *= -1;
 		}
 		ctx.shutdown();
 	}
