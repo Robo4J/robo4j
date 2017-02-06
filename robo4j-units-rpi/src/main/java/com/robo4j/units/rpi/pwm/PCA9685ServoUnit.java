@@ -77,7 +77,7 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 		servo = new Servo(pcaDevice.getChannel(channel));
 		servo.setTrim(configuration.getFloat(CONFIGURATION_KEY_TRIM, 0f));
 		servo.setInverted(configuration.getBoolean(CONFIGURATION_KEY_INVERTED, false));
-		servo.setDualRate(configuration.getFloat(CONFIGURATION_KEY_DUAL_RATE, 100.0f));
+		servo.setDualRate(configuration.getFloat(CONFIGURATION_KEY_DUAL_RATE, 1.0f));
 		servo.setExpo(configuration.getFloat(CONFIGURATION_KEY_EXPO, 0.0f));
 	}
 
