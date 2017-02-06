@@ -52,7 +52,7 @@ public class ServoUnitExample {
 		while (!stop) {
 			for (int tiltStep = 0; tiltStep < STEPS; tiltStep++) {
 				// Just move the tilt a quarter of max positive.
-				float tilt = tiltStep / (STEPS * 25);
+				float tilt = tiltStep / (STEPS * 25.0f);
 				tiltRef.sendMessage(tilt);
 				for (int panStep = 0; panStep < STEPS; panStep++) {
 					float pan = (panStep * 2.0f / STEPS - 1.0f) * panDirection;
