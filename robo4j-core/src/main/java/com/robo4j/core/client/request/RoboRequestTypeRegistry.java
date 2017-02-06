@@ -29,6 +29,7 @@ import java.util.Set;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+//TODO fix the concurrency 
 public final class RoboRequestTypeRegistry {
 
     private static volatile RoboRequestTypeRegistry INSTANCE;
