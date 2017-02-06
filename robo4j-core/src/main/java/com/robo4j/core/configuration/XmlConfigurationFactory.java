@@ -201,6 +201,9 @@ public class XmlConfigurationFactory {
 		if (value instanceof Long) {
 			return TYPE_LONG;
 		}
+		if (value instanceof Boolean) {
+			return TYPE_BOOLEAN;
+		}
 		return null;
 	}
 }
