@@ -25,6 +25,7 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.concurrency.RoboThreadFactory;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 
 /**
  * This is the default scheduler used in Robo4J.
@@ -34,6 +35,7 @@ import com.robo4j.core.concurrency.RoboThreadFactory;
  */
 public class DefaultScheduler implements Scheduler {
 	private final static int DEFAULT_NUMBER_OF_THREADS = 2;
+	private static final int TERMINATION_TIMEOUT = 2;
 
 	private final ScheduledExecutorService executor;
 	private final RoboContext context;
@@ -86,6 +88,12 @@ public class DefaultScheduler implements Scheduler {
 	public <T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval,
 			TimeUnit unit) {
 		return executor.scheduleAtFixedRate( () -> sendMessage(target, message), delay, interval, unit);
+	}
+
+	@Override
+	public void shutdown() throws InterruptedException {
+		executor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
+		executor.shutdownNow();
 	}
 
 	static <T> void sendMessage(final RoboReference<T> reference, final T message) {

@@ -92,4 +92,9 @@ public interface Scheduler {
 	 *         the number of invocations.
 	 */
 	<T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval, TimeUnit unit);
+
+	/**
+	 * Scheduler shutdown
+	 */
+	void shutdown() throws InterruptedException;
 }
