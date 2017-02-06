@@ -24,7 +24,9 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 
 public class ServoUnitExample {
-	private final static int STEPS = 30;
+	private final static int PAN_STEPS = 30;
+	private final static int TILT_STEPS = 10;
+
 	private static volatile boolean stop = false;
 
 	public static void main(String[] args) throws RoboBuilderException {
@@ -40,17 +42,17 @@ public class ServoUnitExample {
 			public void run() {
 				float panDirection = 1.0f;
 				while (!stop) {
-					for (int tiltStep = 0; tiltStep < STEPS; tiltStep++) {
+					for (int tiltStep = 0; tiltStep < TILT_STEPS; tiltStep++) {
 						// Just move the tilt a quarter of max positive.
-						float tilt = tiltStep / (STEPS * 25.0f);
+						float tilt = tiltStep / (TILT_STEPS * 25.0f);
 						tiltRef.sendMessage(tilt);
-						for (int panStep = 0; panStep < STEPS; panStep++) {
+						for (int panStep = 0; panStep < PAN_STEPS; panStep++) {
 							if (stop) {
 								break;
 							}
-							float pan = (panStep * 2.0f / STEPS - 1.0f) * panDirection;
+							float pan = (panStep * 2.0f / PAN_STEPS - 1.0f) * panDirection;
 							panRef.sendMessage(pan);
-							sleep(100);
+							sleep(50);
 						}
 						panDirection *= -1;
 					}
