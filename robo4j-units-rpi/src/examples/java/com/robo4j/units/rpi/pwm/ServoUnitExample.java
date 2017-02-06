@@ -35,33 +35,38 @@ public class ServoUnitExample {
 		RoboReference<Float> panRef = ctx.getReference("pan");
 		RoboReference<Float> tiltRef = ctx.getReference("tilt");
 
-		new Thread(new Runnable() {
+		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				System.out.println("Press enter to quit!");
-				try {
-					System.in.read();
-				} catch (IOException e) {
-					e.printStackTrace();
+				float panDirection = 1.0f;
+				while (!stop) {
+					for (int tiltStep = 0; tiltStep < STEPS; tiltStep++) {
+						// Just move the tilt a quarter of max positive.
+						float tilt = tiltStep / (STEPS * 25.0f);
+						tiltRef.sendMessage(tilt);
+						for (int panStep = 0; panStep < STEPS; panStep++) {
+							if (stop) {
+								break;
+							}
+							float pan = (panStep * 2.0f / STEPS - 1.0f) * panDirection;
+							panRef.sendMessage(pan);
+							sleep(100);
+						}
+						panDirection *= -1;
+					}
 				}
-				stop = true;
 			}
-		}).start();
-
-		float panDirection = 1.0f;
-		while (!stop) {
-			for (int tiltStep = 0; tiltStep < STEPS; tiltStep++) {
-				// Just move the tilt a quarter of max positive.
-				float tilt = tiltStep / (STEPS * 25.0f);
-				tiltRef.sendMessage(tilt);
-				for (int panStep = 0; panStep < STEPS; panStep++) {
-					float pan = (panStep * 2.0f / STEPS - 1.0f) * panDirection;
-					panRef.sendMessage(pan);
-					sleep(100);
-				}
-				panDirection *= -1;
-			}
+		});
+		thread.setDaemon(true);
+		thread.start();
+		
+		System.out.println("Press enter to quit!");
+		try {
+			System.in.read();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		stop = true;
 		ctx.shutdown();
 	}
 
