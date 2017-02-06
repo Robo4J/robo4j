@@ -100,13 +100,13 @@ public class XmlConfigurationFactory {
 				currentConfig.setString(currentName, currentValue);
 				break;
 			case TYPE_INT:
-				currentConfig.setInteger(currentName, Integer.parseInt(currentValue));
+				currentConfig.setInteger(currentName, Integer.decode(currentValue));
 				break;
 			case TYPE_FLOAT:
 				currentConfig.setFloat(currentName, Float.parseFloat(currentValue));
 				break;
 			case TYPE_LONG:
-				currentConfig.setLong(currentName, Long.parseLong(currentValue));
+				currentConfig.setLong(currentName, Long.decode(currentValue));
 				break;
 			case TYPE_DOUBLE:
 				currentConfig.setDouble(currentName, Double.parseDouble(currentValue));
