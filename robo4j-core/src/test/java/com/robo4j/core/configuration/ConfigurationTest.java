@@ -34,13 +34,16 @@ public class ConfigurationTest {
 		config.setDouble("MyDouble", 2.0);
 		config.setString("MyString", "toodiloo");
 		config.setCharacter("MyCharacter", 'C');
+		config.setBoolean("MyBoolean", true);
 
+		
 		Assert.assertEquals(1, (int) config.getInteger("MyInt", -1));
 		Assert.assertEquals(2L, (long) config.getLong("MyLong", -1L));
 		Assert.assertEquals(1.0f, config.getFloat("MyFloat", -1f), 0.000000001f);
 		Assert.assertEquals(2.0, config.getDouble("MyDouble", -1.0), 0.000000001f);
 		Assert.assertEquals("toodiloo", config.getString("MyString", "nope"));
 		Assert.assertEquals(Character.valueOf('C'), config.getCharacter("MyCharacter", 'A'));
+		Assert.assertEquals(true, config.getBoolean("MyBoolean", false));
 	}
 	
 	@Test

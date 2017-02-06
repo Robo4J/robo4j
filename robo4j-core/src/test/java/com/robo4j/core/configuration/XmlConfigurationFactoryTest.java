@@ -30,6 +30,7 @@ public class XmlConfigurationFactoryTest {
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("firstString", "S1");
 		config.setString("secondString", "S2");
+		config.setBoolean("boolean", true);
 		Configuration child = config.createChildConfiguration("child");
 		child.setInteger("int", 1);
 		child.setFloat("float", 1.0f);
