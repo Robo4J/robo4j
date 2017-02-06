@@ -21,6 +21,7 @@ package com.robo4j.core;
 
 import java.io.IOException;
 
+import com.robo4j.core.util.SystemUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -64,5 +65,26 @@ public class RoboHttpDynamicTests {
         Assert.assertEquals(system.getUnits().size(), 0);
         Assert.assertEquals(httpDynamic.getState(), LifecycleState.INITIALIZED);
         Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+
+        system.addUnits(httpDynamic, consumer);
+
+        System.out.println("State before start:");
+        System.out.println(SystemUtil.generateStateReport(system));
+        system.start();
+
+        System.out.println("State after start:");
+        System.out.println(SystemUtil.generateStateReport(system));
+
+        System.out.println("RoboSystem http server\n\tPort:" + PORT + "\n");
+        System.out.println("Usage:\n\tRequest GET: http://<IP_ADDRESS>:" + PORT + "?type=tank&command=stop");
+        System.out.println("\tRequest command types: stop, move, back, left, right\n");
+
+
+        System.out.println("Going Down!");
+//        System.in.read();
+        system.shutdown();
+        System.out.println("System is Down!");
+        Assert.assertNotNull(system.getUnits());
+        Assert.assertEquals(system.getUnits().size(), 2);
     }
 }

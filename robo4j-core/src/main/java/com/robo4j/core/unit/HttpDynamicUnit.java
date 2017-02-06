@@ -61,6 +61,14 @@ public class HttpDynamicUnit extends HttpUnit {
         super(context, id);
     }
 
+    @Override
+    public void start() {
+        setState(LifecycleState.STARTING);
+        final RoboReference<String> targetRef = getContext().getReference(target);
+        executor.execute(() -> server(targetRef));
+        setState(LifecycleState.STARTED);
+    }
+
     //TODO: improve after it works
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
@@ -74,7 +82,7 @@ public class HttpDynamicUnit extends HttpUnit {
         }
         //@formatter:off
 
-        Set<RoboRequestElement> elemenets;
+        Set<RoboRequestElement> elements;
         String path;
         Integer pathCommands;
         String commandName;
@@ -83,18 +91,19 @@ public class HttpDynamicUnit extends HttpUnit {
         for(int i=0; i<pathsNumber; i++){
             path = configuration.getString("path_" + i, _DEFAULT_COMMAND);
             pathCommands = configuration.getInteger("pathCommands_"+ i, _DEFAULT_COMMAND_NUMBERS);
-            elemenets = new HashSet<>();
+            elements = new HashSet<>();
             for(int j=0; j<pathCommands; j++){
 
                 String tmp = i+"_"+j;
                 commandName = configuration.getString("commandName_".concat(tmp), _DEFAULT_COMMAND);
-                commandValues = Stream.of(configuration.getString("commandValues_.".concat(tmp), _DEFAULT_COMMAND)
+                commandValues = Stream.of(configuration.getString("commandValues_".concat(tmp), _DEFAULT_COMMAND)
+                        .trim()
                         .split(","))
                         .map(String::trim)
                         .collect(Collectors.toSet());
 
-                elemenets.add(new RoboRequestElement(commandName, commandValues));
-                RoboRequestTypeRegistry.getInstance().addPathWithValues(path, elemenets);
+                elements.add(new RoboRequestElement(commandName, commandValues));
+                RoboRequestTypeRegistry.getInstance().addPathWithValues(path, elements);
             }
 
 
