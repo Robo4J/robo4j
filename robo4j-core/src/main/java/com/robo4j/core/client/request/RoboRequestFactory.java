@@ -36,20 +36,7 @@ import java.util.stream.Collectors;
  */
 public class RoboRequestFactory implements DefaultRequestFactory<String> {
 
-    private static volatile RoboRequestFactory INSTANCE;
-
     public RoboRequestFactory() {
-    }
-
-    public static RoboRequestFactory getInstance() {
-        if (INSTANCE == null) {
-            synchronized (RoboRequestFactory.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new RoboRequestFactory();
-                }
-            }
-        }
-        return INSTANCE;
     }
 
     @Override

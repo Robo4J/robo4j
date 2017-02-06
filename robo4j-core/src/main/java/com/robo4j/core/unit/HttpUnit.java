@@ -52,13 +52,14 @@ public class HttpUnit extends RoboUnit<Object> {
 	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
 	private static final int KEEP_ALIVE_TIME = 10;
 	private static final int _DEFAULT_PORT = 8042;
-	protected static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
-	protected final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
+	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
+	private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
 			KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
 			new RoboThreadFactory("Robo4J HttpUnit ", true));
-	protected Integer port;
-	protected String target;
-	protected ServerSocketChannel server;
+	private boolean available;
+	private Integer port;
+	private String target;
+	private ServerSocketChannel server;
 
 	public HttpUnit(RoboContext context, String id) {
 		super(context, id);
@@ -68,7 +69,12 @@ public class HttpUnit extends RoboUnit<Object> {
 	public void start() {
 		setState(LifecycleState.STARTING);
 		final RoboReference<String> targetRef = getContext().getReference(target);
-		executor.execute(() -> server(targetRef));
+		if(!available){
+			executor.execute(() -> server(targetRef));
+			available = true;
+		} else {
+			System.out.println("Http start() error: " + targetRef);
+		}
 		setState(LifecycleState.STARTED);
 	}
 
@@ -93,10 +99,11 @@ public class HttpUnit extends RoboUnit<Object> {
 		setState(LifecycleState.SHUTTING_DOWN);
 		try {
 			if (server != null) {
+				server.socket().close();
 				server.close();
 			}
 		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "server problem: ", e);
+			SimpleLoggingUtil.error(getClass(), "Http server problem: ", e);
 		}
 
 		executor.shutdownNow();
@@ -118,13 +125,13 @@ public class HttpUnit extends RoboUnit<Object> {
 			while (activeStates.contains(getState())) {
 				SocketChannel requestChannel = server.accept();
 				Future<String> result = executor
-						.submit(new RoboRequestCallable(requestChannel.socket(), RoboRequestFactory.getInstance()));
+						.submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestFactory()));
 				targetRef.sendMessage(result.get());
 				requestChannel.close();
 			}
 
 		} catch (InterruptedException | ExecutionException | IOException e) {
-			SimpleLoggingUtil.error(getClass(), "SERVER CLOSED");
+			SimpleLoggingUtil.error(getClass(), "SERVER CLOSED", e);
 		}
 		SimpleLoggingUtil.debug(getClass(), "stopped port: " + port);
 		setState(LifecycleState.STOPPED);

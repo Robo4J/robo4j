@@ -23,11 +23,13 @@ import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
+import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.request.RoboRequestCallable;
 import com.robo4j.core.client.request.RoboRequestDynamicFactory;
 import com.robo4j.core.client.request.RoboRequestElement;
 import com.robo4j.core.client.request.RoboRequestFactory;
 import com.robo4j.core.client.request.RoboRequestTypeRegistry;
+import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 
@@ -35,11 +37,16 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,11 +58,22 @@ import java.util.stream.Stream;
  * @author Miro Wengner (@miragemiko)
  * @since 05.02.2017
  */
-public class HttpDynamicUnit extends HttpUnit {
+public class HttpDynamicUnit extends RoboUnit<Object> {
 
+    private static final int DEFAULT_THREAD_POOL_SIZE = 2;
+    private static final int KEEP_ALIVE_TIME = 10;
     private static final int _DEFAULT_PORT = 8042;
-    private static final int _DEFAULT_COMMAND_NUMBERS = 0;
+    public static final int _DEFAULT_COMMAND_NUMBERS = 0;
     public static final String _DEFAULT_COMMAND = "";
+    private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
+    private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
+            KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
+            new RoboThreadFactory("Robo4J HttpDynamicUnit ", true));
+    private boolean available;
+    private Integer port;
+    private String target;
+    private ServerSocketChannel server;
+
 
     public HttpDynamicUnit(RoboContext context, String id) {
         super(context, id);
@@ -65,9 +83,15 @@ public class HttpDynamicUnit extends HttpUnit {
     public void start() {
         setState(LifecycleState.STARTING);
         final RoboReference<String> targetRef = getContext().getReference(target);
-        executor.execute(() -> server(targetRef));
+        if(!available){
+            executor.execute(() -> server(targetRef));
+            available = true;
+        } else {
+            System.out.println("HttpDynamicUnit start() -> error: " + targetRef);
+        }
         setState(LifecycleState.STARTED);
     }
+
 
     //TODO: improve after it works
     @Override
@@ -112,8 +136,23 @@ public class HttpDynamicUnit extends HttpUnit {
         //@formatter:on
 
 
-
         setState(LifecycleState.INITIALIZED);
+    }
+
+    @Override
+    public void shutdown() {
+        setState(LifecycleState.SHUTTING_DOWN);
+        try {
+            if (server != null) {
+                server.socket().close();
+                server.close();
+            }
+        } catch (IOException e) {
+            SimpleLoggingUtil.error(getClass(), "server problem: ", e);
+        }
+
+        executor.shutdownNow();
+        setState(LifecycleState.SHUTDOWN);
     }
 
     // Private Methods
@@ -137,9 +176,10 @@ public class HttpDynamicUnit extends HttpUnit {
             }
 
         } catch (InterruptedException | ExecutionException | IOException e) {
-            SimpleLoggingUtil.error(getClass(), "SERVER CLOSED");
+            SimpleLoggingUtil.error(getClass(), "SERVER CLOSED", e);
         }
         SimpleLoggingUtil.debug(getClass(), "stopped port: " + port);
         setState(LifecycleState.STOPPED);
     }
+
 }

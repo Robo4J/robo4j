@@ -128,6 +128,7 @@ public class RoboSystem implements RoboContext {
 		stop();
 		try {
 			systemExecutor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
+			systemExecutor.shutdown();
 		} catch (InterruptedException e) {
 			SimpleLoggingUtil.error(getClass(), "Was interrupted when shutting down.", e);
 		}
