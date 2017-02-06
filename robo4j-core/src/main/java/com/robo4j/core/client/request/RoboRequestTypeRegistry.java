@@ -29,38 +29,46 @@ import java.util.Set;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-//TODO fix the concurrency 
+// TODO fix the concurrency
 public final class RoboRequestTypeRegistry {
 
-    private static volatile RoboRequestTypeRegistry INSTANCE;
-    private final Map<String, Set<RoboRequestElement>> pathValues = new HashMap<>();
+	private static volatile RoboRequestTypeRegistry INSTANCE;
+	private final Map<String, Set<RoboRequestElement>> pathValues = new HashMap<>();
 
-    public RoboRequestTypeRegistry() {
-    }
+	public RoboRequestTypeRegistry() {
+	}
 
-    public static RoboRequestTypeRegistry getInstance() {
-        if (INSTANCE == null) {
-            synchronized (RoboRequestTypeRegistry.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new RoboRequestTypeRegistry();
-                }
-            }
-        }
-        return INSTANCE;
-    }
+	public static RoboRequestTypeRegistry getInstance() {
+		if (INSTANCE == null) {
+			synchronized (RoboRequestTypeRegistry.class) {
+				if (INSTANCE == null) {
+					INSTANCE = new RoboRequestTypeRegistry();
+				}
+			}
+		}
+		return INSTANCE;
+	}
 
-    public void addPathWithValues(String path, Set<RoboRequestElement> values){
-        pathValues.put(path, values);
-    }
+	public void addPathWithValues(String path, Set<RoboRequestElement> values) {
+		pathValues.put(path, values);
+	}
 
-    public Set<RoboRequestElement> getPathValues(String path){
-        return pathValues.get(path);
-    }
+	public Set<RoboRequestElement> getPathValues(String path) {
+		return pathValues.get(path);
+	}
 
-    @Override
-    public String toString() {
-        return "RoboRequestTypeProvider{" +
-                "pathValues=" + pathValues +
-                '}';
-    }
+	public boolean contains(String path, String key, String value) {
+		//@formatter:off
+        return pathValues.get(path).stream()
+                .filter(e -> e.getKey().equals(key))
+                .map(RoboRequestElement::getValues)
+                .filter(v -> value.contains(value))
+                .count() > 0;
+        //@formatter:on
+	}
+
+	@Override
+	public String toString() {
+		return "RoboRequestTypeProvider{" + "pathValues=" + pathValues + '}';
+	}
 }

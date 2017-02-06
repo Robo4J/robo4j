@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 
 import com.robo4j.core.client.util.HttpUtils;
 import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.unit.HttpDynamicUnit;
 import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.http.HttpMessage;
 import com.robo4j.http.HttpVersion;
@@ -39,61 +40,50 @@ import com.robo4j.http.HttpVersion;
  * @author Miro Wengner (@miragemiko)
  * @since 05.02.2017
  */
-public class RoboRequestDynamicFactory implements DefaultRequestFactory<String>{
+public class RoboRequestDynamicFactory implements DefaultRequestFactory<String> {
 
-    private static final int PATH_ALLOWED = 0;
-    private static volatile RoboRequestDynamicFactory INSTANCE;
+	private static final int DEFAULT_POSITION_0 = 0;
 
-    public RoboRequestDynamicFactory() {
-    }
+	public RoboRequestDynamicFactory() {
+	}
 
-    //TODO: FIXME -> refactor
-    public static RoboRequestDynamicFactory getInstance() {
-        if (INSTANCE == null) {
-            synchronized (RoboRequestDynamicFactory.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new RoboRequestDynamicFactory();
-                }
-            }
-        }
-        return INSTANCE;
-    }
-
-    @Override
-    public String processGet(HttpMessage httpMessage) {
-        if (HttpVersion.containsValue(httpMessage.getVersion())) {
-            final URI uri = httpMessage.getUri();
-            //@formatter:off
+	@Override
+	public String processGet(HttpMessage httpMessage) {
+		if (HttpVersion.containsValue(httpMessage.getVersion())) {
+			final URI uri = httpMessage.getUri();
+			//@formatter:off
             final List<String> paths = Stream.of(httpMessage.getUri().getPath()
                         .split(ConstantUtil.getHttpSeparator(12)))
                     .filter(e -> !e.isEmpty())
                     .collect(Collectors.toList());
             //@formatter:on
 
-            //TODO: support more paths
-            SimpleLoggingUtil.debug(getClass(), "path: " + paths);
-            String path = paths.get(PATH_ALLOWED);
-            System.out.println(getClass().getSimpleName() + " requested PATH: " + path);
-            Set<RoboRequestElement> pathValues = RoboRequestTypeRegistry.getInstance().getPathValues(paths.get(PATH_ALLOWED));
-            System.out.println(getClass().getSimpleName() + " requested pathValues : " + pathValues);
+			// TODO: support more paths
+			SimpleLoggingUtil.debug(getClass(), "path: " + paths);
+			String path = paths.get(DEFAULT_POSITION_0);
+			Set<RoboRequestElement> availablePathValues = RoboRequestTypeRegistry.getInstance().getPathValues(path);
 
-            if(!pathValues.isEmpty()){
-                if(uri != null && uri.getQuery() != null && !uri.getQuery().isEmpty()){
-                    final Map<String, String> queryValues = HttpUtils.parseURIQueryToMap(uri.getQuery(),
-                            ConstantUtil.HTTP_QUERY_SEP);
+			if (!availablePathValues.isEmpty()) {
+				if (uri != null && uri.getQuery() != null && !uri.getQuery().isEmpty()) {
+					final Map<String, String> currentRequestValues = HttpUtils.parseURIQueryToMap(uri.getQuery(),
+							ConstantUtil.HTTP_QUERY_SEP);
+					//@formatter:off
+                    return currentRequestValues.entrySet().stream()
+                            .filter(e -> availablePathValues.stream()
+                                    .filter(ac -> ac.getKey().equals(e.getKey()))
+                                    .filter(ac -> ac.getValues().contains(e.getValue()))
+                                    .count() > 0)
+                            .map(Map.Entry::getValue)
+                            .findFirst()
+                            .orElse(HttpDynamicUnit._DEFAULT_COMMAND);
+                    //@formatter:on
+				}
+			}
 
-                    Set<RoboRequestElement> availableCommands = RoboRequestTypeRegistry.getInstance().getPathValues(path);
-                    System.out.println(getClass().getSimpleName() + " queryValues: " + queryValues);
-                    System.out.println(getClass().getSimpleName() + " availableCommands: " + availableCommands);
+		} else {
+			SimpleLoggingUtil.error(getClass(), "processGet is corrupted: " + httpMessage);
+		}
 
-                    return "magic";
-                }
-            }
-
-        } else {
-            SimpleLoggingUtil.error(getClass(), "processGet is corrupted: " + httpMessage);
-        }
-
-        return null;
-    }
+		return null;
+	}
 }

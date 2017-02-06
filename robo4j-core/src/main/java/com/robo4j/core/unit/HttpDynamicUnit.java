@@ -54,8 +54,8 @@ import java.util.stream.Stream;
 public class HttpDynamicUnit extends HttpUnit {
 
     private static final int _DEFAULT_PORT = 8042;
-    private static final String _DEFAULT_COMMAND = "";
     private static final int _DEFAULT_COMMAND_NUMBERS = 0;
+    public static final String _DEFAULT_COMMAND = "";
 
     public HttpDynamicUnit(RoboContext context, String id) {
         super(context, id);
