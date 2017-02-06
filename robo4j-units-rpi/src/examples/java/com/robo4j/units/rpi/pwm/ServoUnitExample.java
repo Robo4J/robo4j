@@ -26,7 +26,7 @@ import com.robo4j.core.RoboReference;
 public class ServoUnitExample {
 	private final static int STEPS = 30;
 	private static volatile boolean stop = false;
-	
+
 	public static void main(String[] args) throws RoboBuilderException {
 		RoboBuilder builder = new RoboBuilder();
 		builder.add(ServoUnitExample.class.getClassLoader().getResourceAsStream("robo4j.xml"));
@@ -47,19 +47,29 @@ public class ServoUnitExample {
 				stop = true;
 			}
 		}).start();
-		
+
 		float panDirection = 1.0f;
 		while (!stop) {
-			for (int tiltStep = 0; tiltStep < STEPS; tiltStep++) {				
-				float tilt = tiltStep / (STEPS * 25); // Just move the tilt a quarter of max positive. 
+			for (int tiltStep = 0; tiltStep < STEPS; tiltStep++) {
+				// Just move the tilt a quarter of max positive.
+				float tilt = tiltStep / (STEPS * 25);
 				tiltRef.sendMessage(tilt);
 				for (int panStep = 0; panStep < STEPS; panStep++) {
 					float pan = (panStep * 2.0f / STEPS - 1.0f) * panDirection;
 					panRef.sendMessage(pan);
+					sleep(100);
 				}
 			}
 			panDirection *= -1;
 		}
 		ctx.shutdown();
+	}
+
+	private static void sleep(long time) {
+		try {
+			Thread.sleep(time);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }
