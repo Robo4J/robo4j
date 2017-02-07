@@ -17,13 +17,12 @@
 package com.robo4j.core.enums;
 
 /**
- * @param <EnumType> - type of Hardware where is used, standard usage if to specify commands
+ *
+ * @param <TargetType> - specifies the target of a assignment example Hardware
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface RoboHardwareEnumI<EnumType> {
+public interface IRoboTargetEnum<TargetType> {
 
-	EnumType getType();
-
-	String getName();
-
+    TargetType getTarget();
 }

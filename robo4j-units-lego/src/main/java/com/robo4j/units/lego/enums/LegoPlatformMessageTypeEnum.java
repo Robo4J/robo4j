@@ -19,17 +19,19 @@
 
 package com.robo4j.units.lego.enums;
 
-import com.robo4j.core.enums.RoboHardwareEnumI;
+import com.robo4j.core.enums.IRoboHardwareEnum;
 
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * LegoMindstorm available buttons
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum LegoPlatformMessageTypeEnum implements RoboHardwareEnumI<Integer> {
+public enum LegoPlatformMessageTypeEnum implements IRoboHardwareEnum<Integer> {
 
     //@formatter:off
     STOP        (0, "stop"),

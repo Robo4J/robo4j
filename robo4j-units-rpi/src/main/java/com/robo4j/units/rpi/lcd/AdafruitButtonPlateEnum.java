@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.robo4j.core.enums.RoboHardwareEnumI;
+import com.robo4j.core.enums.IRoboHardwareEnum;
 
 /**
  * Adafruit Button Plat possible control buttons
@@ -28,7 +28,7 @@ import com.robo4j.core.enums.RoboHardwareEnumI;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum AdafruitButtonPlateEnum implements RoboHardwareEnumI<Integer> {
+public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer> {
 
     // @formatter:off
 	SELECT 			(0, "S", "select"),
