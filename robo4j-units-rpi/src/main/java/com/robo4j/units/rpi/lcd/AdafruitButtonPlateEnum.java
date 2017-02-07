@@ -91,7 +91,6 @@ public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer>, IRobo
         return text;
     }
 
-    //TODO, FIXME -> getNames -> also interface
     @Override
     public Set<String> commandNames() {
         //@formatter:off

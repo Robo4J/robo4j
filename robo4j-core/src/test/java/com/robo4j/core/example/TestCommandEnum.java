@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This HttpDynamicUnitTests.java  is part of robo4j.
+ * This TestCommandEnum.java  is part of robo4j.
  * module: robo4j-core
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -17,28 +17,50 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core.unit;
-
-import org.junit.Test;
+package com.robo4j.core.example;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.robo4j.core.enums.IRoboCommand;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class HttpDynamicUnitTests {
+public enum TestCommandEnum implements IRoboCommand {
 
-    @Test
-    public void test(){
+	// @formatter:off
+    SELECT 			("select"),
+    LEFT		    ("left"),
+    RIGHT		    ("right"),
+    UP      		("up"),
+    DOWN    		("down"),
+    ;
+    // @formatter:on
 
-        String example = "magic,more,   super";
-        Set<String> result = Stream.of(example.split(","))
-                .map(String::trim)
+	private String name;
+
+	TestCommandEnum(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public Set<String> commandNames() {
+		//@formatter:off
+        return Stream.of(values())
+                .map(TestCommandEnum::getName)
                 .collect(Collectors.toSet());
+        //@formatter:on
+	}
 
-        System.out.println("magic: " + result);
-    }
+	@Override
+	public String toString() {
+		return "TestCommandEnum{" + "name='" + name + '\'' + '}';
+	}
 }
