@@ -19,9 +19,11 @@
 
 package com.robo4j.units.lego.enums;
 
+import com.robo4j.core.enums.IRoboCommand;
 import com.robo4j.core.enums.IRoboHardwareEnum;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,7 +33,7 @@ import java.util.stream.Stream;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum LegoPlatformMessageTypeEnum implements IRoboHardwareEnum<Integer> {
+public enum LegoPlatformMessageTypeEnum implements IRoboHardwareEnum<Integer>, IRoboCommand {
 
     //@formatter:off
     STOP        (0, "stop"),
@@ -78,11 +80,22 @@ public enum LegoPlatformMessageTypeEnum implements IRoboHardwareEnum<Integer> {
         return name;
     }
 
+
+
     @Override
     public String toString() {
         return "LegoPlatformMessageType{" +
                 "type=" + type +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    @Override
+    public Set<String> commandNames() {
+        //@formatter:off
+        return Stream.of(values())
+                .map(LegoPlatformMessageTypeEnum::getName)
+                .collect(Collectors.toSet());
+        //@formatter:on
     }
 }

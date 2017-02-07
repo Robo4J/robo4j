@@ -29,6 +29,6 @@ import java.util.Set;
  */
 public interface IRoboCommand {
 
-    Set<String> commmandNames();
+    Set<String> commandNames();
 
 }

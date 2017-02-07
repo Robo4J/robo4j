@@ -17,9 +17,11 @@
 package com.robo4j.units.rpi.lcd;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.robo4j.core.enums.IRoboCommand;
 import com.robo4j.core.enums.IRoboHardwareEnum;
 
 /**
@@ -28,7 +30,7 @@ import com.robo4j.core.enums.IRoboHardwareEnum;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer> {
+public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer>, IRoboCommand {
 
     // @formatter:off
 	SELECT 			(0, "S", "select"),
@@ -89,6 +91,16 @@ public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer> {
         return text;
     }
 
+    //TODO, FIXME -> getNames -> also interface
+    @Override
+    public Set<String> commandNames() {
+        //@formatter:off
+        return Stream.of(values())
+                .map(AdafruitButtonPlateEnum::getText)
+                .collect(Collectors.toSet());
+        //@formatter:on
+    }
+
     @Override
     public String toString() {
         return "AdaruitButtonPlateEnum{" +
@@ -96,4 +108,5 @@ public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer> {
                 ", name='" + name + '\'' +
                 '}';
     }
+
 }
