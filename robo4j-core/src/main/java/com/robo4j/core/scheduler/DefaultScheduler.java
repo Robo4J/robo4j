@@ -92,8 +92,8 @@ public class DefaultScheduler implements Scheduler {
 
 	@Override
 	public void shutdown() throws InterruptedException {
+		executor.shutdown();
 		executor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
-		executor.shutdownNow();
 	}
 
 	static <T> void sendMessage(final RoboReference<T> reference, final T message) {
