@@ -39,6 +39,8 @@ public class XmlConfigurationFactory {
 	public static final String ELEMENT_CONFIG = "config";
 	public static final String ATTRIBUTE_NAME = "name";
 	public static final String ATTRIBUTE_TYPE = "type";
+	public static final String ATTRIBUTE_PATH = "path";
+	public static final String ATTRIBUTE_METHOD = "method";
 	private static final String TYPE_BOOLEAN = "boolean";
 	private static final String TYPE_LONG = "long";
 	private static final String TYPE_DOUBLE = "double";
@@ -77,7 +79,12 @@ public class XmlConfigurationFactory {
 			} else if (qName.equals(ELEMENT_HTTP_COMMANDS)){
 				//TODO (marcus) -> please review, maybe we can do it all recursively
 				configStack.push(currentConfig);
+				System.out.println("qName = " + qName);
+				System.out.println("path= " + attributes.getValue(ATTRIBUTE_PATH));
+				System.out.println("method= " + attributes.getValue(ATTRIBUTE_METHOD));
+
 				currentConfig = currentConfig.createChildConfiguration(ELEMENT_HTTP_COMMANDS);
+
 			} else if (qName.equals(ELEMENT_VALUE)) {
 				currentName = attributes.getValue(ATTRIBUTE_NAME);
 				currentType = attributes.getValue(ATTRIBUTE_TYPE);

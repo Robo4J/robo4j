@@ -31,7 +31,7 @@
             <value name="commandName_0_0" type="String">command</value>
             <value name="commandValues_0_0" type="String">select,left,right,up,down</value>
             <value name="target" type="String">request_consumer</value>
-            <commands>
+            <commands path="test" method="GET">
                 <command name="up" type="String">move</command>
                 <command name="down" type="String">back</command>
                 <command name="left" type="String">right</command>

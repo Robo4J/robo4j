@@ -118,9 +118,11 @@ public final class RoboBuilder {
 
 		// Private Methods
 		private Object toString(Attributes attributes) {
-			return String.format("%s=\"%s\" %s=\"%s\"", XmlConfigurationFactory.ATTRIBUTE_NAME,
-					attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_NAME), XmlConfigurationFactory.ATTRIBUTE_TYPE,
-					attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_TYPE));
+			return String.format("%s=\"%s\" %s=\"%s\" %s=\"%s\" %s=\"%s\"",
+					XmlConfigurationFactory.ATTRIBUTE_NAME, attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_NAME),
+					XmlConfigurationFactory.ATTRIBUTE_TYPE, attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_TYPE),
+					XmlConfigurationFactory.ATTRIBUTE_PATH, attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_PATH),
+					XmlConfigurationFactory.ATTRIBUTE_METHOD, attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_METHOD));
 		}
 
 		private void clearCurrentVariables() {
