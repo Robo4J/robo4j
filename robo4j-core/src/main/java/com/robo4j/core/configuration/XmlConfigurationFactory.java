@@ -47,6 +47,9 @@ public class XmlConfigurationFactory {
 	private static final String TYPE_STRING = "String";
 	private static final String ELEMENT_ROOT = "com.robo4j.core.root";
 	private static final String ELEMENT_VALUE = "value";
+	//TODO (marcus) -> please review
+	private static final String ELEMENT_HTTP_COMMANDS = "commands";
+	private static final String ELEMENT_COMMAND = "command";
 
 	private static final Deque<Configuration> configStack = new ArrayDeque<>();
 
@@ -65,13 +68,20 @@ public class XmlConfigurationFactory {
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes)
 				throws SAXException {
-			if (qName.equals("config")) {
+			if (qName.equals(ELEMENT_CONFIG)) {
 				String value = attributes.getValue(ATTRIBUTE_NAME);
 				if (!value.equals(ELEMENT_ROOT)) {
 					configStack.push(currentConfig);
 					currentConfig = currentConfig.createChildConfiguration(value);
 				}
-			} else if (qName.equals("value")) {
+			} else if (qName.equals(ELEMENT_HTTP_COMMANDS)){
+				//TODO (marcus) -> please review, maybe we can do it all recursively
+				configStack.push(currentConfig);
+				currentConfig = currentConfig.createChildConfiguration(ELEMENT_HTTP_COMMANDS);
+			} else if (qName.equals(ELEMENT_VALUE)) {
+				currentName = attributes.getValue(ATTRIBUTE_NAME);
+				currentType = attributes.getValue(ATTRIBUTE_TYPE);
+			} else if(qName.equals(ELEMENT_COMMAND)){
 				currentName = attributes.getValue(ATTRIBUTE_NAME);
 				currentType = attributes.getValue(ATTRIBUTE_TYPE);
 			}
@@ -85,9 +95,18 @@ public class XmlConfigurationFactory {
 				writeValue(currentConfig, currentValue.trim(), currentType, currentName);
 				currentValue = "";
 				break;
+			case ELEMENT_COMMAND:
+				writeValue(currentConfig, currentValue.trim(), currentType, currentName);
+				currentValue = "";
+				break;
 			case ELEMENT_CONFIG:
 				if (!configStack.isEmpty()) { // Closing of the last config...
 					currentConfig = configStack.pop();					
+				}
+				break;
+			case ELEMENT_HTTP_COMMANDS:
+				if (!configStack.isEmpty()) { // Closing of the last config...
+					currentConfig = configStack.pop();
 				}
 				break;
 			}
@@ -125,6 +144,7 @@ public class XmlConfigurationFactory {
 			// for a single text() node.
 			switch (lastElement) {
 			case ELEMENT_VALUE:
+			case ELEMENT_COMMAND:
 				currentValue += String.valueOf(ch, start, length);
 				break;
 			default:

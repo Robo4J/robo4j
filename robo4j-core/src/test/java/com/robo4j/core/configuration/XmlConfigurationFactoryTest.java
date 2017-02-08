@@ -23,6 +23,7 @@ import org.junit.Test;
  * Tests for the configuration.
  * 
  * @author Marcus Hirt
+ * @author Miroslav Wengner (@miragemiko)
  */
 public class XmlConfigurationFactoryTest {
 	@Test

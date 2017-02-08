@@ -25,12 +25,19 @@
         <config name="com.robo4j.core.root">
             <value name="port" type="int">8025</value>
             <value name="pathsNumber" type="int">1</value>
-            <value name="path_0" type="String">lcd</value>
+            <value name="path_0" type="String">test</value>
             <value name="method_0" type="String">GET</value>
             <value name="pathCommands_0" type="int">1</value>
             <value name="commandName_0_0" type="String">command</value>
-            <value name="commandValues_0_0" type="Enum">com.robo4j.core.example.TestCommandEnum</value>
-            <value name="target" type="String">controller</value>
+            <value name="commandValues_0_0" type="String">select,left,right,up,down</value>
+            <value name="target" type="String">request_consumer</value>
+            <commands>
+                <command name="up" type="String">move</command>
+                <command name="down" type="String">back</command>
+                <command name="left" type="String">right</command>
+                <command name="right" type="String">left</command>
+                <command name="enter" type="String">select</command>
+            </commands>
         </config>
     </roboUnit>
     <roboUnit id="request_consumer">

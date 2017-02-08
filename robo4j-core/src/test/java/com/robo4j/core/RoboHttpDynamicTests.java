@@ -24,6 +24,7 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.robo4j.core.client.util.ClientClassLoader;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.unit.HttpUnit;
@@ -35,7 +36,6 @@ import com.robo4j.core.util.SystemUtil;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 05.02.2017
  */
 public class RoboHttpDynamicTests {
 
@@ -54,7 +54,6 @@ public class RoboHttpDynamicTests {
 		config.setInteger("pathsNumber", 1);
 		config.setString("path_0", "test");
 		config.setString("method_0", "GET");
-		// TODO: we need to work on request design
 		config.setInteger("pathCommands_0", 1);
 		config.setString("commandName_0_0", "command");
 		config.setString("commandValues_0_0", "right,left,move,back,enter");
@@ -77,14 +76,30 @@ public class RoboHttpDynamicTests {
 		System.out.println(SystemUtil.generateStateReport(system));
 
 		System.out.println("RoboSystem http server\n\tPort:" + PORT + "\n");
-		System.out.println("Usage:\n\tRequest GET: http://<IP_ADDRESS>:" + PORT + "?type=tank&command=stop");
-		System.out.println("\tRequest command types: stop, move, back, left, right\n");
+		System.out.println("Usage:\n\tRequest GET: http://<IP_ADDRESS>:" + PORT + "/test?command=enter");
+		System.out.println("\tRequest command types: right,left,move,back,enter\n");
 
 		System.out.println("Going Down!");
-		// system.shutdown();
+		// System.in.read();
+		system.stop();
+		system.shutdown();
 		System.out.println("System is Down!");
 		Assert.assertNotNull(system.getUnits());
 		Assert.assertEquals(system.getUnits().size(), 2);
 		Assert.assertEquals(consumer.getReceivedMessages().size(), 0);
+	}
+
+	@Test
+	public void simpleHttpDeclarative() throws RoboBuilderException, IOException {
+
+		RoboBuilder builder = new RoboBuilder().add(ClientClassLoader.getInstance().getResource("http_get.xml"));
+		RoboContext ctx = builder.build();
+
+		Configuration configuration = ctx.getReference("http").getConfiguration().getChildConfiguration("commands");
+		Assert.assertNotNull(configuration.getValueNames());
+		Assert.assertEquals(configuration.getValueNames().size(), 5);
+		Assert.assertEquals(configuration.getString("up", null), "move");
+
+
 	}
 }

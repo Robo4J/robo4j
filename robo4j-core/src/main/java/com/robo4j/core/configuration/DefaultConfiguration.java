@@ -139,6 +139,7 @@ class DefaultConfiguration implements Configuration {
 		return val;
 	}
 
+	//TODO : we may have it wrong here hashCode, equals
 	@Override
 	public int hashCode() {
 		final int prime = 31;

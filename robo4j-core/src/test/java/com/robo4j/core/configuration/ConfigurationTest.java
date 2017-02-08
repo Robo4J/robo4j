@@ -19,10 +19,13 @@ package com.robo4j.core.configuration;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.robo4j.core.example.TestCommands;
+
 /**
  * Tests for the configuration.
  * 
  * @author Marcus Hirt
+ * @author Miroslav Wengner (@miragemiko)
  */
 public class ConfigurationTest {
 	@Test
@@ -36,7 +39,6 @@ public class ConfigurationTest {
 		config.setCharacter("MyCharacter", 'C');
 		config.setBoolean("MyBoolean", true);
 
-		
 		Assert.assertEquals(1, (int) config.getInteger("MyInt", -1));
 		Assert.assertEquals(2L, (long) config.getLong("MyLong", -1L));
 		Assert.assertEquals(1.0f, config.getFloat("MyFloat", -1f), 0.000000001f);
@@ -45,7 +47,7 @@ public class ConfigurationTest {
 		Assert.assertEquals(Character.valueOf('C'), config.getCharacter("MyCharacter", 'A'));
 		Assert.assertEquals(true, config.getBoolean("MyBoolean", false));
 	}
-	
+
 	@Test
 	public void testSubConfigurations() {
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
@@ -57,4 +59,5 @@ public class ConfigurationTest {
 		Assert.assertEquals(2.0, config.getDouble("sub", null), 0.000000001f);
 		Assert.assertEquals("child", config.getChildConfiguration("sub").getString("c", null));
 	}
+
 }

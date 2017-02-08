@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.robo4j.core.enums.IRoboCommand;
+import com.robo4j.core.enums.IRoboCommands;
 import com.robo4j.core.enums.IRoboHardwareEnum;
 
 /**
@@ -30,7 +30,7 @@ import com.robo4j.core.enums.IRoboHardwareEnum;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer>, IRoboCommand {
+public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer>, IRoboCommands {
 
     // @formatter:off
 	SELECT 			(0, "S", "select"),

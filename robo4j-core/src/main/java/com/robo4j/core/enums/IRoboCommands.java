@@ -27,7 +27,7 @@ import java.util.Set;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public interface IRoboCommand {
+public interface IRoboCommands {
 
     Set<String> commandNames();
 

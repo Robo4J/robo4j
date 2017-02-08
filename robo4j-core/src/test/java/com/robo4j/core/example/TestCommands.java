@@ -23,44 +23,28 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.robo4j.core.enums.IRoboCommand;
+import com.robo4j.core.enums.IRoboCommands;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum TestCommandEnum implements IRoboCommand {
+public class TestCommands implements IRoboCommands {
 
-	// @formatter:off
-    SELECT 			("select"),
-    LEFT		    ("left"),
-    RIGHT		    ("right"),
-    UP      		("up"),
-    DOWN    		("down"),
-    ;
-    // @formatter:on
+	private static final String[] values = {"select", "left", "right", "up", "down"};
 
 	private String name;
 
-	TestCommandEnum(String name) {
-		this.name = name;
-	}
-
-	public String getName() {
-		return name;
+	public TestCommands() {
+		name = "test_commands";
 	}
 
 	@Override
 	public Set<String> commandNames() {
 		//@formatter:off
-        return Stream.of(values())
-                .map(TestCommandEnum::getName)
+        return Stream.of(values)
                 .collect(Collectors.toSet());
         //@formatter:on
 	}
 
-	@Override
-	public String toString() {
-		return "TestCommandEnum{" + "name='" + name + '\'' + '}';
-	}
 }

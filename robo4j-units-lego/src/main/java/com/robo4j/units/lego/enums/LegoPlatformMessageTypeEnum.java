@@ -19,7 +19,7 @@
 
 package com.robo4j.units.lego.enums;
 
-import com.robo4j.core.enums.IRoboCommand;
+import com.robo4j.core.enums.IRoboCommands;
 import com.robo4j.core.enums.IRoboHardwareEnum;
 
 import java.util.Map;
@@ -33,7 +33,7 @@ import java.util.stream.Stream;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum LegoPlatformMessageTypeEnum implements IRoboHardwareEnum<Integer>, IRoboCommand {
+public enum LegoPlatformMessageTypeEnum implements IRoboHardwareEnum<Integer>, IRoboCommands {
 
     //@formatter:off
     STOP        (0, "stop"),
