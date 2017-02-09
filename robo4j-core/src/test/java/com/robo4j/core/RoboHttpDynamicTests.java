@@ -97,8 +97,13 @@ public class RoboHttpDynamicTests {
 
 		Configuration configuration = ctx.getReference("http").getConfiguration().getChildConfiguration("commands");
 		Assert.assertNotNull(configuration.getValueNames());
-		Assert.assertEquals(configuration.getValueNames().size(), 5);
+		Assert.assertEquals(configuration.getValueNames().size(), 7);
 		Assert.assertEquals(configuration.getString("up", null), "move");
+		Assert.assertEquals(configuration.getString("down", null), "back");
+		Assert.assertEquals(configuration.getString("right", null), "left");
+		Assert.assertEquals(configuration.getString("left", null), "right");
+		Assert.assertEquals(configuration.getString("path", null), "test");
+		Assert.assertEquals(configuration.getString("method", null), "GET");
 
 
 	}

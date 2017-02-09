@@ -77,13 +77,10 @@ public class XmlConfigurationFactory {
 					currentConfig = currentConfig.createChildConfiguration(value);
 				}
 			} else if (qName.equals(ELEMENT_HTTP_COMMANDS)){
-				//TODO (marcus) -> please review, maybe we can do it all recursively
 				configStack.push(currentConfig);
-				System.out.println("qName = " + qName);
-				System.out.println("path= " + attributes.getValue(ATTRIBUTE_PATH));
-				System.out.println("method= " + attributes.getValue(ATTRIBUTE_METHOD));
-
 				currentConfig = currentConfig.createChildConfiguration(ELEMENT_HTTP_COMMANDS);
+				writeValue(currentConfig, attributes.getValue(ATTRIBUTE_PATH), TYPE_STRING, ATTRIBUTE_PATH);
+				writeValue(currentConfig, attributes.getValue(ATTRIBUTE_METHOD), TYPE_STRING, ATTRIBUTE_METHOD);
 
 			} else if (qName.equals(ELEMENT_VALUE)) {
 				currentName = attributes.getValue(ATTRIBUTE_NAME);
@@ -112,7 +109,7 @@ public class XmlConfigurationFactory {
 				}
 				break;
 			case ELEMENT_HTTP_COMMANDS:
-				if (!configStack.isEmpty()) { // Closing of the last config...
+				if (!configStack.isEmpty()) { // Closing of the last commands...
 					currentConfig = configStack.pop();
 				}
 				break;
