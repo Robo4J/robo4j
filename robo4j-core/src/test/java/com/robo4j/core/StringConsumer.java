@@ -37,7 +37,7 @@ public class StringConsumer extends RoboUnit<String> {
 		super(context, id);
 	}
 
-	public List<String> getReceivedMessages() {
+	public synchronized List<String> getReceivedMessages() {
 		return receivedMessages;
 	}
 	
@@ -48,7 +48,6 @@ public class StringConsumer extends RoboUnit<String> {
 			return new RoboResult<String, Integer>(this, receivedMessages.size());
 		}
 		String str = (String) message;
-		System.out.println(getClass().getSimpleName() + ":: onMessage: " + message);
 		receivedMessages.add(str);
 		return new RoboResult<String, Integer>(this, receivedMessages.size());
 	}
