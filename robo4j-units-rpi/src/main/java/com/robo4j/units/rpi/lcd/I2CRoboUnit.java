@@ -30,8 +30,8 @@ import com.robo4j.core.configuration.Configuration;
 public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
 	// For all Raspberry Pi's except the first model, this is always the case.
 	private static final int _DEFAULT_BUS = 1;
-	public final static String PROPERTY_KEY_BUS = "bus";
-	public final static String PROPERTY_KEY_ADDRESS = "address";
+	public static final String PROPERTY_KEY_BUS = "bus";
+	public static final String PROPERTY_KEY_ADDRESS = "address";
 
 	private Integer bus;
 	private Integer address;

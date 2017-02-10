@@ -235,7 +235,7 @@ public final class BMP085Device extends AbstractI2CDevice {
 		int waitTime;
 		int currentDraw;
 
-		private OperatingMode(int maxConversionTime, int currentDraw) {
+		OperatingMode(int maxConversionTime, int currentDraw) {
 			this.waitTime = (maxConversionTime + 5) / 10;
 			this.currentDraw = currentDraw;
 		}

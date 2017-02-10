@@ -27,7 +27,6 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.hw.lego.ILcd;
 import com.robo4j.hw.lego.wrapper.LcdWrapper;
-import lejos.hardware.lcd.GraphicsLCD;
 
 /**
  * Lego Mindstorm Brick LCD unit

@@ -46,7 +46,7 @@ public enum LegoPlatformMessageTypeEnum implements IRoboHardwareEnum<Integer>, I
 
     //@formatter:on
 
-    private volatile static Map<Integer, LegoPlatformMessageTypeEnum> internMapByType;
+    private static volatile Map<Integer, LegoPlatformMessageTypeEnum> internMapByType;
     private Integer type;
     private String name;
 

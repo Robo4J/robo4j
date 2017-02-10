@@ -43,7 +43,7 @@ public enum AccuracyCategory {
 	private String name;
 	private String description;
 
-	private AccuracyCategory(int dop, String name, String description) {
+	AccuracyCategory(int dop, String name, String description) {
 		this.dop = dop;
 		this.name = name;
 		this.description = description;

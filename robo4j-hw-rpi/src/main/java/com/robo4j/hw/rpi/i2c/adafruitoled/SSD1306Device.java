@@ -38,9 +38,9 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
  * @author Miro Wengner (@miragemiko)
  */
 public class SSD1306Device extends AbstractI2CDevice {
-	private final static byte CHARGE_PUMP_VALUE_ENABLE = 0x14;
-	private final static byte CHARGE_PUMP_VALUE_DISABLE = 0x10;
-	private final static int DEFAULT_CONTRAST = 0x88;
+	private static final byte CHARGE_PUMP_VALUE_ENABLE = 0x14;
+	private static final byte CHARGE_PUMP_VALUE_DISABLE = 0x10;
+	private static final int DEFAULT_CONTRAST = 0x88;
 
 	public enum OLEDVariant {
 		Type96x16(96, 16, 0x2, 1),
@@ -52,7 +52,7 @@ public class SSD1306Device extends AbstractI2CDevice {
 		private final int comPins;
 		private final int pageEnd;
 
-		private OLEDVariant(int width, int height, int comPins, int pageEnd) {
+		OLEDVariant(int width, int height, int comPins, int pageEnd) {
 			this.width = width;
 			this.height = height;
 			this.comPins = comPins;
@@ -103,7 +103,7 @@ public class SSD1306Device extends AbstractI2CDevice {
 
 		private byte commandValue;
 
-		private Commands(byte commandValue) {
+		Commands(byte commandValue) {
 			this.commandValue = commandValue;
 		}
 
@@ -119,7 +119,7 @@ public class SSD1306Device extends AbstractI2CDevice {
 
 		private byte value;
 
-		private MemoryModes(byte value) {
+		MemoryModes(byte value) {
 			this.value = value;
 		}
 

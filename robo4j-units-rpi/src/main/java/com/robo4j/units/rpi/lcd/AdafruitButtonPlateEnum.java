@@ -41,7 +41,7 @@ public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer>, IRobo
 	;
 	// @formatter:on
 
-    private volatile static Map<Integer, AdafruitButtonPlateEnum> defToCommandTargetMapping;
+    private static volatile Map<Integer, AdafruitButtonPlateEnum> defToCommandTargetMapping;
     private int type;
     private String name;
     private String text;

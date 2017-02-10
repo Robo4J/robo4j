@@ -106,7 +106,7 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 
 		private int ctrlCode;
 
-		private DataRate(int ctrlCode) {
+		DataRate(int ctrlCode) {
 			this.ctrlCode = ctrlCode;
 		}
 
@@ -119,7 +119,7 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 		NORMAL(0x0), LOW_POWER(0x8);
 		private int ctrlCode;
 
-		private PowerMode(int ctrlCode) {
+		PowerMode(int ctrlCode) {
 			this.ctrlCode = ctrlCode;
 		}
 
@@ -133,7 +133,7 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 		private int ctrlCode;
 		private int sensitivity;
 
-		private FullScale(int ctrlCode, int sensitivity) {
+		FullScale(int ctrlCode, int sensitivity) {
 			this.ctrlCode = ctrlCode;
 			this.sensitivity = sensitivity;
 		}

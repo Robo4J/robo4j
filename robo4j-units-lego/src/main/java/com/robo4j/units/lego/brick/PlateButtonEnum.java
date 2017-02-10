@@ -43,7 +43,7 @@ public enum  PlateButtonEnum implements ILegoHardware<Integer> {
     ;
 
     //@formatter:on
-    private volatile static Map<Integer, PlateButtonEnum> internMapByType;
+    private static volatile Map<Integer, PlateButtonEnum> internMapByType;
 
     private int type;
     private String name;

@@ -24,8 +24,8 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 
 public class ServoUnitExample {
-	private final static int PAN_STEPS = 30;
-	private final static int TILT_STEPS = 10;
+	private static final int PAN_STEPS = 30;
+	private static final int TILT_STEPS = 10;
 
 	private static volatile boolean stop = false;
 

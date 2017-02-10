@@ -116,7 +116,7 @@ public class FeatureExtraction {
 		return (float) (Math.atan2(fDeltaX, fDeltaY) - Math.atan2(bDeltaX, bDeltaY));		
 	}
 
-	private final static double segmentMaxRange(float lastRange, float angularResolution) {
+	private static double segmentMaxRange(float lastRange, float angularResolution) {
 		return lastRange * Math.sin(angularResolution) / Math.sin(AUXILIARY_CONSTANT - angularResolution) + 3 * RESIDUAL_VARIANCE;
 	}
 
@@ -274,7 +274,7 @@ public class FeatureExtraction {
 		return Point2DIndex - i;
 	}
 	
-	public final static void main(String[] args) {
+	public static final void main(String[] args) {
 		Point2D b = new Point2D(18, 18);
 		Point2D center = new Point2D(19, 19);
 		Point2D f = new Point2D(20, 20);

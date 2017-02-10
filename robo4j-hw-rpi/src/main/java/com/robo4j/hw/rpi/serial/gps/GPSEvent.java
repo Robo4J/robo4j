@@ -27,7 +27,7 @@ abstract class GPSEvent {
 	
 	private final GPS source;
 
-	public GPSEvent(GPS source) {
+	GPSEvent(GPS source) {
 		this.source = source;
 	}
 

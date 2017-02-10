@@ -118,7 +118,7 @@ public class GyroL3GD20Device extends AbstractI2CDevice implements
 		private final int fullScaleSelectionMask;
 		private final float sensitivityFactor;
 
-		private Sensitivity(int fullScaleSelectionMask, float sensitivityFactor) {
+		Sensitivity(int fullScaleSelectionMask, float sensitivityFactor) {
 			this.fullScaleSelectionMask = fullScaleSelectionMask;
 			this.sensitivityFactor = sensitivityFactor;
 		}
