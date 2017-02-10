@@ -36,7 +36,7 @@ class ScheduledMessageWrapper<T> implements Runnable {
 	private final FinalInvocationListener listener;
 	private ScheduledFuture<?> future;
 
-	public ScheduledMessageWrapper(RoboContext context, RoboReference<T> reference, int numberOfInvocations, T message,
+	ScheduledMessageWrapper(RoboContext context, RoboReference<T> reference, int numberOfInvocations, T message,
 			FinalInvocationListener listener) {
 		this.context = context;
 		this.reference = reference;

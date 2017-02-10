@@ -24,5 +24,5 @@ import com.robo4j.http.HttpMessage;
  */
 public interface DefaultRequestFactory<ResponseType> {
 
-      ResponseType processGet(final HttpMessage httpMessage);
+      ResponseType processGet(HttpMessage httpMessage);
 }

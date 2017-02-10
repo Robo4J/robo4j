@@ -58,7 +58,7 @@ public class RoboSystem implements RoboContext {
 	private class ReferenceImplementation<T> implements RoboReference<T> {
 		private final RoboUnit<T> unit;
 
-		public ReferenceImplementation(RoboUnit<T> unit) {
+		ReferenceImplementation(RoboUnit<T> unit) {
 			this.unit = unit;
 		}
 

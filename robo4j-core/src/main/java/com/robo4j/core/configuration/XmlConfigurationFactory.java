@@ -63,7 +63,7 @@ public class XmlConfigurationFactory {
 		private String currentType;
 		private String currentName;
 
-		public ConfigurationHandler(DefaultConfiguration config) {
+		ConfigurationHandler(DefaultConfiguration config) {
 			currentConfig = config;
 		}
 

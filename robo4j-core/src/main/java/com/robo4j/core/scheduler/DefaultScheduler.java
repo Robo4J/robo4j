@@ -33,7 +33,7 @@ import com.robo4j.core.concurrency.RoboThreadFactory;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class DefaultScheduler implements Scheduler {
-	private final static int DEFAULT_NUMBER_OF_THREADS = 2;
+	private static final int DEFAULT_NUMBER_OF_THREADS = 2;
 	private static final int TERMINATION_TIMEOUT = 2;
 
 	private final ScheduledExecutorService executor;

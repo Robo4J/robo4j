@@ -16,14 +16,14 @@
  */
 package com.robo4j.core.client.util;
 
-import com.robo4j.core.client.request.RoboBasicMapEntry;
-import com.robo4j.core.util.ConstantUtil;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.robo4j.core.client.request.RoboBasicMapEntry;
+import com.robo4j.core.util.ConstantUtil;
 
 /**
  * Basic Http constants and utils methods

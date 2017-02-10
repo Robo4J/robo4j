@@ -24,7 +24,7 @@ import java.util.Random;
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class StringToolkit {
-	private final static Random RND = new Random(); 
+	private static final Random RND = new Random(); 
 	private StringToolkit() {
 		throw new AssertionError("Toolkit!");
 	}

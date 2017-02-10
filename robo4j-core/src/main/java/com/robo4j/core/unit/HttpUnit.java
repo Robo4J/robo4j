@@ -19,19 +19,6 @@
 
 package com.robo4j.core.unit;
 
-import com.robo4j.core.ConfigurationException;
-import com.robo4j.core.LifecycleState;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboUnit;
-import com.robo4j.core.client.request.RoboRequestCallable;
-import com.robo4j.core.client.request.RoboRequestDynamicFactory;
-import com.robo4j.core.client.request.RoboRequestElement;
-import com.robo4j.core.client.request.RoboRequestTypeRegistry;
-import com.robo4j.core.concurrency.RoboThreadFactory;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.logging.SimpleLoggingUtil;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.Selector;
@@ -49,6 +36,19 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import com.robo4j.core.ConfigurationException;
+import com.robo4j.core.LifecycleState;
+import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboReference;
+import com.robo4j.core.RoboUnit;
+import com.robo4j.core.client.request.RoboRequestCallable;
+import com.robo4j.core.client.request.RoboRequestDynamicFactory;
+import com.robo4j.core.client.request.RoboRequestElement;
+import com.robo4j.core.client.request.RoboRequestTypeRegistry;
+import com.robo4j.core.concurrency.RoboThreadFactory;
+import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 
 /**
  * Http Dynamic unit allows to configure format of the requests

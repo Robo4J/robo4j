@@ -16,13 +16,6 @@
  */
 package com.robo4j.core.client.request;
 
-import com.robo4j.core.client.util.HttpUtils;
-import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.util.ConstantUtil;
-import com.robo4j.http.HttpMessage;
-import com.robo4j.http.HttpMethod;
-import com.robo4j.http.HttpVersion;
-
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,6 +28,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
+
+import com.robo4j.core.client.util.HttpUtils;
+import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.util.ConstantUtil;
+import com.robo4j.http.HttpMessage;
+import com.robo4j.http.HttpMethod;
+import com.robo4j.http.HttpVersion;
 
 /**
  * @author Miro Wengner (@miragemiko)
@@ -61,8 +61,8 @@ public class RoboRequestCallable implements Callable<String> {
             SimpleLoggingUtil.error(getClass(), "no connection");
         }
 
-        try (final Writer out = new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
-             final BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+        try (Writer out = new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
+             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
 
             final Map<String, String> params = new HashMap<>();
             boolean firstLine = true;

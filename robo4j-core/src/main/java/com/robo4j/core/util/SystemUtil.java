@@ -36,7 +36,7 @@ public final class SystemUtil {
 		//no instances
 	}
 
-	public final static Comparator<RoboUnit<?>> ID_COMPARATOR = new Comparator<RoboUnit<?>>() {
+	public static final Comparator<RoboUnit<?>> ID_COMPARATOR = new Comparator<RoboUnit<?>>() {
 		@Override
 		public int compare(RoboUnit<?> o1, RoboUnit<?> o2) {
 			return o1.getId().compareTo(o2.getId());

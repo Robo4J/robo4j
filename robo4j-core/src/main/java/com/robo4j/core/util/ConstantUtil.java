@@ -42,13 +42,13 @@ public final class ConstantUtil {
 	public static final int DEFAULT_PRIORITY = 1;
 	public static final List<String> availablePaths = Arrays.asList(EXIT, STATUS, SETUP);
 	public static final int DEFAULT_ENGINE_SPEED = 300;
-	public final static String HTTP_QUERY_SEP = "&";
-	public final static String HTTP_EMPTY_SEP = "\\s+";
+	public static final String HTTP_QUERY_SEP = "&";
+	public static final String HTTP_EMPTY_SEP = "\\s+";
 	public static final String STORAGE_SERVICE = "storageService";
 	/**
 	 * The HTTP separator characters. Defined in RFC 2616, section 2.2
 	 */
-	private final static String HTTP_SEPARATORS = " ,;=()<>@:\\\"/[]?{}\t";
+	private static final String HTTP_SEPARATORS = " ,;=()<>@:\\\"/[]?{}\t";
 
 	public static String getHttpSeparator(int position) {
 		return Character.toString(HTTP_SEPARATORS.charAt(position));

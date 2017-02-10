@@ -19,8 +19,6 @@ package com.robo4j.core.configuration;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.core.example.TestCommands;
-
 /**
  * Tests for the configuration.
  * 
