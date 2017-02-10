@@ -44,7 +44,7 @@ import com.robo4j.core.scheduler.Scheduler;
  */
 public class RoboSystem implements RoboContext {
 	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
-	private static final int TERMINATION_TIMEOUT = 2;
+	private static final int TERMINATION_TIMEOUT = 5;
 	private static final int KEEP_ALIVE_TIME = 10;
 	private volatile AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
 	private final Map<String, RoboUnit<?>> units = new HashMap<>();

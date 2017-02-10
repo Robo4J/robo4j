@@ -16,13 +16,13 @@
  */
 package com.robo4j.core;
 
-import com.robo4j.core.client.util.ClientClassLoader;
-
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.robo4j.core.client.util.ClientClassLoader;
 
 /**
  * Test(s) for the builder.
@@ -54,7 +54,7 @@ public class RoboBuilderTests {
 		}
 		Future<RoboResult<String, Integer>> result = consumer.sendMessage("getNumberOfSentMessages");
 		context.shutdown();
-		Assert.assertEquals(10, (int)result.get().getResult());		
+		Assert.assertEquals(10, (int) result.get().getResult());
 
 	}
 

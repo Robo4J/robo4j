@@ -58,6 +58,7 @@ public class RoboSchedulerTests {
 		} catch (CancellationException e) {
 			// Expected - using this to wait for completion.
 		}
+
 		Assert.assertEquals(consumer.getReceivedMessages().size(), 3);
 		Assert.assertTrue(listener.wasFinalCalled);
 		system.shutdown();
