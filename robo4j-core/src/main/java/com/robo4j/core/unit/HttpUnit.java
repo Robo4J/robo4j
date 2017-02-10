@@ -19,19 +19,6 @@
 
 package com.robo4j.core.unit;
 
-import com.robo4j.core.ConfigurationException;
-import com.robo4j.core.LifecycleState;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboUnit;
-import com.robo4j.core.client.request.RoboRequestCallable;
-import com.robo4j.core.client.request.RoboRequestDynamicFactory;
-import com.robo4j.core.client.request.RoboRequestElement;
-import com.robo4j.core.client.request.RoboRequestTypeRegistry;
-import com.robo4j.core.concurrency.RoboThreadFactory;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.logging.SimpleLoggingUtil;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
@@ -49,6 +36,19 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.robo4j.core.ConfigurationException;
+import com.robo4j.core.LifecycleState;
+import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboReference;
+import com.robo4j.core.RoboUnit;
+import com.robo4j.core.client.request.RoboRequestCallable;
+import com.robo4j.core.client.request.RoboRequestDynamicFactory;
+import com.robo4j.core.client.request.RoboRequestElement;
+import com.robo4j.core.client.request.RoboRequestTypeRegistry;
+import com.robo4j.core.concurrency.RoboThreadFactory;
+import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.logging.SimpleLoggingUtil;
+
 /**
  * Http Dynamic unit allows to configure format of the requests
  * currently is only GET method available
@@ -57,6 +57,7 @@ import java.util.concurrent.TimeUnit;
  * @author Miro Wengner (@miragemiko)
  * @since 05.02.2017
  */
+// TODO -> miro implement selector
 public class HttpUnit extends RoboUnit<Object> {
 
     private static final int DEFAULT_THREAD_POOL_SIZE = 2;
@@ -69,7 +70,7 @@ public class HttpUnit extends RoboUnit<Object> {
     private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
     private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
             KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
-            new RoboThreadFactory("Robo4J HttpDynamicUnit ", true));
+			new RoboThreadFactory("Robo4J HttpUnit ", true));
     private boolean available;
     private Integer port;
     private String target;
@@ -105,7 +106,6 @@ public class HttpUnit extends RoboUnit<Object> {
         if (target == null && commands == null) {
             throw ConfigurationException.createMissingConfigNameException("target, method, path, commands...");
         }
-        //@formatter:off
 
         Set<String> keys = commands.getValueNames();
         String path = commands.getValue(HTTP_PATH, _EMPTY_STRING).toString();
@@ -123,28 +123,36 @@ public class HttpUnit extends RoboUnit<Object> {
         elements.add(new RoboRequestElement(method, HTTP_COMMAND, elementValues));
         RoboRequestTypeRegistry.getInstance().addPathWithValues(path, elements);
 
-        //@formatter:on
-
         setState(LifecycleState.INITIALIZED);
     }
 
     @Override
+	public void stop() {
+		setState(LifecycleState.STOPPING);
+		stopServer("stop");
+		setState(LifecycleState.STOPPED);
+	}
+
+	@Override
     public void shutdown() {
         setState(LifecycleState.SHUTTING_DOWN);
-        try {
-            if (server != null) {
-                server.socket().close();
-                server.close();
-            }
-        } catch (IOException e) {
-            SimpleLoggingUtil.error(getClass(), "server problem: ", e);
-        }
-
         executor.shutdownNow();
+		stopServer("shutdown");
         setState(LifecycleState.SHUTDOWN);
     }
 
     // Private Methods
+
+	public void stopServer(String method) {
+		try {
+			if (server != null && server.isOpen()) {
+				server.close();
+			}
+		} catch (IOException e) {
+			SimpleLoggingUtil.error(getClass(), "server problem: ", e);
+		}
+	}
+
     /**
      * Start non-blocking socket server on http protocol
      *
@@ -153,7 +161,11 @@ public class HttpUnit extends RoboUnit<Object> {
      */
     private void server(final RoboReference<String> targetRef) {
         try {
+			// TODO miro -> implement;
+
+			/* selector is multiplexor to SelectableChannel */
             server = ServerSocketChannel.open();
+			server.configureBlocking(false);
             server.socket().bind(new InetSocketAddress(port));
             SimpleLoggingUtil.debug(getClass(), "started port: " + port);
             while (activeStates.contains(getState())) {
