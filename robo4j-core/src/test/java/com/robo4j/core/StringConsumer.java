@@ -48,6 +48,7 @@ public class StringConsumer extends RoboUnit<String> {
 			return new RoboResult<String, Integer>(this, receivedMessages.size());
 		}
 		String str = (String) message;
+		System.out.println(getClass().getSimpleName() + ":: onMessage: " + message);
 		receivedMessages.add(str);
 		return new RoboResult<String, Integer>(this, receivedMessages.size());
 	}

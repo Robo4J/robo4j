@@ -37,7 +37,10 @@ import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -45,8 +48,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Http Dynamic unit allows to configure format of the requests
@@ -61,8 +62,10 @@ public class HttpUnit extends RoboUnit<Object> {
     private static final int DEFAULT_THREAD_POOL_SIZE = 2;
     private static final int KEEP_ALIVE_TIME = 10;
     private static final int _DEFAULT_PORT = 8042;
-    public static final int _DEFAULT_COMMAND_NUMBERS = 0;
-    public static final String _DEFAULT_COMMAND = "";
+    private static final String HTTP_PATH = "path";
+    private static final String HTTP_METHOD = "method";
+    private static final String HTTP_COMMAND = "command";
+    public static final String _EMPTY_STRING = "";
     private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
     private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
             KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
@@ -98,41 +101,29 @@ public class HttpUnit extends RoboUnit<Object> {
         target = configuration.getString("target", null);
         port = configuration.getInteger("port", _DEFAULT_PORT);
 
-        Integer pathsNumber = configuration.getInteger("pathsNumber", 0);
-        if (target == null && pathsNumber == null) {
-            throw ConfigurationException.createMissingConfigNameException("target, pathsNumber");
+        final Configuration commands = configuration.getChildConfiguration(HTTP_COMMAND.concat("s"));
+        if (target == null && commands == null) {
+            throw ConfigurationException.createMissingConfigNameException("target, method, path, commands...");
         }
         //@formatter:off
 
-        Set<RoboRequestElement> elements;
-        String path;
-        Integer pathCommands;
-        String commandName;
-        Set<String> commandValues;
+        Set<String> keys = commands.getValueNames();
+        String path = commands.getValue(HTTP_PATH, _EMPTY_STRING).toString();
+        keys.remove(HTTP_PATH);
+        String method = commands.getValue(HTTP_METHOD, _EMPTY_STRING).toString();
+        keys.remove(HTTP_METHOD);
 
-        for(int i=0; i<pathsNumber; i++){
-            path = configuration.getString("path_" + i, _DEFAULT_COMMAND);
-            pathCommands = configuration.getInteger("pathCommands_"+ i, _DEFAULT_COMMAND_NUMBERS);
-            elements = new HashSet<>();
-            for(int j=0; j<pathCommands; j++){
-
-                String tmp = i+"_"+j;
-                commandName = configuration.getString("commandName_".concat(tmp), _DEFAULT_COMMAND);
-                commandValues = Stream.of(configuration.getString("commandValues_".concat(tmp), _DEFAULT_COMMAND)
-                        .trim()
-                        .split(","))
-                        .map(String::trim)
-                        .collect(Collectors.toSet());
-
-                elements.add(new RoboRequestElement(commandName, commandValues));
-                RoboRequestTypeRegistry.getInstance().addPathWithValues(path, elements);
-            }
-
-
+        Set<RoboRequestElement> elements = new HashSet<>();
+        Map<String, String> elementValues = new HashMap<>();
+        for(Iterator<String> it = keys.iterator(); it.hasNext();){
+            String key = it.next();
+            String value = commands.getString(key, _EMPTY_STRING);
+            elementValues.put(key, value);
         }
+        elements.add(new RoboRequestElement(method, HTTP_COMMAND, elementValues));
+        RoboRequestTypeRegistry.getInstance().addPathWithValues(path, elements);
 
         //@formatter:on
-
 
         setState(LifecycleState.INITIALIZED);
     }

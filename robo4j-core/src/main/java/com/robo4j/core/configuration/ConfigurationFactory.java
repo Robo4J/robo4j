@@ -26,4 +26,5 @@ public class ConfigurationFactory {
 	public static Configuration createEmptyConfiguration() {
 		return new DefaultConfiguration();
 	}
+
 }

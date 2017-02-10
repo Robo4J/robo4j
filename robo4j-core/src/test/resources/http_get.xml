@@ -24,12 +24,6 @@
         <class>com.robo4j.core.unit.HttpUnit</class>
         <config name="com.robo4j.core.root">
             <value name="port" type="int">8025</value>
-            <value name="pathsNumber" type="int">1</value>
-            <value name="path_0" type="String">test</value>
-            <value name="method_0" type="String">GET</value>
-            <value name="pathCommands_0" type="int">1</value>
-            <value name="commandName_0_0" type="String">command</value>
-            <value name="commandValues_0_0" type="String">select,left,right,up,down</value>
             <value name="target" type="String">request_consumer</value>
             <commands path="test" method="GET">
                 <command name="up" type="String">move</command>

@@ -20,6 +20,7 @@
 package com.robo4j.core;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,12 +52,13 @@ public class RoboHttpDynamicTests {
 		config.setInteger("port", PORT);
 
 		/* specific configuration */
-		config.setInteger("pathsNumber", 1);
-		config.setString("path_0", "test");
-		config.setString("method_0", "GET");
-		config.setInteger("pathCommands_0", 1);
-		config.setString("commandName_0_0", "command");
-		config.setString("commandValues_0_0", "right,left,move,back,enter");
+		Configuration commands = config.createChildConfiguration("commands");
+		commands.setString("path", "tank");
+		commands.setString("method", "GET");
+		commands.setString("up", "move");
+		commands.setString("down", "back");
+		commands.setString("left", "right");
+		commands.setString("right", "left");
 		httpDynamic.initialize(config);
 
 		StringConsumer consumer = new StringConsumer(system, "request_consumer");
@@ -79,8 +81,9 @@ public class RoboHttpDynamicTests {
 		System.out.println("Usage:\n\tRequest GET: http://<IP_ADDRESS>:" + PORT + "/test?command=enter");
 		System.out.println("\tRequest command types: right,left,move,back,enter\n");
 
+//		System.in.read();
+
 		System.out.println("Going Down!");
-		// System.in.read();
 		system.stop();
 		system.shutdown();
 		System.out.println("System is Down!");
@@ -90,21 +93,63 @@ public class RoboHttpDynamicTests {
 	}
 
 	@Test
+	public void simpleHttpConfiguration() throws ConfigurationException, IOException {
+		RoboSystem system = new RoboSystem();
+		Configuration config = ConfigurationFactory.createEmptyConfiguration();
+
+		HttpUnit httpDynamic = new HttpUnit(system, "http");
+		config.setInteger("port", PORT);
+		config.setString("target", "request_consumer");
+		Configuration commands = config.createChildConfiguration("commands");
+		commands.setString("path", "tank");
+		commands.setString("method", "GET");
+		commands.setString("up", "move");
+		commands.setString("down", "back");
+		commands.setString("left", "right");
+		commands.setString("right", "left");
+		httpDynamic.initialize(config);
+
+		StringConsumer consumer = new StringConsumer(system, "request_consumer");
+
+		system.addUnits(httpDynamic, consumer);
+
+		System.out.println("State before start:");
+		System.out.println(SystemUtil.generateStateReport(system));
+		system.start();
+
+		System.out.println("State after start:");
+		System.out.println(SystemUtil.generateStateReport(system));
+
+		System.out.println("RoboSystem http server\n\tPort:" + PORT + "\n");
+		System.out.println("Usage:\n\tRequest GET: http://<IP_ADDRESS>:" + PORT + "/test?command=enter");
+		System.out.println("\tRequest command types: right,left,move,back,enter\n");
+
+//		System.in.read();
+		System.out.println("Going Down!");
+		system.stop();
+		system.shutdown();
+		System.out.println("System is Down!");
+		Assert.assertNotNull(system.getUnits());
+		Assert.assertEquals(system.getUnits().size(), 2);
+		Assert.assertEquals(consumer.getReceivedMessages().size(), 0);
+
+	}
+
+	@Test
 	public void simpleHttpDeclarative() throws RoboBuilderException, IOException {
 
 		RoboBuilder builder = new RoboBuilder().add(ClientClassLoader.getInstance().getResource("http_get.xml"));
 		RoboContext ctx = builder.build();
 
-		Configuration configuration = ctx.getReference("http").getConfiguration().getChildConfiguration("commands");
-		Assert.assertNotNull(configuration.getValueNames());
-		Assert.assertEquals(configuration.getValueNames().size(), 7);
-		Assert.assertEquals(configuration.getString("up", null), "move");
-		Assert.assertEquals(configuration.getString("down", null), "back");
-		Assert.assertEquals(configuration.getString("right", null), "left");
-		Assert.assertEquals(configuration.getString("left", null), "right");
-		Assert.assertEquals(configuration.getString("path", null), "test");
-		Assert.assertEquals(configuration.getString("method", null), "GET");
+		Configuration confCommands = ctx.getReference("http").getConfiguration().getChildConfiguration("commands");
+		Assert.assertNotNull(confCommands.getValueNames());
+		Assert.assertEquals(confCommands.getValueNames().size(), 5);
+		Assert.assertEquals(confCommands.getString("up", null), "move");
+		Assert.assertEquals(confCommands.getString("down", null), "back");
+		Assert.assertEquals(confCommands.getString("right", null), "left");
+		Assert.assertEquals(confCommands.getString("left", null), "right");
 
 
 	}
+
 }

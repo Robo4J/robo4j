@@ -19,7 +19,7 @@
 
 package com.robo4j.core.client.request;
 
-import java.util.Set;
+import java.util.Map;
 
 /**
  * RoboRequestElement type is immutable value
@@ -30,27 +30,34 @@ import java.util.Set;
  */
 public class RoboRequestElement {
 
+    private String method;
     private String key;
-    private Set<String> values;
+    private Map<String, String> values;
 
-    public RoboRequestElement(String key, Set<String> values) {
+    public RoboRequestElement(String method, String key, Map<String, String> values) {
+        this.method = method;
         this.key = key;
         this.values = values;
+    }
+
+    public String getMethod() {
+        return method;
     }
 
     public String getKey() {
         return key;
     }
 
-    public Set<String> getValues() {
+    public Map<String, String> getValues() {
         return values;
     }
 
     @Override
     public String toString() {
         return "RoboRequestElement{" +
-                "key='" + key + '\'' +
-                ", values='" + values + '\'' +
+                "method='" + method + '\'' +
+                ", key='" + key + '\'' +
+                ", values=" + values +
                 '}';
     }
 }

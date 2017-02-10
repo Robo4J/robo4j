@@ -64,18 +64,18 @@ public class RoboRequestDynamicFactory implements DefaultRequestFactory<String> 
 			Set<RoboRequestElement> availablePathValues = RoboRequestTypeRegistry.getInstance().getPathValues(path);
 
 			if (availablePathValues != null && !availablePathValues.isEmpty()) {
+				RoboRequestElement roboRequestElement = availablePathValues.stream().findFirst().get();
 				if (uri != null && uri.getQuery() != null && !uri.getQuery().isEmpty()) {
 					final Map<String, String> currentRequestValues = HttpUtils.parseURIQueryToMap(uri.getQuery(),
 							ConstantUtil.HTTP_QUERY_SEP);
 					//@formatter:off
                     return currentRequestValues.entrySet().stream()
-                            .filter(e -> availablePathValues.stream()
-                                    .filter(ac -> ac.getKey().equals(e.getKey()))
-                                    .filter(ac -> ac.getValues().contains(e.getValue()))
-                                    .count() > 0)
-                            .map(Map.Entry::getValue)
+							.filter(e -> roboRequestElement.getValues().containsValue(e.getValue()))
+                            .map(e -> roboRequestElement.getValues().entrySet()
+									.stream().filter(v -> v.getValue().equals(e.getValue())).findFirst().get())
                             .findFirst()
-                            .orElse(HttpUnit._DEFAULT_COMMAND);
+							.map(Map.Entry::getKey)
+                            .orElse(HttpUnit._EMPTY_STRING);
                     //@formatter:on
 				}
 			}

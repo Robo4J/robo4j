@@ -62,7 +62,7 @@ public final class RoboRequestTypeRegistry {
         return pathValues.get(path).stream()
                 .filter(e -> e.getKey().equals(key))
                 .map(RoboRequestElement::getValues)
-                .filter(v -> value.contains(value))
+                .filter(v -> v.containsKey(value))
                 .count() > 0;
         //@formatter:on
 	}
