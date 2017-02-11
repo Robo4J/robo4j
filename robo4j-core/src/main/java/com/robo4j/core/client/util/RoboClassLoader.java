@@ -24,20 +24,20 @@ import java.io.InputStream;
  *
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class ClientClassLoader {
+public final class RoboClassLoader {
 
-	private static volatile ClientClassLoader INSTANCE;
+	private static volatile RoboClassLoader INSTANCE;
 	private volatile ClassLoader cl;
 
-	private ClientClassLoader() {
+	private RoboClassLoader() {
 		cl = Thread.currentThread().getContextClassLoader();
 	}
 
-	public static ClientClassLoader getInstance() {
+	public static RoboClassLoader getInstance() {
 		if (INSTANCE == null) {
-			synchronized (ClientClassLoader.class) {
+			synchronized (RoboClassLoader.class) {
 				if (INSTANCE == null) {
-					INSTANCE = new ClientClassLoader();
+					INSTANCE = new RoboClassLoader();
 				}
 			}
 		}

@@ -18,7 +18,7 @@ package com.robo4j.core.client.io;
 
 import java.io.InputStream;
 
-import com.robo4j.core.client.util.ClientClassLoader;
+import com.robo4j.core.client.util.RoboClassLoader;
 
 /**
  *
@@ -29,7 +29,7 @@ import com.robo4j.core.client.util.ClientClassLoader;
 public final class ResourceLoader {
 
 	public Resource getInputStream(String name) {
-		final InputStream source = ClientClassLoader.getInstance().getResource(name);
+		final InputStream source = RoboClassLoader.getInstance().getResource(name);
 		if (source != null) {
 			return new InputStreamResource(source);
 		} else {

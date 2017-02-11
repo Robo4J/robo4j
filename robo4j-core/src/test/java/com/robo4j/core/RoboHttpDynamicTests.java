@@ -24,7 +24,7 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.core.client.util.ClientClassLoader;
+import com.robo4j.core.client.util.RoboClassLoader;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.unit.HttpUnit;
@@ -137,7 +137,7 @@ public class RoboHttpDynamicTests {
 	@Test
 	public void simpleHttpDeclarative() throws RoboBuilderException, IOException {
 
-		RoboBuilder builder = new RoboBuilder().add(ClientClassLoader.getInstance().getResource("http_get.xml"));
+		RoboBuilder builder = new RoboBuilder().add(RoboClassLoader.getInstance().getResource("http_get.xml"));
 		RoboContext ctx = builder.build();
 
 		Configuration confCommands = ctx.getReference("http").getConfiguration().getChildConfiguration("commands");

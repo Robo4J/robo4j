@@ -22,7 +22,7 @@ import java.util.concurrent.Future;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.core.client.util.ClientClassLoader;
+import com.robo4j.core.client.util.RoboClassLoader;
 
 /**
  * Test(s) for the builder.
@@ -35,7 +35,7 @@ public class RoboBuilderTests {
 	@Test
 	public void testParsingFile() throws RoboBuilderException, InterruptedException, ExecutionException {
 		RoboBuilder builder = new RoboBuilder();
-		builder.add(ClientClassLoader.getInstance().getResource("test.xml"));
+		builder.add(RoboClassLoader.getInstance().getResource("test.xml"));
 //		builder.add(RoboBuilderTests.class.getResourceAsStream("test.xml"));
 		RoboContext context = builder.build();
 		Assert.assertEquals(context.getState(), LifecycleState.UNINITIALIZED);
@@ -63,7 +63,7 @@ public class RoboBuilderTests {
 		RoboBuilder builder = new RoboBuilder();
 		boolean gotException = false;
 		try {
-			builder.add(ClientClassLoader.getInstance().getResource("double.xml"));
+			builder.add(RoboClassLoader.getInstance().getResource("double.xml"));
 		} catch (RoboBuilderException e) {
 			gotException = true;
 		}
