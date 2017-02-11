@@ -27,7 +27,7 @@ import org.junit.Test;
 import com.robo4j.core.client.util.RoboClassLoader;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
-import com.robo4j.core.unit.HttpUnit;
+import com.robo4j.core.unit.HttpServerUnit;
 import com.robo4j.core.util.SystemUtil;
 
 /**
@@ -46,7 +46,7 @@ public class RoboHttpDynamicTests {
 		RoboSystem system = new RoboSystem();
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
-		HttpUnit httpDynamic = new HttpUnit(system, "http_dynamic");
+		HttpServerUnit httpDynamic = new HttpServerUnit(system, "http_dynamic");
 		config.setString("target", "request_consumer");
 		config.setInteger("port", PORT);
 
@@ -96,7 +96,7 @@ public class RoboHttpDynamicTests {
 		RoboSystem system = new RoboSystem();
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
-		HttpUnit httpDynamic = new HttpUnit(system, "http");
+		HttpServerUnit httpDynamic = new HttpServerUnit(system, "http");
 		config.setInteger("port", PORT);
 		config.setString("target", "request_consumer");
 		Configuration commands = config.createChildConfiguration("commands");

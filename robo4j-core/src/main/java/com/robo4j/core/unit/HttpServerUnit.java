@@ -58,7 +58,7 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
  * @author Miro Wengner (@miragemiko)
  * @since 05.02.2017
  */
-public class HttpUnit extends RoboUnit<Object> {
+public class HttpServerUnit extends RoboUnit<Object> {
 
     private static final int DEFAULT_THREAD_POOL_SIZE = 2;
     private static final int KEEP_ALIVE_TIME = 10;
@@ -78,7 +78,7 @@ public class HttpUnit extends RoboUnit<Object> {
     private Selector selector;
 
 
-    public HttpUnit(RoboContext context, String id) {
+    public HttpServerUnit(RoboContext context, String id) {
         super(context, id);
     }
 

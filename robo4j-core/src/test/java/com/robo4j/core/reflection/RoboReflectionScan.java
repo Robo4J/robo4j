@@ -107,7 +107,8 @@ public final class RoboReflectionScan {
 
 		try {
 			this.classes = StreamUtils.enumerationAsStream(classLoader.getResources(packageName), false)
-					.map(URL::getFile).map(File::new).map(f -> findClasses(f, packageName)).flatMap(List::stream)
+					.map(URL::getFile).map(File::new)
+					.map(f -> findClasses(f, packageName)).flatMap(List::stream)
 					.collect(Collectors.toList());
 
 		} catch (IOException e) {
