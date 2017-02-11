@@ -35,8 +35,8 @@ import com.robo4j.core.client.util.RoboClassLoader;
 import com.robo4j.core.util.ConstantUtil;
 
 /**
- * @author Miro Kopecky (@miragemiko)
- * @since 30.11.2016
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 @SuppressWarnings(value = "unchecked")
 public final class RoboReflectionScan {
