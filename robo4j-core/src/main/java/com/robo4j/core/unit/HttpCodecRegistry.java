@@ -53,15 +53,10 @@ class HttpCodecRegistry {
 	private static final char SLASH = '/';
 	private static final char DOT = '.';
 
-	public HttpCodecRegistry(String... packages) {
-		scan(Thread.currentThread().getContextClassLoader(), packages);
+	public HttpCodecRegistry() {
 	}
 
-	public HttpCodecRegistry(ClassLoader loader, String... packages) {
-		scan(loader, packages);
-	}
-
-	private void scan(ClassLoader loader, String... packages) {
+	public void scan(ClassLoader loader, String... packages) {
 		scanPackages(loader, packages);
 	}
 
