@@ -56,6 +56,10 @@ class HttpCodecRegistry {
 	public HttpCodecRegistry() {
 	}
 
+	public HttpCodecRegistry(String... packages) {
+		scan(Thread.currentThread().getContextClassLoader(), packages);
+	}
+
 	public void scan(ClassLoader loader, String... packages) {
 		scanPackages(loader, packages);
 	}
@@ -101,7 +105,8 @@ class HttpCodecRegistry {
 			HttpEncoder<?> encoder = (HttpEncoder<?>) instance;
 			encoders.put(encoder.getEncodedClass(), encoder);
 		}
-		// Note, not "else if". People are free to implement both in the same class
+		// Note, not "else if". People are free to implement both in the same
+		// class
 		if (instance instanceof HttpDecoder) {
 			HttpDecoder<?> decoder = (HttpDecoder<?>) instance;
 			decoders.put(decoder.getDecodedClass(), decoder);
