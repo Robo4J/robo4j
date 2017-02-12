@@ -60,58 +60,12 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
  */
 public class HttpServerUnit extends RoboUnit<Object> {
 
-    private static final int KEEP_ALIVE_TIME = 10;
-    private static final String HTTP_PATH = "path";
-    private static final String HTTP_METHOD = "method";
-    private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
-	private final ExecutorService executor = new ThreadPoolExecutor(RoboHttpUtils.DEFAULT_THREAD_POOL_SIZE,
-			RoboHttpUtils.DEFAULT_THREAD_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
-			new RoboThreadFactory("Robo4J HttpServerUnit ", true));
-    private boolean available;
-    private Integer port;
-    private String target;
-    private ServerSocketChannel server;
-    private Selector selector;
-
-
-    public HttpServerUnit(RoboContext context, String id) {
-        super(context, id);
-    }
-
-    @Override
-    public void start() {
-        setState(LifecycleState.STARTING);
-        final RoboReference<String> targetRef = getContext().getReference(target);
-        if(!available){
-            executor.execute(() -> server(targetRef));
-            available = true;
-        } else {
-            System.out.println("HttpDynamicUnit start() -> error: " + targetRef);
-        }
-        setState(LifecycleState.STARTED);
-    }
-
-
-    //TODO: improve after it works
-    @Override
-    protected void onInitialization(Configuration configuration) throws ConfigurationException {
-        setState(LifecycleState.UNINITIALIZED);
-        target = configuration.getString("target", null);
-        port = configuration.getInteger("port", RoboHttpUtils._DEFAULT_PORT);
-
-        final Configuration commands = configuration.getChildConfiguration(RoboHttpUtils.HTTP_COMMAND.concat("s"));
-        if (target == null && commands == null) {
-            throw ConfigurationException.createMissingConfigNameException("target, method, path, commands...");
-        }
-        //@formatter:off
-=======
 	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
 	private static final int KEEP_ALIVE_TIME = 10;
 	private static final int _DEFAULT_PORT = 8042;
 	private static final String HTTP_PATH = "path";
 	private static final String HTTP_METHOD = "method";
 	private static final String HTTP_COMMAND = "command";
-	public static final String _EMPTY_STRING = "";
 	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
 	private static final HttpCodecRegistry CODEC_REGISTRY = new HttpCodecRegistry();
 	private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
@@ -140,7 +94,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		setState(LifecycleState.STARTED);
 	}
 
-	// TODO: improve after it works
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
@@ -157,7 +110,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			throw ConfigurationException.createMissingConfigNameException("target, method, path, commands...");
 		}
 		//@formatter:off
->>>>>>> 7d79782980f2e0b935df6be016f5db18961003f9
 
         Set<String> keys = commands.getValueNames();
         String path = commands.getValue(HTTP_PATH, RoboHttpUtils._EMPTY_STRING).toString();
@@ -177,7 +129,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
         //@formatter:on
 
-<<<<<<< HEAD
         setState(LifecycleState.INITIALIZED);
     }
 
@@ -203,7 +154,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
                 server.close();
             }
         } catch (IOException e) {
-            SimpleLoggingUtil.error(getClass(), "server problem: ", e);
+            SimpleLoggingUtil.error(getClass(), "method:"+ method + ",server problem: ", e);
         }
     }
 
@@ -238,9 +189,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
         SimpleLoggingUtil.debug(getClass(), "stopped port: " + port);
         setState(LifecycleState.STOPPED);
     }
-=======
-		setState(LifecycleState.INITIALIZED);
-	}
+
 
 	private boolean validatePackages(String packages) {
 		if (packages != null) {
@@ -254,64 +203,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		return true;
 	}
 
-	@Override
-	public void stop() {
-		setState(LifecycleState.STOPPING);
-		stopServer("stop");
-		setState(LifecycleState.STOPPED);
-	}
 
-	@Override
-	public void shutdown() {
-		setState(LifecycleState.SHUTTING_DOWN);
-		executor.shutdownNow();
-		stopServer("shutdown");
-		setState(LifecycleState.SHUTDOWN);
-	}
-
-	// Private Methods
-
-	public void stopServer(String method) {
-		try {
-			if (server != null && server.isOpen()) {
-				server.close();
-			}
-		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "server problem: ", e);
-		}
-	}
-
-	/**
-	 * Start non-blocking socket server on http protocol
-	 *
-	 * @param targetRef
-	 *            - reference to the target queue
-	 */
-	private void server(final RoboReference<String> targetRef) {
-		try {
-			// TODO miro -> implement;
-
-			/* selector is multiplexor to SelectableChannel */
-			selector = Selector.open();
-			server = ServerSocketChannel.open();
-			server.configureBlocking(false);
-			server.socket().bind(new InetSocketAddress(port));
-			SimpleLoggingUtil.debug(getClass(), "started port: " + port);
-			while (activeStates.contains(getState())) {
-				selector.select();
-				SocketChannel requestChannel = server.accept();
-				Future<String> result = executor
-						.submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestDynamicFactory()));
-				targetRef.sendMessage(result.get());
-				requestChannel.close();
-			}
-
-		} catch (InterruptedException | ExecutionException | IOException e) {
-			SimpleLoggingUtil.error(getClass(), "SERVER CLOSED", e);
-		}
-		SimpleLoggingUtil.debug(getClass(), "stopped port: " + port);
-		setState(LifecycleState.STOPPED);
-	}
->>>>>>> 7d79782980f2e0b935df6be016f5db18961003f9
 
 }
