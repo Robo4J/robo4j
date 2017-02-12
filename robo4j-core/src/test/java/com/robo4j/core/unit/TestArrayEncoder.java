@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- *
+ * 
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,33 +14,31 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.robo4j.core.unit;
 
-package com.robo4j.core.reflection;
-
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
- * Streams related utils
+ * Simple encoder that encodes an array of string to Json.
  * 
- * @author Miro Kopecky (@miragemiko)
- * @since 30.11.2016
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
-public final class StreamUtils {
+@HttpProducer
+public class TestArrayEncoder implements HttpEncoder<String[]> {
 
-	public static <Type> Stream<Type> enumerationAsStream(Enumeration<Type> e, boolean parallel) {
-		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<Type>() {
-			public Type next() {
-				return e.nextElement();
-			}
+	@Override
+	public String encode(String[] stuff) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("{array:[");
+		builder.append(Stream.of(stuff).collect(Collectors.joining(",")));
+		builder.append("]}");
+		return builder.toString();
+	}
 
-			public boolean hasNext() {
-				return e.hasMoreElements();
-			}
-		}, Spliterator.ORDERED), parallel);
+	@Override
+	public Class<String[]> getEncodedClass() {
+		return String[].class;
 	}
 }

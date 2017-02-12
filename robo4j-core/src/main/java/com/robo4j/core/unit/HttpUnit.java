@@ -102,7 +102,8 @@ public class HttpUnit extends RoboUnit<Object> {
         setState(LifecycleState.UNINITIALIZED);
         target = configuration.getString("target", null);
         port = configuration.getInteger("port", _DEFAULT_PORT);
-
+        scan(configuration.getString("packages", null));
+        
         final Configuration commands = configuration.getChildConfiguration(HTTP_COMMAND.concat("s"));
         if (target == null && commands == null) {
             throw ConfigurationException.createMissingConfigNameException("target, method, path, commands...");
@@ -130,7 +131,11 @@ public class HttpUnit extends RoboUnit<Object> {
         setState(LifecycleState.INITIALIZED);
     }
 
-    @Override
+    private void scan(String string) {
+		
+	}
+
+	@Override
     public void stop() {
         setState(LifecycleState.STOPPING);
         stopServer("stop");

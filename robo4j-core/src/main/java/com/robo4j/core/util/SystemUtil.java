@@ -33,7 +33,7 @@ public final class SystemUtil {
 	private static final String BREAK = "\n";
 
 	private SystemUtil() {
-		//no instances
+		// no instances
 	}
 
 	public static final Comparator<RoboUnit<?>> ID_COMPARATOR = new Comparator<RoboUnit<?>>() {
@@ -47,13 +47,11 @@ public final class SystemUtil {
 		StringBuilder builder = new StringBuilder();
 		List<RoboUnit<?>> units = new ArrayList<>(ctx.getUnits());
 		units.sort(ID_COMPARATOR);
-		builder.append("RoboSystem state ")
-				.append(ctx.getState().getLocalizedName())
-				.append("\n================================================")
-				.append(BREAK);
+		builder.append("RoboSystem state ").append(ctx.getState().getLocalizedName())
+				.append("\n================================================").append(BREAK);
 		for (RoboUnit<?> unit : units) {
 			builder.append(String.format("    %-25s   %13s", unit.getId(), unit.getState().getLocalizedName()))
-				.append(BREAK);
+					.append(BREAK);
 		}
 		return builder.toString();
 	}
