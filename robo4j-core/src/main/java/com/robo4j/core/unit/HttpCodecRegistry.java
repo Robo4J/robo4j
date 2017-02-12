@@ -67,6 +67,7 @@ class HttpCodecRegistry {
 	private void scanPackages(ClassLoader loader, String... packages) {
 		List<String> allClasses = new ArrayList<>();
 		for (String packageName : packages) {
+			packageName = packageName.trim();
 			try {
 				List<String> classesInPackage = scanJarPackage(loader, packageName);
 				if (classesInPackage.isEmpty()) {
