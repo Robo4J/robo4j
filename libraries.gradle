@@ -6,7 +6,6 @@ ext {
     robo4jVersion = "alpha-0.3"
     javassistVersion = "3.20.0-GA"
     guavaVersion = "19.0"
-    jsonVersion = "1.1"
     reflectionsVersion = "0.9.9-RC2"
     googleCollectionsVersion = "1.0"
     log4jApiVersion = "2.1"

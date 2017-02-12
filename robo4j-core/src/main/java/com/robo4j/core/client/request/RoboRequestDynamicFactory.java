@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 
 import com.robo4j.core.client.util.HttpUtils;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.unit.HttpUnit;
+import com.robo4j.core.unit.HttpServerUnit;
 import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.http.HttpMessage;
 import com.robo4j.http.HttpVersion;
@@ -75,7 +75,7 @@ public class RoboRequestDynamicFactory implements DefaultRequestFactory<String> 
 									.stream().filter(v -> v.getValue().equals(e.getValue())).findFirst().get())
                             .findFirst()
 							.map(Map.Entry::getKey)
-                            .orElse(HttpUnit._EMPTY_STRING);
+                            .orElse(HttpServerUnit._EMPTY_STRING);
                     //@formatter:on
 				}
 			}
