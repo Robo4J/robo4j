@@ -106,7 +106,7 @@ class HttpCodecRegistry {
 			HttpEncoder<?> encoder = (HttpEncoder<?>) instance;
 			encoders.put(encoder.getEncodedClass(), encoder);
 		}
-		// Note, not "else if". People are free to implement both in th
+		// Note, not "else if". People are free to implement both in the same class
 		if (instance instanceof HttpDecoder) {
 			HttpDecoder<?> decoder = (HttpDecoder<?>) instance;
 			decoders.put(decoder.getDecodedClass(), decoder);
