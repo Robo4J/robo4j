@@ -17,7 +17,7 @@
 package com.robo4j.core.unit;
 
 /**
- * Encoder for encoding a target type to Json.
+ * Encoder for encoding a target type to a message String.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
