@@ -16,6 +16,12 @@
  */
 package com.robo4j.core.unit;
 
+/**
+ * Encoder for encoding a target type to Json.
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
 public interface HttpEncoder<T> {
 	String encode(T stuff);
 	Class<T> getEncodedClass();

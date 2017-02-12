@@ -16,6 +16,12 @@
  */
 package com.robo4j.core.unit;
 
+/**
+ * Decoder for translating from Json to a specific target type.
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
 public interface HttpDecoder<T> {
 	T decode(String json);
 	Class<T> getDecodedClass();

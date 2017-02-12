@@ -34,8 +34,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.testutil.StreamUtils;
 import com.robo4j.core.util.ConstantUtil;
+import com.robo4j.core.util.StreamUtils;
 
 /**
  * Registry for codecs.
