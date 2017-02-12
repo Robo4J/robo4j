@@ -56,7 +56,6 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 05.02.2017
  */
 public class HttpServerUnit extends RoboUnit<Object> {
 
