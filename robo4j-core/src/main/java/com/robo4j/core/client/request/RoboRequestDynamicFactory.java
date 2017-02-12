@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.robo4j.core.client.util.HttpUtils;
+import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.unit.HttpServerUnit;
 import com.robo4j.core.util.ConstantUtil;
@@ -66,7 +66,7 @@ public class RoboRequestDynamicFactory implements DefaultRequestFactory<String> 
 			if (availablePathValues != null && !availablePathValues.isEmpty()) {
 				RoboRequestElement roboRequestElement = availablePathValues.stream().findFirst().get();
 				if (uri != null && uri.getQuery() != null && !uri.getQuery().isEmpty()) {
-					final Map<String, String> currentRequestValues = HttpUtils.parseURIQueryToMap(uri.getQuery(),
+					final Map<String, String> currentRequestValues = RoboHttpUtils.parseURIQueryToMap(uri.getQuery(),
 							ConstantUtil.HTTP_QUERY_SEP);
 					//@formatter:off
                     return currentRequestValues.entrySet().stream()
@@ -75,7 +75,7 @@ public class RoboRequestDynamicFactory implements DefaultRequestFactory<String> 
 									.stream().filter(v -> v.getValue().equals(e.getValue())).findFirst().get())
                             .findFirst()
 							.map(Map.Entry::getKey)
-                            .orElse(HttpServerUnit._EMPTY_STRING);
+                            .orElse(RoboHttpUtils._EMPTY_STRING);
                     //@formatter:on
 				}
 			}

@@ -46,31 +46,27 @@ import com.robo4j.core.client.request.RoboRequestCallable;
 import com.robo4j.core.client.request.RoboRequestDynamicFactory;
 import com.robo4j.core.client.request.RoboRequestElement;
 import com.robo4j.core.client.request.RoboRequestTypeRegistry;
+import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 
 /**
- * Http Dynamic unit allows to configure format of the requests
- * currently is only GET method available
+ * Http NIO unit allows to configure format of the requests currently is only
+ * GET method available
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 05.02.2017
  */
 public class HttpServerUnit extends RoboUnit<Object> {
 
-    private static final int DEFAULT_THREAD_POOL_SIZE = 2;
     private static final int KEEP_ALIVE_TIME = 10;
-    private static final int _DEFAULT_PORT = 8042;
     private static final String HTTP_PATH = "path";
     private static final String HTTP_METHOD = "method";
-    private static final String HTTP_COMMAND = "command";
-    public static final String _EMPTY_STRING = "";
     private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
-    private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
-            KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
-            new RoboThreadFactory("Robo4J HttpUnit ", true));
+	private final ExecutorService executor = new ThreadPoolExecutor(RoboHttpUtils.DEFAULT_THREAD_POOL_SIZE,
+			RoboHttpUtils.DEFAULT_THREAD_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
+			new RoboThreadFactory("Robo4J HttpServerUnit ", true));
     private boolean available;
     private Integer port;
     private String target;
@@ -101,28 +97,28 @@ public class HttpServerUnit extends RoboUnit<Object> {
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
         setState(LifecycleState.UNINITIALIZED);
         target = configuration.getString("target", null);
-        port = configuration.getInteger("port", _DEFAULT_PORT);
+        port = configuration.getInteger("port", RoboHttpUtils._DEFAULT_PORT);
 
-        final Configuration commands = configuration.getChildConfiguration(HTTP_COMMAND.concat("s"));
+        final Configuration commands = configuration.getChildConfiguration(RoboHttpUtils.HTTP_COMMAND.concat("s"));
         if (target == null && commands == null) {
             throw ConfigurationException.createMissingConfigNameException("target, method, path, commands...");
         }
         //@formatter:off
 
         Set<String> keys = commands.getValueNames();
-        String path = commands.getValue(HTTP_PATH, _EMPTY_STRING).toString();
+        String path = commands.getValue(HTTP_PATH, RoboHttpUtils._EMPTY_STRING).toString();
         keys.remove(HTTP_PATH);
-        String method = commands.getValue(HTTP_METHOD, _EMPTY_STRING).toString();
+        String method = commands.getValue(HTTP_METHOD, RoboHttpUtils._EMPTY_STRING).toString();
         keys.remove(HTTP_METHOD);
 
         Set<RoboRequestElement> elements = new HashSet<>();
         Map<String, String> elementValues = new HashMap<>();
         for(Iterator<String> it = keys.iterator(); it.hasNext();){
             String key = it.next();
-            String value = commands.getString(key, _EMPTY_STRING);
+            String value = commands.getString(key, RoboHttpUtils._EMPTY_STRING);
             elementValues.put(key, value);
         }
-        elements.add(new RoboRequestElement(method, HTTP_COMMAND, elementValues));
+        elements.add(new RoboRequestElement(method, RoboHttpUtils.HTTP_COMMAND, elementValues));
         RoboRequestTypeRegistry.getInstance().addPathWithValues(path, elements);
 
         //@formatter:on
@@ -145,8 +141,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
         setState(LifecycleState.SHUTDOWN);
     }
 
-    // Private Methods
-
+    //Private Methods
     public void stopServer(String method){
         try {
             if (server != null && server.isOpen()) {

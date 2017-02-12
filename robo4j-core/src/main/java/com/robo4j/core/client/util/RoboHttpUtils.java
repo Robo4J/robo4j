@@ -30,11 +30,16 @@ import com.robo4j.core.util.ConstantUtil;
  *
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class HttpUtils {
+public final class RoboHttpUtils {
 
-	public static final String HTTP_HEADER_OK = "HTTP/1.0 200 OK";
+	public static final int DEFAULT_THREAD_POOL_SIZE = 2;
+	public static final String HTTP_HEADER_OK = "HTTP/1.1 200 OK\n";
+	public static final int _DEFAULT_PORT = 8042;
+	public static final String _EMPTY_STRING = "";
+	public static final String HTTP_COMMAND = "command";
 	public static final String HTTP_HEADER_NOT = "HTTP/1.0 501 Not Implemented";
 	public static final String HTTP_HEADER_NOT_ALLOWED = "HTTP/1.0 405 Method Not Allowed";
+	public static final int KEEP_ALIVE_TIME = 10;
 	private static final String NEXT_LINE = "\r\n";
 
 	public static String setHeader(String responseCode, int length) throws IOException {

@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import com.robo4j.core.client.util.HttpUtils;
+import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.http.HttpMessage;
@@ -37,6 +37,9 @@ import com.robo4j.http.HttpMethod;
 import com.robo4j.http.HttpVersion;
 
 /**
+ * Handling Request
+ *
+ * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class RoboRequestCallable implements Callable<String> {
@@ -71,7 +74,7 @@ public class RoboRequestCallable implements Callable<String> {
             String inputLine;
 
             //TODO: refactor
-            while (!(inputLine = HttpUtils.correctLine(in.readLine())).equals(ConstantUtil.EMPTY_STRING)) {
+            while (!(inputLine = RoboHttpUtils.correctLine(in.readLine())).equals(ConstantUtil.EMPTY_STRING)) {
                 if (firstLine) {
                     tokens = inputLine.split(ConstantUtil.HTTP_EMPTY_SEP);
                     method = HttpMethod.getByName(tokens[METHOD_KEY_POSITION]);
@@ -92,7 +95,7 @@ public class RoboRequestCallable implements Callable<String> {
 
     //Private Methods
     private void processWritter(final Writer out, String message) throws Exception{
-        out.write("HTTP/1.1 200 OK\n");
+        out.write(RoboHttpUtils.HTTP_HEADER_OK);
         Map<String, String> responseValues = new HashMap<>();
         responseValues.put("Content-Length", String.valueOf(message.length()));
         responseValues.forEach((k, v) -> {
