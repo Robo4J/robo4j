@@ -53,15 +53,14 @@ class HttpCodecRegistry {
 	private static final char SLASH = '/';
 	private static final char DOT = '.';
 
+	public HttpCodecRegistry() {
+	}
+
 	public HttpCodecRegistry(String... packages) {
 		scan(Thread.currentThread().getContextClassLoader(), packages);
 	}
 
-	public HttpCodecRegistry(ClassLoader loader, String... packages) {
-		scan(loader, packages);
-	}
-
-	private void scan(ClassLoader loader, String... packages) {
+	public void scan(ClassLoader loader, String... packages) {
 		scanPackages(loader, packages);
 	}
 
@@ -106,7 +105,8 @@ class HttpCodecRegistry {
 			HttpEncoder<?> encoder = (HttpEncoder<?>) instance;
 			encoders.put(encoder.getEncodedClass(), encoder);
 		}
-		// Note, not "else if". People are free to implement both in th
+		// Note, not "else if". People are free to implement both in the same
+		// class
 		if (instance instanceof HttpDecoder) {
 			HttpDecoder<?> decoder = (HttpDecoder<?>) instance;
 			decoders.put(decoder.getDecodedClass(), decoder);

@@ -17,7 +17,7 @@
 package com.robo4j.core.unit;
 
 /**
- * Decoder for translating from Json to a specific target type.
+ * Decoder for translating from a message string to a specific target type.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
