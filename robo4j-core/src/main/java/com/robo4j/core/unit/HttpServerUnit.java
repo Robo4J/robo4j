@@ -192,12 +192,13 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 
 	private boolean validatePackages(String packages) {
-		if (packages != null) {
-			for (int i = 0; i < packages.length(); i++) {
-				char c = packages.charAt(i);
-				if (!Character.isJavaIdentifierPart(c) || c != ',' || !Character.isWhitespace(c)) {
-					return false;
-				}
+		if (packages == null) {
+			return false;
+		}
+		for (int i = 0; i < packages.length(); i++) {
+			char c = packages.charAt(i);
+			if (!Character.isJavaIdentifierPart(c) || c != ',' || !Character.isWhitespace(c)) {
+				return false;
 			}
 		}
 		return true;
