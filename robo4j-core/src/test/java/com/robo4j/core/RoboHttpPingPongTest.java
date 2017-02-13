@@ -80,8 +80,6 @@ public class RoboHttpPingPongTest {
 
 		});
 
-//		System.in.read();
-
         RoboReference systemPingProducer = systemPing.getReference("http_producer");
 
         StringConsumer pongConsumer = (StringConsumer) systemPong.getUnits().stream()
