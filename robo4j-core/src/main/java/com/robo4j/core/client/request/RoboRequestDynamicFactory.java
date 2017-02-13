@@ -28,7 +28,6 @@ import java.util.stream.Stream;
 
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.unit.HttpServerUnit;
 import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.http.HttpMessage;
 import com.robo4j.http.HttpVersion;

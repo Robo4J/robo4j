@@ -17,8 +17,10 @@
 
 package com.robo4j.core.unit;
 
-import java.util.EnumSet;
-import java.util.Set;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -27,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboResult;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.util.RoboHttpUtils;
@@ -42,13 +43,11 @@ import com.robo4j.core.configuration.Configuration;
  */
 public class HttpClientUnit extends RoboUnit<Object> {
 
-	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
 	private final ExecutorService executor = new ThreadPoolExecutor(RoboHttpUtils.DEFAULT_THREAD_POOL_SIZE,
 			RoboHttpUtils.DEFAULT_THREAD_POOL_SIZE, RoboHttpUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
 			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J HttpClientUnit ", true));
 	private boolean available;
-    private Integer port;
-    private String adress;
+    private InetSocketAddress address;
 
     public HttpClientUnit(RoboContext context, String id) {
         super(context, id);
@@ -57,47 +56,43 @@ public class HttpClientUnit extends RoboUnit<Object> {
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
         setState(LifecycleState.UNINITIALIZED);
-        adress = configuration.getString("address", null);
-        port = configuration.getInteger("port", RoboHttpUtils._DEFAULT_PORT);
+        String confAddress = configuration.getString("address", null);
+        int confPort = configuration.getInteger("port", RoboHttpUtils._DEFAULT_PORT);
 
         final Configuration commands = configuration.getChildConfiguration(RoboHttpUtils.HTTP_COMMAND.concat("s"));
-        if (adress == null && port == null && commands == null) {
-            throw ConfigurationException.createMissingConfigNameException("address, method, path, commands...");
+        if (confAddress == null || commands == null) {
+            throw ConfigurationException.createMissingConfigNameException("address, path, commands...");
         }
+        address = new InetSocketAddress(confAddress, confPort);
+
         setState(LifecycleState.INITIALIZED);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public RoboResult<Object, ?> onMessage(Object message) {
-
-        System.out.println(getClass().getSimpleName() + ": onMassage: " + message);
-
-        return super.onMessage(message);
+        try {
+            SocketChannel client = SocketChannel.open(address);
+            ByteBuffer buffer = ByteBuffer.wrap(message.toString().getBytes());
+            client.write(buffer);
+            client.close();
+        } catch (IOException e) {
+            throw new HttpException("onMessage", e );
+        }
+        return null;
     }
 
     @Override
     public void start() {
         setState(LifecycleState.STARTING);
-        final RoboReference<String> addressRef = getContext().getReference(adress);
-
         available = true;
-
         setState(LifecycleState.STARTED);
-    }
-
-    @Override
-    public void stop() {
-        setState(LifecycleState.STOPPING);
-        System.out.println(getClass().getSimpleName() + " : stop");
-        setState(LifecycleState.STOPPED);
     }
 
     @Override
     public void shutdown() {
         setState(LifecycleState.SHUTTING_DOWN);
         executor.shutdownNow();
-        System.out.println(getClass().getSimpleName() + " : shutdown");
         setState(LifecycleState.SHUTDOWN);
     }
 

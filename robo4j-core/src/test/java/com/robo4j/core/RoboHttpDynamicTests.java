@@ -46,7 +46,7 @@ public class RoboHttpDynamicTests {
 		RoboSystem system = new RoboSystem();
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
-		HttpServerUnit httpDynamic = new HttpServerUnit(system, "http_dynamic");
+		HttpServerUnit httpDynamic = new HttpServerUnit(system, "http");
 		config.setString("target", "request_consumer");
 		config.setInteger("port", PORT);
 
@@ -77,10 +77,10 @@ public class RoboHttpDynamicTests {
 		System.out.println(SystemUtil.generateStateReport(system));
 
 		System.out.println("RoboSystem http server\n\tPort:" + PORT + "\n");
-		System.out.println("Usage:\n\tRequest GET: http://<IP_ADDRESS>:" + PORT + "/test?command=enter");
+		System.out.println("Usage:\n\tRequest GET: http://<IP_ADDRESS>:" + PORT + "/tank?command=move");
 		System.out.println("\tRequest command types: right,left,move,back,enter\n");
 
-//		System.in.read();
+		System.in.read();
 
 		System.out.println("Going Down!");
 		system.stop();
@@ -89,49 +89,6 @@ public class RoboHttpDynamicTests {
 		Assert.assertNotNull(system.getUnits());
 		Assert.assertEquals(system.getUnits().size(), 2);
 		Assert.assertEquals(consumer.getReceivedMessages().size(), 0);
-	}
-
-	@Test
-	public void simpleHttpConfiguration() throws ConfigurationException, IOException {
-		RoboSystem system = new RoboSystem();
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-
-		HttpServerUnit httpDynamic = new HttpServerUnit(system, "http");
-		config.setInteger("port", PORT);
-		config.setString("target", "request_consumer");
-		Configuration commands = config.createChildConfiguration("commands");
-		commands.setString("path", "tank");
-		commands.setString("method", "GET");
-		commands.setString("up", "move");
-		commands.setString("down", "back");
-		commands.setString("left", "right");
-		commands.setString("right", "left");
-		httpDynamic.initialize(config);
-
-		StringConsumer consumer = new StringConsumer(system, "request_consumer");
-
-		system.addUnits(httpDynamic, consumer);
-
-		System.out.println("State before start:");
-		System.out.println(SystemUtil.generateStateReport(system));
-		system.start();
-
-		System.out.println("State after start:");
-		System.out.println(SystemUtil.generateStateReport(system));
-
-		System.out.println("RoboSystem http server\n\tPort:" + PORT + "\n");
-		System.out.println("Usage:\n\tRequest GET: http://<IP_ADDRESS>:" + PORT + "/test?command=enter");
-		System.out.println("\tRequest command types: right,left,move,back,enter\n");
-
-//		System.in.read();
-		System.out.println("Going Down!");
-		system.stop();
-		system.shutdown();
-		System.out.println("System is Down!");
-		Assert.assertNotNull(system.getUnits());
-		Assert.assertEquals(system.getUnits().size(), 2);
-		Assert.assertEquals(consumer.getReceivedMessages().size(), 0);
-
 	}
 
 	@Test

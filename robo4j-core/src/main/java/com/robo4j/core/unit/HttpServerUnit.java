@@ -21,6 +21,7 @@ package com.robo4j.core.unit;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
@@ -70,7 +71,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private static final HttpCodecRegistry CODEC_REGISTRY = new HttpCodecRegistry();
 	private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
 			KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
-			new RoboThreadFactory("Robo4J HttpUnit ", true));
+			new RoboThreadFactory("Robo4J HttServerUnit ", true));
 	private boolean available;
 	private Integer port;
 	private String target;
@@ -85,9 +86,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	public void start() {
 		setState(LifecycleState.STARTING);
 		final RoboReference<String> targetRef = getContext().getReference(target);
-		if (!available) {
-			executor.execute(() -> server(targetRef));
-			available = true;
+        if (!available) {
+            available = true;
+            executor.execute(() -> server(targetRef));
 		} else {
 			System.out.println("HttpDynamicUnit start() -> error: " + targetRef);
 		}
@@ -169,18 +170,44 @@ public class HttpServerUnit extends RoboUnit<Object> {
             //TODO miro -> implement;
 
             /* selector is multiplexor to SelectableChannel */
+            // Selects a set of keys whose corresponding channels are ready for I/O operations
             selector = Selector.open();
             server = ServerSocketChannel.open();
-            server.configureBlocking(false);
             server.socket().bind(new InetSocketAddress(port));
+            server.configureBlocking(false);
+
+            System.out.println("server started: port: " + port);
             SimpleLoggingUtil.debug(getClass(), "started port: " + port);
+
+            int selectorOpt = server.validOps();
+            SelectionKey selectorKey = server.register(selector, selectorOpt, null);
             while (activeStates.contains(getState())) {
                 selector.select();
-                SocketChannel requestChannel = server.accept();
-                Future<String> result = executor
-                        .submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestDynamicFactory()));
-                targetRef.sendMessage(result.get());
-                requestChannel.close();
+
+
+                /* token representing the registration of a SelectableChannel with a Selector */
+                Set<SelectionKey> selectedKeys = selector.selectedKeys();
+                Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
+
+                while(selectedIterator.hasNext()){
+                    SelectionKey selectedKey = selectedIterator.next();
+                    if(selectedKey.isAcceptable()){
+                        SocketChannel requestChannel = server.accept();
+                        requestChannel.configureBlocking(true);
+                        //TODO: miro -> improve multi-channels electionKey.OP_READ, etc. option
+                        Future<String> result = executor
+                                .submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestDynamicFactory()));
+                        targetRef.sendMessage(result.get());
+                        requestChannel.close();
+
+                    } else {
+                        System.out.println("something is not right: " + selectedKey);
+                    }
+                    selectedIterator.remove();
+                }
+
+
+
             }
 
         } catch (InterruptedException | ExecutionException | IOException e) {
