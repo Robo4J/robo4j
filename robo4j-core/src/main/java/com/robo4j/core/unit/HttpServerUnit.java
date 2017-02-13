@@ -176,14 +176,12 @@ public class HttpServerUnit extends RoboUnit<Object> {
             server.socket().bind(new InetSocketAddress(port));
             server.configureBlocking(false);
 
-            System.out.println("server started: port: " + port);
             SimpleLoggingUtil.debug(getClass(), "started port: " + port);
 
             int selectorOpt = server.validOps();
             SelectionKey selectorKey = server.register(selector, selectorOpt, null);
             while (activeStates.contains(getState())) {
                 selector.select();
-
 
                 /* token representing the registration of a SelectableChannel with a Selector */
                 Set<SelectionKey> selectedKeys = selector.selectedKeys();
