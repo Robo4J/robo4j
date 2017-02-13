@@ -19,6 +19,7 @@ package com.robo4j.units.rpi.lcd;
 import java.io.IOException;
 
 import com.robo4j.core.ConfigurationException;
+import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboResult;
 import com.robo4j.core.RoboUnit;
@@ -100,6 +101,19 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 		}
 	}
 
+	@Override
+	public void stop() {
+		setState(LifecycleState.STOPPING);
+		try {
+			lcd.clear();
+			lcd.setDisplayEnabled(false);
+			lcd.stop();
+		} catch (IOException e) {
+			throw new AdafruitException("Could not stop LCD", e);
+		}
+		setState(LifecycleState.STOPPED);
+	}
+
 	/**
 	 * @param message
 	 *            accepted message type
@@ -140,7 +154,7 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 			lcd.stop();
 			break;
 		default:
-			SimpleLoggingUtil.error(getClass(), message.getType() + " not supported!");
+			SimpleLoggingUtil.error(getClass(), message.getType() + "demo not supported!");
 			break;
 		}
 	}

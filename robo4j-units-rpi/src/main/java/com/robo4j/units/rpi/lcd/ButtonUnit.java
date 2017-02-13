@@ -39,10 +39,13 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonPressedObserver;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ButtonUnit extends I2CRoboUnit<Object> {
+	private static final String TYPE_CONTROLL = "controll";
 	private AdafruitLcd lcd;
 	private ButtonPressedObserver observer;
 	private String target;
 	private ButtonListener buttonListener;
+	private String type;
+
 
 	public ButtonUnit(RoboContext context, String id) {
 		super(context, id);
@@ -55,8 +58,18 @@ public class ButtonUnit extends I2CRoboUnit<Object> {
 		if (target == null) {
 			throw ConfigurationException.createMissingConfigNameException("target");
 		}
+		type = configuration.getString("type", "");
 		try {
-			lcd = AdafruitLcdUnit.getLCD(getBus(), getAddress());
+			//TODO -> refactor
+			switch (type){
+				case TYPE_CONTROLL:
+					lcd = AdafruitRobotLcdUnit.getLCD(getBus(), getAddress());
+					break;
+				default:
+					lcd = AdafruitLcdUnit.getLCD(getBus(), getAddress());
+					break;
+			}
+
 		} catch (IOException e) {
 			throw new ConfigurationException("Could not initialize LCD shield", e);
 		}
