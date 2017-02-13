@@ -29,6 +29,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.robo4j.core.client.util.RoboHttpUtils;
+
 /**
  * Factory for creating configurations from XML and vice versa.
  * 
@@ -49,9 +51,6 @@ public class XmlConfigurationFactory {
 	private static final String TYPE_STRING = "String";
 	private static final String ELEMENT_ROOT = "com.robo4j.core.root";
 	private static final String ELEMENT_VALUE = "value";
-	//TODO (marcus) -> please review
-	private static final String ELEMENT_HTTP_COMMANDS = "commands";
-	private static final String ELEMENT_COMMAND = "command";
 
 	private static final Deque<Configuration> configStack = new ArrayDeque<>();
 
@@ -76,16 +75,16 @@ public class XmlConfigurationFactory {
 					configStack.push(currentConfig);
 					currentConfig = currentConfig.createChildConfiguration(value);
 				}
-			} else if (qName.equals(ELEMENT_HTTP_COMMANDS)){
+			} else if (qName.equals(RoboHttpUtils.HTTP_COMMANDS)){
 				configStack.push(currentConfig);
-				currentConfig = currentConfig.createChildConfiguration(ELEMENT_HTTP_COMMANDS);
+				currentConfig = currentConfig.createChildConfiguration(RoboHttpUtils.HTTP_COMMANDS);
 				writeValue(currentConfig, attributes.getValue(ATTRIBUTE_PATH), TYPE_STRING, ATTRIBUTE_PATH);
 				writeValue(currentConfig, attributes.getValue(ATTRIBUTE_METHOD), TYPE_STRING, ATTRIBUTE_METHOD);
 
 			} else if (qName.equals(ELEMENT_VALUE)) {
 				currentName = attributes.getValue(ATTRIBUTE_NAME);
 				currentType = attributes.getValue(ATTRIBUTE_TYPE);
-			} else if(qName.equals(ELEMENT_COMMAND)){
+			} else if(qName.equals(RoboHttpUtils.HTTP_COMMAND)){
 				currentName = attributes.getValue(ATTRIBUTE_NAME);
 				currentType = attributes.getValue(ATTRIBUTE_TYPE);
 			}
@@ -99,7 +98,7 @@ public class XmlConfigurationFactory {
 				writeValue(currentConfig, currentValue.trim(), currentType, currentName);
 				currentValue = "";
 				break;
-			case ELEMENT_COMMAND:
+			case RoboHttpUtils.HTTP_COMMAND:
 				writeValue(currentConfig, currentValue.trim(), currentType, currentName);
 				currentValue = "";
 				break;
@@ -108,7 +107,7 @@ public class XmlConfigurationFactory {
 					currentConfig = configStack.pop();					
 				}
 				break;
-			case ELEMENT_HTTP_COMMANDS:
+			case RoboHttpUtils.HTTP_COMMANDS:
 				if (!configStack.isEmpty()) { // Closing of the last commands...
 					currentConfig = configStack.pop();
 				}
@@ -148,7 +147,7 @@ public class XmlConfigurationFactory {
 			// for a single text() node.
 			switch (lastElement) {
 			case ELEMENT_VALUE:
-			case ELEMENT_COMMAND:
+			case RoboHttpUtils.HTTP_COMMAND:
 				currentValue += String.valueOf(ch, start, length);
 				break;
 			default:

@@ -21,6 +21,7 @@ package com.robo4j.core;
 
 import java.io.IOException;
 
+import com.robo4j.core.client.util.RoboHttpUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -51,7 +52,7 @@ public class RoboHttpDynamicTests {
 		config.setInteger("port", PORT);
 
 		/* specific configuration */
-		Configuration commands = config.createChildConfiguration("commands");
+		Configuration commands = config.createChildConfiguration(RoboHttpUtils.HTTP_COMMANDS);
 		commands.setString("path", "tank");
 		commands.setString("method", "GET");
 		commands.setString("up", "move");
@@ -97,7 +98,8 @@ public class RoboHttpDynamicTests {
 		RoboBuilder builder = new RoboBuilder().add(RoboClassLoader.getInstance().getResource("http_get.xml"));
 		RoboContext ctx = builder.build();
 
-		Configuration confCommands = ctx.getReference("http").getConfiguration().getChildConfiguration("commands");
+		Configuration confCommands = ctx.getReference("http").getConfiguration()
+				.getChildConfiguration(RoboHttpUtils.HTTP_COMMANDS);
 		Assert.assertNotNull(confCommands.getValueNames());
 		Assert.assertEquals(confCommands.getValueNames().size(), 5);
 		Assert.assertEquals(confCommands.getString("up", null), "move");

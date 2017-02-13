@@ -59,7 +59,7 @@ public class HttpClientUnit extends RoboUnit<Object> {
         String confAddress = configuration.getString("address", null);
         int confPort = configuration.getInteger("port", RoboHttpUtils._DEFAULT_PORT);
 
-        final Configuration commands = configuration.getChildConfiguration(RoboHttpUtils.HTTP_COMMAND.concat("s"));
+        final Configuration commands = configuration.getChildConfiguration(RoboHttpUtils.HTTP_COMMANDS);
         if (confAddress == null || commands == null) {
             throw ConfigurationException.createMissingConfigNameException("address, path, commands...");
         }

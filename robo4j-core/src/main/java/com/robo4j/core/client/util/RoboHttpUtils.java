@@ -37,6 +37,7 @@ public final class RoboHttpUtils {
 	public static final int _DEFAULT_PORT = 8042;
 	public static final String METHOD_GET = "GET";
 	public static final String _EMPTY_STRING = "";
+	public static final String HTTP_COMMANDS = "commands";
 	public static final String HTTP_COMMAND = "command";
 	public static final String HTTP_HEADER_NOT = "HTTP/1.0 501 Not Implemented";
 	public static final String HTTP_HEADER_NOT_ALLOWED = "HTTP/1.0 405 Method Not Allowed";

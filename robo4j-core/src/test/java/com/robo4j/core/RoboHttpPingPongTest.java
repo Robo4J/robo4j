@@ -22,6 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.robo4j.core.client.util.RoboHttpUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -80,7 +81,7 @@ public class RoboHttpPingPongTest {
 
 		});
 
-        RoboReference systemPingProducer = systemPing.getReference("http_producer");
+        RoboReference<Object> systemPingProducer = systemPing.getReference("http_producer");
 
         StringConsumer pongConsumer = (StringConsumer) systemPong.getUnits().stream()
                 .filter(e -> e.getId().equals("request_consumer"))
@@ -120,7 +121,7 @@ public class RoboHttpPingPongTest {
 		config.setInteger("port", PORT);
 
 		/* specific configuration */
-		Configuration commands = config.createChildConfiguration("commands");
+		Configuration commands = config.createChildConfiguration(RoboHttpUtils.HTTP_COMMANDS);
 		commands.setString("path", TEST_PATH);
 		commands.setString("method", "GET");
 		commands.setString("up", "move");
@@ -144,7 +145,7 @@ public class RoboHttpPingPongTest {
 		config.setString("address", "localhost");
 		config.setInteger("port", PORT);
 		/* specific configuration */
-		Configuration commands = config.createChildConfiguration("commands");
+		Configuration commands = config.createChildConfiguration(RoboHttpUtils.HTTP_COMMANDS);
 		commands.setString("path", "tank");
 		commands.setString("method", "GET");
 		commands.setString("up", "move");
