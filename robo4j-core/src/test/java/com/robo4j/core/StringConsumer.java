@@ -44,6 +44,7 @@ public class StringConsumer extends RoboUnit<String> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized RoboResult<String, Integer> onMessage(String message) {
+		System.out.println("StringConsumer: onMessage= " + message);
 		if (message.equals("getNumberOfSentMessages")) {
 			return new RoboResult<String, Integer>(this, receivedMessages.size());
 		}

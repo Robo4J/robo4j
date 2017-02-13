@@ -110,17 +110,22 @@ public class RoboRequestCallable implements Callable<String> {
         out.flush();
     }
 
+    //TODO, FIXME refactor
     private String parseHttpRequest(HttpMethod method, final String[] tokens, final Map<String, String> params){
-     final HttpMessage httpMessage = new HttpMessage(method, URI.create(tokens[URI_VALUE_POSITION]),
-             HttpVersion.getByValue(tokens[VERSION_POSITION]), params);
-     switch (method){
-         case GET:
-             //TODO, FIXME refactor
-             return factory.processGet(httpMessage).toString();
-         default:
-             SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
-             return null;
-     }
+        if(method != null){
+		    /* validate token */
+            final HttpMessage httpMessage = new HttpMessage(method, URI.create(tokens[URI_VALUE_POSITION]),
+                    HttpVersion.getByValue(tokens[VERSION_POSITION]), params);
+            switch (method) {
+                case GET:
+                    return factory.processGet(httpMessage).toString();
+                default:
+                    SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
+                    return null;
+            }
+        }
+        return null;
     }
+
 }
 

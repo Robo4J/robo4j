@@ -19,6 +19,11 @@ package com.robo4j.core;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
@@ -39,14 +44,21 @@ import com.robo4j.core.util.SystemUtil;
 public class RoboHttpPingPongTest {
 
 	private static final int PORT = 8025;
+    private static final String TEST_PATH ="tank";
+    private static final int MESSAGES = 2;
+    private static final int SECONDS = 1;
+
 
 	private ExecutorService executor = Executors.newFixedThreadPool(2);
+    private AtomicBoolean active;
 
-	// @Test
+    @SuppressWarnings("unchecked")
+	@Test
 	public void pingPongTest() throws Exception {
+        active = new AtomicBoolean(true);
 
-		// RoboSystem systemPing = configurePingSystem();
 		RoboSystem systemPong = configurePongSystem();
+        RoboSystem systemPing = configurePingSystem();
 
 		executor.execute(() -> {
 			System.out.println("systemPong: State before start:");
@@ -57,32 +69,46 @@ public class RoboHttpPingPongTest {
 
 		});
 
-		// executor.execute(() -> {
-		// System.out.println("systemPing: State before start:");
-		// System.out.println(SystemUtil.generateStateReport(systemPing));
-		// systemPing.start();
-		// System.out.println("systemPing: State after start:");
-		// System.out.println(SystemUtil.generateStateReport(systemPing));
-		//
-		// try {
-		// TimeUnit.SECONDS.sleep(5);
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-		//
-		// System.out.println("systemPing: send messages");
-		// systemPing.getReference("http_producer").sendMessage("sendRandomMessage");
-		// });
+		executor.execute(() -> {
+			System.out.println("systemPing: State before start:");
+			System.out.println(SystemUtil.generateStateReport(systemPing));
+			systemPing.start();
+			System.out.println("systemPing: State after start:");
+			System.out.println(SystemUtil.generateStateReport(systemPing));
 
-		System.in.read();
+			System.out.println("systemPing: send messages");
 
-		// System.out.println("systemPing : Going Down!");
-		// systemPing.stop();
-		// systemPing.shutdown();
+		});
+
+//		System.in.read();
+
+        RoboReference systemPingProducer = systemPing.getReference("http_producer");
+
+        StringConsumer pongConsumer = (StringConsumer) systemPong.getUnits().stream()
+                .filter(e -> e.getId().equals("request_consumer"))
+                .findFirst().get();
+
+        while (active.get()){
+            systemPingProducer.sendMessage("sendGetMessage::".concat(TEST_PATH).concat("?").concat("command=back"));
+            /* sleep simulates human reactions */
+            TimeUnit.SECONDS.sleep(SECONDS);
+            if(pongConsumer.getReceivedMessages().size() == MESSAGES){
+                active.set(false);
+            }
+        }
+
+
+        System.out.println("systemPing : Going Down!");
+        systemPing.stop();
+        systemPing.shutdown();
 
 		System.out.println("systemPong : Going Down!");
 		systemPong.stop();
-		systemPong.shutdown();
+        systemPong.shutdown();
+
+        executor.shutdown();
+        System.out.println("PingPong is down!");
+        Assert.assertEquals(pongConsumer.getReceivedMessages().size(), MESSAGES);
 
 	}
 
@@ -97,7 +123,7 @@ public class RoboHttpPingPongTest {
 
 		/* specific configuration */
 		Configuration commands = config.createChildConfiguration("commands");
-		commands.setString("path", "tank");
+		commands.setString("path", TEST_PATH);
 		commands.setString("method", "GET");
 		commands.setString("up", "move");
 		commands.setString("down", "back");
@@ -133,6 +159,7 @@ public class RoboHttpPingPongTest {
 		StringProducer producer = new StringProducer(result, "http_producer");
 		config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("target", "http_client");
+		config.setString("method", "GET");
 		producer.initialize(config);
 
 		result.addUnits(producer, httpClient);

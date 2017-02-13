@@ -37,7 +37,6 @@ import com.robo4j.http.HttpVersion;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 05.02.2017
  */
 public class RoboRequestDynamicFactory implements DefaultRequestFactory<String> {
 

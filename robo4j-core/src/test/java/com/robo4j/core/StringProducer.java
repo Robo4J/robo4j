@@ -16,6 +16,7 @@
  */
 package com.robo4j.core;
 
+import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.configuration.Configuration;
 
 /**
@@ -25,6 +26,7 @@ import com.robo4j.core.configuration.Configuration;
  */
 public class StringProducer extends RoboUnit<String> {
 	private String target;
+	private String method;
 
 	/**
 	 * @param context
@@ -34,27 +36,49 @@ public class StringProducer extends RoboUnit<String> {
 		super(context, id);
 	}
 
-	public void sendRandomMessage() {
-		getContext().getReference(target).sendMessage(StringToolkit.getRandomMessage(10));
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public RoboResult<String, Integer> onMessage(String message) {
-		if (message.equals("sendRandomMessage")) {
-			sendRandomMessage();
-		} else {
-			System.out.println("Do not understand " + message);
-		}
-		return null;
-	}
-
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		target = configuration.getString("target", null);
 		if (target == null) {
 			throw ConfigurationException.createMissingConfigNameException("target");
 		}
+
+		method = configuration.getString("method", null);
+
+	}
+
+	public void sendRandomMessage() {
+		final String message = StringToolkit.getRandomMessage(10);
+		getContext().getReference(target).sendMessage(message);
+	}
+
+	public void sendGetSimpleMessage(String host, String message){
+		final String request = method.equals("GET") ? RoboHttpUtils.createGetRequest(host, message) : null;
+		getContext().getReference(target).sendMessage(request);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public RoboResult<String, Integer> onMessage(String message) {
+
+		if(message == null){
+			System.out.println("No Message!");
+		} else {
+
+			String[] input = message.split("::");
+			switch (input[0]){
+				case "sendRandomMessage":
+					sendRandomMessage();
+					break;
+				case "sendGetMessage":
+					sendGetSimpleMessage("localhost", input[1].trim());
+					break;
+				default:
+					System.out.println("don't understand message: " + message);
+
+			}
+		}
+		return null;
 	}
 
 }
