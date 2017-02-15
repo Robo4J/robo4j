@@ -105,4 +105,14 @@ public class DefaultScheduler implements Scheduler {
 			reference.sendMessage(message);
 		}
 	}
+
+	@Override
+	public void scheduleAtFixedRate(Runnable runnable, long delay, long interval, TimeUnit unit) {
+		executor.scheduleAtFixedRate(runnable, delay, interval, unit);
+	}
+	
+	@Override
+	public void schedule(Runnable runnable, long delay, TimeUnit unit) {
+		executor.schedule(runnable, delay, unit);
+	}	
 }

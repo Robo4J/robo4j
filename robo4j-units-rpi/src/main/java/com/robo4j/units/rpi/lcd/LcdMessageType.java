@@ -26,6 +26,4 @@ public enum LcdMessageType {
 	// FIXME(Marcus/Jan 23, 2017): If we go with Object, we can have
 	// different actual message types instead.
 	SET_TEXT, CLEAR, DISPLAY_ENABLE, STOP, SCROLL,
-	//TODO : we need to refactor it
-	LEFT, RIGHT, MOVE, BACK, HALT
 }

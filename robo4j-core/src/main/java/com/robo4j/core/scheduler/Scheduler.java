@@ -73,7 +73,7 @@ public interface Scheduler {
 	 */
 	<T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval, TimeUnit unit,
 			int numberOfInvocations);
-	
+
 	/**
 	 * Schedules a message to the target. Will run the message until cancelled.
 	 * 
@@ -93,6 +93,34 @@ public interface Scheduler {
 	 */
 	<T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval, TimeUnit unit);
 
+	/**
+	 * 
+	 * @param runnable
+	 *            the command to execute.
+	 * @param delay
+	 *            the delay to wait.
+	 * @param interval
+	 *            the interval between invocations.
+	 * @param unit
+	 *            the time unit.
+	 * @param listener
+	 *            the listener to execute once the last one has been run.
+	 */
+	void schedule(Runnable runnable, long delay, TimeUnit unit);
+	
+	/**
+	 * 
+	 * @param runnable
+	 *            the command to execute.
+	 * @param delay
+	 *            the delay to wait.
+	 * @param unit
+	 *            the time unit.
+	 * @param listener
+	 *            the listener to execute once the last one has been run.
+	 */
+	void scheduleAtFixedRate(Runnable runnable, long delay, long interval, TimeUnit unit);
+	
 	/**
 	 * Scheduler shutdown
 	 */
