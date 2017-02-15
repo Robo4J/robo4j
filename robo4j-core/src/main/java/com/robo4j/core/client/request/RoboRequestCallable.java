@@ -69,26 +69,35 @@ public class RoboRequestCallable implements Callable<String> {
 			final String[] tokens = firstLine.split(ConstantUtil.HTTP_EMPTY_SEP);
 			final HttpMethod method = HttpMethod.getByName(tokens[HttpMessageUtil.METHOD_KEY_POSITION]);
 
-            final Map<String, String> params = new HashMap<>();
-            String inputLine;
-            while (!(inputLine = RoboHttpUtils.correctLine(in.readLine())).equals(ConstantUtil.EMPTY_STRING)) {
-                final String[] array = inputLine
-						.split(HttpMessageUtil.getHttpSeparator(HttpMessageUtil.HTTP_HEADER_SEP));
-				params.put(array[HttpMessageUtil.METHOD_KEY_POSITION].toLowerCase(),
-						array[HttpMessageUtil.URI_VALUE_POSITION]);
+            if(method != null){
+                final Map<String, String> params = new HashMap<>();
+
+                String inputLine;
+                while (!(inputLine = RoboHttpUtils.correctLine(in.readLine())).equals(ConstantUtil.EMPTY_STRING)) {
+                    final String[] array = inputLine
+                            .split(HttpMessageUtil.getHttpSeparator(HttpMessageUtil.HTTP_HEADER_SEP));
+                    params.put(array[HttpMessageUtil.METHOD_KEY_POSITION].toLowerCase(),
+                            array[HttpMessageUtil.URI_VALUE_POSITION]);
+                }
+
+                processWriter(out, DEFAULT_RESPONSE);
+                switch (method){
+                    case GET:
+                        return factory.processGet(new HttpMessageWrapper(method, tokens, params));
+                    case POST:
+                        int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH).trim());
+                        char[] buffer = new char[length];
+                        in.read(buffer);
+                        return factory.processPost(new HttpMessageWrapper(method, tokens, params, buffer));
+                    default:
+                        SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
+                        return null;
+                }
+            } else {
+                SimpleLoggingUtil.error(getClass(), "error");
             }
-
-			char[] buffer = null;
-			if (method != null && method.equals(HttpMethod.POST)) {
-				int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH).trim());
-				buffer = new char[length];
-				in.read(buffer);
-			}
-
-			processWriter(out, DEFAULT_RESPONSE);
-			return parseHttpRequest(method, tokens, params, buffer);
         }
-
+        return null;
     }
 
     //Private Methods
@@ -108,23 +117,6 @@ public class RoboRequestCallable implements Callable<String> {
         out.flush();
     }
 
-    //TODO, FIXME refactor
-	private String parseHttpRequest(HttpMethod method, final String[] tokens, final Map<String, String> params,
-			char[] buffer) {
-		if (method != null && tokens != null) {
-			/* maybe validation here */
-            switch (method) {
-                case GET:
-				return factory.processGet(new HttpMessageWrapper(method, tokens, params));
-			case POST:
-				return factory.processPost(new HttpMessageWrapper(method, tokens, params, buffer));
-                default:
-                    SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
-                    return null;
-            }
-        }
-        return null;
-    }
 
 }
 

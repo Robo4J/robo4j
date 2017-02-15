@@ -89,6 +89,9 @@ public class RoboRequestFactory implements DefaultRequestFactory<String> {
 
 	@Override
 	public String processPost(HttpMessageWrapper wrapper) {
+		System.out.println("processPost NOT IMPLEMENTED");
+		System.out.println("processPost message: " + wrapper.message());
+		System.out.println("processPost body: " + wrapper.body());
 		return null;
 	}
 }
