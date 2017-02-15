@@ -26,12 +26,11 @@ public class ScanRequest {
 	public enum ScanAction {
 		STOP, ONCE, CONTINUOUSLY
 	}
-
+	private final ScanAction action;
 	private final boolean continuously;
 	private final float startAngle;
 	private final float range;
 	private final float step;
-	private final ScanAction action;
 
 	/**
 	 * 
