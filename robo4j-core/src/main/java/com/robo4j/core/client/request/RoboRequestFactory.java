@@ -30,7 +30,9 @@ import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.http.HttpMessage;
+import com.robo4j.http.HttpMessageWrapper;
 import com.robo4j.http.HttpVersion;
+import com.robo4j.http.util.HttpMessageUtil;
 
 /**
  * Dynamically configurable request factory
@@ -38,20 +40,20 @@ import com.robo4j.http.HttpVersion;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RoboRequestDynamicFactory implements DefaultRequestFactory<String> {
+public class RoboRequestFactory implements DefaultRequestFactory<String> {
 
 	private static final int DEFAULT_POSITION_0 = 0;
 
-	public RoboRequestDynamicFactory() {
+	public RoboRequestFactory() {
 	}
 
 	@Override
-	public String processGet(HttpMessage httpMessage) {
-		if (HttpVersion.containsValue(httpMessage.getVersion())) {
-			final URI uri = httpMessage.getUri();
+	public String processGet(HttpMessageWrapper wrapper) {
+		if (HttpVersion.containsValue(wrapper.message().version())) {
+			final URI uri = wrapper.message().uri();
 			//@formatter:off
-            final List<String> paths = Stream.of(httpMessage.getUri().getPath()
-                        .split(ConstantUtil.getHttpSeparator(12)))
+            final List<String> paths = Stream.of(wrapper.message().uri().getPath()
+                        .split(HttpMessageUtil.getHttpSeparator(12)))
                     .filter(e -> !e.isEmpty())
                     .collect(Collectors.toList());
             //@formatter:on
@@ -79,9 +81,14 @@ public class RoboRequestDynamicFactory implements DefaultRequestFactory<String> 
 			}
 
 		} else {
-			SimpleLoggingUtil.error(getClass(), "processGet is corrupted: " + httpMessage);
+			SimpleLoggingUtil.error(getClass(), "processGet is corrupted: " + wrapper);
 		}
 
+		return null;
+	}
+
+	@Override
+	public String processPost(HttpMessageWrapper wrapper) {
 		return null;
 	}
 }

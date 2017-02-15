@@ -88,7 +88,7 @@ public class RoboHttpPingPongTest {
                 .findFirst().get();
 
         while (active.get()){
-            systemPingProducer.sendMessage("sendGetMessage::".concat(TEST_PATH).concat("?").concat("command=back"));
+            systemPingProducer.sendMessage("sendGetMessage::".concat(TEST_PATH).concat("?").concat("command=move"));
             /* sleep simulates human reactions */
             TimeUnit.SECONDS.sleep(SECONDS);
             if(pongConsumer.getReceivedMessages().size() == MESSAGES){

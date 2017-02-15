@@ -23,8 +23,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
-import java.net.URI;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -32,9 +30,10 @@ import java.util.concurrent.Callable;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
-import com.robo4j.http.HttpMessage;
+import com.robo4j.http.HttpHeaderNames;
+import com.robo4j.http.HttpMessageWrapper;
 import com.robo4j.http.HttpMethod;
-import com.robo4j.http.HttpVersion;
+import com.robo4j.http.util.HttpMessageUtil;
 
 /**
  * Handling Request
@@ -46,13 +45,12 @@ public class RoboRequestCallable implements Callable<String> {
 
     private static final String NEW_LINE = "\n";
     private static final String DEFAULT_RESPONSE = "done";
-    private static final int METHOD_KEY_POSITION = 0, URI_VALUE_POSITION = 1, VERSION_POSITION = 2, HTTP_HEADER_SEP = 9;
 
-    private DefaultRequestFactory<?> factory;
+	private DefaultRequestFactory<String> factory;
     private Socket connection;
 
 
-    public RoboRequestCallable(Socket connection, DefaultRequestFactory<?> factory) {
+	public RoboRequestCallable(Socket connection, DefaultRequestFactory<String> factory) {
         this.connection = connection;
         this.factory = factory;
     }
@@ -67,37 +65,37 @@ public class RoboRequestCallable implements Callable<String> {
         try (Writer out = new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
              BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
 
+			final String firstLine = RoboHttpUtils.correctLine(in.readLine());
+			final String[] tokens = firstLine.split(ConstantUtil.HTTP_EMPTY_SEP);
+			final HttpMethod method = HttpMethod.getByName(tokens[HttpMessageUtil.METHOD_KEY_POSITION]);
+
             final Map<String, String> params = new HashMap<>();
-            boolean firstLine = true;
-            String[] tokens = null;
-            HttpMethod method = null;
             String inputLine;
-
-            //TODO: refactor
             while (!(inputLine = RoboHttpUtils.correctLine(in.readLine())).equals(ConstantUtil.EMPTY_STRING)) {
-                if (firstLine) {
-                    tokens = inputLine.split(ConstantUtil.HTTP_EMPTY_SEP);
-                    method = HttpMethod.getByName(tokens[METHOD_KEY_POSITION]);
-                    SimpleLoggingUtil.debug(getClass(), "header method: " + method);
-                    firstLine = false;
-                } else {
-                    final String[] array = inputLine.split(ConstantUtil.getHttpSeparator(HTTP_HEADER_SEP));
-                    SimpleLoggingUtil.debug(getClass(), "header without method: " + Arrays.asList(array));
-                    params.put(array[METHOD_KEY_POSITION], array[URI_VALUE_POSITION]);
-                }
+                final String[] array = inputLine
+						.split(HttpMessageUtil.getHttpSeparator(HttpMessageUtil.HTTP_HEADER_SEP));
+				params.put(array[HttpMessageUtil.METHOD_KEY_POSITION].toLowerCase(),
+						array[HttpMessageUtil.URI_VALUE_POSITION]);
             }
-            processWritter(out, DEFAULT_RESPONSE);
 
-            return tokens == null ? null : parseHttpRequest(method, tokens, params);
+			char[] buffer = null;
+			if (method != null && method.equals(HttpMethod.POST)) {
+				int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH).trim());
+				buffer = new char[length];
+				in.read(buffer);
+			}
+
+			processWriter(out, DEFAULT_RESPONSE);
+			return parseHttpRequest(method, tokens, params, buffer);
         }
 
     }
 
     //Private Methods
-    private void processWritter(final Writer out, String message) throws Exception{
+	private void processWriter(final Writer out, String message) throws Exception {
         out.write(RoboHttpUtils.HTTP_HEADER_OK);
         Map<String, String> responseValues = new HashMap<>();
-        responseValues.put("Content-Length", String.valueOf(message.length()));
+		responseValues.put(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(message.length()));
         responseValues.forEach((k, v) -> {
             try {
                 out.write(k + ": " + v + NEW_LINE);
@@ -111,14 +109,15 @@ public class RoboRequestCallable implements Callable<String> {
     }
 
     //TODO, FIXME refactor
-    private String parseHttpRequest(HttpMethod method, final String[] tokens, final Map<String, String> params){
-        if(method != null){
-		    /* validate token */
-            final HttpMessage httpMessage = new HttpMessage(method, URI.create(tokens[URI_VALUE_POSITION]),
-                    HttpVersion.getByValue(tokens[VERSION_POSITION]), params);
+	private String parseHttpRequest(HttpMethod method, final String[] tokens, final Map<String, String> params,
+			char[] buffer) {
+		if (method != null && tokens != null) {
+			/* maybe validation here */
             switch (method) {
                 case GET:
-                    return factory.processGet(httpMessage).toString();
+				return factory.processGet(new HttpMessageWrapper(method, tokens, params));
+			case POST:
+				return factory.processPost(new HttpMessageWrapper(method, tokens, params, buffer));
                 default:
                     SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
                     return null;

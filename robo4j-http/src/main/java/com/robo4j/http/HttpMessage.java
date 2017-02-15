@@ -19,6 +19,7 @@
 package com.robo4j.http;
 
 import java.net.URI;
+import java.util.Comparator;
 import java.util.Map;
 
 /**
@@ -42,25 +43,30 @@ public class HttpMessage implements Comparable<HttpMessage> {
 		this.header = header;
 	}
 
-	public HttpMethod getMethod() {
+	public HttpMethod method() {
 		return method;
 	}
 
-	public URI getUri() {
+	public URI uri() {
 		return uri;
 	}
 
-	public HttpVersion getVersion() {
+	public HttpVersion version() {
 		return version;
 	}
 
-	public Map<String, String> getHeader() {
+	public Map<String, String> header() {
 		return header;
 	}
 
 	@Override
 	public int compareTo(HttpMessage o) {
-		return this.method.compareTo(o.method);
+		//@formatter:off
+		return Comparator.comparing((HttpMessage hm) -> hm.method)
+				.thenComparing(hm -> hm.uri.getPath())
+				.thenComparing(HttpMessage::version)
+				.compare(this, o);
+		//@formatter:on
 	}
 
 	@Override

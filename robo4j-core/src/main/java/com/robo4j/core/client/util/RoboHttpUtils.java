@@ -24,6 +24,10 @@ import java.util.stream.Stream;
 
 import com.robo4j.core.client.request.RoboBasicMapEntry;
 import com.robo4j.core.util.ConstantUtil;
+import com.robo4j.http.HttpHeaderNames;
+import com.robo4j.http.util.HttpFirstLineBuilder;
+import com.robo4j.http.util.HttpHeaderBuilder;
+import com.robo4j.http.util.HttpMessageUtil;
 
 /**
  * Basic Http constants and utils methods
@@ -32,51 +36,64 @@ import com.robo4j.core.util.ConstantUtil;
  */
 public final class RoboHttpUtils {
 
+	private static final String SPACE = "\u0020";
+	private static final String NEXT_LINE = "\r\n";
+	public static final String NEW_LINE = "\n";
+	public static final String HTTP_VERSION = "HTTP/1.1";
+	public static final String HTTP_HEADER_OK = HttpFirstLineBuilder.Build(HTTP_VERSION).add("200")
+			.add("OK").build();
 	public static final int DEFAULT_THREAD_POOL_SIZE = 2;
-	public static final String HTTP_HEADER_OK = "HTTP/1.1 200 OK\n";
 	public static final int _DEFAULT_PORT = 8042;
 	public static final String METHOD_GET = "GET";
+	public static final String METHOD_POST = "POST";
 	public static final String _EMPTY_STRING = "";
+	public static final String COLON = ":";
 	public static final String HTTP_COMMANDS = "commands";
 	public static final String HTTP_COMMAND = "command";
-	public static final String HTTP_HEADER_NOT = "HTTP/1.0 501 Not Implemented";
-	public static final String HTTP_HEADER_NOT_ALLOWED = "HTTP/1.0 405 Method Not Allowed";
+	public static final String HTTP_HEADER_NOT = "HTTP/1.1 501 Not Implemented";
+	public static final String HTTP_HEADER_NOT_ALLOWED = "HTTP/1.1 405 Method Not Allowed";
 	public static final int KEEP_ALIVE_TIME = 10;
-	private static final String NEXT_LINE = "\r\n";
-	private static final String SPACE = "\u0020";
+
 
 
 	public static String setHeader(String responseCode, int length) throws IOException {
 		//@formatter:off
-		return new StringBuilder(ConstantUtil.EMPTY_STRING).append(responseCode).append(NEXT_LINE)
-				.append("Date:").append(SPACE).append(LocalDateTime.now()).append(NEXT_LINE)
-				.append("Server:").append(SPACE).append("robo4j-client").append(NEXT_LINE)
-				.append("Content-length:").append(SPACE).append(length).append(NEXT_LINE)
-				.append("Content-type:").append(SPACE).append("text/html;").append(SPACE).append("charset=utf-8")
-				.append(NEXT_LINE).append(NEXT_LINE)
-				.toString();
+		return HttpHeaderBuilder.Build()
+				.add(ConstantUtil.EMPTY_STRING, responseCode)
+				.add(HttpHeaderNames.DATE, LocalDateTime.now().toString())
+				.add(HttpHeaderNames.SERVER, "Robo4J-client")
+				.add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(length))
+				.add(HttpHeaderNames.CONTENT_TYPE, "text/html;".concat(HttpMessageUtil.SPACE).concat("charset=utf-8"))
+				.build();
 		//@formatter:on
 	}
 
 	public static String createResponseHeader(String host) {
 		//@formatter:off
-		return new StringBuilder("Host:").append(SPACE).append(host).append(NEXT_LINE)
-				.append("Connection:").append(SPACE).append("keep-alive").append(NEXT_LINE)
-				.append("Cache-Control:").append(SPACE).append("no-cache").append(NEXT_LINE)
-				.append("User-Agent:").append(SPACE).append("Robo4J-HttpClient").append(NEXT_LINE)
-				.append("Accept:").append(SPACE).append("*/*").append(NEXT_LINE)
-				.append("Accept-Encoding:").append(SPACE).append("gzip, deflate, sdch, br").append(NEXT_LINE)
-				.append("Accept-Language:").append(SPACE).append("en-US,en;q=0.8")
-				.append(NEXT_LINE)
-				.toString();
+		return  HttpHeaderBuilder.Build()
+				.add(HttpHeaderNames.HOST, host)
+				.add(HttpHeaderNames.CONNECTION, "keep-alive")
+				.add(HttpHeaderNames.CACHE_CONTROL, "no-cache")
+				.add(HttpHeaderNames.USER_AGENT, "Robo4J-HttpClient")
+				.add(HttpHeaderNames.ACCEPT, "*/*")
+				.add(HttpHeaderNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
+				.add(HttpHeaderNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8")
+				.build();
+
+
+//		return new StringBuilder(HttpHeaderNames.HOST).append(COLON).append(SPACE).append(host).append(NEXT_LINE)
+//				.append(HttpHeaderNames.ACCEPT).append(COLON).append(SPACE).append("*/*").append(NEXT_LINE)
+//				.append(HttpHeaderNames.ACCEPT_ENCODING).append(COLON).append(SPACE).append("gzip, deflate, sdch, br").append(NEXT_LINE)
+//				.append(HttpHeaderNames.ACCEPT_LANGUAGE).append(COLON).append(SPACE).append("en-US,en;q=0.8")
+//				.append(NEXT_LINE)
+//				.toString();
 		//@formatter:on
 	}
 
 	public static String createGetRequest(String host, String message) {
 		//@formatter:off
-		return new StringBuilder("GET").append(SPACE).append(message).append(SPACE).append("HTTP/1.1").append(NEXT_LINE)
-				.append(createResponseHeader(host))
-				.toString();
+		return HttpFirstLineBuilder.Build(METHOD_GET).add(message).add(HTTP_VERSION)
+				.build().concat(createResponseHeader(host));
 		//@formatter:on
 	}
 

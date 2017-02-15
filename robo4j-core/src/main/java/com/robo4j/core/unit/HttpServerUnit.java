@@ -44,7 +44,7 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.request.RoboRequestCallable;
-import com.robo4j.core.client.request.RoboRequestDynamicFactory;
+import com.robo4j.core.client.request.RoboRequestFactory;
 import com.robo4j.core.client.request.RoboRequestElement;
 import com.robo4j.core.client.request.RoboRequestTypeRegistry;
 import com.robo4j.core.client.util.RoboHttpUtils;
@@ -194,7 +194,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
                         requestChannel.configureBlocking(true);
                         //TODO: miro -> improve multi-channels electionKey.OP_READ, etc. option
                         Future<String> result = executor
-                                .submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestDynamicFactory()));
+                                .submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestFactory()));
                         targetRef.sendMessage(result.get());
                         requestChannel.close();
 
