@@ -19,13 +19,11 @@ package com.robo4j.core;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.robo4j.core.client.util.RoboHttpUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.unit.HttpClientUnit;
@@ -46,17 +44,14 @@ public class RoboHttpPingPongTest {
 
 	private static final int PORT = 8025;
     private static final String TEST_PATH ="tank";
-    private static final int MESSAGES = 2;
-    private static final int SECONDS = 1;
+	private static final int MESSAGES = 3;
 
 
 	private ExecutorService executor = Executors.newFixedThreadPool(2);
-    private AtomicBoolean active;
 
     @SuppressWarnings("unchecked")
 	@Test
 	public void pingPongTest() throws Exception {
-        active = new AtomicBoolean(true);
 
 		RoboSystem systemPong = configurePongSystem();
         RoboSystem systemPing = configurePingSystem();
@@ -67,7 +62,6 @@ public class RoboHttpPingPongTest {
 			systemPong.start();
 			System.out.println("systemPong: State after start:");
 			System.out.println(SystemUtil.generateStateReport(systemPong));
-
 		});
 
 		executor.execute(() -> {
@@ -76,38 +70,28 @@ public class RoboHttpPingPongTest {
 			systemPing.start();
 			System.out.println("systemPing: State after start:");
 			System.out.println(SystemUtil.generateStateReport(systemPing));
-
 			System.out.println("systemPing: send messages");
-
+			RoboReference<Object> systemPingProducer = systemPing.getReference("http_producer");
+			for (int i = 0; i < MESSAGES; i++) {
+				systemPingProducer.sendMessage("sendGetMessage::".concat(TEST_PATH).concat("?").concat("command=move"));
+			}
 		});
 
-        RoboReference<Object> systemPingProducer = systemPing.getReference("http_producer");
+
 
         StringConsumer pongConsumer = (StringConsumer) systemPong.getUnits().stream()
                 .filter(e -> e.getId().equals("request_consumer"))
                 .findFirst().get();
 
-        while (active.get()){
-            systemPingProducer.sendMessage("sendGetMessage::".concat(TEST_PATH).concat("?").concat("command=move"));
-            /* sleep simulates human reactions */
-            TimeUnit.SECONDS.sleep(SECONDS);
-            if(pongConsumer.getReceivedMessages().size() == MESSAGES){
-                active.set(false);
-            }
-        }
-
-
-        System.out.println("systemPing : Going Down!");
+		System.out.println("systemPing : Going Down!");
         systemPing.stop();
         systemPing.shutdown();
 
 		System.out.println("systemPong : Going Down!");
 		systemPong.stop();
         systemPong.shutdown();
-
-        executor.shutdown();
         System.out.println("PingPong is down!");
-        Assert.assertEquals(pongConsumer.getReceivedMessages().size(), MESSAGES);
+		Assert.assertEquals(pongConsumer.getReceivedMessages().size(), MESSAGES);
 
 	}
 

@@ -29,7 +29,6 @@ import java.util.stream.Stream;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
-import com.robo4j.http.HttpMessage;
 import com.robo4j.http.HttpMessageWrapper;
 import com.robo4j.http.HttpVersion;
 import com.robo4j.http.util.HttpMessageUtil;
@@ -61,17 +60,17 @@ public class RoboRequestFactory implements DefaultRequestFactory<String> {
 			// TODO: support more paths
 			SimpleLoggingUtil.debug(getClass(), "path: " + paths);
 			String path = paths.get(DEFAULT_POSITION_0);
-			Set<RoboRequestElement> availablePathValues = RoboRequestTypeRegistry.getInstance().getPathValues(path);
+			Set<RoboRequestEntity> availablePathValues = RoboRequestTypeRegistry.getInstance().getPathValues(path);
 
 			if (availablePathValues != null && !availablePathValues.isEmpty()) {
-				RoboRequestElement roboRequestElement = availablePathValues.stream().findFirst().get();
+				RoboRequestEntity roboRequestEntity = availablePathValues.stream().findFirst().get();
 				if (uri != null && uri.getQuery() != null && !uri.getQuery().isEmpty()) {
 					final Map<String, String> currentRequestValues = RoboHttpUtils.parseURIQueryToMap(uri.getQuery(),
 							ConstantUtil.HTTP_QUERY_SEP);
 					//@formatter:off
                     return currentRequestValues.entrySet().stream()
-							.filter(e -> roboRequestElement.getValues().containsValue(e.getValue()))
-                            .map(e -> roboRequestElement.getValues().entrySet()
+							.filter(e -> roboRequestEntity.getValues().containsValue(e.getValue()))
+                            .map(e -> roboRequestEntity.getValues().entrySet()
 									.stream().filter(v -> v.getValue().equals(e.getValue())).findFirst().get())
                             .findFirst()
 							.map(Map.Entry::getKey)

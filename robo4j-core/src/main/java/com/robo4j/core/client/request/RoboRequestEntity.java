@@ -28,13 +28,13 @@ import java.util.Map;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RoboRequestElement {
+public class RoboRequestEntity {
 
     private String method;
     private String key;
     private Map<String, String> values;
 
-    public RoboRequestElement(String method, String key, Map<String, String> values) {
+    public RoboRequestEntity(String method, String key, Map<String, String> values) {
         this.method = method;
         this.key = key;
         this.values = values;

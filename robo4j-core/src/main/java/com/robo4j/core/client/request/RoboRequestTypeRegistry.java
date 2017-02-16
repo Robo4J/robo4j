@@ -33,7 +33,7 @@ import java.util.Set;
 public final class RoboRequestTypeRegistry {
 
 	private static volatile RoboRequestTypeRegistry INSTANCE;
-	private final Map<String, Set<RoboRequestElement>> pathValues = new HashMap<>();
+	private final Map<String, Set<RoboRequestEntity>> pathValues = new HashMap<>();
 
 	public RoboRequestTypeRegistry() {
 	}
@@ -49,11 +49,11 @@ public final class RoboRequestTypeRegistry {
 		return INSTANCE;
 	}
 
-	public void addPathWithValues(String path, Set<RoboRequestElement> values) {
+	public void addPathWithValues(String path, Set<RoboRequestEntity> values) {
 		pathValues.put(path, values);
 	}
 
-	public Set<RoboRequestElement> getPathValues(String path) {
+	public Set<RoboRequestEntity> getPathValues(String path) {
 		return pathValues.get(path);
 	}
 
@@ -61,7 +61,7 @@ public final class RoboRequestTypeRegistry {
 		//@formatter:off
         return pathValues.get(path).stream()
                 .filter(e -> e.getKey().equals(key))
-                .map(RoboRequestElement::getValues)
+                .map(RoboRequestEntity::getValues)
                 .filter(v -> v.containsKey(value))
                 .count() > 0;
         //@formatter:on

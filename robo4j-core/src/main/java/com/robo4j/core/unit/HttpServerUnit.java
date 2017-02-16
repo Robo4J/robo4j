@@ -45,7 +45,7 @@ import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.request.RoboRequestCallable;
 import com.robo4j.core.client.request.RoboRequestFactory;
-import com.robo4j.core.client.request.RoboRequestElement;
+import com.robo4j.core.client.request.RoboRequestEntity;
 import com.robo4j.core.client.request.RoboRequestTypeRegistry;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.concurrency.RoboThreadFactory;
@@ -118,14 +118,14 @@ public class HttpServerUnit extends RoboUnit<Object> {
         String method = commands.getValue(HTTP_METHOD, RoboHttpUtils._EMPTY_STRING).toString();
         keys.remove(HTTP_METHOD);
 
-        Set<RoboRequestElement> elements = new HashSet<>();
+        Set<RoboRequestEntity> elements = new HashSet<>();
         Map<String, String> elementValues = new HashMap<>();
         for(Iterator<String> it = keys.iterator(); it.hasNext();){
             String key = it.next();
             String value = commands.getString(key, RoboHttpUtils._EMPTY_STRING);
             elementValues.put(key, value);
         }
-        elements.add(new RoboRequestElement(method, RoboHttpUtils.HTTP_COMMAND, elementValues));
+        elements.add(new RoboRequestEntity(method, RoboHttpUtils.HTTP_COMMAND, elementValues));
         RoboRequestTypeRegistry.getInstance().addPathWithValues(path, elements);
 
         //@formatter:on
