@@ -81,7 +81,7 @@ public class RoboHttpDynamicTests {
 		System.out.println("Usage:\n\tRequest GET: http://<IP_ADDRESS>:" + PORT + "/tank?command=move");
 		System.out.println("\tRequest command types: right,left,move,back,enter\n");
 
-		System.in.read();
+//		System.in.read();
 
 		System.out.println("Going Down!");
 		system.stop();
