@@ -36,7 +36,6 @@ public class RoboBuilderTests {
 	public void testParsingFile() throws RoboBuilderException, InterruptedException, ExecutionException {
 		RoboBuilder builder = new RoboBuilder();
 		builder.add(RoboClassLoader.getInstance().getResource("test.xml"));
-//		builder.add(RoboBuilderTests.class.getResourceAsStream("test.xml"));
 		RoboContext context = builder.build();
 		Assert.assertEquals(context.getState(), LifecycleState.UNINITIALIZED);
 		context.start();
