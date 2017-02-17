@@ -53,4 +53,13 @@ public class StringConsumer extends RoboUnit<String> {
 		
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
+		if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
+			return (R) new Integer(getReceivedMessages().size());
+		}
+		return null;
+	}
+
 }
