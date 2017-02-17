@@ -21,7 +21,6 @@ import java.io.IOException;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboResult;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
@@ -76,13 +75,12 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	 * @return
 	 */
 	@Override
-	public RoboResult<LcdMessage, Object> onMessage(LcdMessage message) {
+	public void onMessage(LcdMessage message) {
 		try {
 			processLcdMessage(message);
 		} catch (Exception e) {
 			SimpleLoggingUtil.debug(getClass(), "Could not accept message" + message.toString(), e);
 		}
-		return super.onMessage(message);
 	}
 
 	/**

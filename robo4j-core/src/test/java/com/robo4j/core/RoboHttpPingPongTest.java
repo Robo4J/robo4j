@@ -49,7 +49,6 @@ public class RoboHttpPingPongTest {
 
 	private ExecutorService executor = Executors.newFixedThreadPool(2);
 
-    @SuppressWarnings("unchecked")
 	@Test
 	public void pingPongTest() throws Exception {
 

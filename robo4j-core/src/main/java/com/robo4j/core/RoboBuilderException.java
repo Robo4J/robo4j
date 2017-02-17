@@ -23,6 +23,7 @@ package com.robo4j.core;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboBuilderException extends Exception {
+	private static final long serialVersionUID = 1L;
 
 	public RoboBuilderException(String message, Throwable cause) {
 		super(message, cause);

@@ -16,6 +16,7 @@
  */
 package com.robo4j.core;
 
+import java.util.Collection;
 import java.util.concurrent.Future;
 
 import com.robo4j.core.configuration.Configuration;
@@ -34,10 +35,21 @@ public interface RoboReference<T> {
 	 *            the message to send.
 	 * @return the RoboUnit specific response.
 	 */
-	<R> Future<RoboResult<T, R>> sendMessage(T message);
-	
+	void sendMessage(T message);
+
 	/**
 	 * @return the configuration.
 	 */
 	Configuration getConfiguration();
+
+	/**
+	 * @return the value for a certain attribute.
+	 */
+	<R> Future<R> getAttribute(AttributeDescriptor<R> attribute);
+
+	/**
+	 * @return the attributes that this RoboUnit knows about. Should not
+	 *         change, and AttributeDescriptiors may be cached.
+	 */
+	Collection<AttributeDescriptor<?>> getKnownAttributes();
 }

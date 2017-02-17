@@ -57,10 +57,8 @@ public class StringProducer extends RoboUnit<String> {
 		getContext().getReference(target).sendMessage(request);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public RoboResult<String, Integer> onMessage(String message) {
-
+	public void onMessage(String message) {
 		if(message == null){
 			System.out.println("No Message!");
 		} else {
@@ -78,7 +76,6 @@ public class StringProducer extends RoboUnit<String> {
 
 			}
 		}
-		return null;
 	}
 
 }

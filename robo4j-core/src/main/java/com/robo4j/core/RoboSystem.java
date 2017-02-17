@@ -68,8 +68,18 @@ public class RoboSystem implements RoboContext {
 		}
 
 		@Override
-		public <R> Future<RoboResult<T, R>> sendMessage(T message) {
-			return systemExecutor.submit(() -> unit.onMessage(message));
+		public void sendMessage(T message) {
+			systemExecutor.submit(() -> unit.onMessage(message));
+		}
+
+		@Override
+		public <R> Future<R> getAttribute(AttributeDescriptor<R> attribute) {
+			return systemExecutor.submit(() -> unit.onGetAttribute(attribute));
+		}
+
+		@Override
+		public Collection<AttributeDescriptor<?>> getKnownAttributes() {
+			return unit.getKnownAttributes();
 		}
 	}
 

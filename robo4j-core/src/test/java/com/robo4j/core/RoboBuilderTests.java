@@ -49,13 +49,12 @@ public class RoboBuilderTests {
 		Assert.assertNotNull(consumer);
 		
 		for (int i = 0; i < 10; i++) {
-			Future<RoboResult<String, Integer>> result = producer.sendMessage("sendRandomMessage");
-			Assert.assertNull(result.get());
+			producer.sendMessage("sendRandomMessage");
 		}
-		Future<RoboResult<String, Integer>> result = consumer.sendMessage("getNumberOfSentMessages");
+		DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class, "getNumberOfSentMessages");
+		Future<Integer> result = consumer.getAttribute(descriptor);
 		context.shutdown();
-		Assert.assertEquals(10, (int) result.get().getResult());
-
+		Assert.assertEquals(10, (int) result.get());
 	}
 
 	@Test

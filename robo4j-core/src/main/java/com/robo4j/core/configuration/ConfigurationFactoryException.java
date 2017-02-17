@@ -23,6 +23,8 @@ package com.robo4j.core.configuration;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ConfigurationFactoryException extends Exception {
+	private static final long serialVersionUID = 1L;
+
 	public ConfigurationFactoryException(String message, Throwable cause) {
 		super(message, cause);
 	}

@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboResult;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.concurrency.RoboThreadFactory;
@@ -70,7 +69,7 @@ public class HttpClientUnit extends RoboUnit<Object> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public RoboResult<Object, ?> onMessage(Object message) {
+    public void onMessage(Object message) {
         try {
             SocketChannel client = SocketChannel.open(address);
             ByteBuffer buffer = ByteBuffer.wrap(message.toString().getBytes());
@@ -79,7 +78,6 @@ public class HttpClientUnit extends RoboUnit<Object> {
         } catch (IOException e) {
             throw new HttpException("onMessage", e );
         }
-        return null;
     }
 
     @Override

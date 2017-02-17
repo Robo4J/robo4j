@@ -14,12 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.unit;
+package com.robo4j.core;
 
-public class CodecRegistryException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
-
-	public CodecRegistryException(String message, Throwable cause) {
-		super(message, cause);
-	}
+/**
+ * The descriptor for an attribute.
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
+public interface AttributeDescriptor<T> {
+	Class<T> getAttributeType();
+	String getAttributeName();
 }

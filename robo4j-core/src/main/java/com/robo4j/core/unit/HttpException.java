@@ -25,8 +25,9 @@ package com.robo4j.core.unit;
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpException extends RuntimeException{
+	private static final long serialVersionUID = 1L;
 
-    public HttpException(String message, Throwable cause) {
+	public HttpException(String message, Throwable cause) {
         super(message, cause);
     }
 }

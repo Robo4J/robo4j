@@ -14,20 +14,37 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.client.util;
+package com.robo4j.core;
+
+import java.io.Serializable;
 
 /**
- *
+ * Default implementation of an attribute descriptor.
+ * 
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class ClientCommException extends RuntimeException {
+public class DefaultAttributeDescriptor<T> implements AttributeDescriptor<T>, Serializable {
 	private static final long serialVersionUID = 1L;
+	private final Class<T> attributeType;
+	private String attributeName;
 
-	public ClientCommException(String message) {
-		super(message);
+	public DefaultAttributeDescriptor(Class<T> attributeType, String attributeName) {
+		this.attributeType = attributeType;
+		this.attributeName = attributeName;
 	}
 
-	public ClientCommException(String message, Throwable cause) {
-		super(message, cause);
+	@Override
+	public Class<T> getAttributeType() {
+		return attributeType;
+	}
+
+	@Override
+	public String getAttributeName() {
+		return attributeName;
+	}
+
+	public static<T> DefaultAttributeDescriptor<T> create(Class<T> attributeType, String attributeName) {
+		return new DefaultAttributeDescriptor<>(attributeType, attributeName);
 	}
 }

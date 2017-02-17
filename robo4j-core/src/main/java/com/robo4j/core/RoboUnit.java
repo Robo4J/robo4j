@@ -69,7 +69,17 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	 * 
 	 * @return the unit specific result from the call.
 	 */
-	public <R> RoboResult<T, R> onMessage(T message) {
+	public void onMessage(T message) {
+	}
+
+	/**
+	 * Should be overridden in subclasses to provide attributes.
+	 * 
+	 * @param descriptor
+	 *            the descriptor for which to return the attribute.
+	 * @return the attribute value.
+	 */
+	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
 		return null;
 	}
 
@@ -170,8 +180,16 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	 * Sends a message to this unit.
 	 */
 	@Override
-	public <R> Future<RoboResult<T, R>> sendMessage(T message) {
-		return reference.sendMessage(message);
+	public void sendMessage(T message) {
+		reference.sendMessage(message);
+	}
+
+	/**
+	 * Retrieves the attribute from this unit.
+	 */
+	@Override
+	public <R> Future<R> getAttribute(AttributeDescriptor<R> attribute) {
+		return reference.getAttribute(attribute);
 	}
 
 	/**
@@ -220,4 +238,8 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 		return String.format("%s [id=%s]", getClass().getName(), getId());
 	}
 
+	@Override
+	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
+		return Collections.emptyList();
+	}
 }

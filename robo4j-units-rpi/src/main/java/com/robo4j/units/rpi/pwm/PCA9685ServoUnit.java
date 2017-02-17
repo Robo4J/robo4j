@@ -98,4 +98,13 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 		}
 		return null;
 	}
+	
+	public Float getLastMessage() {
+		try {
+			return servo.getInput();
+		} catch (IOException e) {
+			SimpleLoggingUtil.error(getClass(), "Could not retrieve state.", e);
+		}
+		return Float.NaN;
+	}
 }
