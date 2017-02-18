@@ -40,7 +40,7 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	private AdafruitLcd lcd;
 
 	public AdafruitLcdUnit(RoboContext context, String id) {
-		super(context, id);
+		super(LcdMessage.class, context, id);
 	}
 
 	/**

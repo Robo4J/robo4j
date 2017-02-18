@@ -77,8 +77,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private ServerSocketChannel server;
 	private Selector selector;
 
-	public HttpServerUnit(RoboContext context, String id) {
-		super(context, id);
+	public HttpServerUnit(Class<Object> messageType, RoboContext context, String id) {
+		super(messageType, context, id);
 	}
 
 	@Override

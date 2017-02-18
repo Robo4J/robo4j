@@ -47,7 +47,7 @@ public class RoboHttpDynamicTests {
 		RoboSystem system = new RoboSystem();
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
-		HttpServerUnit httpDynamic = new HttpServerUnit(system, "http");
+		HttpServerUnit httpDynamic = new HttpServerUnit(Object.class, system, "http");
 		config.setString("target", "request_consumer");
 		config.setInteger("port", PORT);
 

@@ -32,6 +32,8 @@ import com.robo4j.core.configuration.Configuration;
  * @author Miroslav Wengner (@miragemiko)
  */
 public abstract class RoboUnit<T> implements RoboReference<T> {
+	// Yay for erasure
+	private final Class<T> messageType;
 	private final RoboContext context;
 	private final String id;
 	private volatile LifecycleState state = LifecycleState.UNINITIALIZED;
@@ -41,7 +43,8 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	/**
 	 * Either provide id up front
 	 */
-	public RoboUnit(RoboContext context, String id) {
+	public RoboUnit(Class<T> messageType, RoboContext context, String id) {
+		this.messageType = messageType;
 		this.context = context;
 		this.id = id;
 		if (context instanceof RoboSystem) {
@@ -194,6 +197,11 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 		return Collections.emptyList();
 	}
 
+	@Override
+	public Class<T> getMessageType() {
+		return messageType;
+	}
+	
 	/**
 	 * Should be overridden in subclasses to define the behaviour of the unit.
 	 * 

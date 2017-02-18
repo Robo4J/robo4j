@@ -46,7 +46,7 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 	private Integer channel;
 
 	public PCA9685ServoUnit(RoboContext context, String id) {
-		super(context, id);
+		super(Float.class, context, id);
 	}
 
 	/**

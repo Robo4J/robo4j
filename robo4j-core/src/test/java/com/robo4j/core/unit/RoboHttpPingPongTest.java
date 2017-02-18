@@ -103,7 +103,7 @@ public class RoboHttpPingPongTest {
 		final RoboSystem result = new RoboSystem();
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
-		HttpServerUnit httpServer = new HttpServerUnit(result, "http_server");
+		HttpServerUnit httpServer = new HttpServerUnit(Object.class, result, "http_server");
 		config.setString("target", "request_consumer");
 		config.setInteger("port", PORT);
 
@@ -128,7 +128,7 @@ public class RoboHttpPingPongTest {
 		final RoboSystem result = new RoboSystem();
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
-		HttpClientUnit httpClient = new HttpClientUnit(result, "http_client");
+		HttpClientUnit httpClient = new HttpClientUnit(Object.class, result, "http_client");
 		config.setString("address", "localhost");
 		config.setInteger("port", PORT);
 		/* specific configuration */

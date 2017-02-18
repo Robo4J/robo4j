@@ -45,7 +45,7 @@ public class ButtonUnit extends I2CRoboUnit<Object> {
 	private ButtonListener buttonListener;
 
 	public ButtonUnit(RoboContext context, String id) {
-		super(context, id);
+		super(Object.class, context, id);
 	}
 
 	@Override

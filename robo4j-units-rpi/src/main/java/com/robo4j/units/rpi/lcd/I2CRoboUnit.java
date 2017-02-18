@@ -40,8 +40,8 @@ public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
 	 * @param context
 	 * @param id
 	 */
-	public I2CRoboUnit(RoboContext context, String id) {
-		super(context, id);
+	public I2CRoboUnit(Class<T> messageType, RoboContext context, String id) {
+		super(messageType, context, id);
 	}
 
 	@Override

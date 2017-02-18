@@ -33,7 +33,7 @@ public class StringProducer extends RoboUnit<String> {
 	 * @param id
 	 */
 	public StringProducer(RoboContext context, String id) {
-		super(context, id);
+		super(String.class, context, id);
 	}
 
 	@Override

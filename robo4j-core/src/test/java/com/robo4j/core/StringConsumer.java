@@ -34,7 +34,7 @@ public class StringConsumer extends RoboUnit<String> {
 	 * @param id
 	 */
 	public StringConsumer(RoboContext context, String id) {
-		super(context, id);
+		super(String.class, context, id);
 	}
 
 	public synchronized List<String> getReceivedMessages() {

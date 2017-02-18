@@ -86,6 +86,11 @@ public class RoboSystem implements RoboContext {
 		public Future<Map<AttributeDescriptor<?>, Object>> getAttributes() {
 			return systemExecutor.submit(() -> unit.onGetAttributes());
 		}
+
+		@Override
+		public Class<T> getMessageType() {
+			return unit.getMessageType();
+		}
 	}
 
 	public RoboSystem() {

@@ -39,6 +39,12 @@ public interface RoboReference<T> {
 	void sendMessage(T message);
 
 	/**
+	 * @return the type of messages this RoboUnit accepts. This should never
+	 *         change in runtime.
+	 */
+	Class<T> getMessageType();
+
+	/**
 	 * @return the configuration.
 	 */
 	Configuration getConfiguration();
