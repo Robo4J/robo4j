@@ -67,12 +67,15 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	private String tilt;
 	private String target;
 	private LidarLiteDevice lidar;
-	private boolean currentScanDirection;
+	private volatile boolean currentScanDirection;
 	private float panServoRange;
 	private float tiltServoRange;
+	private float panAngularSpeed;
+	private float minimumAcquisitionTime;
+	private float angularOffset;
 
 	public LaserScanner(RoboContext context, String id) {
-		super(context, id);
+		super(ScanRequest.class, context, id);
 	}
 
 	@Override
@@ -83,6 +86,18 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		panServoRange = (float) Math.toRadians(configuration.getFloat("panServoRange", 45.0f));
 		tilt = configuration.getString("tilt", "tilt");
 		tiltServoRange = (float) Math.toRadians(configuration.getFloat("tiltServoRange", 45.0f));
+		
+		// Using angular degrees per second. 
+		panAngularSpeed = configuration.getFloat("panAngularSpeed", 90.0f);
+		
+		// Minimum acquisition time, in ms
+		minimumAcquisitionTime = configuration.getFloat("minAquisitionTime", 2.0f);
+		
+		// Angular offset - required since we don't wait for an acquired range before moving the servo. 
+		// If you always move the servo very slowly, this is not required.
+		// FIXME(Marcus/Feb 16, 2017): We will very likely need configuration tables for this - i.e. different 
+		// finely tuned offsets for different angular steps? 
+		angularOffset = configuration.getFloat("angularOffset", 3.0f);
 		
 		target = configuration.getString("target", "scanController");
 		try {
@@ -95,19 +110,32 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	}
 
 	@Override
-	public <R> RoboResult<ScanRequest, R> onMessage(ScanRequest message) {
+	public void onMessage(ScanRequest message) {
 		RoboReference<Long> panServo = getReference(pan);
 		RoboReference<Long> tiltServo = getReference(tilt);
 		RoboReference<ScanResult2D> targetRef = getContext().getReference(target);
 
 		scheduleScan(message, panServo, tiltServo, targetRef);
-
-		return super.onMessage(message);
 	}
 
 	private void scheduleScan(ScanRequest message, RoboReference<Long> panServo, RoboReference<Long> tiltServo,
 			RoboReference<ScanResult2D> targetRef) {
 		final ScanResultImpl result = new ScanResultImpl();
+		
+		float minimumServoMovementTime = message.getRange() / panAngularSpeed;
+		float numberOfScans = message.getRange() / message.getStep();
+		float minimumSampleAquisitionTime = numberOfScans * minimumAcquisitionTime;
+		
+		if (minimumSampleAquisitionTime < minimumServoMovementTime) {
+			// We are constrained by the servo movement speed, simply sample whilst moving
+			// So, start with setting a servo movement from min to max (or max to min, depending on scan direction and current angle), 
+			// and then schedule scans throughout the movement.
+		} else {
+			// We are constrained by the time it takes to acquire the samples. Move the servo with the calculated delays and acquire samples in between
+			
+		}
+		// Note that to be able to scan as quickly as possible, we will actually move the head whilst waiting for the results. This will result in 
+		// a necessary angular offset. This must be compensated for.
 		
 		
 		// getContext().getScheduler().schedule(targetRef, , delay, interval, TimeUnit.MILLISECONDS);
