@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core;
+package com.robo4j.core.unit;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,6 +23,10 @@ import java.util.concurrent.Executors;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.robo4j.core.RoboReference;
+import com.robo4j.core.RoboSystem;
+import com.robo4j.core.StringConsumer;
+import com.robo4j.core.StringProducer;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
@@ -42,7 +46,7 @@ import com.robo4j.core.util.SystemUtil;
  */
 public class RoboHttpPingPongTest {
 
-	private static final int PORT = 8025;
+	private static final int PORT = 8011;
     private static final String TEST_PATH ="tank";
 	private static final int MESSAGES = 3;
 
