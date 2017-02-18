@@ -27,6 +27,7 @@ package com.robo4j.hw.lego;
  * @author Miro Wengner (@miragemiko)
  */
 public class LegoException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
 	public LegoException(String message) {
 		super(message);
