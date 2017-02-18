@@ -61,7 +61,7 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 			new RoboThreadFactory("Robo4J Lego Platform ", true));
 
 	public SimpleTankUnit(RoboContext context, String id) {
-		super(context, id);
+		super(LegoPlatformMessage.class, context, id);
 	}
 
 	/**
@@ -73,8 +73,8 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public RoboResult<LegoPlatformMessage, Boolean> onMessage(LegoPlatformMessage message) {
-		return processPlatformMessage(message);
+	public void onMessage(LegoPlatformMessage message) {
+		processPlatformMessage(message);
 	}
 
 	@Override

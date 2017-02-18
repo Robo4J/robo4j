@@ -19,6 +19,7 @@
 
 package com.robo4j.units.lego;
 
+import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.configuration.Configuration;
@@ -50,4 +51,14 @@ public class SimpleTankUnitMock extends SimpleTankUnit {
         super.shutdown();
         System.out.println("executor is down");
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
+        if (attribute.getAttributeName().equals("getStatus") && attribute.getAttributeType() == Boolean.class) {
+            return (R) Boolean.valueOf(true);
+        }
+        return null;
+    }
+
 }

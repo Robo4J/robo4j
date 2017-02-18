@@ -22,7 +22,6 @@ package com.robo4j.units.lego;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboResult;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.hw.lego.ILcd;
@@ -40,12 +39,12 @@ public class LcdUnit extends RoboUnit<Object> {
 	protected ILcd lcd;
 
 	public LcdUnit(RoboContext context, String id) {
-		super(context, id);
+		super(Object.class, context, id);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public RoboResult<Object, ?> onMessage(Object message) {
+	public void onMessage(Object message) {
 
 		String lcdMessage = message.toString();
 		switch (lcdMessage) {
@@ -56,8 +55,6 @@ public class LcdUnit extends RoboUnit<Object> {
 			lcd.printText(lcdMessage);
 			break;
 		}
-
-		return super.onMessage(message);
 	}
 
 	/**

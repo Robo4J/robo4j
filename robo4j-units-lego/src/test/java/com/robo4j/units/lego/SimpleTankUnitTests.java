@@ -19,6 +19,7 @@
 
 package com.robo4j.units.lego;
 
+import com.robo4j.core.DefaultAttributeDescriptor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -26,6 +27,8 @@ import com.robo4j.core.RoboSystem;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.units.lego.platform.LegoPlatformMessage;
+
+import java.util.concurrent.Future;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -41,11 +44,11 @@ public class SimpleTankUnitTests {
         Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
         tank.onInitialization(config);
-        Assert.assertTrue(tank.onMessage(new LegoPlatformMessage("right")).getResult());
-        Assert.assertTrue(tank.onMessage(new LegoPlatformMessage("left")).getResult());
-        Assert.assertTrue(tank.onMessage(new LegoPlatformMessage("move")).getResult());
-        Assert.assertTrue(tank.onMessage(new LegoPlatformMessage("back")).getResult());
-        Assert.assertFalse(tank.onMessage(new LegoPlatformMessage("stop")).getResult());
+
+        DefaultAttributeDescriptor<Boolean> descriptor = DefaultAttributeDescriptor.create(Boolean.class, "getStatus");
+        tank.onMessage(new LegoPlatformMessage("right"));
+        Assert.assertTrue(tank.getAttribute(descriptor).get());
+
         tank.shutdown();
 
     }

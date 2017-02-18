@@ -72,7 +72,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	private float tiltServoRange;
 
 	public LaserScanner(RoboContext context, String id) {
-		super(context, id);
+		super(ScanRequest.class, context, id);
 	}
 
 	@Override
@@ -95,14 +95,12 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	}
 
 	@Override
-	public <R> RoboResult<ScanRequest, R> onMessage(ScanRequest message) {
+	public void onMessage(ScanRequest message) {
 		RoboReference<Long> panServo = getReference(pan);
 		RoboReference<Long> tiltServo = getReference(tilt);
 		RoboReference<ScanResult2D> targetRef = getContext().getReference(target);
 
 		scheduleScan(message, panServo, tiltServo, targetRef);
-
-		return super.onMessage(message);
 	}
 
 	private void scheduleScan(ScanRequest message, RoboReference<Long> panServo, RoboReference<Long> tiltServo,
