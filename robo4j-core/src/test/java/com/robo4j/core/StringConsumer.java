@@ -18,6 +18,7 @@ package com.robo4j.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.robo4j.core.configuration.Configuration;
 
@@ -27,7 +28,9 @@ import com.robo4j.core.configuration.Configuration;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class StringConsumer extends RoboUnit<String> {
+	private static final int DEFAULT = 0;
 	private final List<String> receivedMessages = new ArrayList<>();
+	private volatile AtomicInteger counter;
 
 	/**
 	 * @param context
@@ -35,6 +38,7 @@ public class StringConsumer extends RoboUnit<String> {
 	 */
 	public StringConsumer(RoboContext context, String id) {
 		super(String.class, context, id);
+		this.counter = new AtomicInteger(DEFAULT);
 	}
 
 	public synchronized List<String> getReceivedMessages() {
@@ -43,8 +47,9 @@ public class StringConsumer extends RoboUnit<String> {
 	
 	@Override
 	public synchronized void onMessage(String message) {
-		System.out.println("StringConsumer: onMessage= " + message);
 		String str = (String) message;
+		int value = counter.incrementAndGet();
+		System.out.println("StringConsumer: onMessage= " + message + " counter: " + value);
 		receivedMessages.add(str);
 	}
 
@@ -60,6 +65,14 @@ public class StringConsumer extends RoboUnit<String> {
 			return (R) new Integer(getReceivedMessages().size());
 		}
 		return null;
+	}
+
+	public int getCounter(){
+		return counter.get();
+	}
+
+	public void resetCounter(){
+		counter.set(DEFAULT);
 	}
 
 }

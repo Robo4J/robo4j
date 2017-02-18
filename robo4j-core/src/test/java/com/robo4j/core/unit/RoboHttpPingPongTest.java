@@ -48,7 +48,7 @@ public class RoboHttpPingPongTest {
 
 	private static final int PORT = 8011;
     private static final String TEST_PATH ="tank";
-	private static final int MESSAGES = 3;
+	private static final int MESSAGES = 100;
 
 
 	private ExecutorService executor = Executors.newFixedThreadPool(2);
@@ -94,7 +94,7 @@ public class RoboHttpPingPongTest {
 		systemPong.stop();
         systemPong.shutdown();
         System.out.println("PingPong is down!");
-		Assert.assertEquals(pongConsumer.getReceivedMessages().size(), MESSAGES);
+		Assert.assertEquals(pongConsumer.getCounter(), MESSAGES);
 
 	}
 
