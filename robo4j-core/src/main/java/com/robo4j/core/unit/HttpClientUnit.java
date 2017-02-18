@@ -48,8 +48,8 @@ public class HttpClientUnit extends RoboUnit<Object> {
 	private boolean available;
     private InetSocketAddress address;
 
-    public HttpClientUnit(Class<Object> messageType, RoboContext context, String id) {
-        super(messageType, context, id);
+    public HttpClientUnit(RoboContext context, String id) {
+        super(Object.class, context, id);
     }
 
     @Override
