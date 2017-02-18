@@ -17,10 +17,14 @@
 package com.robo4j.units.rpi.pwm;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 
+import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.ConfigurationException;
+import com.robo4j.core.DefaultAttributeDescriptor;
 import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboResult;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
@@ -41,6 +45,9 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 	public static String CONFIGURATION_KEY_INVERTED = "inverted";
 	public static String CONFIGURATION_KEY_DUAL_RATE = "dualRate";
 	public static String CONFIGURATION_KEY_EXPO = "expo";
+
+	public static Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections.unmodifiableCollection(
+			Arrays.asList(new AttributeDescriptor<?>[] { DefaultAttributeDescriptor.create(Float.class, "input") }));
 
 	private Servo servo;
 	private Integer channel;
@@ -90,21 +97,30 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 	 * 
 	 * @return the unit specific result from the call.
 	 */
-	public <R> RoboResult<Float, R> onMessage(Float message) {
+	@Override
+	public void onMessage(Float message) {
 		try {
 			servo.setInput(message);
 		} catch (IOException e) {
 			SimpleLoggingUtil.error(getClass(), "Could not set servo input", e);
 		}
-		return null;
 	}
-	
-	public Float getLastMessage() {
-		try {
-			return servo.getInput();
-		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "Could not retrieve state.", e);
+
+	@SuppressWarnings("unchecked")
+	@Override
+	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
+		if (descriptor.getAttributeName().equals("input") && descriptor.getAttributeType() == Float.class) {
+			try {
+				return (R) Float.valueOf(servo.getInput());
+			} catch (IOException e) {
+				SimpleLoggingUtil.error(getClass(), "Failed to read servo input", e);
+			}
 		}
-		return Float.NaN;
+		return super.onGetAttribute(descriptor);
+	}
+
+	@Override
+	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
+		return KNOWN_ATTRIBUTES; 
 	}
 }

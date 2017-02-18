@@ -89,7 +89,8 @@ public class RoboSystem implements RoboContext {
 
 		@Override
 		public Class<T> getMessageType() {
-			return unit.getMessageType();
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 
