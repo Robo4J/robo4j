@@ -29,7 +29,7 @@ import com.robo4j.core.configuration.Configuration;
  */
 public class StringConsumer extends RoboUnit<String> {
 	private static final int DEFAULT = 0;
-	private final List<String> receivedMessages = new ArrayList<>();
+	private volatile List<String> receivedMessages = new ArrayList<>();
 	private volatile AtomicInteger counter;
 
 	/**
