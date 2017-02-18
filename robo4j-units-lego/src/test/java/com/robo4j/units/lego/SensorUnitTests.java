@@ -19,6 +19,8 @@
 
 package com.robo4j.units.lego;
 
+import com.robo4j.core.DefaultAttributeDescriptor;
+import com.robo4j.units.lego.platform.LegoPlatformMessage;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,7 +44,10 @@ public class SensorUnitTests {
         Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
         sonicUnit.onInitialization(config);
-        Assert.assertEquals("magic", sonicUnit.onMessage(new LegoSensorMessage(SensorTypeEnum.SONIC, "magic")).getResult());
+
+        DefaultAttributeDescriptor<Boolean> descriptor = DefaultAttributeDescriptor.create(Boolean.class, "getStatus");
+        sonicUnit.onMessage(new LegoSensorMessage(SensorTypeEnum.SONIC, "magic"));
+        Assert.assertTrue(sonicUnit.getAttribute(descriptor).get());
 
         sonicUnit.shutdown();
 

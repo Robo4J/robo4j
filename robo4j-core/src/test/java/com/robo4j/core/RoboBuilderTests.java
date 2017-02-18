@@ -31,6 +31,7 @@ import com.robo4j.core.client.util.RoboClassLoader;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboBuilderTests {
+	private static final int MESSAGES = 10;
 
 	@Test
 	public void testParsingFile() throws RoboBuilderException, InterruptedException, ExecutionException {
@@ -47,13 +48,13 @@ public class RoboBuilderTests {
 		RoboReference<String> consumer = context.getReference("consumer");		
 		Assert.assertNotNull(consumer);
 		
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < MESSAGES; i++) {
 			producer.sendMessage("sendRandomMessage");
 		}
 		DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class, "getNumberOfSentMessages");
 		Future<Integer> result = consumer.getAttribute(descriptor);
 		context.shutdown();
-		Assert.assertEquals(10, (int) result.get());
+		Assert.assertEquals(MESSAGES, (int) result.get());
 	}
 
 	@Test

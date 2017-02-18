@@ -56,7 +56,7 @@ public class BrickButtonsUnit extends RoboUnit<String> {
 	private Map<PlateButtonEnum, ButtonTypeEnum> buttons;
 
 	public BrickButtonsUnit(RoboContext context, String id) {
-		super(context, id);
+		super(String.class, context, id);
 	}
 
 	/**

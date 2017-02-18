@@ -19,6 +19,7 @@
 
 package com.robo4j.units.lego;
 
+import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboResult;
@@ -46,9 +47,8 @@ public class BasicSonicSensorUnitMock extends BasicSonicUnit {
     }
 
     @Override
-    public RoboResult<LegoSensorMessage, String> onMessage(LegoSensorMessage message) {
+    public void onMessage(LegoSensorMessage message) {
         System.out.println("onMessage : " + message);
-        return new RoboResult<>(this, message.getValue());
     }
 
     @Override
@@ -56,6 +56,16 @@ public class BasicSonicSensorUnitMock extends BasicSonicUnit {
         super.shutdown();
         System.out.println("executor is down");
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
+        if (attribute.getAttributeName().equals("getStatus") && attribute.getAttributeType() == Boolean.class) {
+            return (R) Boolean.valueOf(true);
+        }
+        return null;
+    }
+
 
 
 }

@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboResult;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
@@ -57,12 +56,12 @@ public class BasicSonicUnit extends RoboUnit<LegoSensorMessage> {
 	protected ILegoSensor sensor;
 
 	public BasicSonicUnit(RoboContext context, String id) {
-		super(context, id);
+		super(LegoSensorMessage.class, context, id);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public RoboResult<LegoSensorMessage, String> onMessage(LegoSensorMessage message) {
+	public void onMessage(LegoSensorMessage message) {
 
 		final Future<String> future = executor.submit(() -> sensor.getData());
 		String result;
@@ -73,7 +72,6 @@ public class BasicSonicUnit extends RoboUnit<LegoSensorMessage> {
 			result = "";
 		}
 		getContext().getReference(target).sendMessage(result);
-		return new RoboResult<>(this, result);
 	}
 
 	@Override
