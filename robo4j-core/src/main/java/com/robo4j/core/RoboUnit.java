@@ -18,6 +18,8 @@ package com.robo4j.core;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 import com.robo4j.core.configuration.Configuration;
@@ -59,28 +61,6 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	 */
 	public RoboContext getContext() {
 		return context;
-	}
-
-	/**
-	 * Should be overridden in subclasses to define the behaviour of the unit.
-	 * 
-	 * @param message
-	 *            the message received by this unit.
-	 * 
-	 * @return the unit specific result from the call.
-	 */
-	public void onMessage(T message) {
-	}
-
-	/**
-	 * Should be overridden in subclasses to provide attributes.
-	 * 
-	 * @param descriptor
-	 *            the descriptor for which to return the attribute.
-	 * @return the attribute value.
-	 */
-	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
-		return null;
 	}
 
 	/**
@@ -177,7 +157,9 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	}
 
 	/**
-	 * Sends a message to this unit.
+	 * Sends a message to this unit by posting a message on the message bus.
+	 * 
+	 * @see #onMessage(Object)
 	 */
 	@Override
 	public void sendMessage(T message) {
@@ -185,7 +167,19 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	}
 
 	/**
-	 * Retrieves the attribute from this unit.
+	 * Will post a message to get the attributes on the message queue.
+	 * 
+	 * @see #onGetAttributes()
+	 */
+	@Override
+	public Future<Map<AttributeDescriptor<?>, Object>> getAttributes() {
+		return reference.getAttributes();
+	}
+
+	/**
+	 * Retrieves an attribute from this unit.
+	 * 
+	 * @see #getAttribute(AttributeDescriptor)
 	 */
 	@Override
 	public <R> Future<R> getAttribute(AttributeDescriptor<R> attribute) {
@@ -193,21 +187,26 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	}
 
 	/**
-	 * @return a RoboReference. Internal use only.
+	 * Override in subclasses to expose the attributes known.
 	 */
-	RoboReference<T> internalGetReference() {
-		// NOTE(Marcus/Jan 27, 2017): Can we avoid this?
-		if (reference == null) {
-			return getContext().getReference(getId());
-		} else {
-			return reference;
-		}
+	@Override
+	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
+		return Collections.emptyList();
 	}
 
-	private void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
+	/**
+	 * Should be overridden in subclasses to define the behaviour of the unit.
+	 * 
+	 * @param message
+	 *            the message received by this unit.
+	 * 
+	 * @return the unit specific result from the call.
+	 */
+	public void onMessage(T message) {
+		// Note that this method is public so the scheduler has access. We may
+		// want to consider other means of accessing it to keep it protected.
 	}
-
+	
 	@Override
 	public int hashCode() {
 		return id.hashCode();
@@ -238,8 +237,46 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 		return String.format("%s [id=%s]", getClass().getName(), getId());
 	}
 
-	@Override
-	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
-		return Collections.emptyList();
+	/**
+	 * May be overridden in subclasses for more performance. The default
+	 * implementation will get the job done though.
+	 * 
+	 * @return the map of all the attributes.
+	 */
+	protected Map<AttributeDescriptor<?>, Object> onGetAttributes() {
+		Map<AttributeDescriptor<?>, Object> result = new HashMap<>();
+		Collection<AttributeDescriptor<?>> knownAttributes = getKnownAttributes();
+		for (AttributeDescriptor<?> descriptor : knownAttributes) {
+			result.put(descriptor, getAttribute(descriptor));
+		}
+		return result;
+	}
+
+	/**
+	 * Should be overridden in subclasses to provide attributes.
+	 * 
+	 * @param descriptor
+	 *            the descriptor for which to return the attribute.
+	 * @return the attribute value.
+	 */
+	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
+		return null;
+	}
+
+
+	/**
+	 * @return a RoboReference. Internal use only.
+	 */
+	RoboReference<T> internalGetReference() {
+		// NOTE(Marcus/Jan 27, 2017): Can we avoid this?
+		if (reference == null) {
+			return getContext().getReference(getId());
+		} else {
+			return reference;
+		}
+	}
+
+	private void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
 	}
 }

@@ -81,6 +81,11 @@ public class RoboSystem implements RoboContext {
 		public Collection<AttributeDescriptor<?>> getKnownAttributes() {
 			return unit.getKnownAttributes();
 		}
+
+		@Override
+		public Future<Map<AttributeDescriptor<?>, Object>> getAttributes() {
+			return systemExecutor.submit(() -> unit.onGetAttributes());
+		}
 	}
 
 	public RoboSystem() {

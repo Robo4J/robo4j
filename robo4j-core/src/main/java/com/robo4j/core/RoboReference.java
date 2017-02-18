@@ -17,6 +17,7 @@
 package com.robo4j.core;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 import com.robo4j.core.configuration.Configuration;
@@ -48,8 +49,14 @@ public interface RoboReference<T> {
 	<R> Future<R> getAttribute(AttributeDescriptor<R> attribute);
 
 	/**
-	 * @return the attributes that this RoboUnit knows about. Should not
-	 *         change, and AttributeDescriptiors may be cached.
+	 * @return the attributes that this RoboUnit knows about. Should not change,
+	 *         and AttributeDescriptiors may be cached.
 	 */
 	Collection<AttributeDescriptor<?>> getKnownAttributes();
+
+	/**
+	 * @return the values of all attributes in a go, providing the state of the
+	 *         RoboUnit.
+	 */
+	Future<Map<AttributeDescriptor<?>, Object>> getAttributes();
 }
