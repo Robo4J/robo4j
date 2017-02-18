@@ -46,7 +46,13 @@ public class SimpleTankUnitTests {
         tank.onInitialization(config);
 
         DefaultAttributeDescriptor<Boolean> descriptor = DefaultAttributeDescriptor.create(Boolean.class, "getStatus");
+
         tank.onMessage(new LegoPlatformMessage("right"));
+        tank.onMessage(new LegoPlatformMessage("left"));
+        tank.onMessage(new LegoPlatformMessage("move"));
+        tank.onMessage(new LegoPlatformMessage("back"));
+        tank.onMessage(new LegoPlatformMessage("stop"));
+
         Assert.assertTrue(tank.getAttribute(descriptor).get());
 
         tank.shutdown();
