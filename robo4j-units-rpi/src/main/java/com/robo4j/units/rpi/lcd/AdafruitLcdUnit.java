@@ -17,14 +17,21 @@
 package com.robo4j.units.rpi.lcd;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.atomic.AtomicReference;
 
+import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.ConfigurationException;
+import com.robo4j.core.DefaultAttributeDescriptor;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.LcdFactory;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd.Direction;
 import com.robo4j.units.rpi.I2CEndPoint;
@@ -37,7 +44,15 @@ import com.robo4j.units.rpi.I2CRegistry;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
+	private static final String ATTRIBUTE_NAME_COLOR = "color";
+	private static final String ATTRIBUTE_NAME_TEXT = "text";
+
+	public static Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections.unmodifiableCollection(Arrays
+			.asList(new AttributeDescriptor<?>[] { DefaultAttributeDescriptor.create(String.class, ATTRIBUTE_NAME_TEXT),
+					DefaultAttributeDescriptor.create(Color.class, ATTRIBUTE_NAME_COLOR) }));
+
 	private AdafruitLcd lcd;
+	private AtomicReference<String> stringMessage = new AtomicReference<String>("");
 
 	public AdafruitLcdUnit(RoboContext context, String id) {
 		super(LcdMessage.class, context, id);
@@ -145,7 +160,9 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 				lcd.setBacklight(message.getColor());
 			}
 			if (message.getText() != null) {
-				lcd.setText(message.getText());
+				String text = message.getText();
+				lcd.setText(text);
+				stringMessage.set(text);
 			}
 			break;
 		case STOP:
@@ -155,6 +172,27 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 			SimpleLoggingUtil.error(getClass(), message.getType() + "demo not supported!");
 			break;
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
+		if (ATTRIBUTE_NAME_TEXT.equals(attribute.getAttributeName())) {
+			return (R) stringMessage.get();
+		} else if (ATTRIBUTE_NAME_COLOR.equals(attribute.getAttributeName())) {
+			try {
+				return (R) lcd.getBacklight();
+			} catch (IOException e) {
+				SimpleLoggingUtil.error(getClass(), "Failed to read the color", e);
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
+		// TODO Auto-generated method stub
+		return super.getKnownAttributes();
 	}
 
 }
