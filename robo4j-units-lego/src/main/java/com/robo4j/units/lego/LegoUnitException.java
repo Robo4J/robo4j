@@ -27,7 +27,9 @@ package com.robo4j.units.lego;
  * @since 30.01.2017
  */
 public class LegoUnitException extends RuntimeException{
-    public LegoUnitException(String message) {
+	private static final long serialVersionUID = 1L;
+
+	public LegoUnitException(String message) {
         super(message);
     }
 

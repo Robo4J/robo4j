@@ -59,7 +59,6 @@ public class BasicSonicUnit extends RoboUnit<LegoSensorMessage> {
 		super(LegoSensorMessage.class, context, id);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void onMessage(LegoSensorMessage message) {
 

@@ -71,7 +71,6 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	 *
 	 * @return result
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void onMessage(LegoPlatformMessage message) {
 		processPlatformMessage(message);

@@ -43,7 +43,6 @@ public class LcdUnit extends RoboUnit<Object> {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void onMessage(Object message) {
 
 		String lcdMessage = message.toString();
