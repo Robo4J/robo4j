@@ -26,6 +26,11 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class LcdMessage {
+    public static LcdMessage MESSAGE_CLEAR = new LcdMessage(LcdMessageType.CLEAR, null, null, null);
+    public static LcdMessage MESSAGE_STOP = new LcdMessage(LcdMessageType.STOP, null, null, null);
+    public static LcdMessage MESSAGE_TURN_ON = new LcdMessage(LcdMessageType.DISPLAY_ENABLE, null, null, "true");
+    public static LcdMessage MESSAGE_TURN_OFF = new LcdMessage(LcdMessageType.DISPLAY_ENABLE, null, null, "false");
+	
 	private final RoboReference<?> source;
 	private final Color color;
 	private final String text;
