@@ -85,9 +85,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	public void start() {
 		setState(LifecycleState.STARTING);
 		final RoboReference<String> targetRef = getContext().getReference(target);
-        if (!available) {
-            available = true;
-            executor.execute(() -> server(targetRef));
+		if (!available) {
+			available = true;
+			executor.execute(() -> server(targetRef));
 		} else {
 			System.out.println("HttpDynamicUnit start() -> error: " + targetRef);
 		}
@@ -129,91 +129,93 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
         //@formatter:on
 
-        setState(LifecycleState.INITIALIZED);
-    }
+		setState(LifecycleState.INITIALIZED);
+	}
 
-    @Override
-    public void stop() {
-        setState(LifecycleState.STOPPING);
-        stopServer("stop");
-        setState(LifecycleState.STOPPED);
-    }
+	@Override
+	public void stop() {
+		setState(LifecycleState.STOPPING);
+		stopServer("stop");
+		setState(LifecycleState.STOPPED);
+	}
 
-    @Override
-    public void shutdown() {
-        setState(LifecycleState.SHUTTING_DOWN);
-        executor.shutdownNow();
-        stopServer("shutdown");
-        setState(LifecycleState.SHUTDOWN);
-    }
+	@Override
+	public void shutdown() {
+		setState(LifecycleState.SHUTTING_DOWN);
+		executor.shutdownNow();
+		stopServer("shutdown");
+		setState(LifecycleState.SHUTDOWN);
+	}
 
-    //Private Methods
-    public void stopServer(String method){
-        try {
-            if (server != null && server.isOpen()) {
-                server.close();
-            }
-        } catch (IOException e) {
-            SimpleLoggingUtil.error(getClass(), "method:"+ method + ",server problem: ", e);
-        }
-    }
+	// Private Methods
+	public void stopServer(String method) {
+		try {
+			if (server != null && server.isOpen()) {
+				server.close();
+			}
+		} catch (IOException e) {
+			SimpleLoggingUtil.error(getClass(), "method:" + method + ",server problem: ", e);
+		}
+	}
 
-    /**
-     * Start non-blocking socket server on http protocol
-     *
-     * @param targetRef
-     *            - reference to the target queue
-     */
-    private void server(final RoboReference<String> targetRef) {
-        try {
-            //TODO miro -> implement;
+	/**
+	 * Start non-blocking socket server on http protocol
+	 *
+	 * @param targetRef
+	 *            - reference to the target queue
+	 */
+	private void server(final RoboReference<String> targetRef) {
+		try {
+			// TODO miro -> implement;
 
-            /* selector is multiplexor to SelectableChannel */
-            // Selects a set of keys whose corresponding channels are ready for I/O operations
-            selector = Selector.open();
-            server = ServerSocketChannel.open();
-            server.socket().bind(new InetSocketAddress(port));
-            server.configureBlocking(false);
+			/* selector is multiplexor to SelectableChannel */
+			// Selects a set of keys whose corresponding channels are ready for
+			// I/O operations
+			selector = Selector.open();
+			server = ServerSocketChannel.open();
+			server.socket().bind(new InetSocketAddress(port));
+			server.configureBlocking(false);
 
-            SimpleLoggingUtil.debug(getClass(), "started port: " + port);
+			SimpleLoggingUtil.debug(getClass(), "started port: " + port);
 
-            int selectorOpt = server.validOps();
-            SelectionKey selectorKey = server.register(selector, selectorOpt, null);
-            while (activeStates.contains(getState())) {
-                selector.select();
+			int selectorOpt = server.validOps();
+			server.register(selector, selectorOpt, null);
+			while (activeStates.contains(getState())) {
+				selector.select();
 
-                /* token representing the registration of a SelectableChannel with a Selector */
-                Set<SelectionKey> selectedKeys = selector.selectedKeys();
-                Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
+				/*
+				 * token representing the registration of a SelectableChannel
+				 * with a Selector
+				 */
+				Set<SelectionKey> selectedKeys = selector.selectedKeys();
+				Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
 
-                while(selectedIterator.hasNext()){
-                    SelectionKey selectedKey = selectedIterator.next();
-                    if(selectedKey.isAcceptable()){
-                        SocketChannel requestChannel = server.accept();
-                        requestChannel.configureBlocking(true);
-                        //TODO: miro -> improve multi-channels electionKey.OP_READ, etc. option
-                        Future<String> result = executor
-                                .submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestFactory()));
-                        targetRef.sendMessage(result.get());
-                        requestChannel.close();
+				while (selectedIterator.hasNext()) {
+					SelectionKey selectedKey = selectedIterator.next();
+					if (selectedKey.isAcceptable()) {
+						SocketChannel requestChannel = server.accept();
+						requestChannel.configureBlocking(true);
+						// TODO: miro -> improve multi-channels
+						// electionKey.OP_READ, etc. option
+						Future<String> result = executor
+								.submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestFactory()));
+						targetRef.sendMessage(result.get());
+						requestChannel.close();
 
-                    } else {
-                        System.out.println("something is not right: " + selectedKey);
-                    }
-                    selectedIterator.remove();
-                }
+					} else {
+						System.out.println("something is not right: " + selectedKey);
+					}
+					selectedIterator.remove();
+				}
 
+			}
 
-
-            }
-
-        } catch (InterruptedException | ExecutionException | IOException e) {
-            SimpleLoggingUtil.error(getClass(), "SERVER CLOSED", e);
-        }
-        SimpleLoggingUtil.debug(getClass(), "stopped port: " + port);
-        setState(LifecycleState.STOPPED);
-    }
-
+		} catch (InterruptedException | ExecutionException | IOException e) {
+			SimpleLoggingUtil.error(getClass(), "SERVER CLOSED", e);
+		}
+		SimpleLoggingUtil.debug(getClass(), "stopped port: " + port);
+		setState(LifecycleState.STOPPED);
+	}
 
 	private boolean validatePackages(String packages) {
 		if (packages == null) {
@@ -227,7 +229,5 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		}
 		return true;
 	}
-
-
 
 }
