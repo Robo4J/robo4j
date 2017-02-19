@@ -191,8 +191,7 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 
 	@Override
 	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
-		// TODO Auto-generated method stub
-		return super.getKnownAttributes();
+		return KNOWN_ATTRIBUTES;
 	}
 
 }
