@@ -47,17 +47,17 @@ import com.robo4j.http.util.HttpMessageUtil;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RoboRequestCallable implements Callable<String> {
+public class RoboRequestCallable implements Callable<Object> {
 
     private static final String NEW_LINE = "\n";
     private static final String DEFAULT_RESPONSE = "done";
 
     private final Socket connection;
-    private final DefaultRequestFactory<String> factory;
+    private final DefaultRequestFactory<?> factory;
     private final List<RoboUnit<?>> registeredUnits;
 
 
-    public RoboRequestCallable(Socket connection, DefaultRequestFactory<String> factory, List<RoboUnit<?>> registeredUnits) {
+    public RoboRequestCallable(Socket connection, DefaultRequestFactory<Object> factory, List<RoboUnit<?>> registeredUnits) {
         assert connection != null;
         this.connection = connection;
         this.factory = factory;
@@ -65,7 +65,7 @@ public class RoboRequestCallable implements Callable<String> {
     }
 
     @Override
-    public String call() throws Exception {
+    public Object call() throws Exception {
         try (Writer out = new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
              BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
 

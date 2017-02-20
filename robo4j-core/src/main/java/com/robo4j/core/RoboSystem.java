@@ -89,7 +89,11 @@ public class RoboSystem implements RoboContext {
 
 		@Override
 		public Class<T> getMessageType() {
-			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <R> R getMessageAttribute(AttributeDescriptor<R> descriptor, String name) {
 			return null;
 		}
 	}

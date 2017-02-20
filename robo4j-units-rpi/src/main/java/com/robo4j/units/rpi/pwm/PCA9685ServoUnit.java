@@ -17,7 +17,6 @@
 package com.robo4j.units.rpi.pwm;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -47,7 +46,7 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 	public static String CONFIGURATION_KEY_EXPO = "expo";
 
 	public static Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections.unmodifiableCollection(
-			Arrays.asList(new AttributeDescriptor<?>[] { DefaultAttributeDescriptor.create(Float.class, "input") }));
+			Collections.singleton(DefaultAttributeDescriptor.create(Float.class, "input")));
 
 	private Servo servo;
 	private Integer channel;

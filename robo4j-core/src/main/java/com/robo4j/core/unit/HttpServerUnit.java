@@ -142,7 +142,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	@Override
 	public void start() {
 		setState(LifecycleState.STARTING);
-		final RoboReference<String> targetRef = getContext().getReference(target);
+		final RoboReference<Object> targetRef = getContext().getReference(target);
 		if (!available) {
 			available = true;
 			executor.execute(() -> server(targetRef));
@@ -184,7 +184,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	 * @param targetRef
 	 *            - reference to the target queue
 	 */
-	private void server(final RoboReference<String> targetRef) {
+	private void server(final RoboReference<Object> targetRef) {
 		try {
 			// TODO miro -> implement;
 
@@ -224,7 +224,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 								.collect(Collectors.toList());
 						//@formatter:on
 						System.out.println("HttpServerUnit registeredUnits: " + registeredUnits);
-						Future<String> result = executor
+						Future<Object> result = executor
 								.submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestFactory(),
 										registeredUnits));
 

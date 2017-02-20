@@ -197,6 +197,14 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 		return Collections.emptyList();
 	}
 
+	/**
+	 * getValue of Enum Attribute By Name
+     */
+	@Override
+	public <R> R getMessageAttribute(AttributeDescriptor<R> descriptor, String name) {
+		return null;
+	}
+
 	@Override
 	public Class<T> getMessageType() {
 		return messageType;

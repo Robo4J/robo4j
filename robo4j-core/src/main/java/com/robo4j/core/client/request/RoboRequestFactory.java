@@ -22,10 +22,10 @@ package com.robo4j.core.client.request;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.logging.SimpleLoggingUtil;
@@ -40,7 +40,7 @@ import com.robo4j.http.util.HttpMessageUtil;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RoboRequestFactory implements DefaultRequestFactory<String> {
+public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 
 	private static final int DEFAULT_POSITION_0 = 0;
 
@@ -50,7 +50,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<String> {
 	}
 
 	@Override
-	public String processGet(HttpMessageWrapper<?> wrapper) {
+	public Object processGet(HttpMessageWrapper<?> wrapper) {
 		if (HttpVersion.containsValue(wrapper.message().version())) {
 			final URI uri = wrapper.message().uri();
 			//@formatter:off
@@ -63,37 +63,23 @@ public class RoboRequestFactory implements DefaultRequestFactory<String> {
 			// TODO: support more paths
 			SimpleLoggingUtil.debug(getClass(), "path: " + paths);
 
-			String path = paths.get(DEFAULT_POSITION_0);
-			Set<RoboRequestEntity> availablePathValues = RoboRequestTypeRegistry.getInstance().getPathValues(path);
+//			String path = paths.get(DEFAULT_POSITION_0);
+//			Set<RoboRequestEntity> availablePathValues = RoboRequestTypeRegistry.getInstance().getPathValues(path);
 
 			if (units != null) {
 				RoboUnit<?> desiredUnit = units.get(DEFAULT_POSITION_0);
-				System.out.println(getClass().getSimpleName() + " desiredUnit: " + desiredUnit);
-				System.out.println(getClass().getSimpleName() + " getMessageType: " + desiredUnit.getMessageType());
-				System.out.println(
-						getClass().getSimpleName() + " getMessageType: " + desiredUnit.getMessageType().isEnum());
 
-			} else {
-				System.out.println(getClass().getSimpleName() + " NO DESIRED UNITS");
-			}
+				Map<String, String> tmpQueryParsed = RoboHttpUtils.parseURIQueryToMap(uri.getQuery(),
+						ConstantUtil.HTTP_QUERY_SEP);
 
-			if (availablePathValues != null && !availablePathValues.isEmpty()) {
-				RoboRequestEntity roboRequestEntity = availablePathValues.stream().findFirst().get();
-				if (uri != null && uri.getQuery() != null && !uri.getQuery().isEmpty()) {
-					final Map<String, String> currentRequestValues = RoboHttpUtils.parseURIQueryToMap(uri.getQuery(),
-							ConstantUtil.HTTP_QUERY_SEP);
-					//@formatter:off
+				System.out.println(getClass().getSimpleName() + " getMessageType uri3: " + tmpQueryParsed);
 
+				AttributeDescriptor descriptor = desiredUnit.getKnownAttributes().stream().filter(a -> tmpQueryParsed.containsKey(a.getAttributeName()))
+						.findFirst().orElse(null);
+				System.out.println(getClass().getSimpleName() + " getMessageType uri3 descriptor: " + descriptor);
+				System.out.println(getClass().getSimpleName() + " value " + desiredUnit.getMessageAttribute(descriptor, tmpQueryParsed.get(descriptor.getAttributeName())));
 
-                    return currentRequestValues.entrySet().stream()
-							.filter(e -> roboRequestEntity.getValues().containsValue(e.getValue()))
-                            .map(e -> roboRequestEntity.getValues().entrySet()
-									.stream().filter(v -> v.getValue().equals(e.getValue())).findFirst().get())
-                            .findFirst()
-							.map(Map.Entry::getKey)
-                            .orElse(RoboHttpUtils._EMPTY_STRING);
-                    //@formatter:on
-				}
+				return desiredUnit.getMessageAttribute(descriptor, tmpQueryParsed.get(descriptor.getAttributeName()));
 			}
 
 		} else {

@@ -47,4 +47,12 @@ public class DefaultAttributeDescriptor<T> implements AttributeDescriptor<T>, Se
 	public static<T> DefaultAttributeDescriptor<T> create(Class<T> attributeType, String attributeName) {
 		return new DefaultAttributeDescriptor<>(attributeType, attributeName);
 	}
+
+	@Override
+	public String toString() {
+		return "DefaultAttributeDescriptor{" +
+				"attributeType=" + attributeType +
+				", attributeName='" + attributeName + '\'' +
+				'}';
+	}
 }

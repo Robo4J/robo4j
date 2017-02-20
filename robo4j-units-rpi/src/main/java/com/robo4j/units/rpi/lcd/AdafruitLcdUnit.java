@@ -48,11 +48,11 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	private static final String ATTRIBUTE_NAME_TEXT = "text";
 
 	public static Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections.unmodifiableCollection(Arrays
-			.asList(new AttributeDescriptor<?>[] { DefaultAttributeDescriptor.create(String.class, ATTRIBUTE_NAME_TEXT),
-					DefaultAttributeDescriptor.create(Color.class, ATTRIBUTE_NAME_COLOR) }));
+			.asList(DefaultAttributeDescriptor.create(String.class, ATTRIBUTE_NAME_TEXT),
+					DefaultAttributeDescriptor.create(Color.class, ATTRIBUTE_NAME_COLOR)));
 
 	private AdafruitLcd lcd;
-	private AtomicReference<String> stringMessage = new AtomicReference<String>("");
+	private AtomicReference<String> stringMessage = new AtomicReference<>("");
 
 	public AdafruitLcdUnit(RoboContext context, String id) {
 		super(LcdMessage.class, context, id);

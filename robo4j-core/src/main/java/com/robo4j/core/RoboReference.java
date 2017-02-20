@@ -65,4 +65,12 @@ public interface RoboReference<T> {
 	 *         RoboUnit.
 	 */
 	Future<Map<AttributeDescriptor<?>, Object>> getAttributes();
+
+	/**
+	 * Attribute is used as the unit message which changes the unit state
+     * @return the value of the message
+     */
+	<R> R getMessageAttribute(AttributeDescriptor<R> descriptor, String name);
+
 }
+
