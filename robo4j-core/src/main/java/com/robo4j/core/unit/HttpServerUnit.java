@@ -63,8 +63,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
 	private static final int KEEP_ALIVE_TIME = 10;
 	private static final int _DEFAULT_PORT = 8042;
-	private static final String HTTP_PATH = "path";
-	private static final String HTTP_METHOD = "method";
 	private static final String HTTP_COMMAND = "command";
 	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
 	private static final HttpCodecRegistry CODEC_REGISTRY = new HttpCodecRegistry();
