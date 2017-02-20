@@ -60,26 +60,24 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
                     .collect(Collectors.toList());
             //@formatter:on
 
+			/* currently is supported only */
 			// TODO: support more paths
 			SimpleLoggingUtil.debug(getClass(), "path: " + paths);
-
-//			String path = paths.get(DEFAULT_POSITION_0);
-//			Set<RoboRequestEntity> availablePathValues = RoboRequestTypeRegistry.getInstance().getPathValues(path);
-
 			if (units != null) {
-				RoboUnit<?> desiredUnit = units.get(DEFAULT_POSITION_0);
-
-				Map<String, String> tmpQueryParsed = RoboHttpUtils.parseURIQueryToMap(uri.getQuery(),
+				/* currently is supported only one http unit */
+				final RoboUnit<?> desiredUnit = units.get(DEFAULT_POSITION_0);
+				final Map<String, String> tmpQueryParsed = RoboHttpUtils.parseURIQueryToMap(uri.getQuery(),
 						ConstantUtil.HTTP_QUERY_SEP);
 
-				System.out.println(getClass().getSimpleName() + " getMessageType uri3: " + tmpQueryParsed);
-
-				AttributeDescriptor descriptor = desiredUnit.getKnownAttributes().stream().filter(a -> tmpQueryParsed.containsKey(a.getAttributeName()))
+				// @formatter:
+				final AttributeDescriptor descriptor = desiredUnit.getKnownAttributes().stream()
+						.filter(a -> tmpQueryParsed.containsKey(a.getAttributeName()))
 						.findFirst().orElse(null);
-				System.out.println(getClass().getSimpleName() + " getMessageType uri3 descriptor: " + descriptor);
-				System.out.println(getClass().getSimpleName() + " value " + desiredUnit.getMessageAttribute(descriptor, tmpQueryParsed.get(descriptor.getAttributeName())));
-
-				return desiredUnit.getMessageAttribute(descriptor, tmpQueryParsed.get(descriptor.getAttributeName()));
+				System.out.println(getClass().getSimpleName() + " descriptor: " + descriptor);
+				final Object result = desiredUnit.getMessageAttribute(descriptor,
+						tmpQueryParsed.get(descriptor.getAttributeName()));
+				System.out.println(getClass().getSimpleName() + " result " + result);
+				return result;
 			}
 
 		} else {

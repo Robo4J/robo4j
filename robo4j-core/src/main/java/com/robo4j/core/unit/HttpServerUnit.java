@@ -28,7 +28,6 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -47,9 +46,7 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.request.RoboRequestCallable;
-import com.robo4j.core.client.request.RoboRequestEntity;
 import com.robo4j.core.client.request.RoboRequestFactory;
-import com.robo4j.core.client.request.RoboRequestTypeRegistry;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
@@ -101,24 +98,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			throw ConfigurationException.createMissingConfigNameException("target, method, path, commands...");
 		}
 		//@formatter:off
-
-
-
-        Set<String> keys = commands.getValueNames();
-        String path = commands.getValue(HTTP_PATH, RoboHttpUtils._EMPTY_STRING).toString();
-        keys.remove(HTTP_PATH);
-        String method = commands.getValue(HTTP_METHOD, RoboHttpUtils._EMPTY_STRING).toString();
-        keys.remove(HTTP_METHOD);
-
-        Set<RoboRequestEntity> elements = new HashSet<>();
-        Map<String, String> elementValues = new HashMap<>();
-        for(Iterator<String> it = keys.iterator(); it.hasNext();){
-            String key = it.next();
-            String value = commands.getString(key, RoboHttpUtils._EMPTY_STRING);
-            elementValues.put(key, value);
-        }
-        elements.add(new RoboRequestEntity(method, RoboHttpUtils.HTTP_COMMAND, elementValues));
-        RoboRequestTypeRegistry.getInstance().addPathWithValues(path, elements);
 
 
 		final Configuration targetUnits = configuration.getChildConfiguration("targetUnits");
