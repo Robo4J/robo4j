@@ -21,8 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.robo4j.core.enums.IRoboCommands;
-import com.robo4j.core.enums.IRoboHardwareEnum;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.Button;
 
 /**
  * Adafruit Button Plat possible control buttons
@@ -30,60 +29,57 @@ import com.robo4j.core.enums.IRoboHardwareEnum;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer>, IRoboCommands<AdafruitButtonPlateEnum> {
+public enum AdafruitButtonPlateEnum {
 
     // @formatter:off
-	SELECT 			(0, "S", "select"),
-	LEFT		    (1, "L", "left"),
-	RIGHT		    (2, "R", "right"),
-	UP      		(3, "U", "up"),
-	DOWN    		(4, "D", "down"),
-	;
+	SELECT 			(Button.SELECT, "S", "select"),
+	LEFT		    (Button.LEFT, "L", "left"),
+	RIGHT		    (Button.RIGHT, "R", "right"),
+	UP      		(Button.UP, "U", "up"),
+	DOWN    		(Button.DOWN, "D", "down");
 	// @formatter:on
 
-    private static volatile Map<Integer, AdafruitButtonPlateEnum> defToCommandTargetMapping;
-    private int type;
+    private static volatile Map<Button, AdafruitButtonPlateEnum> buttonToEnum;
+    private Button button;
     private String name;
     private String text;
 
-    AdafruitButtonPlateEnum(int type, String name, String text) {
-        this.type = type;
+    AdafruitButtonPlateEnum(Button button, String name, String text) {
+        this.button = button;
         this.name = name;
         this.text = text;
     }
 
-    private static Map<Integer, AdafruitButtonPlateEnum> initMapping() {
-        return Stream.of(values()).collect(Collectors.toMap(AdafruitButtonPlateEnum::getType, e -> e));
+    private static Map<Button, AdafruitButtonPlateEnum> initMapping() {
+        return Stream.of(values()).collect(Collectors.toMap(AdafruitButtonPlateEnum::getButton, e -> e));
     }
 
 
     //@formatter:off
     public static AdafruitButtonPlateEnum getInternalByName(String def) {
-        if (defToCommandTargetMapping == null)
-            defToCommandTargetMapping = initMapping();
+        if (buttonToEnum == null)
+            buttonToEnum = initMapping();
 
-        return defToCommandTargetMapping.entrySet().stream()
+        return buttonToEnum.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .filter(e -> e.getName().equals(def.toUpperCase()))
                 .findFirst().get();
     }
 
     public static AdafruitButtonPlateEnum getInternalByText(String text) {
-        if (defToCommandTargetMapping == null)
-            defToCommandTargetMapping = initMapping();
-        return defToCommandTargetMapping.entrySet().stream()
+        if (buttonToEnum == null)
+            buttonToEnum = initMapping();
+        return buttonToEnum.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .filter(e -> e.getText().equals(text))
                 .findFirst().get();
     }
     //@formatter:on
 
-    @Override
-    public Integer getType() {
-        return type;
+    public Button getButton() {
+        return button;
     }
 
-    @Override
     public String getName() {
         return name;
     }
@@ -92,7 +88,6 @@ public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer>, IRobo
         return text;
     }
 
-    @Override
     public Set<String> commandNames() {
         //@formatter:off
         return Stream.of(values())
@@ -101,7 +96,6 @@ public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer>, IRobo
         //@formatter:on
     }
 
-	@Override
 	public AdafruitButtonPlateEnum getByName(String name) {
 		return getInternalByName(name);
 	}
@@ -109,7 +103,7 @@ public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer>, IRobo
     @Override
     public String toString() {
         return "AdaruitButtonPlateEnum{" +
-                "type=" + type +
+                "button=" + getButton() +
                 ", name='" + name + '\'' +
                 '}';
     }

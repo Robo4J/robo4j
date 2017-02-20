@@ -24,17 +24,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.robo4j.core.enums.IRoboCommands;
-import com.robo4j.core.enums.IRoboHardwareEnum;
-
 /**
  * LegoMindstorm available buttons
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum LegoPlatformMessageTypeEnum
-		implements IRoboHardwareEnum<Integer>, IRoboCommands<LegoPlatformMessageTypeEnum> {
+public enum LegoPlatformMessageTypeEnum {
 
     //@formatter:off
     STOP        (0, "stop"),
@@ -71,17 +67,14 @@ public enum LegoPlatformMessageTypeEnum
     }
     //@formatter:on
 
-    @Override
     public Integer getType() {
         return type;
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
-	@Override
 	public Set<String> commandNames() {
 		//@formatter:off
         return Stream.of(values())
@@ -90,7 +83,6 @@ public enum LegoPlatformMessageTypeEnum
         //@formatter:on
 	}
 
-	@Override
 	public LegoPlatformMessageTypeEnum getByName(String name) {
 		return getInternalByName(name);
 	}
