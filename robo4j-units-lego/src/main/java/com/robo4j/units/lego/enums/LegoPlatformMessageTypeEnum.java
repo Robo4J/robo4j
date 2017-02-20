@@ -19,13 +19,13 @@
 
 package com.robo4j.units.lego.enums;
 
-import com.robo4j.core.enums.IRoboCommands;
-import com.robo4j.core.enums.IRoboHardwareEnum;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.robo4j.core.enums.IRoboCommands;
+import com.robo4j.core.enums.IRoboHardwareEnum;
 
 /**
  * LegoMindstorm available buttons
@@ -33,7 +33,8 @@ import java.util.stream.Stream;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum LegoPlatformMessageTypeEnum implements IRoboHardwareEnum<Integer>, IRoboCommands {
+public enum LegoPlatformMessageTypeEnum
+		implements IRoboHardwareEnum<Integer>, IRoboCommands<LegoPlatformMessageTypeEnum> {
 
     //@formatter:off
     STOP        (0, "stop"),
@@ -60,12 +61,12 @@ public enum LegoPlatformMessageTypeEnum implements IRoboHardwareEnum<Integer>, I
         return Stream.of(values())
                 .collect(Collectors.toMap(LegoPlatformMessageTypeEnum::getType, e -> e));
     }
-    public static LegoPlatformMessageTypeEnum getByText(String text) {
+    public static LegoPlatformMessageTypeEnum getInternalByName(String name) {
         if (internMapByType == null)
             internMapByType = initMapping();
         return internMapByType.entrySet().stream()
                 .map(Map.Entry::getValue)
-                .filter(e -> e.getName().equals(text))
+                .filter(e -> e.getName().equals(name))
                 .findFirst().get();
     }
     //@formatter:on
@@ -80,6 +81,19 @@ public enum LegoPlatformMessageTypeEnum implements IRoboHardwareEnum<Integer>, I
         return name;
     }
 
+	@Override
+	public Set<String> commandNames() {
+		//@formatter:off
+        return Stream.of(values())
+                .map(LegoPlatformMessageTypeEnum::getName)
+                .collect(Collectors.toSet());
+        //@formatter:on
+	}
+
+	@Override
+	public LegoPlatformMessageTypeEnum getByName(String name) {
+		return getInternalByName(name);
+	}
 
 
     @Override
@@ -90,12 +104,5 @@ public enum LegoPlatformMessageTypeEnum implements IRoboHardwareEnum<Integer>, I
                 '}';
     }
 
-    @Override
-    public Set<String> commandNames() {
-        //@formatter:off
-        return Stream.of(values())
-                .map(LegoPlatformMessageTypeEnum::getName)
-                .collect(Collectors.toSet());
-        //@formatter:on
-    }
+
 }

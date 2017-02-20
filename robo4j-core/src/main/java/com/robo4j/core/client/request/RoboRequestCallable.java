@@ -23,16 +23,22 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
+import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
+import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.http.HttpHeaderNames;
+import com.robo4j.http.HttpMessage;
 import com.robo4j.http.HttpMessageWrapper;
 import com.robo4j.http.HttpMethod;
+import com.robo4j.http.HttpVersion;
 import com.robo4j.http.util.HttpMessageUtil;
 
 /**
@@ -46,22 +52,20 @@ public class RoboRequestCallable implements Callable<String> {
     private static final String NEW_LINE = "\n";
     private static final String DEFAULT_RESPONSE = "done";
 
-	private DefaultRequestFactory<String> factory;
-    private Socket connection;
+    private final Socket connection;
+    private final DefaultRequestFactory<String> factory;
+    private final List<RoboUnit<?>> registeredUnits;
 
 
-	public RoboRequestCallable(Socket connection, DefaultRequestFactory<String> factory) {
+    public RoboRequestCallable(Socket connection, DefaultRequestFactory<String> factory, List<RoboUnit<?>> registeredUnits) {
+        assert connection != null;
         this.connection = connection;
         this.factory = factory;
+        this.registeredUnits = registeredUnits;
     }
 
     @Override
     public String call() throws Exception {
-
-        if(connection == null){
-            SimpleLoggingUtil.error(getClass(), "no connection");
-        }
-
         try (Writer out = new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
              BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
 
@@ -80,15 +84,30 @@ public class RoboRequestCallable implements Callable<String> {
                             array[HttpMessageUtil.URI_VALUE_POSITION]);
                 }
 
+                /* parsed http specifics, header */
+                final HttpMessage httpMessage = new HttpMessage(method, URI.create(tokens[HttpMessageUtil.URI_VALUE_POSITION]),
+                        HttpVersion.getByValue(tokens[HttpMessageUtil.VERSION_POSITION]), params);
+
+                //TODO -> improve response -> here can be printed out basic system
+                final String targetUnitId = httpMessage.uri().getPath().replace("/", "");
+                System.out.println("RoboRequestCallable -> targetUnitId: " +  targetUnitId);
+
+                //@formatter:off
+                final List<RoboUnit<?>> desiredUnits = registeredUnits.stream()
+                        .filter(u -> u.getId().equals(targetUnitId))
+                        .collect(Collectors.toList());
+                factory.setRoboUnits(desiredUnits);
+                //@formatter:on
+                System.out.println("RoboRequestCallable -> desiredUnits: " + desiredUnits);
                 processWriter(out, DEFAULT_RESPONSE);
                 switch (method){
                     case GET:
-                        return factory.processGet(new HttpMessageWrapper(method, tokens, params));
+                        return factory.processGet(new HttpMessageWrapper<>(httpMessage));
                     case POST:
                         int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH).trim());
                         char[] buffer = new char[length];
                         in.read(buffer);
-                        return factory.processPost(new HttpMessageWrapper(method, tokens, params, buffer));
+                        return factory.processPost(new HttpMessageWrapper<>(httpMessage, buffer));
                     default:
                         SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
                         return null;

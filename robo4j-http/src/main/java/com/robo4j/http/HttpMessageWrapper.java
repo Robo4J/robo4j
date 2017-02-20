@@ -17,11 +17,6 @@
 
 package com.robo4j.http;
 
-import java.net.URI;
-import java.util.Map;
-
-import com.robo4j.http.util.HttpMessageUtil;
-
 /**
  * Simple Message Wrapper to the incoming request GET/POST
  *
@@ -30,28 +25,26 @@ import com.robo4j.http.util.HttpMessageUtil;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class HttpMessageWrapper {
+public class HttpMessageWrapper<T> {
 
 	private HttpMessage message;
-	private String body;
+	private T body;
 
-	public HttpMessageWrapper(HttpMethod method, String[] tokens, Map<String, String> params) {
-		this.message = new HttpMessage(method, URI.create(tokens[HttpMessageUtil.URI_VALUE_POSITION]),
-				HttpVersion.getByValue(tokens[HttpMessageUtil.VERSION_POSITION]), params);
+	public HttpMessageWrapper(final HttpMessage message) {
+		this.message = message;
 		this.body = null;
 	}
 
-	public HttpMessageWrapper(HttpMethod method, String[] tokens, Map<String, String> params, char[] body) {
-		this.message = new HttpMessage(method, URI.create(tokens[HttpMessageUtil.URI_VALUE_POSITION]),
-				HttpVersion.getByValue(tokens[HttpMessageUtil.VERSION_POSITION]), params);
-		this.body = String.valueOf(body);
+	public HttpMessageWrapper(final HttpMessage message, T body) {
+		this.message = message;
+		this.body = body;
 	}
 
 	public HttpMessage message() {
 		return message;
 	}
 
-	public String body() {
+	public T body() {
 		return body;
 	}
 

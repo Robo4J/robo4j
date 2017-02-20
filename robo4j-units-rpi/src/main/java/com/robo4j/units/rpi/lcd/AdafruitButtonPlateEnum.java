@@ -30,7 +30,7 @@ import com.robo4j.core.enums.IRoboHardwareEnum;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer>, IRoboCommands {
+public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer>, IRoboCommands<AdafruitButtonPlateEnum> {
 
     // @formatter:off
 	SELECT 			(0, "S", "select"),
@@ -56,8 +56,9 @@ public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer>, IRobo
         return Stream.of(values()).collect(Collectors.toMap(AdafruitButtonPlateEnum::getType, e -> e));
     }
 
+
     //@formatter:off
-    public static AdafruitButtonPlateEnum getByName(String def) {
+    public static AdafruitButtonPlateEnum getInternalByName(String def) {
         if (defToCommandTargetMapping == null)
             defToCommandTargetMapping = initMapping();
 
@@ -67,7 +68,7 @@ public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer>, IRobo
                 .findFirst().get();
     }
 
-    public static AdafruitButtonPlateEnum getByText(String text) {
+    public static AdafruitButtonPlateEnum getInternalByText(String text) {
         if (defToCommandTargetMapping == null)
             defToCommandTargetMapping = initMapping();
         return defToCommandTargetMapping.entrySet().stream()
@@ -99,6 +100,11 @@ public enum AdafruitButtonPlateEnum implements IRoboHardwareEnum<Integer>, IRobo
                 .collect(Collectors.toSet());
         //@formatter:on
     }
+
+	@Override
+	public AdafruitButtonPlateEnum getByName(String name) {
+		return getInternalByName(name);
+	}
 
     @Override
     public String toString() {

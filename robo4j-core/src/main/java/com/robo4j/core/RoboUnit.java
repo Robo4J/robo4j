@@ -201,7 +201,7 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	public Class<T> getMessageType() {
 		return messageType;
 	}
-	
+
 	/**
 	 * Should be overridden in subclasses to define the behaviour of the unit.
 	 * 
@@ -214,7 +214,50 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 		// Note that this method is public so the scheduler has access. We may
 		// want to consider other means of accessing it to keep it protected.
 	}
-	
+
+	/**
+	 * May be overridden in subclasses for more performance. The default
+	 * implementation will get the job done though.
+	 *
+	 * @return the map of all the attributes.
+	 */
+	protected Map<AttributeDescriptor<?>, Object> onGetAttributes() {
+		Map<AttributeDescriptor<?>, Object> result = new HashMap<>();
+		Collection<AttributeDescriptor<?>> knownAttributes = getKnownAttributes();
+		for (AttributeDescriptor<?> descriptor : knownAttributes) {
+			result.put(descriptor, getAttribute(descriptor));
+		}
+		return result;
+	}
+
+	/**
+	 * Should be overridden in subclasses to provide attributes.
+	 *
+	 * @param descriptor
+	 *            the descriptor for which to return the attribute.
+	 * @return the attribute value.
+	 */
+	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
+		return null;
+	}
+
+
+	/**
+	 * @return a RoboReference. Internal use only.
+	 */
+	RoboReference<T> internalGetReference() {
+		// NOTE(Marcus/Jan 27, 2017): Can we avoid this?
+		if (reference == null) {
+			return getContext().getReference(getId());
+		} else {
+			return reference;
+		}
+	}
+
+	private void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
+	}
+
 	@Override
 	public int hashCode() {
 		return id.hashCode();
@@ -245,46 +288,4 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 		return String.format("%s [id=%s]", getClass().getName(), getId());
 	}
 
-	/**
-	 * May be overridden in subclasses for more performance. The default
-	 * implementation will get the job done though.
-	 * 
-	 * @return the map of all the attributes.
-	 */
-	protected Map<AttributeDescriptor<?>, Object> onGetAttributes() {
-		Map<AttributeDescriptor<?>, Object> result = new HashMap<>();
-		Collection<AttributeDescriptor<?>> knownAttributes = getKnownAttributes();
-		for (AttributeDescriptor<?> descriptor : knownAttributes) {
-			result.put(descriptor, getAttribute(descriptor));
-		}
-		return result;
-	}
-
-	/**
-	 * Should be overridden in subclasses to provide attributes.
-	 * 
-	 * @param descriptor
-	 *            the descriptor for which to return the attribute.
-	 * @return the attribute value.
-	 */
-	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
-		return null;
-	}
-
-
-	/**
-	 * @return a RoboReference. Internal use only.
-	 */
-	RoboReference<T> internalGetReference() {
-		// NOTE(Marcus/Jan 27, 2017): Can we avoid this?
-		if (reference == null) {
-			return getContext().getReference(getId());
-		} else {
-			return reference;
-		}
-	}
-
-	private void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
-	}
 }

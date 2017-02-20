@@ -59,7 +59,14 @@ public class RoboHttpDynamicTests {
 		commands.setString("down", "back");
 		commands.setString("left", "right");
 		commands.setString("right", "left");
+
+		/* put target units */
+		Configuration targetUnits = config.createChildConfiguration("targetUnits");
+		targetUnits.setString("request_consumer", "GET");
+
+
 		httpDynamic.initialize(config);
+
 
 		StringConsumer consumer = new StringConsumer(system, "request_consumer");
 
@@ -81,7 +88,7 @@ public class RoboHttpDynamicTests {
 		System.out.println("Usage:\n\tRequest GET: http://<IP_ADDRESS>:" + PORT + "/tank?command=move");
 		System.out.println("\tRequest command types: right,left,move,back,enter\n");
 
-//		System.in.read();
+		System.in.read();
 
 		System.out.println("Going Down!");
 		system.stop();

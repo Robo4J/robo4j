@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
@@ -43,11 +44,13 @@ public class RoboRequestFactory implements DefaultRequestFactory<String> {
 
 	private static final int DEFAULT_POSITION_0 = 0;
 
+	private List<RoboUnit<?>> units = null;
+
 	public RoboRequestFactory() {
 	}
 
 	@Override
-	public String processGet(HttpMessageWrapper wrapper) {
+	public String processGet(HttpMessageWrapper<?> wrapper) {
 		if (HttpVersion.containsValue(wrapper.message().version())) {
 			final URI uri = wrapper.message().uri();
 			//@formatter:off
@@ -59,8 +62,20 @@ public class RoboRequestFactory implements DefaultRequestFactory<String> {
 
 			// TODO: support more paths
 			SimpleLoggingUtil.debug(getClass(), "path: " + paths);
+
 			String path = paths.get(DEFAULT_POSITION_0);
 			Set<RoboRequestEntity> availablePathValues = RoboRequestTypeRegistry.getInstance().getPathValues(path);
+
+			if (units != null) {
+				RoboUnit<?> desiredUnit = units.get(DEFAULT_POSITION_0);
+				System.out.println(getClass().getSimpleName() + " desiredUnit: " + desiredUnit);
+				System.out.println(getClass().getSimpleName() + " getMessageType: " + desiredUnit.getMessageType());
+				System.out.println(
+						getClass().getSimpleName() + " getMessageType: " + desiredUnit.getMessageType().isEnum());
+
+			} else {
+				System.out.println(getClass().getSimpleName() + " NO DESIRED UNITS");
+			}
 
 			if (availablePathValues != null && !availablePathValues.isEmpty()) {
 				RoboRequestEntity roboRequestEntity = availablePathValues.stream().findFirst().get();
@@ -68,6 +83,8 @@ public class RoboRequestFactory implements DefaultRequestFactory<String> {
 					final Map<String, String> currentRequestValues = RoboHttpUtils.parseURIQueryToMap(uri.getQuery(),
 							ConstantUtil.HTTP_QUERY_SEP);
 					//@formatter:off
+
+
                     return currentRequestValues.entrySet().stream()
 							.filter(e -> roboRequestEntity.getValues().containsValue(e.getValue()))
                             .map(e -> roboRequestEntity.getValues().entrySet()
@@ -87,10 +104,20 @@ public class RoboRequestFactory implements DefaultRequestFactory<String> {
 	}
 
 	@Override
-	public String processPost(HttpMessageWrapper wrapper) {
+	public String processPost(HttpMessageWrapper<?> wrapper) {
 		System.out.println("processPost NOT IMPLEMENTED");
 		System.out.println("processPost message: " + wrapper.message());
 		System.out.println("processPost body: " + wrapper.body());
 		return null;
+	}
+
+	@Override
+	public void setRoboUnits(List<RoboUnit<?>> units) {
+		this.units = units;
+	}
+
+	@Override
+	public List<RoboUnit<?>> getRoboUnits() {
+		return units;
 	}
 }

@@ -25,10 +25,12 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -37,6 +39,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
@@ -44,8 +47,8 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.request.RoboRequestCallable;
-import com.robo4j.core.client.request.RoboRequestFactory;
 import com.robo4j.core.client.request.RoboRequestEntity;
+import com.robo4j.core.client.request.RoboRequestFactory;
 import com.robo4j.core.client.request.RoboRequestTypeRegistry;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.concurrency.RoboThreadFactory;
@@ -76,22 +79,10 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private String target;
 	private ServerSocketChannel server;
 	private Selector selector;
+	private final List<String> registeredUnitIds = new ArrayList<>();
 
 	public HttpServerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
-	}
-
-	@Override
-	public void start() {
-		setState(LifecycleState.STARTING);
-		final RoboReference<String> targetRef = getContext().getReference(target);
-		if (!available) {
-			available = true;
-			executor.execute(() -> server(targetRef));
-		} else {
-			System.out.println("HttpDynamicUnit start() -> error: " + targetRef);
-		}
-		setState(LifecycleState.STARTED);
 	}
 
 	@Override
@@ -111,6 +102,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		}
 		//@formatter:off
 
+
+
         Set<String> keys = commands.getValueNames();
         String path = commands.getValue(HTTP_PATH, RoboHttpUtils._EMPTY_STRING).toString();
         keys.remove(HTTP_PATH);
@@ -127,9 +120,36 @@ public class HttpServerUnit extends RoboUnit<Object> {
         elements.add(new RoboRequestEntity(method, RoboHttpUtils.HTTP_COMMAND, elementValues));
         RoboRequestTypeRegistry.getInstance().addPathWithValues(path, elements);
 
-        //@formatter:on
 
+		final Configuration targetUnits = configuration.getChildConfiguration("targetUnits");
+		final Map<String, String> targetUnitValues = new HashMap<>();
+		if(targetUnits == null){
+			SimpleLoggingUtil.error(getClass(), "no targetUnits");
+		} else {
+			Set<String> targetUnitNames = targetUnits.getValueNames();
+			for(Iterator<String> it = targetUnitNames.iterator(); it.hasNext();){
+				String key = it.next();
+				String value = targetUnits.getString(key, RoboHttpUtils._EMPTY_STRING);
+				targetUnitValues.put(key, value);
+				registeredUnitIds.add(key);
+			}
+		}
+
+        //@formatter:on
 		setState(LifecycleState.INITIALIZED);
+	}
+
+	@Override
+	public void start() {
+		setState(LifecycleState.STARTING);
+		final RoboReference<String> targetRef = getContext().getReference(target);
+		if (!available) {
+			available = true;
+			executor.execute(() -> server(targetRef));
+		} else {
+			System.out.println("HttpDynamicUnit start() -> error: " + targetRef);
+		}
+		setState(LifecycleState.STARTED);
 	}
 
 	@Override
@@ -197,8 +217,17 @@ public class HttpServerUnit extends RoboUnit<Object> {
 						requestChannel.configureBlocking(true);
 						// TODO: miro -> improve multi-channels
 						// electionKey.OP_READ, etc. option
+
+						//@formatter:off
+						final List<RoboUnit<?>> registeredUnits = getContext().getUnits().stream()
+								.filter(u -> registeredUnitIds.contains(u.getId()))
+								.collect(Collectors.toList());
+						//@formatter:on
+						System.out.println("HttpServerUnit registeredUnits: " + registeredUnits);
 						Future<String> result = executor
-								.submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestFactory()));
+								.submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestFactory(),
+										registeredUnits));
+
 						targetRef.sendMessage(result.get());
 						requestChannel.close();
 
