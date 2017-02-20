@@ -14,39 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.unit;
+package com.robo4j.core.httpunit;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * Test class implementing both an encoder and decoder.
+ * Marker annotation marking the class as of interest for the HttpUnit.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-@HttpProducer
-public class TestStringCodec implements HttpDecoder<String>, HttpEncoder<String> {
-	@Override
-	public String decode(String json) {
-		String withoutStart = json.replace("data:", "");
-		String withoutBrackets = withoutStart.replaceAll("[\\[\\]\\{\\}]", "");
-		return withoutBrackets;
-	}
+@Retention(RetentionPolicy.RUNTIME)
+public @interface HttpProducer {
 
-	@Override
-	public Class<String> getDecodedClass() {
-		return String.class;
-	}
-
-	@Override
-	public String encode(String data) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("{data:");
-		builder.append(data);
-		builder.append("}");
-		return builder.toString();
-	}
-
-	@Override
-	public Class<String> getEncodedClass() {
-		return String.class;
-	}
 }

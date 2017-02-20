@@ -14,15 +14,34 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.unit;
+package com.robo4j.core.httpunit;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import com.robo4j.core.httpunit.HttpEncoder;
+import com.robo4j.core.httpunit.HttpProducer;
 
 /**
- * Encoder for encoding a target type to a message String.
+ * Simple encoder that encodes an array of string to Json.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface HttpEncoder<T> {
-	String encode(T stuff);
-	Class<T> getEncodedClass();
+@HttpProducer
+public class TestArrayEncoder implements HttpEncoder<String[]> {
+
+	@Override
+	public String encode(String[] stuff) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("{array:[");
+		builder.append(Stream.of(stuff).collect(Collectors.joining(",")));
+		builder.append("]}");
+		return builder.toString();
+	}
+
+	@Override
+	public Class<String[]> getEncodedClass() {
+		return String[].class;
+	}
 }

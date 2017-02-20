@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core.unit;
+package com.robo4j.core.httpunit;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

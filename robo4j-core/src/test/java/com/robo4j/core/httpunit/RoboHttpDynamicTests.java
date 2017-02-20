@@ -17,7 +17,7 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core.unit;
+package com.robo4j.core.httpunit;
 
 import java.io.IOException;
 
@@ -30,6 +30,7 @@ import com.robo4j.core.RoboSystem;
 import com.robo4j.core.StringConsumer;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
+import com.robo4j.core.httpunit.HttpServerUnit;
 import com.robo4j.core.util.SystemUtil;
 
 /**

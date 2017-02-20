@@ -14,31 +14,43 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.unit;
+package com.robo4j.core.httpunit;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.robo4j.core.httpunit.HttpDecoder;
+import com.robo4j.core.httpunit.HttpEncoder;
+import com.robo4j.core.httpunit.HttpProducer;
 
 /**
- * Simple encoder that encodes an array of string to Json.
+ * Test class implementing both an encoder and decoder.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 @HttpProducer
-public class TestArrayEncoder implements HttpEncoder<String[]> {
+public class TestStringCodec implements HttpDecoder<String>, HttpEncoder<String> {
+	@Override
+	public String decode(String json) {
+		String withoutStart = json.replace("data:", "");
+		String withoutBrackets = withoutStart.replaceAll("[\\[\\]\\{\\}]", "");
+		return withoutBrackets;
+	}
 
 	@Override
-	public String encode(String[] stuff) {
+	public Class<String> getDecodedClass() {
+		return String.class;
+	}
+
+	@Override
+	public String encode(String data) {
 		StringBuilder builder = new StringBuilder();
-		builder.append("{array:[");
-		builder.append(Stream.of(stuff).collect(Collectors.joining(",")));
-		builder.append("]}");
+		builder.append("{data:");
+		builder.append(data);
+		builder.append("}");
 		return builder.toString();
 	}
 
 	@Override
-	public Class<String[]> getEncodedClass() {
-		return String[].class;
+	public Class<String> getEncodedClass() {
+		return String.class;
 	}
 }

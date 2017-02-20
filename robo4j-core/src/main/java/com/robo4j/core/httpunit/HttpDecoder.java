@@ -14,18 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.unit;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+package com.robo4j.core.httpunit;
 
 /**
- * Marker annotation marking the class as of interest for the HttpUnit.
+ * Decoder for translating from a message string to a specific target type.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-@Retention(RetentionPolicy.RUNTIME)
-public @interface HttpProducer {
-
+public interface HttpDecoder<T> {
+	T decode(String json);
+	Class<T> getDecodedClass();
 }

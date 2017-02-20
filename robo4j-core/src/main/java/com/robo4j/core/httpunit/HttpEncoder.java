@@ -14,25 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.unit;
+package com.robo4j.core.httpunit;
 
 /**
- * Simple decoder that decodes json to an array of string.
+ * Encoder for encoding a target type to a message String.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-@HttpProducer
-public class TestArrayDecoder implements HttpDecoder<String[]> {
-	@Override
-	public String[] decode(String json) {
-		String withoutStart = json.replace("array:", "");
-		String withoutBrackets = withoutStart.replaceAll("[\\[\\]\\{\\}]", "");
-		return withoutBrackets.split(",");
-	}
-
-	@Override
-	public Class<String[]> getDecodedClass() {
-		return String[].class;
-	}
+public interface HttpEncoder<T> {
+	String encode(T stuff);
+	Class<T> getEncodedClass();
 }
