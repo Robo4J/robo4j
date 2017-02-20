@@ -30,8 +30,6 @@ import com.robo4j.core.StringProducer;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
-import com.robo4j.core.unit.HttpClientUnit;
-import com.robo4j.core.unit.HttpServerUnit;
 import com.robo4j.core.util.SystemUtil;
 
 /**
@@ -53,6 +51,7 @@ public class RoboHttpPingPongTest {
 
 	private ExecutorService executor = Executors.newFixedThreadPool(2);
 
+	// TODO FIXME : improvet test
 	@Test
 	public void pingPongTest() throws Exception {
 
@@ -76,7 +75,7 @@ public class RoboHttpPingPongTest {
 			System.out.println("systemPing: send messages");
 			RoboReference<Object> systemPingProducer = systemPing.getReference("http_producer");
 			for (int i = 0; i < MESSAGES; i++) {
-				systemPingProducer.sendMessage("sendGetMessage::".concat(TEST_PATH).concat("?").concat("command=move"));
+				systemPingProducer.sendMessage("sendGetMessage::".concat(TEST_PATH).concat("?").concat("something"));
 			}
 		});
 
@@ -108,13 +107,9 @@ public class RoboHttpPingPongTest {
 		config.setInteger("port", PORT);
 
 		/* specific configuration */
-		Configuration commands = config.createChildConfiguration(RoboHttpUtils.HTTP_COMMANDS);
-		commands.setString("path", TEST_PATH);
-		commands.setString("method", "GET");
-		commands.setString("up", "move");
-		commands.setString("down", "back");
-		commands.setString("left", "right");
-		commands.setString("right", "left");
+		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
+		targetUnits.setString("controller", "GET");
+
 		httpServer.initialize(config);
 
 		StringConsumer consumer = new StringConsumer(result, "request_consumer");
@@ -132,13 +127,10 @@ public class RoboHttpPingPongTest {
 		config.setString("address", "localhost");
 		config.setInteger("port", PORT);
 		/* specific configuration */
-		Configuration commands = config.createChildConfiguration(RoboHttpUtils.HTTP_COMMANDS);
-		commands.setString("path", "tank");
-		commands.setString("method", "GET");
-		commands.setString("up", "move");
-		commands.setString("down", "back");
-		commands.setString("left", "right");
-		commands.setString("right", "left");
+
+		// TODO FIXIME: implement controller
+		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
+		targetUnits.setString("controller", "GET");
 
 		httpClient.initialize(config);
 

@@ -64,7 +64,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 			/* currently is supported only */
 			// TODO: support more paths
 			SimpleLoggingUtil.debug(getClass(), "path: " + paths);
-			if (units != null && units.get(DEFAULT_POSITION_0) != null) {
+			if (units != null && !units.isEmpty() && units.get(DEFAULT_POSITION_0) != null) {
 				/* currently is supported only one http unit */
 				final RoboUnit<?> desiredUnit = units.get(DEFAULT_POSITION_0);
 				final Map<String, String> tmpQueryParsed = RoboHttpUtils.parseURIQueryToMap(uri.getQuery(),

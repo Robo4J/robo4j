@@ -48,6 +48,7 @@ public final class RoboHttpUtils {
 	public static final String METHOD_POST = "POST";
 	public static final String _EMPTY_STRING = "";
 	public static final String COLON = ":";
+	public static final String HTTP_TARGET_UNITS = "targetUnits";
 	public static final String HTTP_COMMANDS = "commands";
 	public static final String HTTP_COMMAND = "command";
 	public static final String HTTP_HEADER_NOT = "HTTP/1.1 501 Not Implemented";
