@@ -25,13 +25,6 @@
         <config name="com.robo4j.core.root">
             <value name="port" type="int">8025</value>
             <value name="target" type="String">request_consumer</value>
-            <commands path="test" method="GET">
-                <command name="up" type="String">move</command>
-                <command name="down" type="String">back</command>
-                <command name="left" type="String">right</command>
-                <command name="right" type="String">left</command>
-                <command name="enter" type="String">select</command>
-            </commands>
         </config>
     </roboUnit>
     <roboUnit id="request_consumer">

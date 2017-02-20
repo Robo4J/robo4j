@@ -42,6 +42,7 @@ import com.robo4j.http.util.HttpMessageUtil;
  */
 public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 
+	private static final int SEPARATOR_PATH = 12;
 	private static final int DEFAULT_POSITION_0 = 0;
 
 	private List<RoboUnit<?>> units = null;
@@ -55,7 +56,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 			final URI uri = wrapper.message().uri();
 			//@formatter:off
             final List<String> paths = Stream.of(wrapper.message().uri().getPath()
-                        .split(HttpMessageUtil.getHttpSeparator(12)))
+                        .split(HttpMessageUtil.getHttpSeparator(SEPARATOR_PATH)))
                     .filter(e -> !e.isEmpty())
                     .collect(Collectors.toList());
             //@formatter:on
@@ -63,21 +64,19 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 			/* currently is supported only */
 			// TODO: support more paths
 			SimpleLoggingUtil.debug(getClass(), "path: " + paths);
-			if (units != null) {
+			if (units != null && units.get(DEFAULT_POSITION_0) != null) {
 				/* currently is supported only one http unit */
 				final RoboUnit<?> desiredUnit = units.get(DEFAULT_POSITION_0);
 				final Map<String, String> tmpQueryParsed = RoboHttpUtils.parseURIQueryToMap(uri.getQuery(),
 						ConstantUtil.HTTP_QUERY_SEP);
-
-				// @formatter:
-				final AttributeDescriptor descriptor = desiredUnit.getKnownAttributes().stream()
+				// @formatter:off
+				final AttributeDescriptor<?> descriptor = desiredUnit.getKnownAttributes().stream()
 						.filter(a -> tmpQueryParsed.containsKey(a.getAttributeName()))
 						.findFirst().orElse(null);
-				System.out.println(getClass().getSimpleName() + " descriptor: " + descriptor);
-				final Object result = desiredUnit.getMessageAttribute(descriptor,
+				//TODO: make validation
+				return desiredUnit.getMessageAttribute(descriptor,
 						tmpQueryParsed.get(descriptor.getAttributeName()));
-				System.out.println(getClass().getSimpleName() + " result " + result);
-				return result;
+				// @formatter:on
 			}
 
 		} else {

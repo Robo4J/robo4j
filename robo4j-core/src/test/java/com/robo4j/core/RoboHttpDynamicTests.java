@@ -50,22 +50,8 @@ public class RoboHttpDynamicTests {
 		HttpServerUnit httpDynamic = new HttpServerUnit(system, "http");
 		config.setString("target", "request_consumer");
 		config.setInteger("port", PORT);
-
-		/* specific configuration */
-		Configuration commands = config.createChildConfiguration(RoboHttpUtils.HTTP_COMMANDS);
-		commands.setString("path", "tank");
-		commands.setString("method", "GET");
-		commands.setString("up", "move");
-		commands.setString("down", "back");
-		commands.setString("left", "right");
-		commands.setString("right", "left");
-
-		/* put target units */
-		Configuration targetUnits = config.createChildConfiguration("targetUnits");
-		targetUnits.setString("request_consumer", "GET");
-
-
 		httpDynamic.initialize(config);
+		//TODO FIXME: implement some logic how to
 
 
 		StringConsumer consumer = new StringConsumer(system, "request_consumer");
@@ -105,15 +91,7 @@ public class RoboHttpDynamicTests {
 		RoboBuilder builder = new RoboBuilder().add(RoboClassLoader.getInstance().getResource("http_get.xml"));
 		RoboContext ctx = builder.build();
 
-		Configuration confCommands = ctx.getReference("http").getConfiguration()
-				.getChildConfiguration(RoboHttpUtils.HTTP_COMMANDS);
-		Assert.assertNotNull(confCommands.getValueNames());
-		Assert.assertEquals(confCommands.getValueNames().size(), 5);
-		Assert.assertEquals(confCommands.getString("up", null), "move");
-		Assert.assertEquals(confCommands.getString("down", null), "back");
-		Assert.assertEquals(confCommands.getString("right", null), "left");
-		Assert.assertEquals(confCommands.getString("left", null), "right");
-
+		//TODO FIXME: create tests
 
 	}
 

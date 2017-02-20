@@ -22,6 +22,7 @@ import java.io.InputStream;
  *
  * Singleton instance of classLoader
  *
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class RoboClassLoader {
