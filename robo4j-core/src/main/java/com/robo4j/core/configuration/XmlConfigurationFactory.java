@@ -75,7 +75,13 @@ public class XmlConfigurationFactory {
 					configStack.push(currentConfig);
 					currentConfig = currentConfig.createChildConfiguration(value);
 				}
+			} else if (qName.equals(RoboHttpUtils.HTTP_TARGET_UNITS)){
+				configStack.push(currentConfig);
+				currentConfig = currentConfig.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
 			}  else if (qName.equals(ELEMENT_VALUE)) {
+				currentName = attributes.getValue(ATTRIBUTE_NAME);
+				currentType = attributes.getValue(ATTRIBUTE_TYPE);
+			} else if (qName.equals(RoboHttpUtils.HTTP_TARGET_UNIT)){
 				currentName = attributes.getValue(ATTRIBUTE_NAME);
 				currentType = attributes.getValue(ATTRIBUTE_TYPE);
 			}
@@ -89,9 +95,18 @@ public class XmlConfigurationFactory {
 				writeValue(currentConfig, currentValue.trim(), currentType, currentName);
 				currentValue = "";
 				break;
+			case RoboHttpUtils.HTTP_TARGET_UNIT:
+				writeValue(currentConfig, currentValue.trim(), currentType, currentName);
+				currentValue = "";
+				break;
 			case ELEMENT_CONFIG:
 				if (!configStack.isEmpty()) { // Closing of the last config...
 					currentConfig = configStack.pop();					
+				}
+				break;
+			case RoboHttpUtils.HTTP_TARGET_UNITS:
+				if (!configStack.isEmpty()) { // Closing of the last commands...
+					currentConfig = configStack.pop();
 				}
 				break;
 			}
@@ -129,6 +144,7 @@ public class XmlConfigurationFactory {
 			// for a single text() node.
 			switch (lastElement) {
 			case ELEMENT_VALUE:
+			case RoboHttpUtils.HTTP_TARGET_UNIT:
 				currentValue += String.valueOf(ch, start, length);
 				break;
 			default:
