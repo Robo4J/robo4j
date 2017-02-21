@@ -55,8 +55,8 @@ public class RoboBuilderTests {
 		DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor
 				.create(Integer.class, "getNumberOfSentMessages");
 		Future<Integer> result = consumer.getAttribute(descriptor);
-		context.shutdown();
 		Assert.assertEquals(MESSAGES, (int) result.get());
+		context.shutdown();
 	}
 
 	@Test
