@@ -29,6 +29,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.robo4j.core.client.util.RoboHttpUtils;
+
 /**
  * Factory for creating configurations from XML and vice versa.
  * 

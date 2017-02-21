@@ -19,10 +19,6 @@ package com.robo4j.core.httpunit;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.core.httpunit.HttpCodecRegistry;
-import com.robo4j.core.httpunit.HttpDecoder;
-import com.robo4j.core.httpunit.HttpEncoder;
-
 public class HttpUnitTests {
 	@Test
 	public void testArrayDecoder() {
@@ -41,7 +37,7 @@ public class HttpUnitTests {
 
 	@Test
 	public void testHttpCodecRegistry() {
-		HttpCodecRegistry registry = new HttpCodecRegistry("com.robo4j.core.unit");
+		HttpCodecRegistry registry = new HttpCodecRegistry("com.robo4j.core.httpunit");
 		HttpEncoder<String[]> encoder = registry.getEncoder(String[].class);
 		HttpDecoder<String[]> decoder = registry.getDecoder(String[].class);	
 		Assert.assertNotNull(encoder);
@@ -56,7 +52,7 @@ public class HttpUnitTests {
 	
 	@Test
 	public void testHttpCodecRegistryCodec() {
-		HttpCodecRegistry registry = new HttpCodecRegistry("com.robo4j.core.unit");
+		HttpCodecRegistry registry = new HttpCodecRegistry("com.robo4j.core.httpunit");
 		HttpEncoder<String> encoder = registry.getEncoder(String.class);
 		HttpDecoder<String> decoder = registry.getDecoder(String.class);
 		Assert.assertNotNull(encoder);

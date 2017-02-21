@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpHeaderBuilder {
+    private static final String STRING_EMPTY = "";
     private static final int ELEMENT_JOIN = 0;
     private final Map<String, String> map;
 
@@ -49,6 +50,6 @@ public class HttpHeaderBuilder {
                         .concat(HttpMessageUtil.SPACE)
                         .concat(e.getValue())
                         .concat(HttpMessageUtil.NEXT_LINE))
-                .collect(Collectors.joining(HttpMessageUtil.getHttpSeparator(ELEMENT_JOIN)));
+                .collect(Collectors.joining(STRING_EMPTY));
     }
 }

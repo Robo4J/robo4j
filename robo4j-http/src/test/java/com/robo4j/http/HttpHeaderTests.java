@@ -47,9 +47,9 @@ public class HttpHeaderTests {
 		Assert.assertNotNull(header);
 		Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE).length, 7);
 		Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[1],
-				HttpHeaderBuilder.Build().add(HttpHeaderNames.CONNECTION, CONST_CACHE_CONTROL).build());
+				HttpHeaderBuilder.Build().add(HttpHeaderNames.CONNECTION, CONST_CACHE_CONTROL).build().trim());
 		Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[3],
-				HttpHeaderBuilder.Build().add(HttpHeaderNames.USER_AGENT, CONST_USER_AGENT).build());
+				HttpHeaderBuilder.Build().add(HttpHeaderNames.USER_AGENT, CONST_USER_AGENT).build().trim());
 	}
 
 }
