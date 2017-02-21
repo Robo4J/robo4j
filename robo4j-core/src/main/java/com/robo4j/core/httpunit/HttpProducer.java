@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- *
+ * 
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,20 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.robo4j.core.httpunit;
 
-package com.robo4j.core.unit;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- *
- * generic http exception
- *
+ * Marker annotation marking the class as of interest for the HttpUnit.
+ * 
  * @author Marcus Hirt (@hirt)
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  */
-public class HttpException extends RuntimeException{
-	private static final long serialVersionUID = 1L;
+@Retention(RetentionPolicy.RUNTIME)
+public @interface HttpProducer {
 
-	public HttpException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

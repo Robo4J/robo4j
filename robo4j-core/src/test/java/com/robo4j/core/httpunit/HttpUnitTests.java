@@ -14,10 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.unit;
+package com.robo4j.core.httpunit;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.robo4j.core.httpunit.HttpCodecRegistry;
+import com.robo4j.core.httpunit.HttpDecoder;
+import com.robo4j.core.httpunit.HttpEncoder;
 
 public class HttpUnitTests {
 	@Test

@@ -17,18 +17,20 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core;
+package com.robo4j.core.httpunit;
 
 import java.io.IOException;
 
-import com.robo4j.core.client.util.RoboHttpUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.core.client.util.RoboClassLoader;
+import com.robo4j.core.ConfigurationException;
+import com.robo4j.core.LifecycleState;
+import com.robo4j.core.RoboSystem;
+import com.robo4j.core.StringConsumer;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
-import com.robo4j.core.unit.HttpServerUnit;
+import com.robo4j.core.httpunit.HttpServerUnit;
 import com.robo4j.core.util.SystemUtil;
 
 /**
@@ -84,15 +86,4 @@ public class RoboHttpDynamicTests {
 		Assert.assertEquals(system.getUnits().size(), 2);
 		Assert.assertEquals(consumer.getReceivedMessages().size(), 0);
 	}
-
-	@Test
-	public void simpleHttpDeclarative() throws RoboBuilderException, IOException {
-
-		RoboBuilder builder = new RoboBuilder().add(RoboClassLoader.getInstance().getResource("http_get.xml"));
-		RoboContext ctx = builder.build();
-
-		//TODO FIXME: create tests
-
-	}
-
 }

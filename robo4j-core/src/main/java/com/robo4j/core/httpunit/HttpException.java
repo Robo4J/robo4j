@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,25 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.unit;
+
+package com.robo4j.core.httpunit;
 
 /**
- * Simple decoder that decodes json to an array of string.
- * 
+ *
+ * generic http exception
+ *
  * @author Marcus Hirt (@hirt)
- * @author Miroslav Wengner (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  */
-@HttpProducer
-public class TestArrayDecoder implements HttpDecoder<String[]> {
-	@Override
-	public String[] decode(String json) {
-		String withoutStart = json.replace("array:", "");
-		String withoutBrackets = withoutStart.replaceAll("[\\[\\]\\{\\}]", "");
-		return withoutBrackets.split(",");
-	}
+public class HttpException extends RuntimeException{
+	private static final long serialVersionUID = 1L;
 
-	@Override
-	public Class<String[]> getDecodedClass() {
-		return String[].class;
-	}
+	public HttpException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

@@ -14,22 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.io;
+package com.robo4j.core.httpunit;
 
-import org.junit.Test;
+import com.robo4j.core.httpunit.HttpDecoder;
+import com.robo4j.core.httpunit.HttpProducer;
 
 /**
+ * Simple decoder that decodes json to an array of string.
+ * 
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class FileLoaderTest {
+@HttpProducer
+public class TestArrayDecoder implements HttpDecoder<String[]> {
+	@Override
+	public String[] decode(String json) {
+		String withoutStart = json.replace("array:", "");
+		String withoutBrackets = withoutStart.replaceAll("[\\[\\]\\{\\}]", "");
+		return withoutBrackets.split(",");
+	}
 
-	@Test
-	public void testFileLoader() {
-		// String filePath1 = FileLoader.loadFile(null, "magic.pdf", "pages",
-		// "advanced");
-		// String filePath2 = FileLoader.loadFile(null, "magic.pdf",
-		// "advanced");
-		// System.out.println("MAGIC1 = " + filePath1);
-		// System.out.println("MAGIC2 = " + filePath2);
+	@Override
+	public Class<String[]> getDecodedClass() {
+		return String[].class;
 	}
 }

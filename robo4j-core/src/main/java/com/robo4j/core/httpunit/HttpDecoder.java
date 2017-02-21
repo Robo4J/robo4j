@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.enums;
+package com.robo4j.core.httpunit;
 
 /**
- *
- * @param <TargetType> - specifies the target of a assignment example Hardware
+ * Decoder for translating from a message string to a specific target type.
+ * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface IRoboTargetEnum<TargetType> {
-
-    TargetType getTarget();
+public interface HttpDecoder<T> {
+	T decode(String json);
+	Class<T> getDecodedClass();
 }
