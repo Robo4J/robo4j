@@ -202,11 +202,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 								.filter(u -> registeredUnitIds.contains(u.getId()))
 								.collect(Collectors.toList());
 						//@formatter:on
-						System.out.println("HttpServerUnit registeredUnits: " + registeredUnits);
 						Future<Object> result = executor
 								.submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestFactory(),
 										registeredUnits));
-
 						targetRef.sendMessage(result.get());
 						requestChannel.close();
 

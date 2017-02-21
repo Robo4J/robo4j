@@ -39,6 +39,7 @@ import com.robo4j.http.HttpMessage;
 import com.robo4j.http.HttpMessageWrapper;
 import com.robo4j.http.HttpMethod;
 import com.robo4j.http.HttpVersion;
+import com.robo4j.http.util.HttpHeaderBuilder;
 import com.robo4j.http.util.HttpMessageUtil;
 
 /**
@@ -49,7 +50,6 @@ import com.robo4j.http.util.HttpMessageUtil;
  */
 public class RoboRequestCallable implements Callable<Object> {
 
-    private static final String NEW_LINE = "\n";
     private static final String DEFAULT_RESPONSE = "done";
 
     private final Socket connection;
@@ -89,16 +89,13 @@ public class RoboRequestCallable implements Callable<Object> {
                         HttpVersion.getByValue(tokens[HttpMessageUtil.VERSION_POSITION]), params);
 
                 //TODO -> improve response -> here can be printed out basic system
-                final String targetUnitId = httpMessage.uri().getPath().replace("/", "");
-                System.out.println("RoboRequestCallable -> targetUnitId: " +  targetUnitId);
-
+                final String targetUnitId = httpMessage.uri().getPath().replace("/", RoboHttpUtils._EMPTY_STRING);
                 //@formatter:off
                 final List<RoboUnit<?>> desiredUnits = registeredUnits.stream()
                         .filter(u -> u.getId().equals(targetUnitId))
                         .collect(Collectors.toList());
                 factory.setRoboUnits(desiredUnits);
                 //@formatter:on
-                System.out.println("RoboRequestCallable -> desiredUnits: " + desiredUnits);
                 processWriter(out, DEFAULT_RESPONSE);
                 switch (method){
                     case GET:
@@ -122,16 +119,10 @@ public class RoboRequestCallable implements Callable<Object> {
     //Private Methods
 	private void processWriter(final Writer out, String message) throws Exception {
         out.write(RoboHttpUtils.HTTP_HEADER_OK);
-        Map<String, String> responseValues = new HashMap<>();
-		responseValues.put(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(message.length()));
-        responseValues.forEach((k, v) -> {
-            try {
-                out.write(k + ": " + v + NEW_LINE);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        out.write(NEW_LINE);
+        out.write(HttpHeaderBuilder.Build()
+                .add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(message.length()))
+                .build());
+        out.write(RoboHttpUtils.NEW_LINE);
         out.write(message);
         out.flush();
     }

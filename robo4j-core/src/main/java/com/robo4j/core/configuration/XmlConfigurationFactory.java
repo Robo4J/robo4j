@@ -81,9 +81,6 @@ public class XmlConfigurationFactory {
 			}  else if (qName.equals(ELEMENT_VALUE)) {
 				currentName = attributes.getValue(ATTRIBUTE_NAME);
 				currentType = attributes.getValue(ATTRIBUTE_TYPE);
-			} else if (qName.equals(RoboHttpUtils.HTTP_TARGET_UNIT)){
-				currentName = attributes.getValue(ATTRIBUTE_NAME);
-				currentType = attributes.getValue(ATTRIBUTE_TYPE);
 			}
 			lastElement = qName;
 		}
@@ -92,10 +89,6 @@ public class XmlConfigurationFactory {
 		public void endElement(String uri, String localName, String qName) throws SAXException {
 			switch (qName) {
 			case ELEMENT_VALUE:
-				writeValue(currentConfig, currentValue.trim(), currentType, currentName);
-				currentValue = "";
-				break;
-			case RoboHttpUtils.HTTP_TARGET_UNIT:
 				writeValue(currentConfig, currentValue.trim(), currentType, currentName);
 				currentValue = "";
 				break;
@@ -144,7 +137,6 @@ public class XmlConfigurationFactory {
 			// for a single text() node.
 			switch (lastElement) {
 			case ELEMENT_VALUE:
-			case RoboHttpUtils.HTTP_TARGET_UNIT:
 				currentValue += String.valueOf(ch, start, length);
 				break;
 			default:

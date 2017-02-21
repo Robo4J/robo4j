@@ -26,7 +26,7 @@
             <value name="port" type="int">8025</value>
             <value name="target" type="String">request_consumer</value>
             <targetUnits>
-                <targetUnit name="controller" type="String">GET</targetUnit>
+                <value name="controller" type="String">GET</value>
             </targetUnits>
         </config>
     </roboUnit>

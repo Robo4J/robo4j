@@ -36,7 +36,7 @@ import com.robo4j.http.util.HttpMessageUtil;
  */
 public final class RoboHttpUtils {
 
-	// private static final String SPACE = "\u0020";
+	private static final String SPACE = "\u0020";
 	// private static final String NEXT_LINE = "\r\n";
 	public static final String NEW_LINE = "\n";
 	public static final String HTTP_VERSION = "HTTP/1.1";
@@ -49,7 +49,6 @@ public final class RoboHttpUtils {
 	public static final String _EMPTY_STRING = "";
 	public static final String COLON = ":";
 	public static final String HTTP_TARGET_UNITS = "targetUnits";
-	public static final String HTTP_TARGET_UNIT = "targetUnit";
 	public static final String HTTP_HEADER_NOT = "HTTP/1.1 501 Not Implemented";
 	public static final String HTTP_HEADER_NOT_ALLOWED = "HTTP/1.1 405 Method Not Allowed";
 	public static final int KEEP_ALIVE_TIME = 10;
@@ -79,14 +78,6 @@ public final class RoboHttpUtils {
 				.add(HttpHeaderNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
 				.add(HttpHeaderNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8")
 				.build();
-
-
-//		return new StringBuilder(HttpHeaderNames.HOST).append(COLON).append(SPACE).append(host).append(NEXT_LINE)
-//				.append(HttpHeaderNames.ACCEPT).append(COLON).append(SPACE).append("*/*").append(NEXT_LINE)
-//				.append(HttpHeaderNames.ACCEPT_ENCODING).append(COLON).append(SPACE).append("gzip, deflate, sdch, br").append(NEXT_LINE)
-//				.append(HttpHeaderNames.ACCEPT_LANGUAGE).append(COLON).append(SPACE).append("en-US,en;q=0.8")
-//				.append(NEXT_LINE)
-//				.toString();
 		//@formatter:on
 	}
 

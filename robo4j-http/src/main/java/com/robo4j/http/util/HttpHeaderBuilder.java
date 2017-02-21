@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpHeaderBuilder {
+    private static final int ELEMENT_JOIN = 0;
     private final Map<String, String> map;
 
     private HttpHeaderBuilder(){
@@ -44,7 +45,10 @@ public class HttpHeaderBuilder {
 
     public String build(){
         return map.entrySet().stream()
-                .map(e -> e.getKey().concat(HttpMessageUtil.COLON).concat(HttpMessageUtil.SPACE).concat(e.getValue()))
-                .collect(Collectors.joining(HttpMessageUtil.NEXT_LINE));
+                .map(e -> e.getKey().concat(HttpMessageUtil.COLON)
+                        .concat(HttpMessageUtil.SPACE)
+                        .concat(e.getValue())
+                        .concat(HttpMessageUtil.NEXT_LINE))
+                .collect(Collectors.joining(HttpMessageUtil.getHttpSeparator(ELEMENT_JOIN)));
     }
 }
