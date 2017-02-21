@@ -44,12 +44,13 @@ public class RoboBuilderTests {
 		
 		RoboReference<String> producer = context.getReference("producer");
 		Assert.assertNotNull(producer);
-		for (int i = 0; i < MESSAGES; i++) {
-			producer.sendMessage("sendRandomMessage");
-		}
 
 		RoboReference<String> consumer = context.getReference("consumer");		
 		Assert.assertNotNull(consumer);
+
+		for (int i = 0; i < MESSAGES; i++) {
+			producer.sendMessage("sendRandomMessage");
+		}
 
 		DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor
 				.create(Integer.class, "getNumberOfSentMessages");
