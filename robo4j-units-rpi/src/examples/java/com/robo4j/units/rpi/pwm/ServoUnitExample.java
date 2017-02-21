@@ -32,7 +32,7 @@ public class ServoUnitExample {
 
 	public static void main(String[] args) throws RoboBuilderException {
 		RoboBuilder builder = new RoboBuilder();
-		InputStream settings = ServoUnitExample.class.getClassLoader().getResourceAsStream("robo4j.xml");
+		InputStream settings = ServoUnitExample.class.getClassLoader().getResourceAsStream("servoexample.xml");
 		if (settings == null) {
 			System.out.println("Could not find the settings for the ServoUnitExample!");
 			System.exit(2);
