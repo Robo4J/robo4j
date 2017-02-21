@@ -17,6 +17,7 @@
 package com.robo4j.units.rpi.pwm;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import com.robo4j.core.RoboBuilder;
 import com.robo4j.core.RoboBuilderException;
@@ -31,7 +32,12 @@ public class ServoUnitExample {
 
 	public static void main(String[] args) throws RoboBuilderException {
 		RoboBuilder builder = new RoboBuilder();
-		builder.add(ServoUnitExample.class.getClassLoader().getResourceAsStream("robo4j.xml"));
+		InputStream settings = ServoUnitExample.class.getClassLoader().getResourceAsStream("robo4j.xml");
+		if (settings == null) {
+			System.out.println("Could not find the settings for the ServoUnitExample!");
+			System.exit(2);
+		}
+		builder.add(settings);
 		RoboContext ctx = builder.build();
 
 		RoboReference<Float> panRef = ctx.getReference("pan");

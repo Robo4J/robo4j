@@ -36,7 +36,7 @@ import com.robo4j.http.util.HttpMessageUtil;
  */
 public final class RoboHttpUtils {
 
-	private static final String SPACE = "\u0020";
+	// private static final String SPACE = "\u0020";
 	// private static final String NEXT_LINE = "\r\n";
 	public static final String NEW_LINE = "\n";
 	public static final String HTTP_VERSION = "HTTP/1.1";

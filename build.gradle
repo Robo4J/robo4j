@@ -251,7 +251,6 @@ project("robo4j-units-lego") {
     dependencies {
         compile(project(":robo4j-hw-lego"))
         compile(project(":robo4j-core"))
-        testCompile(project(":robo4j-units-lego-test"))
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }

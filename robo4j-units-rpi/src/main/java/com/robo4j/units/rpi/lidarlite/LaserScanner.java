@@ -17,12 +17,9 @@
 package com.robo4j.units.rpi.lidarlite;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboResult;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.hw.rpi.i2c.lidar.LidarLiteDevice;
 import com.robo4j.math.geometry.ScanResult2D;
