@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutionException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboBuilderTests {
-    private static final int MESSAGES = 100;
+    private static final int MESSAGES = 1000;
 
     @Test
     public void testParsingFile() throws RoboBuilderException, InterruptedException, ExecutionException {
