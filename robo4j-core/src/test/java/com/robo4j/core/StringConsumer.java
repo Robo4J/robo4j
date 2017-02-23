@@ -29,8 +29,8 @@ import com.robo4j.core.configuration.Configuration;
  */
 public class StringConsumer extends RoboUnit<String> {
 	private static final int DEFAULT = 0;
-	private volatile List<String> receivedMessages = new ArrayList<>();
-	private volatile AtomicInteger counter;
+	private AtomicInteger counter;
+	private List<String> receivedMessages = new ArrayList<>();
 
 	/**
 	 * @param context
@@ -62,7 +62,7 @@ public class StringConsumer extends RoboUnit<String> {
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
 		if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
-			return (R) new Integer(counter.get());
+			return (R) (Integer)counter.get();
 		}
 		return null;
 	}

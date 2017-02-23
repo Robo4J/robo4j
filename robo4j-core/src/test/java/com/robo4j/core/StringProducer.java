@@ -19,63 +19,77 @@ package com.robo4j.core;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.configuration.Configuration;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
- * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class StringProducer extends RoboUnit<String> {
-	private String target;
-	private String method;
+    /* default sent messages */
+    private static final int DEFAULT = 0;
+    private AtomicInteger counter;
+    private String target;
+    private String method;
 
-	/**
-	 * @param context
-	 * @param id
-	 */
-	public StringProducer(RoboContext context, String id) {
-		super(String.class, context, id);
-	}
+    /**
+     * @param context
+     * @param id
+     */
+    public StringProducer(RoboContext context, String id) {
+        super(String.class, context, id);
+    }
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		target = configuration.getString("target", null);
-		if (target == null) {
-			throw ConfigurationException.createMissingConfigNameException("target");
-		}
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        target = configuration.getString("target", null);
+        if (target == null) {
+            throw ConfigurationException.createMissingConfigNameException("target");
+        }
 
-		method = configuration.getString("method", null);
+        method = configuration.getString("method", null);
+        counter = new AtomicInteger(DEFAULT);
 
-	}
+    }
 
-	public void sendRandomMessage() {
-		final String message = StringToolkit.getRandomMessage(10);
-		getContext().getReference(target).sendMessage(message);
-	}
+    @Override
+    public void onMessage(String message) {
+        if (message == null) {
+            System.out.println("No Message!");
+        } else {
+            counter.incrementAndGet();
+            String[] input = message.split("::");
+            switch (input[0]) {
+                case "sendRandomMessage":
+                    sendRandomMessage();
+                    break;
+                case "sendGetMessage":
+                    sendGetSimpleMessage("localhost", input[1].trim());
+                    break;
+                default:
+                    System.out.println("don't understand message: " + message);
 
-	public void sendGetSimpleMessage(String host, String message){
-		final String request = method.equals("GET") ? RoboHttpUtils.createGetRequest(host, message) : null;
-		getContext().getReference(target).sendMessage(request);
-	}
+            }
+        }
+    }
 
-	@Override
-	public void onMessage(String message) {
-		if(message == null){
-			System.out.println("No Message!");
-		} else {
+    @SuppressWarnings("unchecked")
+    @Override
+    public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
+        if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
+            return (R) (Integer) counter.get();
+        }
+        return null;
+    }
 
-			String[] input = message.split("::");
-			switch (input[0]){
-				case "sendRandomMessage":
-					sendRandomMessage();
-					break;
-				case "sendGetMessage":
-					sendGetSimpleMessage("localhost", input[1].trim());
-					break;
-				default:
-					System.out.println("don't understand message: " + message);
+    public void sendRandomMessage() {
+        final String message = StringToolkit.getRandomMessage(10);
+        getContext().getReference(target).sendMessage(message);
+    }
 
-			}
-		}
-	}
+    public void sendGetSimpleMessage(String host, String message) {
+        final String request = method.equals("GET") ? RoboHttpUtils.createGetRequest(host, message) : null;
+        getContext().getReference(target).sendMessage(request);
+    }
 
 }
