@@ -108,8 +108,6 @@ public class RoboRequestCallable implements Callable<Object> {
                         SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
                         return null;
                 }
-            } else {
-                SimpleLoggingUtil.error(getClass(), "error");
             }
         }
         return null;

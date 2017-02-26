@@ -49,10 +49,10 @@ public class RoboHttpDynamicTests {
 		RoboSystem system = new RoboSystem();
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
-		HttpServerUnit httpDynamic = new HttpServerUnit(system, "http");
+		HttpServerUnit httpServer = new HttpServerUnit(system, "http");
 		config.setString("target", "request_consumer");
 		config.setInteger("port", PORT);
-		httpDynamic.initialize(config);
+		httpServer.initialize(config);
 		//TODO FIXME: implement some logic how to
 
 
@@ -60,10 +60,10 @@ public class RoboHttpDynamicTests {
 
 		Assert.assertNotNull(system.getUnits());
 		Assert.assertEquals(system.getUnits().size(), 0);
-		Assert.assertEquals(httpDynamic.getState(), LifecycleState.INITIALIZED);
+		Assert.assertEquals(httpServer.getState(), LifecycleState.INITIALIZED);
 		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
 
-		system.addUnits(httpDynamic, consumer);
+		system.addUnits(httpServer, consumer);
 
 		System.out.println("State before start:");
 		System.out.println(SystemUtil.generateStateReport(system));
@@ -72,11 +72,13 @@ public class RoboHttpDynamicTests {
 		System.out.println("State after start:");
 		System.out.println(SystemUtil.generateStateReport(system));
 
-		System.out.println("RoboSystem http server\n\tPort:" + PORT + "\n");
-		System.out.println("Usage:\n\tRequest GET: http://<IP_ADDRESS>:" + PORT + "/tank?command=move");
-		System.out.println("\tRequest command types: right,left,move,back,enter\n");
 
-		System.in.read();
+		httpServer.getKnownAttributes().forEach(a ->
+				System.out.println("http://<IP>"+ PORT + "/" + a.getAttributeName() +
+						"?<value of:" + a.getAttributeType().getSimpleName() + ">" )
+		);
+
+//		System.in.read();
 
 		System.out.println("Going Down!");
 		system.stop();

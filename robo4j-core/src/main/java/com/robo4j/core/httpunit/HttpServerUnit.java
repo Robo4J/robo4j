@@ -207,7 +207,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 						requestChannel.close();
 
 					} else {
-						System.out.println("something is not right: " + selectedKey);
+						SimpleLoggingUtil.error(getClass(), "something is not right: " + selectedKey);
 					}
 					selectedIterator.remove();
 				}

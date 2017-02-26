@@ -19,6 +19,17 @@ package com.robo4j.core.httpunit;
 import org.junit.Assert;
 import org.junit.Test;
 
+
+/**
+ *
+ * Http units coder, decoder related tests
+ *
+ * @see HttpServerUnit
+ * @see HttpClientUnit
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ */
 public class HttpUnitTests {
 	@Test
 	public void testArrayDecoder() {
