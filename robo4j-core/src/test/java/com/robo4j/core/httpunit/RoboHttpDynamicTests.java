@@ -20,14 +20,16 @@
 package com.robo4j.core.httpunit;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import com.robo4j.core.*;
+import com.robo4j.core.client.util.RoboHttpUtils;
+import com.robo4j.core.httpunit.test.HttpCommandTestUnit;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.core.ConfigurationException;
-import com.robo4j.core.LifecycleState;
-import com.robo4j.core.RoboSystem;
-import com.robo4j.core.StringConsumer;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.httpunit.HttpServerUnit;
@@ -44,17 +46,23 @@ public class RoboHttpDynamicTests {
 
 	private static final int PORT = 8025;
 
+	//TODO: miro -> continue here
 	@Test
-	public void simpleHttpNonUnitTest() throws ConfigurationException, IOException {
+	public void simpleHttpNonUnitTest() throws Exception {
 		RoboSystem system = new RoboSystem();
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
 		HttpServerUnit httpServer = new HttpServerUnit(system, "http");
-		config.setString("target", "request_consumer");
+		config.setString("target", "controller");
 		config.setInteger("port", PORT);
+		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
+		targetUnits.setString("controller", "GET");
 		httpServer.initialize(config);
-		//TODO FIXME: implement some logic how to
 
+		HttpCommandTestUnit ctrl = new HttpCommandTestUnit(system, "controller");
+		config = ConfigurationFactory.createEmptyConfiguration();
+		config.setString("target", "request_consumer");
+		ctrl.initialize(config);
 
 		StringConsumer consumer = new StringConsumer(system, "request_consumer");
 
@@ -63,7 +71,7 @@ public class RoboHttpDynamicTests {
 		Assert.assertEquals(httpServer.getState(), LifecycleState.INITIALIZED);
 		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
 
-		system.addUnits(httpServer, consumer);
+		system.addUnits(httpServer, ctrl, consumer);
 
 		System.out.println("State before start:");
 		System.out.println(SystemUtil.generateStateReport(system));
@@ -72,20 +80,22 @@ public class RoboHttpDynamicTests {
 		System.out.println("State after start:");
 		System.out.println(SystemUtil.generateStateReport(system));
 
-
-		httpServer.getKnownAttributes().forEach(a ->
-				System.out.println("http://<IP>"+ PORT + "/" + a.getAttributeName() +
-						"?<value of:" + a.getAttributeType().getSimpleName() + ">" )
-		);
+		ctrl.getKnownAttributes().forEach(a -> System.out.println("http://<IP>" + PORT + "/"
+				+ a.getAttributeName() + "?<value of:" + a.getAttributeType().getSimpleName() + ">"));
 
 //		System.in.read();
+
+		DefaultAttributeDescriptor<ArrayList> messagesDescriptor = DefaultAttributeDescriptor.create(ArrayList.class, "getReceivedMessages");
+		List<String> receivedMessages = consumer.getAttribute(messagesDescriptor).get();
+		System.out.println("receivedMessages: " + receivedMessages);
+
 
 		System.out.println("Going Down!");
 		system.stop();
 		system.shutdown();
 		System.out.println("System is Down!");
 		Assert.assertNotNull(system.getUnits());
-		Assert.assertEquals(system.getUnits().size(), 2);
-		Assert.assertEquals(consumer.getReceivedMessages().size(), 0);
+		Assert.assertEquals(system.getUnits().size(), 3);
+//		Assert.assertEquals(consumer.getReceivedMessages().size(), 1);
 	}
 }

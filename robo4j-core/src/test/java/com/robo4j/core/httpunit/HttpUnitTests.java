@@ -38,7 +38,7 @@ public class HttpUnitTests {
 		Assert.assertArrayEquals(new String[] {""}, array);
 		Assert.assertArrayEquals(new String[] {"Lalaa", "Lalala"}, arrayDecoder.decode("Lalaa,Lalala"));
 	}
-	
+
 	@Test
 	public void testArrayEncoder() {
 		TestArrayEncoder arrayEncoder = new TestArrayEncoder();
@@ -50,17 +50,17 @@ public class HttpUnitTests {
 	public void testHttpCodecRegistry() {
 		HttpCodecRegistry registry = new HttpCodecRegistry("com.robo4j.core.httpunit");
 		HttpEncoder<String[]> encoder = registry.getEncoder(String[].class);
-		HttpDecoder<String[]> decoder = registry.getDecoder(String[].class);	
+		HttpDecoder<String[]> decoder = registry.getDecoder(String[].class);
 		Assert.assertNotNull(encoder);
 		Assert.assertNotNull(decoder);
-		
+
 		String [] originalData = new String[] {"A", "B", "C"};
 		String encoded = encoder.encode(originalData);
 		String [] decoded = decoder.decode(encoded);
-		
+
 		Assert.assertArrayEquals(originalData, decoded);
 	}
-	
+
 	@Test
 	public void testHttpCodecRegistryCodec() {
 		HttpCodecRegistry registry = new HttpCodecRegistry("com.robo4j.core.httpunit");
@@ -68,12 +68,12 @@ public class HttpUnitTests {
 		HttpDecoder<String> decoder = registry.getDecoder(String.class);
 		Assert.assertNotNull(encoder);
 		Assert.assertNotNull(decoder);
-		
+
 		String originalData = "Oh my god, it's full of stars";
 		String encoded = encoder.encode(originalData);
 		String decoded = decoder.decode(encoded);
-		
+
 		Assert.assertEquals(originalData, decoded);
 	}
-	
+
 }

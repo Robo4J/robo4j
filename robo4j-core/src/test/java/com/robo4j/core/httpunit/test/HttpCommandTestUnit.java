@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
+ *
+ * Test Controller Test Unit for various commands
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
@@ -35,7 +37,7 @@ public class HttpCommandTestUnit extends RoboUnit<TestCommandEnum> {
             .unmodifiableCollection(Collections.singleton(DefaultAttributeDescriptor
                     .create(TestCommandEnum.class, ATTRIBUTE_NAME_COMMAND)));
     //@formatter:on
-
+    private String target;
 
     public HttpCommandTestUnit(RoboContext context, String id) {
         super(TestCommandEnum.class, context, id);
@@ -43,6 +45,29 @@ public class HttpCommandTestUnit extends RoboUnit<TestCommandEnum> {
 
     @Override
     public void onInitialization(Configuration configuration) throws ConfigurationException {
-
+        target = configuration.getString("target", null);
+        if (target == null) {
+            throw ConfigurationException.createMissingConfigNameException("target");
+        }
     }
+
+    @Override
+    public void onMessage(TestCommandEnum message) {
+        processTestMessage(message);
+    }
+
+    @Override
+    public Collection<AttributeDescriptor<?>> getKnownAttributes() {
+        return KNOWN_ATTRIBUTES;
+    }
+
+    //Private Methods
+    private void sendMessage(RoboContext ctx, UnitTestMessage message) {
+        ctx.getReference(target).sendMessage(message.toString());
+    }
+
+    private void processTestMessage(TestCommandEnum myMessage) {
+        sendMessage(getContext(), new UnitTestMessage(myMessage));
+    }
+
 }

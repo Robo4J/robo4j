@@ -63,6 +63,9 @@ public class StringConsumer extends RoboUnit<String> {
 		if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
 			return (R) (Integer)counter.get();
 		}
+		if(attribute.getAttributeName().equals("getReceivedMessages") && attribute.getAttributeType() == List.class){
+			return (R) receivedMessages;
+		}
 		return null;
 	}
 
