@@ -19,20 +19,20 @@
 
 package com.robo4j.core.httpunit;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import com.robo4j.core.*;
-import com.robo4j.core.client.util.RoboHttpUtils;
-import com.robo4j.core.httpunit.test.HttpCommandTestUnit;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.robo4j.core.DefaultAttributeDescriptor;
+import com.robo4j.core.LifecycleState;
+import com.robo4j.core.RoboSystem;
+import com.robo4j.core.StringConsumer;
+import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
-import com.robo4j.core.httpunit.HttpServerUnit;
+import com.robo4j.core.httpunit.test.HttpCommandTestUnit;
 import com.robo4j.core.util.SystemUtil;
 
 /**
@@ -44,58 +44,99 @@ import com.robo4j.core.util.SystemUtil;
  */
 public class RoboHttpDynamicTests {
 
-	private static final int PORT = 8025;
 
-	//TODO: miro -> continue here
+	private static final int PORT = 8025;
+	private static final String TARGET_UNIT = "controller";
+	private static final int MESSAGES_NUMBER = 3;
+	private static final String HOST_SYSTEM = "0.0.0.0";
+
+	/**
+	 * Motivation Client system is sending messages to the main system over HTTP
+	 * Main System receives desired number of messages.
+	 *
+	 * Values are requested by Attributes
+	 * 
+	 * @throws Exception
+	 */
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Test
 	public void simpleHttpNonUnitTest() throws Exception {
-		RoboSystem system = new RoboSystem();
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
-		HttpServerUnit httpServer = new HttpServerUnit(system, "http");
-		config.setString("target", "controller");
+		/* system which is testing main system */
+		Configuration config = ConfigurationFactory.createEmptyConfiguration();
+		RoboSystem clientSystem = new RoboSystem();
+
+		HttpClientUnit httpClient = new HttpClientUnit(clientSystem, "httpClient");
+		config.setString("address", HOST_SYSTEM);
 		config.setInteger("port", PORT);
+		/* specific configuration */
 		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
 		targetUnits.setString("controller", "GET");
+		httpClient.initialize(config);
+		clientSystem.addUnits(httpClient);
+		System.out.println("Client State after start:");
+		System.out.println(SystemUtil.generateStateReport(clientSystem));
+		clientSystem.start();
+
+		/* tested system configuration */
+		RoboSystem mainSystem = new RoboSystem();
+
+		HttpServerUnit httpServer = new HttpServerUnit(mainSystem, "http");
+		config.setString("target", TARGET_UNIT);
+		config.setInteger("port", PORT);
+		targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
+		targetUnits.setString(TARGET_UNIT, "GET");
 		httpServer.initialize(config);
 
-		HttpCommandTestUnit ctrl = new HttpCommandTestUnit(system, "controller");
+		HttpCommandTestUnit ctrl = new HttpCommandTestUnit(mainSystem, TARGET_UNIT);
 		config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("target", "request_consumer");
 		ctrl.initialize(config);
 
-		StringConsumer consumer = new StringConsumer(system, "request_consumer");
+		StringConsumer consumer = new StringConsumer(mainSystem, "request_consumer");
 
-		Assert.assertNotNull(system.getUnits());
-		Assert.assertEquals(system.getUnits().size(), 0);
+		Assert.assertNotNull(mainSystem.getUnits());
+		Assert.assertEquals(mainSystem.getUnits().size(), 0);
 		Assert.assertEquals(httpServer.getState(), LifecycleState.INITIALIZED);
-		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+		Assert.assertEquals(mainSystem.getState(), LifecycleState.UNINITIALIZED);
 
-		system.addUnits(httpServer, ctrl, consumer);
+		mainSystem.addUnits(httpServer, ctrl, consumer);
 
 		System.out.println("State before start:");
-		System.out.println(SystemUtil.generateStateReport(system));
-		system.start();
+		System.out.println(SystemUtil.generateStateReport(mainSystem));
+		mainSystem.start();
 
 		System.out.println("State after start:");
-		System.out.println(SystemUtil.generateStateReport(system));
+		System.out.println(SystemUtil.generateStateReport(mainSystem));
 
+		/* client system sending a messages to the main system */
+		for (int i = 0; i < MESSAGES_NUMBER; i++) {
+			httpClient.onMessage(RoboHttpUtils.createGetRequest(HOST_SYSTEM,
+					"/".concat(TARGET_UNIT).concat("?").concat("command=move")));
+		}
+		clientSystem.stop();
+		clientSystem.shutdown();
 		ctrl.getKnownAttributes().forEach(a -> System.out.println("http://<IP>" + PORT + "/"
 				+ a.getAttributeName() + "?<value of:" + a.getAttributeType().getSimpleName() + ">"));
 
+		/* used only for standalone test */
 //		System.in.read();
-
-		DefaultAttributeDescriptor<ArrayList> messagesDescriptor = DefaultAttributeDescriptor.create(ArrayList.class, "getReceivedMessages");
-		List<String> receivedMessages = consumer.getAttribute(messagesDescriptor).get();
+		DefaultAttributeDescriptor<ArrayList> messagesDescriptor = DefaultAttributeDescriptor.create(ArrayList.class,
+				"getReceivedMessages");
+		DefaultAttributeDescriptor<Integer> messagesNumberDescriptor = DefaultAttributeDescriptor.create(Integer.class,
+				"getNumberOfSentMessages");
+		final List<String> receivedMessages = consumer.getAttribute(messagesDescriptor).get();
 		System.out.println("receivedMessages: " + receivedMessages);
-
+		Assert.assertEquals(receivedMessages.size(), MESSAGES_NUMBER);
+		final int number = consumer.getAttribute(messagesNumberDescriptor).get();
+		Assert.assertEquals(number, MESSAGES_NUMBER);
 
 		System.out.println("Going Down!");
-		system.stop();
-		system.shutdown();
+		mainSystem.stop();
+		mainSystem.shutdown();
 		System.out.println("System is Down!");
-		Assert.assertNotNull(system.getUnits());
-		Assert.assertEquals(system.getUnits().size(), 3);
-//		Assert.assertEquals(consumer.getReceivedMessages().size(), 1);
+		Assert.assertNotNull(mainSystem.getUnits());
+		Assert.assertEquals(mainSystem.getUnits().size(), MESSAGES_NUMBER);
+
 	}
 }

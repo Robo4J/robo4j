@@ -20,6 +20,7 @@ package com.robo4j.core.httpunit;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.robo4j.core.DefaultAttributeDescriptor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -46,6 +47,7 @@ import com.robo4j.core.util.SystemUtil;
  */
 public class RoboHttpPingPongTest {
 
+	private static final String HOST_SYSTEM = "0.0.0.0";
 	private static final int PORT = 8011;
     private static final String TEST_PATH ="tank";
 	private static final int MESSAGES = 3;
@@ -93,9 +95,14 @@ public class RoboHttpPingPongTest {
 
 		System.out.println("systemPong : Going Down!");
 		systemPong.stop();
-        systemPong.shutdown();
-        System.out.println("PingPong is down!");
-		Assert.assertEquals(pongConsumer.getCounter(), MESSAGES);
+
+
+		DefaultAttributeDescriptor<Integer> messagesNumberDescriptor = DefaultAttributeDescriptor.create(Integer.class,
+				"getNumberOfSentMessages");
+		final int number = pongConsumer.getAttribute(messagesNumberDescriptor).get();
+		Assert.assertEquals(number, MESSAGES);
+		System.out.println("PingPong is down!");
+		systemPong.shutdown();
 
 	}
 
@@ -126,7 +133,7 @@ public class RoboHttpPingPongTest {
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
 		HttpClientUnit httpClient = new HttpClientUnit(result, "http_client");
-		config.setString("address", "localhost");
+		config.setString("address", HOST_SYSTEM);
 		config.setInteger("port", PORT);
 		/* specific configuration */
 

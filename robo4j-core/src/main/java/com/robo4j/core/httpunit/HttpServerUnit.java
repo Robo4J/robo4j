@@ -25,7 +25,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -74,7 +73,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private String target;
 	private ServerSocketChannel server;
 	private Selector selector;
-	private final List<String> registeredUnitIds = new ArrayList<>();
+	private final Map<String, String> registeredUnit = new HashMap<>();
 
 	public HttpServerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -96,22 +95,16 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			throw ConfigurationException.createMissingConfigNameException("target, method, path, commands...");
 		}
 		//@formatter:off
-
-
 		final Configuration targetUnits = configuration.getChildConfiguration("targetUnits");
-		final Map<String, String> targetUnitValues = new HashMap<>();
 		if(targetUnits == null){
 			SimpleLoggingUtil.error(getClass(), "no targetUnits");
 		} else {
-			Set<String> targetUnitNames = targetUnits.getValueNames();
-			for(Iterator<String> it = targetUnitNames.iterator(); it.hasNext();){
-				String key = it.next();
-				String value = targetUnits.getString(key, RoboHttpUtils._EMPTY_STRING);
-				targetUnitValues.put(key, value);
-				registeredUnitIds.add(key);
+			for(Iterator<String> it =  targetUnits.getValueNames().iterator(); it.hasNext();){
+				final String key = it.next();
+				final String value = targetUnits.getString(key, RoboHttpUtils._EMPTY_STRING);
+				registeredUnit.put(key, value);
 			}
 		}
-
         //@formatter:on
 		setState(LifecycleState.INITIALIZED);
 	}
@@ -163,8 +156,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	 */
 	private void server(final RoboReference<Object> targetRef) {
 		try {
-			// TODO miro -> implement;
-
 			/* selector is multiplexor to SelectableChannel */
 			// Selects a set of keys whose corresponding channels are ready for
 			// I/O operations
@@ -172,8 +163,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			server = ServerSocketChannel.open();
 			server.socket().bind(new InetSocketAddress(port));
 			server.configureBlocking(false);
-
-			SimpleLoggingUtil.debug(getClass(), "started port: " + port);
 
 			int selectorOpt = server.validOps();
 			server.register(selector, selectorOpt, null);
@@ -192,28 +181,25 @@ public class HttpServerUnit extends RoboUnit<Object> {
 					if (selectedKey.isAcceptable()) {
 						SocketChannel requestChannel = server.accept();
 						requestChannel.configureBlocking(true);
-						// TODO: miro -> improve multi-channels
+						// TODO: miro -> improve multi-channels, selectors
 						// electionKey.OP_READ, etc. option
 
 						//@formatter:off
 						final List<RoboUnit<?>> registeredUnits = getContext().getUnits().stream()
-								.filter(u -> registeredUnitIds.contains(u.getId()))
+								.filter(u -> registeredUnit.containsKey(u.getId()))
 								.collect(Collectors.toList());
 						//@formatter:on
-						Future<Object> result = executor
+						final Future<Object> result = executor
 								.submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestFactory(),
 										registeredUnits));
 						targetRef.sendMessage(result.get());
 						requestChannel.close();
-
 					} else {
 						SimpleLoggingUtil.error(getClass(), "something is not right: " + selectedKey);
 					}
 					selectedIterator.remove();
 				}
-
 			}
-
 		} catch (InterruptedException | ExecutionException | IOException e) {
 			SimpleLoggingUtil.error(getClass(), "SERVER CLOSED", e);
 		}

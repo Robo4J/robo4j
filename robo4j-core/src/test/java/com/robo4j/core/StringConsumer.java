@@ -47,9 +47,8 @@ public class StringConsumer extends RoboUnit<String> {
 	
 	@Override
 	public synchronized void onMessage(String message) {
-		String str = (String) message;
-		int value = counter.incrementAndGet();
-		receivedMessages.add(str);
+		counter.incrementAndGet();
+		receivedMessages.add(message);
 	}
 
 	@Override
@@ -63,18 +62,11 @@ public class StringConsumer extends RoboUnit<String> {
 		if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
 			return (R) (Integer)counter.get();
 		}
-		if(attribute.getAttributeName().equals("getReceivedMessages") && attribute.getAttributeType() == List.class){
+		if (attribute.getAttributeName().equals("getReceivedMessages")
+				&& attribute.getAttributeType() == ArrayList.class) {
 			return (R) receivedMessages;
 		}
 		return null;
-	}
-
-	public int getCounter(){
-		return counter.get();
-	}
-
-	public void resetCounter(){
-		counter.set(DEFAULT);
 	}
 
 }

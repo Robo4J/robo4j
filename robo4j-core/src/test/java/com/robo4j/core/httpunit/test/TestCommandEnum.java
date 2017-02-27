@@ -17,6 +17,10 @@
 
 package com.robo4j.core.httpunit.test;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -29,12 +33,30 @@ public enum TestCommandEnum {
     ;
     //@formatter:on
 
+    private static volatile Map<Integer, TestCommandEnum> nameToEnum;
     private int id;
     private String name;
 
     TestCommandEnum(int id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    private static Map<Integer, TestCommandEnum> initMapping() {
+        return Stream.of(values()).collect(Collectors.toMap(TestCommandEnum::getId, e -> e));
+    }
+
+    public static TestCommandEnum getInternalByName(String name){
+        if(nameToEnum == null){
+            nameToEnum = initMapping();
+        }
+        //@formatter:off
+        return nameToEnum.entrySet().stream()
+                .filter(e -> e.getValue().getName().equals(name))
+                .map(Map.Entry::getValue)
+                .findFirst()
+                .get();
+        //@formatter:on
     }
 
     public int getId() {
@@ -44,6 +66,7 @@ public enum TestCommandEnum {
     public String getName() {
         return name;
     }
+
 
     @Override
     public String toString() {
