@@ -44,7 +44,6 @@ import com.robo4j.core.util.SystemUtil;
  */
 public class RoboHttpDynamicTests {
 
-
 	private static final int PORT = 8025;
 	private static final String TARGET_UNIT = "controller";
 	private static final int MESSAGES_NUMBER = 3;
