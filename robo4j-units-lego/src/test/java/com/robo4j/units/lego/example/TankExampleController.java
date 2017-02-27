@@ -28,7 +28,6 @@ import java.util.Collections;
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 30.01.2017
  */
 public class TankExampleController extends RoboUnit<LegoPlatformMessageTypeEnum> {
 

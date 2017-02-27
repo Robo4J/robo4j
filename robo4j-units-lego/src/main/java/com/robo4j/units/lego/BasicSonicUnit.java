@@ -44,7 +44,6 @@ import com.robo4j.units.lego.utils.LegoUtils;
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 04.02.2017
  */
 //TODO miro -> continue here
 public class BasicSonicUnit extends RoboUnit<LegoSensorMessage> {

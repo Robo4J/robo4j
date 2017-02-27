@@ -32,7 +32,6 @@ import com.robo4j.units.lego.sensor.LegoSensorMessage;
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 04.02.2017
  */
 public class BasicSonicSensorUnitMock extends BasicSonicUnit {
 

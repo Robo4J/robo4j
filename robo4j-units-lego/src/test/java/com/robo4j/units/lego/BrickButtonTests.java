@@ -30,7 +30,6 @@ import java.util.Set;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 01.02.2017
  */
 public class BrickButtonTests {
 

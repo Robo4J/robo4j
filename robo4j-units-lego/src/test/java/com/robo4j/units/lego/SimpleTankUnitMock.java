@@ -30,7 +30,6 @@ import com.robo4j.hw.lego.wrapper.MotorTestWrapper;
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 30.01.2017
  */
 public class SimpleTankUnitMock extends SimpleTankUnit {
 
