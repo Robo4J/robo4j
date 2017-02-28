@@ -25,12 +25,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -38,6 +33,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
@@ -73,7 +69,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private String target;
 	private ServerSocketChannel server;
 	private Selector selector;
-	private final Map<String, String> registeredUnit = new HashMap<>();
+	/* Map<path, List<method>> */
+	private final Map<String, List<String>> pathMethods = new HashMap<>();
 
 	public HttpServerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -102,7 +99,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			for(Iterator<String> it =  targetUnits.getValueNames().iterator(); it.hasNext();){
 				final String key = it.next();
 				final String value = targetUnits.getString(key, RoboHttpUtils._EMPTY_STRING);
-				registeredUnit.put(key, value);
+				HttpUriRegister.getInstance().addNote(key, value);
 			}
 		}
         //@formatter:on
@@ -117,7 +114,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			available = true;
 			executor.execute(() -> server(targetRef));
 		} else {
-			System.out.println("HttpDynamicUnit start() -> error: " + targetRef);
+			SimpleLoggingUtil.error(getClass(), "HttpDynamicUnit start() -> error: " + targetRef);
 		}
 		setState(LifecycleState.STARTED);
 	}
@@ -185,13 +182,15 @@ public class HttpServerUnit extends RoboUnit<Object> {
 						// electionKey.OP_READ, etc. option
 
 						//@formatter:off
-						final List<RoboUnit<?>> registeredUnits = getContext().getUnits().stream()
-								.filter(u -> registeredUnit.containsKey(u.getId()))
-								.collect(Collectors.toList());
-						//@formatter:on
+						//Here is the problem
+
+						HttpUriRegister.getInstance().updateUnits(getContext());
+
+
 						final Future<Object> result = executor
-								.submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestFactory(),
-										registeredUnits));
+								.submit(new RoboRequestCallable(requestChannel.socket(),
+								new RoboRequestFactory()));
+						//@formatter:on
 						targetRef.sendMessage(result.get());
 						requestChannel.close();
 					} else {
@@ -205,6 +204,15 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		}
 		SimpleLoggingUtil.debug(getClass(), "stopped port: " + port);
 		setState(LifecycleState.STOPPED);
+	}
+
+	private RoboUnit<?> getRoboUnitById(String id) {
+		//@formatter:off
+		return getContext().getUnits().stream()
+					.filter(u -> u.getId().equals(id))
+					.findFirst()
+					.orElse(null);
+		//@formatter:on
 	}
 
 	private boolean validatePackages(String packages) {

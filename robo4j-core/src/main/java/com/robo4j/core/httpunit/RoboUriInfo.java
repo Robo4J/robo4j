@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,18 +14,47 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.client.request;
 
-import com.robo4j.http.HttpMessageWrapper;
+package com.robo4j.core.httpunit;
+
+import com.robo4j.core.RoboUnit;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
+ * Related information to the URI
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public interface DefaultRequestFactory<ResponseType> {
+public class RoboUriInfo {
 
-	ResponseType processGet(HttpMessageWrapper<?> wrapper);
+	private RoboUnit<?> unit = null;
+	private final List<String> methods = new ArrayList<>();
 
-	ResponseType processPost(HttpMessageWrapper<?> wrapper);
+	public RoboUriInfo() {
+	}
 
+	public RoboUnit<?> getUnit() {
+		return unit;
+	}
+
+	public void setUnit(RoboUnit<?> unit) {
+		this.unit = unit;
+	}
+
+	public List<String> getMethods() {
+		return methods;
+	}
+
+	public RoboUriInfo addMethod(String method) {
+		methods.add(method);
+		return this;
+	}
+
+	@Override
+	public String toString() {
+		return "RoboUriInfo{" + "unit=" + unit + ", methods=" + methods + '}';
+	}
 }

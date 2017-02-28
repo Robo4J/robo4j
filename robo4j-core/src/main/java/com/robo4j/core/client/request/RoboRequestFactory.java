@@ -28,6 +28,8 @@ import java.util.stream.Stream;
 import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.util.RoboHttpUtils;
+import com.robo4j.core.httpunit.HttpServerUnit;
+import com.robo4j.core.httpunit.HttpUriRegister;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.http.HttpMessageWrapper;
@@ -45,8 +47,6 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	private static final int SEPARATOR_PATH = 12;
 	private static final int DEFAULT_POSITION_0 = 0;
 
-	private List<RoboUnit<?>> units = null;
-
 	public RoboRequestFactory() {
 	}
 
@@ -63,10 +63,11 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 
 			/* currently is supported only */
 			// TODO: support more paths
-			SimpleLoggingUtil.debug(getClass(), "path: " + paths);
-			if (units != null && !units.isEmpty() && units.get(DEFAULT_POSITION_0) != null) {
+			final String path = paths.get(DEFAULT_POSITION_0);
+			final HttpUriRegister register = HttpUriRegister.getInstance();
+			if (register.isUnitAvailable(path)) {
 				/* currently is supported only one http unit */
-				final RoboUnit<?> desiredUnit = units.get(DEFAULT_POSITION_0);
+				final RoboUnit<?> desiredUnit = HttpUriRegister.getInstance().getRoboUnitByPath(path);
 				final Map<String, String> tmpQueryParsed = RoboHttpUtils.parseURIQueryToMap(uri.getQuery(),
 						ConstantUtil.HTTP_QUERY_SEP);
 				// @formatter:off
@@ -82,7 +83,6 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 		} else {
 			SimpleLoggingUtil.error(getClass(), "processGet is corrupted: " + wrapper);
 		}
-
 		return null;
 	}
 
@@ -94,13 +94,4 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 		return null;
 	}
 
-	@Override
-	public void setRoboUnits(List<RoboUnit<?>> units) {
-		this.units = units;
-	}
-
-	@Override
-	public List<RoboUnit<?>> getRoboUnits() {
-		return units;
-	}
 }

@@ -32,7 +32,7 @@ import com.robo4j.core.StringConsumer;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
-import com.robo4j.core.httpunit.test.HttpCommandTestUnit;
+import com.robo4j.core.httpunit.test.HttpCommandTestController;
 import com.robo4j.core.util.SystemUtil;
 
 /**
@@ -57,7 +57,7 @@ public class RoboHttpDynamicTests {
 	 * 
 	 * @throws Exception
 	 */
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	public void simpleHttpNonUnitTest() throws Exception {
 
@@ -87,7 +87,7 @@ public class RoboHttpDynamicTests {
 		targetUnits.setString(TARGET_UNIT, "GET");
 		httpServer.initialize(config);
 
-		HttpCommandTestUnit ctrl = new HttpCommandTestUnit(mainSystem, TARGET_UNIT);
+		HttpCommandTestController ctrl = new HttpCommandTestController(mainSystem, TARGET_UNIT);
 		config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("target", "request_consumer");
 		ctrl.initialize(config);
@@ -115,11 +115,11 @@ public class RoboHttpDynamicTests {
 		}
 		clientSystem.stop();
 		clientSystem.shutdown();
-		ctrl.getKnownAttributes().forEach(a -> System.out.println("http://<IP>" + PORT + "/"
-				+ a.getAttributeName() + "?<value of:" + a.getAttributeType().getSimpleName() + ">"));
+		ctrl.getKnownAttributes().forEach(a -> System.out.println("http://<IP>" + PORT + "/" + a.getAttributeName()
+				+ "?<value of:" + a.getAttributeType().getSimpleName() + ">"));
 
 		/* used only for standalone test */
-//		System.in.read();
+		// System.in.read();
 		DefaultAttributeDescriptor<ArrayList> messagesDescriptor = DefaultAttributeDescriptor.create(ArrayList.class,
 				"getReceivedMessages");
 		DefaultAttributeDescriptor<Integer> messagesNumberDescriptor = DefaultAttributeDescriptor.create(Integer.class,
