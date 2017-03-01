@@ -75,10 +75,16 @@ public class MessageProcessor {
 
     /* clone current map */
     public Map<String, String> getTicketAndResults(){
-        //@formatter:off
-        return ticketAndResults.entrySet().stream()
+		lock.lock();
+		try {
+			//@formatter:off
+            return ticketAndResults.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        //@formatter:on
+             //@formatter:on
+		} finally {
+			lock.unlock();
+		}
+
     }
 
     public int getCount(){
@@ -90,7 +96,7 @@ public class MessageProcessor {
         try {
             while(activeAsyncWorker.get() && asyncCounter.get() != ticketAndResults.size()){
                 lock.lock();
-                condition.await(1, TimeUnit.MILLISECONDS);
+				condition.await();
                 lock.unlock();
             }
             return asyncCounter.get();
