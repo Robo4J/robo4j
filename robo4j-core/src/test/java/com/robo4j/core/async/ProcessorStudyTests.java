@@ -59,13 +59,33 @@ public class ProcessorStudyTests {
 
         int numberAllAsync = processor.getAllAsync();
         System.out.println(getClass().getSimpleName() + " allSync: " + numberAllAsync);
-        System.out.println(getClass().getSimpleName() + " processor: " + processor.stopAsyncWorker());
+        System.out.println(getClass().getSimpleName() + " stopAsyncWorker : " + processor.stopAsyncWorker());
         System.out.println(getClass().getSimpleName() + " tickets: " + tickets + " size: "+ tickets.size());
         Map<String, String> ticketAndResultMap = processor.getTicketAndResults();
         System.out.println(getClass() + " TicketAndResults: " +ticketAndResultMap + " size: " + ticketAndResultMap.size());
 
-
         Assert.assertEquals(numberAllAsync, ticketAndResultMap.size());
+    }
+
+    @Test
+    public void testAsyncAndSyncMessagesProcessor(){
+
+        MessageProcessor processor = new MessageProcessor();
+        List<String> tickets = new ArrayList<>();
+        List<String> syncResult = new ArrayList<>();
+        for(int i=0; i<SYNC_MESSAGES; i++){
+            String message = "_test_" + i + "_message";
+            syncResult.add(processor.processSync(message));
+            tickets.add(processor.processAsync(message));
+        }
+
+        System.out.println("SyncMessages: " + syncResult);
+        Assert.assertEquals(SYNC_MESSAGES, syncResult.size());
+        Assert.assertEquals(SYNC_MESSAGES, processor.getAllAsync());
+        Assert.assertEquals(SYNC_MESSAGES, processor.getTicketAndResults().size());
+
+        System.out.println("AsyncAndSync tickets: " + tickets);
+        System.out.println("AsyncAndSync getTicketAndResults: " + processor.getTicketAndResults());
     }
 
 

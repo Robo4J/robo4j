@@ -77,7 +77,7 @@ public class MessageProcessor {
     public Map<String, String> getTicketAndResults(){
         //@formatter:off
         return ticketAndResults.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getKey));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         //@formatter:on
     }
 
