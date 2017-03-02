@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.junit.Assert;
+import org.junit.Test;
 
 import com.robo4j.core.DefaultAttributeDescriptor;
 import com.robo4j.core.RoboReference;
@@ -31,7 +32,6 @@ import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.util.SystemUtil;
-import org.junit.Test;
 
 /**
  * Ping Pong test from outside/foreign unit is send signal. The signal has been
@@ -39,6 +39,8 @@ import org.junit.Test;
  * target unit.
  *
  * (FU)<- client gets response from the server ->(SU)->(TU)
+ *
+ * Test communicates over socket on PORT
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
