@@ -147,6 +147,7 @@ public class MockupLcd implements AdafruitLcd {
 
 	public void setBacklight(Color color) {
 		this.color = color;
+		this.textArea.setBackground(LCDColorConverter.toAWTColor(color));
 	}
 
 	public void scrollDisplay(Direction direction) {
@@ -269,5 +270,19 @@ public class MockupLcd implements AdafruitLcd {
 	public void reset() throws IOException {
 		// TODO Auto-generated method stub
 
+	}
+}
+
+
+final class LCDColorConverter {
+	static java.awt.Color  toAWTColor( Color color) {
+		return new java.awt.Color(
+				rgbVal(color.getValue()&Color.RED.getValue()) ,
+				rgbVal(color.getValue()&Color.GREEN.getValue()),
+				rgbVal(color.getValue()&Color.BLUE.getValue()) );
+	}
+
+	private static int rgbVal( int bits) {
+		return bits == 0 ? 0 : 255;
 	}
 }
