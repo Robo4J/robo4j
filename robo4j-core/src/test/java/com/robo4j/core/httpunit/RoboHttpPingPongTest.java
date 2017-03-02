@@ -20,10 +20,9 @@ package com.robo4j.core.httpunit;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.robo4j.core.DefaultAttributeDescriptor;
 import org.junit.Assert;
-import org.junit.Test;
 
+import com.robo4j.core.DefaultAttributeDescriptor;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboSystem;
 import com.robo4j.core.StringConsumer;
@@ -31,8 +30,6 @@ import com.robo4j.core.StringProducer;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
-import com.robo4j.core.httpunit.HttpClientUnit;
-import com.robo4j.core.httpunit.HttpServerUnit;
 import com.robo4j.core.util.SystemUtil;
 
 /**

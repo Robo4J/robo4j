@@ -48,7 +48,6 @@ public class TankExampleController extends RoboUnit<LegoPlatformMessageTypeEnum>
 	 *            accepted message
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void onMessage(LegoPlatformMessageTypeEnum message) {
 		processPlatformMessage(message);
