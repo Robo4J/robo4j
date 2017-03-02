@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
  */
 public class HttpHeaderBuilder {
     private static final String STRING_EMPTY = "";
-    private static final int ELEMENT_JOIN = 0;
     private final Map<String, String> map;
 
     private HttpHeaderBuilder(){

@@ -22,7 +22,6 @@ package com.robo4j.units.lego;
 import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboResult;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
