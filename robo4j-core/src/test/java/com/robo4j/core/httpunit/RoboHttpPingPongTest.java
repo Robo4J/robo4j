@@ -31,6 +31,7 @@ import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.util.SystemUtil;
+import org.junit.Test;
 
 /**
  * Ping Pong test from outside/foreign unit is send signal. The signal has been
@@ -52,7 +53,7 @@ public class RoboHttpPingPongTest {
 
 	private ExecutorService executor = Executors.newFixedThreadPool(2);
 
-//	@Test
+	@Test
 	public void pingPongTest() throws Exception {
 
 		RoboSystem systemPong = configurePongSystem();
@@ -133,7 +134,6 @@ public class RoboHttpPingPongTest {
 		config.setInteger("port", PORT);
 		/* specific configuration */
 
-		// TODO FIXIME: implement controller
 		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
 		targetUnits.setString("controller", "GET");
 
