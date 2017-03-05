@@ -54,6 +54,11 @@ public class SensorTestWrapper implements ILegoSensor {
 	}
 
 	@Override
+	public void activate(boolean status) {
+		System.out.println(String.format("SensorTest.activate %s,  port:%s, type: %s", status, port, type));
+	}
+
+	@Override
 	public void close() {
 		System.out.println(String.format("SensorTest.close port:%s, type: %s", port, type));
 	}

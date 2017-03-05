@@ -70,6 +70,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 				final Map<String, String> tmpQueryParsed = RoboHttpUtils.parseURIQueryToMap(uri.getQuery(),
 						ConstantUtil.HTTP_QUERY_SEP);
 				// @formatter:off
+
 				final AttributeDescriptor<?> descriptor = desiredUnit.getKnownAttributes().stream()
 						.filter(a -> tmpQueryParsed.containsKey(a.getAttributeName()))
 						.findFirst().orElse(null);

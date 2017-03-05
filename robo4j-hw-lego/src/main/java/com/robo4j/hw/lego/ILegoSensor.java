@@ -38,6 +38,8 @@ public interface ILegoSensor {
 
 	String getData();
 
+	void activate(boolean status);
+
 	void close();
 
 }
