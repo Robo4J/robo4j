@@ -60,7 +60,7 @@ import com.robo4j.core.util.ConstantUtil;
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpServerUnit extends RoboUnit<Object> {
-	private static final String DELIMETER = ",";
+	private static final String DELIMITER = ",";
 	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
 	private static final int KEEP_ALIVE_TIME = 10;
 	private static final int _DEFAULT_PORT = 8042;
@@ -82,7 +82,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
 		/* target is always initiated as the list */
-		target = Arrays.asList(configuration.getString("target", ConstantUtil.EMPTY_STRING).split(DELIMETER));
+		target = Arrays.asList(configuration.getString("target", ConstantUtil.EMPTY_STRING).split(DELIMITER));
 		port = configuration.getInteger("port", _DEFAULT_PORT);
 
 		String packages = configuration.getString("packages", null);

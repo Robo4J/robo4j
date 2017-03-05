@@ -21,7 +21,7 @@ package com.robo4j.http.util;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class HttpFirstLineBuilder {
+public final class HttpFirstLineBuilder {
 	private volatile StringBuilder sb;
 
 	private HttpFirstLineBuilder(String value) {

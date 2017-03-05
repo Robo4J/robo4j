@@ -24,10 +24,13 @@ import java.io.Writer;
 import java.net.Socket;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.util.RoboHttpUtils;
+import com.robo4j.core.httpunit.HttpUriRegister;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.http.HttpHeaderNames;
@@ -37,6 +40,7 @@ import com.robo4j.http.HttpMethod;
 import com.robo4j.http.HttpVersion;
 import com.robo4j.http.util.HttpHeaderBuilder;
 import com.robo4j.http.util.HttpMessageUtil;
+import com.robo4j.http.util.HttpPathUtil;
 
 /**
  * Handling Request
@@ -46,6 +50,7 @@ import com.robo4j.http.util.HttpMessageUtil;
  */
 public class RoboRequestCallable implements Callable<Object> {
 
+	private static final int DEFAULT_POSITION_0 = 0;
 	private static final String DEFAULT_RESPONSE = "done";
 
 	private final Socket connection;
@@ -85,16 +90,20 @@ public class RoboRequestCallable implements Callable<Object> {
 						URI.create(tokens[HttpMessageUtil.URI_VALUE_POSITION]),
 						HttpVersion.getByValue(tokens[HttpMessageUtil.VERSION_POSITION]), params);
 
+				final List<String> paths = HttpPathUtil.generatePaths(httpMessage.uri().getPath());
+				final RoboUnit<?> desiredUnit = HttpUriRegister.getInstance()
+						.getRoboUnitByPath(paths.get(DEFAULT_POSITION_0));
 				//@formatter:on
 				processWriter(out, DEFAULT_RESPONSE);
 				switch (method) {
 				case GET:
-					return factory.processGet(new HttpMessageWrapper<>(httpMessage));
+					return factory.processGet(desiredUnit, paths.get(0), new HttpMessageWrapper<>(httpMessage));
 				case POST:
 					int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH).trim());
 					char[] buffer = new char[length];
 					in.read(buffer);
-					return factory.processPost(new HttpMessageWrapper<>(httpMessage, buffer));
+					return factory.processPost(desiredUnit, paths.get(0),
+							new HttpMessageWrapper<>(httpMessage, buffer));
 				default:
 					SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
 					return null;

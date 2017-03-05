@@ -17,38 +17,23 @@
 
 package com.robo4j.http.util;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
+ * Utils for the path operation
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class HttpHeaderBuilder {
-    private static final String STRING_EMPTY = "";
-    private final Map<String, String> map;
+public final class HttpPathUtil {
+    private static final int SEPARATOR_PATH = 12;
 
-    private HttpHeaderBuilder(){
-        map = new LinkedHashMap<>();
-    }
-
-    public static HttpHeaderBuilder Build(){
-        return new HttpHeaderBuilder();
-    }
-
-    public HttpHeaderBuilder add(String key, String value){
-        map.put(key, value);
-        return this;
-    }
-
-
-    public String build(){
-        return map.entrySet().stream()
-                .map(e -> e.getKey().concat(HttpMessageUtil.COLON)
-                        .concat(HttpMessageUtil.SPACE)
-                        .concat(e.getValue())
-                        .concat(HttpMessageUtil.NEXT_LINE))
-                .collect(Collectors.joining(STRING_EMPTY));
+    public static List<String> generatePaths(String source){
+        return Stream.of(source
+                .split(HttpMessageUtil.getHttpSeparator(SEPARATOR_PATH)))
+                .filter(e -> !e.isEmpty())
+                .collect(Collectors.toList());
     }
 }
