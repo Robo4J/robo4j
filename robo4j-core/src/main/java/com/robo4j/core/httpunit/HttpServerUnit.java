@@ -186,15 +186,14 @@ public class HttpServerUnit extends RoboUnit<Object> {
 						//Here is the problem
 
 						HttpUriRegister.getInstance().updateUnits(getContext());
-
-
 						final Future<Object> futureResult = executor
 								.submit(new RoboRequestCallable(requestChannel.socket(),
 								new RoboRequestFactory()));
 						//@formatter:on
+						/* here can be parallel, but we need to keep channel */
 						final Object result = futureResult.get();
 						for (RoboReference<Object> ref : targetRefs) {
-							if (ref.getMessageType() != null && result != null
+							if (result != null && ref.getMessageType() != null
 									&& ref.getMessageType().equals(result.getClass())) {
 								ref.sendMessage(result);
 							}
