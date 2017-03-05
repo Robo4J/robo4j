@@ -31,6 +31,7 @@ import com.robo4j.core.StringProducer;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
+import com.robo4j.core.httpunit.test.HttpCommandTestController;
 import com.robo4j.core.util.SystemUtil;
 
 /**
@@ -47,16 +48,15 @@ import com.robo4j.core.util.SystemUtil;
  */
 public class RoboHttpPingPongTest {
 
+	private static final String CONTROLLER_PING_PONG = "controller";
 	private static final String HOST_SYSTEM = "0.0.0.0";
 	private static final int PORT = 8042;
-    private static final String TEST_PATH ="tank";
 	private static final int MESSAGES = 3;
 
 
 	private ExecutorService executor = Executors.newFixedThreadPool(2);
 
-	//TODO FIXME -> miro fix
-//	@Test
+	@Test
 	public void pingPongTest() throws Exception {
 
 		RoboSystem systemPong = configurePongSystem();
@@ -79,15 +79,16 @@ public class RoboHttpPingPongTest {
 			System.out.println("systemPing: send messages");
 			RoboReference<Object> systemPingProducer = systemPing.getReference("http_producer");
 			for (int i = 0; i < MESSAGES; i++) {
-				systemPingProducer.sendMessage("sendGetMessage::".concat(TEST_PATH).concat("?").concat("something"));
+				systemPingProducer
+						.sendMessage("sendGetMessage::".concat("/controller").concat("?").concat("command=move"));
 			}
 		});
-
 
 
         StringConsumer pongConsumer = (StringConsumer) systemPong.getUnits().stream()
                 .filter(e -> e.getId().equals("request_consumer"))
                 .findFirst().get();
+
 
 		System.out.println("systemPing : Going Down!");
         systemPing.stop();
@@ -112,19 +113,24 @@ public class RoboHttpPingPongTest {
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
 		HttpServerUnit httpServer = new HttpServerUnit(result, "http_server");
-		config.setString("target", "request_consumer");
+		config.setString("target", CONTROLLER_PING_PONG);
 		config.setInteger("port", PORT);
 
 		/* specific configuration */
 		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
-		targetUnits.setString("controller", "GET");
-
+		targetUnits.setString(CONTROLLER_PING_PONG, "GET");
 		httpServer.initialize(config);
 
 		StringConsumer consumer = new StringConsumer(result, "request_consumer");
 		config = ConfigurationFactory.createEmptyConfiguration();
 		consumer.initialize(config);
-		result.addUnits(httpServer, consumer);
+
+		HttpCommandTestController ctrl = new HttpCommandTestController(result, CONTROLLER_PING_PONG);
+		config = ConfigurationFactory.createEmptyConfiguration();
+		config.setString("target", "request_consumer");
+		ctrl.initialize(config);
+
+		result.addUnits(httpServer, consumer, ctrl);
 		return result;
 	}
 
@@ -136,9 +142,8 @@ public class RoboHttpPingPongTest {
 		config.setString("address", HOST_SYSTEM);
 		config.setInteger("port", PORT);
 		/* specific configuration */
-
 		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
-		targetUnits.setString("controller", "GET");
+		targetUnits.setString(CONTROLLER_PING_PONG, "GET");
 
 		httpClient.initialize(config);
 
@@ -146,6 +151,7 @@ public class RoboHttpPingPongTest {
 		config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("target", "http_client");
 		config.setString("method", "GET");
+		config.setString("targetAddress", HOST_SYSTEM);
 		producer.initialize(config);
 
 		result.addUnits(producer, httpClient);

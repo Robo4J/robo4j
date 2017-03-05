@@ -31,6 +31,7 @@ public class StringProducer extends RoboUnit<String> {
     private AtomicInteger counter;
     private String target;
     private String method;
+    private String targetAddress;
 
     /**
      * @param context
@@ -48,6 +49,8 @@ public class StringProducer extends RoboUnit<String> {
         }
 
         method = configuration.getString("method", null);
+        targetAddress = configuration.getString("targetAddress", "0.0.0.0");
+
         counter = new AtomicInteger(DEFAULT);
 
     }
@@ -64,7 +67,7 @@ public class StringProducer extends RoboUnit<String> {
                     sendRandomMessage();
                     break;
                 case "sendGetMessage":
-                    sendGetSimpleMessage("localhost", input[1].trim());
+                    sendGetSimpleMessage(targetAddress, input[1].trim());
                     break;
                 default:
                     System.out.println("don't understand message: " + message);
