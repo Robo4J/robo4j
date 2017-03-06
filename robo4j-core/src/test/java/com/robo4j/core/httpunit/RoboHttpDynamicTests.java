@@ -115,8 +115,9 @@ public class RoboHttpDynamicTests {
 		}
 		clientSystem.stop();
 		clientSystem.shutdown();
-		ctrl.getKnownAttributes().forEach(a -> System.out.println("http://<IP>" + PORT + "/" + a.getAttributeName()
-				+ "?<value of:" + a.getAttributeType().getSimpleName() + ">"));
+
+		SystemUtil.generateSocketPoint(httpServer, ctrl);
+
 
 		/* used only for standalone test */
 		// System.in.read();
