@@ -29,8 +29,9 @@ import java.util.stream.Stream;
 public enum LegoSonicMessageTypeEnum {
 
     //@formatter:off
-    STOP        (0, "stop"),
+    FINISH      (0, "finish"),
     SCAN        (1, "scan"),
+    STOP        (2, "stop"),
     ;
 
 

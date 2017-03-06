@@ -62,7 +62,7 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 			LegoUtils.DEFAULT_THREAD_POOL_SIZE, LegoUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
 			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J Lego BasicSonic ", true));
 	private static final int POSITION_START = 0;
-	private static final int POSITION_STEP = 30;
+	private static final int POSITION_STEP = 45;
 	private static final int POSITION_MAX = 2*POSITION_STEP;
 	private String target;
 	private volatile AtomicBoolean unitActive = new AtomicBoolean(false);
@@ -127,11 +127,14 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 	private void processSonicMessage(LegoSonicMessage message){
 		try {
 			switch (message.getType()){
-				case STOP:
-					stop(sensor, servo).get();
+				case FINISH:
+					finish(sensor, servo).get();
 					break;
 				case SCAN:
 					scan(sensor, servo).get();
+					break;
+				case STOP:
+					stop(sensor, servo).get();
 					break;
 				default:
 					break;
@@ -142,7 +145,7 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 	}
 
 	private Future<Boolean> scan(ILegoSensor sensor, ILegoMotor motor){
-
+		unitActive.set(true);
 		return executor.submit(() -> {
 			while(unitActive.get()){
 				if(!motor.isMoving()){
@@ -164,21 +167,27 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 						servoPosition.set(POSITION_MAX);
 						servoRight.set(false);
 					}
-
 				}
-
-
 			}
 			return true;
 		});
 	}
 
+	private Future<Boolean> finish(ILegoSensor sensor, ILegoMotor motor){
+		return executor.submit(() -> {
+			sensor.close();
+			motor.close();
+			unitActive.set(false);
+			return motor.isMoving();
+		});
+	}
 
 	private Future<Boolean> stop(ILegoSensor sensor, ILegoMotor motor){
 		return executor.submit(() -> {
-			sensor.close();
-			motor.stop();
+			motor.rotate(servoPosition.get());
+			sensor.activate(false);
 			unitActive.set(false);
+			servoPosition.set(POSITION_START);
 			return motor.isMoving();
 		});
 	}
