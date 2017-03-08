@@ -62,13 +62,13 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 			LegoUtils.DEFAULT_THREAD_POOL_SIZE, LegoUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
 			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J Lego BasicSonic ", true));
 	private static final int POSITION_START = 0;
-	private static final int POSITION_STEP = 45;
-	private static final int POSITION_MAX = 2*POSITION_STEP;
+	private static final int POSITION_STEP = 5;
+	private static final int POSITION_MAX = 45; // should be degrees
 	private String target;
-	private volatile AtomicBoolean unitActive = new AtomicBoolean(false);
 	private volatile AtomicBoolean servoRight = new AtomicBoolean(false);
+	private volatile AtomicBoolean unitActive = new AtomicBoolean(false);
 	private volatile AtomicInteger servoPosition = new AtomicInteger(POSITION_START);
-	protected ILegoSensor sensor;
+	protected volatile ILegoSensor sensor;
 	protected volatile ILegoMotor servo;
 
 	public BasicSonicUnit(RoboContext context, String id) {
@@ -153,24 +153,25 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 					String data = sensor.getData();
 					sensor.activate(false);
 
-					if(servoPosition.get() == POSITION_START && servoRight.get()){
-						motor.rotate(POSITION_STEP);
-						servoPosition.set(POSITION_STEP);
+					int sign = servoRight.get() ? 1 : -1;
+					int currentPosition = servoPosition.get();
+					int rotation = sign * (POSITION_STEP);
+					if (currentPosition == POSITION_MAX) {
 						servoRight.set(false);
-					} else if((servoPosition.get() == POSITION_STEP || servoPosition.get() == POSITION_MAX) && !servoRight.get()){
-						int leftMax = -POSITION_MAX;
-						motor.rotate(leftMax);
-						servoPosition.set(leftMax);
+					} else if (currentPosition == -POSITION_MAX) {
 						servoRight.set(true);
-					} else 	if(servoPosition.get() < 0 && servoRight.get()){
-						motor.rotate(POSITION_MAX);
-						servoPosition.set(POSITION_MAX);
-						servoRight.set(false);
 					}
+					rotateToPosition(motor, rotation, currentPosition);
 				}
 			}
 			return true;
 		});
+	}
+
+	private void rotateToPosition(ILegoMotor motor, int rotation, int currentPostion) {
+		final int calcPosition = currentPostion + rotation;
+		servoPosition.set(calcPosition);
+		motor.rotate(rotation);
 	}
 
 	private Future<Boolean> finish(ILegoSensor sensor, ILegoMotor motor){
@@ -184,10 +185,11 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 
 	private Future<Boolean> stop(ILegoSensor sensor, ILegoMotor motor){
 		return executor.submit(() -> {
-			motor.rotate(servoPosition.get());
-			sensor.activate(false);
-			unitActive.set(false);
-			servoPosition.set(POSITION_START);
+			if (unitActive.get()) {
+				motor.stop();
+				unitActive.set(false);
+				sensor.activate(false);
+			}
 			return motor.isMoving();
 		});
 	}
