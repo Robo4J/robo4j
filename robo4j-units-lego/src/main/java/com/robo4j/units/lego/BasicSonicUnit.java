@@ -46,6 +46,8 @@ import com.robo4j.hw.lego.provider.MotorProvider;
 import com.robo4j.hw.lego.provider.SensorProvider;
 import com.robo4j.hw.lego.wrapper.MotorWrapper;
 import com.robo4j.hw.lego.wrapper.SensorWrapper;
+import com.robo4j.units.lego.sonic.LegoServoRotationEnum;
+import com.robo4j.units.lego.sonic.LegoSonicBrainMessage;
 import com.robo4j.units.lego.sonic.LegoSonicMessage;
 import com.robo4j.units.lego.utils.LegoUtils;
 
@@ -124,6 +126,12 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 
 
 	//Private Methods
+	private void sendMessage(RoboContext ctx, LegoSonicBrainMessage message) {
+		//TODO FIXME
+		System.err.println(getClass().getSimpleName() + " target: " + target + " message: " + message);
+		ctx.getReference(target).sendMessage(message);
+	}
+
 	private void processSonicMessage(LegoSonicMessage message){
 		try {
 			switch (message.getType()){
@@ -152,7 +160,6 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 					sensor.activate(true);
 					String data = sensor.getData();
 					sensor.activate(false);
-
 					int sign = servoRight.get() ? 1 : -1;
 					int currentPosition = servoPosition.get();
 					int rotation = sign * (POSITION_STEP);
@@ -161,6 +168,8 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 					} else if (currentPosition == -POSITION_MAX) {
 						servoRight.set(true);
 					}
+					final LegoServoRotationEnum servoRotation = servoRight.get() ? LegoServoRotationEnum.RIGHT : LegoServoRotationEnum.LEFT;
+					sendMessage(getContext(), new LegoSonicBrainMessage(servoRotation, currentPosition,  data));
 					rotateToPosition(motor, rotation, currentPosition);
 				}
 			}
