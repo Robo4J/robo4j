@@ -25,12 +25,11 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -51,6 +50,7 @@ import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.util.ConstantUtil;
 
 /**
  * Http NIO unit allows to configure format of the requests currently is only
@@ -60,10 +60,10 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpServerUnit extends RoboUnit<Object> {
+	private static final String DELIMITER = ",";
 	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
 	private static final int KEEP_ALIVE_TIME = 10;
 	private static final int _DEFAULT_PORT = 8042;
-	private static final String HTTP_COMMAND = "command";
 	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
 	private static final HttpCodecRegistry CODEC_REGISTRY = new HttpCodecRegistry();
 	private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
@@ -71,11 +71,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			new RoboThreadFactory("Robo4J HttServerUnit ", true));
 	private boolean available;
 	private Integer port;
-	private String target;
+	private List<String> target;
 	private ServerSocketChannel server;
 	private Selector selector;
-	private final List<String> registeredUnitIds = new ArrayList<>();
-
 	public HttpServerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
 	}
@@ -83,7 +81,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
-		target = configuration.getString("target", null);
+		/* target is always initiated as the list */
+		target = Arrays.asList(configuration.getString("target", ConstantUtil.EMPTY_STRING).split(DELIMITER));
 		port = configuration.getInteger("port", _DEFAULT_PORT);
 
 		String packages = configuration.getString("packages", null);
@@ -91,27 +90,17 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			CODEC_REGISTRY.scan(Thread.currentThread().getContextClassLoader(), packages.split(","));
 		}
 
-		final Configuration commands = configuration.getChildConfiguration(HTTP_COMMAND.concat("s"));
-		if (target == null && commands == null) {
-			throw ConfigurationException.createMissingConfigNameException("target, method, path, commands...");
-		}
 		//@formatter:off
-
-
 		final Configuration targetUnits = configuration.getChildConfiguration("targetUnits");
-		final Map<String, String> targetUnitValues = new HashMap<>();
 		if(targetUnits == null){
 			SimpleLoggingUtil.error(getClass(), "no targetUnits");
 		} else {
-			Set<String> targetUnitNames = targetUnits.getValueNames();
-			for(Iterator<String> it = targetUnitNames.iterator(); it.hasNext();){
-				String key = it.next();
-				String value = targetUnits.getString(key, RoboHttpUtils._EMPTY_STRING);
-				targetUnitValues.put(key, value);
-				registeredUnitIds.add(key);
+			for(Iterator<String> it =  targetUnits.getValueNames().iterator(); it.hasNext();){
+				final String key = it.next();
+				final String value = targetUnits.getString(key, RoboHttpUtils._EMPTY_STRING);
+				HttpUriRegister.getInstance().addNote(key, value);
 			}
 		}
-
         //@formatter:on
 		setState(LifecycleState.INITIALIZED);
 	}
@@ -119,12 +108,14 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	@Override
 	public void start() {
 		setState(LifecycleState.STARTING);
-		final RoboReference<Object> targetRef = getContext().getReference(target);
+
+		final List<RoboReference<Object>> targetRefs = target.stream().map(e -> getContext().getReference(e))
+				.filter(Objects::nonNull).collect(Collectors.toList());
 		if (!available) {
 			available = true;
-			executor.execute(() -> server(targetRef));
+			executor.execute(() -> server(targetRefs));
 		} else {
-			System.out.println("HttpDynamicUnit start() -> error: " + targetRef);
+			SimpleLoggingUtil.error(getClass(), "HttpDynamicUnit start() -> error: " + targetRefs);
 		}
 		setState(LifecycleState.STARTED);
 	}
@@ -161,10 +152,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	 * @param targetRef
 	 *            - reference to the target queue
 	 */
-	private void server(final RoboReference<Object> targetRef) {
+	private void server(final List<RoboReference<Object>> targetRefs) {
 		try {
-			// TODO miro -> implement;
-
 			/* selector is multiplexor to SelectableChannel */
 			// Selects a set of keys whose corresponding channels are ready for
 			// I/O operations
@@ -172,8 +161,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			server = ServerSocketChannel.open();
 			server.socket().bind(new InetSocketAddress(port));
 			server.configureBlocking(false);
-
-			SimpleLoggingUtil.debug(getClass(), "started port: " + port);
 
 			int selectorOpt = server.validOps();
 			server.register(selector, selectorOpt, null);
@@ -192,28 +179,34 @@ public class HttpServerUnit extends RoboUnit<Object> {
 					if (selectedKey.isAcceptable()) {
 						SocketChannel requestChannel = server.accept();
 						requestChannel.configureBlocking(true);
-						// TODO: miro -> improve multi-channels
+						// TODO: miro -> improve multi-channels, selectors
 						// electionKey.OP_READ, etc. option
 
 						//@formatter:off
-						final List<RoboUnit<?>> registeredUnits = getContext().getUnits().stream()
-								.filter(u -> registeredUnitIds.contains(u.getId()))
-								.collect(Collectors.toList());
-						//@formatter:on
-						Future<Object> result = executor
-								.submit(new RoboRequestCallable(requestChannel.socket(), new RoboRequestFactory(),
-										registeredUnits));
-						targetRef.sendMessage(result.get());
-						requestChannel.close();
+						//Here is the problem
 
+						HttpUriRegister.getInstance().updateUnits(getContext());
+						final Future<Object> futureResult = executor
+								.submit(new RoboRequestCallable(requestChannel.socket(),
+								new RoboRequestFactory()));
+						//@formatter:on
+						/* here can be parallel, but we need to keep channel */
+						final Object result = futureResult.get();
+						for (RoboReference<Object> ref : targetRefs) {
+							if (result != null && ref.getMessageType() != null
+									&& ref.getMessageType().equals(result.getClass())) {
+								ref.sendMessage(result);
+							}
+						}
+
+						// targetRef.sendMessage(futureResult.get());
+						requestChannel.close();
 					} else {
-						System.out.println("something is not right: " + selectedKey);
+						SimpleLoggingUtil.error(getClass(), "something is not right: " + selectedKey);
 					}
 					selectedIterator.remove();
 				}
-
 			}
-
 		} catch (InterruptedException | ExecutionException | IOException e) {
 			SimpleLoggingUtil.error(getClass(), "SERVER CLOSED", e);
 		}

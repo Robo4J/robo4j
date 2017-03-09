@@ -19,21 +19,18 @@
 
 package com.robo4j.units.lego;
 
-import com.robo4j.core.DefaultAttributeDescriptor;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.robo4j.core.DefaultAttributeDescriptor;
 import com.robo4j.core.RoboSystem;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.units.lego.platform.LegoPlatformMessage;
 
-import java.util.concurrent.Future;
-
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 30.01.2017
  */
 public class SimpleTankUnitTests {
 

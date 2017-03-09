@@ -25,9 +25,8 @@ import java.util.stream.Collectors;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class HttpHeaderBuilder {
+public final class HttpHeaderBuilder {
     private static final String STRING_EMPTY = "";
-    private static final int ELEMENT_JOIN = 0;
     private final Map<String, String> map;
 
     private HttpHeaderBuilder(){

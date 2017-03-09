@@ -46,7 +46,6 @@ import lejos.hardware.KeyListener;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 31.01.2017
  */
 public class BrickButtonsUnit extends RoboUnit<String> {
 	private static final int COLOR_GREEN = 1;

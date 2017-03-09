@@ -49,7 +49,6 @@ import com.robo4j.units.lego.utils.LegoUtils;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 30.01.2017
  */
 public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements RoboReference<LegoPlatformMessage> {
 

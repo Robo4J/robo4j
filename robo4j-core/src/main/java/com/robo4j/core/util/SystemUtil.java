@@ -31,6 +31,7 @@ import com.robo4j.core.RoboUnit;
  */
 public final class SystemUtil {
 	private static final String BREAK = "\n";
+	private static final String SLASH = "/";
 
 	private SystemUtil() {
 		// no instances
@@ -47,12 +48,46 @@ public final class SystemUtil {
 		StringBuilder builder = new StringBuilder();
 		List<RoboUnit<?>> units = new ArrayList<>(ctx.getUnits());
 		units.sort(ID_COMPARATOR);
+		//formatter:off
 		builder.append("RoboSystem state ").append(ctx.getState().getLocalizedName())
-				.append("\n================================================").append(BREAK);
+				.append(BREAK)
+				.append("================================================")
+				.append(BREAK);
 		for (RoboUnit<?> unit : units) {
 			builder.append(String.format("    %-25s   %13s", unit.getId(), unit.getState().getLocalizedName()))
 					.append(BREAK);
 		}
+		//formatter:on
 		return builder.toString();
+	}
+
+	public static String generateSocketPoint(RoboUnit<?> point, RoboUnit<?> codecUnit){
+		final int port = point.getConfiguration().getInteger("port", 0);
+		StringBuilder sb = new StringBuilder();
+		sb.append("RoboSystem end-points:")
+				.append(BREAK)
+				.append("================================================")
+				.append(BREAK);
+		codecUnit.getKnownAttributes().forEach(a ->
+			sb.append("http://<IP>")
+					.append(port)
+					.append(SLASH)
+					.append(codecUnit.getId())
+					.append("?")
+					.append(a.getAttributeName())
+					.append("=<value of:\"")
+					.append(a.getAttributeType().getSimpleName())
+					.append("\">")
+					.append(BREAK));
+		sb.append("================================================")
+				.append(BREAK);
+		return sb.toString();
+	}
+
+	public static RoboUnit<?> genUnitFromContext(RoboContext ctx, String id){
+		return ctx.getUnits().stream()
+				.filter(u -> u.getId().equals(id))
+				.findFirst()
+				.orElse(null);
 	}
 }

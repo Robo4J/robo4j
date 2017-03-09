@@ -16,8 +16,6 @@
  */
 package com.robo4j.core.client.request;
 
-import java.util.List;
-
 import com.robo4j.core.RoboUnit;
 import com.robo4j.http.HttpMessageWrapper;
 
@@ -27,22 +25,8 @@ import com.robo4j.http.HttpMessageWrapper;
  */
 public interface DefaultRequestFactory<ResponseType> {
 
+	ResponseType processGet(RoboUnit<?> desiredUnit, String path, HttpMessageWrapper<?> wrapper);
 
-	  ResponseType processGet(HttpMessageWrapper<?> wrapper);
+	ResponseType processPost(RoboUnit<?> desiredUnit, String path, HttpMessageWrapper<?> wrapper);
 
-	  ResponseType processPost(HttpMessageWrapper<?> wrapper);
-
-      /**
-      *
-      * @param units
-      *            represent target units that are holding information about API
-      *            entitie
-      */
-      void setRoboUnits(List<RoboUnit<?>> units);
-
-      /**
-      *
-      * @return registered units
-      */
-      List<RoboUnit<?>> getRoboUnits();
 }

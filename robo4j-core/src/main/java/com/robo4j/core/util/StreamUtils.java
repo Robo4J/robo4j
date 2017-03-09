@@ -27,7 +27,8 @@ import java.util.stream.StreamSupport;
 /**
  * Streams related utils
  * 
- * @author Miro Kopecky (@miragemiko)
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 public final class StreamUtils {
 

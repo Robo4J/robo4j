@@ -22,17 +22,16 @@ package com.robo4j.units.lego;
 import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboResult;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
 import com.robo4j.hw.lego.wrapper.SensorTestWrapper;
 import com.robo4j.units.lego.sensor.LegoSensorMessage;
+import com.robo4j.units.lego.sonic.LegoSonicMessage;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 04.02.2017
  */
 public class BasicSonicSensorUnitMock extends BasicSonicUnit {
 
@@ -47,7 +46,7 @@ public class BasicSonicSensorUnitMock extends BasicSonicUnit {
     }
 
     @Override
-    public void onMessage(LegoSensorMessage message) {
+    public void onMessage(LegoSonicMessage message) {
         System.out.println("onMessage : " + message);
     }
 

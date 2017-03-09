@@ -32,7 +32,6 @@ import com.robo4j.hw.lego.wrapper.LcdWrapper;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
- * @since 01.02.2017
  */
 public class LcdUnit extends RoboUnit<Object> {
 	private static final String CONSTANT_CLEAR = "clear";

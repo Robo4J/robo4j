@@ -27,10 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.util.RoboHttpUtils;
+import com.robo4j.core.httpunit.HttpUriRegister;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.http.HttpHeaderNames;
@@ -40,6 +40,7 @@ import com.robo4j.http.HttpMethod;
 import com.robo4j.http.HttpVersion;
 import com.robo4j.http.util.HttpHeaderBuilder;
 import com.robo4j.http.util.HttpMessageUtil;
+import com.robo4j.http.util.HttpPathUtil;
 
 /**
  * Handling Request
@@ -49,83 +50,77 @@ import com.robo4j.http.util.HttpMessageUtil;
  */
 public class RoboRequestCallable implements Callable<Object> {
 
-    private static final String DEFAULT_RESPONSE = "done";
+	private static final int DEFAULT_POSITION_0 = 0;
+	private static final String DEFAULT_RESPONSE = "done";
 
-    private final Socket connection;
-    private final DefaultRequestFactory<?> factory;
-    private final List<RoboUnit<?>> registeredUnits;
+	private final Socket connection;
+	private final DefaultRequestFactory<?> factory;
 
+	// public RoboRequestCallable(Socket connection,
+	// DefaultRequestFactory<Object> factory, List<RoboUnit<?>> registeredUnits)
+	// {
+	public RoboRequestCallable(Socket connection, DefaultRequestFactory<Object> factory) {
+		assert connection != null;
+		this.connection = connection;
+		this.factory = factory;
+	}
 
-    public RoboRequestCallable(Socket connection, DefaultRequestFactory<Object> factory, List<RoboUnit<?>> registeredUnits) {
-        assert connection != null;
-        this.connection = connection;
-        this.factory = factory;
-        this.registeredUnits = registeredUnits;
-    }
-
-    @Override
-    public Object call() throws Exception {
-        try (Writer out = new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
-             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+	@Override
+	public Object call() throws Exception {
+		try (Writer out = new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
+				BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
 
 			final String firstLine = RoboHttpUtils.correctLine(in.readLine());
 			final String[] tokens = firstLine.split(ConstantUtil.HTTP_EMPTY_SEP);
 			final HttpMethod method = HttpMethod.getByName(tokens[HttpMessageUtil.METHOD_KEY_POSITION]);
 
-            if(method != null){
-                final Map<String, String> params = new HashMap<>();
+			if (method != null) {
+				final Map<String, String> params = new HashMap<>();
 
-                String inputLine;
-                while (!(inputLine = RoboHttpUtils.correctLine(in.readLine())).equals(ConstantUtil.EMPTY_STRING)) {
-                    final String[] array = inputLine
-                            .split(HttpMessageUtil.getHttpSeparator(HttpMessageUtil.HTTP_HEADER_SEP));
-                    params.put(array[HttpMessageUtil.METHOD_KEY_POSITION].toLowerCase(),
-                            array[HttpMessageUtil.URI_VALUE_POSITION]);
-                }
+				String inputLine;
+				while (!(inputLine = RoboHttpUtils.correctLine(in.readLine())).equals(ConstantUtil.EMPTY_STRING)) {
+					final String[] array = inputLine
+							.split(HttpMessageUtil.getHttpSeparator(HttpMessageUtil.HTTP_HEADER_SEP));
+					params.put(array[HttpMessageUtil.METHOD_KEY_POSITION].toLowerCase(),
+							array[HttpMessageUtil.URI_VALUE_POSITION]);
+				}
 
-                /* parsed http specifics, header */
-                final HttpMessage httpMessage = new HttpMessage(method, URI.create(tokens[HttpMessageUtil.URI_VALUE_POSITION]),
-                        HttpVersion.getByValue(tokens[HttpMessageUtil.VERSION_POSITION]), params);
+				/* parsed http specifics, header */
+				final HttpMessage httpMessage = new HttpMessage(method,
+						URI.create(tokens[HttpMessageUtil.URI_VALUE_POSITION]),
+						HttpVersion.getByValue(tokens[HttpMessageUtil.VERSION_POSITION]), params);
 
-                //TODO -> improve response -> here can be printed out basic system
-                final String targetUnitId = httpMessage.uri().getPath().replace("/", RoboHttpUtils._EMPTY_STRING);
-                //@formatter:off
-                final List<RoboUnit<?>> desiredUnits = registeredUnits.stream()
-                        .filter(u -> u.getId().equals(targetUnitId))
-                        .collect(Collectors.toList());
-                factory.setRoboUnits(desiredUnits);
-                //@formatter:on
-                processWriter(out, DEFAULT_RESPONSE);
-                switch (method){
-                    case GET:
-                        return factory.processGet(new HttpMessageWrapper<>(httpMessage));
-                    case POST:
-                        int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH).trim());
-                        char[] buffer = new char[length];
-                        in.read(buffer);
-                        return factory.processPost(new HttpMessageWrapper<>(httpMessage, buffer));
-                    default:
-                        SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
-                        return null;
-                }
-            } else {
-                SimpleLoggingUtil.error(getClass(), "error");
-            }
-        }
-        return null;
-    }
+				final List<String> paths = HttpPathUtil.generatePaths(httpMessage.uri().getPath());
+				final RoboUnit<?> desiredUnit = HttpUriRegister.getInstance()
+						.getRoboUnitByPath(paths.get(DEFAULT_POSITION_0));
+				//@formatter:on
+				processWriter(out, DEFAULT_RESPONSE);
+				switch (method) {
+				case GET:
+					return factory.processGet(desiredUnit, paths.get(0), new HttpMessageWrapper<>(httpMessage));
+				case POST:
+					int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH).trim());
+					char[] buffer = new char[length];
+					in.read(buffer);
+					return factory.processPost(desiredUnit, paths.get(0),
+							new HttpMessageWrapper<>(httpMessage, buffer));
+				default:
+					SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
+					return null;
+				}
+			}
+		}
+		return null;
+	}
 
-    //Private Methods
+	// Private Methods
 	private void processWriter(final Writer out, String message) throws Exception {
-        out.write(RoboHttpUtils.HTTP_HEADER_OK);
-        out.write(HttpHeaderBuilder.Build()
-                .add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(message.length()))
-                .build());
-        out.write(RoboHttpUtils.NEW_LINE);
-        out.write(message);
-        out.flush();
-    }
-
+		out.write(RoboHttpUtils.HTTP_HEADER_OK);
+		out.write(HttpHeaderBuilder.Build().add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(message.length()))
+				.build());
+		out.write(RoboHttpUtils.NEW_LINE);
+		out.write(message);
+		out.flush();
+	}
 
 }
-

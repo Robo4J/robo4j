@@ -256,40 +256,6 @@ project("robo4j-units-lego") {
     }
 }
 
-project("robo4j-units-lego-test") {
-    description = "Robo4J Lego Test Abstractions"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
-
-    sourceCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "${mavenRepository}")
-            }
-        }
-    }
-
-    dependencies {
-        compile(project(":robo4j-units-lego"))
-        compile(project(":robo4j-core"))
-        testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
-    }
-}
-
 project("robo4j-units-rpi") {
     description = "Robo4J Raspberry Pi"
 
@@ -334,6 +300,10 @@ project("robo4j-units-rpi") {
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "${gradleVersion}"
 }
 
 /* global settings */

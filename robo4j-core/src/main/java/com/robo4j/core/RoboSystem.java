@@ -89,7 +89,7 @@ public class RoboSystem implements RoboContext {
 
 		@Override
 		public Class<T> getMessageType() {
-			return null;
+			return unit.getMessageType();
 		}
 
 		@Override

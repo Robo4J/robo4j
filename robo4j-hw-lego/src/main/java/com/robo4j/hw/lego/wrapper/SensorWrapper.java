@@ -82,6 +82,17 @@ public class SensorWrapper<Sensor extends BaseSensor> implements ILegoSensor {
 	}
 
 	@Override
+	public void activate(boolean status) {
+		if (sensor instanceof EV3UltrasonicSensor){
+			if(status){
+				((EV3UltrasonicSensor) sensor).enable();
+			} else {
+				((EV3UltrasonicSensor) sensor).disable();
+			}
+		}
+	}
+
+	@Override
 	public void close() {
 		((EV3UltrasonicSensor) sensor).disable();
 		sensor.close();

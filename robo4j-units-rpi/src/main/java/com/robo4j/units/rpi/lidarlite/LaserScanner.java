@@ -64,7 +64,6 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	private String tilt;
 	private String target;
 	private LidarLiteDevice lidar;
-	private volatile boolean currentScanDirection;
 	private float panServoRange;
 	private float tiltServoRange;
 	private float panAngularSpeed;
@@ -117,7 +116,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 
 	private void scheduleScan(ScanRequest message, RoboReference<Long> panServo, RoboReference<Long> tiltServo,
 			RoboReference<ScanResult2D> targetRef) {
-		final ScanResultImpl result = new ScanResultImpl();
+		new ScanResultImpl();
 		
 		float minimumServoMovementTime = message.getRange() / panAngularSpeed;
 		float numberOfScans = message.getRange() / message.getStep();
