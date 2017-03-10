@@ -217,7 +217,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		float currentInput = getCurrentInput(servo);
 		float midPoint = message.getStartAngle() + message.getRange() / 2;
 		boolean lowToHigh = false;
-		if (inputToAngle(currentInput) >= midPoint) {
+		if (inputToAngle(currentInput) <= midPoint) {
 			lowToHigh = true;
 		}
 		float minimumServoMovementTime = message.getRange() / angularSpeed;
