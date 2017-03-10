@@ -41,7 +41,7 @@ public class Servo {
 	private float trim = 0.0f;
 	private float dualRate = 1.0f;
 	private float expo = 0.0f;
-	private float input = 0.0f;
+	private volatile float input = 0.0f;
 
 	/**
 	 * Constructs a servo wrapper instance for the specified channel.
@@ -56,23 +56,23 @@ public class Servo {
 	/**
 	 * Sets the normalized input to this servo, between -1 (min) and 1 (max).
 	 * 
-	 * @param input
+	 * @param newInput
 	 *            normalized input between -1 and 1.
 	 * 
 	 * @throws IOException
 	 *             if there was a problem communicating with the device.
 	 */
-	public void setInput(float input) throws IOException {
-		input = calculateExpo(input);
-		input = (input * dualRate) + trim / TRIM_STEPS;
+	public void setInput(float newInput) throws IOException {
+		newInput = calculateExpo(newInput);
+		newInput = (newInput * dualRate) + trim / TRIM_STEPS;
 		
-		input = (input + 1.0f)/2;
+		newInput = (newInput + 1.0f)/2;
 		if (invert) {
-			input = 1.0f - input;
+			newInput = 1.0f - newInput;
 		}	
-		int width = Math.round((max - min) * input) + min;
+		int width = Math.round((max - min) * newInput) + min;
 		channel.setPWM(0, width);
-		this.input = input;
+		this.input = newInput;
 	}
 
 	/**
