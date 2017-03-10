@@ -166,8 +166,8 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		super.onInitialization(configuration);
 		pan = configuration.getString("servo", "laserscanner.servo");
-		// Using degrees for convenience, but using radians internally
-		servoRange = (float) Math.toRadians(configuration.getFloat("servoRange", 45.0f));
+		// Using degrees for convenience
+		servoRange = (float) configuration.getFloat("servoRange", 45.0f);
 
 		// Using angular degrees per second.
 		angularSpeed = configuration.getFloat("angularSpeed", 90.0f);
