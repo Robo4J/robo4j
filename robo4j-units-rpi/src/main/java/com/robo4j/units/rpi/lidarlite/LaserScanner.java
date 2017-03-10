@@ -17,14 +17,20 @@
 package com.robo4j.units.rpi.lidarlite;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.hw.rpi.i2c.lidar.LidarLiteDevice;
 import com.robo4j.math.geometry.ScanResult2D;
 import com.robo4j.math.geometry.impl.ScanResultImpl;
 import com.robo4j.units.rpi.lcd.I2CRoboUnit;
+import com.robo4j.units.rpi.pwm.PCA9685ServoUnit;
 
 /**
  * This unit controls two servos to do laser range finder scans.
@@ -62,13 +68,107 @@ import com.robo4j.units.rpi.lcd.I2CRoboUnit;
 public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	private String pan;
 	private String tilt;
-	private String target;
 	private LidarLiteDevice lidar;
 	private float panServoRange;
 	private float tiltServoRange;
 	private float panAngularSpeed;
 	private float minimumAcquisitionTime;
 	private float angularOffset;
+
+	private final static class ScanJob implements Runnable {
+		private final AtomicInteger invokeCount = new AtomicInteger(0);
+		private final ScanResultImpl scanResult = new ScanResultImpl(100);
+		private final ScanRequest request;
+		private final RoboReference<ScanResult2D> recipient;
+		private final RoboReference<Float> servo;
+		private final boolean lowToHigh;
+		private final int numberOfScans;
+		private final int delay;
+		private final float minimumServoMovementTime;
+		private final float minimumAcquisitionTime;
+		private final float servoRange;
+		private volatile float currentAngle;
+		private final LidarLiteDevice lidar;
+		private volatile boolean finished = false;
+
+		public ScanJob(boolean lowToHigh, float minimumServoMovementTime, float minimumAcquisitionTime, ScanRequest request,
+				RoboReference<Float> servo, float servoRange, LidarLiteDevice lidar, RoboReference<ScanResult2D> recipient) {
+			this.lowToHigh = lowToHigh;
+			this.minimumServoMovementTime = minimumServoMovementTime;
+			this.minimumAcquisitionTime = minimumAcquisitionTime;
+			this.request = request;
+			this.servo = servo;
+			this.servoRange = servoRange;
+			this.lidar = lidar;
+			this.recipient = recipient;
+			this.numberOfScans = calculateNumberOfScans() + 1;
+			this.delay = calculateDelay();
+			this.currentAngle = lowToHigh ? request.getStartAngle() : request.getStartAngle() + request.getRange();
+		}
+
+		@Override
+		public void run() {
+			int currentRun = invokeCount.incrementAndGet();
+			if (currentRun == 1) {
+				// On first step, only move servo to start position
+				float normalizedServoTarget = getNormalizedAngle();
+				servo.sendMessage(normalizedServoTarget);
+			} else if (currentRun > numberOfScans) {
+				doScan();
+				finish();
+			} else {
+				doScan();
+			}
+			// FIXME(Marcus/Mar 10, 2017): May want to synchronize this...
+			updateTargetAngle();
+		}
+
+		private float getNormalizedAngle() {
+			return this.currentAngle / this.servoRange;
+		}
+
+		private void doScan() {
+			// Read previous acquisition
+			try {
+				float readDistance = lidar.readDistance();
+				// Laser was actually shooting at the previous angle, before
+				// moving - recalculate for that angle
+				float lastAngle = currentAngle + (lowToHigh ? -request.getStep() : request.getStep());
+				scanResult.addPoint(readDistance, lastAngle);
+				servo.sendMessage(getNormalizedAngle());
+				lidar.acquireRange();
+			} catch (IOException e) {
+				SimpleLoggingUtil.error(getClass(), "Could not read laser!", e);
+			}
+		}
+
+		private void finish() {
+			if (!finished) {
+				recipient.sendMessage(scanResult);
+				finished = true;
+			} else {
+				SimpleLoggingUtil.error(getClass(), "Tried to scan more laser points after being finished!");
+			}
+		}
+
+		private void updateTargetAngle() {
+			if (lowToHigh) {
+				currentAngle += request.getStep();
+			} else {
+				currentAngle -= request.getStep();
+			}
+		}
+
+		private int calculateNumberOfScans() {
+			return Math.round(request.getRange() / request.getStep());
+		}
+
+		// FIXME(Marcus/Mar 10, 2017): Calculate the required delay later from
+		// physical model.
+		private int calculateDelay() {
+			return 10;
+		}
+	}
 
 	public LaserScanner(RoboContext context, String id) {
 		super(ScanRequest.class, context, id);
@@ -77,71 +177,90 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		super.onInitialization(configuration);
-		pan = configuration.getString("pan", "pan");
+		pan = configuration.getString("pan", "laserscanner.pan");
 		// Using degrees for convenience, but using radians internally
 		panServoRange = (float) Math.toRadians(configuration.getFloat("panServoRange", 45.0f));
-		tilt = configuration.getString("tilt", "tilt");
+		tilt = configuration.getString("tilt", "laserscanner.tilt");
 		tiltServoRange = (float) Math.toRadians(configuration.getFloat("tiltServoRange", 45.0f));
-		
-		// Using angular degrees per second. 
+
+		// Using angular degrees per second.
 		panAngularSpeed = configuration.getFloat("panAngularSpeed", 90.0f);
-		
+
 		// Minimum acquisition time, in ms
 		minimumAcquisitionTime = configuration.getFloat("minAquisitionTime", 2.0f);
-		
-		// Angular offset - required since we don't wait for an acquired range before moving the servo. 
+
+		// Angular offset - required since we don't wait for an acquired range
+		// before moving the servo.
 		// If you always move the servo very slowly, this is not required.
-		// FIXME(Marcus/Feb 16, 2017): We will very likely need configuration tables for this - i.e. different 
-		// finely tuned offsets for different angular steps? 
+		// FIXME(Marcus/Feb 16, 2017): We will very likely need configuration
+		// tables for this - i.e. different
+		// finely tuned offsets for different angular steps?
 		angularOffset = configuration.getFloat("angularOffset", 3.0f);
-		
-		target = configuration.getString("target", "scanController");
+
 		try {
 			lidar = new LidarLiteDevice(getBus(), getAddress());
 		} catch (IOException e) {
 			throw new ConfigurationException(String.format(
-					"Failed to initialize lidar device. Make sure it is hooked up to bus: %d address: %xd", getBus(),
-					getAddress()), e);
+					"Failed to initialize lidar device. Make sure it is hooked up to bus: %d address: %xd", getBus(), getAddress()), e);
 		}
 	}
 
 	@Override
 	public void onMessage(ScanRequest message) {
-		RoboReference<Long> panServo = getReference(pan);
-		RoboReference<Long> tiltServo = getReference(tilt);
-		RoboReference<ScanResult2D> targetRef = getContext().getReference(target);
+		RoboReference<Float> panServo = getReference(pan);
+		RoboReference<Float> tiltServo = getReference(tilt);
 
-		scheduleScan(message, panServo, tiltServo, targetRef);
+		RoboReference<ScanResult2D> receiverRef = getContext().getReference(message.getReceiverId());
+		scheduleScan(message, panServo, tiltServo, receiverRef);
 	}
 
-	private void scheduleScan(ScanRequest message, RoboReference<Long> panServo, RoboReference<Long> tiltServo,
-			RoboReference<ScanResult2D> targetRef) {
-		new ScanResultImpl();
-		
-		float minimumServoMovementTime = message.getRange() / panAngularSpeed;
-		float numberOfScans = message.getRange() / message.getStep();
-		float minimumSampleAquisitionTime = numberOfScans * minimumAcquisitionTime;
-		
-		if (minimumSampleAquisitionTime < minimumServoMovementTime) {
-			// We are constrained by the servo movement speed, simply sample whilst moving
-			// So, start with setting a servo movement from min to max (or max to min, depending on scan direction and current angle), 
-			// and then schedule scans throughout the movement.
-		} else {
-			// We are constrained by the time it takes to acquire the samples. Move the servo with the calculated delays and acquire samples in between
-			
+	private void scheduleScan(ScanRequest message, RoboReference<Float> panServo, RoboReference<Float> tiltServo,
+			RoboReference<ScanResult2D> recipient) {
+		float currentInput = getCurrentInput(panServo);
+		float midPoint = message.getStartAngle() + message.getRange() / 2;
+		boolean lowToHigh = false;
+		if (currentInput > midPoint) {
+			lowToHigh = true;
 		}
-		// Note that to be able to scan as quickly as possible, we will actually move the head whilst waiting for the results. This will result in 
-		// a necessary angular offset. This must be compensated for.
-		
-		
-		// getContext().getScheduler().schedule(targetRef, , delay, interval, TimeUnit.MILLISECONDS);
+		float minimumServoMovementTime = message.getRange() / panAngularSpeed;
+		ScanJob job = new ScanJob(lowToHigh, minimumServoMovementTime, minimumAcquisitionTime, message, panServo, panServoRange, lidar,
+				recipient);
+
+		schedule(job);
 	}
 
-	private <T> RoboReference<Long> getReference(String unit) {
+	private void schedule(ScanJob job) {
+		long actualDelay = 2;
+		for (int i = 0; i < job.numberOfScans; i++) {
+			getContext().getScheduler().schedule(job, actualDelay, TimeUnit.MILLISECONDS);
+			actualDelay += job.delay;
+		}
+	}
+
+	private float getCurrentInput(RoboReference<Float> servo) {
+		try {
+			return servo.getAttribute(PCA9685ServoUnit.ATTRIBUTE_SERVO_INPUT).get();
+		} catch (InterruptedException | ExecutionException e) {
+			SimpleLoggingUtil.error(getClass(), "Could not read servo input!", e);
+			return 0;
+		}
+	}
+
+	private <T> RoboReference<Float> getReference(String unit) {
 		if (unit.equals("null")) {
 			return null;
 		}
 		return getContext().getReference(unit);
 	}
 
+	/**
+	 * if (minimumSampleAquisitionTime < minimumServoMovementTime) { // We are
+	 * constrained by the servo movement speed, simply sample whilst moving //
+	 * So, start with setting a servo movement from min to max (or max to min,
+	 * depending on scan direction and current angle), } else { // We are
+	 * constrained by the time it takes to acquire the samples. Move the servo
+	 * with the calculated delays and acquire samples in between
+	 * 
+	 * }
+	 */
 }

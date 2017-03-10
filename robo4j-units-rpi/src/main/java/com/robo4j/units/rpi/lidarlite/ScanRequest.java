@@ -26,35 +26,44 @@ public class ScanRequest {
 	public enum ScanAction {
 		STOP, ONCE, CONTINUOUSLY
 	}
+
+	private final String receiverId;
 	private final ScanAction action;
-	private final boolean continuously;
 	private final float startAngle;
 	private final float range;
 	private final float step;
+	private final float abortRange;
 
 	/**
-	 * 
-	 * @param continuously
-	 *            should the unit keep scanning until told otherwise?
+	 * @param receiverId
+	 *            the id of the receiver for the result of the scan.
 	 * @param servoRange
 	 *            how much of the full servo range should be scanned (in
 	 *            radians).
 	 */
-	public ScanRequest(ScanAction action, boolean continuously, float startAngle, float range, float step) {
+	public ScanRequest(String receiverId, ScanAction action, float startAngle, float range, float step) {
+		this(receiverId, action, startAngle, range, step, Float.MAX_VALUE);
+
+	}
+
+	
+	/**
+	 * @param receiverId
+	 *            the id of the receiver for the result of the scan.
+	 * @param servoRange
+	 *            how much of the full servo range should be scanned (in
+	 *            radians).
+	 */
+	public ScanRequest(String receiverId, ScanAction action, float startAngle, float range, float step, float abortRange) {
+		this.receiverId = receiverId;
 		this.action = action;
-		this.continuously = continuously;
 		this.startAngle = startAngle;
 		this.range = range;
 		this.step = step;
+		this.abortRange = abortRange;
 	}
 
-	/**
-	 * @return true if you want to keep the scan running until told otherwise.
-	 */
-	public boolean isContinuously() {
-		return continuously;
-	}
-
+	
 	/**
 	 * @return the start angle in degrees for the scan.
 	 */
@@ -81,5 +90,17 @@ public class ScanRequest {
 	 */
 	public ScanAction getAction() {
 		return action;
+	}
+
+	/**
+	 * @return the receiver id to receive the result of the scan.
+	 */
+	public String getReceiverId() {
+		return receiverId;
+	}
+
+
+	public float getAbortRange() {
+		return abortRange;
 	}
 }

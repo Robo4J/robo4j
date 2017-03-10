@@ -173,12 +173,12 @@ public final class RoboBuilder {
 	 * @param clazz
 	 *            the class to use.
 	 * @param id
-	 *            the id for the instatiated RoboUnit.
+	 *            the id for the instantiated RoboUnit.
 	 * @return the builder, for chaining.
 	 * @throws RoboBuilderException
 	 *             if the creation or adding of the unit failed.
 	 */
-	public RoboBuilder add(Class<RoboUnit<?>> clazz, String id) throws RoboBuilderException {
+	public RoboBuilder add(Class<? extends RoboUnit<?>> clazz, String id) throws RoboBuilderException {
 		internalAddUnit(instantiateRoboUnit(clazz, id));
 		return this;
 	}
@@ -252,9 +252,9 @@ public final class RoboBuilder {
 		units.add(unit);
 	}
 
-	private RoboUnit<?> instantiateRoboUnit(Class<RoboUnit<?>> clazz, String id) throws RoboBuilderException {
+	private RoboUnit<?> instantiateRoboUnit(Class<? extends RoboUnit<?>> clazz, String id) throws RoboBuilderException {
 		try {
-			Constructor<RoboUnit<?>> constructor = clazz.getConstructor(RoboContext.class, String.class);
+			Constructor<? extends RoboUnit<?>> constructor = clazz.getConstructor(RoboContext.class, String.class);
 			return constructor.newInstance(system, id);
 		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException e) {

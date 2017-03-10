@@ -45,8 +45,8 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 	public static String CONFIGURATION_KEY_DUAL_RATE = "dualRate";
 	public static String CONFIGURATION_KEY_EXPO = "expo";
 
-	public static Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections.unmodifiableCollection(
-			Collections.singleton(DefaultAttributeDescriptor.create(Float.class, "input") ));
+	public static final AttributeDescriptor<Float> ATTRIBUTE_SERVO_INPUT = DefaultAttributeDescriptor.create(Float.class, "input");
+	public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections.singleton(ATTRIBUTE_SERVO_INPUT);
 
 	private Servo servo;
 	private Integer channel;
@@ -120,6 +120,6 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 
 	@Override
 	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
-		return KNOWN_ATTRIBUTES; 
+		return KNOWN_ATTRIBUTES;
 	}
 }
