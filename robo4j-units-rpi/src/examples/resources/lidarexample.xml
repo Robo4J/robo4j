@@ -35,21 +35,4 @@
 			<value name="angularSpeed" type="float">90.0</value>
 		</config>
 	</roboUnit>
-	<!-- Note that it is possible to define two different scanners using the 
-		 same laser and components (be careful to not run them at the same time though ;))
-	 	 This example is simply using another servo for "panning" - in this case the tilt servo, 
-	 	 making for a vertical scan. -->
-	<roboUnit id="verticalscanner">
-		<class>com.robo4j.units.rpi.lidarlite.LaserScanner</class>
-		<config name="com.robo4j.core.root">
-			<value name="bus" type="int">1</value>
-			<!-- 0x40 hex -->
-			<value name="address" type="int">0x62</value>
-			<value name="servo" type="String">laserscanner.tilt</value>
-			<!-- Currently defined as the range from center to max -->
-			<value name="servoRange" type="float">10.0</value>
-			<!-- Currently defined as the angular speed in angular degrees per second -->
-			<value name="angularSpeed" type="float">50.0</value>
-		</config>
-	</roboUnit>
 </robo4j>
