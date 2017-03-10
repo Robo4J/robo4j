@@ -33,45 +33,33 @@ import com.robo4j.units.rpi.lcd.I2CRoboUnit;
 import com.robo4j.units.rpi.pwm.PCA9685ServoUnit;
 
 /**
- * This unit controls two servos to do laser range finder scans.
+ * This unit controls a servo to do laser range sweep.
  * 
  * <p>
  * Configuration:
  * </p>
  * <li>
  * <ul>
- * pan: the servo to use for panning the laser. Defaults to "pan". Set to "null"
+ * pan: the servo to use for panning the laser. Defaults to "laserscanner.servo". Set to "null"
  * to not use a servo for panning.
  * </ul>
  * <ul>
- * panServoRange: the range in degrees that send 1.0 (full) to a servo will
- * result in. This must be measured by testing your hardware. Changing
- * configuration on your servo will change this too.
- * </ul>
- * <ul>
- * tilt: the servo to use for tilting the laser. Defaults to "tilt". Set to
- * "null" to not use a servo for tilting.
- * </ul>
- * <ul>
- * tiltServoRange: the range in degrees that send 1.0 (full) to a servo will
- * result in. This must be measured by testing your hardware. Changing
- * configuration on your servo will change this too.
- * </ul>
- * <ul>
- * target: the target to send completed scans to. Defaults to "scanController".
+ * servoRange: the range in degrees that send 1.0 (full) to a servo will result
+ * in. This must be measured by testing your hardware. Changing configuration on
+ * your servo will change this too.
  * </ul>
  * </li>
+ * 
+ * FIXME(Marcus/Mar 10, 2017): Only supports the pan servo for now.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	private String pan;
-	private String tilt;
 	private LidarLiteDevice lidar;
-	private float panServoRange;
-	private float tiltServoRange;
-	private float panAngularSpeed;
+	private float servoRange;
+	private float angularSpeed;
 	private float minimumAcquisitionTime;
 	private float angularOffset;
 
@@ -177,14 +165,12 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		super.onInitialization(configuration);
-		pan = configuration.getString("pan", "laserscanner.pan");
+		pan = configuration.getString("servo", "laserscanner.servo");
 		// Using degrees for convenience, but using radians internally
-		panServoRange = (float) Math.toRadians(configuration.getFloat("panServoRange", 45.0f));
-		tilt = configuration.getString("tilt", "laserscanner.tilt");
-		tiltServoRange = (float) Math.toRadians(configuration.getFloat("tiltServoRange", 45.0f));
+		servoRange = (float) Math.toRadians(configuration.getFloat("servoRange", 45.0f));
 
 		// Using angular degrees per second.
-		panAngularSpeed = configuration.getFloat("panAngularSpeed", 90.0f);
+		angularSpeed = configuration.getFloat("angularSpeed", 90.0f);
 
 		// Minimum acquisition time, in ms
 		minimumAcquisitionTime = configuration.getFloat("minAquisitionTime", 2.0f);
@@ -207,23 +193,22 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 
 	@Override
 	public void onMessage(ScanRequest message) {
-		RoboReference<Float> panServo = getReference(pan);
-		RoboReference<Float> tiltServo = getReference(tilt);
+		RoboReference<Float> servo = getReference(pan);
 
 		RoboReference<ScanResult2D> receiverRef = getContext().getReference(message.getReceiverId());
-		scheduleScan(message, panServo, tiltServo, receiverRef);
+		scheduleScan(message, servo, receiverRef);
 	}
 
-	private void scheduleScan(ScanRequest message, RoboReference<Float> panServo, RoboReference<Float> tiltServo,
+	private void scheduleScan(ScanRequest message, RoboReference<Float> servo,
 			RoboReference<ScanResult2D> recipient) {
-		float currentInput = getCurrentInput(panServo);
+		float currentInput = getCurrentInput(servo);
 		float midPoint = message.getStartAngle() + message.getRange() / 2;
 		boolean lowToHigh = false;
 		if (currentInput > midPoint) {
 			lowToHigh = true;
 		}
-		float minimumServoMovementTime = message.getRange() / panAngularSpeed;
-		ScanJob job = new ScanJob(lowToHigh, minimumServoMovementTime, minimumAcquisitionTime, message, panServo, panServoRange, lidar,
+		float minimumServoMovementTime = message.getRange() / angularSpeed;
+		ScanJob job = new ScanJob(lowToHigh, minimumServoMovementTime, minimumAcquisitionTime, message, servo, servoRange, lidar,
 				recipient);
 
 		schedule(job);
