@@ -89,7 +89,8 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			this.servoRange = servoRange;
 			this.lidar = lidar;
 			this.recipient = recipient;
-			this.numberOfScans = calculateNumberOfScans() + 1;
+			// one move, one first acquisition
+			this.numberOfScans = calculateNumberOfScans() + 2;
 			this.delay = calculateDelay();
 			this.currentAngle = lowToHigh ? request.getStartAngle() : request.getStartAngle() + request.getRange();
 		}
@@ -101,6 +102,9 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 				// On first step, only move servo to start position
 				float normalizedServoTarget = getNormalizedAngle();
 				servo.sendMessage(normalizedServoTarget);
+			} else if (currentRun == 2) {
+				// On second, just start acquisition (no point to read yet)
+				startAcquisition();
 			} else if (currentRun > numberOfScans) {
 				doScan();
 				finish();
@@ -109,6 +113,15 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			}
 			// FIXME(Marcus/Mar 10, 2017): May want to synchronize this...
 			updateTargetAngle();
+		}
+
+		private void startAcquisition() {
+			try {
+				lidar.acquireRange();
+				servo.sendMessage(getNormalizedAngle());
+			} catch (IOException e) {
+				SimpleLoggingUtil.error(getClass(), "Could not read laser!", e);
+			}		
 		}
 
 		private float getNormalizedAngle() {
@@ -216,7 +229,8 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 
 	private void schedule(ScanJob job) {
 		long actualDelay = 2;
-		for (int i = 0; i < job.numberOfScans; i++) {
+		// Need two extra for first servo move and initial acquisition start.
+		for (int i = 0; i < job.numberOfScans + 2; i++) {
 			getContext().getScheduler().schedule(job, actualDelay, TimeUnit.MILLISECONDS);
 			actualDelay += job.delay;
 		}
