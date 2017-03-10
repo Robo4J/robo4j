@@ -54,7 +54,7 @@ public class RoboHttpPingPongTest {
 	private static final int MESSAGES = 3;
 
 
-	private ExecutorService executor = Executors.newFixedThreadPool(2);
+	private ExecutorService executor = Executors.newFixedThreadPool(1);
 
 	@Test
 	public void pingPongTest() throws Exception {
