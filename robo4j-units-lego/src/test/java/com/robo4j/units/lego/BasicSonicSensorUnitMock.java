@@ -26,7 +26,6 @@ import com.robo4j.core.configuration.Configuration;
 import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
 import com.robo4j.hw.lego.wrapper.SensorTestWrapper;
-import com.robo4j.units.lego.sensor.LegoSensorMessage;
 import com.robo4j.units.lego.sonic.LegoSonicMessage;
 
 /**

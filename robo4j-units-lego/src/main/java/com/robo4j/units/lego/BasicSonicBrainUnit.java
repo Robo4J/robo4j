@@ -65,7 +65,6 @@ public class BasicSonicBrainUnit extends RoboUnit<LegoSonicBrainMessage>  {
      *            accepted message
      * @return
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void onMessage(LegoSonicBrainMessage message) {
 
