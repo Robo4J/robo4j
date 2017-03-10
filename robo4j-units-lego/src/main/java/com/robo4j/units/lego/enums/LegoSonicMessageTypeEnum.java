@@ -31,7 +31,8 @@ public enum LegoSonicMessageTypeEnum {
     //@formatter:off
     FINISH      (0, "finish"),
     SCAN        (1, "scan"),
-    STOP        (2, "stop"),
+    CENTER      (2, "center"),
+    STOP        (3, "stop"),
     ;
 
 

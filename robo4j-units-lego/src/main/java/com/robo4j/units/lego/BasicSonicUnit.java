@@ -126,10 +126,9 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 
 
 	//Private Methods
-	private void sendMessage(RoboContext ctx, LegoSonicBrainMessage message) {
-		//TODO FIXME
-		System.err.println(getClass().getSimpleName() + " target: " + target + " message: " + message);
-		ctx.getReference(target).sendMessage(message);
+	private void sendMessage(LegoSonicBrainMessage message) {
+		System.err.println(getClass().getSimpleName() + " SEND target: " + target + " message: " + message);
+		getContext().getReference(target).sendMessage(message);
 	}
 
 	private void processSonicMessage(LegoSonicMessage message){
@@ -141,6 +140,9 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 				case SCAN:
 					scan(sensor, servo).get();
 					break;
+				case CENTER:
+					center(sensor, servo).get();
+					break;
 				case STOP:
 					stop(sensor, servo).get();
 					break;
@@ -150,6 +152,22 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 		} catch (InterruptedException | ExecutionException e){
 			throw new LegoUnitException("sonic unit processSonicMessage: ", e);
 		}
+	}
+
+	private Future<Boolean> center(ILegoSensor sensor, ILegoMotor motor){
+		return executor.submit(() -> {
+			if(!motor.isMoving()){
+				sensor.activate(true);
+				String data = sensor.getData();
+				sensor.activate(false);
+				int currentPosition = servoPosition.get();
+				int rotation = -currentPosition;
+				final LegoServoRotationEnum servoRotation = !servoRight.get() ? LegoServoRotationEnum.RIGHT : LegoServoRotationEnum.LEFT;
+				sendMessage(new LegoSonicBrainMessage(servoRotation, currentPosition,  data));
+				rotateToPosition(motor, rotation, currentPosition);
+			}
+			return true;
+		});
 	}
 
 	private Future<Boolean> scan(ILegoSensor sensor, ILegoMotor motor){
@@ -169,7 +187,7 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 						servoRight.set(true);
 					}
 					final LegoServoRotationEnum servoRotation = servoRight.get() ? LegoServoRotationEnum.RIGHT : LegoServoRotationEnum.LEFT;
-					sendMessage(getContext(), new LegoSonicBrainMessage(servoRotation, currentPosition,  data));
+					sendMessage(new LegoSonicBrainMessage(servoRotation, currentPosition,  data));
 					rotateToPosition(motor, rotation, currentPosition);
 				}
 			}
