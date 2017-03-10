@@ -41,8 +41,7 @@ public class LaserScannerExample {
 			System.out.println("Could not find the settings for the LaserScannerExample!");
 			System.exit(2);
 		}
-		builder.add(settings).add(LaserScannerTestController.class, "controller");
-		builder.add(settings).add(LaserScanProcessor.class, "processor");
+		builder.add(settings).add(LaserScannerTestController.class, "controller").add(LaserScanProcessor.class, "processor");
 		RoboContext ctx = builder.build();
 		RoboReference<String> reference = ctx.getReference("controller");
 		System.out.println("Starting scanning for ever\nPress enter to quit");
