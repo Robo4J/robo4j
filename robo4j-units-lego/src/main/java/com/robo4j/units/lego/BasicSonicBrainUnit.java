@@ -36,9 +36,9 @@ public class BasicSonicBrainUnit extends RoboUnit<LegoSonicBrainMessage>  {
 	/* center value is the 0 -> setup by the hand at the begining */
 	private static final int POSITION_CENTER = 0;
 	private static final int POSITION_INFINITY = 1024;
-	private volatile int VALUE_CENTER = 0;
+	private static final double VALUE_SECURE_DISTANCE = 0.15;
+	private volatile int value_center = 0;
 	private volatile LegoPlatformMessageTypeEnum currentPlatformState;
-	private final double VALUE_SECURE_DISTANCE = 0.15;
     private String target;
 
     public BasicSonicBrainUnit(RoboContext context, String id) {
@@ -76,26 +76,39 @@ public class BasicSonicBrainUnit extends RoboUnit<LegoSonicBrainMessage>  {
 		System.err.println(getClass().getSimpleName() + " distance: " + distance);
 
 		if (message.getPosition() == POSITION_CENTER && distance > VALUE_SECURE_DISTANCE) {
-			System.err.println(getClass().getSimpleName() + " RUN onMessage: " + message);
+			System.err.println(getClass().getSimpleName() + " RUN FORWARD onMessage: " + message);
 			if (!currentPlatformState.equals(LegoPlatformMessageTypeEnum.MOVE)) {
 				sendMessage(new LegoPlatformMessage(LegoPlatformMessageTypeEnum.MOVE));
 				currentPlatformState = LegoPlatformMessageTypeEnum.MOVE;
 			}
-		} else if (message.getPosition() > 0 && distance > VALUE_SECURE_DISTANCE
-				&& !currentPlatformState.equals(LegoPlatformMessageTypeEnum.RIGHT)) {
-			System.err.println(getClass().getSimpleName() + " RIGHT onMessage: " + message);
-			sendMessage(new LegoPlatformMessage(LegoPlatformMessageTypeEnum.RIGHT));
-			currentPlatformState = LegoPlatformMessageTypeEnum.RIGHT;
-		} else if (message.getPosition() < 0 && distance > VALUE_SECURE_DISTANCE
-				&& !currentPlatformState.equals(LegoPlatformMessageTypeEnum.LEFT)) {
-			System.err.println(getClass().getSimpleName() + " LEFT onMessage: " + message);
-			sendMessage(new LegoPlatformMessage(LegoPlatformMessageTypeEnum.LEFT));
-			currentPlatformState = LegoPlatformMessageTypeEnum.LEFT;
-		} else {
-			System.err.println(getClass().getSimpleName() + " STOP onMessage: " + message);
-			sendMessage(new LegoPlatformMessage(LegoPlatformMessageTypeEnum.STOP));
-			currentPlatformState = LegoPlatformMessageTypeEnum.STOP;
 		}
+		if (distance > VALUE_SECURE_DISTANCE && !currentPlatformState.equals(LegoPlatformMessageTypeEnum.STOP)) {
+			System.err.println(getClass().getSimpleName() + " RUNNING move:"+ currentPlatformState + " onMessage: " + message);
+
+		} else if(message.getPosition() == POSITION_CENTER && distance > VALUE_SECURE_DISTANCE ) {
+			System.err.println(getClass().getSimpleName() + " MOVE FORWARD onMessage: " + message);
+			sendMessage(new LegoPlatformMessage(LegoPlatformMessageTypeEnum.RIGHT));
+			currentPlatformState = LegoPlatformMessageTypeEnum.MOVE;
+		}
+
+		else {
+			if (message.getPosition() > POSITION_CENTER && distance > VALUE_SECURE_DISTANCE
+					&& !currentPlatformState.equals(LegoPlatformMessageTypeEnum.RIGHT) ) {
+				System.err.println(getClass().getSimpleName() + " RIGHT onMessage: " + message);
+				sendMessage(new LegoPlatformMessage(LegoPlatformMessageTypeEnum.RIGHT));
+				currentPlatformState = LegoPlatformMessageTypeEnum.RIGHT;
+			} else if (message.getPosition() < POSITION_CENTER && distance > VALUE_SECURE_DISTANCE
+					&& !currentPlatformState.equals(LegoPlatformMessageTypeEnum.LEFT)) {
+				System.err.println(getClass().getSimpleName() + " LEFT onMessage: " + message);
+				sendMessage(new LegoPlatformMessage(LegoPlatformMessageTypeEnum.LEFT));
+				currentPlatformState = LegoPlatformMessageTypeEnum.LEFT;
+			} else if (message.getPosition() < VALUE_SECURE_DISTANCE) {
+				System.err.println(getClass().getSimpleName() + " STOP onMessage: " + message);
+				sendMessage(new LegoPlatformMessage(LegoPlatformMessageTypeEnum.STOP));
+				currentPlatformState = LegoPlatformMessageTypeEnum.STOP;
+			}
+		}
+
     }
 
     //Private Methods
