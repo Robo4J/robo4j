@@ -62,17 +62,17 @@ public class Servo {
 	 * @throws IOException
 	 *             if there was a problem communicating with the device.
 	 */
-	public void setInput(float newInput) throws IOException {
-		newInput = calculateExpo(newInput);
-		newInput = (newInput * dualRate) + trim / TRIM_STEPS;
+	public void setInput(float input) throws IOException {
+		float actualInput = calculateExpo(input);
+		actualInput = (actualInput * dualRate) + trim / TRIM_STEPS;
 		
-		newInput = (newInput + 1.0f)/2;
+		actualInput = (actualInput + 1.0f)/2;
 		if (invert) {
-			newInput = 1.0f - newInput;
+			actualInput = 1.0f - actualInput;
 		}	
-		int width = Math.round((max - min) * newInput) + min;
+		int width = Math.round((max - min) * actualInput) + min;
 		channel.setPWM(0, width);
-		this.input = newInput;
+		this.input = input;
 	}
 
 	/**
