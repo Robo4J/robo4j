@@ -68,7 +68,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private static final HttpCodecRegistry CODEC_REGISTRY = new HttpCodecRegistry();
 	private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
 			KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
-			new RoboThreadFactory("Robo4J HttServerUnit ", true));
+			new RoboThreadFactory("Robo4J HttServerUnit", true));
 	private boolean available;
 	private Integer port;
 	private List<String> target;

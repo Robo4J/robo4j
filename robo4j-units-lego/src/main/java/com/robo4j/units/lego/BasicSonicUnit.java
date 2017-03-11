@@ -62,7 +62,7 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 
 	private final ExecutorService executor = new ThreadPoolExecutor(LegoUtils.DEFAULT_THREAD_POOL_SIZE,
 			LegoUtils.DEFAULT_THREAD_POOL_SIZE, LegoUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J Lego BasicSonic ", true));
+			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J Lego BasicSonic", true));
 	private static final int POSITION_START = 0;
 	private static final int POSITION_STEP = 5;
 	private static final int POSITION_MAX = 45; // should be degrees

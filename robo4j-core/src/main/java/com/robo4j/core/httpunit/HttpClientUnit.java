@@ -44,7 +44,7 @@ public class HttpClientUnit extends RoboUnit<Object> {
 
 	private final ExecutorService executor = new ThreadPoolExecutor(RoboHttpUtils.DEFAULT_THREAD_POOL_SIZE,
 			RoboHttpUtils.DEFAULT_THREAD_POOL_SIZE, RoboHttpUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J HttpClientUnit ", true));
+			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J HttpClientUnit", true));
 	private InetSocketAddress address;
 
 	public HttpClientUnit(RoboContext context, String id) {

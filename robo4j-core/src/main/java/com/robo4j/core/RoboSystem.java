@@ -104,7 +104,7 @@ public class RoboSystem implements RoboContext {
 
 	public RoboSystem(int threadPoolSize) {
 		systemExecutor = new ThreadPoolExecutor(threadPoolSize, threadPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-				workQueue, new RoboThreadFactory("Robo4J System ", true));
+				workQueue, new RoboThreadFactory("Robo4J System", true));
 	}
 
 	public RoboSystem(int threadPoolSize, Set<RoboUnit<?>> unitSet) {
