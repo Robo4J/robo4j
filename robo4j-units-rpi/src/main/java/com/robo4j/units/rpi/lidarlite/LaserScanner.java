@@ -105,7 +105,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			} else if (currentRun == 2) {
 				// On second, just start acquisition (no point to read yet)
 				startAcquisition();
-			} else if (currentRun >= numberOfScans) {
+			} else if (currentRun > numberOfScans) {
 				doScan();
 				finish();
 			} else {
