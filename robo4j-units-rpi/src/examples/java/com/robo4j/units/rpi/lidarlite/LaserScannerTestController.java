@@ -50,7 +50,7 @@ public class LaserScannerTestController extends RoboUnit<String> {
 
 	private void scan() {
 		RoboReference<ScanRequest> scanner = getContext().getReference("scanner");
-		scanner.sendMessage(new ScanRequest("processor", ScanAction.ONCE, -45.0f, 90.0f, 3.0f));
+		scanner.sendMessage(new ScanRequest("processor", ScanAction.ONCE, -45.0f, 90.0f, 1.0f));
 	}
 
 }
