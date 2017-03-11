@@ -29,6 +29,7 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.hw.rpi.i2c.lidar.LidarLiteDevice;
 import com.robo4j.math.geometry.ScanResult2D;
 import com.robo4j.math.geometry.impl.ScanResultImpl;
+import com.robo4j.math.jfr.ScanEvent;
 import com.robo4j.units.rpi.lcd.I2CRoboUnit;
 import com.robo4j.units.rpi.pwm.PCA9685ServoUnit;
 
@@ -40,8 +41,8 @@ import com.robo4j.units.rpi.pwm.PCA9685ServoUnit;
  * </p>
  * <li>
  * <ul>
- * pan: the servo to use for panning the laser. Defaults to "laserscanner.servo". Set to "null"
- * to not use a servo for panning.
+ * pan: the servo to use for panning the laser. Defaults to
+ * "laserscanner.servo". Set to "null" to not use a servo for panning.
  * </ul>
  * <ul>
  * servoRange: the range in degrees that send 1.0 (full) to a servo will result
@@ -75,9 +76,10 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		private final float minimumServoMovementTime;
 		private final float minimumAcquisitionTime;
 		private final float servoRange;
-		private volatile float currentAngle;
 		private final LidarLiteDevice lidar;
+		private volatile float currentAngle;
 		private volatile boolean finished = false;
+		private final ScanEvent scanEvent;
 
 		public ScanJob(boolean lowToHigh, float minimumServoMovementTime, float minimumAcquisitionTime, ScanRequest request,
 				RoboReference<Float> servo, float servoRange, LidarLiteDevice lidar, RoboReference<ScanResult2D> recipient) {
@@ -93,12 +95,16 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			this.numberOfScans = calculateNumberOfScans() + 1;
 			this.delay = calculateDelay();
 			this.currentAngle = lowToHigh ? request.getStartAngle() : request.getStartAngle() + request.getRange();
+			scanEvent = new ScanEvent(scanResult.getScanID(), getScanInfo());
+			scanEvent.setScanLeftRight(lowToHigh);
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public void run() {
 			int currentRun = invokeCount.incrementAndGet();
 			if (currentRun == 1) {
+				scanEvent.begin();
 				// On first step, only move servo to start position
 				float normalizedServoTarget = getNormalizedAngle();
 				servo.sendMessage(normalizedServoTarget);
@@ -121,7 +127,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 				servo.sendMessage(getNormalizedAngle());
 			} catch (IOException e) {
 				SimpleLoggingUtil.error(getClass(), "Could not read laser!", e);
-			}		
+			}
 		}
 
 		private float getNormalizedAngle() {
@@ -143,10 +149,13 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			}
 		}
 
+		@SuppressWarnings("deprecation")
 		private void finish() {
 			if (!finished) {
 				recipient.sendMessage(scanResult);
 				finished = true;
+				scanEvent.end();
+				scanEvent.commit();
 			} else {
 				SimpleLoggingUtil.error(getClass(), "Tried to scan more laser points after being finished!");
 			}
@@ -168,6 +177,11 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		// physical model.
 		private int calculateDelay() {
 			return 10;
+		}
+
+		private String getScanInfo() {
+			return String.format("start: %2.1f, end: %2.1f, step:%2.1f", request.getStartAngle(),
+					request.getStartAngle() + request.getRange(), request.getStep());
 		}
 	}
 
@@ -212,8 +226,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		scheduleScan(message, servo, receiverRef);
 	}
 
-	private void scheduleScan(ScanRequest message, RoboReference<Float> servo,
-			RoboReference<ScanResult2D> recipient) {
+	private void scheduleScan(ScanRequest message, RoboReference<Float> servo, RoboReference<ScanResult2D> recipient) {
 		float currentInput = getCurrentInput(servo);
 		float midPoint = message.getStartAngle() + message.getRange() / 2;
 		boolean lowToHigh = false;

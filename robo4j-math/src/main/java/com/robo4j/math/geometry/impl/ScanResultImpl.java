@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.robo4j.math.jfr.ScanPoint2DEvent;
 import com.robo4j.math.geometry.Point2D;
@@ -29,15 +30,12 @@ import com.robo4j.math.geometry.ScanResult2D;
  * The implementation of a scan result. This particular implementation will emit
  * JFR events to help with the analysis of the recorded JFR data.
  * 
- * FIXME(Marcus/Jan 13, 2017): Will open source the JMC 5.5 plug-in for
- * visualizing these.
- * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ScanResultImpl implements ScanResult2D {
 	private static final PointComparator POINT_COMPARATOR = new PointComparator();
-	private static int SCANCOUNTER;
+	private static final AtomicInteger SCANCOUNTER = new AtomicInteger(0);
 
 	private final List<Point2D> points;
 
@@ -57,7 +55,7 @@ public class ScanResultImpl implements ScanResult2D {
 	}
 
 	public ScanResultImpl(int size) {
-		scanID = SCANCOUNTER++;
+		scanID = SCANCOUNTER.incrementAndGet();
 		points = new ArrayList<Point2D>(size);
 	}
 
