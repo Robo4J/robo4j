@@ -151,4 +151,9 @@ public class ScanResultImpl implements ScanResult2D {
 			return Float.compare(o1.getAngle(), o2.getAngle());
 		}
 	}
+
+	public String toString() {
+		return String.format("Closest: %s, Farthest: %s, # points: %d", String.valueOf(getNearestPoint()),
+				String.valueOf(getFarthestPoint()), getPoints().size());
+	}
 }
