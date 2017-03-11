@@ -97,6 +97,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			this.currentAngle = lowToHigh ? request.getStartAngle() : request.getStartAngle() + request.getRange();
 			scanEvent = new ScanEvent(scanResult.getScanID(), getScanInfo());
 			scanEvent.setScanLeftRight(lowToHigh);
+			scanEvent.begin();
 		}
 
 		@SuppressWarnings("deprecation")
@@ -104,7 +105,6 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		public void run() {
 			int currentRun = invokeCount.incrementAndGet();
 			if (currentRun == 1) {
-				scanEvent.begin();
 				// On first step, only move servo to start position
 				float normalizedServoTarget = getNormalizedAngle();
 				servo.sendMessage(normalizedServoTarget);
