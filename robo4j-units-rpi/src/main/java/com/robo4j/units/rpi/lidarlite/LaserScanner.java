@@ -101,7 +101,6 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			JfrUtils.begin(scanEvent);
 		}
 
-		@SuppressWarnings("deprecation")
 		@Override
 		public void run() {
 			int currentRun = invokeCount.incrementAndGet();
@@ -142,7 +141,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 				// Laser was actually shooting at the previous angle, before
 				// moving - recalculate for that angle
 				float lastAngle = currentAngle + (lowToHigh ? -request.getStep() : request.getStep());
-				scanResult.addPoint(readDistance, lastAngle);
+				scanResult.addPoint(readDistance, (float) Math.toRadians(lastAngle));
 				servo.sendMessage(getNormalizedAngle());
 				lidar.acquireRange();
 			} catch (IOException e) {
@@ -150,7 +149,6 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			}
 		}
 
-		@SuppressWarnings("deprecation")
 		private void finish() {
 			if (!finished) {
 				recipient.sendMessage(scanResult);

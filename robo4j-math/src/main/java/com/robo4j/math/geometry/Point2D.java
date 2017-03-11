@@ -36,6 +36,12 @@ public class Point2D {
 	private float x;
 	private float y;
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param range in meters
+	 * @param angle in radians
+	 */
 	public Point2D(float range, float angle) {
 		this.range = range;
 		this.angle = angle;
@@ -50,14 +56,23 @@ public class Point2D {
 		return range;
 	}
 	
+	/**
+	 * @return the angle in radians.
+	 */
 	public float getAngle() {
 		return angle;
 	}
 
+	/**
+	 * @return X value, in meters.
+	 */
 	public double getX() {
 		return x;
 	}
 
+	/**
+	 * @return Y value, in meters.
+	 */
 	public double getY() {
 		return y;
 	}
