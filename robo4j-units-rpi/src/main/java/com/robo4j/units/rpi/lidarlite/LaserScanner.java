@@ -90,7 +90,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			this.lidar = lidar;
 			this.recipient = recipient;
 			// one move, one first acquisition
-			this.numberOfScans = calculateNumberOfScans() + 2;
+			this.numberOfScans = calculateNumberOfScans() + 1;
 			this.delay = calculateDelay();
 			this.currentAngle = lowToHigh ? request.getStartAngle() : request.getStartAngle() + request.getRange();
 		}
@@ -105,7 +105,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			} else if (currentRun == 2) {
 				// On second, just start acquisition (no point to read yet)
 				startAcquisition();
-			} else if (currentRun > numberOfScans) {
+			} else if (currentRun >= numberOfScans) {
 				doScan();
 				finish();
 			} else {
@@ -233,8 +233,8 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 
 	private void schedule(ScanJob job) {
 		long actualDelay = 2;
-		// Need two extra for first servo move and initial acquisition start.
-		for (int i = 0; i < job.numberOfScans + 2; i++) {
+		// One extra for first servo move.
+		for (int i = 0; i < job.numberOfScans + 1; i++) {
 			getContext().getScheduler().schedule(job, actualDelay, TimeUnit.MILLISECONDS);
 			actualDelay += job.delay;
 		}
