@@ -17,9 +17,14 @@
 package com.robo4j.math.jfr;
 
 import java.net.URI;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.oracle.jrockit.jfr.DurationEvent;
 import com.oracle.jrockit.jfr.EventToken;
 import com.oracle.jrockit.jfr.InstantEvent;
 import com.oracle.jrockit.jfr.InvalidEventDefinitionException;
@@ -35,6 +40,15 @@ import com.oracle.jrockit.jfr.Producer;
 @SuppressWarnings({ "deprecation" })
 public class JfrUtils {
 	public static final Producer PRODUCER;
+	private final static ThreadPoolExecutor EXECUTOR = new ThreadPoolExecutor(1, 1, 2, TimeUnit.SECONDS, new LinkedBlockingQueue<>(50),
+			new ThreadFactory() {
+				@Override
+				public Thread newThread(Runnable r) {
+					Thread thread = new Thread(r, "JFR Event Queue");
+					thread.setDaemon(true);
+					return thread;
+				}
+			});
 
 	// Register the producer and keep the reference around
 	static {
@@ -66,4 +80,48 @@ public class JfrUtils {
 		return null;
 	}
 
+	/**
+	 * Use this to begin JFR events when you cannot guarantee that they will
+	 * being, end and be committed in the same thread.
+	 * 
+	 * @param event the event to begin.
+	 */
+	public static void begin(DurationEvent event) {
+		EXECUTOR.execute(new Runnable() {
+			@Override
+			public void run() {
+				event.begin();
+			}
+		});
+	}
+
+	/**
+	 * Use this to end JFR events when you cannot guarantee that they will
+	 * begin, end and be committed in the same thread.
+	 * 
+	 * @param event the event to end.
+	 */
+	public static void end(DurationEvent event) {
+		EXECUTOR.execute(new Runnable() {
+			@Override
+			public void run() {
+				event.end();
+			}
+		});
+	}
+
+	/**
+	 * Use this to commit JFR events when you cannot guarantee that they will
+	 * begin, end and be committed in the same thread.
+	 * 
+	 * @param event the event to commit.
+	 */
+	public static void commit(DurationEvent event) {
+		EXECUTOR.execute(new Runnable() {
+			@Override
+			public void run() {
+				event.commit();
+			}
+		});
+	}
 }

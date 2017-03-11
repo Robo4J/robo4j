@@ -29,6 +29,7 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.hw.rpi.i2c.lidar.LidarLiteDevice;
 import com.robo4j.math.geometry.ScanResult2D;
 import com.robo4j.math.geometry.impl.ScanResultImpl;
+import com.robo4j.math.jfr.JfrUtils;
 import com.robo4j.math.jfr.ScanEvent;
 import com.robo4j.units.rpi.lcd.I2CRoboUnit;
 import com.robo4j.units.rpi.pwm.PCA9685ServoUnit;
@@ -97,7 +98,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			this.currentAngle = lowToHigh ? request.getStartAngle() : request.getStartAngle() + request.getRange();
 			scanEvent = new ScanEvent(scanResult.getScanID(), getScanInfo());
 			scanEvent.setScanLeftRight(lowToHigh);
-			scanEvent.begin();
+			JfrUtils.begin(scanEvent);
 		}
 
 		@SuppressWarnings("deprecation")
@@ -154,8 +155,8 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			if (!finished) {
 				recipient.sendMessage(scanResult);
 				finished = true;
-				scanEvent.end();
-				scanEvent.commit();
+				JfrUtils.end(scanEvent);
+				JfrUtils.commit(scanEvent);
 			} else {
 				SimpleLoggingUtil.error(getClass(), "Tried to scan more laser points after being finished!");
 			}

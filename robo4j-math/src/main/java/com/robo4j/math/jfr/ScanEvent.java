@@ -28,7 +28,7 @@ import com.oracle.jrockit.jfr.ValueDefinition;
  * @author Miroslav Wengner (@miragemiko)
  */
 @SuppressWarnings("deprecation")
-@EventDefinition(path = "robo4j/overview/scanevent", name = "Scan", description = "An event for a full scan.", stacktrace = false, thread = false) 
+@EventDefinition(path = "robo4j/overview/scanevent", name = "Scan", description = "An event for a full scan.", stacktrace = false, thread = true) 
 public class ScanEvent extends TimedEvent {
 	public static final String RELATIONAL_KEY_SCAN = "http://se.hirt.tank/scan";
 	
