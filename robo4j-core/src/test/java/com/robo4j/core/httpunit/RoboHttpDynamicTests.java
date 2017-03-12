@@ -19,9 +19,6 @@
 
 package com.robo4j.core.httpunit;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.junit.Assert;
 
 import com.robo4j.core.LifecycleState;
@@ -47,8 +44,6 @@ public class RoboHttpDynamicTests {
 	private static final int MESSAGES_NUMBER = 3;
 	private static final String HOST_SYSTEM = "0.0.0.0";
 
-	private ExecutorService executor = Executors.newFixedThreadPool(1);
-
 	/**
 	 * Motivation Client system is sending messages to the main system over HTTP
 	 * Main System receives desired number of messages.
@@ -57,7 +52,6 @@ public class RoboHttpDynamicTests {
 	 * 
 	 * @throws Exception
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 //	@Test
 	public void simpleHttpNonUnitTest() throws Exception {
 
@@ -89,14 +83,12 @@ public class RoboHttpDynamicTests {
 		clientSystem.stop();
 		clientSystem.shutdown();
 
-
 		System.out.println("Going Down!");
 		mainSystem.stop();
 		mainSystem.shutdown();
 		System.out.println("System is Down!");
 		Assert.assertNotNull(mainSystem.getUnits());
 		Assert.assertEquals(mainSystem.getUnits().size(), MESSAGES_NUMBER);
-
 	}
 
 	private RoboSystem getServerRoboSystem() throws Exception {
@@ -127,7 +119,6 @@ public class RoboHttpDynamicTests {
 
 		SystemUtil.generateSocketPoint(httpServer, ctrl);
 		return result;
-
 	}
 
 	private RoboSystem getClientRoboSystem() throws Exception {
