@@ -60,7 +60,7 @@ public class CalibrationUtility {
 		Scanner scanner = new Scanner(System.in);
 		System.out.println(
 				"Type the servo to control and how much to move the servo, between -1 and 1. For example:\npan -1.0\nType q and enter to quit!\n");
-		while (!"q".equals(lastCommand = scanner.next())) {
+		while (!"q".equals(lastCommand = scanner.nextLine())) {
 			lastCommand = lastCommand.trim();
 			String[] split = lastCommand.split(" ");
 			if (split.length != 2) {
