@@ -1,0 +1,24 @@
+<!-- Example - Update parameters to suit your set up, especially servo trimming and inversion! -->
+<robo4j>
+	<roboUnit id="pan">
+		<class>com.robo4j.units.rpi.pwm.PCA9685ServoUnit</class>
+		<config name="com.robo4j.core.root">
+			<value name="bus" type="int">1</value>
+			<!-- 0x40 hex -->	
+			<value name="address" type="int">0x40</value>
+			<value name="channel" type="int">0</value>
+			<value name="trim" type="float">16</value>
+		</config>
+	</roboUnit>
+	<roboUnit id="tilt">
+		<class>com.robo4j.units.rpi.pwm.PCA9685ServoUnit</class>
+		<config name="com.robo4j.core.root">
+			<value name="bus" type="int">1</value>
+			<!-- 0x40 hex -->	
+			<value name="address" type="int">0x40</value>
+			<value name="channel" type="int">1</value>
+			<value name="trim" type="float">-50</value>
+			<value name="panServoRange" type="float">45</value>
+		</config>
+	</roboUnit>
+</robo4j>
