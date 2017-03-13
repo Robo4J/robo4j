@@ -25,6 +25,7 @@ import com.robo4j.core.RoboBuilder;
 import com.robo4j.core.RoboBuilderException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
+import com.robo4j.core.util.SystemUtil;
 
 /**
  * Small calibration utility to help fine tune a servo.
@@ -48,10 +49,15 @@ public class CalibrationUtility {
 		}
 		builder.add(settings);
 		RoboContext ctx = builder.build();
+		System.out.println("State before start:");
+		System.out.println(SystemUtil.generateStateReport(ctx));
+		ctx.start();
+
+		System.out.println("State after start:");
+		System.out.println(SystemUtil.generateStateReport(ctx));
 
 		String lastCommand = "";
 		Scanner scanner = new Scanner(System.in);
-
 		System.out.println(
 				"Type the servo to control and how much to move the servo, between -1 and 1. For example:\npan -1.0\nType q and enter to quit!\n");
 		while (!"q".equals(lastCommand = scanner.next())) {
