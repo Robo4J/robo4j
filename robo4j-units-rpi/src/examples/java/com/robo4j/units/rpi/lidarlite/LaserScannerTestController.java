@@ -30,6 +30,11 @@ import com.robo4j.units.rpi.lidarlite.ScanRequest.ScanAction;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class LaserScannerTestController extends RoboUnit<String> {
+	public static String CONFIG_KEY_START_ANGLE = "startAngle";
+	public static String CONFIG_KEY_RANGE = "range";
+	public static String CONFIG_KEY_STEP = "step";
+	
+	
 	public LaserScannerTestController(RoboContext context, String id) {
 		super(String.class, context, id);
 	}
