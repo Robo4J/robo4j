@@ -64,14 +64,15 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 			LegoUtils.DEFAULT_THREAD_POOL_SIZE, LegoUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
 			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J Lego BasicSonic", true));
 	private static final int POSITION_START = 0;
-	private static final int POSITION_STEP = 5;
-	private static final int POSITION_MAX = 45; // should be degrees
+	private static final int POSITION_STEP = 30;
+	private static final int POSITION_MAX = 30; // should be degrees
 	private String target;
 	private volatile AtomicBoolean servoRight = new AtomicBoolean(false);
 	private volatile AtomicBoolean unitActive = new AtomicBoolean(false);
+	private volatile AtomicBoolean scanActive = new AtomicBoolean(false);
 	private volatile AtomicInteger servoPosition = new AtomicInteger(POSITION_START);
-	protected volatile ILegoSensor sensor;
-	protected volatile ILegoMotor servo;
+	private volatile ILegoSensor sensor;
+	private volatile ILegoMotor servo;
 
 	public BasicSonicUnit(RoboContext context, String id) {
 		super(LegoSonicMessage.class, context, id);

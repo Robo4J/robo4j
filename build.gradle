@@ -282,6 +282,19 @@ project("robo4j-units-rpi") {
         }
     }
 
+    //create a single Jar with all dependencies
+    task fatJar(type: Jar) {
+        manifest {
+            attributes 'Implementation-Title': 'robo4j-units-rpi',
+                    'Implementation-Version': version,
+                    'Main-Class': 'com.robo4j.hw.rpi.i2c.lidar.LidarLiteTest'
+        }
+        //baseName = project.name + '-all'
+        baseName = 'robo4j-units-rpi'
+        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+        with jar
+    }
+
     //sources
     sourceSets {
         main {
