@@ -34,6 +34,9 @@ public class LaserScannerTestController extends RoboUnit<String> {
 	public static String CONFIG_KEY_RANGE = "range";
 	public static String CONFIG_KEY_STEP = "step";
 	
+	private float startAngle = -45.0f;
+	private float range = 90.0f;
+	private float step = 1.0f;
 	
 	public LaserScannerTestController(RoboContext context, String id) {
 		super(String.class, context, id);
@@ -41,7 +44,9 @@ public class LaserScannerTestController extends RoboUnit<String> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-
+		startAngle = configuration.getFloat(CONFIG_KEY_START_ANGLE, startAngle);
+		range = configuration.getFloat(CONFIG_KEY_RANGE, range);
+		step = configuration.getFloat(CONFIG_KEY_STEP, step);
 	}
 
 	@Override
@@ -55,7 +60,7 @@ public class LaserScannerTestController extends RoboUnit<String> {
 
 	private void scan() {
 		RoboReference<ScanRequest> scanner = getContext().getReference("scanner");
-		scanner.sendMessage(new ScanRequest("processor", ScanAction.ONCE, -45.0f, 90.0f, 1.0f));
+		scanner.sendMessage(new ScanRequest("processor", ScanAction.ONCE, startAngle, range, step));
 	}
 
 }

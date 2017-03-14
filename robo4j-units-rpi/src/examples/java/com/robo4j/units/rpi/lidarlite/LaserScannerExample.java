@@ -55,6 +55,8 @@ public class LaserScannerExample {
 		controllerConfiguration.setFloat(LaserScannerTestController.CONFIG_KEY_RANGE, range);
 		controllerConfiguration.setFloat(LaserScannerTestController.CONFIG_KEY_STEP, step);
 
+		System.out.println(String.format("Running scans with startAngle=%2.1f, range=%2.1f and step=%2.1f", startAngle, range, step));
+		
 		RoboBuilder builder = new RoboBuilder();
 		InputStream settings = ServoUnitExample.class.getClassLoader().getResourceAsStream("lidarexample.xml");
 		if (settings == null) {
