@@ -8,7 +8,7 @@
 			<!-- 0x40 hex -->
 			<value name="address" type="int">0x40</value>
 			<value name="channel" type="int">0</value>
-			<value name="trim" type="float">16</value>
+			<value name="trim" type="float">3</value>
 		</config>
 	</roboUnit>
 	<roboUnit id="laserscanner.tilt">
@@ -18,7 +18,7 @@
 			<!-- 0x40 hex -->
 			<value name="address" type="int">0x40</value>
 			<value name="channel" type="int">1</value>
-			<value name="trim" type="float">-50</value>
+			<value name="trim" type="float">-40</value>
 			<value name="inverted" type="boolean">true</value>
 		</config>
 	</roboUnit>
