@@ -53,7 +53,7 @@ public class RoboHttpDynamicTests {
 	 * 
 	 * @throws Exception
 	 */
-	@Test
+//	@Test
 	public void simpleHttpNonUnitTest() throws Exception {
 
 		/* system which is testing main system */
@@ -92,6 +92,7 @@ public class RoboHttpDynamicTests {
 		Assert.assertEquals(mainSystem.getUnits().size(), MESSAGES_NUMBER);
 	}
 
+	//Private Methods
 	private RoboSystem getServerRoboSystem() throws Exception {
 		/* tested system configuration */
 		RoboSystem result = new RoboSystem();
