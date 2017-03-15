@@ -23,6 +23,11 @@ import org.junit.Assert;
 
 import com.robo4j.core.RoboSystem;
 import com.robo4j.core.httpunit.test.HttpCommandTestController;
+import org.junit.Test;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * target is defined by the unit methods are specified GET, POST options are
@@ -35,8 +40,7 @@ public class HttpUriRegisterTests {
 	private static final String TARGET_UNIT = "controller";
 	private static final String[] METHODS = { "GET", "POST" };
 
-	// FIXME(Marcus/Mar 9, 2017): Disabling this test, as it doesn't work on RPi.
-	//@Test
+	@Test
 	public void registerSimpleTest() {
 		/* tested system configuration */
 		RoboSystem system = new RoboSystem();
@@ -48,9 +52,9 @@ public class HttpUriRegisterTests {
 
 		HttpCommandTestController ctrl = new HttpCommandTestController(system, TARGET_UNIT);
 		register.addUnitToNote(TARGET_UNIT, ctrl);
-		Assert.assertNotNull(register.getMethodsBytPath(TARGET_UNIT));
-		Assert.assertEquals(register.getMethodsBytPath(TARGET_UNIT).getUnit(), ctrl);
-		Assert.assertEquals(register.getMethodsBytPath(TARGET_UNIT).getMethods(), Arrays.asList(METHODS));
+		assertNotNull(register.getMethodsBytPath(TARGET_UNIT));
+		assertEquals(register.getMethodsBytPath(TARGET_UNIT).getUnit(), ctrl);
+		assertTrue(register.getMethodsBytPath(TARGET_UNIT).getMethods().containsAll(Arrays.asList(METHODS)));
 
 	}
 
