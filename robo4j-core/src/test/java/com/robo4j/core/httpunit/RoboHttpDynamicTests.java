@@ -29,6 +29,7 @@ import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.httpunit.test.HttpCommandTestController;
 import com.robo4j.core.util.SystemUtil;
+import org.junit.Test;
 
 /**
  *
@@ -52,7 +53,7 @@ public class RoboHttpDynamicTests {
 	 * 
 	 * @throws Exception
 	 */
-//	@Test
+	@Test
 	public void simpleHttpNonUnitTest() throws Exception {
 
 		/* system which is testing main system */

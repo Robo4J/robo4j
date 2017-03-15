@@ -71,8 +71,9 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 	private volatile AtomicBoolean unitActive = new AtomicBoolean(false);
 	private volatile AtomicBoolean scanActive = new AtomicBoolean(false);
 	private volatile AtomicInteger servoPosition = new AtomicInteger(POSITION_START);
-	private volatile ILegoSensor sensor;
-	private volatile ILegoMotor servo;
+	/* used by wrapper */
+	protected volatile ILegoSensor sensor;
+	protected volatile ILegoMotor servo;
 
 	public BasicSonicUnit(RoboContext context, String id) {
 		super(LegoSonicMessage.class, context, id);
