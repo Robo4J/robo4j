@@ -67,12 +67,6 @@ public class TankExampleController extends RoboUnit<LegoPlatformMessageTypeEnum>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <R> R getMessageAttribute(AttributeDescriptor<R> descriptor, String value) {
-		return descriptor != null ? (R) LegoPlatformMessageTypeEnum.getInternalByName(value) : null;
-	}
-
 	@Override
 	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
 		return KNOWN_ATTRIBUTES;

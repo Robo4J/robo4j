@@ -58,8 +58,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 						.filter(a -> tmpQueryParsed.containsKey(a.getAttributeName()))
 						.findFirst().orElse(null);
 				//TODO: make validation
-				return desiredUnit.getMessageAttribute(descriptor,
-						tmpQueryParsed.get(descriptor.getAttributeName()));
+				return desiredUnit.getAttribute(descriptor);
 				// @formatter:on
 			}
 

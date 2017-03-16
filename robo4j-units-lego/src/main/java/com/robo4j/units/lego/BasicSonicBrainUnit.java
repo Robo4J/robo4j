@@ -22,8 +22,6 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
@@ -31,7 +29,6 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
 import com.robo4j.units.lego.platform.LegoPlatformMessage;
-import com.robo4j.units.lego.sonic.LegoServoRotationEnum;
 import com.robo4j.units.lego.sonic.LegoSonicBrainMessage;
 
 /**

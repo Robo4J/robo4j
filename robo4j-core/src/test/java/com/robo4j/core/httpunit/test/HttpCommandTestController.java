@@ -62,12 +62,6 @@ public class HttpCommandTestController extends RoboUnit<TestCommandEnum> {
 		return KNOWN_ATTRIBUTES;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <R> R getMessageAttribute(AttributeDescriptor<R> descriptor, String value) {
-		return descriptor != null ? (R) TestCommandEnum.getInternalByName(value) : null;
-	}
-
 	// Private Methods
 	private void sendMessage(RoboContext ctx, UnitTestMessage message) {
 		ctx.getReference(target).sendMessage(message.toString());

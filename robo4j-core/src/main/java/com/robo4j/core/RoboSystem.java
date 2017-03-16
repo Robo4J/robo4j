@@ -91,11 +91,6 @@ public class RoboSystem implements RoboContext {
 		public Class<T> getMessageType() {
 			return unit.getMessageType();
 		}
-
-		@Override
-		public <R> R getMessageAttribute(AttributeDescriptor<R> descriptor, String name) {
-			return null;
-		}
 	}
 
 	public RoboSystem() {

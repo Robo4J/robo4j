@@ -17,17 +17,16 @@
 
 package com.robo4j.core.httpunit;
 
-import java.util.Arrays;
-
-import org.junit.Assert;
-
-import com.robo4j.core.RoboSystem;
-import com.robo4j.core.httpunit.test.HttpCommandTestController;
-import org.junit.Test;
-
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertNotNull;
+
+import java.util.Arrays;
+
+import org.junit.Test;
+
+import com.robo4j.core.RoboSystem;
+import com.robo4j.core.httpunit.test.HttpCommandTestController;
 
 /**
  * target is defined by the unit methods are specified GET, POST options are
