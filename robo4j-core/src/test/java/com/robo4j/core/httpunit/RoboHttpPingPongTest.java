@@ -85,9 +85,7 @@ public class RoboHttpPingPongTest {
 		});
 
 
-        StringConsumer pongConsumer = (StringConsumer) systemPong.getUnits().stream()
-                .filter(e -> e.getId().equals("request_consumer"))
-                .findFirst().get();
+        RoboReference<String> pongConsumer = systemPong.getReference("request_consumer");
 
 
 		System.out.println("systemPing : Going Down!");
