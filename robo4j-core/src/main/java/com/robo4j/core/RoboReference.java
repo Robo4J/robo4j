@@ -30,6 +30,18 @@ import com.robo4j.core.configuration.Configuration;
  */
 public interface RoboReference<T> {
 	/**
+	 * @return the {@link RoboSystem} unique identifier for this unit.
+	 */
+	String getId();
+	
+	/**
+	 * Returns the state of this unit.
+	 * 
+	 * @return the state in the life cycle of this unit.
+	 */
+	LifecycleState getState();
+
+	/**
 	 * Sends a message to this RoboUnit.
 	 * 
 	 * @param message

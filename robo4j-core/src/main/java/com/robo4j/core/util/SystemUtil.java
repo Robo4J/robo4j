@@ -21,7 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboUnit;
+import com.robo4j.core.RoboReference;
 
 /**
  * Some useful little utilities.
@@ -37,31 +37,31 @@ public final class SystemUtil {
 		// no instances
 	}
 
-	public static final Comparator<RoboUnit<?>> ID_COMPARATOR = new Comparator<RoboUnit<?>>() {
+	public static final Comparator<RoboReference<?>> ID_COMPARATOR = new Comparator<RoboReference<?>>() {
 		@Override
-		public int compare(RoboUnit<?> o1, RoboUnit<?> o2) {
+		public int compare(RoboReference<?> o1, RoboReference<?> o2) {
 			return o1.getId().compareTo(o2.getId());
 		}
 	};
 
 	public static String generateStateReport(RoboContext ctx) {
 		StringBuilder builder = new StringBuilder();
-		List<RoboUnit<?>> units = new ArrayList<>(ctx.getUnits());
-		units.sort(ID_COMPARATOR);
+		List<RoboReference<?>> references = new ArrayList<>(ctx.getUnits());
+		references.sort(ID_COMPARATOR);
 		//formatter:off
 		builder.append("RoboSystem state ").append(ctx.getState().getLocalizedName())
 				.append(BREAK)
 				.append("================================================")
 				.append(BREAK);
-		for (RoboUnit<?> unit : units) {
-			builder.append(String.format("    %-25s   %13s", unit.getId(), unit.getState().getLocalizedName()))
+		for (RoboReference<?> reference : references) {
+			builder.append(String.format("    %-25s   %13s", reference.getId(), reference.getState().getLocalizedName()))
 					.append(BREAK);
 		}
 		//formatter:on
 		return builder.toString();
 	}
 
-	public static String generateSocketPoint(RoboUnit<?> point, RoboUnit<?> codecUnit){
+	public static String generateSocketPoint(RoboReference<?> point, RoboReference<?> codecUnit){
 		final int port = point.getConfiguration().getInteger("port", 0);
 		StringBuilder sb = new StringBuilder();
 		sb.append("RoboSystem end-points:")
@@ -82,12 +82,5 @@ public final class SystemUtil {
 		sb.append("================================================")
 				.append(BREAK);
 		return sb.toString();
-	}
-
-	public static RoboUnit<?> genUnitFromContext(RoboContext ctx, String id){
-		return ctx.getUnits().stream()
-				.filter(u -> u.getId().equals(id))
-				.findFirst()
-				.orElse(null);
 	}
 }

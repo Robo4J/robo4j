@@ -18,6 +18,7 @@
 package com.robo4j.core.httpunit;
 
 import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 
@@ -72,7 +73,7 @@ public final class HttpUriRegister {
 
 	public void updateUnits(RoboContext context) {
 		pathMethods.entrySet().forEach(e -> {
-			final RoboUnit<?> roboUnit = getRoboUnitById(context, e.getKey().substring(1));
+			final RoboReference<?> roboUnit = getRoboUnitById(context, e.getKey().substring(1));
 			e.getValue().setUnit(roboUnit);
 		});
 	}
@@ -81,7 +82,7 @@ public final class HttpUriRegister {
 		return pathMethods.get(SOLIDUS.concat(path));
 	}
 
-	public RoboUnit<?> getRoboUnitByPath(String path) {
+	public RoboReference<?> getRoboUnitByPath(String path) {
 		return pathMethods.get(SOLIDUS.concat(path)).getUnit();
 	}
 
@@ -96,7 +97,7 @@ public final class HttpUriRegister {
 	}
 
 	// Private Methods
-	private RoboUnit<?> getRoboUnitById(RoboContext context, String id) {
+	private RoboReference<?> getRoboUnitById(RoboContext context, String id) {
 		//@formatter:off
         return context.getUnits().stream()
                 .filter(u -> u.getId().equals(id))

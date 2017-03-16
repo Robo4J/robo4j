@@ -17,7 +17,7 @@
 
 package com.robo4j.core.httpunit;
 
-import com.robo4j.core.RoboUnit;
+import com.robo4j.core.RoboReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,17 +30,17 @@ import java.util.List;
  */
 public class RoboUriInfo {
 
-	private RoboUnit<?> unit = null;
+	private RoboReference<?> unit = null;
 	private final List<String> methods = new ArrayList<>();
 
 	public RoboUriInfo() {
 	}
 
-	public RoboUnit<?> getUnit() {
+	public RoboReference<?> getUnit() {
 		return unit;
 	}
 
-	public void setUnit(RoboUnit<?> unit) {
+	public void setUnit(RoboReference<?> unit) {
 		this.unit = unit;
 	}
 

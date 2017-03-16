@@ -27,6 +27,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.robo4j.core.concurrency.RoboThreadFactory;
@@ -36,8 +37,7 @@ import com.robo4j.core.scheduler.DefaultScheduler;
 import com.robo4j.core.scheduler.Scheduler;
 
 /**
- * Contains RoboUnits, RoboUnit lookup, a system level life cycle and a known
- * RoboUnit providing a system message queue.
+ * Contains RoboUnits, a lookup service for references to RoboUnits, and a system level life cycle.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -60,6 +60,16 @@ public class RoboSystem implements RoboContext {
 
 		ReferenceImplementation(RoboUnit<T> unit) {
 			this.unit = unit;
+		}
+
+		@Override
+		public String getId() {
+			return unit.getId();
+		}
+
+		@Override
+		public LifecycleState getState() {
+			return unit.getState();
 		}
 
 		@Override
@@ -90,7 +100,7 @@ public class RoboSystem implements RoboContext {
 		@Override
 		public Class<T> getMessageType() {
 			return unit.getMessageType();
-		}
+		}		
 	}
 
 	public RoboSystem() {
@@ -166,8 +176,8 @@ public class RoboSystem implements RoboContext {
 	/**
 	 * Returns all the units in the system.
 	 */
-	public Collection<RoboUnit<?>> getUnits() {
-		return units.values();
+	public Collection<RoboReference<?>> getUnits() {
+		return units.values().stream().map(unit -> getReference(unit)).collect(Collectors.toList());
 	}
 
 	/**

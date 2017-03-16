@@ -198,4 +198,12 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 			return motor.isMoving();
 		});
 	}
+
+	public String getId() {
+		return null;
+	}
+
+	public LifecycleState getState() {
+		return null;
+	}
 }

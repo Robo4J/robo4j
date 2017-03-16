@@ -16,7 +16,7 @@
  */
 package com.robo4j.core.client.request;
 
-import com.robo4j.core.RoboUnit;
+import com.robo4j.core.RoboReference;
 import com.robo4j.http.HttpMessageWrapper;
 
 /**
@@ -25,8 +25,7 @@ import com.robo4j.http.HttpMessageWrapper;
  */
 public interface DefaultRequestFactory<ResponseType> {
 
-	ResponseType processGet(RoboUnit<?> desiredUnit, String path, HttpMessageWrapper<?> wrapper);
+	ResponseType processGet(RoboReference<?> desiredUnit, String path, HttpMessageWrapper<?> wrapper);
 
-	ResponseType processPost(RoboUnit<?> desiredUnit, String path, HttpMessageWrapper<?> wrapper);
-
+	ResponseType processPost(RoboReference<?> desiredUnit, String path, HttpMessageWrapper<?> wrapper);
 }

@@ -59,7 +59,7 @@ public interface RoboContext {
 	/**
 	 * @return the available units.
 	 */
-	Collection<RoboUnit<?>> getUnits();
+	Collection<RoboReference<?>> getUnits();
 
 	/**
 	 * @return the system scheduler.

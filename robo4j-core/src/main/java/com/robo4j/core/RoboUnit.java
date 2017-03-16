@@ -41,7 +41,7 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	private Configuration configuration;
 
 	/**
-	 * Either provide id up front
+	 * Constructor.
 	 */
 	public RoboUnit(Class<T> messageType, RoboContext context, String id) {
 		this.messageType = messageType;
@@ -55,6 +55,7 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	/**
 	 * @return the {@link RoboSystem} unique identifier for this unit.
 	 */
+	@Override
 	public String getId() {
 		return id;
 	}
@@ -127,6 +128,7 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	 * 
 	 * @return the state in the life cycle of this unit.
 	 */
+	@Override
 	public LifecycleState getState() {
 		return state;
 	}

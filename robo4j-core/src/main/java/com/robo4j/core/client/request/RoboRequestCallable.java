@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import com.robo4j.core.RoboUnit;
+import com.robo4j.core.RoboReference;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.httpunit.HttpUriRegister;
 import com.robo4j.core.logging.SimpleLoggingUtil;
@@ -91,7 +91,7 @@ public class RoboRequestCallable implements Callable<Object> {
 						HttpVersion.getByValue(tokens[HttpMessageUtil.VERSION_POSITION]), params);
 
 				final List<String> paths = HttpPathUtil.generatePaths(httpMessage.uri().getPath());
-				final RoboUnit<?> desiredUnit = HttpUriRegister.getInstance()
+				final RoboReference<?> desiredUnit = HttpUriRegister.getInstance()
 						.getRoboUnitByPath(paths.get(DEFAULT_POSITION_0));
 				//@formatter:on
 				processWriter(out, DEFAULT_RESPONSE);

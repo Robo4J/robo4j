@@ -23,7 +23,7 @@ import java.net.URI;
 import java.util.Map;
 
 import com.robo4j.core.AttributeDescriptor;
-import com.robo4j.core.RoboUnit;
+import com.robo4j.core.RoboReference;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.httpunit.HttpUriRegister;
 import com.robo4j.core.logging.SimpleLoggingUtil;
@@ -43,7 +43,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	}
 
 	@Override
-	public Object processGet(final RoboUnit<?> desiredUnit, final String path, final HttpMessageWrapper<?> wrapper) {
+	public Object processGet(final RoboReference<?> desiredUnit, final String path, final HttpMessageWrapper<?> wrapper) {
 		if (HttpVersion.containsValue(wrapper.message().version())) {
 			final URI uri = wrapper.message().uri();
 			/* currently is supported only */
@@ -69,7 +69,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	}
 
 	@Override
-	public String processPost(final RoboUnit<?> desiredUnit, final String path, final HttpMessageWrapper<?> wrapper) {
+	public String processPost(final RoboReference<?> desiredUnit, final String path, final HttpMessageWrapper<?> wrapper) {
 		System.out.println("processPost NOT IMPLEMENTED");
 		System.out.println("processPost unit: " + desiredUnit);
 		System.out.println("processPost path: " + path);
