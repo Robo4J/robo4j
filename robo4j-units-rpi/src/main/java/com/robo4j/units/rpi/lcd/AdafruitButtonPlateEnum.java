@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Button;
 
 /**
- * Adafruit Button Plat possible control buttons
+ * This enum is sent as messages from the Adafruit Button Plate.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
