@@ -24,12 +24,14 @@ import java.util.stream.Stream;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Button;
 
 /**
- * This enum is sent as messages from the Adafruit Button Plate.
+ * This enum is sent as messages from the buttons of the Adafruit LCD.
+ *
+ * @see AdafruitButtonUnit
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum AdafruitButtonPlateEnum {
+public enum AdafruitButtonEnum {
 
     // @formatter:off
 	SELECT 			(Button.SELECT, "S", "select"),
@@ -39,24 +41,24 @@ public enum AdafruitButtonPlateEnum {
 	DOWN    		(Button.DOWN, "D", "down");
 	// @formatter:on
 
-    private static volatile Map<Button, AdafruitButtonPlateEnum> buttonToEnum;
+    private static volatile Map<Button, AdafruitButtonEnum> buttonToEnum;
     private Button button;
     private String name;
     private String text;
 
-    AdafruitButtonPlateEnum(Button button, String name, String text) {
+    AdafruitButtonEnum(Button button, String name, String text) {
         this.button = button;
         this.name = name;
         this.text = text;
     }
 
-    private static Map<Button, AdafruitButtonPlateEnum> initMapping() {
-        return Stream.of(values()).collect(Collectors.toMap(AdafruitButtonPlateEnum::getButton, e -> e));
+    private static Map<Button, AdafruitButtonEnum> initMapping() {
+        return Stream.of(values()).collect(Collectors.toMap(AdafruitButtonEnum::getButton, e -> e));
     }
 
 
     //@formatter:off
-    public static AdafruitButtonPlateEnum getInternalByName(String def) {
+    public static AdafruitButtonEnum getInternalByName(String def) {
         if (buttonToEnum == null)
             buttonToEnum = initMapping();
 
@@ -66,7 +68,7 @@ public enum AdafruitButtonPlateEnum {
                 .findFirst().get();
     }
 
-    public static AdafruitButtonPlateEnum getInternalByText(String text) {
+    public static AdafruitButtonEnum getInternalByText(String text) {
         if (buttonToEnum == null)
             buttonToEnum = initMapping();
         return buttonToEnum.entrySet().stream()
@@ -91,12 +93,12 @@ public enum AdafruitButtonPlateEnum {
     public Set<String> commandNames() {
         //@formatter:off
         return Stream.of(values())
-                .map(AdafruitButtonPlateEnum::getText)
+                .map(AdafruitButtonEnum::getText)
                 .collect(Collectors.toSet());
         //@formatter:on
     }
 
-	public AdafruitButtonPlateEnum getByName(String name) {
+	public AdafruitButtonEnum getByName(String name) {
 		return getInternalByName(name);
 	}
 

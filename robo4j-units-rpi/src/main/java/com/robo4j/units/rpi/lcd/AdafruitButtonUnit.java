@@ -38,13 +38,13 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonPressedObserver;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class ButtonUnit extends I2CRoboUnit<Object> {
+public class AdafruitButtonUnit extends I2CRoboUnit<Object> {
 	private AdafruitLcd lcd;
 	private ButtonPressedObserver observer;
 	private String target;
 	private ButtonListener buttonListener;
 
-	public ButtonUnit(RoboContext context, String id) {
+	public AdafruitButtonUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
 	}
 
@@ -65,7 +65,7 @@ public class ButtonUnit extends I2CRoboUnit<Object> {
 
 	@Override
 	public void start() {
-		final RoboReference<AdafruitButtonPlateEnum> targetRef = getContext().getReference(target);
+		final RoboReference<AdafruitButtonEnum> targetRef = getContext().getReference(target);
 		setState(LifecycleState.STARTING);
 		observer = new ButtonPressedObserver(lcd);
 		buttonListener = (Button button) -> {
@@ -73,19 +73,19 @@ public class ButtonUnit extends I2CRoboUnit<Object> {
 				try {
 					switch (button) {
 					case UP:
-						targetRef.sendMessage(AdafruitButtonPlateEnum.UP);
+						targetRef.sendMessage(AdafruitButtonEnum.UP);
 						break;
 					case DOWN:
-						targetRef.sendMessage(AdafruitButtonPlateEnum.DOWN);
+						targetRef.sendMessage(AdafruitButtonEnum.DOWN);
 						break;
 					case RIGHT:
-						targetRef.sendMessage(AdafruitButtonPlateEnum.LEFT);
+						targetRef.sendMessage(AdafruitButtonEnum.LEFT);
 						break;
 					case LEFT:
-						targetRef.sendMessage(AdafruitButtonPlateEnum.RIGHT);
+						targetRef.sendMessage(AdafruitButtonEnum.RIGHT);
 						break;
 					case SELECT:
-						targetRef.sendMessage(AdafruitButtonPlateEnum.SELECT);
+						targetRef.sendMessage(AdafruitButtonEnum.SELECT);
 						break;
 					default:
 						lcd.clear();
