@@ -63,7 +63,6 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	private float servoRange;
 	private float angularSpeed;
 	private float minimumAcquisitionTime;
-	private float angularOffset;
 
 	private final static class ScanJob implements Runnable {
 		private final AtomicInteger invokeCount = new AtomicInteger(0);
@@ -74,19 +73,16 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		private final boolean lowToHigh;
 		private final int numberOfScans;
 		private final int delay;
-		private final float minimumServoMovementTime;
-		private final float minimumAcquisitionTime;
 		private final float servoRange;
 		private final LidarLiteDevice lidar;
 		private volatile float currentAngle;
 		private volatile boolean finished = false;
 		private final ScanEvent scanEvent;
 
+		// FIXME: Add configuration and physical model for minimal servo movement time and minimum acquisition time
 		public ScanJob(boolean lowToHigh, float minimumServoMovementTime, float minimumAcquisitionTime, ScanRequest request,
 				RoboReference<Float> servo, float servoRange, LidarLiteDevice lidar, RoboReference<ScanResult2D> recipient) {
 			this.lowToHigh = lowToHigh;
-			this.minimumServoMovementTime = minimumServoMovementTime;
-			this.minimumAcquisitionTime = minimumAcquisitionTime;
 			this.request = request;
 			this.servo = servo;
 			this.servoRange = servoRange;
@@ -207,7 +203,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		// FIXME(Marcus/Feb 16, 2017): We will very likely need configuration
 		// tables for this - i.e. different
 		// finely tuned offsets for different angular steps?
-		angularOffset = configuration.getFloat("angularOffset", 3.0f);
+		// angularOffset = configuration.getFloat("angularOffset", 3.0f);
 
 		try {
 			lidar = new LidarLiteDevice(getBus(), getAddress());
