@@ -19,9 +19,6 @@ package com.robo4j.core.httpunit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.robo4j.core.httpunit.HttpEncoder;
-import com.robo4j.core.httpunit.HttpProducer;
-
 /**
  * Simple encoder that encodes an array of string to Json.
  * 

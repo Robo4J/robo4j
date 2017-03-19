@@ -22,9 +22,10 @@ package com.robo4j.core.client.request;
 import java.net.URI;
 import java.util.Map;
 
-import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.client.util.RoboHttpUtils;
+import com.robo4j.core.httpunit.HttpCodecRegistry;
+import com.robo4j.core.httpunit.HttpDecoder;
 import com.robo4j.core.httpunit.HttpUriRegister;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.util.ConstantUtil;
@@ -38,8 +39,12 @@ import com.robo4j.http.HttpVersion;
  * @author Miro Wengner (@miragemiko)
  */
 public class RoboRequestFactory implements DefaultRequestFactory<Object> {
+	private static final String URI_COMMAND = "command";
 
-	public RoboRequestFactory() {
+	private final HttpCodecRegistry codecRegistry;
+
+	public RoboRequestFactory(final HttpCodecRegistry codecRegistry) {
+		this.codecRegistry = codecRegistry;
 	}
 
 	@Override
@@ -52,14 +57,15 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 				/* currently is supported only one http unit */
 				final Map<String, String> tmpQueryParsed = RoboHttpUtils.parseURIQueryToMap(uri.getQuery(),
 						ConstantUtil.HTTP_QUERY_SEP);
-				// @formatter:off
 
-				final AttributeDescriptor<?> descriptor = desiredUnit.getKnownAttributes().stream()
-						.filter(a -> tmpQueryParsed.containsKey(a.getAttributeName()))
-						.findFirst().orElse(null);
-				//TODO: make validation
-				return desiredUnit.getAttribute(descriptor);
-				// @formatter:on
+				//TODO we who we construct URI remove URI_COMMAND constant
+				final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredUnit.getMessageType());
+				if(decoder != null){
+					return decoder.decode(tmpQueryParsed.get(URI_COMMAND));
+				} else {
+					SimpleLoggingUtil.error(getClass(), "no decoder available");
+				}
+
 			}
 
 		} else {

@@ -30,7 +30,12 @@ import java.util.stream.Stream;
 public final class HttpPathUtil {
     private static final int SEPARATOR_PATH = 12;
 
-    public static List<String> generatePaths(String source){
+    /**
+     *
+     * @param source complete URI as string
+     * @return list of paths
+     */
+    public static List<String> uriStringToPathList(String source){
         return Stream.of(source
                 .split(HttpMessageUtil.getHttpSeparator(SEPARATOR_PATH)))
                 .filter(e -> !e.isEmpty())

@@ -32,12 +32,6 @@ import java.util.Collections;
  */
 public class HttpCommandTestController extends RoboUnit<TestCommandEnum> {
 
-	private final static String ATTRIBUTE_NAME_COMMAND = "command";
-	//@formatter:off
-    private final static Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
-            .unmodifiableCollection(Collections.singleton(DefaultAttributeDescriptor
-                    .create(TestCommandEnum.class, ATTRIBUTE_NAME_COMMAND)));
-    //@formatter:on
 	private String target;
 
 	public HttpCommandTestController(RoboContext context, String id) {
@@ -55,11 +49,6 @@ public class HttpCommandTestController extends RoboUnit<TestCommandEnum> {
 	@Override
 	public void onMessage(TestCommandEnum message) {
 		processTestMessage(message);
-	}
-
-	@Override
-	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
-		return KNOWN_ATTRIBUTES;
 	}
 
 	// Private Methods

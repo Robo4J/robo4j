@@ -44,7 +44,7 @@ public final class SystemUtil {
 		}
 	};
 
-	public static String generateStateReport(RoboContext ctx) {
+	public static String printStateReport(RoboContext ctx) {
 		StringBuilder builder = new StringBuilder();
 		List<RoboReference<?>> references = new ArrayList<>(ctx.getUnits());
 		references.sort(ID_COMPARATOR);
@@ -61,7 +61,7 @@ public final class SystemUtil {
 		return builder.toString();
 	}
 
-	public static String generateSocketPoint(RoboReference<?> point, RoboReference<?> codecUnit){
+	public static String printSocketEndPoint(RoboReference<?> point, RoboReference<?> codecUnit){
 		final int port = point.getConfiguration().getInteger("port", 0);
 		StringBuilder sb = new StringBuilder();
 		sb.append("RoboSystem end-points:")
@@ -79,7 +79,7 @@ public final class SystemUtil {
 					.append(a.getAttributeType().getSimpleName())
 					.append("\">")
 					.append(BREAK));
-		sb.append("================================================")
+			sb.append("================================================")
 				.append(BREAK);
 		return sb.toString();
 	}

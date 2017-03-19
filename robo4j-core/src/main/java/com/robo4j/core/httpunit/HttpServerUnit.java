@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -98,10 +99,12 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			for(Iterator<String> it =  targetUnits.getValueNames().iterator(); it.hasNext();){
 				final String key = it.next();
 				final String value = targetUnits.getString(key, RoboHttpUtils._EMPTY_STRING);
+				System.out.println(getClass().getSimpleName() + " register URI:: key: " + key + ", value: " + value);
 				HttpUriRegister.getInstance().addNote(key, value);
 			}
 		}
         //@formatter:on
+
 		setState(LifecycleState.INITIALIZED);
 	}
 
@@ -186,9 +189,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 						//Here is the problem
 
 						HttpUriRegister.getInstance().updateUnits(getContext());
-						final Future<Object> futureResult = executor
+						final Future<?> futureResult = executor
 								.submit(new RoboRequestCallable(requestChannel.socket(),
-								new RoboRequestFactory()));
+								new RoboRequestFactory(CODEC_REGISTRY)));
 						//@formatter:on
 						/* here can be parallel, but we need to keep channel */
 						final Object result = futureResult.get();
@@ -220,7 +223,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		}
 		for (int i = 0; i < packages.length(); i++) {
 			char c = packages.charAt(i);
-			if (!Character.isJavaIdentifierPart(c) || c != ',' || !Character.isWhitespace(c)) {
+//			if (!Character.isJavaIdentifierPart(c) || c != ',' || !Character.isWhitespace(c)) {
+			if (Character.isWhitespace(c)) {
 				return false;
 			}
 		}

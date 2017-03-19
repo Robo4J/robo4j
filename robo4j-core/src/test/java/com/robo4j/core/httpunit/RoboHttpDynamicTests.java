@@ -47,6 +47,7 @@ public class RoboHttpDynamicTests {
 	private static final int MESSAGES_NUMBER = 3;
 	private static final String HOST_SYSTEM = "0.0.0.0";
 
+
 	/**
 	 * Motivation Client system is sending messages to the main system over HTTP
 	 * Main System receives desired number of messages.
@@ -60,19 +61,19 @@ public class RoboHttpDynamicTests {
 
 		/* tested system configuration */
 		RoboSystem mainSystem = getServerRoboSystem();
-		System.out.println(SystemUtil.generateStateReport(mainSystem));
+		System.out.println(SystemUtil.printStateReport(mainSystem));
 		System.out.println("Server start after start:");
 
 		/* system which is testing main system */
 		RoboSystem clientSystem = getClientRoboSystem();
 		RoboReference<Object> httpClientReference = clientSystem.getReference(CLIEN_UNIT_ID);
 
-		System.out.println(SystemUtil.generateStateReport(clientSystem));
+		System.out.println(SystemUtil.printStateReport(clientSystem));
 		System.out.println("Client State after start:");
 
 
 		System.out.println("State after start:");
-		System.out.println(SystemUtil.generateStateReport(mainSystem));
+		System.out.println(SystemUtil.printStateReport(mainSystem));
 
 		/* client system sending a messages to the main system */
 		for (int i = 0; i < MESSAGES_NUMBER; i++) {
@@ -94,11 +95,11 @@ public class RoboHttpDynamicTests {
 	private RoboSystem getServerRoboSystem() throws Exception {
 		/* tested system configuration */
 		RoboSystem result = new RoboSystem();
-
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		HttpServerUnit httpServer = new HttpServerUnit(result, "http");
 		config.setString("target", TARGET_UNIT);
 		config.setInteger("port", PORT);
+		config.setString("packages", "com.robo4j.core.httpunit.test.codec");
 		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
 		targetUnits.setString(TARGET_UNIT, "GET");
 		httpServer.initialize(config);
@@ -116,7 +117,7 @@ public class RoboHttpDynamicTests {
 		Assert.assertEquals(result.getState(), LifecycleState.UNINITIALIZED);
 
 		result.addUnits(httpServer, ctrl, consumer);
-		SystemUtil.generateSocketPoint(httpServer, ctrl);
+		SystemUtil.printSocketEndPoint(httpServer, ctrl);
 		result.start();
 		return result;
 	}
@@ -135,7 +136,7 @@ public class RoboHttpDynamicTests {
 		httpClient.initialize(config);
 		result.addUnits(httpClient);
 		System.out.println("Client State after start:");
-		System.out.println(SystemUtil.generateStateReport(result));
+		System.out.println(SystemUtil.printStateReport(result));
 		result.start();
 		return result;
 	}

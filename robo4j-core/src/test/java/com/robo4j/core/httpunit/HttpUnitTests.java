@@ -19,6 +19,7 @@ package com.robo4j.core.httpunit;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.robo4j.core.httpunit.test.TestCommandEnum;
 
 /**
  *
@@ -35,14 +36,14 @@ public class HttpUnitTests {
 	public void testArrayDecoder() {
 		TestArrayDecoder arrayDecoder = new TestArrayDecoder();
 		String[] array = arrayDecoder.decode("[]{}}{");
-		Assert.assertArrayEquals(new String[] {""}, array);
-		Assert.assertArrayEquals(new String[] {"Lalaa", "Lalala"}, arrayDecoder.decode("Lalaa,Lalala"));
+		Assert.assertArrayEquals(new String[] { "" }, array);
+		Assert.assertArrayEquals(new String[] { "Lalaa", "Lalala" }, arrayDecoder.decode("Lalaa,Lalala"));
 	}
 
 	@Test
 	public void testArrayEncoder() {
 		TestArrayEncoder arrayEncoder = new TestArrayEncoder();
-		String json = arrayEncoder.encode(new String[] {"A", "B", "C"});
+		String json = arrayEncoder.encode(new String[] { "A", "B", "C" });
 		Assert.assertEquals("{array:[A,B,C]}", json);
 	}
 
@@ -54,9 +55,9 @@ public class HttpUnitTests {
 		Assert.assertNotNull(encoder);
 		Assert.assertNotNull(decoder);
 
-		String [] originalData = new String[] {"A", "B", "C"};
+		String[] originalData = new String[] { "A", "B", "C" };
 		String encoded = encoder.encode(originalData);
-		String [] decoded = decoder.decode(encoded);
+		String[] decoded = decoder.decode(encoded);
 
 		Assert.assertArrayEquals(originalData, decoded);
 	}
@@ -72,6 +73,25 @@ public class HttpUnitTests {
 		String originalData = "Oh my god, it's full of stars";
 		String encoded = encoder.encode(originalData);
 		String decoded = decoder.decode(encoded);
+
+		Assert.assertEquals(originalData, decoded);
+	}
+
+	/**
+	 * Translates Enum to String and otherwise
+	 */
+	@Test
+	public void testHttpTestCommandEnumMessage() {
+		HttpCodecRegistry registry = new HttpCodecRegistry("com.robo4j.core.httpunit.test.codec");
+		HttpEncoder<TestCommandEnum> encoder = registry.getEncoder(TestCommandEnum.class);
+		HttpDecoder<TestCommandEnum> decoder = registry.getDecoder(TestCommandEnum.class);
+		Assert.assertNotNull(encoder);
+		Assert.assertNotNull(decoder);
+
+		TestCommandEnum originalData = TestCommandEnum.MOVE;
+		String encoded = encoder.encode(TestCommandEnum.MOVE);
+
+		TestCommandEnum decoded = decoder.decode("move");
 
 		Assert.assertEquals(originalData, decoded);
 	}

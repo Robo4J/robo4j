@@ -46,7 +46,7 @@ public enum TestCommandEnum {
         return Stream.of(values()).collect(Collectors.toMap(TestCommandEnum::getId, e -> e));
     }
 
-    public static TestCommandEnum getInternalByName(String name){
+    public static TestCommandEnum getByName(String name){
         if(nameToEnum == null){
             nameToEnum = initMapping();
         }
@@ -55,7 +55,7 @@ public enum TestCommandEnum {
                 .filter(e -> e.getValue().getName().equals(name))
                 .map(Map.Entry::getValue)
                 .findFirst()
-                .get();
+                .orElse(null);
         //@formatter:on
     }
 

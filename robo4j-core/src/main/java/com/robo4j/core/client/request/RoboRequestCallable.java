@@ -50,7 +50,8 @@ import com.robo4j.http.util.HttpPathUtil;
  */
 public class RoboRequestCallable implements Callable<Object> {
 
-	private static final int DEFAULT_POSITION_0 = 0;
+	/* currently is supported only one PATH */
+	private static final int DEFAULT_PATH_POSITION_0 = 0;
 	private static final String DEFAULT_RESPONSE = "done";
 
 	private final Socket connection;
@@ -90,19 +91,20 @@ public class RoboRequestCallable implements Callable<Object> {
 						URI.create(tokens[HttpMessageUtil.URI_VALUE_POSITION]),
 						HttpVersion.getByValue(tokens[HttpMessageUtil.VERSION_POSITION]), params);
 
-				final List<String> paths = HttpPathUtil.generatePaths(httpMessage.uri().getPath());
+				final List<String> paths = HttpPathUtil.uriStringToPathList(httpMessage.uri().getPath());
 				final RoboReference<?> desiredUnit = HttpUriRegister.getInstance()
-						.getRoboUnitByPath(paths.get(DEFAULT_POSITION_0));
+						.getRoboUnitByPath(paths.get(DEFAULT_PATH_POSITION_0));
 				//@formatter:on
 				processWriter(out, DEFAULT_RESPONSE);
 				switch (method) {
 				case GET:
-					return factory.processGet(desiredUnit, paths.get(0), new HttpMessageWrapper<>(httpMessage));
+					/* currently is supported only one path */
+					return factory.processGet(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0), new HttpMessageWrapper<>(httpMessage));
 				case POST:
 					int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH).trim());
 					char[] buffer = new char[length];
 					in.read(buffer);
-					return factory.processPost(desiredUnit, paths.get(0),
+					return factory.processPost(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0),
 							new HttpMessageWrapper<>(httpMessage, buffer));
 				default:
 					SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);

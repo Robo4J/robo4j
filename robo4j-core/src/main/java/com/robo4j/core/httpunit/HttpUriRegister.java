@@ -17,14 +17,13 @@
 
 package com.robo4j.core.httpunit;
 
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboUnit;
-import com.robo4j.core.logging.SimpleLoggingUtil;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboReference;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 
 /**
  * Register URIs by methods
@@ -37,6 +36,7 @@ public final class HttpUriRegister {
 	private static final String SOLIDUS = "/";
 
 	private static volatile HttpUriRegister INSTANCE;
+	/* avalibale paths */
 	private final Map<String, RoboUriInfo> pathMethods = new HashMap<>();
 
 	private HttpUriRegister() {
@@ -62,7 +62,7 @@ public final class HttpUriRegister {
 		}
 	}
 
-	public void addUnitToNote(String path, RoboUnit<?> unit) {
+	public void addUnitToNote(String path, RoboReference<?> unit) {
 		final String tmpPath = SOLIDUS.concat(path);
 		if (pathMethods.containsKey(tmpPath)) {
 			pathMethods.get(tmpPath).setUnit(unit);
@@ -97,6 +97,14 @@ public final class HttpUriRegister {
 	}
 
 	// Private Methods
+
+	/**
+	 * Deliver RoboReference of the desired unit from the context
+	 *
+	 * @param context available context
+	 * @param id is unique name inside the RoboContext
+	 * @return reference to the desired unit if exists
+	 */
 	private RoboReference<?> getRoboUnitById(RoboContext context, String id) {
 		//@formatter:off
         return context.getUnits().stream()

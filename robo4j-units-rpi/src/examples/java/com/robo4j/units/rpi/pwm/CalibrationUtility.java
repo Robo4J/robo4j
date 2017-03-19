@@ -50,11 +50,11 @@ public class CalibrationUtility {
 		builder.add(settings);
 		RoboContext ctx = builder.build();
 		System.out.println("State before start:");
-		System.out.println(SystemUtil.generateStateReport(ctx));
+		System.out.println(SystemUtil.printStateReport(ctx));
 		ctx.start();
 
 		System.out.println("State after start:");
-		System.out.println(SystemUtil.generateStateReport(ctx));
+		System.out.println(SystemUtil.printStateReport(ctx));
 
 		String lastCommand = "";
 		Scanner scanner = new Scanner(System.in);

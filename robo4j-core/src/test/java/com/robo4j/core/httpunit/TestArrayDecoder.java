@@ -16,9 +16,6 @@
  */
 package com.robo4j.core.httpunit;
 
-import com.robo4j.core.httpunit.HttpDecoder;
-import com.robo4j.core.httpunit.HttpProducer;
-
 /**
  * Simple decoder that decodes json to an array of string.
  * 

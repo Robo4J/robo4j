@@ -64,18 +64,18 @@ public class RoboHttpPingPongTest {
 
 		executor.execute(() -> {
 			System.out.println("systemPong: State before start:");
-			System.out.println(SystemUtil.generateStateReport(systemPong));
+			System.out.println(SystemUtil.printStateReport(systemPong));
 			systemPong.start();
 			System.out.println("systemPong: State after start:");
-			System.out.println(SystemUtil.generateStateReport(systemPong));
+			System.out.println(SystemUtil.printStateReport(systemPong));
 		});
 
 		executor.execute(() -> {
 			System.out.println("systemPing: State before start:");
-			System.out.println(SystemUtil.generateStateReport(systemPing));
+			System.out.println(SystemUtil.printStateReport(systemPing));
 			systemPing.start();
 			System.out.println("systemPing: State after start:");
-			System.out.println(SystemUtil.generateStateReport(systemPing));
+			System.out.println(SystemUtil.printStateReport(systemPing));
 			System.out.println("systemPing: send messages");
 			RoboReference<Object> systemPingProducer = systemPing.getReference("http_producer");
 			for (int i = 0; i < MESSAGES; i++) {
@@ -84,9 +84,7 @@ public class RoboHttpPingPongTest {
 			}
 		});
 
-
-        RoboReference<String> pongConsumer = systemPong.getReference("request_consumer");
-
+        RoboReference<Object> pongConsumer = systemPong.getReference("request_consumer");
 
 		System.out.println("systemPing : Going Down!");
         systemPing.stop();
@@ -96,11 +94,11 @@ public class RoboHttpPingPongTest {
 		systemPong.stop();
 
 
-		DefaultAttributeDescriptor<Integer> messagesNumberDescriptor = DefaultAttributeDescriptor.create(Integer.class,
+		final DefaultAttributeDescriptor<Integer> messagesNumberDescriptor = DefaultAttributeDescriptor.create(Integer.class,
 				"getNumberOfSentMessages");
 		final int number = pongConsumer.getAttribute(messagesNumberDescriptor).get();
 		// NOTE: Not working
-		// Assert.assertEquals(number, MESSAGES);
+		Assert.assertEquals(number, MESSAGES);
 		System.out.println("PingPong is down!");
 		systemPong.shutdown();
 
@@ -114,6 +112,7 @@ public class RoboHttpPingPongTest {
 		HttpServerUnit httpServer = new HttpServerUnit(result, "http_server");
 		config.setString("target", CONTROLLER_PING_PONG);
 		config.setInteger("port", PORT);
+		config.setString("packages", "com.robo4j.core.httpunit.test.codec");
 
 		/* specific configuration */
 		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);

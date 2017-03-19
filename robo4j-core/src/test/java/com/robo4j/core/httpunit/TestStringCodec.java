@@ -16,10 +16,6 @@
  */
 package com.robo4j.core.httpunit;
 
-import com.robo4j.core.httpunit.HttpDecoder;
-import com.robo4j.core.httpunit.HttpEncoder;
-import com.robo4j.core.httpunit.HttpProducer;
-
 /**
  * Test class implementing both an encoder and decoder.
  * 

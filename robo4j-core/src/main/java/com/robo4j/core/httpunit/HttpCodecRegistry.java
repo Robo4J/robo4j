@@ -43,7 +43,7 @@ import com.robo4j.core.util.StreamUtils;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-class HttpCodecRegistry {
+public class HttpCodecRegistry {
 	private Map<Class<?>, HttpEncoder<?>> encoders = new HashMap<>();
 	private Map<Class<?>, HttpDecoder<?>> decoders = new HashMap<>();
 
