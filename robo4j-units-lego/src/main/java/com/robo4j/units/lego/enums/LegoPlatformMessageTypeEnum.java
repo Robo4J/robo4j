@@ -32,7 +32,7 @@ import java.util.stream.Stream;
  */
 public enum LegoPlatformMessageTypeEnum {
 
-    //@formatter:off
+	//@formatter:off
     STOP        (0, "stop"),
     MOVE        (1, "move"),
     BACK        (2, "back"),
@@ -43,37 +43,39 @@ public enum LegoPlatformMessageTypeEnum {
 
     //@formatter:on
 
-    private static volatile Map<Integer, LegoPlatformMessageTypeEnum> internMapByType;
-    private Integer type;
-    private String name;
+	private static volatile Map<Integer, LegoPlatformMessageTypeEnum> internMapByType;
+	private Integer type;
+	private String name;
 
-    LegoPlatformMessageTypeEnum(int type, String name) {
-        this.type = type;
-        this.name = name;
-    }
+	LegoPlatformMessageTypeEnum(int type, String name) {
+		this.type = type;
+		this.name = name;
+	}
 
-    //@formatter:off
+	//@formatter:off
     private static Map<Integer, LegoPlatformMessageTypeEnum> initMapping() {
         return Stream.of(values())
                 .collect(Collectors.toMap(LegoPlatformMessageTypeEnum::getType, e -> e));
     }
-    public static LegoPlatformMessageTypeEnum getInternalByName(String name) {
+    
+    public static LegoPlatformMessageTypeEnum getByName(String name) {
         if (internMapByType == null)
             internMapByType = initMapping();
         return internMapByType.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .filter(e -> e.getName().equals(name))
-                .findFirst().get();
+                .findFirst()
+                .orElse(null);
     }
     //@formatter:on
 
-    public Integer getType() {
-        return type;
-    }
+	public Integer getType() {
+		return type;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
 	public Set<String> commandNames() {
 		//@formatter:off
@@ -83,18 +85,9 @@ public enum LegoPlatformMessageTypeEnum {
         //@formatter:on
 	}
 
-	public LegoPlatformMessageTypeEnum getByName(String name) {
-		return getInternalByName(name);
+	@Override
+	public String toString() {
+		return "LegoPlatformMessageType{" + "type=" + type + ", name='" + name + '\'' + '}';
 	}
-
-
-    @Override
-    public String toString() {
-        return "LegoPlatformMessageType{" +
-                "type=" + type +
-                ", name='" + name + '\'' +
-                '}';
-    }
-
 
 }

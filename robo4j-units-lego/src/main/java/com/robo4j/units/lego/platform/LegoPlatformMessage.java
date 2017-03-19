@@ -35,7 +35,7 @@ public class LegoPlatformMessage {
     private final LegoPlatformMessageTypeEnum type;
 
     public LegoPlatformMessage(String text){
-		this(null, LegoPlatformMessageTypeEnum.getInternalByName(text));
+		this(null, LegoPlatformMessageTypeEnum.getByName(text));
     }
 
     public LegoPlatformMessage(LegoPlatformMessageTypeEnum type) {
@@ -49,7 +49,7 @@ public class LegoPlatformMessage {
 
     public LegoPlatformMessage(RoboReference<?> source, String text) {
         this.source = source;
-		this.type = LegoPlatformMessageTypeEnum.getInternalByName(text);
+		this.type = LegoPlatformMessageTypeEnum.getByName(text);
     }
 
     public RoboReference<?> getSource(){

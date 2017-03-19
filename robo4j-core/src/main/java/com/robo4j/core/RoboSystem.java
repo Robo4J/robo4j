@@ -132,7 +132,7 @@ public class RoboSystem implements RoboContext {
 	}
 
 	public void addToMap(Set<RoboUnit<?>> unitSet) {
-		unitSet.stream().forEach(unit -> units.put(unit.getId(), unit));
+		unitSet.forEach(unit -> units.put(unit.getId(), unit));
 	}
 
 	public void addToMap(RoboUnit<?>... unitArray) {

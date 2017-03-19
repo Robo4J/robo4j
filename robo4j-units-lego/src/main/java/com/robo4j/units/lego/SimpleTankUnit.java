@@ -200,7 +200,7 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	}
 
 	public String getId() {
-		return null;
+		return super.getId();
 	}
 
 	public LifecycleState getState() {

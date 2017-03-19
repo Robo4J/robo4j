@@ -35,6 +35,7 @@ public class SimpleTankTestUnit extends SimpleTankUnit {
 
     public SimpleTankTestUnit(RoboContext context, String id) {
         super(context, id);
+        System.out.println(getClass().getSimpleName() + " constructor: id: " + id);
     }
 
     @Override
@@ -50,5 +51,7 @@ public class SimpleTankTestUnit extends SimpleTankUnit {
         leftMotor = new MotorTestWrapper(AnalogPortEnum.getByType(leftMotorPort), MotorTypeEnum.getByType(leftMotorType));
         setState(LifecycleState.INITIALIZED);
     }
+
+
 
 }

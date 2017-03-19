@@ -34,6 +34,7 @@ import org.junit.Test;
  */
 public class TankExampleTests {
 
+    private static final String UNIT_CONTROLLER_NAME = "controller";
     private static final int PORT = 8025;
 
     @Test
@@ -42,14 +43,15 @@ public class TankExampleTests {
         Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
         HttpServerUnit http = new HttpServerUnit(system, "http");
-        config.setString("target", "controller");
+        config.setString("target", UNIT_CONTROLLER_NAME);
         config.setInteger("port", PORT);
+        config.setString("packages", "com.robo4j.units.lego.example.codec");
         /* specific configuration */
         Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
-        targetUnits.setString("controller", "GET");
+        targetUnits.setString(UNIT_CONTROLLER_NAME, "GET");
         http.initialize(config);
 
-        TankExampleController ctrl = new TankExampleController(system, "controller");
+        TankExampleController ctrl = new TankExampleController(system, UNIT_CONTROLLER_NAME);
         config = ConfigurationFactory.createEmptyConfiguration();
         config.setString("target", "platform");
         ctrl.initialize(config);
@@ -76,6 +78,7 @@ public class TankExampleTests {
         // system.addUnits(http, ctrl, platform, lcd, sonic);
         system.addUnits(http, ctrl, platform, lcd);
         system.start();
+
         ctrl.getKnownAttributes().forEach(a ->
             System.out.println("http://<IP>"+ PORT + "/" + a.getAttributeName() +
                     "?<value of:" + a.getAttributeType().getSimpleName() + ">" )
