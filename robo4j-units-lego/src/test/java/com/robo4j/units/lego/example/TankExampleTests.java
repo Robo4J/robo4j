@@ -79,10 +79,7 @@ public class TankExampleTests {
         system.addUnits(http, ctrl, platform, lcd);
         system.start();
 
-        ctrl.getKnownAttributes().forEach(a ->
-            System.out.println("http://<IP>"+ PORT + "/" + a.getAttributeName() +
-                    "?<value of:" + a.getAttributeType().getSimpleName() + ">" )
-        );
+
 
         lcd.onMessage("Press Key to end...");
 //		System.in.read();
