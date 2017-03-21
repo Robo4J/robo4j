@@ -68,19 +68,18 @@ public final class SystemUtil {
 				.append(BREAK)
 				.append("================================================")
 				.append(BREAK);
-		codecUnit.getKnownAttributes().forEach(a ->
-			sb.append("http://<IP>")
-					.append(port)
-					.append(SLASH)
-					.append(codecUnit.getId())
-					.append("?")
-					.append(a.getAttributeName())
-					.append("=<value of:\"")
-					.append(a.getAttributeType().getSimpleName())
-					.append("\">")
-					.append(BREAK));
-			sb.append("================================================")
+		sb.append("http://<IP>")
+				.append(port)
+				.append(SLASH)
+				.append(codecUnit.getId())
+				.append("?")
+				.append("command")
+				.append("=<value of:\"")
+				.append(codecUnit.getMessageType().getSimpleName())
+				.append("\">")
 				.append(BREAK);
+				sb.append("==============================================")
+		.append(BREAK);
 		return sb.toString();
 	}
 }

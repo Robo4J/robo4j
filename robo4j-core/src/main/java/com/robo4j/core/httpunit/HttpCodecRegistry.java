@@ -76,6 +76,8 @@ public class HttpCodecRegistry {
 					if (classesInPackage.isEmpty()) {
 						SimpleLoggingUtil.debug(getClass(),
 								"We did not find any annotated classes in package " + packageName);
+					} else {
+						allClasses.addAll(classesInPackage);
 					}
 				} else {
 					allClasses.addAll(classesInPackage);

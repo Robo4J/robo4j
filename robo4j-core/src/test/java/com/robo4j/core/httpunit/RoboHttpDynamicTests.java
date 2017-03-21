@@ -48,6 +48,21 @@ public class RoboHttpDynamicTests {
 	private static final String HOST_SYSTEM = "0.0.0.0";
 
 
+	@Test
+	public void simpleHttpServerUnitTest() throws Exception {
+		/* tested system configuration */
+		RoboSystem mainSystem = getServerRoboSystem();
+		System.out.println(SystemUtil.printStateReport(mainSystem));
+		System.out.println("Server start after start:");
+
+//		System.in.read();
+		mainSystem.stop();
+		System.out.println(SystemUtil.printStateReport(mainSystem));
+		System.out.println("Server start after stop:");
+
+		mainSystem.shutdown();
+	}
+
 	/**
 	 * Motivation Client system is sending messages to the main system over HTTP
 	 * Main System receives desired number of messages.
@@ -117,7 +132,7 @@ public class RoboHttpDynamicTests {
 		Assert.assertEquals(result.getState(), LifecycleState.UNINITIALIZED);
 
 		result.addUnits(httpServer, ctrl, consumer);
-		SystemUtil.printSocketEndPoint(httpServer, ctrl);
+		System.out.println(SystemUtil.printSocketEndPoint(httpServer, ctrl));
 		result.start();
 		return result;
 	}

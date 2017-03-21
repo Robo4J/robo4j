@@ -99,7 +99,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			for(Iterator<String> it =  targetUnits.getValueNames().iterator(); it.hasNext();){
 				final String key = it.next();
 				final String value = targetUnits.getString(key, RoboHttpUtils._EMPTY_STRING);
-				System.out.println(getClass().getSimpleName() + " register URI:: key: " + key + ", value: " + value);
 				HttpUriRegister.getInstance().addNote(key, value);
 			}
 		}
