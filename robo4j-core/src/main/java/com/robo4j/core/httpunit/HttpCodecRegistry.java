@@ -65,6 +65,7 @@ public class HttpCodecRegistry {
 	}
 
 	private void scanPackages(ClassLoader loader, String... packages) {
+
 		List<String> allClasses = new ArrayList<>();
 		for (String packageName : packages) {
 			packageName = packageName.trim();
@@ -75,9 +76,9 @@ public class HttpCodecRegistry {
 					if (classesInPackage.isEmpty()) {
 						SimpleLoggingUtil.debug(getClass(),
 								"We did not find any annotated classes in package " + packageName);
-					} else {
-						allClasses.addAll(classesInPackage);
 					}
+				} else {
+					allClasses.addAll(classesInPackage);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -126,7 +127,9 @@ public class HttpCodecRegistry {
 
 	private List<String> scanJarPackage(ClassLoader loader, String packageName) throws IOException {
 		List<String> classes = new ArrayList<>();
-		Enumeration<URL> resources = loader.getResources(slashify(packageName));
+		String slashifyPackage = slashify(packageName);
+		Enumeration<URL> resources = loader.getResources(slashifyPackage);
+
 		StreamUtils.enumerationAsStream(resources, false).map(url -> {
 			try {
 				String jarFile = url.getFile().split(EXCLAMATION)[0].replace(FILE, ConstantUtil.EMPTY_STRING);
@@ -140,7 +143,7 @@ public class HttpCodecRegistry {
 		}).filter(Objects::nonNull).forEach(e -> {
 			try {
 				for (ZipEntry entry = e.getNextEntry(); entry != null; entry = e.getNextEntry()) {
-					if (!entry.isDirectory() && entry.getName().contains(packageName)
+					if (!entry.isDirectory() && entry.getName().contains(slashifyPackage)
 							&& entry.getName().endsWith(SUFFIX)) {
 						String cName = entry.getName().replace(SLASH, DOT).replace(SUFFIX, ConstantUtil.EMPTY_STRING);
 						classes.add(cName);
