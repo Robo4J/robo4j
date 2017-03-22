@@ -20,15 +20,12 @@
 package com.robo4j.core.client.request;
 
 import java.net.URI;
-import java.util.Map;
 
 import com.robo4j.core.RoboReference;
-import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.httpunit.HttpCodecRegistry;
 import com.robo4j.core.httpunit.HttpDecoder;
 import com.robo4j.core.httpunit.HttpUriRegister;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.http.HttpMessageWrapper;
 import com.robo4j.http.HttpVersion;
 
@@ -38,8 +35,8 @@ import com.robo4j.http.HttpVersion;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+//TODO discuss how to use URIs
 public class RoboRequestFactory implements DefaultRequestFactory<Object> {
-	private static final String URI_COMMAND = "command";
 
 	private final HttpCodecRegistry codecRegistry;
 
@@ -54,18 +51,16 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 			/* currently is supported only */
 			final HttpUriRegister register = HttpUriRegister.getInstance();
 			if (register.isUnitAvailable(path)) {
-				/* currently is supported only one http unit */
-				final Map<String, String> tmpQueryParsed = RoboHttpUtils.parseURIQueryToMap(uri.getQuery(),
-						ConstantUtil.HTTP_QUERY_SEP);
-
-				//TODO we who we construct URI remove URI_COMMAND constant
 				final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredUnit.getMessageType());
 				if(decoder != null){
-					return decoder.decode(tmpQueryParsed.get(URI_COMMAND));
+					return "Unit Description\n" +
+							"codec is available:\n" +
+							"to send command use POST request\n" +
+							"example: { \"value\":\"<possible_value>\"}\n\n" +
+							"available type: " + desiredUnit.getMessageType().toGenericString();
 				} else {
 					SimpleLoggingUtil.error(getClass(), "no decoder available");
 				}
-
 			}
 
 		} else {
@@ -74,13 +69,32 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 		return null;
 	}
 
+	/**
+	 * currently is supported POST message in JSON format
+	 *
+	 * example: { "value" : "move" }
+	 *
+	 * @param desiredUnit
+	 * @param path
+	 * @param wrapper
+	 * @return
+	 */
 	@Override
-	public String processPost(final RoboReference<?> desiredUnit, final String path, final HttpMessageWrapper<?> wrapper) {
-		System.out.println("processPost NOT IMPLEMENTED");
-		System.out.println("processPost unit: " + desiredUnit);
-		System.out.println("processPost path: " + path);
-		System.out.println("processPost message: " + wrapper.message());
-		System.out.println("processPost body: " + wrapper.body());
+	public Object processPost(final RoboReference<?> desiredUnit, final String path, final HttpMessageWrapper<?> wrapper) {
+		if (HttpVersion.containsValue(wrapper.message().version())) {
+			final HttpUriRegister register = HttpUriRegister.getInstance();
+			if (register.isUnitAvailable(path)) {
+				final String json = new String((char[])wrapper.body());
+				final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredUnit.getMessageType());
+				if(decoder != null){
+					return decoder.decode(json);
+				} else {
+					SimpleLoggingUtil.error(getClass(), "no decoder available");
+				}
+			}
+		} else {
+			SimpleLoggingUtil.error(getClass(), "processPost is corrupted: " + wrapper);
+		}
 		return null;
 	}
 

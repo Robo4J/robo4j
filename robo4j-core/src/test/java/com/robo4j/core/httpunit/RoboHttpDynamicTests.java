@@ -42,26 +42,11 @@ import com.robo4j.core.util.SystemUtil;
 public class RoboHttpDynamicTests {
 
 	private static final int PORT = 8025;
-	private static final String CLIEN_UNIT_ID = "httpClient";
+	private static final String CLIENT_UNIT_ID = "httpClient";
 	private static final String TARGET_UNIT = "controller";
 	private static final int MESSAGES_NUMBER = 3;
 	private static final String HOST_SYSTEM = "0.0.0.0";
-
-
-	@Test
-	public void simpleHttpServerUnitTest() throws Exception {
-		/* tested system configuration */
-		RoboSystem mainSystem = getServerRoboSystem();
-		System.out.println(SystemUtil.printStateReport(mainSystem));
-		System.out.println("Server start after start:");
-
-//		System.in.read();
-		mainSystem.stop();
-		System.out.println(SystemUtil.printStateReport(mainSystem));
-		System.out.println("Server start after stop:");
-
-		mainSystem.shutdown();
-	}
+	static final String JSON_STRING = "{ \"value\":\"move\" }";
 
 	/**
 	 * Motivation Client system is sending messages to the main system over HTTP
@@ -81,19 +66,18 @@ public class RoboHttpDynamicTests {
 
 		/* system which is testing main system */
 		RoboSystem clientSystem = getClientRoboSystem();
-		RoboReference<Object> httpClientReference = clientSystem.getReference(CLIEN_UNIT_ID);
+		RoboReference<Object> httpClientReference = clientSystem.getReference(CLIENT_UNIT_ID);
 
 		System.out.println(SystemUtil.printStateReport(clientSystem));
 		System.out.println("Client State after start:");
-
 
 		System.out.println("State after start:");
 		System.out.println(SystemUtil.printStateReport(mainSystem));
 
 		/* client system sending a messages to the main system */
 		for (int i = 0; i < MESSAGES_NUMBER; i++) {
-			httpClientReference.sendMessage(RoboHttpUtils.createGetRequest(HOST_SYSTEM,
-					"/".concat(TARGET_UNIT).concat("?").concat("command=move")));
+			httpClientReference
+					.sendMessage(RoboHttpUtils.createPostRequest(HOST_SYSTEM, "/".concat(TARGET_UNIT), JSON_STRING));
 		}
 		clientSystem.stop();
 		clientSystem.shutdown();
@@ -106,17 +90,18 @@ public class RoboHttpDynamicTests {
 		Assert.assertEquals(mainSystem.getUnits().size(), MESSAGES_NUMBER);
 	}
 
-	//Private Methods
+	// Private Methods
 	private RoboSystem getServerRoboSystem() throws Exception {
 		/* tested system configuration */
 		RoboSystem result = new RoboSystem();
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
+
 		HttpServerUnit httpServer = new HttpServerUnit(result, "http");
 		config.setString("target", TARGET_UNIT);
 		config.setInteger("port", PORT);
 		config.setString("packages", "com.robo4j.core.httpunit.test.codec");
 		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
-		targetUnits.setString(TARGET_UNIT, "GET");
+		targetUnits.setString(TARGET_UNIT, "POST");
 		httpServer.initialize(config);
 
 		HttpCommandTestController ctrl = new HttpCommandTestController(result, TARGET_UNIT);
@@ -142,12 +127,12 @@ public class RoboHttpDynamicTests {
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		RoboSystem result = new RoboSystem();
 
-		HttpClientUnit httpClient = new HttpClientUnit(result, CLIEN_UNIT_ID);
+		HttpClientUnit httpClient = new HttpClientUnit(result, CLIENT_UNIT_ID);
 		config.setString("address", HOST_SYSTEM);
 		config.setInteger("port", PORT);
 		/* specific configuration */
 		Configuration configuration = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
-		configuration.setString("controller", "GET");
+		configuration.setString("controller", "POST");
 		httpClient.initialize(config);
 		result.addUnits(httpClient);
 		System.out.println("Client State after start:");

@@ -20,6 +20,8 @@ package com.robo4j.core.httpunit.test.codec;
 import com.robo4j.core.httpunit.HttpDecoder;
 import com.robo4j.core.httpunit.HttpEncoder;
 import com.robo4j.core.httpunit.HttpProducer;
+import com.robo4j.core.httpunit.codec.SimpleCommand;
+import com.robo4j.core.httpunit.codec.SimpleCommandCodec;
 import com.robo4j.core.httpunit.test.TestCommandEnum;
 
 /**
@@ -29,14 +31,17 @@ import com.robo4j.core.httpunit.test.TestCommandEnum;
 @HttpProducer
 public class CommandEnumToStringTestCodec implements HttpDecoder<TestCommandEnum>, HttpEncoder<TestCommandEnum> {
 
+    private final SimpleCommandCodec codec = new SimpleCommandCodec();
     @Override
     public String encode(TestCommandEnum stuff) {
-        return stuff.toString();
+        final SimpleCommand simpleCommand = new SimpleCommand(stuff.getName());
+        return codec.encode(simpleCommand);
     }
 
     @Override
     public TestCommandEnum decode(String json) {
-        return TestCommandEnum.getByName(json);
+        final SimpleCommand simpleCommand = codec.decode(json);
+        return TestCommandEnum.getByName(simpleCommand.getValue());
     }
 
     @Override

@@ -49,6 +49,7 @@ public class StringConsumer extends RoboUnit<String> {
 	public synchronized void onMessage(String message) {
 		counter.incrementAndGet();
 		receivedMessages.add(message);
+		System.out.println("MAGIC: " + message);
 	}
 
 	@Override

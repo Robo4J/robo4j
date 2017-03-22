@@ -31,6 +31,7 @@ public class StringProducer extends RoboUnit<String> {
     private AtomicInteger counter;
     private String target;
     private String method;
+    private String uri;
     private String targetAddress;
 
     /**
@@ -49,6 +50,7 @@ public class StringProducer extends RoboUnit<String> {
         }
 
         method = configuration.getString("method", null);
+        uri = configuration.getString("uri", null);
         targetAddress = configuration.getString("targetAddress", "0.0.0.0");
 
         counter = new AtomicInteger(DEFAULT);
@@ -68,6 +70,9 @@ public class StringProducer extends RoboUnit<String> {
                     break;
                 case "sendGetMessage":
                     sendGetSimpleMessage(targetAddress, input[1].trim());
+                    break;
+                case "sendPostMessage":
+                    sendPostSimpleMessage(targetAddress, uri, input[1].trim());
                     break;
                 default:
                     System.out.println("don't understand message: " + message);
@@ -94,5 +99,14 @@ public class StringProducer extends RoboUnit<String> {
         final String request = method.equals("GET") ? RoboHttpUtils.createGetRequest(host, message) : null;
         getContext().getReference(target).sendMessage(request);
     }
+
+    public void sendPostSimpleMessage(String host, String uri, String message) {
+        if(uri == null){
+            throw new IllegalStateException("uri not available");
+        }
+        final String request = method.equals("POST") ? RoboHttpUtils.createPostRequest(host, uri, message) : null;
+        getContext().getReference(target).sendMessage(request);
+    }
+
 
 }

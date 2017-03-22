@@ -19,6 +19,8 @@ package com.robo4j.core.httpunit;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.robo4j.core.httpunit.codec.SimpleCommand;
+import com.robo4j.core.httpunit.codec.SimpleCommandCodec;
 import com.robo4j.core.httpunit.test.TestCommandEnum;
 
 /**
@@ -45,6 +47,19 @@ public class HttpUnitTests {
 		TestArrayEncoder arrayEncoder = new TestArrayEncoder();
 		String json = arrayEncoder.encode(new String[] { "A", "B", "C" });
 		Assert.assertEquals("{array:[A,B,C]}", json);
+	}
+
+	@Test
+	public void testSimpleCommandCodecEncoded() {
+		SimpleCommand simpleCommand = new SimpleCommand("move");
+		String jsonString = "{ \"value\":\"move\" }";
+		SimpleCommandCodec simpleCommandCodec = new SimpleCommandCodec();
+		SimpleCommand decSimpleCommand = simpleCommandCodec.decode(jsonString);
+
+		String enSimpleCommand = simpleCommandCodec.encode(simpleCommand);
+
+		Assert.assertEquals(enSimpleCommand, jsonString);
+		Assert.assertEquals(simpleCommand.getValue(), decSimpleCommand.getValue());
 	}
 
 	@Test

@@ -36,21 +36,19 @@ import com.robo4j.http.util.HttpMessageUtil;
  */
 public final class RoboHttpUtils {
 
+	private static final String METHOD_GET = "GET";
+	private static final String METHOD_POST = "POST";
+	private static final String HTTP_VERSION = "HTTP/1.1";
+	private static final String ROBO4J_CLIENT = "Robo4J-HttpClient";
 	// private static final String SPACE = "\u0020";
 	// private static final String NEXT_LINE = "\r\n";
 	public static final String NEW_LINE = "\n";
-	public static final String HTTP_VERSION = "HTTP/1.1";
 	public static final String HTTP_HEADER_OK = HttpFirstLineBuilder.Build(HTTP_VERSION).add("200")
 			.add("OK").build();
 	public static final int DEFAULT_THREAD_POOL_SIZE = 2;
 	public static final int _DEFAULT_PORT = 8042;
-	public static final String METHOD_GET = "GET";
-	public static final String METHOD_POST = "POST";
 	public static final String _EMPTY_STRING = "";
-	public static final String COLON = ":";
 	public static final String HTTP_TARGET_UNITS = "targetUnits";
-	public static final String HTTP_HEADER_NOT = "HTTP/1.1 501 Not Implemented";
-	public static final String HTTP_HEADER_NOT_ALLOWED = "HTTP/1.1 405 Method Not Allowed";
 	public static final int KEEP_ALIVE_TIME = 10;
 
 
@@ -60,31 +58,48 @@ public final class RoboHttpUtils {
 		return HttpHeaderBuilder.Build()
 				.add(ConstantUtil.EMPTY_STRING, responseCode)
 				.add(HttpHeaderNames.DATE, LocalDateTime.now().toString())
-				.add(HttpHeaderNames.SERVER, "Robo4J-client")
+				.add(HttpHeaderNames.SERVER, ROBO4J_CLIENT)
 				.add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(length))
 				.add(HttpHeaderNames.CONTENT_TYPE, "text/html;".concat(HttpMessageUtil.SPACE).concat("charset=utf-8"))
 				.build();
 		//@formatter:on
 	}
 
-	public static String createResponseHeader(String host) {
+	public static String createRequestHeader(String host, int length) {
 		//@formatter:off
-		return  HttpHeaderBuilder.Build()
-				.add(HttpHeaderNames.HOST, host)
-				.add(HttpHeaderNames.CONNECTION, "keep-alive")
-				.add(HttpHeaderNames.CACHE_CONTROL, "no-cache")
-				.add(HttpHeaderNames.USER_AGENT, "Robo4J-HttpClient")
-				.add(HttpHeaderNames.ACCEPT, "*/*")
-				.add(HttpHeaderNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
-				.add(HttpHeaderNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8")
-				.build();
+		HttpHeaderBuilder builder = HttpHeaderBuilder.Build()
+			.add(HttpHeaderNames.HOST, host)
+			.add(HttpHeaderNames.CONNECTION, "keep-alive")
+			.add(HttpHeaderNames.CACHE_CONTROL, "no-cache")
+			.add(HttpHeaderNames.USER_AGENT, ROBO4J_CLIENT)
+			.add(HttpHeaderNames.ACCEPT, "*/*")
+			.add(HttpHeaderNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
+			.add(HttpHeaderNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8")
+			.add(HttpHeaderNames.CONTENT_TYPE, "text/html;".concat(HttpMessageUtil.SPACE).concat("charset=utf-8"));
+		if(length != 0){
+			builder.add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(length));
+		}
+		return builder.build();
+		//@formatter:on
+	}
+
+	public static String createPostRequest(String host, String uri, String message){
+		//@formatter:off
+		final String header = HttpFirstLineBuilder.Build(METHOD_POST)
+				.add(uri)
+				.add(HTTP_VERSION)
+				.build()
+				.concat(createRequestHeader(host, message.length()));
+		return header
+				.concat(NEW_LINE)
+				.concat(message);
 		//@formatter:on
 	}
 
 	public static String createGetRequest(String host, String message) {
 		//@formatter:off
 		return HttpFirstLineBuilder.Build(METHOD_GET).add(message).add(HTTP_VERSION)
-				.build().concat(createResponseHeader(host));
+				.build().concat(createRequestHeader(host, 0));
 		//@formatter:on
 	}
 

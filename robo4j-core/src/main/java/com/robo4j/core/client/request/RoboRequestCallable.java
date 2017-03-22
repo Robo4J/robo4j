@@ -95,15 +95,18 @@ public class RoboRequestCallable implements Callable<Object> {
 				final RoboReference<?> desiredUnit = HttpUriRegister.getInstance()
 						.getRoboUnitByPath(paths.get(DEFAULT_PATH_POSITION_0));
 				//@formatter:on
-				processWriter(out, DEFAULT_RESPONSE);
 				switch (method) {
 				case GET:
 					/* currently is supported only one path */
-					return factory.processGet(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0), new HttpMessageWrapper<>(httpMessage));
+					final Object unitDescription = factory.processGet(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0),
+							new HttpMessageWrapper<>(httpMessage));
+					processWriter(out, unitDescription.toString());
+					return null;
 				case POST:
+					processWriter(out, DEFAULT_RESPONSE);
 					int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH).trim());
 					char[] buffer = new char[length];
-					in.read(buffer);
+					int c = in.read(buffer);
 					return factory.processPost(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0),
 							new HttpMessageWrapper<>(httpMessage, buffer));
 				default:

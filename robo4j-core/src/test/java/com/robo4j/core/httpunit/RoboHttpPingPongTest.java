@@ -17,9 +17,6 @@
 
 package com.robo4j.core.httpunit;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -53,49 +50,40 @@ public class RoboHttpPingPongTest {
 	private static final int PORT = 8042;
 	private static final int MESSAGES = 3;
 
-
-	private ExecutorService executor = Executors.newFixedThreadPool(1);
-
 	@Test
 	public void pingPongTest() throws Exception {
 
 		RoboSystem systemPong = configurePongSystem();
-        RoboSystem systemPing = configurePingSystem();
+		RoboSystem systemPing = configurePingSystem();
 
-		executor.execute(() -> {
-			System.out.println("systemPong: State before start:");
-			System.out.println(SystemUtil.printStateReport(systemPong));
-			systemPong.start();
-			System.out.println("systemPong: State after start:");
-			System.out.println(SystemUtil.printStateReport(systemPong));
-		});
+		System.out.println("systemPong: State before start:");
+		System.out.println(SystemUtil.printStateReport(systemPong));
+		systemPong.start();
+		System.out.println("systemPong: State after start:");
+		System.out.println(SystemUtil.printStateReport(systemPong));
 
-		executor.execute(() -> {
-			System.out.println("systemPing: State before start:");
-			System.out.println(SystemUtil.printStateReport(systemPing));
-			systemPing.start();
-			System.out.println("systemPing: State after start:");
-			System.out.println(SystemUtil.printStateReport(systemPing));
-			System.out.println("systemPing: send messages");
-			RoboReference<Object> systemPingProducer = systemPing.getReference("http_producer");
-			for (int i = 0; i < MESSAGES; i++) {
-				systemPingProducer
-						.sendMessage("sendGetMessage::".concat("/controller").concat("?").concat("command=move"));
-			}
-		});
+		System.out.println("systemPing: State before start:");
+		System.out.println(SystemUtil.printStateReport(systemPing));
+		systemPing.start();
+		System.out.println("systemPing: State after start:");
+		System.out.println(SystemUtil.printStateReport(systemPing));
+		System.out.println("systemPing: send messages");
+		RoboReference<Object> systemPingProducer = systemPing.getReference("http_producer");
+		for (int i = 0; i < MESSAGES; i++) {
+			systemPingProducer.sendMessage("sendPostMessage::".concat(RoboHttpDynamicTests.JSON_STRING));
+		}
 
-        RoboReference<Object> pongConsumer = systemPong.getReference("request_consumer");
+		RoboReference<Object> pongConsumer = systemPong.getReference("request_consumer");
 
 		System.out.println("systemPing : Going Down!");
-        systemPing.stop();
-        systemPing.shutdown();
+		systemPing.stop();
+		systemPing.shutdown();
 
 		System.out.println("systemPong : Going Down!");
 		systemPong.stop();
 
-
-		final DefaultAttributeDescriptor<Integer> messagesNumberDescriptor = DefaultAttributeDescriptor.create(Integer.class,
-				"getNumberOfSentMessages");
+		final DefaultAttributeDescriptor<Integer> messagesNumberDescriptor = DefaultAttributeDescriptor
+				.create(Integer.class, "getNumberOfSentMessages");
 		final int number = pongConsumer.getAttribute(messagesNumberDescriptor).get();
 		// NOTE: Not working
 		Assert.assertEquals(number, MESSAGES);
@@ -113,10 +101,9 @@ public class RoboHttpPingPongTest {
 		config.setString("target", CONTROLLER_PING_PONG);
 		config.setInteger("port", PORT);
 		config.setString("packages", "com.robo4j.core.httpunit.test.codec");
-
 		/* specific configuration */
 		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
-		targetUnits.setString(CONTROLLER_PING_PONG, "GET");
+		targetUnits.setString(CONTROLLER_PING_PONG, "POST");
 		httpServer.initialize(config);
 
 		StringConsumer consumer = new StringConsumer(result, "request_consumer");
@@ -141,14 +128,15 @@ public class RoboHttpPingPongTest {
 		config.setInteger("port", PORT);
 		/* specific configuration */
 		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
-		targetUnits.setString(CONTROLLER_PING_PONG, "GET");
+		targetUnits.setString(CONTROLLER_PING_PONG, "POST");
 
 		httpClient.initialize(config);
 
 		StringProducer producer = new StringProducer(result, "http_producer");
 		config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("target", "http_client");
-		config.setString("method", "GET");
+		config.setString("method", "POST");
+		config.setString("uri", "/controller");
 		config.setString("targetAddress", HOST_SYSTEM);
 		producer.initialize(config);
 
