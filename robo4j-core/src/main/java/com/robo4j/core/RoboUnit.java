@@ -243,7 +243,6 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 		return null;
 	}
 
-
 	/**
 	 * @return a RoboReference. Internal use only.
 	 */

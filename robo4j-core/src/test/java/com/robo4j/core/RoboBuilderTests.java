@@ -54,7 +54,12 @@ public class RoboBuilderTests {
 
         RoboReference<String> consumer = system.getReference("consumer");
         Assert.assertNotNull(consumer);
-        Assert.assertEquals(MESSAGES, (int) consumer.getAttribute(descriptor).get());
+
+        //TODO is it proper ? 
+        synchronized(consumer){
+            Assert.assertEquals(MESSAGES, (int) consumer.getAttribute(descriptor).get());
+        }
+
 
         system.stop();
         system.shutdown();

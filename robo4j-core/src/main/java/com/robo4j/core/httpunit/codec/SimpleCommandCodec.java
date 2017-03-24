@@ -17,14 +17,17 @@
 
 package com.robo4j.core.httpunit.codec;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.robo4j.core.httpunit.HttpDecoder;
 import com.robo4j.core.httpunit.HttpEncoder;
 import com.robo4j.core.httpunit.HttpProducer;
 import com.robo4j.core.util.ConstantUtil;
 
 /**
- * default simple codec for simple commands
- * Simple codec is currently used for Enum
+ * default simple codec for simple commands Simple codec is currently used for
+ * Enum
  *
  * @see SimpleCommand
  *
@@ -33,16 +36,36 @@ import com.robo4j.core.util.ConstantUtil;
  */
 @HttpProducer
 public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncoder<SimpleCommand> {
+	private static final String KEY_TYPE = "type";
+	private static final String KEY_VALUE = "value";
 
 	@Override
 	public String encode(SimpleCommand stuff) {
-		return "{ \"value\":\"" + stuff.getValue() + "\" }";
+		final StringBuilder sb = new StringBuilder("{\"value\":\"")
+				.append(stuff.getValue());
+		if(stuff.getType().equals(ConstantUtil.EMPTY_STRING)){
+			sb.append("\"}");
+		} else {
+			sb.append("\",\"type\":\"")
+				.append(stuff.getType())
+				.append("\"}");
+		}
+		return sb.toString();
 	}
 
 	@Override
 	public SimpleCommand decode(String json) {
-		final String clearData = json.replaceAll("(value|:|\"|\\{|})", ConstantUtil.EMPTY_STRING).trim();
-		return new SimpleCommand(clearData);
+		final Map<String, String> map = new HashMap<>();
+		//@formatter:off
+		final String[] parts = json.replaceAll("^\\{\\s*\"|\"\\}$", ConstantUtil.EMPTY_STRING)
+				.split("\"?(\"?:\"?|,)\"?");
+		//@formatter:on
+		for (int i = 0; i < parts.length - 1; i += 2) {
+			map.put(parts[i], parts[i + 1]);
+		}
+
+		return map.containsKey(KEY_TYPE) ? new SimpleCommand(map.get(KEY_VALUE), map.get(KEY_TYPE))
+				: new SimpleCommand(map.get(KEY_VALUE));
 	}
 
 	@Override

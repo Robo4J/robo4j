@@ -52,7 +52,7 @@ public class HttpUnitTests {
 	@Test
 	public void testSimpleCommandCodecEncoded() {
 		SimpleCommand simpleCommand = new SimpleCommand("move");
-		String jsonString = "{ \"value\":\"move\" }";
+		String jsonString = "{\"value\":\"move\"}";
 		SimpleCommandCodec simpleCommandCodec = new SimpleCommandCodec();
 		SimpleCommand decSimpleCommand = simpleCommandCodec.decode(jsonString);
 
@@ -96,7 +96,8 @@ public class HttpUnitTests {
 	 * Translates Enum to String and otherwise
 	 */
 	@Test
-	public void testHttpTestCommandEnumMessage() {
+	public void testHttpTestCommandValueEnumMessage() {
+		final String jsonString = "{\"value\":\"move\"}";
 		HttpCodecRegistry registry = new HttpCodecRegistry("com.robo4j.core.httpunit.test.codec");
 		HttpEncoder<TestCommandEnum> encoder = registry.getEncoder(TestCommandEnum.class);
 		HttpDecoder<TestCommandEnum> decoder = registry.getDecoder(TestCommandEnum.class);
@@ -106,9 +107,10 @@ public class HttpUnitTests {
 		TestCommandEnum originalData = TestCommandEnum.MOVE;
 		String encoded = encoder.encode(TestCommandEnum.MOVE);
 
-		TestCommandEnum decoded = decoder.decode("move");
+		TestCommandEnum decoded = decoder.decode(jsonString);
 
 		Assert.assertEquals(originalData, decoded);
+		Assert.assertEquals(encoded, jsonString);
 	}
 
 }

@@ -46,7 +46,7 @@ public class RoboHttpDynamicTests {
 	private static final String TARGET_UNIT = "controller";
 	private static final int MESSAGES_NUMBER = 3;
 	private static final String HOST_SYSTEM = "0.0.0.0";
-	static final String JSON_STRING = "{ \"value\":\"move\" }";
+	static final String JSON_STRING = "{\"value\":\"move\"}";
 
 	/**
 	 * Motivation Client system is sending messages to the main system over HTTP

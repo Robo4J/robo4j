@@ -17,30 +17,48 @@
 
 package com.robo4j.core.httpunit.codec;
 
+import com.robo4j.core.util.ConstantUtil;
+
 /**
  * used for simple http communication
  *
- * json: { "value" : "some_value" }
+ * json: { "value" : "some_value", "type" : "class_type" }
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class SimpleCommand {
 
-    private final String value;
+	private final String value;
+	private final String type;
 
-    public SimpleCommand(String value) {
-        this.value = value;
-    }
+	public SimpleCommand(String value) {
+		this.value = value;
+		this.type = ConstantUtil.EMPTY_STRING;
+	}
 
-    public String getValue() {
-        return value;
-    }
+	/**
+	 *
+	 * @param value
+	 *            command value
+	 * @param type
+	 *            command class name
+	 */
+	public SimpleCommand(String value, String type) {
+		this.value = value;
+		this.type = type;
+	}
 
-    @Override
-    public String toString() {
-        return "SimpleCommand{" +
-                "value='" + value + '\'' +
-                '}';
-    }
+	public String getValue() {
+		return value;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	@Override
+	public String toString() {
+		return "SimpleCommand{" + "value='" + value + '\'' + ", type='" + type + '\'' + '}';
+	}
 }
