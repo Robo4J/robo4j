@@ -24,6 +24,7 @@ import com.robo4j.core.util.ConstantUtil;
 
 /**
  * default simple codec for simple commands
+ * Simple codec is currently used for Enum
  *
  * @see SimpleCommand
  *
