@@ -54,8 +54,8 @@ public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncod
 	public SimpleCommand decode(String json) {
 		final Map<String, String> map = new HashMap<>();
 		//@formatter:off
-		final String[] parts = json.replaceAll("^\\{\\s*\"|\"\\}$", ConstantUtil.EMPTY_STRING)
-				.split("\"?(\"?:\"?|,)\"?");
+		final String[] parts = json.replaceAll("^\\{\\s*\"|\"\\s*\\}$", ConstantUtil.EMPTY_STRING)
+				.split("\"?(\"?\\s*:\\s*\"?|,)\"?");
 		//@formatter:on
 		for (int i = 0; i < parts.length - 1; i += 2) {
 			map.put(parts[i], parts[i + 1]);

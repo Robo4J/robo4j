@@ -97,7 +97,8 @@ public class HttpUnitTests {
 	 */
 	@Test
 	public void testHttpTestCommandValueEnumMessage() {
-		final String jsonString = "{\"value\":\"move\"}";
+		final String jsonCorruptedString = "{  \"value\" :  \"move\"  }";
+		final String jsonProperString = "{\"value\":\"move\"}";
 		HttpCodecRegistry registry = new HttpCodecRegistry("com.robo4j.core.httpunit.test.codec");
 		HttpEncoder<TestCommandEnum> encoder = registry.getEncoder(TestCommandEnum.class);
 		HttpDecoder<TestCommandEnum> decoder = registry.getDecoder(TestCommandEnum.class);
@@ -107,10 +108,28 @@ public class HttpUnitTests {
 		TestCommandEnum originalData = TestCommandEnum.MOVE;
 		String encoded = encoder.encode(TestCommandEnum.MOVE);
 
-		TestCommandEnum decoded = decoder.decode(jsonString);
+		TestCommandEnum decoded = decoder.decode(jsonCorruptedString);
 
 		Assert.assertEquals(originalData, decoded);
-		Assert.assertEquals(encoded, jsonString);
+		Assert.assertEquals(encoded, jsonProperString);
+	}
+
+	@Test
+	public void testHttpTestCommandValueCorrectEnumMessage() {
+		final String jsonProperString = "{\"value\":\"move\"}";
+		HttpCodecRegistry registry = new HttpCodecRegistry("com.robo4j.core.httpunit.test.codec");
+		HttpEncoder<TestCommandEnum> encoder = registry.getEncoder(TestCommandEnum.class);
+		HttpDecoder<TestCommandEnum> decoder = registry.getDecoder(TestCommandEnum.class);
+		Assert.assertNotNull(encoder);
+		Assert.assertNotNull(decoder);
+
+		TestCommandEnum originalData = TestCommandEnum.MOVE;
+		String encoded = encoder.encode(TestCommandEnum.MOVE);
+
+		TestCommandEnum decoded = decoder.decode(jsonProperString);
+
+		Assert.assertEquals(originalData, decoded);
+		Assert.assertEquals(encoded, jsonProperString);
 	}
 
 }
