@@ -64,6 +64,7 @@ public final class SystemUtil {
 	public static String printSocketEndPoint(RoboReference<?> point, RoboReference<?> codecUnit){
 		final int port = point.getConfiguration().getInteger("port", 0);
 		StringBuilder sb = new StringBuilder();
+		//@formatter:off
 		sb.append("RoboSystem end-points:")
 				.append(BREAK)
 				.append("================================================")
@@ -80,6 +81,7 @@ public final class SystemUtil {
 				.append(BREAK);
 				sb.append("==============================================")
 		.append(BREAK);
+		//@formatter:on
 		return sb.toString();
 	}
 }
