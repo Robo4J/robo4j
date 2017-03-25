@@ -53,12 +53,14 @@ public enum LegoSonicMessageTypeEnum {
                 .collect(Collectors.toMap(LegoSonicMessageTypeEnum::getType, e -> e));
     }
     public static LegoSonicMessageTypeEnum getInternalByName(String name) {
-        if (internMapByType == null)
+        if (internMapByType == null) {
             internMapByType = initMapping();
+        }
         return internMapByType.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .filter(e -> e.getName().equals(name))
-                .findFirst().get();
+                .findFirst()
+                .orElse(null);
     }
     //@formatter:on
 

@@ -41,14 +41,11 @@ public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncod
 
 	@Override
 	public String encode(SimpleCommand stuff) {
-		final StringBuilder sb = new StringBuilder("{\"value\":\"")
-				.append(stuff.getValue());
-		if(stuff.getType().equals(ConstantUtil.EMPTY_STRING)){
+		final StringBuilder sb = new StringBuilder("{\"value\":\"").append(stuff.getValue());
+		if (stuff.getType().equals(ConstantUtil.EMPTY_STRING)) {
 			sb.append("\"}");
 		} else {
-			sb.append("\",\"type\":\"")
-				.append(stuff.getType())
-				.append("\"}");
+			sb.append("\",\"type\":\"").append(stuff.getType()).append("\"}");
 		}
 		return sb.toString();
 	}
@@ -64,8 +61,8 @@ public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncod
 			map.put(parts[i], parts[i + 1]);
 		}
 
-		return map.containsKey(KEY_TYPE) ? new SimpleCommand(map.get(KEY_VALUE), map.get(KEY_TYPE))
-				: new SimpleCommand(map.get(KEY_VALUE));
+		return map.containsKey(KEY_TYPE) ? new SimpleCommand(map.get(KEY_VALUE).trim(), map.get(KEY_TYPE).trim())
+				: new SimpleCommand(map.get(KEY_VALUE).trim());
 	}
 
 	@Override

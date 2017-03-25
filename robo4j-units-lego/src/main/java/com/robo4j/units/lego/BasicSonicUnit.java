@@ -222,13 +222,4 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 		});
 	}
 
-	public String getId() {
-		return null;
-	}
-
-	public LifecycleState getState() {
-		return null;
-	}
-
-
 }
