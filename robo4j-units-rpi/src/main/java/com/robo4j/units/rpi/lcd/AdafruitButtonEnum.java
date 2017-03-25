@@ -58,23 +58,25 @@ public enum AdafruitButtonEnum {
 
 
     //@formatter:off
-    public static AdafruitButtonEnum getInternalByName(String def) {
+    public static AdafruitButtonEnum getByName(String def) {
         if (buttonToEnum == null)
             buttonToEnum = initMapping();
 
         return buttonToEnum.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .filter(e -> e.getName().equals(def.toUpperCase()))
-                .findFirst().get();
+                .findFirst()
+                .orElse(null);
     }
 
-    public static AdafruitButtonEnum getInternalByText(String text) {
+    public static AdafruitButtonEnum getByText(String text) {
         if (buttonToEnum == null)
             buttonToEnum = initMapping();
         return buttonToEnum.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .filter(e -> e.getText().equals(text))
-                .findFirst().get();
+                .findFirst()
+                .orElse(null);
     }
     //@formatter:on
 
@@ -97,10 +99,6 @@ public enum AdafruitButtonEnum {
                 .collect(Collectors.toSet());
         //@formatter:on
     }
-
-	public AdafruitButtonEnum getByName(String name) {
-		return getInternalByName(name);
-	}
 
     @Override
     public String toString() {
