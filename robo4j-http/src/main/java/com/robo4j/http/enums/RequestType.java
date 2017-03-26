@@ -31,7 +31,7 @@ public enum RequestType {
 	// @formatter:off
 	NONE	(0, "none"),
 	HTTP	(1, "http"),
-	RAW(2, "raw"),
+	RAW		(2, "raw"),
 	;
 	private volatile static Map<String, RequestType> defNameToTypeMapping;
 	// @formatter:on

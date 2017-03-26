@@ -26,52 +26,60 @@ import com.robo4j.core.httpunit.HttpProducer;
 import com.robo4j.core.util.ConstantUtil;
 
 /**
- * default simple codec for simple commands Simple codec is currently used for
- * Enum
- *
- * @see SimpleCommand
- *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 @HttpProducer
-public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncoder<SimpleCommand> {
+public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncoder<CameraMessage> {
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_VALUE = "value";
+	private static final String KEY_IMAGE = "image";
 
 	@Override
-	public String encode(SimpleCommand stuff) {
-		final StringBuilder sb = new StringBuilder("{\"value\":\"").append(stuff.getValue());
-		if (stuff.getType().equals(ConstantUtil.EMPTY_STRING)) {
-			sb.append("\"}");
-		} else {
-			sb.append("\",\"type\":\"").append(stuff.getType()).append("\"}");
-		}
-		return sb.toString();
-	}
-
-	@Override
-	public SimpleCommand decode(String json) {
-		final Map<String, String> map = new HashMap<>();
+	public String encode(CameraMessage stuff) {
 		//@formatter:off
+        final StringBuilder sb = new StringBuilder("{\"")
+				.append(KEY_TYPE).append("\":\"")
+                .append(stuff.getType())
+                .append("\",\"")
+				.append(KEY_VALUE)
+				.append("\":\"")
+                .append(stuff.getValue())
+                .append("\",\"")
+				.append(KEY_IMAGE)
+				.append("\":\"")
+                .append(new String(stuff.getImage()))
+                .append("\"}");
+        //@formatter:off
+        return sb.toString();
+    }
+
+    @Override
+    public CameraMessage decode(String json) {
+        final Map<String, String> map = new HashMap<>();
+        //@formatter:off
 		final String[] parts = json.replaceAll("^\\{\\s*\"|\"\\s*\\}$", ConstantUtil.EMPTY_STRING)
 				.split("\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?");
 		//@formatter:on
 		for (int i = 0; i < parts.length - 1; i += 2) {
-			map.put(parts[i], parts[i + 1]);
+			map.put(parts[i].trim(), parts[i + 1].trim());
 		}
 
-		return map.containsKey(KEY_TYPE) ? new SimpleCommand(map.get(KEY_VALUE).trim(), map.get(KEY_TYPE).trim())
-				: new SimpleCommand(map.get(KEY_VALUE).trim());
+		final String type = map.get(KEY_TYPE);
+		final String value =  map.get(KEY_VALUE);
+		final byte[] image = map.get(KEY_IMAGE).getBytes();
+		return new CameraMessage(type, value, image);
+
 	}
 
 	@Override
-	public Class<SimpleCommand> getEncodedClass() {
-		return SimpleCommand.class;
+	public Class<CameraMessage> getEncodedClass() {
+		return CameraMessage.class;
 	}
 
 	@Override
-	public Class<SimpleCommand> getDecodedClass() {
-		return SimpleCommand.class;
+	public Class<CameraMessage> getDecodedClass() {
+		return CameraMessage.class;
 	}
+
 }

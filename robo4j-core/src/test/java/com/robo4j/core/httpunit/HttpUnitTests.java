@@ -16,6 +16,7 @@
  */
 package com.robo4j.core.httpunit;
 
+import com.robo4j.core.httpunit.codec.CameraMessage;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -130,6 +131,26 @@ public class HttpUnitTests {
 
 		Assert.assertEquals(originalData, decoded);
 		Assert.assertEquals(encoded, jsonProperString);
+	}
+
+	@Test
+	public void testHttpCameraMessage(){
+		final String jsonCammeraMessageCorrupted = "{ \"type\"  :  \"jpg\" ,  \"value\"   :  \"description\"  ,\"image\":\"12345\"}";
+		final String jsonCammeraMessage = "{\"type\":\"jpg\",\"value\":\"description\",\"image\":\"12345\"}";
+		HttpCodecRegistry registry = new HttpCodecRegistry("com.robo4j.core.httpunit.codec");
+		HttpEncoder<CameraMessage> encoder = registry.getEncoder(CameraMessage.class);
+		HttpDecoder<CameraMessage> decoder = registry.getDecoder(CameraMessage.class);
+		Assert.assertNotNull(encoder);
+		Assert.assertNotNull(decoder);
+
+		CameraMessage cameraMessage = new CameraMessage("jpg", "description", "12345".getBytes());
+		String encoded = encoder.encode(cameraMessage);
+		CameraMessage decoded = decoder.decode(jsonCammeraMessageCorrupted);
+
+		Assert.assertEquals(jsonCammeraMessage, encoded);
+		Assert.assertEquals(cameraMessage.getType(), decoded.getType());
+		Assert.assertEquals(cameraMessage.getValue(), decoded.getValue());
+
 	}
 
 }
