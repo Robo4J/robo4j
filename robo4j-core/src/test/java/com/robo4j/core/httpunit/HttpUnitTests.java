@@ -143,7 +143,7 @@ public class HttpUnitTests {
 		Assert.assertNotNull(encoder);
 		Assert.assertNotNull(decoder);
 
-		CameraMessage cameraMessage = new CameraMessage("jpg", "description", "12345".getBytes());
+		CameraMessage cameraMessage = new CameraMessage("jpg", "description", "12345");
 		String encoded = encoder.encode(cameraMessage);
 		CameraMessage decoded = decoder.decode(jsonCammeraMessageCorrupted);
 

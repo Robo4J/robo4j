@@ -32,9 +32,9 @@ public class CameraMessage {
 
     private final String type;
     private final String value;
-    private final byte[] image;
+    private final String image;
 
-    public CameraMessage(String type, String value, byte[] image) {
+    public CameraMessage(String type, String value, String image) {
         this.type = type;
         this.value = value;
         this.image = image;
@@ -48,7 +48,7 @@ public class CameraMessage {
         return value;
     }
 
-    public byte[] getImage() {
+    public String getImage() {
         return image;
     }
 
@@ -57,7 +57,7 @@ public class CameraMessage {
         return "CameraMessage{" +
                 "type='" + type + '\'' +
                 ", value='" + value + '\'' +
-                ", image=" + Arrays.toString(image) +
+                ", image=" + image +
                 '}';
     }
 }

@@ -48,7 +48,7 @@ public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncod
                 .append("\",\"")
 				.append(KEY_IMAGE)
 				.append("\":\"")
-                .append(new String(stuff.getImage()))
+                .append(stuff.getImage())
                 .append("\"}");
         //@formatter:off
         return sb.toString();
@@ -67,7 +67,7 @@ public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncod
 
 		final String type = map.get(KEY_TYPE);
 		final String value =  map.get(KEY_VALUE);
-		final byte[] image = map.get(KEY_IMAGE).getBytes();
+		final String image = map.get(KEY_IMAGE);
 		return new CameraMessage(type, value, image);
 
 	}
