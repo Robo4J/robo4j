@@ -17,8 +17,6 @@
 
 package com.robo4j.core.httpunit.codec;
 
-import java.util.Arrays;
-
 /**
  * Camera message contains description and image as byte array
  * used for http codec.
