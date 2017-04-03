@@ -35,7 +35,7 @@ import com.robo4j.http.HttpVersion;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-//TODO discuss how to use URIs
+// TODO discuss how to use URIs
 public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 
 	private final HttpCodecRegistry codecRegistry;
@@ -45,19 +45,18 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	}
 
 	@Override
-	public Object processGet(final RoboReference<?> desiredUnit, final String path, final HttpMessageWrapper<?> wrapper) {
+	public Object processGet(final RoboReference<?> desiredUnit, final String path,
+			final HttpMessageWrapper<?> wrapper) {
 		if (HttpVersion.containsValue(wrapper.message().version())) {
 			final URI uri = wrapper.message().uri();
 			/* currently is supported only */
 			final HttpUriRegister register = HttpUriRegister.getInstance();
 			if (register.isUnitAvailable(path)) {
 				final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredUnit.getMessageType());
-				if(decoder != null){
-					return "Unit Description\n" +
-							"codec is available:\n" +
-							"to send command use POST request\n" +
-							"example: { \"value\":\"<possible_value>\"}\n\n" +
-							"available type: " + desiredUnit.getMessageType().toGenericString();
+				if (decoder != null) {
+					return "Unit Description\n" + "codec is available:\n" + "to send command use POST request\n"
+							+ "example: { \"value\":\"<possible_value>\"}\n\n" + "available type: "
+							+ desiredUnit.getMessageType().toGenericString();
 				} else {
 					SimpleLoggingUtil.error(getClass(), "no decoder available");
 				}
@@ -80,13 +79,14 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	 * @return
 	 */
 	@Override
-	public Object processPost(final RoboReference<?> desiredUnit, final String path, final HttpMessageWrapper<?> wrapper) {
+	public Object processPost(final RoboReference<?> desiredUnit, final String path,
+			final HttpMessageWrapper<?> wrapper) {
 		if (HttpVersion.containsValue(wrapper.message().version())) {
 			final HttpUriRegister register = HttpUriRegister.getInstance();
 			if (register.isUnitAvailable(path)) {
-				final String json = new String((char[])wrapper.body());
+				final String json = (String) wrapper.body();
 				final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredUnit.getMessageType());
-				if(decoder != null){
+				if (decoder != null) {
 					return decoder.decode(json);
 				} else {
 					SimpleLoggingUtil.error(getClass(), "no decoder available");

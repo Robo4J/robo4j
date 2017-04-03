@@ -73,11 +73,14 @@ public final class SystemUtil {
 				.append(port)
 				.append(SLASH)
 				.append(codecUnit.getId())
-				.append("?")
-				.append("command")
-				.append("=<value of:\"")
+				.append(BREAK)
+				.append("http methods GET and POST")
+				.append(BREAK)
+				.append("GET: information about the POST request")
+				.append(BREAK)
+				.append("POST: uses values of ")
 				.append(codecUnit.getMessageType().getSimpleName())
-				.append("\">")
+				.append(" object")
 				.append(BREAK);
 				sb.append("==============================================")
 		.append(BREAK);

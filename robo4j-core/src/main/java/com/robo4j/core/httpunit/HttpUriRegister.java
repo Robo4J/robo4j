@@ -83,7 +83,8 @@ public final class HttpUriRegister {
 	}
 
 	public RoboReference<?> getRoboUnitByPath(String path) {
-		return pathMethods.get(SOLIDUS.concat(path)).getUnit();
+		final RoboUriInfo uri = pathMethods.get(SOLIDUS.concat(path));
+		return uri != null ? uri.getUnit() : null;
 	}
 
 	public boolean isUnitAvailable(String id) {
@@ -101,8 +102,10 @@ public final class HttpUriRegister {
 	/**
 	 * Deliver RoboReference of the desired unit from the context
 	 *
-	 * @param context available context
-	 * @param id is unique name inside the RoboContext
+	 * @param context
+	 *            available context
+	 * @param id
+	 *            is unique name inside the RoboContext
 	 * @return reference to the desired unit if exists
 	 */
 	private RoboReference<?> getRoboUnitById(RoboContext context, String id) {

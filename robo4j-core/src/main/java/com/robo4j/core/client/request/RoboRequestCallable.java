@@ -23,6 +23,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +70,8 @@ public class RoboRequestCallable implements Callable<Object> {
 	@Override
 	public Object call() throws Exception {
 		try (Writer out = new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
-				BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+				BufferedReader in = new BufferedReader(
+						new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
 
 			final String firstLine = RoboHttpUtils.correctLine(in.readLine());
 			final String[] tokens = firstLine.split(ConstantUtil.HTTP_EMPTY_SEP);
@@ -92,7 +94,9 @@ public class RoboRequestCallable implements Callable<Object> {
 						HttpVersion.getByValue(tokens[HttpMessageUtil.VERSION_POSITION]), params);
 
 				final List<String> paths = HttpPathUtil.uriStringToPathList(httpMessage.uri().getPath());
-				final RoboReference<?> desiredUnit = HttpUriRegister.getInstance()
+
+				final HttpUriRegister httpUriRegister = HttpUriRegister.getInstance();
+				final RoboReference<?> desiredUnit = httpUriRegister
 						.getRoboUnitByPath(paths.get(DEFAULT_PATH_POSITION_0));
 				//@formatter:on
 				switch (method) {
@@ -100,15 +104,18 @@ public class RoboRequestCallable implements Callable<Object> {
 					/* currently is supported only one path */
 					final Object unitDescription = factory.processGet(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0),
 							new HttpMessageWrapper<>(httpMessage));
-					processWriter(out, unitDescription.toString());
+					if (unitDescription != null) {
+						processWriter(out, unitDescription.toString());
+					}
 					return null;
 				case POST:
 					processWriter(out, DEFAULT_RESPONSE);
 					int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH).trim());
 					char[] buffer = new char[length];
-					int c = in.read(buffer);
+					int c = in.read(buffer, 0, length);
+					String jsonString = String.valueOf(buffer);
 					return factory.processPost(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0),
-							new HttpMessageWrapper<>(httpMessage, buffer));
+							new HttpMessageWrapper<>(httpMessage, jsonString));
 				default:
 					SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
 					return null;
