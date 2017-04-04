@@ -134,8 +134,6 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			// Read previous acquisition
 			try {
 				float readDistance = lidar.readDistance();
-				// FIXME(Marcus/Apr 4, 2017): Remove when this works. ;)
-				System.out.println("Read range: " + readDistance);
 				// Laser was actually shooting at the previous angle, before
 				// moving - recalculate for that angle
 				float lastAngle = currentAngle + (lowToHigh ? -request.getStep() : request.getStep());
