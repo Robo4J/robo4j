@@ -33,6 +33,8 @@
 			<value name="servoRange" type="float">45.0</value>
 			<!-- Currently defined as the angular speed in angular degrees per second -->
 			<value name="angularSpeed" type="float">90.0</value>
+			<!-- How long does the Lidar need to acquire a range -->
+			<value name="minAquisitionTime" type="float">2.5</value>
 		</config>
 	</roboUnit>
 </robo4j>

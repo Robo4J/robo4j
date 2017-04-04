@@ -72,7 +72,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		private final RoboReference<Float> servo;
 		private final boolean lowToHigh;
 		private final int numberOfScans;
-		private final int delay;
+		private long delayMicros;
 		private final float servoRange;
 		private final LidarLiteDevice lidar;
 		private volatile float currentAngle;
@@ -90,7 +90,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			this.recipient = recipient;
 			// one move, one first acquisition
 			this.numberOfScans = calculateNumberOfScans() + 1;
-			this.delay = calculateDelay();
+			this.delayMicros = calculateDelay(minimumAcquisitionTime);
 			this.currentAngle = lowToHigh ? request.getStartAngle() : request.getStartAngle() + request.getRange();
 			scanEvent = new ScanEvent(scanResult.getScanID(), getScanInfo());
 			scanEvent.setScanLeftRight(lowToHigh);
@@ -134,6 +134,8 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			// Read previous acquisition
 			try {
 				float readDistance = lidar.readDistance();
+				// FIXME(Marcus/Apr 4, 2017): Remove when this works. ;)
+				System.out.println("Read range: " + readDistance);
 				// Laser was actually shooting at the previous angle, before
 				// moving - recalculate for that angle
 				float lastAngle = currentAngle + (lowToHigh ? -request.getStep() : request.getStep());
@@ -170,8 +172,8 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 
 		// FIXME(Marcus/Mar 10, 2017): Calculate the required delay later from
 		// physical model.
-		private int calculateDelay() {
-			return 10;
+		private long calculateDelay(float minimumAcquisitionTime) {
+			return Math.round(minimumAcquisitionTime * 1000.0d);
 		}
 
 		private String getScanInfo() {
@@ -240,11 +242,12 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	}
 
 	private void schedule(ScanJob job) {
-		long actualDelay = 2;
+		long actualDelayMicros = job.delayMicros;
 		// One extra for first servo move.
 		for (int i = 0; i < job.numberOfScans + 1; i++) {
-			getContext().getScheduler().schedule(job, actualDelay, TimeUnit.MILLISECONDS);
-			actualDelay += job.delay;
+			// FIXME(Marcus/Apr 4, 2017): Simplified - need to take angular speed of the servo into account. 
+			getContext().getScheduler().schedule(job, actualDelayMicros, TimeUnit.MICROSECONDS);
+			actualDelayMicros += job.delayMicros;
 		}
 	}
 
