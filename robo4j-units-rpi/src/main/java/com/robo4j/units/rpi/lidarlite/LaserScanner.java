@@ -90,7 +90,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			this.recipient = recipient;
 			// one move, one first acquisition
 			this.numberOfScans = calculateNumberOfScans() + 1;
-			this.delayMicros = calculateDelay(minimumAcquisitionTime);
+			this.delayMicros = calculateDelay(minimumAcquisitionTime, minimumServoMovementTime);
 			this.currentAngle = lowToHigh ? request.getStartAngle() : request.getStartAngle() + request.getRange();
 			scanEvent = new ScanEvent(scanResult.getScanID(), getScanInfo());
 			scanEvent.setScanLeftRight(lowToHigh);
@@ -170,8 +170,12 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 
 		// FIXME(Marcus/Mar 10, 2017): Calculate the required delay later from
 		// physical model.
-		private long calculateDelay(float minimumAcquisitionTime) {
-			return Math.round(minimumAcquisitionTime * 1000.0d);
+		private long calculateDelay(float minimumAcquisitionTime, float minimumServoMovementTime) {
+			float delayPerStep = minimumAcquisitionTime * 1000 / calculateNumberOfScans();
+			// If we have a slow servo, we will need to wait for the servo to move. If we have a slow acquisition, 
+			// we will need to the laser before continuing
+			float actualDelay = Math.max(delayPerStep, minimumAcquisitionTime); 
+			return Math.round(actualDelay * 1000.0d);
 		}
 
 		private String getScanInfo() {
@@ -196,14 +200,6 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 
 		// Minimum acquisition time, in ms
 		minimumAcquisitionTime = configuration.getFloat("minAquisitionTime", 2.0f);
-
-		// Angular offset - required since we don't wait for an acquired range
-		// before moving the servo.
-		// If you always move the servo very slowly, this is not required.
-		// FIXME(Marcus/Feb 16, 2017): We will very likely need configuration
-		// tables for this - i.e. different
-		// finely tuned offsets for different angular steps?
-		// angularOffset = configuration.getFloat("angularOffset", 3.0f);
 
 		try {
 			lidar = new LidarLiteDevice(getBus(), getAddress());
