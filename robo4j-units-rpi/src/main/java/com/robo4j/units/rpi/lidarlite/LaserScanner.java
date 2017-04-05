@@ -181,7 +181,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		// FIXME(Marcus/Mar 10, 2017): Calculate the required delay later from
 		// physical model.
 		private long calculateDelay(float minimumAcquisitionTime, float minimumServoMovementTime) {
-			float delayPerStep = minimumAcquisitionTime * 1000 / calculateNumberOfScans();
+			float delayPerStep = minimumServoMovementTime * 1000 / calculateNumberOfScans();
 			// If we have a slow servo, we will need to wait for the servo to move. If we have a slow acquisition, 
 			// we will need to the laser before continuing
 			float actualDelay = Math.max(delayPerStep, minimumAcquisitionTime); 
