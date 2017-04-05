@@ -79,7 +79,17 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		private volatile boolean finished = false;
 		private final ScanEvent scanEvent;
 
-		// FIXME: Add configuration and physical model for minimal servo movement time and minimum acquisition time
+		/**
+		 * 
+		 * @param lowToHigh
+		 * @param minimumServoMovementTime the minimum time for the servo to complete the movement over the range, in seconds
+		 * @param minimumAcquisitionTime
+		 * @param request
+		 * @param servo
+		 * @param servoRange
+		 * @param lidar
+		 * @param recipient
+		 */
 		public ScanJob(boolean lowToHigh, float minimumServoMovementTime, float minimumAcquisitionTime, ScanRequest request,
 				RoboReference<Float> servo, float servoRange, LidarLiteDevice lidar, RoboReference<ScanResult2D> recipient) {
 			this.lowToHigh = lowToHigh;
