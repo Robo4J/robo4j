@@ -32,12 +32,12 @@
 			<!-- Currently defined as the range from center to max -->
 			<value name="servoRange" type="float">45.0</value>
 			<!-- Currently defined as the angular speed in angular degrees per second -->
-			<value name="angularSpeed" type="float">70.0</value>
+			<value name="angularSpeed" type="float">100.0</value>
 			<!-- How long does the Lidar need to acquire a range -->
 			<value name="minAquisitionTime" type="float">2.5</value>
 			<!-- Trim to align left to right and right to left scans
 			     This will be added/subtracted depending on direction -->
-			<value name="trim" type="float">3</value>
+			<value name="trim" type="float">5.5</value>
 		</config>
 	</roboUnit>
 </robo4j>
