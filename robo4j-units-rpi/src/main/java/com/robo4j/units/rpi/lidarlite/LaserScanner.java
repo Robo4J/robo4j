@@ -63,6 +63,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	private float servoRange;
 	private float angularSpeed;
 	private float minimumAcquisitionTime;
+	private float trim;
 
 	private final static class ScanJob implements Runnable {
 		private final AtomicInteger invokeCount = new AtomicInteger(0);
@@ -73,6 +74,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		private final boolean lowToHigh;
 		private final int numberOfScans;
 		private long delayMicros;
+		private final float trim;
 		private final float servoRange;
 		private final LidarLiteDevice lidar;
 		private volatile float currentAngle;
@@ -84,15 +86,17 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		 * @param lowToHigh
 		 * @param minimumServoMovementTime the minimum time for the servo to complete the movement over the range, in seconds
 		 * @param minimumAcquisitionTime
+		 * @param trim 
 		 * @param request
 		 * @param servo
 		 * @param servoRange
 		 * @param lidar
 		 * @param recipient
 		 */
-		public ScanJob(boolean lowToHigh, float minimumServoMovementTime, float minimumAcquisitionTime, ScanRequest request,
+		public ScanJob(boolean lowToHigh, float minimumServoMovementTime, float minimumAcquisitionTime, float trim, ScanRequest request,
 				RoboReference<Float> servo, float servoRange, LidarLiteDevice lidar, RoboReference<ScanResult2D> recipient) {
 			this.lowToHigh = lowToHigh;
+			this.trim = trim;
 			this.request = request;
 			this.servo = servo;
 			this.servoRange = servoRange;
@@ -146,7 +150,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 				float readDistance = lidar.readDistance();
 				// Laser was actually shooting at the previous angle, before
 				// moving - recalculate for that angle
-				float lastAngle = currentAngle + (lowToHigh ? -request.getStep() : request.getStep());
+				float lastAngle = currentAngle + (lowToHigh ? -request.getStep() - trim : request.getStep() + trim);
 				scanResult.addPoint(readDistance, (float) Math.toRadians(lastAngle));
 				servo.sendMessage(getNormalizedAngle());
 				lidar.acquireRange();
@@ -211,6 +215,9 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		// Minimum acquisition time, in ms
 		minimumAcquisitionTime = configuration.getFloat("minAquisitionTime", 2.0f);
 
+		// Trim to align left to right and right to left scans (in degrees)
+		trim = configuration.getFloat("trim", 0.0f);
+		
 		try {
 			lidar = new LidarLiteDevice(getBus(), getAddress());
 		} catch (IOException e) {
@@ -235,7 +242,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			lowToHigh = true;
 		}
 		float minimumServoMovementTime = message.getRange() / angularSpeed;
-		ScanJob job = new ScanJob(lowToHigh, minimumServoMovementTime, minimumAcquisitionTime, message, servo, servoRange, lidar,
+		ScanJob job = new ScanJob(lowToHigh, minimumServoMovementTime, minimumAcquisitionTime, trim, message, servo, servoRange, lidar,
 				recipient);
 
 		schedule(job);
