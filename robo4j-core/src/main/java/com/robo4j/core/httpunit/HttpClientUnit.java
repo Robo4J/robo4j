@@ -33,6 +33,7 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 
 /**
  * Http NIO Client to communicate with external system/Robo4J units
@@ -70,8 +71,10 @@ public class HttpClientUnit extends RoboUnit<Object> {
 	public void onMessage(Object message) {
 		try {
 			SocketChannel client = SocketChannel.open(address);
-			ByteBuffer buffer = ByteBuffer.wrap(message.toString().getBytes());
-			client.write(buffer);
+			client.configureBlocking(true);
+
+			ByteBuffer buffer = ByteBuffer.wrap(((String)message).getBytes());
+			int c = client.write(buffer);
 			client.close();
 		} catch (IOException e) {
 			throw new HttpException("onMessage", e);

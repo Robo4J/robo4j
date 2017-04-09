@@ -9,6 +9,7 @@
 			<value name="address" type="int">0x40</value>
 			<value name="channel" type="int">0</value>
 			<value name="trim" type="float">3</value>
+			<value name="inverted" type="boolean">true</value>
 		</config>
 	</roboUnit>
 	<roboUnit id="laserscanner.tilt">

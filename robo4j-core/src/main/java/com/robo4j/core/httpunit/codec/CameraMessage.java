@@ -35,7 +35,7 @@ public class CameraMessage {
     public CameraMessage(String type, String value, String image) {
         this.type = type;
         this.value = value;
-        this.image = image.trim();
+        this.image = image;
     }
 
     public String getType() {

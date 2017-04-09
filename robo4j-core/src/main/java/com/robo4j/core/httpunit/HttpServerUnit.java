@@ -34,7 +34,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -194,6 +193,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 						//@formatter:on
 						/* here can be parallel, but we need to keep channel */
 						final Object result = futureResult.get();
+						requestChannel.close();
 						for (RoboReference<Object> ref : targetRefs) {
 							if (result != null && ref.getMessageType() != null
 									&& ref.getMessageType().equals(result.getClass())) {

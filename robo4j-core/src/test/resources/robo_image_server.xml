@@ -1,0 +1,42 @@
+<!--
+  ~ Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
+  ~
+  ~ Robo4J is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ Robo4J is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<robo4j>
+    <roboUnit id="httpServer">
+        <class>com.robo4j.core.httpunit.HttpServerUnit</class>
+        <config name="com.robo4j.core.root">
+            <value name="port" type="int">8027</value>
+            <value name="target" type="String">imageController</value>
+            <value name="packages" type="String">com.robo4j.core.httpunit.codec</value>
+            <targetUnits>
+                <value name="imageController" type="String">POST</value>
+            </targetUnits>
+        </config>
+    </roboUnit>
+    <roboUnit id="imageController">
+        <class>com.robo4j.core.httpunit.test.TestServerImageController</class>
+        <config name="com.robo4j.core.root">
+            <value name="target" type="String">imageProcessor</value>
+        </config>
+    </roboUnit>
+    <roboUnit id="imageProcessor">
+        <class>com.robo4j.core.httpunit.test.TestServerImageProcessor</class>
+        <config name="com.robo4j.core.root">
+            <value name="output" type="String">file</value>
+        </config>
+    </roboUnit>
+</robo4j>

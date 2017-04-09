@@ -18,16 +18,21 @@ package com.robo4j.core.client.request;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
 import java.net.URI;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.client.util.RoboHttpUtils;
@@ -85,7 +90,7 @@ public class RoboRequestCallable implements Callable<Object> {
 					final String[] array = inputLine
 							.split(HttpMessageUtil.getHttpSeparator(HttpMessageUtil.HTTP_HEADER_SEP));
 					params.put(array[HttpMessageUtil.METHOD_KEY_POSITION].toLowerCase(),
-							array[HttpMessageUtil.URI_VALUE_POSITION]);
+							array[HttpMessageUtil.URI_VALUE_POSITION].trim());
 				}
 
 				/* parsed http specifics, header */
@@ -109,11 +114,22 @@ public class RoboRequestCallable implements Callable<Object> {
 					}
 					return null;
 				case POST:
-					processWriter(out, DEFAULT_RESPONSE);
-					int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH).trim());
+					int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH));
+
+					StringBuilder jsonSB = new StringBuilder();
 					char[] buffer = new char[length];
-					int c = in.read(buffer, 0, length);
-					String jsonString = String.valueOf(buffer);
+
+					try {
+						for(int i=0; i<length; i++){
+							buffer[i] =((char)in.read());
+							jsonSB.append( buffer[i]);
+						}
+					} catch (IOException e){
+						SimpleLoggingUtil.error(getClass(), " POST: Problem", e);
+					}
+					String jsonString = jsonSB.toString();
+					processWriter(out, DEFAULT_RESPONSE);
+					in.close();
 					return factory.processPost(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0),
 							new HttpMessageWrapper<>(httpMessage, jsonString));
 				default:
