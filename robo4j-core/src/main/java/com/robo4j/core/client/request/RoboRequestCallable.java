@@ -115,23 +115,18 @@ public class RoboRequestCallable implements Callable<Object> {
 					return null;
 				case POST:
 					int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH));
-
-					StringBuilder jsonSB = new StringBuilder();
-					char[] buffer = new char[length];
-
+					final StringBuilder jsonSB = new StringBuilder();
 					try {
 						for(int i=0; i<length; i++){
-							buffer[i] =((char)in.read());
-							jsonSB.append( buffer[i]);
+							jsonSB.append((char)in.read());
 						}
 					} catch (IOException e){
 						SimpleLoggingUtil.error(getClass(), " POST: Problem", e);
 					}
-					String jsonString = jsonSB.toString();
 					processWriter(out, DEFAULT_RESPONSE);
 					in.close();
 					return factory.processPost(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0),
-							new HttpMessageWrapper<>(httpMessage, jsonString));
+							new HttpMessageWrapper<>(httpMessage, jsonSB.toString()));
 				default:
 					SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
 					return null;

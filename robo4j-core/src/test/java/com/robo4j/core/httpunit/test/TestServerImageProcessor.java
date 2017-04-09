@@ -17,6 +17,7 @@
 
 package com.robo4j.core.httpunit.test;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,7 +32,6 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.httpunit.codec.CameraMessage;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 
 import javafx.scene.image.Image;
 
@@ -67,8 +67,9 @@ public class TestServerImageProcessor extends RoboUnit<CameraMessage> {
 
         storeImageByBytes(bytes);
 
-        image = new Image(new ByteInputStream(bytes, bytes.length));
+        image = new Image(new ByteArrayInputStream(bytes));
     }
+
 
     @SuppressWarnings("unchecked")
     @Override

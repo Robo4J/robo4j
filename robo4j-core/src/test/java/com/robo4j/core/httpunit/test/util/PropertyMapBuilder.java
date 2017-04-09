@@ -25,6 +25,7 @@ import java.util.Map;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@SuppressWarnings("rawtypes")
 public class PropertyMapBuilder<Key, Value> {
 
 	private Map<Key, Value> map;
