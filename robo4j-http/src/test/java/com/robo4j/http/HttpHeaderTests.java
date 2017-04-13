@@ -38,7 +38,7 @@ public class HttpHeaderTests {
 	@Test
 	public void simpleHttpHeader() {
 		// formatter:off
-		final String header = HttpHeaderBuilder.Build().add(HttpHeaderNames.HOST, "localhost")
+		final String header = HttpHeaderBuilder.Build().add(HttpHeaderNames.HOST, "127.0.0.1")
 				.add(HttpHeaderNames.CONNECTION, CONST_CACHE_CONTROL).add(HttpHeaderNames.CACHE_CONTROL, "no-cache")
 				.add(HttpHeaderNames.USER_AGENT, CONST_USER_AGENT).add(HttpHeaderNames.ACCEPT, "*/*")
 				.add(HttpHeaderNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")

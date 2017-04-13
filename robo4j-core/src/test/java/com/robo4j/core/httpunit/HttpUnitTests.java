@@ -214,6 +214,8 @@ public class HttpUnitTests {
 		Assert.assertEquals(jsonCammeraMessage, encoded);
 		Assert.assertEquals(cameraMessage.getType(), decoded.getType());
 		Assert.assertEquals(cameraMessage.getValue(), decoded.getValue());
+		Assert.assertNotNull(imageDecoded);
+		Assert.assertTrue(imageDecoded.length > 0);
 	}
 
 }

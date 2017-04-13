@@ -17,10 +17,6 @@
 
 package com.robo4j.core.httpunit;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
 import com.robo4j.core.RoboBuilder;
@@ -72,11 +68,4 @@ public class HttpUnitHelperMain {
         System.in.read();
     }
 
-    public void encodedFile() throws Exception {
-        String fileString = getExampleCamera();
-
-        final byte[] imageBytes = Base64.getDecoder().decode(fileString);
-        Path path = Files.createFile(Paths.get("testFile.jpg"));
-        Files.write(path, imageBytes);
-    }
 }
