@@ -33,7 +33,6 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.logging.SimpleLoggingUtil;
 
 /**
  * Http NIO Client to communicate with external system/Robo4J units
