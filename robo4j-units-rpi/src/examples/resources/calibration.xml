@@ -19,6 +19,7 @@
 			<value name="channel" type="int">1</value>
 			<value name="trim" type="float">-50</value>
 			<value name="panServoRange" type="float">45</value>
+			<value name="inverted" type="boolean">true</value>
 		</config>
 	</roboUnit>
 </robo4j>
