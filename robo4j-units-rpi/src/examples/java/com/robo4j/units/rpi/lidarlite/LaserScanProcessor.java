@@ -41,7 +41,7 @@ public class LaserScanProcessor extends RoboUnit<ScanResult2D> {
 
 	@Override
 	public void onMessage(ScanResult2D result) {
-		System.out.println(result.toString());
+		// System.out.println(result.toString());
 		RoboReference<String> controller = getContext().getReference("controller");
 		controller.sendMessage("scan");
 	}
