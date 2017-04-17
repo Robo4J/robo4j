@@ -118,6 +118,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 				// On first step, only move servo to start position
 				float normalizedServoTarget = getNormalizedAngle();
 				servo.sendMessage(normalizedServoTarget);
+				return;
 			} else if (currentRun == 2) {
 				// On second, just start acquisition (no point to read yet)
 				startAcquisition();
