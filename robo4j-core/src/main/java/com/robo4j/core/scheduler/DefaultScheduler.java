@@ -107,8 +107,8 @@ public class DefaultScheduler implements Scheduler {
 	}
 
 	@Override
-	public void scheduleAtFixedRate(Runnable runnable, long delay, long interval, TimeUnit unit) {
-		executor.scheduleAtFixedRate(runnable, delay, interval, unit);
+	public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long delay, long interval, TimeUnit unit) {
+		return executor.scheduleAtFixedRate(runnable, delay, interval, unit);
 	}
 	
 	@Override

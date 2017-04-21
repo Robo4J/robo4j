@@ -119,7 +119,7 @@ public interface Scheduler {
 	 * @param listener
 	 *            the listener to execute once the last one has been run.
 	 */
-	void scheduleAtFixedRate(Runnable runnable, long delay, long interval, TimeUnit unit);
+	ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long delay, long interval, TimeUnit unit);
 	
 	/**
 	 * Scheduler shutdown

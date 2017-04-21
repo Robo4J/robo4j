@@ -125,7 +125,7 @@ public class GyroL3GD20Device extends AbstractI2CDevice implements
 
 		public float getSensitivityFactor() {
 			return sensitivityFactor;
-		}
+		}		
 	}
 
 	public Float3D read() throws IOException {
