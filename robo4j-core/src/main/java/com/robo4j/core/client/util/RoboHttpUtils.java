@@ -65,6 +65,13 @@ public final class RoboHttpUtils {
 		//@formatter:on
 	}
 
+	public static String createRequestHeader(Map<String, String> headerMap) {
+		HttpHeaderBuilder result = HttpHeaderBuilder.Build();
+		headerMap.entrySet().forEach(e -> result.add(e.getKey(), e.getValue()));
+		return result.build();
+
+	}
+
 	public static String createRequestHeader(String host, int length) {
 		//@formatter:off
 		HttpHeaderBuilder builder = HttpHeaderBuilder.Build()
@@ -85,11 +92,23 @@ public final class RoboHttpUtils {
 
 	public static String createPostRequest(String host, String uri, String message){
 		//@formatter:off
-		final String header = HttpFirstLineBuilder.Build(METHOD_POST)
+		final String header = createHeader(host, uri, message);
+		return createPostRequest(header, message)
+				.concat(NEW_LINE)
+				.concat(message);
+		//@formatter:on
+	}
+
+	public static String createHeader(String host, String uri, String message) {
+		return HttpFirstLineBuilder.Build(METHOD_POST)
 				.add(uri)
 				.add(HTTP_VERSION)
 				.build()
 				.concat(createRequestHeader(host, message.length()));
+	}
+
+	public static String createPostRequest(String header,  String message){
+		//@formatter:off
 		return header
 				.concat(NEW_LINE)
 				.concat(message);

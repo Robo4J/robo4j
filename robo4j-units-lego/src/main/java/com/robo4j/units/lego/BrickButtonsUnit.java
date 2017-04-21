@@ -39,8 +39,6 @@ import com.robo4j.units.lego.brick.PlateButtonEnum;
 import com.robo4j.units.lego.brick.PlateButtonI;
 import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
 
-import lejos.hardware.KeyListener;
-
 /**
  * Lego Mindstorm Brick button plate
  *
@@ -92,10 +90,9 @@ public class BrickButtonsUnit extends RoboUnit<String> {
 		final RoboReference<LegoPlatformMessageTypeEnum> targetRef = getContext().getReference(target);
 
 		//@formatter:off
-        buttons.entrySet().stream()
-                .forEach(e ->
+        buttons.entrySet().forEach(e ->
                     e.getValue().getType()
-							.addKeyListener((KeyListener) new ButtonListener(targetRef, e.getKey(), COLOR_GREEN))
+							.addKeyListener(new ButtonListener(targetRef, e.getKey(), COLOR_GREEN))
                 );
         //@formatter:on
 		setState(LifecycleState.STARTED);
