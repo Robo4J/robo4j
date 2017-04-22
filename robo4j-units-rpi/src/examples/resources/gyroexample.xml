@@ -1,7 +1,7 @@
 <!-- Example - Update parameters to suit your set up, especially servo trimming and inversion! -->
 <robo4j>
 	<roboUnit id="gyro">
-		<class>com.robo4j.units.rpi.gyro.L3GD20GyroUnit</class>
+		<class>com.robo4j.units.rpi.gyro.GyroL3GD20Unit</class>
 		<config name="com.robo4j.core.root">
 			<value name="bus" type="int">1</value>
 			<value name="address" type="int">0x6b</value>

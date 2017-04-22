@@ -48,7 +48,7 @@ import com.robo4j.units.rpi.lcd.I2CRoboUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 @WorkTrait
-public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
+public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 	/**
 	 * This key configures the sensitivity of the gyro. Use the name of the
 	 * Sensitivity enum. Default is DPS_245.
@@ -103,7 +103,7 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 		}
 
 		private void addToDeltas(Float3D data) {
-			synchronized (L3GD20GyroUnit.this) {
+			synchronized (GyroL3GD20Unit.this) {
 				for (GyroNotificationEntry notificationEntry : activeThresholds.values()) {
 					notificationEntry.addDelta(data);
 				}
@@ -133,7 +133,7 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 	 * @param id
 	 *            the robo unit id.
 	 */
-	public L3GD20GyroUnit(RoboContext context, String id) {
+	public GyroL3GD20Unit(RoboContext context, String id) {
 		super(GyroRequest.class, context, id);
 	}
 
