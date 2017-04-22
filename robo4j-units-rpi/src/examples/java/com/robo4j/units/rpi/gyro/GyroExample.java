@@ -23,6 +23,7 @@ import com.robo4j.core.RoboBuilder;
 import com.robo4j.core.RoboBuilderException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
+import com.robo4j.core.util.SystemUtil;
 import com.robo4j.math.geometry.Float3D;
 
 /**
@@ -44,6 +45,14 @@ public class GyroExample {
 		}
 		builder.add(GyroProcessor.class, ID_PROCESSOR);
 		RoboContext ctx = builder.build();
+		
+		System.out.println("State before start:");
+		System.out.println(SystemUtil.printStateReport(ctx));
+		ctx.start();
+
+		System.out.println("State after start:");
+		System.out.println(SystemUtil.printStateReport(ctx));
+		
 		RoboReference<GyroRequest> gyro = ctx.getReference("gyro");
 		RoboReference<GyroEvent> processor = ctx.getReference(ID_PROCESSOR);
 		
