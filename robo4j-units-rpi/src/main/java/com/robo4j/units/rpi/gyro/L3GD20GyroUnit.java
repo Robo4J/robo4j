@@ -89,13 +89,7 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 		@Override
 		public void run() {
 			System.out.println("Probe run");
-			Float3D data;
-			try {
-				data = gyro.read();
-			} catch (IOException e) {
-				SimpleLoggingUtil.error(getClass(), "Could not read gyro, aborting.", e);
-				return;
-			}
+			Float3D data = read();
 			long newTime = System.currentTimeMillis();
 
 			// Trapezoid
@@ -116,9 +110,19 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 			}
 		}
 		
-		private void updateLastReadingTime() {
+		private void reset() {
 			lastReadingTime = System.currentTimeMillis();
+			lastReading = read();
 		}
+
+		private Float3D read() {
+			try {
+				return gyro.read();
+			} catch (IOException e) {
+				SimpleLoggingUtil.error(getClass(), "Could not read gyro, aborting.", e);
+				return null;
+			}
+		}		
 	}
 	
 	public L3GD20GyroUnit(RoboContext context, String id) {
@@ -148,7 +152,7 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 		if (message.calibrate() == true) {
 			try {
 				gyro.calibrate();
-				scanner.updateLastReadingTime();
+				scanner.reset();
 			} catch (IOException e) {
 				SimpleLoggingUtil.error(getClass(), "Failed to calibrate!", e);
 			}
