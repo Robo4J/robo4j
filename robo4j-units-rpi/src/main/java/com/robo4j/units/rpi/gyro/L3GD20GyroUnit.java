@@ -82,9 +82,8 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 	private CalibratedGyro gyro;
 	private volatile ScheduledFuture<?> readings;
 	
-	
 	private class GyroScanner implements Runnable {
-		private long lastReadingTime;
+		private long lastReadingTime = System.currentTimeMillis();
 		private Float3D lastReading;
 		
 		@Override
@@ -115,7 +114,11 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 					notificationEntry.addDelta(data);
 				}				
 			}
-		}		
+		}
+		
+		private void updateLastReadingTime() {
+			lastReadingTime = System.currentTimeMillis();
+		}
 	}
 	
 	public L3GD20GyroUnit(RoboContext context, String id) {
@@ -145,6 +148,7 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 		if (message.calibrate() == true) {
 			try {
 				gyro.calibrate();
+				scanner.updateLastReadingTime();
 			} catch (IOException e) {
 				SimpleLoggingUtil.error(getClass(), "Failed to calibrate!", e);
 			}
