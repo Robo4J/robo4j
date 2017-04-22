@@ -43,6 +43,7 @@ public class GyroExample {
 			System.out.println("Could not find the settings for the GyroExample!");
 			System.exit(2);
 		}
+		builder.add(settings);
 		builder.add(GyroProcessor.class, ID_PROCESSOR);
 		RoboContext ctx = builder.build();
 		
