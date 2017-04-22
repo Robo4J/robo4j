@@ -46,6 +46,7 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			RoboHttpUtils.DEFAULT_THREAD_POOL_SIZE, RoboHttpUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
 			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J HttpClientUnit", true));
 	private InetSocketAddress address;
+	private String uri;
 
 	public HttpClientUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
