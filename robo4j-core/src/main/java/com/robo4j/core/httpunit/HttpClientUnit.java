@@ -33,6 +33,7 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.util.ConstantUtil;
 
 /**
  * Http NIO Client to communicate with external system/Robo4J units
@@ -46,6 +47,7 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			RoboHttpUtils.DEFAULT_THREAD_POOL_SIZE, RoboHttpUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
 			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J HttpClientUnit", true));
 	private InetSocketAddress address;
+	private String uri;
 
 	public HttpClientUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
