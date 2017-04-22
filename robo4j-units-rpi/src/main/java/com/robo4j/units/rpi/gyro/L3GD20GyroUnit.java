@@ -88,7 +88,6 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 		
 		@Override
 		public void run() {
-			System.out.println("Probe run");
 			Float3D data = read();
 			long newTime = System.currentTimeMillis();
 
@@ -97,6 +96,7 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 			long deltaTime = newTime - lastReadingTime;
 			data.add(lastReading);
 			data.multiplyScalar(deltaTime / 2000.0f);
+			
 			lastReading.set(tmp);
 			addToDeltas(data);
 			lastReadingTime = newTime;
