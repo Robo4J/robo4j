@@ -59,10 +59,17 @@ public class GyroRequest {
 		return notificationThreshold;
 	}
 
+	/**
+	 * @return the recipient of the notifications.
+	 */
 	public RoboReference<GyroEvent> getTarget() {
 		return target;
 	}
 
+	/**
+	 * @return true if this is a request for continuous notifications. false, if
+	 *         this is a request for a one-off notification.
+	 */
 	public boolean isContinuous() {
 		return continuous;
 	}

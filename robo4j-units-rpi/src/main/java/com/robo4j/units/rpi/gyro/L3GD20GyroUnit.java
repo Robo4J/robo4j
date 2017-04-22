@@ -76,16 +76,16 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 	private final Map<RoboReference<GyroEvent>, GyroNotificationEntry> activeThresholds = new HashMap<>();
 
 	private final GyroScanner scanner = new GyroScanner();
-	
+
 	private Sensitivity sensitivity;
 	private boolean highPassFilter;
 	private CalibratedGyro gyro;
 	private volatile ScheduledFuture<?> readings;
-	
+
 	private class GyroScanner implements Runnable {
 		private long lastReadingTime = System.currentTimeMillis();
 		private Float3D lastReading;
-		
+
 		@Override
 		public void run() {
 			Float3D data = read();
@@ -96,7 +96,7 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 			long deltaTime = newTime - lastReadingTime;
 			data.add(lastReading);
 			data.multiplyScalar(deltaTime / 2000.0f);
-			
+
 			lastReading.set(tmp);
 			addToDeltas(data);
 			lastReadingTime = newTime;
@@ -106,10 +106,10 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 			synchronized (L3GD20GyroUnit.this) {
 				for (GyroNotificationEntry notificationEntry : activeThresholds.values()) {
 					notificationEntry.addDelta(data);
-				}				
+				}
 			}
 		}
-		
+
 		private void reset() {
 			lastReadingTime = System.currentTimeMillis();
 			lastReading = read();
@@ -122,9 +122,17 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 				SimpleLoggingUtil.error(getClass(), "Could not read gyro, aborting.", e);
 				return null;
 			}
-		}		
+		}
 	}
-	
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param context
+	 *            the robo context.
+	 * @param id
+	 *            the robo unit id.
+	 */
 	public L3GD20GyroUnit(RoboContext context, String id) {
 		super(GyroRequest.class, context, id);
 	}
@@ -163,21 +171,6 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 		super.onMessage(message);
 	}
 
-	private void setUpNotification(RoboReference<GyroEvent> target, GyroRequest request) {
-		synchronized (this) {
-			if (request.isContinuous()) {
-				activeThresholds.put(target, new ContinuousGyroNotificationEntry(target, request.getNotificationThreshold()));				
-			} else {
-				activeThresholds.put(target, new FixedGyroNotificationEntry(target, request.getNotificationThreshold()));								
-			}
-		}
-		if (readings == null) {
-			synchronized (this) {
-				readings = getContext().getScheduler().scheduleAtFixedRate(scanner, 0, 10, TimeUnit.MILLISECONDS);
-			}
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
@@ -189,5 +182,20 @@ public class L3GD20GyroUnit extends I2CRoboUnit<GyroRequest> {
 			}
 		}
 		return super.onGetAttribute(descriptor);
+	}
+	
+	private void setUpNotification(RoboReference<GyroEvent> target, GyroRequest request) {
+		synchronized (this) {
+			if (request.isContinuous()) {
+				activeThresholds.put(target, new ContinuousGyroNotificationEntry(target, request.getNotificationThreshold()));
+			} else {
+				activeThresholds.put(target, new FixedGyroNotificationEntry(target, request.getNotificationThreshold()));
+			}
+		}
+		if (readings == null) {
+			synchronized (this) {
+				readings = getContext().getScheduler().scheduleAtFixedRate(scanner, 0, 10, TimeUnit.MILLISECONDS);
+			}
+		}
 	}
 }

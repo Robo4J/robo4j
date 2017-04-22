@@ -26,8 +26,24 @@ import com.robo4j.math.geometry.Float3D;
  * @author Miroslav Wengner (@miragemiko)
  */
 interface GyroNotificationEntry {
+	/**
+	 * @return the current delta angles.
+	 */
 	Float3D getDelta();
+
+	/**
+	 * @return the robo unit to get the notifications.
+	 */
 	RoboReference<GyroEvent> getTarget();
+
+	/**
+	 * @return should this be a one-off, or should it be continuously running.
+	 */
 	boolean isContinuous();
+
+	/**
+	 * @param data
+	 *            the delta measurement to add to the current angles.
+	 */
 	void addDelta(Float3D data);
 }

@@ -20,7 +20,7 @@ import com.robo4j.core.RoboReference;
 import com.robo4j.math.geometry.Float3D;
 
 /**
- * Gyro unit requires some book keeping per target
+ * Notification entry for a one-off notification.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -28,6 +28,14 @@ import com.robo4j.math.geometry.Float3D;
 class FixedGyroNotificationEntry extends AbstractNotificationEntry implements GyroNotificationEntry {
 	private final Float3D notificationThreshold;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param target
+	 *            the recipient of the notification.
+	 * @param notificationThreshold
+	 *            the threshold to be reached for a notification to be sent.
+	 */
 	public FixedGyroNotificationEntry(RoboReference<GyroEvent> target, Float3D notificationThreshold) {
 		super(target);
 		this.notificationThreshold = notificationThreshold;

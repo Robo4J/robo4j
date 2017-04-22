@@ -19,10 +19,23 @@ package com.robo4j.units.rpi.gyro;
 import com.robo4j.core.RoboReference;
 import com.robo4j.math.geometry.Float3D;
 
+/**
+ * This is the abstract base class for notification entries (used for internal
+ * book keeping).
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
 abstract class AbstractNotificationEntry implements GyroNotificationEntry {
 	private final RoboReference<GyroEvent> target;
 	private final Float3D delta = new Float3D();
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param target
+	 *            the recipient of the notifications.
+	 */
 	public AbstractNotificationEntry(RoboReference<GyroEvent> target) {
 		this.target = target;
 	}
@@ -37,7 +50,13 @@ abstract class AbstractNotificationEntry implements GyroNotificationEntry {
 		return delta;
 	}
 
-	protected void report(Float3D newAngle) {
-		getTarget().sendMessage(new GyroEvent(newAngle));
+	/**
+	 * Sends an event to the registered receiver of the notification(s).
+	 * 
+	 * @param angles
+	 *            the angles to report.
+	 */
+	protected void report(Float3D angles) {
+		getTarget().sendMessage(new GyroEvent(angles));
 	}
 }

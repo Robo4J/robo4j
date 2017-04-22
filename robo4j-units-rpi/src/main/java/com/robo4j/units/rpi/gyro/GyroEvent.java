@@ -27,14 +27,25 @@ import com.robo4j.math.geometry.Float3D;
 public class GyroEvent {
 	private final Float3D angles;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param angles
+	 *            the angular delta to report.
+	 */
 	public GyroEvent(Float3D angles) {
 		this.angles = angles;
 	}
 
+	/**
+	 * @return the angular (in angular degrees) deltas since originally asking
+	 *         for notifications.
+	 */
 	public Float3D getAngles() {
 		return angles;
 	}
-	
+
+	@Override
 	public String toString() {
 		return "Angles: " + angles == null ? "null" : angles.toString();
 	}

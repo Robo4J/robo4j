@@ -20,7 +20,8 @@ import com.robo4j.core.RoboReference;
 import com.robo4j.math.geometry.Float3D;
 
 /**
- * Gyro unit requires some book keeping per target
+ * Notification entry for the required book keeping when sending notifications
+ * continuously.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -28,7 +29,18 @@ import com.robo4j.math.geometry.Float3D;
 class ContinuousGyroNotificationEntry extends AbstractNotificationEntry implements GyroNotificationEntry {
 	private final Float3D deltaToNotify;
 	private final Float3D lastReported = new Float3D();
-	
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param target
+	 *            the recipient of the notifications.
+	 * 
+	 * @param deltaToNotify
+	 *            the delta angles required to send a change. For example (0, 0,
+	 *            1) will cause notifications whenever a one degree change has
+	 *            been detected around the Z-axis).
+	 */
 	public ContinuousGyroNotificationEntry(RoboReference<GyroEvent> target, Float3D deltaToNotify) {
 		super(target);
 		this.deltaToNotify = deltaToNotify;
@@ -39,17 +51,23 @@ class ContinuousGyroNotificationEntry extends AbstractNotificationEntry implemen
 		return true;
 	}
 
+	/**
+	 * @return the last reported angles.
+	 */
 	public Float3D getLastReported() {
 		return lastReported;
 	}
 
+	/**
+	 * @return the delta angle required to notify the target.
+	 */
 	public Float3D getDeltaToNotify() {
 		return deltaToNotify;
 	}
 
 	@Override
 	public void addDelta(Float3D data) {
-		getDelta().add(data);		
+		getDelta().add(data);
 		Float3D diff = getDelta().diff(lastReported);
 		if (Math.abs(diff.x) > deltaToNotify.x || Math.abs(diff.y) > deltaToNotify.y || Math.abs(diff.z) > deltaToNotify.z) {
 			Float3D reportedInstance = getDelta().copy();
