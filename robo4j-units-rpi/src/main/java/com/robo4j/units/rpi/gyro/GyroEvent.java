@@ -34,4 +34,8 @@ public class GyroEvent {
 	public Float3D getAngles() {
 		return angles;
 	}
+	
+	public String toString() {
+		return "Angles: " + angles == null ? "null" : angles.toString();
+	}
 }
