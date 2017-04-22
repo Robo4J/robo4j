@@ -66,6 +66,11 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 	public static final String PROPERTY_KEY_HIGH_PASS_FILTER = "enableHighPass";
 
 	/**
+	 * This key configures how often to read the gyro in ms. Default is 10.
+	 */
+	public static final String PROPERTY_KEY_PERIOD = "period";
+
+	/**
 	 * This attribute will provide the state of the gyro as a {@link Float3D}.
 	 */
 	public static final String ATTRIBUTE_NAME_STATE = "state";
@@ -79,6 +84,7 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 
 	private Sensitivity sensitivity;
 	private boolean highPassFilter;
+	private int period;
 	private CalibratedGyro gyro;
 	private volatile ScheduledFuture<?> readings;
 
@@ -141,6 +147,7 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		super.onInitialization(configuration);
 		sensitivity = Sensitivity.valueOf(configuration.getString(PROPERTY_KEY_SENSITIVITY, "DPS_245"));
+		period = configuration.getInteger(PROPERTY_KEY_PERIOD, 10);
 		highPassFilter = configuration.getBoolean(PROPERTY_KEY_HIGH_PASS_FILTER, true);
 		try {
 			gyro = new CalibratedGyro(new GyroL3GD20Device(getBus(), getAddress(), sensitivity, highPassFilter));
@@ -183,7 +190,7 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 		}
 		return super.onGetAttribute(descriptor);
 	}
-	
+
 	private void setUpNotification(RoboReference<GyroEvent> target, GyroRequest request) {
 		synchronized (this) {
 			if (request.isContinuous()) {
@@ -194,7 +201,7 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 		}
 		if (readings == null) {
 			synchronized (this) {
-				readings = getContext().getScheduler().scheduleAtFixedRate(scanner, 0, 10, TimeUnit.MILLISECONDS);
+				readings = getContext().getScheduler().scheduleAtFixedRate(scanner, 0, period, TimeUnit.MILLISECONDS);
 			}
 		}
 	}

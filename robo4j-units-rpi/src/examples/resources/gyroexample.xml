@@ -6,7 +6,9 @@
 			<value name="bus" type="int">1</value>
 			<value name="address" type="int">0x6b</value>
 			<value name="sensitivity" type="String">DPS_245</value>
-			<value name="enableHighPass" type="boolean">true</value> 
+			<value name="enableHighPass" type="boolean">true</value>
+			<!-- Periodicity, in ms, to sample the gyro -->
+			<value name="period" type="int">10</value>			 
 		</config>
 	</roboUnit>
 </robo4j>
