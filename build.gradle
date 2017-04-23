@@ -121,7 +121,7 @@ project("robo4j-hw-rpi") {
         manifest {
             attributes 'Implementation-Title': 'robo4j-hw-rpi',
                     'Implementation-Version': version,
-                    'Main-Class': 'com.robo4j.hw.rpi.i2c.lidar.LidarLiteTest'
+                    'Main-Class': 'com.robo4j.hw.rpi.i2c.accelerometer.AccelerometerLSM303Test'
         }
         //baseName = project.name + '-all'
         baseName = 'robo4j-hw-rpi'
@@ -287,7 +287,7 @@ project("robo4j-units-rpi") {
         manifest {
             attributes 'Implementation-Title': 'robo4j-units-rpi',
                     'Implementation-Version': version,
-                    'Main-Class': 'com.robo4j.units.rpi.lidarlite.LaserScannerExample'
+                    'Main-Class': 'com.robo4j.units.rpi.accelerometer.AccelerometerExample'
         }
         //baseName = project.name + '-all'
         baseName = 'robo4j-units-rpi'

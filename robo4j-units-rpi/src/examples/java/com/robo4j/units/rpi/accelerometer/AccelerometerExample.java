@@ -23,6 +23,7 @@ import com.robo4j.core.RoboBuilder;
 import com.robo4j.core.RoboBuilderException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
+import com.robo4j.core.client.util.RoboClassLoader;
 import com.robo4j.core.util.SystemUtil;
 
 /**
@@ -36,7 +37,7 @@ public class AccelerometerExample {
 
 	public static void main(String[] args) throws RoboBuilderException, IOException {
 		RoboBuilder builder = new RoboBuilder();
-		InputStream settings = AccelerometerExample.class.getClassLoader().getResourceAsStream("accelerometerexample.xml");
+		InputStream settings = RoboClassLoader.getInstance().getResource("accelerometerexample.xml");
 		if (settings == null) {
 			System.out.println("Could not find the settings for the GyroExample!");
 			System.exit(2);
