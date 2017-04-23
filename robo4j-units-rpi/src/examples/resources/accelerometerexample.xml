@@ -6,7 +6,7 @@
 			<value name="bus" type="int">1</value>
 			<value name="address" type="int">0x19</value>
 			<value name="rate" type="String">HZ_10</value>
-			<value name="axisEnable" type="String">7</value>
+			<value name="axisEnable" type="int">7</value>
 			<!-- Periodicity, in ms, to sample the gyro -->
 			<value name="period" type="int">200</value>
 			<config name="offsets">
