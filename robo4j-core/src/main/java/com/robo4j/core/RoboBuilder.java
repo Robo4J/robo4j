@@ -60,9 +60,11 @@ public final class RoboBuilder {
 				currentId = attributes.getValue("id");
 				break;
 			case XmlConfigurationFactory.ELEMENT_CONFIG:
-				currentConfiguration = "";
-				configState = true;
-				break;
+				if (!configState) {
+					currentConfiguration = "";
+					configState = true;
+					break;
+				}
 			}
 			lastElement = qName;
 			if (configState) {

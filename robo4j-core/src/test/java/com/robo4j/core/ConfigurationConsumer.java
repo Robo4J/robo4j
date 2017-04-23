@@ -27,7 +27,7 @@ import com.robo4j.core.configuration.Configuration;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class StringConsumer extends RoboUnit<String> {
+public class ConfigurationConsumer extends RoboUnit<String> {
 	private static final int DEFAULT = 0;
 	private AtomicInteger counter;
 	private List<String> receivedMessages = new ArrayList<>();
@@ -36,7 +36,7 @@ public class StringConsumer extends RoboUnit<String> {
 	 * @param context
 	 * @param id
 	 */
-	public StringConsumer(RoboContext context, String id) {
+	public ConfigurationConsumer(RoboContext context, String id) {
 		super(String.class, context, id);
 		this.counter = new AtomicInteger(DEFAULT);
 	}
@@ -53,7 +53,7 @@ public class StringConsumer extends RoboUnit<String> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		
+		System.out.println(configuration);
 	}
 
 	@SuppressWarnings("unchecked")

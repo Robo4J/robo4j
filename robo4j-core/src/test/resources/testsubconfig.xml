@@ -1,0 +1,19 @@
+<!-- Robo4J Unit Definition file for JUnit Tests -->
+<robo4j>
+	<roboUnit id="consumer">
+		<class>com.robo4j.core.ConfigurationConsumer</class>
+		<config name="com.robo4j.core.root">
+			<value name="target" type="String">consumer</value>
+			<config name="offsets">
+				<value name="x" type="float">0.064</value>
+				<value name="y" type="float">0.001</value>
+				<value name="z" type="float">0</value>
+			</config>
+			<config name="multipliers">
+				<value name="x" type="float">-0.969932</value>
+				<value name="y" type="float">0.917431</value>
+				<value name="z" type="float">0.943396</value>
+			</config>
+		</config>
+	</roboUnit>
+</robo4j>

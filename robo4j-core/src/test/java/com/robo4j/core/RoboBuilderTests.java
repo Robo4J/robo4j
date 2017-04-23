@@ -51,7 +51,6 @@ public class RoboBuilderTests {
         }
         Assert.assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
 
-
         RoboReference<String> consumer = system.getReference("consumer");
         Assert.assertNotNull(consumer);
 
@@ -78,5 +77,14 @@ public class RoboBuilderTests {
         Assert.assertTrue(gotException);
     }
 
-
+    @Test
+    public void testComplexConfiguration() throws RoboBuilderException {
+        RoboBuilder builder = new RoboBuilder();
+        builder.add(RoboClassLoader.getInstance().getResource("testsubconfig.xml"));
+        RoboContext system = builder.build();
+        system.start();
+        RoboReference<Object> reference = system.getReference("consumer");
+        Assert.assertNotNull(reference);
+    }
+  
 }
