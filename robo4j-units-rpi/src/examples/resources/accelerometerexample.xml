@@ -1,0 +1,24 @@
+<!-- Example - Update parameters to suit your set up, especially servo trimming and inversion! -->
+<robo4j>
+	<roboUnit id="gyro">
+		<class>com.robo4j.units.rpi.accelerometer.AccelerometerLSM303Unit</class>
+		<config name="com.robo4j.core.root">
+			<value name="bus" type="int">1</value>
+			<value name="address" type="int">0x19</value>
+			<value name="rate" type="String">HZ_10</value>
+			<value name="axisEnable" type="String">7</value>
+			<!-- Periodicity, in ms, to sample the gyro -->
+			<value name="period" type="int">200</value>
+			<config name="offsets">
+				<value name="x" type="float">0.064</value>
+				<value name="y" type="float">0.001</value>
+				<value name="z" type="float">0</value>
+			</config>
+			<config name="multipliers">
+				<value name="x" type="float">-0.969932</value>
+				<value name="y" type="float">0.917431</value>
+				<value name="z" type="float">0.943396</value>
+			</config>
+		</config>
+	</roboUnit>
+</robo4j>

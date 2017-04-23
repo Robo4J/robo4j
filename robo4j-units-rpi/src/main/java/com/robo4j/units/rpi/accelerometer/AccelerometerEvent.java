@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.units.rpi.gyro;
+package com.robo4j.units.rpi.accelerometer;
 
 import com.robo4j.math.geometry.Float3D;
 
@@ -27,7 +27,7 @@ import com.robo4j.math.geometry.Float3D;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class GyroEvent {
+public class AccelerometerEvent {
 	private final Float3D angles;
 
 	/**
@@ -36,7 +36,7 @@ public class GyroEvent {
 	 * @param angles
 	 *            the angular delta to report.
 	 */
-	public GyroEvent(Float3D angles) {
+	public AccelerometerEvent(Float3D angles) {
 		this.angles = angles;
 	}
 

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.units.rpi.gyro;
+package com.robo4j.units.rpi.accelerometer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,26 +24,25 @@ import com.robo4j.core.RoboBuilderException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.util.SystemUtil;
-import com.robo4j.math.geometry.Float3D;
 
 /**
- * Runs the gyro continuously.
+ * Runs the accelerometer continuously and always prints what it reads.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class GyroExample {
+public class AccelerometerExample {
 	private static final String ID_PROCESSOR = "processor";
 
 	public static void main(String[] args) throws RoboBuilderException, IOException {
 		RoboBuilder builder = new RoboBuilder();
-		InputStream settings = GyroExample.class.getClassLoader().getResourceAsStream("gyroexample.xml");
+		InputStream settings = AccelerometerExample.class.getClassLoader().getResourceAsStream("accelerometerexample.xml");
 		if (settings == null) {
 			System.out.println("Could not find the settings for the GyroExample!");
 			System.exit(2);
 		}
 		builder.add(settings);
-		builder.add(GyroProcessor.class, ID_PROCESSOR);
+		builder.add(AccelerometerProcessor.class, ID_PROCESSOR);
 		RoboContext ctx = builder.build();
 
 		System.out.println("State before start:");
@@ -53,12 +52,12 @@ public class GyroExample {
 		System.out.println("State after start:");
 		System.out.println(SystemUtil.printStateReport(ctx));
 
-		RoboReference<GyroRequest> gyro = ctx.getReference("gyro");
-		RoboReference<GyroEvent> processor = ctx.getReference(ID_PROCESSOR);
+		RoboReference<AccelerometerRequest> gyro = ctx.getReference("gyro");
+		RoboReference<AccelerometerEvent> processor = ctx.getReference(ID_PROCESSOR);
 
 		System.out.println("Let the gyro unit be absolutely still, then press enter to calibrate and start!");
 		System.in.read();
-		gyro.sendMessage(new GyroRequest(processor, true, true, new Float3D(1.0f, 1.0f, 1.0f)));
+		gyro.sendMessage(new AccelerometerRequest(processor, true, (Float3D) -> true));
 		System.out.println("Will report angular changes indefinitely.\nPress enter to quit!");
 		System.in.read();
 	}

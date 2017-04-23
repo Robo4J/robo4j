@@ -14,31 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.units.rpi.gyro;
+package com.robo4j.hw.rpi.i2c.accelerometer;
 
-import com.robo4j.core.ConfigurationException;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboUnit;
-import com.robo4j.core.configuration.Configuration;
+import com.robo4j.hw.rpi.i2c.CalibratedFloat3DDevice;
+import com.robo4j.hw.rpi.i2c.ReadableDevice;
+import com.robo4j.math.geometry.Float3D;
 
 /**
- * Example recipient for gyro events.
+ * Strictly not required, but provided for symmetry with the gyro package.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class GyroProcessor extends RoboUnit<GyroEvent> {
-	public GyroProcessor(RoboContext context, String id) {
-		super(GyroEvent.class, context, id);
-	}
-
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-
-	}
-
-	@Override
-	public void onMessage(GyroEvent result) {
-		System.out.println("GyroEvent: " + result.toString());
+public class CalibratedAccelerometer extends CalibratedFloat3DDevice {
+	public CalibratedAccelerometer(ReadableDevice<Float3D> device, Float3D offsets, Float3D multipliers) {
+		super(device, offsets, multipliers);
 	}
 }

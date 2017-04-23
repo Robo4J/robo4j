@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.units.rpi.gyro;
+package com.robo4j.units.rpi.accelerometer;
 
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
@@ -22,14 +22,14 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 
 /**
- * Example recipient for gyro events.
+ * Example recipient for testing the accelerometer.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class GyroProcessor extends RoboUnit<GyroEvent> {
-	public GyroProcessor(RoboContext context, String id) {
-		super(GyroEvent.class, context, id);
+public class AccelerometerProcessor extends RoboUnit<AccelerometerEvent> {
+	public AccelerometerProcessor(RoboContext context, String id) {
+		super(AccelerometerEvent.class, context, id);
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class GyroProcessor extends RoboUnit<GyroEvent> {
 	}
 
 	@Override
-	public void onMessage(GyroEvent result) {
-		System.out.println("GyroEvent: " + result.toString());
+	public void onMessage(AccelerometerEvent result) {
+		System.out.println("AccelerometerEvent: " + result.toString());
 	}
 }

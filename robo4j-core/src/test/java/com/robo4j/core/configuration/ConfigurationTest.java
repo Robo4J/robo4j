@@ -53,7 +53,6 @@ public class ConfigurationTest {
 		child.setString("c", "child");
 		// Children have their own namespace
 		config.setDouble("sub", 2.0);
-
 		Assert.assertEquals(2.0, config.getDouble("sub", null), 0.000000001f);
 		Assert.assertEquals("child", config.getChildConfiguration("sub").getString("c", null));
 	}
