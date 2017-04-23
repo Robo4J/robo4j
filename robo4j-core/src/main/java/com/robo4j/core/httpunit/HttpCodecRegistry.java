@@ -34,7 +34,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.core.util.StreamUtils;
 
 /**
@@ -134,7 +133,7 @@ public class HttpCodecRegistry {
 
 		StreamUtils.enumerationAsStream(resources, false).map(url -> {
 			try {
-				String jarFile = url.getFile().split(EXCLAMATION)[0].replace(FILE, ConstantUtil.EMPTY_STRING);
+				String jarFile = url.getFile().split(EXCLAMATION)[0].replace(FILE, Constants.EMPTY_STRING);
 				if (new File(jarFile).isDirectory()) {
 					return null;
 				}
@@ -147,7 +146,7 @@ public class HttpCodecRegistry {
 				for (ZipEntry entry = e.getNextEntry(); entry != null; entry = e.getNextEntry()) {
 					if (!entry.isDirectory() && entry.getName().contains(slashifyPackage)
 							&& entry.getName().endsWith(SUFFIX)) {
-						String cName = entry.getName().replace(SLASH, DOT).replace(SUFFIX, ConstantUtil.EMPTY_STRING);
+						String cName = entry.getName().replace(SLASH, DOT).replace(SUFFIX, Constants.EMPTY_STRING);
 						classes.add(cName);
 					}
 				}

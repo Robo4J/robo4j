@@ -36,9 +36,9 @@ import java.util.stream.Collectors;
 
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.client.util.RoboHttpUtils;
+import com.robo4j.core.httpunit.Constants;
 import com.robo4j.core.httpunit.HttpUriRegister;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.util.ConstantUtil;
 import com.robo4j.http.HttpHeaderNames;
 import com.robo4j.http.HttpMessage;
 import com.robo4j.http.HttpMessageWrapper;
@@ -79,14 +79,14 @@ public class RoboRequestCallable implements Callable<Object> {
 						new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
 
 			final String firstLine = RoboHttpUtils.correctLine(in.readLine());
-			final String[] tokens = firstLine.split(ConstantUtil.HTTP_EMPTY_SEP);
+			final String[] tokens = firstLine.split(Constants.HTTP_EMPTY_SEP);
 			final HttpMethod method = HttpMethod.getByName(tokens[HttpMessageUtil.METHOD_KEY_POSITION]);
 
 			if (method != null) {
 				final Map<String, String> params = new HashMap<>();
 
 				String inputLine;
-				while (!(inputLine = RoboHttpUtils.correctLine(in.readLine())).equals(ConstantUtil.EMPTY_STRING)) {
+				while (!(inputLine = RoboHttpUtils.correctLine(in.readLine())).equals(Constants.EMPTY_STRING)) {
 					final String[] array = inputLine
 							.split(HttpMessageUtil.getHttpSeparator(HttpMessageUtil.HTTP_HEADER_SEP));
 					params.put(array[HttpMessageUtil.METHOD_KEY_POSITION].toLowerCase(),

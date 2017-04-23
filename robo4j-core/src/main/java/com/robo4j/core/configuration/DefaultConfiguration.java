@@ -171,4 +171,8 @@ class DefaultConfiguration implements Configuration {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "Settings: " + settings.toString() + " Configurations: " + configurations.toString();
+	}
 }

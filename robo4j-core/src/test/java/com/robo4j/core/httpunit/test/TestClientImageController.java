@@ -34,11 +34,11 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.util.RoboClassLoader;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.httpunit.Constants;
 import com.robo4j.core.httpunit.codec.CameraMessage;
 import com.robo4j.core.httpunit.codec.CameraMessageCodec;
 import com.robo4j.core.httpunit.test.util.PropertyMapBuilder;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.util.ConstantUtil;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -105,7 +105,7 @@ public class TestClientImageController extends RoboUnit<Boolean> {
 			String clientPort = configuration.getString("clientPort", null);
 			client = clientPort == null ? inetAddress.getHostAddress() :
 					inetAddress.getHostAddress().concat(":").concat(clientPort);
-			clientUri = configuration.getString("clientUri", ConstantUtil.EMPTY_STRING);
+			clientUri = configuration.getString("clientUri", Constants.EMPTY_STRING);
 		} catch (UnknownHostException e) {
 			SimpleLoggingUtil.error(getClass(), "unknown ip address", e);
 			throw ConfigurationException.createMissingConfigNameException("unknown ip address");

@@ -20,10 +20,10 @@ package com.robo4j.core.httpunit.codec;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.robo4j.core.httpunit.Constants;
 import com.robo4j.core.httpunit.HttpDecoder;
 import com.robo4j.core.httpunit.HttpEncoder;
 import com.robo4j.core.httpunit.HttpProducer;
-import com.robo4j.core.util.ConstantUtil;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -58,7 +58,7 @@ public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncod
     public CameraMessage decode(String json) {
         final Map<String, String> map = new HashMap<>();
         //@formatter:off
-		final String[] parts = json.replaceAll("^\\{\\s*\"|\"\\s*\\}$", ConstantUtil.EMPTY_STRING)
+		final String[] parts = json.replaceAll("^\\{\\s*\"|\"\\s*\\}$", Constants.EMPTY_STRING)
 				.split("\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?");
 		//@formatter:on
 		for (int i = 0; i < parts.length - 1; i += 2) {

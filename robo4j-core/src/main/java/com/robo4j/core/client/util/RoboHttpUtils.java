@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.robo4j.core.client.request.RoboBasicMapEntry;
-import com.robo4j.core.util.ConstantUtil;
+import com.robo4j.core.httpunit.Constants;
 import com.robo4j.http.HttpHeaderNames;
 import com.robo4j.http.util.HttpFirstLineBuilder;
 import com.robo4j.http.util.HttpHeaderBuilder;
@@ -56,7 +56,7 @@ public final class RoboHttpUtils {
 	public static String setHeader(String responseCode, int length) throws IOException {
 		//@formatter:off
 		return HttpHeaderBuilder.Build()
-				.add(ConstantUtil.EMPTY_STRING, responseCode)
+				.add(Constants.EMPTY_STRING, responseCode)
 				.add(HttpHeaderNames.DATE, LocalDateTime.now().toString())
 				.add(HttpHeaderNames.SERVER, ROBO4J_CLIENT)
 				.add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(length))
@@ -127,7 +127,7 @@ public final class RoboHttpUtils {
 	}
 
 	public static String correctLine(String line) {
-		return line == null ? ConstantUtil.EMPTY_STRING : line;
+		return line == null ? Constants.EMPTY_STRING : line;
 	}
 
 	public static Map<String, String> parseURIQueryToMap(final String uriQuery, final String delimiter) {

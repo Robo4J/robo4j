@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.util;
+package com.robo4j.core.httpunit;
 
 /**
  * Commonly used constants
@@ -22,7 +22,7 @@ package com.robo4j.core.util;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class ConstantUtil {
+public final class Constants {
 
 	public static final String EMPTY_STRING = "";
 	public static final int DEFAULT_VALUE_0 = 0;

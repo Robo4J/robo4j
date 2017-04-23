@@ -16,7 +16,7 @@
  */
 package com.robo4j.core.client.request;
 
-import com.robo4j.core.util.ConstantUtil;
+import com.robo4j.core.httpunit.Constants;
 import com.robo4j.http.util.HttpMessageUtil;
 
 /**
@@ -29,8 +29,8 @@ public class RoboBasicMapEntry {
 
     public RoboBasicMapEntry(String text) {
         final String[] values = text.split(HttpMessageUtil.getHttpSeparator(3));
-        key = values[ConstantUtil.DEFAULT_VALUE_0];
-        value = values[ConstantUtil.DEFAULT_VALUE_1];
+        key = values[Constants.DEFAULT_VALUE_0];
+        value = values[Constants.DEFAULT_VALUE_1];
     }
 
     public String getKey() {

@@ -1,6 +1,6 @@
-<!-- Example - Update parameters to suit your set up, especially servo trimming and inversion! -->
+<!-- Example - Update parameters to suit your set up, especially offsets and multipliers! -->
 <robo4j>
-	<roboUnit id="gyro">
+	<roboUnit id="accelerometer">
 		<class>com.robo4j.units.rpi.accelerometer.AccelerometerLSM303Unit</class>
 		<config name="com.robo4j.core.root">
 			<value name="bus" type="int">1</value>

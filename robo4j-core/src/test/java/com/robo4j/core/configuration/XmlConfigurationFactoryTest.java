@@ -16,8 +16,12 @@
  */
 package com.robo4j.core.configuration;
 
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.robo4j.core.util.IOUtil;
 
 /**
  * Tests for the configuration.
@@ -32,16 +36,27 @@ public class XmlConfigurationFactoryTest {
 		config.setString("firstString", "S1");
 		config.setString("secondString", "S2");
 		config.setBoolean("boolean", true);
-		Configuration child = config.createChildConfiguration("child");
-		child.setInteger("int", 1);
-		child.setFloat("float", 1.0f);
+		Configuration child1 = config.createChildConfiguration("child1");
+		child1.setInteger("int", 1);
+		child1.setFloat("float", 1.0f);
+		Configuration child2 = config.createChildConfiguration("child2");
+		child2.setInteger("int", 2);
+		child2.setFloat("float", 2.0f);
 		String xml = XmlConfigurationFactory.toXml(config);
 		System.out.println(xml);
 		Assert.assertNotNull(xml);
-		
+
 		Configuration fromXml = XmlConfigurationFactory.fromXml(xml);
 		System.out.println(XmlConfigurationFactory.toXml(fromXml));
 
 		Assert.assertEquals(config, fromXml);
+	}
+
+	@Test
+	public void testReadResource() throws IOException, ConfigurationFactoryException {
+		String configXml = IOUtil.readStringFromUTF8Stream(XmlConfigurationFactoryTest.class.getClassLoader().getResourceAsStream("configurationtest.xml"));
+		Configuration config = XmlConfigurationFactory.fromXml(configXml);
+		Assert.assertNotNull(config.getChildConfiguration("multipliers"));
+		Assert.assertNotNull(config.getChildConfiguration("offsets"));
 	}
 }

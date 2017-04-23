@@ -20,10 +20,10 @@ package com.robo4j.core.httpunit.codec;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.robo4j.core.httpunit.Constants;
 import com.robo4j.core.httpunit.HttpDecoder;
 import com.robo4j.core.httpunit.HttpEncoder;
 import com.robo4j.core.httpunit.HttpProducer;
-import com.robo4j.core.util.ConstantUtil;
 
 /**
  * default simple codec for simple commands Simple codec is currently used for
@@ -42,7 +42,7 @@ public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncod
 	@Override
 	public String encode(SimpleCommand stuff) {
 		final StringBuilder sb = new StringBuilder("{\"value\":\"").append(stuff.getValue());
-		if (stuff.getType().equals(ConstantUtil.EMPTY_STRING)) {
+		if (stuff.getType().equals(Constants.EMPTY_STRING)) {
 			sb.append("\"}");
 		} else {
 			sb.append("\",\"type\":\"").append(stuff.getType()).append("\"}");
@@ -54,7 +54,7 @@ public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncod
 	public SimpleCommand decode(String json) {
 		final Map<String, String> map = new HashMap<>();
 		//@formatter:off
-		final String[] parts = json.replaceAll("^\\{\\s*\"|\"\\s*\\}$", ConstantUtil.EMPTY_STRING)
+		final String[] parts = json.replaceAll("^\\{\\s*\"|\"\\s*\\}$", Constants.EMPTY_STRING)
 				.split("\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?");
 		//@formatter:on
 		for (int i = 0; i < parts.length - 1; i += 2) {

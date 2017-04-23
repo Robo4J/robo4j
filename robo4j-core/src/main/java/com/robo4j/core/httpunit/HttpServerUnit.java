@@ -50,7 +50,6 @@ import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.util.ConstantUtil;
 
 /**
  * Http NIO unit allows to configure format of the requests currently is only
@@ -82,7 +81,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
 		/* target is always initiated as the list */
-		target = Arrays.asList(configuration.getString("target", ConstantUtil.EMPTY_STRING).split(DELIMITER));
+		target = Arrays.asList(configuration.getString("target", Constants.EMPTY_STRING).split(DELIMITER));
 		port = configuration.getInteger("port", _DEFAULT_PORT);
 
 		String packages = configuration.getString("packages", null);

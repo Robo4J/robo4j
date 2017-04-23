@@ -17,7 +17,7 @@
 
 package com.robo4j.core.httpunit.codec;
 
-import com.robo4j.core.util.ConstantUtil;
+import com.robo4j.core.httpunit.Constants;
 
 /**
  * used for simple http communication
@@ -34,7 +34,7 @@ public class SimpleCommand {
 
 	public SimpleCommand(String value) {
 		this.value = value;
-		this.type = ConstantUtil.EMPTY_STRING;
+		this.type = Constants.EMPTY_STRING;
 	}
 
 	/**

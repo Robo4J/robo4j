@@ -52,7 +52,7 @@ public class AccelerometerExample {
 		System.out.println("State after start:");
 		System.out.println(SystemUtil.printStateReport(ctx));
 
-		RoboReference<AccelerometerRequest> gyro = ctx.getReference("gyro");
+		RoboReference<AccelerometerRequest> gyro = ctx.getReference("accelerometer");
 		RoboReference<AccelerometerEvent> processor = ctx.getReference(ID_PROCESSOR);
 
 		System.out.println("Let the gyro unit be absolutely still, then press enter to calibrate and start!");
