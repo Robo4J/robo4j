@@ -156,19 +156,19 @@ public class Lcd20x4 {
 
 		// Send the low bits
 		dataLow();
-		if ((bits & 0x10) == 0x1) {
+		if ((bits & 0x01) == 0x01) {
 			gpioD4.setState(true);
 		}
 
-		if ((bits & 0x20) == 0x2) {
+		if ((bits & 0x02) == 0x02) {
 			gpioD5.setState(true);
 		}
 
-		if ((bits & 0x40) == 0x4) {
+		if ((bits & 0x04) == 0x04) {
 			gpioD6.setState(true);
 		}
 
-		if ((bits & 0x80) == 0x8) {
+		if ((bits & 0x08) == 0x08) {
 			gpioD7.setState(true);
 		}
 		toggleEnable();
