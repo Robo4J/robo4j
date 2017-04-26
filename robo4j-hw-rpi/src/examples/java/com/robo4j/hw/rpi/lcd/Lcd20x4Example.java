@@ -50,7 +50,8 @@ public class Lcd20x4Example {
 				lcd.sendMessage(4, "--------------------", Alignment.CENTER);
 				sleep(3000);
 			}
-			lcd.sendMessage(1, "Goodbye!", Alignment.CENTER);
+			lcd.clearDisplay();
+			lcd.sendMessage(2, "Goodbye!", Alignment.CENTER);
 		}
 
 		private void sleep(int seconds) {
