@@ -53,25 +53,18 @@ public enum LF710Part {
     }
 
     private static Map<Short, LF710Part> initMapping() {
-        return Stream.of(values())
-                .collect(Collectors.toMap(LF710Part::getMask, e -> e));
+        return Stream.of(values()).collect(Collectors.toMap(LF710Part::getMask, e -> e));
     }
 
     public static LF710Part getByMask(Short mask) {
         if (internMapByMask == null)
             internMapByMask = initMapping();
-        return internMapByMask.entrySet().stream()
-                .map(Map.Entry::getValue)
-                .filter(e -> e.getMask() == mask)
-                .findFirst()
+        return internMapByMask.entrySet().stream().map(Map.Entry::getValue).filter(e -> e.getMask() == mask).findFirst()
                 .orElse(null);
     }
 
     @Override
     public String toString() {
-        return "LF710Part{" +
-                "mask=" + mask +
-                ", name='" + name + '\'' +
-                '}';
+        return "LF710Part{" + "mask=" + mask + ", name='" + name + '\'' + '}';
     }
 }

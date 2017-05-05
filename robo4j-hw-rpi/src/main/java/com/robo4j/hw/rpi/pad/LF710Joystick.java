@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum LF710Joystick {
+public enum LF710Joystick implements LF710Input {
 
     //@formatter:off
     LEFT_X      ((short)0, "left x"),
@@ -57,25 +57,18 @@ public enum LF710Joystick {
     }
 
     private static Map<Short, LF710Joystick> initMapping() {
-        return Stream.of(values())
-                .collect(Collectors.toMap(LF710Joystick::getMask, e -> e));
+        return Stream.of(values()).collect(Collectors.toMap(LF710Joystick::getMask, e -> e));
     }
 
     public static LF710Joystick getByMask(Short mask) {
         if (internMapByMask == null)
             internMapByMask = initMapping();
-        return internMapByMask.entrySet().stream()
-                .map(Map.Entry::getValue)
-                .filter(e -> e.getMask() == mask)
-                .findFirst()
+        return internMapByMask.entrySet().stream().map(Map.Entry::getValue).filter(e -> e.getMask() == mask).findFirst()
                 .orElse(null);
     }
 
     @Override
     public String toString() {
-        return "LF710Joystick{" +
-                "mask=" + mask +
-                ", name='" + name + '\'' +
-                '}';
+        return "LF710Joystick{" + "mask=" + mask + ", name='" + name + '\'' + '}';
     }
 }

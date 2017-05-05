@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum LF710Button {
+public enum LF710Button implements LF710Input {
 
     //@formatter:off
     BLUE                ((short)0,  "blue"),
@@ -63,25 +63,18 @@ public enum LF710Button {
     }
 
     private static Map<Short, LF710Button> initMapping() {
-        return Stream.of(values())
-                .collect(Collectors.toMap(LF710Button::getMask, e -> e));
+        return Stream.of(values()).collect(Collectors.toMap(LF710Button::getMask, e -> e));
     }
 
     public static LF710Button getByMask(Short mask) {
         if (internMapByMask == null)
             internMapByMask = initMapping();
-        return internMapByMask.entrySet().stream()
-                .map(Map.Entry::getValue)
-                .filter(e -> e.getMask() == mask)
-                .findFirst()
+        return internMapByMask.entrySet().stream().map(Map.Entry::getValue).filter(e -> e.getMask() == mask).findFirst()
                 .orElse(null);
     }
 
     @Override
     public String toString() {
-        return "LF710Button{" +
-                "mask=" + mask +
-                ", name='" + name + '\'' +
-                '}';
+        return "LF710Button{" + "mask=" + mask + ", name='" + name + '\'' + '}';
     }
 }

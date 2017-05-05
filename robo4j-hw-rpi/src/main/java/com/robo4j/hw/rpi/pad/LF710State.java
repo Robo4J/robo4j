@@ -29,7 +29,7 @@ import java.util.stream.Stream;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum  LF710State {
+public enum LF710State {
 
     //@formatter:off
     RELEASED    ((short)0, "released"),
@@ -54,25 +54,18 @@ public enum  LF710State {
     }
 
     private static Map<Short, LF710State> initMapping() {
-        return Stream.of(values())
-                .collect(Collectors.toMap(LF710State::getMask, e -> e));
+        return Stream.of(values()).collect(Collectors.toMap(LF710State::getMask, e -> e));
     }
 
     public static LF710State getByMask(Short mask) {
         if (internMapByMask == null)
             internMapByMask = initMapping();
-        return internMapByMask.entrySet().stream()
-                .map(Map.Entry::getValue)
-                .filter(e -> e.getMask() == mask)
-                .findFirst()
+        return internMapByMask.entrySet().stream().map(Map.Entry::getValue).filter(e -> e.getMask() == mask).findFirst()
                 .orElse(null);
     }
 
     @Override
     public String toString() {
-        return "LF710State{" +
-                "mask=" + mask +
-                ", name='" + name + '\'' +
-                '}';
+        return "LF710State{" + "mask=" + mask + ", name='" + name + '\'' + '}';
     }
 }

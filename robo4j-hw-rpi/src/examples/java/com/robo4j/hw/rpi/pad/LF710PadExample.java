@@ -32,7 +32,7 @@ import java.nio.file.Paths;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class LF710Pad implements Runnable {
+public class LF710PadExample implements Runnable {
 
     private static final String REGISTERED_INPUT = "/dev/input/js0";
     private static final int ANDING_LEFT = 0x00ff;
@@ -50,11 +50,11 @@ public class LF710Pad implements Runnable {
 
     public static void main(String[] args) {
         System.out.println("start joystick logitech F710");
-        LF710Pad pad = new LF710Pad();
+        LF710PadExample pad = new LF710PadExample();
         new Thread(pad).start();
     }
 
-    public LF710Pad() {
+    public LF710PadExample() {
 
     }
 
