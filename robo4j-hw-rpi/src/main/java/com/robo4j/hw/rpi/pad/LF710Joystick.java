@@ -17,58 +17,78 @@
 
 package com.robo4j.hw.rpi.pad;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
- * Logitech F710 Joystick related elements
+ * Logitech F710 Gamepad implementation
  *
- * @author Marcus Hirt (@hirt)
- * @author Miro Wengner (@miragemiko)
+ * Created by mirowengner on 05.05.17.
  */
-public enum LF710Joystick implements LF710Input {
+public class LF710Joystick {
 
-    //@formatter:off
-    LEFT_X      ((short)0, "left x"),
-    LEFT_Y      ((short)1, "left y"),
-    RIGHT_X     ((short)2, "right x"),
-    RIGHT_Y     ((short)3, "right y"),
-    PAD_X       ((short)4, "pad x"),
-    PAD_Y       ((short)5, "pad y"),
-    ;
-    //@formatter:on
+    private static final String REGISTERED_INPUT = "/dev/input/js0";
+    private static final int ANDING_LEFT = 0x00ff;
+    private static final int ANDING_LONG_LEFT = 0x00000000000000ff;
+    private static final int BUFFER_SIZE = 8;
+    private static final int INDEX_START = 0;
+    private static final int INDEX_TIME_1 = 1;
+    private static final int INDEX_TIME_2 = 2;
+    private static final int INDEX_TIME_3 = 3;
+    private static final int INDEX_AMOUNT_4 = 4;
+    private static final int INDEX_AMOUNT_5 = 5;
+    private static final int INDEX_PART = 6;
+    private static final int INDEX_ELEMENT = 7;
+    private final Path gamepadPath = Paths.get(REGISTERED_INPUT);
+    private final byte[] buffer = new byte[BUFFER_SIZE];
+    private InputStream inputStream;
+    private boolean active;
 
-    private static volatile Map<Short, LF710Joystick> internMapByMask;
-    private final short mask;
-    private final String name;
-
-    LF710Joystick(short mask, String name) {
-        this.mask = mask;
-        this.name = name;
+    public LF710Joystick() {
     }
 
-    public short getMask() {
-        return mask;
+    public void activate(){
+        try {
+            inputStream = Files.newInputStream(gamepadPath);
+            active = true;
+        } catch (IOException e) {
+            throw new LF710Exception("gamepad problem", e);
+        }
     }
 
-    public String getName() {
-        return name;
+    public LF710Response getState(){
+        try {
+            int bytes = inputStream.read(buffer);
+            if(bytes == BUFFER_SIZE){
+                final long time = ((((((buffer[INDEX_TIME_3] & ANDING_LONG_LEFT) << BUFFER_SIZE) | (buffer[INDEX_TIME_2] &
+                        ANDING_LEFT)) << BUFFER_SIZE) | (buffer[INDEX_TIME_1] & ANDING_LEFT)) << BUFFER_SIZE) |
+                        (buffer[INDEX_START] & ANDING_LEFT);
+                final short amount = (short) (((buffer[INDEX_AMOUNT_5] & ANDING_LEFT) << BUFFER_SIZE) | (buffer[INDEX_AMOUNT_4] & ANDING_LEFT));
+                final short part = buffer[INDEX_PART];
+                final short element = buffer[INDEX_ELEMENT];
+                if(part > 0){
+                    final LF710Part lf710Part = LF710Part.getByMask(part);
+                    switch (lf710Part){
+                        case BUTTON:
+                            return new LF710Response(time, amount, lf710Part, LF710Button.getByMask(element), getInputState(amount));
+                        case JOYSTICK:
+                            return new LF710Response(time, amount, lf710Part, LF710JoystickButtons.getByMask(element), getInputState(amount));
+                        default:
+                            throw new LF710Exception("uknonw pad part:" + lf710Part);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new LF710Exception("gamepad reading problem", e);
+        }
+        return null;
     }
 
-    private static Map<Short, LF710Joystick> initMapping() {
-        return Stream.of(values()).collect(Collectors.toMap(LF710Joystick::getMask, e -> e));
-    }
-
-    public static LF710Joystick getByMask(Short mask) {
-        if (internMapByMask == null)
-            internMapByMask = initMapping();
-        return internMapByMask.entrySet().stream().map(Map.Entry::getValue).filter(e -> e.getMask() == mask).findFirst()
-                .orElse(null);
-    }
-
-    @Override
-    public String toString() {
-        return "LF710Joystick{" + "mask=" + mask + ", name='" + name + '\'' + '}';
+    //Private Methods
+    private LF710State getInputState(short amount){
+        return (amount == 0) ? LF710State.RELEASED : LF710State.PRESSED;
     }
 }

@@ -27,12 +27,14 @@ public class LF710Response {
     private Short amount;
     private LF710Part part;
     private LF710Input input;
+    private LF710State state;
 
-    public LF710Response(Long time, Short amount, LF710Part part, LF710Input input) {
+    public LF710Response(Long time, Short amount, LF710Part part, LF710Input input, LF710State state) {
         this.time = time;
         this.amount = amount;
         this.part = part;
         this.input = input;
+        this.state = state;
     }
 
     public Long getTime() {
@@ -51,6 +53,10 @@ public class LF710Response {
         return input;
     }
 
+    public LF710State getState() {
+        return state;
+    }
+
     @Override
     public String toString() {
         return "LF710Response{" +
@@ -58,6 +64,7 @@ public class LF710Response {
                 ", amount=" + amount +
                 ", part=" + part +
                 ", input=" + input +
+                ", state=" + state +
                 '}';
     }
 }
