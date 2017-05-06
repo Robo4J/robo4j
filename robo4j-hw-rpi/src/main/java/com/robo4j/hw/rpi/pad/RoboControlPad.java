@@ -15,10 +15,22 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.rpi.pad;
+package com.robo4j.hw.rpi.pad;
+
+import java.io.InputStream;
 
 /**
- * Created by mirowengner on 05.05.17.
+ * General pad abstraction
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
  */
-public class LF710Unit {
+public interface RoboControlPad {
+
+    boolean connect();
+
+    void disconnect();
+
+    InputStream source();
+
 }

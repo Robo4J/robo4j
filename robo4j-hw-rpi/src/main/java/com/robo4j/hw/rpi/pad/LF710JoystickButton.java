@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum LF710JoystickButtons implements LF710Input {
+public enum LF710JoystickButton implements LF710Input {
 
     //@formatter:off
     LEFT_X      ((short)0, "left x"),
@@ -39,11 +39,11 @@ public enum LF710JoystickButtons implements LF710Input {
     ;
     //@formatter:on
 
-    private static volatile Map<Short, LF710JoystickButtons> internMapByMask;
+    private static volatile Map<Short, LF710JoystickButton> internMapByMask;
     private final short mask;
     private final String name;
 
-    LF710JoystickButtons(short mask, String name) {
+    LF710JoystickButton(short mask, String name) {
         this.mask = mask;
         this.name = name;
     }
@@ -56,11 +56,11 @@ public enum LF710JoystickButtons implements LF710Input {
         return name;
     }
 
-    private static Map<Short, LF710JoystickButtons> initMapping() {
-        return Stream.of(values()).collect(Collectors.toMap(LF710JoystickButtons::getMask, e -> e));
+    private static Map<Short, LF710JoystickButton> initMapping() {
+        return Stream.of(values()).collect(Collectors.toMap(LF710JoystickButton::getMask, e -> e));
     }
 
-    public static LF710JoystickButtons getByMask(Short mask) {
+    public static LF710JoystickButton getByMask(Short mask) {
         if (internMapByMask == null)
             internMapByMask = initMapping();
         return internMapByMask.entrySet().stream().map(Map.Entry::getValue).filter(e -> e.getMask() == mask).findFirst()
@@ -69,6 +69,6 @@ public enum LF710JoystickButtons implements LF710Input {
 
     @Override
     public String toString() {
-        return "LF710JoystickButtons{" + "mask=" + mask + ", name='" + name + '\'' + '}';
+        return "LF710JoystickButton{" + "mask=" + mask + ", name='" + name + '\'' + '}';
     }
 }

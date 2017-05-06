@@ -80,7 +80,7 @@ public class LF710PadExample implements Runnable {
                                         getInputState(amount) + " time: " + time);
                                 break;
                             case JOYSTICK:
-                                System.out.println("JOYSTICK: " + LF710JoystickButtons.getByMask(element) + " state: " +
+                                System.out.println("JOYSTICK: " + LF710JoystickButton.getByMask(element) + " state: " +
                                         getInputState(amount) + " time: " + time);
                                 break;
                             default:

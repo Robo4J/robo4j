@@ -122,7 +122,7 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 			lcd.setDisplayEnabled(false);
 			lcd.stop();
 		} catch (IOException e) {
-			throw new AdafruitException("Could not stop LCD", e);
+			throw new AdafruitException("Could not disconnect LCD", e);
 		}
 		setState(LifecycleState.STOPPED);
 	}

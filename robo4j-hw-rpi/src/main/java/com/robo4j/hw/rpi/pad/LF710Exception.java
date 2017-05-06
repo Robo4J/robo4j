@@ -20,7 +20,8 @@ package com.robo4j.hw.rpi.pad;
 /**
  * Logitech F710 Gamepad exception
  *
- * Created by mirowengner on 05.05.17.
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
  */
 public class LF710Exception extends RuntimeException {
     public LF710Exception(String message) {

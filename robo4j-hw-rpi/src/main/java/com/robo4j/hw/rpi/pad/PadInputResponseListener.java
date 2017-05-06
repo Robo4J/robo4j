@@ -18,14 +18,16 @@
 package com.robo4j.hw.rpi.pad;
 
 /**
- * Interface for Logitech Gamepad inputs
- * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public interface LF710Input {
+@FunctionalInterface
+public interface PadInputResponseListener {
 
-    short getMask();
+    /**
+     *
+     * @param response joystick or button pressed response
+     */
+    void onInputPressed(LF710Response response);
 
-    String getName();
 }

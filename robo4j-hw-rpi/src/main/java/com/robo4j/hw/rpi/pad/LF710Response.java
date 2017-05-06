@@ -19,7 +19,9 @@ package com.robo4j.hw.rpi.pad;
 
 /**
  * Logitech F710 response
- * Created by mirowengner on 05.05.17.
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
  */
 public class LF710Response {
 

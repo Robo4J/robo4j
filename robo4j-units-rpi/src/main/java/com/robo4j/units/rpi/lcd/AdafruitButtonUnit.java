@@ -101,20 +101,24 @@ public class AdafruitButtonUnit extends I2CRoboUnit<Object> {
 		setState(LifecycleState.STARTED);
 	}
 
+	@Override
 	public void stop() {
 		observer.removeButtonListener(buttonListener);
 		observer = null;
 		buttonListener = null;
 	}
 
+	@Override
 	public void shutdown() {
 		try {
 			lcd.stop();
 		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "Failed to stop LCD", e);
+			SimpleLoggingUtil.error(getClass(), "Failed to disconnect LCD", e);
 		}
 	}
 
+
+	//Private Methods
 	private void handleException(IOException e) {
 		setState(LifecycleState.STOPPING);
 		shutdown();
