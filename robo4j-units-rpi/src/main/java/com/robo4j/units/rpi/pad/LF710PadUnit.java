@@ -22,9 +22,9 @@ import java.nio.file.Paths;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.hw.rpi.pad.LF710ButtonObserver;
 import com.robo4j.hw.rpi.pad.LF710Pad;
 import com.robo4j.hw.rpi.pad.LF710Response;
@@ -67,12 +67,13 @@ public class LF710PadUnit extends RoboUnit<Object>{
 
     @Override
     public void start() {
+        final RoboReference<LF710Response> targetRef = getContext().getReference(target);
         setState(LifecycleState.STARTING);
         pad.connect();
         observer = new LF710ButtonObserver(pad);
         listener = (LF710Response response) -> {
             if(getState() == LifecycleState.STARTED){
-                System.out.println("LOGITECH F710 response: " + response);
+                targetRef.sendMessage(response);
             }
         };
         observer.addButtonListener(listener);
