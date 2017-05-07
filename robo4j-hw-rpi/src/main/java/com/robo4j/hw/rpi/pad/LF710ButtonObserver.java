@@ -74,11 +74,11 @@ public class LF710ButtonObserver {
 							final LF710Part lf710Part = LF710Part.getByMask(part);
 							switch (lf710Part) {
 							case BUTTON:
-								fireNotification(new LF710Response(time, amount, lf710Part,
+								fireNotification(new LF710Message(time, amount, lf710Part,
 										LF710Button.getByMask(element), getInputState(amount)));
 								break;
 							case JOYSTICK:
-								fireNotification(new LF710Response(time, amount, lf710Part,
+								fireNotification(new LF710Message(time, amount, lf710Part,
 										LF710JoystickButton.getByMask(element), getInputState(amount)));
 								break;
 							default:
@@ -90,10 +90,11 @@ public class LF710ButtonObserver {
 					throw new LF710Exception("gamepad reading problem", e);
 				}
 			}
+			pad.disconnect();
 		}
 
 		// Private Methods
-		private void fireNotification(LF710Response response) {
+		private void fireNotification(LF710Message response) {
 			synchronized (buttonListeners) {
 				buttonListeners.forEach(l -> l.onInputPressed(response));
 			}
@@ -111,7 +112,6 @@ public class LF710ButtonObserver {
 	public void stopButtonMonitor() {
 		isRunning = false;
 		try {
-			pad.disconnect();
 			observerThread.join(SLEEP_MILLIS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();

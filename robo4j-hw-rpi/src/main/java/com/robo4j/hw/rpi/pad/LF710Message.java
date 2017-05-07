@@ -18,12 +18,13 @@
 package com.robo4j.hw.rpi.pad;
 
 /**
- * Logitech F710 response
+ * Logitech F710 message
+ * message represents the user action on the pad
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class LF710Response {
+public class LF710Message {
 
     private Long time;
     private Short amount;
@@ -31,7 +32,7 @@ public class LF710Response {
     private LF710Input input;
     private LF710State state;
 
-    public LF710Response(Long time, Short amount, LF710Part part, LF710Input input, LF710State state) {
+    public LF710Message(Long time, Short amount, LF710Part part, LF710Input input, LF710State state) {
         this.time = time;
         this.amount = amount;
         this.part = part;
@@ -61,7 +62,7 @@ public class LF710Response {
 
     @Override
     public String toString() {
-        return "LF710Response{" +
+        return "LF710Message{" +
                 "time=" + time +
                 ", amount=" + amount +
                 ", part=" + part +

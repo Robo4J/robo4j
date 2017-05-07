@@ -28,6 +28,6 @@ public interface PadInputResponseListener {
      *
      * @param response joystick or button pressed response
      */
-    void onInputPressed(LF710Response response);
+    void onInputPressed(LF710Message response);
 
 }

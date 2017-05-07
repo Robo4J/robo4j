@@ -27,7 +27,7 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.hw.rpi.pad.LF710ButtonObserver;
 import com.robo4j.hw.rpi.pad.LF710Pad;
-import com.robo4j.hw.rpi.pad.LF710Response;
+import com.robo4j.hw.rpi.pad.LF710Message;
 import com.robo4j.hw.rpi.pad.PadInputResponseListener;
 import com.robo4j.hw.rpi.pad.RoboControlPad;
 
@@ -67,11 +67,11 @@ public class LF710PadUnit extends RoboUnit<Object>{
 
     @Override
     public void start() {
-        final RoboReference<LF710Response> targetRef = getContext().getReference(target);
+        final RoboReference<LF710Message> targetRef = getContext().getReference(target);
         setState(LifecycleState.STARTING);
         pad.connect();
         observer = new LF710ButtonObserver(pad);
-        listener = (LF710Response response) -> {
+        listener = (LF710Message response) -> {
             if(getState() == LifecycleState.STARTED){
                 targetRef.sendMessage(response);
             }
@@ -89,9 +89,9 @@ public class LF710PadUnit extends RoboUnit<Object>{
         setState(LifecycleState.STOPPED);
     }
 
+    @Override
     public void shutdown() {
         setState(LifecycleState.SHUTTING_DOWN);
-        pad.disconnect();
         setState(LifecycleState.SHUTDOWN);
     }
 
