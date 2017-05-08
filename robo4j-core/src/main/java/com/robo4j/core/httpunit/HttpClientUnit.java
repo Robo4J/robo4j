@@ -47,6 +47,8 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J HttpClientUnit", true));
 	private InetSocketAddress address;
 	private String uri;
+	private String responseUnit;
+	private Integer responseSize;
 
 	public HttpClientUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -57,12 +59,15 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		setState(LifecycleState.UNINITIALIZED);
 		String confAddress = configuration.getString("address", null);
 		int confPort = configuration.getInteger("port", RoboHttpUtils._DEFAULT_PORT);
+		responseUnit = configuration.getString("responseUnit", null);
+		responseSize = configuration.getInteger("responseSize", null);
 
 		final Configuration targetUnits = configuration.getChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
 		if (confAddress == null || targetUnits == null) {
 			throw ConfigurationException.createMissingConfigNameException("address, path, commands...");
 		}
 		address = new InetSocketAddress(confAddress, confPort);
+
 
 		setState(LifecycleState.INITIALIZED);
 	}
@@ -75,6 +80,11 @@ public class HttpClientUnit extends RoboUnit<Object> {
 
 			ByteBuffer buffer = ByteBuffer.wrap(((String)message).getBytes());
 			int c = client.write(buffer);
+			if(responseUnit != null && responseSize != null){
+				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
+				client.read(readBuffer);
+				sendMessageToResponseUnit(readBuffer);
+			}
 			client.close();
 		} catch (IOException e) {
 			throw new HttpException("onMessage", e);
@@ -92,6 +102,11 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		setState(LifecycleState.SHUTTING_DOWN);
 		executor.shutdownNow();
 		setState(LifecycleState.SHUTDOWN);
+	}
+
+	//Private Methods
+	private void sendMessageToResponseUnit(ByteBuffer byteBuffer){
+		getContext().getReference(responseUnit).sendMessage(byteBuffer.array());
 	}
 
 }
