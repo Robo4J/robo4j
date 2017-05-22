@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,20 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.httpunit;
+
+package com.robo4j.http;
 
 /**
- * Commonly used constants
+ *
+ * Standard Http header values
  *
  * @author Marcus Hirt (@hirt)
- * @author Miroslav Wengner (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  */
-public final class Constants {
+public class HttpHeaderValues {
 
-	public static final String EMPTY_STRING = "";
-	public static final int DEFAULT_VALUE_0 = 0;
-	public static final int DEFAULT_VALUE_1 = 1;
-	public static final String HTTP_QUERY_SEP = "\u0026";			//AMPERSAND &
-	public static final String HTTP_EMPTY_SEP = "\\s+";
+    //TODO: add all
+    public static final String APPLICATION_JSON = "application/json";
+    public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
+    public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 
 }

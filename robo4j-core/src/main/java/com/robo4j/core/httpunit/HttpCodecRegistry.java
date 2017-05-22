@@ -48,7 +48,7 @@ public class HttpCodecRegistry {
 
 	private static final String FILE = "file:";
 	private static final String SUFFIX = ".class";
-	private static final String EXCLAMATION = "!";
+	private static final String EXCLAMATION = "\u0021";		//Exclamation mark !
 	private static final char SLASH = '/';
 	private static final char DOT = '.';
 
