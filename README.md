@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/Robo4J/robo4j.svg?branch=master)](https://travis-ci.org/Robo4J/robo4j)
 ## Robo4j.io Framework
 Modular framework for rapid development of interconnected hardware and robots.
 
