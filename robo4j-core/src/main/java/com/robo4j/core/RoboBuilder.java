@@ -33,6 +33,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.configuration.XmlConfigurationFactory;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 
@@ -168,8 +169,7 @@ public final class RoboBuilder {
 
 	/**
 	 * Instantiates a RoboUnit from the provided class using the provided id and
-	 * adds it. No initialization ({@link RoboUnit#initialize(Map)} will take
-	 * place.
+	 * adds it. The instance will be initialized using an empty configuration.
 	 * 
 	 * @param clazz
 	 *            the class to use.
@@ -180,7 +180,7 @@ public final class RoboBuilder {
 	 *             if the creation or adding of the unit failed.
 	 */
 	public RoboBuilder add(Class<? extends RoboUnit<?>> clazz, String id) throws RoboBuilderException {
-		internalAddUnit(instantiateRoboUnit(clazz, id));
+		internalAddUnit(instantiateAndInitialize(clazz, id, ConfigurationFactory.createEmptyConfiguration()));
 		return this;
 	}
 

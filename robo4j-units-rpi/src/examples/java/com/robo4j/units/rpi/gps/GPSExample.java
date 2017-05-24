@@ -54,17 +54,18 @@ public class GPSExample {
 
 		System.out.println("Press enter to start requesting events, then press enter again to stop requesting events!");
 		System.in.read();
-		
+
 		System.out.println("Requesting GPS events! Press enter to stop!");
 		gps.sendMessage(new GPSRequest(processor, Operation.REGISTER));
 		System.in.read();
-		
+
 		System.out.println("Ending requesting GPS events...");
 		gps.sendMessage(new GPSRequest(processor, Operation.UNREGISTER));
-		// Note that we can still get a few more events after this, and that is quite fine. ;)
-		System.out.println("All done! Press enter to quit!");		
+		// Note that we can still get a few more events after this, and that is
+		// quite fine. ;)
+		System.out.println("All done! Press enter to quit!");
 		System.in.read();
-		
+
 		System.out.println("Exiting! Bye!");
 	}
 }
