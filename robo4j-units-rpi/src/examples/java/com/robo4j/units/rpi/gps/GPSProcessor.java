@@ -14,24 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.serial.gps;
+package com.robo4j.units.rpi.gps;
+
+import com.robo4j.core.ConfigurationException;
+import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboUnit;
+import com.robo4j.core.configuration.Configuration;
+import com.robo4j.hw.rpi.serial.gps.GPSEvent;
 
 /**
- * Abstract super class for event classes.
+ * Example recipient for gyro events.
  * 
  * @author Marcus Hirt (@hirt)
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  */
-public abstract class GPSEvent {
-	public static final float INVALID_VALUE = Float.NaN;
-	
-	private final GPS source;
-
-	GPSEvent(GPS source) {
-		this.source = source;
+public class GPSProcessor extends RoboUnit<GPSEvent> {
+	public GPSProcessor(RoboContext context, String id) {
+		super(GPSEvent.class, context, id);
 	}
 
-	public final GPS getSource() {
-		return source;
+	@Override
+	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+
+	}
+
+	@Override
+	public void onMessage(GPSEvent result) {
+		System.out.println("GPSEvent: " + result.toString());
 	}
 }
