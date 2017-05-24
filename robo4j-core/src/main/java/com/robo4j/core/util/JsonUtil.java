@@ -18,7 +18,9 @@
 package com.robo4j.core.util;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.robo4j.core.httpunit.Constants;
 
@@ -31,16 +33,36 @@ import com.robo4j.core.httpunit.Constants;
  */
 public final class JsonUtil {
 
+	private static final Set<Class<?>> withoutQuotationTypes = Stream.of(boolean.class, int.class, short.class,
+			byte.class, long.class, double.class, float.class, char.class, Boolean.class, Integer.class, Short.class,
+			Byte.class, Long.class, Double.class, Float.class, Character.class).collect(Collectors.toSet());
+	private static final Set<Class<?>> quoatationTypes = Stream.of(String.class).collect(Collectors.toSet());
+
 	public static String getJsonByMap(Map<String, Object> map) {
 		StringBuilder sb = new StringBuilder(Constants.UTF8_CURLY_BRACKET_LEFT);
-
-		sb.append(map.entrySet().stream()
-				.map(e -> new StringBuilder(Constants.UTF8_QUOTATION_MARK).append(e.getKey())
-						.append(Constants.UTF8_QUOTATION_MARK).append(Constants.UTF8_COLON)
-						.append(Constants.UTF8_QUOTATION_MARK).append(e.getValue())
-						.append(Constants.UTF8_QUOTATION_MARK).toString())
-				.collect(Collectors.joining(Constants.UTF8_COMMA))).append(Constants.UTF8_CURLY_BRACKET_RIGHT);
+		sb.append(map.entrySet().stream().map(e -> {
+			StringBuilder sb2 = new StringBuilder(Constants.UTF8_QUOTATION_MARK).append(e.getKey())
+					.append(Constants.UTF8_QUOTATION_MARK).append(Constants.UTF8_COLON);
+			Class<?> clazz = e.getValue().getClass();
+			if (checkPrimitiveOrWrapper(clazz)) {
+				sb2.append(e.getValue());
+			} else if (checkString(clazz)) {
+				sb2.append(Constants.UTF8_QUOTATION_MARK).append(e.getValue()).append(Constants.UTF8_QUOTATION_MARK);
+			} else if (e.getValue() instanceof Map) {
+				sb2.append(getJsonByMap((Map<String, Object>) e.getValue()));
+			}
+			return sb2.toString();
+		}).collect(Collectors.joining(Constants.UTF8_COMMA))).append(Constants.UTF8_CURLY_BRACKET_RIGHT);
 		return sb.toString();
+	}
+
+	// Private Methods
+	private static boolean checkPrimitiveOrWrapper(Class<?> clazz) {
+		return withoutQuotationTypes.contains(clazz);
+	}
+
+	private static boolean checkString(Class<?> clazz) {
+		return quoatationTypes.contains(clazz);
 	}
 
 }

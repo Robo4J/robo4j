@@ -34,12 +34,18 @@ public class JsonUtilTests {
 	@Test
 	public void createJsonFromMap() {
 
-		final String expectedResult = "{\"test1\":\"1\",\"test2\":\"2\"}";
-		Map<String, Object> map = new LinkedHashMap<>();
-		map.put("test1", "1");
-		map.put("test2", "2");
+		final String expectedResult = "{\"test1\":\"1\",\"test2\":\"2\",\"prim1\":1,\"add\":{\"add1\":\"3\",\"test\":true}}";
+		final Map<String, Object> mainMap = new LinkedHashMap<>();
+		mainMap.put("test1", "1");
+		mainMap.put("test2", "2");
+		mainMap.put("prim1", 1);
 
-		String result = JsonUtil.getJsonByMap(map);
+		final Map<String, Object> additionalMap = new LinkedHashMap<>();
+		additionalMap.put("add1", "3");
+		additionalMap.put("test", true);
+		mainMap.put("add", additionalMap);
+
+		String result = JsonUtil.getJsonByMap(mainMap);
 
 		Assert.assertEquals(expectedResult, result);
 
