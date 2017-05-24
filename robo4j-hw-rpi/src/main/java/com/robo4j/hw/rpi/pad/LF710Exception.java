@@ -24,7 +24,9 @@ package com.robo4j.hw.rpi.pad;
  * @author Miro Wengner (@miragemiko)
  */
 public class LF710Exception extends RuntimeException {
-    public LF710Exception(String message) {
+	private static final long serialVersionUID = 1L;
+
+	public LF710Exception(String message) {
         super(message);
     }
 
