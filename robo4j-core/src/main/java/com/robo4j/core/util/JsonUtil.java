@@ -38,6 +38,7 @@ public final class JsonUtil {
 			Byte.class, Long.class, Double.class, Float.class, Character.class).collect(Collectors.toSet());
 	private static final Set<Class<?>> quoatationTypes = Stream.of(String.class).collect(Collectors.toSet());
 
+	@SuppressWarnings(value = "unchecked")
 	public static String getJsonByMap(Map<String, Object> map) {
 		StringBuilder sb = new StringBuilder(Constants.UTF8_CURLY_BRACKET_LEFT);
 		sb.append(map.entrySet().stream().map(e -> {
