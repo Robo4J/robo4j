@@ -28,14 +28,15 @@ import com.pi4j.io.serial.SerialFactory;
 
 /**
  * Code to talk to the Adafruit "ultimate GPS" over the serial port.
- * FIXME(Marcus/Dec 5, 2016): Should perhaps be moved to type specific package / MTK3339 
+ * FIXME(Marcus/Dec 5, 2016): Should perhaps be moved to type specific package /
+ * MTK3339
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class GPS {
-	/** 
-	 * The position accuracy without any 
+	/**
+	 * The position accuracy without any
 	 */
 	public static final float UNAIDED_POSITION_ACCURACY = 3.0f;
 	private static final String POSITION_TAG = "$GPGGA";
@@ -48,7 +49,8 @@ public class GPS {
 
 	/**
 	 * Creates a new GPS instance.
-	 * @throws IOException 
+	 * 
+	 * @throws IOException
 	 */
 	public GPS() throws IOException {
 		serial = SerialFactory.createInstance();
@@ -93,7 +95,10 @@ public class GPS {
 	}
 
 	private void initialize() throws IOException {
-		serial.open(Serial.DEFAULT_COM_PORT, 9600);
+		// Since RaspberryPi 3 nabbed the /dev/ttyAMA0 for the bluetooth,
+		// serial0 should be the new logical name to use for the rx/tx pins.
+		// This is supposedly compatible with the older raspberry pis as well.
+		serial.open("serial0", 9600);
 		dataRetrieverThread.start();
 	}
 
