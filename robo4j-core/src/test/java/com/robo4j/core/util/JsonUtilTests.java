@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,21 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.client.request;
 
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboUnit;
-import com.robo4j.http.HttpMessageWrapper;
+package com.robo4j.core.util;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
+ * Test json utils
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public interface DefaultRequestFactory<ResponseType> {
+public class JsonUtilTests {
 
-	ResponseType processGet(RoboUnit<?> desiredUnit, HttpMessageWrapper<?> wrapper);
+	@Test
+	public void createJsonFromMap() {
 
-	ResponseType processGet(RoboReference<?> desiredReference, String path, HttpMessageWrapper<?> wrapper);
+		final String expectedResult = "{\"test1\":\"1\",\"test2\":\"2\"}";
+		Map<String, Object> map = new LinkedHashMap<>();
+		map.put("test1", "1");
+		map.put("test2", "2");
 
-	ResponseType processPost(RoboReference<?> desiredUnit, String path, HttpMessageWrapper<?> wrapper);
+		String result = JsonUtil.getJsonByMap(map);
+
+		Assert.assertEquals(expectedResult, result);
+
+	}
+
 }

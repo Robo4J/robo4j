@@ -27,7 +27,14 @@ public final class Constants {
 	public static final String EMPTY_STRING = "";
 	public static final int DEFAULT_VALUE_0 = 0;
 	public static final int DEFAULT_VALUE_1 = 1;
-	public static final String HTTP_QUERY_SEP = "\u0026";			//AMPERSAND &
+	public static final String HTTP_QUERY_SEP = "\u0026"; // AMPERSAND &
 	public static final String HTTP_EMPTY_SEP = "\\s+";
+	public static final String HTTP_NEW_LINE = "\n";
+	public static final String UTF8_COMMA = "\u002C";
+	public static final String UTF8_SPACE = "\u0020";
+	public static final String UTF8_COLON = "\u003A";
+	public static final String UTF8_QUOTATION_MARK = "\"";
+	public static final String UTF8_CURLY_BRACKET_LEFT = "\u007B";
+	public static final String UTF8_CURLY_BRACKET_RIGHT = "\u007D";
 
 }

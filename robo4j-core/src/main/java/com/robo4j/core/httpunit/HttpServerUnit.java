@@ -73,6 +73,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private List<String> target;
 	private ServerSocketChannel server;
 	private Selector selector;
+
 	public HttpServerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
 	}
@@ -187,7 +188,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 						HttpUriRegister.getInstance().updateUnits(getContext());
 						final Future<?> futureResult = executor
-								.submit(new RoboRequestCallable(requestChannel.socket(),
+								.submit(new RoboRequestCallable(this, requestChannel.socket(),
 								new RoboRequestFactory(CODEC_REGISTRY)));
 						//@formatter:on
 						/* here can be parallel, but we need to keep channel */
@@ -221,7 +222,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		}
 		for (int i = 0; i < packages.length(); i++) {
 			char c = packages.charAt(i);
-//			if (!Character.isJavaIdentifierPart(c) || c != ',' || !Character.isWhitespace(c)) {
+			// if (!Character.isJavaIdentifierPart(c) || c != ',' ||
+			// !Character.isWhitespace(c)) {
 			if (Character.isWhitespace(c)) {
 				return false;
 			}

@@ -24,17 +24,14 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
 import java.net.URI;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import com.robo4j.core.RoboReference;
+import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.httpunit.Constants;
 import com.robo4j.core.httpunit.HttpUriRegister;
@@ -62,12 +59,11 @@ public class RoboRequestCallable implements Callable<Object> {
 
 	private final Socket connection;
 	private final DefaultRequestFactory<?> factory;
+	private final RoboUnit<?> unit;
 
-	// public RoboRequestCallable(Socket connection,
-	// DefaultRequestFactory<Object> factory, List<RoboUnit<?>> registeredUnits)
-	// {
-	public RoboRequestCallable(Socket connection, DefaultRequestFactory<Object> factory) {
+	public RoboRequestCallable(RoboUnit<?> unit, Socket connection, DefaultRequestFactory<Object> factory) {
 		assert connection != null;
+		this.unit = unit;
 		this.connection = connection;
 		this.factory = factory;
 	}
@@ -99,28 +95,31 @@ public class RoboRequestCallable implements Callable<Object> {
 						HttpVersion.getByValue(tokens[HttpMessageUtil.VERSION_POSITION]), params);
 
 				final List<String> paths = HttpPathUtil.uriStringToPathList(httpMessage.uri().getPath());
+				final RoboReference<?> desiredUnit = getRoboReferenceByPath(paths);
 
-				final HttpUriRegister httpUriRegister = HttpUriRegister.getInstance();
-				final RoboReference<?> desiredUnit = httpUriRegister
-						.getRoboUnitByPath(paths.get(DEFAULT_PATH_POSITION_0));
 				//@formatter:on
 				switch (method) {
 				case GET:
 					/* currently is supported only one path */
-					final Object unitDescription = factory.processGet(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0),
-							new HttpMessageWrapper<>(httpMessage));
-					if (unitDescription != null) {
-						processWriter(out, unitDescription.toString());
+					if (desiredUnit == null) {
+						final Object systemSummary = factory.processGet(unit, new HttpMessageWrapper<>(httpMessage));
+						processWriter(out, systemSummary.toString());
+					} else {
+						final Object unitDescription = factory.processGet(desiredUnit,
+								paths.get(DEFAULT_PATH_POSITION_0), new HttpMessageWrapper<>(httpMessage));
+						if (unitDescription != null) {
+							processWriter(out, unitDescription.toString());
+						}
 					}
 					return null;
 				case POST:
 					int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH));
 					final StringBuilder jsonSB = new StringBuilder();
 					try {
-						for(int i=0; i<length; i++){
-							jsonSB.append((char)in.read());
+						for (int i = 0; i < length; i++) {
+							jsonSB.append((char) in.read());
 						}
-					} catch (IOException e){
+					} catch (IOException e) {
 						SimpleLoggingUtil.error(getClass(), " POST: Problem", e);
 					}
 					processWriter(out, DEFAULT_RESPONSE);
@@ -137,6 +136,26 @@ public class RoboRequestCallable implements Callable<Object> {
 	}
 
 	// Private Methods
+
+	/**
+	 * parse desired path. If no path available. System health state for all
+	 * units is returned returned note: currently is supported only one level
+	 * path
+	 *
+	 * @param paths
+	 *            registered paths by the configuration
+	 * @return reference to desired RoboUnit
+	 */
+	private RoboReference<?> getRoboReferenceByPath(final List<String> paths) {
+		if (paths.isEmpty()) {
+			return null;
+		} else {
+			final HttpUriRegister httpUriRegister = HttpUriRegister.getInstance();
+			return httpUriRegister.getRoboUnitByPath(paths.get(DEFAULT_PATH_POSITION_0));
+		}
+
+	}
+
 	private void processWriter(final Writer out, String message) throws Exception {
 		out.write(RoboHttpUtils.HTTP_HEADER_OK);
 		out.write(HttpHeaderBuilder.Build().add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(message.length()))

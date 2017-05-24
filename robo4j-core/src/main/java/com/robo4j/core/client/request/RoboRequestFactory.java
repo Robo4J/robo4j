@@ -20,12 +20,17 @@
 package com.robo4j.core.client.request;
 
 import java.net.URI;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.robo4j.core.RoboReference;
+import com.robo4j.core.RoboUnit;
+import com.robo4j.core.httpunit.Constants;
 import com.robo4j.core.httpunit.HttpCodecRegistry;
 import com.robo4j.core.httpunit.HttpDecoder;
 import com.robo4j.core.httpunit.HttpUriRegister;
 import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.util.JsonUtil;
 import com.robo4j.http.HttpMessageWrapper;
 import com.robo4j.http.HttpVersion;
 
@@ -37,7 +42,7 @@ import com.robo4j.http.HttpVersion;
  */
 // TODO discuss how to use URIs
 public class RoboRequestFactory implements DefaultRequestFactory<Object> {
-
+	private static final int unitNameSize = 20;
 	private final HttpCodecRegistry codecRegistry;
 
 	public RoboRequestFactory(final HttpCodecRegistry codecRegistry) {
@@ -45,23 +50,39 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	}
 
 	@Override
-	public Object processGet(final RoboReference<?> desiredUnit, final String path,
+	public Object processGet(RoboUnit<?> desiredUnit, HttpMessageWrapper<?> wrapper) {
+		if (HttpVersion.containsValue(wrapper.message().version()) && !desiredUnit.getContext().getUnits().isEmpty()) {
+			final Map<String, Object> unitsMap = desiredUnit.getContext().getUnits().stream()
+					.collect(Collectors.toMap(e -> e.getId(), e -> e.getState()));
+			return JsonUtil.getJsonByMap(unitsMap);
+		} else {
+			SimpleLoggingUtil.error(getClass(), "internal error: no units available");
+		}
+
+		return null;
+	}
+
+	@Override
+	public Object processGet(final RoboReference<?> desiredReference, final String path,
 			final HttpMessageWrapper<?> wrapper) {
 		if (HttpVersion.containsValue(wrapper.message().version())) {
 			final URI uri = wrapper.message().uri();
 			/* currently is supported only */
 			final HttpUriRegister register = HttpUriRegister.getInstance();
 			if (register.isUnitAvailable(path)) {
-				final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredUnit.getMessageType());
+				final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredReference.getMessageType());
 				if (decoder != null) {
-					return "Unit Description\n" + "codec is available:\n" + "to send command use POST request\n"
-							+ "example: { \"value\":\"<possible_value>\"}\n\n" + "available type: "
-							+ desiredUnit.getMessageType().toGenericString();
+					StringBuilder sb = new StringBuilder().append("Unit Description").append(Constants.HTTP_NEW_LINE)
+							.append("codec is available:").append(Constants.HTTP_NEW_LINE)
+							.append("to send command use POST request").append(Constants.HTTP_NEW_LINE)
+							.append("example: { \"value\":\"<possible_value>\"}\n\n").append(Constants.HTTP_NEW_LINE)
+							.append(Constants.HTTP_NEW_LINE).append("available type: ")
+							.append(desiredReference.getMessageType().toGenericString());
+					return sb.toString();
 				} else {
 					SimpleLoggingUtil.error(getClass(), "no decoder available");
 				}
 			}
-
 		} else {
 			SimpleLoggingUtil.error(getClass(), "processGet is corrupted: " + wrapper);
 		}

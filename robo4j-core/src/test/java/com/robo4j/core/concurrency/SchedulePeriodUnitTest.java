@@ -17,13 +17,14 @@
 
 package com.robo4j.core.concurrency;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboSystem;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  * @author Marcus Hirt (@hirt)
