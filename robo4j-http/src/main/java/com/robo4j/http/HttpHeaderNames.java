@@ -18,40 +18,43 @@
 package com.robo4j.http;
 
 /**
- * Util class for header  names
+ * Util class for header names
  *
  * all names are lower case, currently supported header values
+ * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public final class HttpHeaderNames {
 
-    public static final String ACCEPT = "accept";
+	public static final String ACCEPT = "accept";
 
-    public static final String ACCEPT_CHARSET = "accept-charset";
+	public static final String ACCEPT_CHARSET = "accept-charset";
 
-    public static final String ACCEPT_ENCODING = "accept-encoding";
+	public static final String ACCEPT_ENCODING = "accept-encoding";
 
-    public static final String ACCEPT_LANGUAGE = "accept-language";
+	public static final String ACCEPT_LANGUAGE = "accept-language";
 
-    public static final String CONNECTION = "connection";
+	public static final String CONNECTION = "connection";
 
-    public static final String CACHE_CONTROL = "cache-control";
+	public static final String CACHE_CONTROL = "cache-control";
 
-    public static final String CONTENT_LENGTH = "content-length";
+	public static final String CONTENT_LENGTH = "content-length";
 
-    public static final String CONTENT_ENCODING = "content-encoding";
+	public static final String CONTENT_DISPOSITION = "content-disposition";
 
-    public static final String CONTENT_TYPE = "content-type";
+	public static final String CONTENT_ENCODING = "content-encoding";
 
-    public static final String DATE = "date";
+	public static final String CONTENT_TYPE = "content-type";
 
-    public static final String HOST = "host";
+	public static final String DATE = "date";
 
-    public static final String ORIGIN = "origin";
+	public static final String HOST = "host";
 
-    public static final String USER_AGENT = "user-agent";
+	public static final String ORIGIN = "origin";
 
-    public static final String SERVER = "server";
+	public static final String USER_AGENT = "user-agent";
+
+	public static final String SERVER = "server";
 
 }

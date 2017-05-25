@@ -18,10 +18,10 @@ package com.robo4j.core.client.request;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.Socket;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -30,13 +30,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
+import com.robo4j.core.client.util.RoboClassLoader;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.httpunit.Constants;
 import com.robo4j.core.httpunit.HttpUriRegister;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.http.HttpHeaderNames;
+import com.robo4j.http.HttpHeaderValues;
 import com.robo4j.http.HttpMessage;
 import com.robo4j.http.HttpMessageWrapper;
 import com.robo4j.http.HttpMethod;
@@ -70,7 +73,7 @@ public class RoboRequestCallable implements Callable<Object> {
 
 	@Override
 	public Object call() throws Exception {
-		try (Writer out = new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
+		try (DataOutputStream out = new DataOutputStream(new BufferedOutputStream(connection.getOutputStream()));
 				BufferedReader in = new BufferedReader(
 						new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
 
@@ -105,13 +108,24 @@ public class RoboRequestCallable implements Callable<Object> {
 						final Object systemSummary = factory.processGet(unit, new HttpMessageWrapper<>(httpMessage));
 						processWriter(out, systemSummary.toString());
 					} else {
-						final Object unitDescription = factory.processGet(desiredUnit,
-								paths.get(DEFAULT_PATH_POSITION_0), new HttpMessageWrapper<>(httpMessage));
-						if (unitDescription != null) {
-							processWriter(out, unitDescription.toString());
+						AttributeDescriptor<?> attributeDescriptor = getAttributeByQuery(desiredUnit,
+								httpMessage.uri());
+						if (attributeDescriptor == null) {
+							final Object unitDescription = factory.processGet(desiredUnit,
+									paths.get(DEFAULT_PATH_POSITION_0), new HttpMessageWrapper<>(httpMessage));
+							if (unitDescription != null) {
+								processWriter(out, unitDescription.toString());
+							}
+						} else {
+							final byte[] unitAttributeValue = (byte[]) factory.processGet(desiredUnit,
+									attributeDescriptor);
+							InputStream is = RoboClassLoader.getInstance().getResource("magic.jpg");
+							byte[] targetArray = new byte[is.available()];
+							is.read(targetArray);
+							processByteWriter(out, unitAttributeValue);
 						}
 					}
-					return null;
+					return DEFAULT_RESPONSE;
 				case POST:
 					int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH));
 					final StringBuilder jsonSB = new StringBuilder();
@@ -123,19 +137,34 @@ public class RoboRequestCallable implements Callable<Object> {
 						SimpleLoggingUtil.error(getClass(), " POST: Problem", e);
 					}
 					processWriter(out, DEFAULT_RESPONSE);
-					in.close();
 					return factory.processPost(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0),
 							new HttpMessageWrapper<>(httpMessage, jsonSB.toString()));
 				default:
 					SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
-					return null;
+					return DEFAULT_RESPONSE;
 				}
 			}
 		}
-		return null;
+		return DEFAULT_RESPONSE;
 	}
 
 	// Private Methods
+	/**
+	 *
+	 * @param unit
+	 *            desired unit {@see RoboReference}
+	 * @param query
+	 *            URI query attributes
+	 * @return specific Attribute
+	 */
+	private AttributeDescriptor<?> getAttributeByQuery(RoboReference<?> unit, URI query) {
+		//@formatter:off
+		return unit.getKnownAttributes().stream()
+				.filter(a -> a.getAttributeName().equals(query.getRawQuery()))
+				.findFirst()
+				.orElse(null);
+		//@formatter:on
+	}
 
 	/**
 	 * parse desired path. If no path available. System health state for all
@@ -156,13 +185,27 @@ public class RoboRequestCallable implements Callable<Object> {
 
 	}
 
-	private void processWriter(final Writer out, String message) throws Exception {
-		out.write(RoboHttpUtils.HTTP_HEADER_OK);
-		out.write(HttpHeaderBuilder.Build().add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(message.length()))
+	private void processWriter(final DataOutputStream out, String message) throws Exception {
+		out.writeBytes(RoboHttpUtils.HTTP_HEADER_OK);
+		out.writeBytes(HttpHeaderBuilder.Build().add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(message.length()))
 				.build());
-		out.write(RoboHttpUtils.NEW_LINE);
+		out.writeBytes(RoboHttpUtils.NEW_LINE);
+		out.writeBytes(message);
+		out.flush();
+	}
+
+	private boolean processByteWriter(final DataOutputStream out, byte[] message) throws Exception {
+		out.writeBytes(RoboHttpUtils.HTTP_HEADER_OK);
+		out.writeBytes(
+				HttpHeaderBuilder.Build().add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_IMAGE_JPG)
+						.add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(message.length))
+						// .add(HttpHeaderNames.CONTENT_DISPOSITION,
+						// HttpHeaderValues.APPLICATION_IMAGE_CONTENT)
+						.build());
+		out.writeBytes(Constants.HTTP_NEW_LINE);
 		out.write(message);
 		out.flush();
+		return true;
 	}
 
 }

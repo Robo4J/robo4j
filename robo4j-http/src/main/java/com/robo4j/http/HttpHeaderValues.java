@@ -26,9 +26,11 @@ package com.robo4j.http;
  */
 public class HttpHeaderValues {
 
-    //TODO: add all
-    public static final String APPLICATION_JSON = "application/json";
-    public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
-    public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
+	// TODO: add all
+	public static final String APPLICATION_JSON = "application/json";
+	public static final String APPLICATION_IMAGE_JPG = "image/jpg";
+	public static final String APPLICATION_IMAGE_CONTENT = "attachment; filename=image.jgp";
+	public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
+	public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 
 }

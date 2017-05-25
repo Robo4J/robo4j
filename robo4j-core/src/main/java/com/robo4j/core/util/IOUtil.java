@@ -21,6 +21,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Useful IO utilities.
@@ -28,12 +30,12 @@ import java.nio.charset.StandardCharsets;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class IOUtil {
+public final class IOUtil {
 	private IOUtil() {
 		throw new UnsupportedOperationException("Toolkit!");
 	}
 
-	public final static String readStringFromUTF8Stream(InputStream is) throws IOException {
+	public static String readStringFromUTF8Stream(InputStream is) throws IOException {
 		return readString(is, StandardCharsets.UTF_8.name());
 	}
 
@@ -47,4 +49,13 @@ public class IOUtil {
 		}
 		return buf.toString(charSetName);
 	}
+
+	public static void storeBytesAsFile(Path path, byte[] bytes) throws IOException {
+		if(Files.exists(path)){
+			Files.delete(path);
+		}
+		Path tmpFilePath = Files.createFile(path);
+		Files.write(tmpFilePath, bytes);
+	}
+
 }

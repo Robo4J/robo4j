@@ -21,8 +21,11 @@ package com.robo4j.core.client.request;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.httpunit.Constants;
@@ -63,6 +66,18 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	}
 
 	@Override
+	public Object processGet(RoboReference<?> desiredReference, AttributeDescriptor<?> attributeDescriptor) {
+		Future<?> future = desiredReference.getAttribute(attributeDescriptor);
+		try {
+			Object result = future.get();
+			return result != null ? result : new byte[Constants.DEFAULT_VALUE_0];
+		} catch (InterruptedException | ExecutionException e) {
+			SimpleLoggingUtil.error(getClass(), "problem", e);
+			return new byte[Constants.DEFAULT_VALUE_0];
+		}
+	}
+
+	@Override
 	public Object processGet(final RoboReference<?> desiredReference, final String path,
 			final HttpMessageWrapper<?> wrapper) {
 		if (HttpVersion.containsValue(wrapper.message().version())) {
@@ -81,6 +96,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 					return sb.toString();
 				} else {
 					SimpleLoggingUtil.error(getClass(), "no decoder available");
+					return "no decoder available";
 				}
 			}
 		} else {

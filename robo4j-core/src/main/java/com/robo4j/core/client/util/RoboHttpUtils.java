@@ -27,7 +27,6 @@ import com.robo4j.core.httpunit.Constants;
 import com.robo4j.http.HttpHeaderNames;
 import com.robo4j.http.util.HttpFirstLineBuilder;
 import com.robo4j.http.util.HttpHeaderBuilder;
-import com.robo4j.http.util.HttpMessageUtil;
 
 /**
  * Basic Http constants and utils methods
@@ -43,15 +42,12 @@ public final class RoboHttpUtils {
 	// private static final String SPACE = "\u0020";
 	// private static final String NEXT_LINE = "\r\n";
 	public static final String NEW_LINE = "\n";
-	public static final String HTTP_HEADER_OK = HttpFirstLineBuilder.Build(HTTP_VERSION).add("200")
-			.add("OK").build();
+	public static final String HTTP_HEADER_OK = HttpFirstLineBuilder.Build(HTTP_VERSION).add("200").add("OK").build();
 	public static final int DEFAULT_THREAD_POOL_SIZE = 2;
 	public static final int _DEFAULT_PORT = 8042;
 	public static final String _EMPTY_STRING = "";
 	public static final String HTTP_TARGET_UNITS = "targetUnits";
 	public static final int KEEP_ALIVE_TIME = 10;
-
-
 
 	public static String setHeader(String responseCode, int length) throws IOException {
 		//@formatter:off
@@ -60,7 +56,7 @@ public final class RoboHttpUtils {
 				.add(HttpHeaderNames.DATE, LocalDateTime.now().toString())
 				.add(HttpHeaderNames.SERVER, ROBO4J_CLIENT)
 				.add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(length))
-				.add(HttpHeaderNames.CONTENT_TYPE, "text/html;".concat(HttpMessageUtil.SPACE).concat("charset=utf-8"))
+				.add(HttpHeaderNames.CONTENT_TYPE, "text/html;".concat(Constants.UTF8_SPACE).concat("charset=utf-8"))
 				.build();
 		//@formatter:on
 	}
@@ -82,7 +78,7 @@ public final class RoboHttpUtils {
 			.add(HttpHeaderNames.ACCEPT, "*/*")
 			.add(HttpHeaderNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
 			.add(HttpHeaderNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8")
-			.add(HttpHeaderNames.CONTENT_TYPE, "text/html;".concat(HttpMessageUtil.SPACE).concat("charset=utf-8"));
+			.add(HttpHeaderNames.CONTENT_TYPE, "text/html;".concat(Constants.UTF8_SPACE).concat("charset=utf-8"));
 		if(length != 0){
 			builder.add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(length));
 		}
@@ -90,7 +86,7 @@ public final class RoboHttpUtils {
 		//@formatter:on
 	}
 
-	public static String createPostRequest(String host, String uri, String message){
+	public static String createPostRequest(String host, String uri, String message) {
 		//@formatter:off
 		final String header = createHeader(host, uri, message);
 		return createPostRequest(header, message)
@@ -99,7 +95,7 @@ public final class RoboHttpUtils {
 		//@formatter:on
 	}
 
-	public static String createPostRequest(String header,  String message){
+	public static String createPostRequest(String header, String message) {
 		//@formatter:off
 		return header
 				.concat(NEW_LINE)
@@ -108,15 +104,11 @@ public final class RoboHttpUtils {
 	}
 
 	public static String createHeader(String host, String uri, String message) {
-		return createHeaderFirstLine(uri)
-				.concat(createRequestHeader(host, message.length()));
+		return createHeaderFirstLine(uri).concat(createRequestHeader(host, message.length()));
 	}
 
 	public static String createHeaderFirstLine(String uri) {
-		return HttpFirstLineBuilder.Build(METHOD_POST)
-				.add(uri)
-				.add(HTTP_VERSION)
-				.build();
+		return HttpFirstLineBuilder.Build(METHOD_POST).add(uri).add(HTTP_VERSION).build();
 	}
 
 	public static String createGetRequest(String host, String message) {

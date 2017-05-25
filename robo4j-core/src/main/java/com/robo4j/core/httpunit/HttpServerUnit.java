@@ -185,15 +185,15 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 						//@formatter:off
 						//Here is the problem
-
 						HttpUriRegister.getInstance().updateUnits(getContext());
 						final Future<?> futureResult = executor
 								.submit(new RoboRequestCallable(this, requestChannel.socket(),
 								new RoboRequestFactory(CODEC_REGISTRY)));
 						//@formatter:on
+
 						/* here can be parallel, but we need to keep channel */
 						final Object result = futureResult.get();
-						requestChannel.close();
+
 						for (RoboReference<Object> ref : targetRefs) {
 							if (result != null && ref.getMessageType() != null
 									&& ref.getMessageType().equals(result.getClass())) {
@@ -201,7 +201,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 							}
 						}
 
-						// targetRef.sendMessage(futureResult.get());
 						requestChannel.close();
 					} else {
 						SimpleLoggingUtil.error(getClass(), "something is not right: " + selectedKey);

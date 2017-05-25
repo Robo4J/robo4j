@@ -138,6 +138,7 @@ public class LF710ButtonObserver {
 
 	// Private Methods
 	//TODO, FIXME: do not randomly threads use executor also @see ButtonPressedObserver Adafruit
+	//FIX : schedule threads
 	private Thread startMonitor() {
 		isRunning = true;
 		Thread result = new Thread(new ButtonChecker(pad.source()), "LF710Pad button checker");

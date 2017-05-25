@@ -16,6 +16,7 @@
  */
 package com.robo4j.core.client.request;
 
+import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.http.HttpMessageWrapper;
@@ -27,6 +28,8 @@ import com.robo4j.http.HttpMessageWrapper;
 public interface DefaultRequestFactory<ResponseType> {
 
 	ResponseType processGet(RoboUnit<?> desiredUnit, HttpMessageWrapper<?> wrapper);
+
+	ResponseType processGet(RoboReference<?> desiredReference, AttributeDescriptor<?> attributeDescriptor);
 
 	ResponseType processGet(RoboReference<?> desiredReference, String path, HttpMessageWrapper<?> wrapper);
 
