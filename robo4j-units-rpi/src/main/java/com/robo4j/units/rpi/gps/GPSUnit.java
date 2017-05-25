@@ -18,11 +18,16 @@ package com.robo4j.units.rpi.gps;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.ConfigurationException;
+import com.robo4j.core.DefaultAttributeDescriptor;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
@@ -33,6 +38,7 @@ import com.robo4j.hw.rpi.serial.gps.GPSEvent;
 import com.robo4j.hw.rpi.serial.gps.GPSListener;
 import com.robo4j.hw.rpi.serial.gps.PositionEvent;
 import com.robo4j.hw.rpi.serial.gps.VelocityEvent;
+import com.robo4j.math.geometry.Float3D;
 
 /**
  * Unit for getting GPS data.
@@ -41,7 +47,44 @@ import com.robo4j.hw.rpi.serial.gps.VelocityEvent;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GPSUnit extends RoboUnit<GPSRequest> {
+	/**
+	 * This key configures the approximate update interval, or how often to
+	 * schedule reads from the serial port.
+	 */
+	public static final String PROPERTY_KEY_READ_INTERVAL = "readInterval";
+
+	/**
+	 * This key configures the scheduler to use for scheduling reads. Either
+	 * PLATFORM or INTERNAL. Use INTERNAL if the reads take too long and start
+	 * disrupting the platform scheduler too much.
+	 */
+	public static final String PROPERTY_KEY_SCHEDULER = "scheduler";
+
+	/**
+	 * Value for the scheduler key for using the platform scheduler.
+	 */
+	public static final String PROPERTY_VALUE_PLATFORM_SCHEDULER = "platform";
+
+	/**
+	 * Value for the scheduler key for using the internal scheduler.
+	 */
+	public static final String PROPERTY_VALUE_INTERNAL_SCHEDULER = "internal";
+
+	/**
+	 * This is the default value for the read interval.
+	 */
+	public static final int DEFAULT_READ_INTERVAL = 550;
+
+	/**
+	 * This attribute will provide the state of the read interval.
+	 */
+	public static final String ATTRIBUTE_NAME_READ_INTERVAL = "readInterval";
+
+	public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
+			.unmodifiableCollection(Arrays.asList(DefaultAttributeDescriptor.create(Float3D.class, ATTRIBUTE_NAME_READ_INTERVAL)));
+
 	private GPS gps;
+	private int readInterval = DEFAULT_READ_INTERVAL;
 	private List<GPSEventListener> listeners = new ArrayList<>();
 
 	private static class GPSEventListener implements GPSListener {
@@ -68,10 +111,24 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		readInterval = configuration.getInteger("readInterval", DEFAULT_READ_INTERVAL);
+		String scheduler = configuration.getString("scheduler", PROPERTY_VALUE_PLATFORM_SCHEDULER);
+		boolean usePlatformScheduler = PROPERTY_VALUE_PLATFORM_SCHEDULER.equals(scheduler) ? true : false;
+
 		try {
-			gps = new GPS();
+			gps = new GPS(readInterval);
 		} catch (IOException e) {
 			throw new ConfigurationException("Could not instantiate GPS!", e);
+		}
+		if (usePlatformScheduler) {
+			getContext().getScheduler().scheduleAtFixedRate(new Runnable() {
+				@Override
+				public void run() {
+					gps.update();
+				}
+			}, 10, readInterval, TimeUnit.MILLISECONDS);
+		} else {
+			gps.startAutoUpdate();
 		}
 	}
 
@@ -115,8 +172,12 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 		gps.addListener(listener);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
+		if (descriptor.getAttributeType() == Integer.class && descriptor.getAttributeName().equals(ATTRIBUTE_NAME_READ_INTERVAL)) {
+			return (R) Integer.valueOf(readInterval);
+		}
 		return super.onGetAttribute(descriptor);
 	}
 }
