@@ -188,7 +188,7 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 	@Override
 	public void shutdown() {
 		if (scheduledFuture != null) {
-			scheduledFuture.cancel(true);
+			scheduledFuture.cancel(false);
 		}
 		gps.shutdown();
 		super.shutdown();

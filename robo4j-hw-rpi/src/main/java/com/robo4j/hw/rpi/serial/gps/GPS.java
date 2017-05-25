@@ -125,7 +125,7 @@ public class GPS {
 	public void shutdown() {
 		synchronized (internalExecutor) {
 			if (scheduledFuture != null) {
-				scheduledFuture.cancel(true);
+				scheduledFuture.cancel(false);
 			}
 			awaitTermination();
 		}
