@@ -17,6 +17,7 @@
 package com.robo4j.hw.rpi.serial.gps;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -98,7 +99,7 @@ public class GPS {
 		// Since RaspberryPi 3 nabbed the /dev/ttyAMA0 for the bluetooth,
 		// serial0 should be the new logical name to use for the rx/tx pins.
 		// This is supposedly compatible with the older raspberry pis as well.
-		serial.open("serial0", 9600);
+		serial.open("/dev/serial0", 9600);
 		dataRetrieverThread.start();
 	}
 
@@ -186,10 +187,7 @@ public class GPS {
 		}
 
 		private String readNext(StringBuilder builder) throws IllegalStateException, IOException {
-			int available = serial.available();
-			for (int i = 0; i < available; i++) {
-				builder.append(serial.read());
-			}
+			builder.append(new String(serial.read(), StandardCharsets.US_ASCII));
 			return builder.toString();
 		}
 	}
