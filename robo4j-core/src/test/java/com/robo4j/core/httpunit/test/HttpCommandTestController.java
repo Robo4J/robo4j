@@ -17,11 +17,10 @@
 
 package com.robo4j.core.httpunit.test;
 
-import com.robo4j.core.*;
+import com.robo4j.core.ConfigurationException;
+import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  *

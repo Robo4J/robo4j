@@ -17,9 +17,15 @@
 package com.robo4j.hw.rpi.serial.gps;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,31 +34,63 @@ import com.pi4j.io.serial.SerialFactory;
 
 /**
  * Code to talk to the Adafruit "ultimate GPS" over the serial port.
- * FIXME(Marcus/Dec 5, 2016): Should perhaps be moved to type specific package / MTK3339 
+ * FIXME(Marcus/Dec 5, 2016): Should perhaps be moved to type specific package /
+ * MTK3339 FIXME(Marcus/May 25, 2017): This thing cannot be allowed to have its
+ * own thread...
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class GPS {
-	/** 
-	 * The position accuracy without any 
+	/**
+	 * The position accuracy without any
 	 */
 	public static final float UNAIDED_POSITION_ACCURACY = 3.0f;
+
+	/**
+	 * The default read interval to use when auto updating.
+	 */
+	private static final int DEFAULT_READ_INTERVAL = 550;
+
 	private static final String POSITION_TAG = "$GPGGA";
 	private static final String VELOCITY_TAG = "$GPVTG";
 
 	private final Serial serial;
-	private final GPSDataRetriever dataRetriever = new GPSDataRetriever();
-	private final Thread dataRetrieverThread;
+	private final GPSDataRetriever dataRetriever;
+	private final int readInterval;
+
+	private final ScheduledExecutorService internalExecutor = Executors.newScheduledThreadPool(1, new ThreadFactory() {
+		@Override
+		public Thread newThread(Runnable r) {
+			Thread t = new Thread(r, "GPS Internal Executor");
+			t.setDaemon(true);
+			return t;
+		}
+	});
 	private final List<GPSListener> listeners = new CopyOnWriteArrayList<GPSListener>();
+
+	// This is the scheduled future controlling the auto updates.
+	private ScheduledFuture<?> scheduledFuture;
+
+	/**
+	 * Creates a new GPS instance. Will use an internal thread to read data, and
+	 * the default read interval.
+	 * 
+	 * @throws IOException
+	 */
+	public GPS() throws IOException {
+		this(DEFAULT_READ_INTERVAL);
+	}
 
 	/**
 	 * Creates a new GPS instance.
-	 * @throws IOException 
+	 * 
+	 * @throws IOException
 	 */
-	public GPS() throws IOException {
+	public GPS(int readInterval) throws IOException {
+		this.readInterval = readInterval;
 		serial = SerialFactory.createInstance();
-		dataRetrieverThread = new Thread(dataRetriever, "GPS Data Retriever");
+		dataRetriever = new GPSDataRetriever();
 		initialize();
 	}
 
@@ -85,16 +123,52 @@ public class GPS {
 	 * events will be sent to listeners.
 	 */
 	public void shutdown() {
-		dataRetriever.isRunning = false;
+		synchronized (internalExecutor) {
+			if (scheduledFuture != null) {
+				scheduledFuture.cancel(false);
+			}
+			awaitTermination();
+		}
 		try {
-			dataRetrieverThread.join();
+			serial.close();
+		} catch (IllegalStateException | IOException e) {
+			// Don't care, we're shutting down.
+		}
+	}
+
+	private void awaitTermination() {
+		try {
+			internalExecutor.awaitTermination(10, TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
+			// Don't care if we were interrupted.
+		}
+	}
+
+	/**
+	 * Call this to perform a read of data from the device in the current
+	 * thread. Use this for scheduling reads yourself.
+	 */
+	public void update() {
+		dataRetriever.update();
+	}
+
+	/**
+	 * Call this to start reading automatically, using an internal scheduler.
+	 */
+	public void startAutoUpdate() {
+		synchronized (internalExecutor) {
+			if (scheduledFuture == null) {
+				scheduledFuture = internalExecutor.scheduleAtFixedRate(dataRetriever, 0, readInterval, TimeUnit.MILLISECONDS);
+			}
+			throw new IllegalStateException("Auto update already started!");
 		}
 	}
 
 	private void initialize() throws IOException {
-		serial.open(Serial.DEFAULT_COM_PORT, 9600);
-		dataRetrieverThread.start();
+		// Since RaspberryPi 3 nabbed the /dev/ttyAMA0 for the bluetooth,
+		// serial0 should be the new logical name to use for the rx/tx pins.
+		// This is supposedly compatible with the older raspberry pis as well.
+		serial.open("/dev/serial0", 9600);
 	}
 
 	private static boolean hasValidCheckSum(String data) {
@@ -128,38 +202,32 @@ public class GPS {
 	}
 
 	private final class GPSDataRetriever implements Runnable {
-		private static final int DEFAULT_READ_INTERVAL = 550;
-		volatile boolean isRunning = true;
-		StringBuilder builder = new StringBuilder();
+		private final StringBuilder builder = new StringBuilder();
 
 		@Override
 		public void run() {
-			while (isRunning) {
-				String str = "";
-				try {
-					str = readNext(builder);
-				} catch (IllegalStateException | IOException e) {
-					Logger.getLogger(GPS.class.getName()).log(Level.WARNING, "Error reading line", e);
-				}
-				builder.setLength(0);
-				StringTokenizer st = new StringTokenizer(str, "\n", true);
-				while (st.hasMoreElements()) {
-					String dataLine = st.nextToken();
-					while ("\n".equals(dataLine) && st.hasMoreElements()) {
-						dataLine = st.nextToken();
-					}
-					if (st.hasMoreElements()) {
-						consume(dataLine);
-					} else if (!"\n".equals(dataLine)) {
-						builder.append(dataLine);
-					}
-				}
-				sleep(DEFAULT_READ_INTERVAL);
-			}
+			update();
+		}
+
+		public void update() {
+			String str = "";
 			try {
-				serial.close();
+				str = readNext(builder);
 			} catch (IllegalStateException | IOException e) {
-				e.printStackTrace();
+				Logger.getLogger(GPS.class.getName()).log(Level.WARNING, "Error reading line", e);
+			}
+			builder.setLength(0);
+			StringTokenizer st = new StringTokenizer(str, "\n", true);
+			while (st.hasMoreElements()) {
+				String dataLine = st.nextToken();
+				while ("\n".equals(dataLine) && st.hasMoreElements()) {
+					dataLine = st.nextToken();
+				}
+				if (st.hasMoreElements()) {
+					consume(dataLine);
+				} else if (!"\n".equals(dataLine)) {
+					builder.append(dataLine);
+				}
 			}
 		}
 
@@ -173,18 +241,8 @@ public class GPS {
 			}
 		}
 
-		private void sleep(int millis) {
-			try {
-				Thread.sleep(millis);
-			} catch (InterruptedException e) {
-			}
-		}
-
 		private String readNext(StringBuilder builder) throws IllegalStateException, IOException {
-			int available = serial.available();
-			for (int i = 0; i < available; i++) {
-				builder.append(serial.read());
-			}
+			builder.append(new String(serial.read(), StandardCharsets.US_ASCII));
 			return builder.toString();
 		}
 	}

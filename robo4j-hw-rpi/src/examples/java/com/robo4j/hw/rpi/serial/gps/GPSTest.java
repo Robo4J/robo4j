@@ -43,6 +43,7 @@ public class GPSTest {
 				System.out.println(event);
 			}
 		});
+		gps.startAutoUpdate();
 		System.out.println("Press enter to quit!");
 		System.in.read();
 		gps.shutdown();
