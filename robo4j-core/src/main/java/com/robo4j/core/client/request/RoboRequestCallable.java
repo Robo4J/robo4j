@@ -119,9 +119,6 @@ public class RoboRequestCallable implements Callable<Object> {
 						} else {
 							final byte[] unitAttributeValue = (byte[]) factory.processGet(desiredUnit,
 									attributeDescriptor);
-							InputStream is = RoboClassLoader.getInstance().getResource("magic.jpg");
-							byte[] targetArray = new byte[is.available()];
-							is.read(targetArray);
 							processByteWriter(out, unitAttributeValue);
 						}
 					}
