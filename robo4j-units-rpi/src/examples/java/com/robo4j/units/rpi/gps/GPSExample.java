@@ -68,5 +68,9 @@ public class GPSExample {
 
 		System.out.println("Exiting! Bye!");
 		ctx.shutdown();
+
+		// Seems Pi4J keeps an executor with non-daemon threads around after
+		// we've used the serial port, even after closing it. :/
+		System.exit(0);
 	}
 }
