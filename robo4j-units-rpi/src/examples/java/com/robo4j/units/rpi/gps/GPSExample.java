@@ -67,5 +67,6 @@ public class GPSExample {
 		System.in.read();
 
 		System.out.println("Exiting! Bye!");
+		ctx.shutdown();
 	}
 }

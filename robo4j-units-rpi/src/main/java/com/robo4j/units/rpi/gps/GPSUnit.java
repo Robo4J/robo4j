@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.robo4j.core.AttributeDescriptor;
@@ -87,6 +88,9 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 	private int readInterval = DEFAULT_READ_INTERVAL;
 	private List<GPSEventListener> listeners = new ArrayList<>();
 
+	// The future, if scheduled with the platform scheduler
+	private volatile ScheduledFuture<?> scheduledFuture;
+
 	private static class GPSEventListener implements GPSListener {
 		private RoboReference<GPSEvent> target;
 
@@ -121,7 +125,7 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 			throw new ConfigurationException("Could not instantiate GPS!", e);
 		}
 		if (usePlatformScheduler) {
-			getContext().getScheduler().scheduleAtFixedRate(new Runnable() {
+			scheduledFuture = getContext().getScheduler().scheduleAtFixedRate(new Runnable() {
 				@Override
 				public void run() {
 					gps.update();
@@ -179,5 +183,14 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 			return (R) Integer.valueOf(readInterval);
 		}
 		return super.onGetAttribute(descriptor);
+	}
+
+	@Override
+	public void shutdown() {
+		if (scheduledFuture != null) {
+			scheduledFuture.cancel(true);
+		}
+		gps.shutdown();
+		super.shutdown();
 	}
 }

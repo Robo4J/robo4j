@@ -126,13 +126,21 @@ public class GPS {
 		synchronized (internalExecutor) {
 			if (scheduledFuture != null) {
 				scheduledFuture.cancel(true);
-			}			
+			}
+			awaitTermination();
 		}
 		try {
 			serial.close();
 		} catch (IllegalStateException | IOException e) {
-			// FIXME(Marcus/May 25, 2017): Decide
-			e.printStackTrace();
+			// Don't care, we're shutting down.
+		}
+	}
+
+	private void awaitTermination() {
+		try {
+			internalExecutor.awaitTermination(10, TimeUnit.MILLISECONDS);
+		} catch (InterruptedException e) {
+			// Don't care if we were interrupted.
 		}
 	}
 
