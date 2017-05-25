@@ -23,7 +23,7 @@ import com.robo4j.core.configuration.Configuration;
 import com.robo4j.hw.rpi.serial.gps.GPSEvent;
 
 /**
- * Example recipient for gyro events.
+ * Example recipient for GPS events.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
