@@ -23,6 +23,7 @@ import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_BRIGHTNESS;
 import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_CONTRAST;
 import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_EXPOSURE;
 import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_HEIGHT;
+import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_ROTATION;
 import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_SHARPNESS;
 import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_TIMELAPSE;
 import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_TIMEOUT;
@@ -81,6 +82,7 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 		parameters.put(KEY_CONTRAST, configuration.getString(KEY_CONTRAST, null));
 		parameters.put(KEY_TIMEOUT, configuration.getString(KEY_TIMEOUT, "1"));
 		parameters.put(KEY_TIMELAPSE, configuration.getString(KEY_TIMELAPSE, "100"));
+		parameters.put(KEY_ROTATION, configuration.getString(KEY_ROTATION, null));
 
 		//@formatter:off
 		cameraCommand = new StringBuilder()

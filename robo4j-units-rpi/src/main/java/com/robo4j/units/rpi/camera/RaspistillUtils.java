@@ -41,6 +41,7 @@ final class RaspistillUtils {
 	static final String KEY_BRIGHTNESS = "brightness";
 	static final String KEY_CONTRAST = "contrast";
 	static final String KEY_SATURATION = "saturation";
+	static final String KEY_ROTATION = "rotation";
 	static final String KEY_TIMELAPSE = "timelapse";
 	static final String KEY_EXPOSURE = "exposure";
 	static final String RASPISTILL_COMMAND = "raspistill";
@@ -54,8 +55,14 @@ final class RaspistillUtils {
 	}
 
 	@SuppressWarnings(value = "unchecked")
-	private static final Map<String, String> raspistillProperties = PropertyMapBuilder.Builder().put(KEY_WIDTH, "-w")
-			.put(KEY_HEIGHT, "-h").put(KEY_TIMEOUT, "-t").put(KEY_QUALITY, "-q").put(KEY_SHARPNESS, "-sh")
-			.put(KEY_BRIGHTNESS, "-br").put(KEY_CONTRAST, "-co").put(KEY_SATURATION, "-sa").put(KEY_EXPOSURE, "-ex")
-			.put(KEY_TIMELAPSE, "-tl").create();
+	//@formatter:off
+	private static final Map<String, String> raspistillProperties = PropertyMapBuilder.Builder()
+			.put(KEY_WIDTH, "-w").put(KEY_HEIGHT, "-h")
+			.put(KEY_TIMEOUT, "-t").put(KEY_QUALITY, "-q")
+			.put(KEY_SHARPNESS, "-sh").put(KEY_BRIGHTNESS, "-br")
+			.put(KEY_CONTRAST, "-co").put(KEY_SATURATION, "-sa")
+			.put(KEY_EXPOSURE, "-ex").put(KEY_TIMELAPSE, "-tl")
+			.put(KEY_ROTATION, "-rot")
+			.create();
+	//@formatter:on
 }
