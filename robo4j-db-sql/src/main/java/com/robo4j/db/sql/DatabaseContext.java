@@ -25,12 +25,13 @@ import javax.persistence.EntityManager;
  */
 public interface DatabaseContext {
 
-    /**
-     *
-     * @param clazz required class
-     * @return EntityManager for required class
-     */
-    EntityManager getEntityManager(Class<?> clazz);
+	/**
+	 *
+	 * @param clazz
+	 *            required class
+	 * @return EntityManager for required class
+	 */
+	EntityManager getEntityManager(Class<?> clazz);
 
-    void close();
+	void close();
 }

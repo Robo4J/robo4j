@@ -17,8 +17,6 @@
 
 package com.robo4j.db.sql;
 
-import com.robo4j.db.sql.util.DbEm;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,48 +24,50 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.metamodel.ManagedType;
 
+import com.robo4j.db.sql.util.DbEm;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class JpaDatabaseContext implements DatabaseContext {
 
-    private final Map<Class<?>, EntityManager> entityManagerCache;
+	private final Map<Class<?>, EntityManager> entityManagerCache;
 
-    public JpaDatabaseContext(Set<EntityManager> entityManagers) {
-        //formatter:off
-        this.entityManagerCache = entityManagers.stream()
-                .flatMap(e ->
-                     e.getMetamodel().getManagedTypes().stream()
-                            .map(ManagedType::getJavaType)
-                            .map(c -> new DbEm(c, e))
-                ).collect(Collectors.toMap(DbEm::getClazz, DbEm::getEm));
-        //formatter:on
-    }
+	public JpaDatabaseContext(Set<EntityManager> entityManagers) {
+		//@formatter:off
+		this.entityManagerCache = entityManagers.stream()
+                .flatMap(e -> e.getMetamodel().getManagedTypes().stream()
+                        .map(ManagedType::getJavaType)
+                        .map(c -> new DbEm(c, e)))
+				.collect(Collectors.toMap(DbEm::getClazz, DbEm::getEm));
+		//@formatter:on
+	}
 
-    /**
-     *
-     * @param clazz required class
-     * @return return class specific entity Manager
-     */
-    @Override
-    public EntityManager getEntityManager(Class<?> clazz) {
-        if(clazz == null){
-            throw new Robo4DbException("not allowed state clazz: " + clazz);
-        }
-        return entityManagerCache.get(clazz);
-    }
+	/**
+	 *
+	 * @param clazz
+	 *            required class
+	 * @return return class specific entity Manager
+	 */
+	@Override
+	public EntityManager getEntityManager(Class<?> clazz) {
+		if (clazz == null) {
+			throw new Robo4DbException("not allowed state clazz: " + clazz);
+		}
+		return entityManagerCache.get(clazz);
+	}
 
-    /**
-     * close all entity managers
-     */
-    @Override
-    public void close() {
-        //formatter:off
-        entityManagerCache.entrySet().stream()
+	/**
+	 * close all entity managers
+	 */
+	@Override
+	public void close() {
+		//@formatter:off
+		entityManagerCache.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .map(EntityManager.class::cast)
-                .forEach(EntityManager::close);
-        //formatter:on
-    }
+				.forEach(EntityManager::close);
+		//@formatter:on
+	}
 }

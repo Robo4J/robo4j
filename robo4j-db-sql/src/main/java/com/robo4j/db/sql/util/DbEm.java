@@ -27,27 +27,24 @@ import javax.persistence.EntityManager;
  */
 public class DbEm {
 
-    private Class<?> clazz;
-    private EntityManager em;
+	private Class<?> clazz;
+	private EntityManager em;
 
-    public DbEm(Class<?> clazz, EntityManager em) {
-        this.clazz = clazz;
-        this.em = em;
-    }
+	public DbEm(Class<?> clazz, EntityManager em) {
+		this.clazz = clazz;
+		this.em = em;
+	}
 
-    public Class<?> getClazz() {
-        return clazz;
-    }
+	public Class<?> getClazz() {
+		return clazz;
+	}
 
-    public EntityManager getEm() {
-        return em;
-    }
+	public EntityManager getEm() {
+		return em;
+	}
 
-    @Override
-    public String toString() {
-        return "DbEm{" +
-                "clazz=" + clazz +
-                ", em=" + em +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "DbEm{" + "clazz=" + clazz + ", em=" + em + '}';
+	}
 }

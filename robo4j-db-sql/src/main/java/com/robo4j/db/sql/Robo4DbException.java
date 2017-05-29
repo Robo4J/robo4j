@@ -24,14 +24,14 @@ package com.robo4j.db.sql;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class Robo4DbException extends RuntimeException{
-    private static final long serialVersionUID = 1L;
+public class Robo4DbException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
-    public Robo4DbException(String message) {
-        super(message);
-    }
+	public Robo4DbException(String message) {
+		super(message);
+	}
 
-    public Robo4DbException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public Robo4DbException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }
