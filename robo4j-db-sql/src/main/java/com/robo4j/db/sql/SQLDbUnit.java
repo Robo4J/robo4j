@@ -24,6 +24,7 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 /**
@@ -34,6 +35,7 @@ public class SQLDbUnit extends RoboUnit<Object> {
 
     private static final String PERSISTENCE_UNIT = "persistenceUnit";
 	private String persistanceUnit;
+	private EntityManagerFactory emf;
 	private EntityManager em;
 
 	public SQLDbUnit(RoboContext context, String id) {
@@ -48,10 +50,27 @@ public class SQLDbUnit extends RoboUnit<Object> {
 		}
 	}
 
+
+
     @Override
     public void start() {
         setState(LifecycleState.STARTING);
-        em = Persistence.createEntityManagerFactory(persistanceUnit).createEntityManager();
+        emf = Persistence.createEntityManagerFactory(persistanceUnit);
+        em = emf.createEntityManager();
         setState(LifecycleState.STARTED);
     }
+
+	@Override
+	public void stop() {
+		setState(LifecycleState.STOPPING);
+		em.close();
+		setState(LifecycleState.STOPPED);
+	}
+
+	@Override
+	public void shutdown() {
+		setState(LifecycleState.SHUTTING_DOWN);;
+		emf.close();
+		setState(LifecycleState.SHUTDOWN);
+	}
 }

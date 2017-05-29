@@ -6,7 +6,7 @@
 
     <persistence-unit name="postgres" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <!--<class>com.robo4j.db.sql.model.Robo4JSystem</class>-->
+        <class>com.robo4j.db.sql.model.Robo4JSystem</class>
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         <properties>
             <property name="hibernate.archive.autodetection" value="class, hbm"/>
@@ -22,7 +22,7 @@
 
     <persistence-unit name="h2" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <!--<class>com.robo4j.db.sql.model.Robo4JSystem</class>-->
+        <class>com.robo4j.db.sql.model.Robo4JSystem</class>
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         <properties>
             <property name="hibernate.archive.autodetection" value="class, hbm"/>

@@ -42,8 +42,6 @@ public class JPADemo {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("h2");
 
 
-
-
 		EntityManager em = emf.createEntityManager();
 
 		em.getTransaction().begin();

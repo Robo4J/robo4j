@@ -1,8 +1,13 @@
+plugins {
+    id "org.flywaydb.flyway" version "4.2.0"
+}
+
 group 'com.robo4j'
 
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
+
 
 apply from: 'libraries.gradle'
 
@@ -40,6 +45,7 @@ project("robo4j-core") {
 }
 
 project("robo4j-db-sql") {
+
     description = "Robo4J Database SQL"
 
     group 'com.robo4j'
@@ -49,6 +55,7 @@ project("robo4j-db-sql") {
     apply plugin: 'idea'
     apply plugin: 'eclipse'
     apply plugin: 'maven'
+    apply plugin: "org.flywaydb.flyway"
 
     sourceCompatibility = 1.8
 
@@ -67,6 +74,17 @@ project("robo4j-db-sql") {
         compile "com.h2database:h2:${h2Version}"
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
+    }
+
+    flyway {
+        url = 'jdbc:postgresql://localhost:5433/robo4j1'
+        user = 'postgres'
+        password = 'post'
+        schemas = ['robo4j1']
+        placeholders = [
+                'keyABC': 'valueXYZ',
+                'otherplaceholder': 'value123'
+        ]
     }
 }
 
