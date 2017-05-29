@@ -76,15 +76,24 @@ project("robo4j-db-sql") {
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
     }
 
+    //main db
     flyway {
-        url = 'jdbc:postgresql://localhost:5433/robo4j1'
-        user = 'postgres'
-        password = 'post'
-        schemas = ['robo4j1']
-        placeholders = [
-                'keyABC': 'valueXYZ',
-                'otherplaceholder': 'value123'
-        ]
+        url = 'jdbc:h2:~/data/robo4jh2'
+        user = 'sa'
+    }
+
+    task('postgres') {
+        doLast {
+            println 'executing PostgreSQL'
+
+            flyway {
+                url = 'jdbc:postgresql://localhost:5433/robo4j1'
+                user = 'postgres'
+                password = 'post'
+                schemas = ['public']
+            }
+
+        }
     }
 }
 
@@ -243,7 +252,6 @@ project("robo4j-http") {
     }
 
     dependencies {
-        compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
         compile "javax.json:javax.json-api:${javaxJsonVersion}"
         compile "org.glassfish:javax.json:${javaxJsonVersion}"
         testCompile "junit:junit:${junitVersion}"

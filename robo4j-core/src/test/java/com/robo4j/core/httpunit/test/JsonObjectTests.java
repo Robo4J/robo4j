@@ -33,11 +33,8 @@ import javax.json.JsonWriter;
 
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.robo4j.core.client.util.RoboClassLoader;
 import com.robo4j.core.httpunit.Constants;
-import com.robo4j.core.httpunit.test.model.ExampleSystem;
 import com.robo4j.core.util.IOUtil;
 
 /**
@@ -83,28 +80,5 @@ public class JsonObjectTests {
 		String fileJsonString = IOUtil.readString(is, Constants.DEFAULT_ENCODING);
 		assertEquals(jsonData, fileJsonString);
 	}
-
-//	@Test
-    public void createJsonObjectByModel() throws IOException{
-
-        ExampleSystem system = new ExampleSystem();
-        system.setId(1L);
-        system.setUid("robo4j_system");
-
-        List<String> configArray = new ArrayList<>();
-        configArray.add("httpClient");
-        configArray.add("imageController");
-        configArray.add("scheduleController");
-        configArray.add("httpServer");
-        system.setConfig(configArray);
-
-		ObjectMapper mapper = new ObjectMapper();
-		String jsonData = mapper.writeValueAsString(system);
-
-		InputStream is = RoboClassLoader.getInstance().getResource(FILENAME_1);
-		String fileJsonString = IOUtil.readString(is, Constants.DEFAULT_ENCODING);
-		assertEquals(jsonData, fileJsonString);
-
-    }
 
 }

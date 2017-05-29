@@ -21,5 +21,59 @@ package com.robo4j.db.sql.model;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class Robo4JUnit {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.io.Serializable;
+
+@Entity
+@Table(name = "ROBO4J_UNIT")
+public class Robo4JUnit implements Serializable{
+
+    private static final long serialVersionUID = 1;
+
+    private Long id;
+    private String uid;
+	private String config;
+
+	@Id
+	@Column(name = "id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+    @Column(name = "uid")
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    @Column(name = "config")
+    public String getConfig() {
+        return config;
+    }
+
+    public void setConfig(String config) {
+        this.config = config;
+    }
+
+    @Override
+    public String toString() {
+        return "Robo4JUnit{" +
+                "id=" + id +
+                ", uid='" + uid + '\'' +
+                ", config='" + config + '\'' +
+                '}';
+    }
 }
