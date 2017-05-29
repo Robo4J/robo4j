@@ -152,7 +152,7 @@ public class TestClientImageController extends RoboUnit<Boolean> {
 		try {
 			byte[] imageArray = new byte[imageData.available()];
 			int  c = imageData.read(imageArray);
-			return new String(Base64.getEncoder().encode(imageArray), "UTF-8");
+			return new String(Base64.getEncoder().encode(imageArray), Constants.DEFAULT_ENCODING);
 		} catch (IOException e) {
 			throw new RuntimeException("error: ", e);
 		}

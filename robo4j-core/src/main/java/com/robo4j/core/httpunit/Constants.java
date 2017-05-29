@@ -24,6 +24,7 @@ package com.robo4j.core.httpunit;
  */
 public final class Constants {
 
+	public static final String DEFAULT_ENCODING = "UTF-8";
 	public static final String EMPTY_STRING = "";
 	public static final int DEFAULT_VALUE_0 = 0;
 	public static final int DEFAULT_VALUE_1 = 1;

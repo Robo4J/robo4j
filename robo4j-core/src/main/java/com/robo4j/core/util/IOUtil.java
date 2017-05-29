@@ -39,7 +39,7 @@ public final class IOUtil {
 		return readString(is, StandardCharsets.UTF_8.name());
 	}
 
-	public final static String readString(InputStream is, String charSetName) throws IOException {
+	public static String readString(InputStream is, String charSetName) throws IOException {
 		BufferedInputStream bis = new BufferedInputStream(is);
 		ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		int result = bis.read();

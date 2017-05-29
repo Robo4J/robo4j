@@ -25,6 +25,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import com.robo4j.core.httpunit.Constants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -151,7 +152,7 @@ public class XmlConfigurationFactory {
 		SAXParser saxParser;
 		try {
 			saxParser = SAXParserFactory.newInstance().newSAXParser();
-			saxParser.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")), new ConfigurationHandler(config));
+			saxParser.parse(new ByteArrayInputStream(xml.getBytes(Constants.DEFAULT_ENCODING)), new ConfigurationHandler(config));
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			throw new ConfigurationFactoryException("Could not parse the configuration", e);
 		}

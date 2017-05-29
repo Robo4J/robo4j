@@ -2,8 +2,16 @@ println "configure $project"
 
 ext {
 //    note::it's necessary to specify local maven repository
+    jacksonVersion = "2.8.8.1";
+    javaxJsonVersion = "1.1"
     mavenRepository = "/home/pi/.m2"
     gradleVersion = "3.4"
+    hibernateVersion = "5.2.10.Final"
+    hibernateJpaVersion = "1.0.0.Final"
+    flywayVersion = "4.2.0"
+    h2Version = "1.4.195"
+    postgresqlVersion = "9.4-1200-jdbc41"
+    persistanceVersion = "1.0.2"
     robo4jVersion = "alpha-0.3"
     javassistVersion = "3.20.0-GA"
     guavaVersion = "19.0"

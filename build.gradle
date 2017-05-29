@@ -39,6 +39,38 @@ project("robo4j-core") {
     }
 }
 
+project("robo4j-db-sql") {
+    description = "Robo4J Database SQL"
+
+    group 'com.robo4j'
+    version "${robo4jVersion}"
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+        compile(project(":robo4j-core"))
+        compile "org.flywaydb:flyway-core:${flywayVersion}"
+        compile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:${hibernateJpaVersion}"
+        compile "javax.persistence:persistence-api:${persistanceVersion}"
+        compile "org.postgresql:postgresql:${postgresqlVersion}"
+        compile "org.hibernate:hibernate-entitymanager:${hibernateVersion}"
+        compile "com.h2database:h2:${h2Version}"
+        testCompile "junit:junit:${junitVersion}@jar"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
+    }
+}
+
+
 project("robo4j-hw-lego") {
     description = "Robo4J Lego Hardware"
 
@@ -193,6 +225,9 @@ project("robo4j-http") {
     }
 
     dependencies {
+        compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+        compile "javax.json:javax.json-api:${javaxJsonVersion}"
+        compile "org.glassfish:javax.json:${javaxJsonVersion}"
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
