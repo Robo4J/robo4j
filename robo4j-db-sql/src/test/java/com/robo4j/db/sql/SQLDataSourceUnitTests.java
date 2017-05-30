@@ -35,17 +35,17 @@ import com.robo4j.db.sql.model.Robo4JUnit;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class SQLDatabaseUnitTests {
+public class SQLDataSourceUnitTests {
 
 	@Test
 	public void testH2Database() throws Exception {
 		final RoboSystem system = new RoboSystem();
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
-		SQLDatabaseUnit sqlDatabaseUnit = new SQLDatabaseUnit(system, "dbSQLUnit");
+		SQLDataSourceUnit sqlDataSourceUnit = new SQLDataSourceUnit(system, "dbSQLUnit");
 		config.setString("persistenceUnit", "h2");
-		sqlDatabaseUnit.initialize(config);
-		system.addUnits(sqlDatabaseUnit);
+		sqlDataSourceUnit.initialize(config);
+		system.addUnits(sqlDataSourceUnit);
 
 		System.out.println("systemPong: State before start:");
 		System.out.println(SystemUtil.printStateReport(system));
@@ -61,11 +61,11 @@ public class SQLDatabaseUnitTests {
 		Robo4JUnit robo4JUnit2 = new Robo4JUnit();
 		robo4JUnit1.setUid("system2");
 		robo4JUnit1.setConfig("httpServer");
-		sqlDatabaseUnit.onMessage(robo4JUnit1);
-		sqlDatabaseUnit.onMessage(robo4JUnit2);
+		sqlDataSourceUnit.onMessage(robo4JUnit1);
+		sqlDataSourceUnit.onMessage(robo4JUnit2);
 
 		AttributeDescriptor<List> descriptor = DefaultAttributeDescriptor.create(List.class, "units");
-		List<Robo4JUnit> list = (List<Robo4JUnit>) sqlDatabaseUnit.onGetAttribute(descriptor);
+		List<Robo4JUnit> list = (List<Robo4JUnit>) sqlDataSourceUnit.onGetAttribute(descriptor);
 		System.out.println("Stored entities = " + list);
 
 		Assert.assertTrue(Arrays.asList(robo4JUnit1, robo4JUnit2).size() == list.size());

@@ -37,12 +37,14 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.db.sql.model.Robo4JUnit;
+import com.robo4j.db.sql.support.DataSourceContext;
+import com.robo4j.db.sql.support.DataSourceProxy;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class SQLDatabaseUnit extends RoboUnit<Robo4JUnit> {
+public class SQLDataSourceUnit extends RoboUnit<Robo4JUnit> {
 
 	private static final String ATTRIBUTE_ROBO_UNIT_NAME = "units";
 	private static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
@@ -50,10 +52,10 @@ public class SQLDatabaseUnit extends RoboUnit<Robo4JUnit> {
 
 	private static final String PERSISTENCE_UNIT = "persistenceUnit";
 	private String persistenceUnit;
-	private DatabaseContext databaseContext;
+	private DataSourceContext dataSourceContext;
 	private EntityManagerFactory emf;
 
-	public SQLDatabaseUnit(RoboContext context, String id) {
+	public SQLDataSourceUnit(RoboContext context, String id) {
 		super(Robo4JUnit.class, context, id);
 	}
 
@@ -67,7 +69,7 @@ public class SQLDatabaseUnit extends RoboUnit<Robo4JUnit> {
 
 	@Override
 	public void onMessage(Robo4JUnit message) {
-		EntityManager em = databaseContext.getEntityManager(message.getClass());
+		EntityManager em = dataSourceContext.getEntityManager(message.getClass());
 		em.getTransaction().begin();
 		em.persist(message);
 		em.getTransaction().commit();
@@ -77,14 +79,14 @@ public class SQLDatabaseUnit extends RoboUnit<Robo4JUnit> {
 	public void start() {
 		setState(LifecycleState.STARTING);
 		emf = Persistence.createEntityManagerFactory(persistenceUnit);
-		databaseContext = new JpaDatabaseContext(Collections.singleton(emf.createEntityManager()));
+		dataSourceContext = new DataSourceProxy(Collections.singleton(emf.createEntityManager()));
 		setState(LifecycleState.STARTED);
 	}
 
 	@Override
 	public void stop() {
 		setState(LifecycleState.STOPPING);
-		databaseContext.close();
+		dataSourceContext.close();
 		setState(LifecycleState.STOPPED);
 	}
 
@@ -101,7 +103,7 @@ public class SQLDatabaseUnit extends RoboUnit<Robo4JUnit> {
 	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
 		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_NAME)
 				&& descriptor.getAttributeType() == List.class) {
-			EntityManager em = databaseContext.getEntityManager(Robo4JUnit.class);
+			EntityManager em = dataSourceContext.getEntityManager(Robo4JUnit.class);
 			CriteriaBuilder cb = em.getCriteriaBuilder();
 			CriteriaQuery<Robo4JUnit> q = cb.createQuery(Robo4JUnit.class);
 			Root<Robo4JUnit> rs = q.from(Robo4JUnit.class);

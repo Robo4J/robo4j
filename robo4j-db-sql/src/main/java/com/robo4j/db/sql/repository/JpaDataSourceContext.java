@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.db.sql;
+package com.robo4j.db.sql.repository;
 
 import java.util.Map;
 import java.util.Set;
@@ -24,17 +24,19 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.metamodel.ManagedType;
 
+import com.robo4j.db.sql.Robo4DbException;
+import com.robo4j.db.sql.support.DataSourceContext;
 import com.robo4j.db.sql.util.DbEm;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class JpaDatabaseContext implements DatabaseContext {
+public class JpaDataSourceContext implements DataSourceContext {
 
 	private final Map<Class<?>, EntityManager> entityManagerCache;
 
-	public JpaDatabaseContext(Set<EntityManager> entityManagers) {
+	public JpaDataSourceContext(Set<EntityManager> entityManagers) {
 		//@formatter:off
 		this.entityManagerCache = entityManagers.stream()
                 .flatMap(e -> e.getMetamodel().getManagedTypes().stream()

@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.db.sql;
+package com.robo4j.db.sql.support;
 
 import javax.persistence.EntityManager;
 
@@ -23,7 +23,7 @@ import javax.persistence.EntityManager;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public interface DatabaseContext {
+public interface DataSourceContext {
 
 	/**
 	 *
