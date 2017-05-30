@@ -26,7 +26,7 @@ import javax.persistence.metamodel.ManagedType;
 
 import com.robo4j.db.sql.Robo4DbException;
 import com.robo4j.db.sql.support.DataSourceContext;
-import com.robo4j.db.sql.util.DbEm;
+import com.robo4j.db.sql.support.DbEm;
 
 /**
  * @author Marcus Hirt (@hirt)

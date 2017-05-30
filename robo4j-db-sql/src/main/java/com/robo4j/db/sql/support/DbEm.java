@@ -15,12 +15,12 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.db.sql.util;
+package com.robo4j.db.sql.support;
 
 import javax.persistence.EntityManager;
 
 /**
- * Helper class to register EntityManager
+ * Stream helper class to register Classes with EntityManager
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
