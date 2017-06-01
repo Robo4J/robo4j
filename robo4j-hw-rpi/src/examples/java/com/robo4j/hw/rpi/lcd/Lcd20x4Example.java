@@ -39,20 +39,21 @@ public class Lcd20x4Example {
 		@Override
 		public void run() {
 			lcd.clearDisplay();
-			while (shouldRun) {
-				lcd.sendMessage(1, "--------------------", Alignment.CENTER);
-				lcd.sendMessage(2, "Rasbperry Pi", Alignment.CENTER);
-				lcd.sendMessage(3, "Robo4J", Alignment.CENTER);
-				lcd.sendMessage(4, "--------------------", Alignment.CENTER);
-				sleep(3000);
-				lcd.sendMessage(1, "--------------------", Alignment.CENTER);
-				lcd.sendMessage(2, "This is a test", Alignment.CENTER);
-				lcd.sendMessage(3, "20x4 LCD Module", Alignment.CENTER);
-				lcd.sendMessage(4, "--------------------", Alignment.CENTER);
-				sleep(3000);
-			}
-			lcd.clearDisplay();
-			lcd.sendMessage(2, "Goodbye!", Alignment.CENTER);
+			sleep(3000);
+//			while (shouldRun) {
+//				lcd.sendMessage(1, "--------------------", Alignment.CENTER);
+//				lcd.sendMessage(2, "Rasbperry Pi", Alignment.CENTER);
+//				lcd.sendMessage(3, "Robo4J", Alignment.CENTER);
+//				lcd.sendMessage(4, "--------------------", Alignment.CENTER);
+//				sleep(3000);
+//				lcd.sendMessage(1, "--------------------", Alignment.CENTER);
+//				lcd.sendMessage(2, "This is a test", Alignment.CENTER);
+//				lcd.sendMessage(3, "20x4 LCD Module", Alignment.CENTER);
+//				lcd.sendMessage(4, "--------------------", Alignment.CENTER);
+//				sleep(3000);
+//			}
+//			lcd.clearDisplay();
+//			lcd.sendMessage(2, "Goodbye!", Alignment.CENTER);
 		}
 
 		private void sleep(int seconds) {
