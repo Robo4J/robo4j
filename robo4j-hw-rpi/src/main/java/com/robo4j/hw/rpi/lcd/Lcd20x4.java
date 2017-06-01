@@ -16,12 +16,14 @@
  */
 package com.robo4j.hw.rpi.lcd;
 
+import java.util.concurrent.TimeUnit;
+
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiBcmPin;
+import com.pi4j.io.gpio.RaspiPin;
 
 /**
  * Hardware support for the 20x4 LCD module.
@@ -67,7 +69,7 @@ public class Lcd20x4 {
 	private final GpioPinDigitalOutput gpioOn;
 
 	// Delay in nanos
-	private final static int E_DELAY = 500000;
+	private final static int E_DELAY = (int) TimeUnit.MICROSECONDS.toNanos(500);
 
 	private enum Mode {
 		CMD(false), CHAR(true);
@@ -93,8 +95,8 @@ public class Lcd20x4 {
 	 * Use this if you have used the default wiring in the example.
 	 */
 	public Lcd20x4() {
-		this(RaspiBcmPin.GPIO_07, RaspiBcmPin.GPIO_08, RaspiBcmPin.GPIO_25, RaspiBcmPin.GPIO_24, RaspiBcmPin.GPIO_23, RaspiBcmPin.GPIO_18,
-				RaspiBcmPin.GPIO_19);
+		this(RaspiPin.GPIO_11, RaspiPin.GPIO_10, RaspiPin.GPIO_06, RaspiPin.GPIO_05, RaspiPin.GPIO_04, RaspiPin.GPIO_01,
+				RaspiPin.GPIO_16);
 	}
 
 	/**
@@ -133,6 +135,7 @@ public class Lcd20x4 {
 	}
 
 	private void sendByte(int bits, Mode cmd) {
+		System.out.println(Integer.toString(bits));
 		gpioRS.setState(cmd.getSendValue());
 		dataLow();
 
@@ -192,10 +195,10 @@ public class Lcd20x4 {
 	public void sendMessage(int line, String text, Alignment alignment) {
 		switch (alignment) {
 		case RIGHT:
-			StringUtils.rightFormat(text, CHAR_WIDTH);
+			text = StringUtils.rightFormat(text, CHAR_WIDTH);
 			break;
 		case CENTER:
-			StringUtils.centerFormat(text, CHAR_WIDTH);
+			text = StringUtils.centerFormat(text, CHAR_WIDTH);
 			break;
 		default:
 			break;
