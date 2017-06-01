@@ -135,6 +135,7 @@ public class Lcd20x4 {
 	}
 
 	private void sendByte(int bits, Mode cmd) {
+		System.out.println(Integer.toString(bits));
 		gpioRS.setState(cmd.getSendValue());
 		dataLow();
 
@@ -194,10 +195,10 @@ public class Lcd20x4 {
 	public void sendMessage(int line, String text, Alignment alignment) {
 		switch (alignment) {
 		case RIGHT:
-			StringUtils.rightFormat(text, CHAR_WIDTH);
+			text = StringUtils.rightFormat(text, CHAR_WIDTH);
 			break;
 		case CENTER:
-			StringUtils.centerFormat(text, CHAR_WIDTH);
+			text = StringUtils.centerFormat(text, CHAR_WIDTH);
 			break;
 		default:
 			break;

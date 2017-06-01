@@ -38,6 +38,7 @@ public class Lcd20x4Example {
 
 		@Override
 		public void run() {
+			lcd.clearDisplay();
 			while (shouldRun) {
 				lcd.sendMessage(1, "--------------------", Alignment.CENTER);
 				lcd.sendMessage(2, "Rasbperry Pi", Alignment.CENTER);
