@@ -113,7 +113,14 @@ public class Lcd20x4 {
 		gpioD6 = gpio.provisionDigitalOutputPin(pinD6, "D6", PinState.LOW);
 		gpioD7 = gpio.provisionDigitalOutputPin(pinD7, "D7", PinState.LOW);
 		gpioOn = gpio.provisionDigitalOutputPin(pinOn, "On", PinState.HIGH);
-		initialize();
+//		initialize();
+	}
+
+	public void simpleClean() {
+		gpioRS.setState(false);
+		toggleEnable();
+		gpioD4.setState(true);
+		toggleEnable();
 	}
 
 	private void initialize() {

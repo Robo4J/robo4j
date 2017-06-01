@@ -38,7 +38,7 @@ public class Lcd20x4Example {
 
 		@Override
 		public void run() {
-			lcd.clearDisplay();
+			lcd.simpleClean();
 			sleep(3000);
 //			while (shouldRun) {
 //				lcd.sendMessage(1, "--------------------", Alignment.CENTER);
