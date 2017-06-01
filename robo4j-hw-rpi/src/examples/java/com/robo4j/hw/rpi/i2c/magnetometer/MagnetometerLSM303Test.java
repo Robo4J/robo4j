@@ -29,71 +29,21 @@ import com.robo4j.math.geometry.Float3D;
 public class MagnetometerLSM303Test {
 	// FIXME(Marcus/Dec 5, 2016): Verify that this one works.
 	public static void main(String[] args) throws IOException, InterruptedException {
+		if (args.length != 2) {
+			System.out.println("Usage: MagnetometerLSM303Test <delay between reads (ms)> <print every Nth read>");	
+			System.exit(1);
+		}
+		int delay = Integer.parseInt(args[0]);
+		int modulo = Integer.parseInt(args[1]);
+		
 		MagnetometerLSM303Device device = new MagnetometerLSM303Device();
-
-		Float3D min = new Float3D();
-		min.x = Float.MAX_VALUE;
-		min.y = Float.MAX_VALUE;
-		min.z = Float.MAX_VALUE;
-
-		Float3D max = new Float3D();
-		max.x = Float.MIN_VALUE;
-		max.y = Float.MIN_VALUE;
-		max.z = Float.MIN_VALUE;
-
 		int count = 0;
 		while (true) {
 			Float3D fl = device.read();
-			if (updateMin(min, fl)) {
-				System.out.println("Min: " + fl);
-			}
-			if (updateMax(max, fl)) {
-				System.out.println("Max: " + fl);
-			}
-			if (count++ % 4 == 0) {
+			if (count++ % modulo == 0) {
 				System.out.println(String.format("Value %d = %s", count, fl.toString()));
 			}
-			Thread.sleep(500);
+			Thread.sleep(delay);
 		}
 	}
-
-
-	//Private Methods
-	//TODO:: maybe duplicate functionality
-	private static boolean updateMin(Float3D min, Float3D newVal) {
-		boolean isUpdated = false;
-
-		if (newVal.x < min.x) {
-			min.x = newVal.x;
-			isUpdated = true;
-		}
-		if (newVal.y < min.y) {
-			min.y = newVal.y;
-			isUpdated = true;
-		}
-		if (newVal.z < min.z) {
-			min.z = newVal.z;
-			isUpdated = true;
-		}
-		return isUpdated;
-	}
-
-	private static boolean updateMax(Float3D max, Float3D newVal) {
-		boolean isUpdated = false;
-
-		if (newVal.x > max.x) {
-			max.x = newVal.x;
-			isUpdated = true;
-		}
-		if (newVal.y > max.y) {
-			max.y = newVal.y;
-			isUpdated = true;
-		}
-		if (newVal.z > max.z) {
-			max.z = newVal.z;
-			isUpdated = true;
-		}
-		return isUpdated;
-	}
-
 }
