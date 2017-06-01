@@ -41,6 +41,7 @@ public class MagnetometerLSM303Test {
 		max.y = Float.MIN_VALUE;
 		max.z = Float.MIN_VALUE;
 
+		int count = 0;
 		while (true) {
 			Float3D fl = device.read();
 			if (updateMin(min, fl)) {
@@ -48,6 +49,9 @@ public class MagnetometerLSM303Test {
 			}
 			if (updateMax(max, fl)) {
 				System.out.println("Max: " + fl);
+			}
+			if (count++ % 4 == 0) {
+				System.out.println(String.format("Value %d = %s", count, fl.toString()));
 			}
 			Thread.sleep(500);
 		}
