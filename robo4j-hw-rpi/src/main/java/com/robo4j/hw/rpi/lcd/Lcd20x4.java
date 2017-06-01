@@ -16,6 +16,8 @@
  */
 package com.robo4j.hw.rpi.lcd;
 
+import java.util.concurrent.TimeUnit;
+
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
@@ -67,7 +69,7 @@ public class Lcd20x4 {
 	private final GpioPinDigitalOutput gpioOn;
 
 	// Delay in nanos
-	private final static int E_DELAY = 500000;
+	private final static int E_DELAY = (int) TimeUnit.MICROSECONDS.toNanos(500);
 
 	private enum Mode {
 		CMD(false), CHAR(true);
@@ -94,7 +96,7 @@ public class Lcd20x4 {
 	 */
 	public Lcd20x4() {
 		this(RaspiBcmPin.GPIO_07, RaspiBcmPin.GPIO_08, RaspiBcmPin.GPIO_25, RaspiBcmPin.GPIO_24, RaspiBcmPin.GPIO_23, RaspiBcmPin.GPIO_18,
-				RaspiBcmPin.GPIO_19);
+				RaspiBcmPin.GPIO_15);
 	}
 
 	/**
