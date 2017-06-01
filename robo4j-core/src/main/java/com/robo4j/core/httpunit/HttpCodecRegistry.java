@@ -34,6 +34,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.reflect.ReflectionScan;
 import com.robo4j.core.util.StreamUtils;
 
 /**
@@ -46,11 +47,6 @@ public class HttpCodecRegistry {
 	private Map<Class<?>, HttpEncoder<?>> encoders = new HashMap<>();
 	private Map<Class<?>, HttpDecoder<?>> decoders = new HashMap<>();
 
-	private static final String FILE = "file:";
-	private static final String SUFFIX = ".class";
-	private static final String EXCLAMATION = "\u0021";		//Exclamation mark !
-	private static final char SLASH = '/';
-	private static final char DOT = '.';
 
 	public HttpCodecRegistry() {
 	}
@@ -60,33 +56,10 @@ public class HttpCodecRegistry {
 	}
 
 	public void scan(ClassLoader loader, String... packages) {
-		scanPackages(loader, packages);
+		ReflectionScan scan = new ReflectionScan(loader);
+		processClasses(loader, scan.scanForEntities(packages));
 	}
 
-	private void scanPackages(ClassLoader loader, String... packages) {
-
-		List<String> allClasses = new ArrayList<>();
-		for (String packageName : packages) {
-			packageName = packageName.trim();
-			try {
-				List<String> classesInPackage = scanJarPackage(loader, packageName);
-				if (classesInPackage.isEmpty()) {
-					classesInPackage.addAll(scanPackageOnDisk(loader, packageName));
-					if (classesInPackage.isEmpty()) {
-						SimpleLoggingUtil.debug(getClass(),
-								"We did not find any annotated classes in package " + packageName);
-					} else {
-						allClasses.addAll(classesInPackage);
-					}
-				} else {
-					allClasses.addAll(classesInPackage);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		processClasses(loader, allClasses);
-	}
 
 	private void processClasses(ClassLoader loader, List<String> allClasses) {
 
@@ -116,66 +89,6 @@ public class HttpCodecRegistry {
 		}
 	}
 
-	private List<String> scanPackageOnDisk(ClassLoader loader, String packageName) throws IOException {
-		Enumeration<URL> resources = loader.getResources(slashify(packageName));
-		return StreamUtils.enumerationAsStream(resources, false).map(URL::getFile).map(File::new)
-				.map(f -> findClasses(f, packageName)).flatMap(List::stream).collect(Collectors.toList());
-	}
-
-	private String slashify(String packageName) {
-		return packageName.replace(DOT, SLASH);
-	}
-
-	private List<String> scanJarPackage(ClassLoader loader, String packageName) throws IOException {
-		List<String> classes = new ArrayList<>();
-		String slashifyPackage = slashify(packageName);
-		Enumeration<URL> resources = loader.getResources(slashifyPackage);
-
-		StreamUtils.enumerationAsStream(resources, false).map(url -> {
-			try {
-				String jarFile = url.getFile().split(EXCLAMATION)[0].replace(FILE, Constants.EMPTY_STRING);
-				if (new File(jarFile).isDirectory()) {
-					return null;
-				}
-				return new ZipInputStream(new FileInputStream(jarFile));
-			} catch (FileNotFoundException e) {
-				throw new CodecRegistryException("Problem finding file", e);
-			}
-		}).filter(Objects::nonNull).forEach(e -> {
-			try {
-				for (ZipEntry entry = e.getNextEntry(); entry != null; entry = e.getNextEntry()) {
-					if (!entry.isDirectory() && entry.getName().contains(slashifyPackage)
-							&& entry.getName().endsWith(SUFFIX)) {
-						String cName = entry.getName().replace(SLASH, DOT).replace(SUFFIX, Constants.EMPTY_STRING);
-						classes.add(cName);
-					}
-				}
-			} catch (IOException e1) {
-				throw new CodecRegistryException("Error reading jar", e1);
-			}
-		});
-		return classes;
-	}
-
-	private List<String> findClasses(File dir, String path) {
-		return dir.exists() ? findClassesIntern(dir, path) : Collections.emptyList();
-	}
-
-	private List<String> findClassesIntern(File dir, String path) {
-		List<String> result = new ArrayList<>();
-		File[] files = dir.listFiles();
-		assert files != null;
-		Stream.of(files).forEach(file -> {
-			if (file.isDirectory()) {
-				assert !file.getName().contains(String.valueOf(DOT));
-				result.addAll(findClassesIntern(file, path + DOT + file.getName()));
-			} else if (file.getName().endsWith(SUFFIX)) {
-				String tmpPath = path.replace(File.separatorChar, DOT);
-				result.add(tmpPath + DOT + file.getName().substring(0, file.getName().length() - SUFFIX.length()));
-			}
-		});
-		return result;
-	}
 
 	@SuppressWarnings("unchecked")
 	public <T> HttpEncoder<T> getEncoder(Class<T> type) {

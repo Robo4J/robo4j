@@ -17,11 +17,6 @@
 
 package com.robo4j.db.sql.model;
 
-/**
- * @author Marcus Hirt (@hirt)
- * @author Miro Wengner (@miragemiko)
- */
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,15 +24,19 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ */
+
 @Entity
-@Table(name = "ROBO4J_UNIT")
-public class Robo4JUnit implements RoboEntity {
+@Table(name = "ROBO4J_SYSTEM")
+public class Robo4JSystem implements RoboEntity {
 
 	private static final long serialVersionUID = 1;
 
 	private Long id;
 	private String uid;
-	private String config;
 
 	@Id
 	@Column(name = "id")
@@ -59,17 +58,8 @@ public class Robo4JUnit implements RoboEntity {
 		this.uid = uid;
 	}
 
-	@Column(name = "config")
-	public String getConfig() {
-		return config;
-	}
-
-	public void setConfig(String config) {
-		this.config = config;
-	}
-
 	@Override
 	public String toString() {
-		return "Robo4JUnit{" + "id=" + id + ", uid='" + uid + '\'' + ", config='" + config + '\'' + '}';
+		return "Robo4JSystem{" + "id=" + id + ", uid='" + uid + '\'' + '}';
 	}
 }

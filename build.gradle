@@ -90,7 +90,6 @@ project("robo4j-db-sql") {
                 url = 'jdbc:postgresql://localhost:5433/robo4j1'
                 user = 'postgres'
                 password = 'post'
-                schemas = ['public']
             }
 
         }

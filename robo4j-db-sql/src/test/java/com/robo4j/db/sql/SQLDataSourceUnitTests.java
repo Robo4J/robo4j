@@ -29,6 +29,7 @@ import com.robo4j.core.RoboSystem;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.util.SystemUtil;
+import com.robo4j.db.sql.model.Robo4JSystem;
 import com.robo4j.db.sql.model.Robo4JUnit;
 
 /**
@@ -37,6 +38,7 @@ import com.robo4j.db.sql.model.Robo4JUnit;
  */
 public class SQLDataSourceUnitTests {
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testH2Database() throws Exception {
 		final RoboSystem system = new RoboSystem();
@@ -44,6 +46,7 @@ public class SQLDataSourceUnitTests {
 
 		SQLDataSourceUnit sqlDataSourceUnit = new SQLDataSourceUnit(system, "dbSQLUnit");
 		config.setString("persistenceUnit", "h2");
+		config.setString("packages", "com.robo4j.db.sql.model");
 		sqlDataSourceUnit.initialize(config);
 		system.addUnits(sqlDataSourceUnit);
 
@@ -59,18 +62,24 @@ public class SQLDataSourceUnitTests {
 		robo4JUnit1.setUid("system1");
 		robo4JUnit1.setConfig("dbSQLUnit,httpClient");
 		Robo4JUnit robo4JUnit2 = new Robo4JUnit();
-		robo4JUnit1.setUid("system2");
-		robo4JUnit1.setConfig("httpServer");
+		robo4JUnit2.setUid("system2");
+		robo4JUnit2.setConfig("httpServer");
+
+		Robo4JSystem robo4JSystem = new Robo4JSystem();
+		robo4JSystem.setUid("mainSystem");
+
 		sqlDataSourceUnit.onMessage(robo4JUnit1);
 		sqlDataSourceUnit.onMessage(robo4JUnit2);
+		sqlDataSourceUnit.onMessage(robo4JSystem);
 
 		AttributeDescriptor<List> descriptor = DefaultAttributeDescriptor.create(List.class, "units");
 		List<Robo4JUnit> list = (List<Robo4JUnit>) sqlDataSourceUnit.onGetAttribute(descriptor);
 		System.out.println("Stored entities = " + list);
 
-		Assert.assertTrue(Arrays.asList(robo4JUnit1, robo4JUnit2).size() == list.size());
+		Assert.assertTrue(Arrays.asList(robo4JUnit1, robo4JUnit2, robo4JSystem).size() == list.size());
 		Assert.assertTrue(list.contains(robo4JUnit1));
 		Assert.assertTrue(list.contains(robo4JUnit2));
+		Assert.assertTrue(list.contains(robo4JSystem));
 
 		system.shutdown();
 		System.out.println("systemPong: State after shutdown:");

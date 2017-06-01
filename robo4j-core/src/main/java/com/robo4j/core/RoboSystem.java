@@ -38,7 +38,7 @@ import com.robo4j.core.scheduler.Scheduler;
 
 /**
  * Contains RoboUnits, a lookup service for references to RoboUnits, and a system level life cycle.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
@@ -100,7 +100,7 @@ public class RoboSystem implements RoboContext {
 		@Override
 		public Class<T> getMessageType() {
 			return unit.getMessageType();
-		}		
+		}
 	}
 
 	public RoboSystem() {
