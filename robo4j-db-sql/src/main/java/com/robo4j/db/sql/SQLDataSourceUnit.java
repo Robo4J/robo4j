@@ -107,7 +107,7 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 				.getH2(RoboClassLoader.getInstance().getClassLoader(), packages);
 		PersistenceUnitDescriptor persistenceUnitDescriptor = new PersistenceUnitInfoDescriptor(persistenceUnitInfo);
 		EntityManagerFactoryBuilder builder = new EntityManagerFactoryBuilderImpl(persistenceUnitDescriptor,
-				new HashMap());
+				new HashMap<>());
 
 		registeredClasses = persistenceDescriptorProvider.registeredClasses();
 		emf = builder.build();
@@ -138,9 +138,9 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 				CriteriaBuilder cb = em.getCriteriaBuilder();
 				CriteriaQuery cq = cb.createQuery(rc);
 				Root<Robo4JUnit> rs = cq.from(rc);
-				CriteriaQuery cq2 = cq.select(rs);
+				CriteriaQuery<?> cq2 = cq.select(rs);
 
-				TypedQuery<Robo4JUnit> tq = em.createQuery(cq2);
+				TypedQuery<?> tq = em.createQuery(cq2);
 				return tq.getResultList();
 
 			}).flatMap(List::stream).collect(Collectors.toList());
