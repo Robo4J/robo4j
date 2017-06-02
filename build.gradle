@@ -250,8 +250,6 @@ project("robo4j-http") {
     }
 
     dependencies {
-        compile "javax.json:javax.json-api:${javaxJsonVersion}"
-        compile "org.glassfish:javax.json:${javaxJsonVersion}"
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
