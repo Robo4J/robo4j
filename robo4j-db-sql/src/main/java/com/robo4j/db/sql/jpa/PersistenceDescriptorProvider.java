@@ -18,23 +18,26 @@
 package com.robo4j.db.sql.jpa;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
 import javax.persistence.spi.PersistenceUnitInfo;
 
+import com.robo4j.core.client.util.RoboClassLoader;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.reflect.ReflectionScan;
 import com.robo4j.db.sql.support.UnitType;
 
 /**
  *
- *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public final class PersistenceDescriptorProvider {
+
+	private List<Class<?>> registeredClasses = null;
 
 	public PersistenceDescriptorProvider() {
 	}
@@ -62,9 +65,23 @@ public final class PersistenceDescriptorProvider {
         //@formatter:on
 	}
 
+	public List<Class<?>> registeredClasses() {
+		return registeredClasses;
+	}
+
+	// Private Methods
 	private List<String> scanForEntities(ClassLoader loader, String... entityPackages) {
 		ReflectionScan scan = new ReflectionScan(loader);
-		return processClassesWithAnnotation(loader, scan.scanForEntities(entityPackages));
+		List<String> classesNames = processClassesWithAnnotation(loader, scan.scanForEntities(entityPackages));
+		registeredClasses = classesNames.stream().map(cn -> {
+			try {
+				return RoboClassLoader.getInstance().getClassLoader().loadClass(cn);
+			} catch (ClassNotFoundException e) {
+				SimpleLoggingUtil.error(getClass(), "failed to load class: ", e);
+				return null;
+			}
+		}).filter(Objects::nonNull).collect(Collectors.toList());
+		return classesNames;
 	}
 
 	private List<String> processClassesWithAnnotation(ClassLoader loader, List<String> allClasses) {

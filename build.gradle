@@ -96,7 +96,6 @@ project("robo4j-db-sql") {
     }
 }
 
-
 project("robo4j-hw-lego") {
     description = "Robo4J Lego Hardware"
 

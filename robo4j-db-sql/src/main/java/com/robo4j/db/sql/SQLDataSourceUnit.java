@@ -17,23 +17,20 @@
 
 package com.robo4j.db.sql;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 import javax.persistence.spi.PersistenceUnitInfo;
 
-import com.robo4j.db.sql.model.Robo4JSystem;
-import com.robo4j.db.sql.model.RoboEntity;
 import org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl;
 import org.hibernate.jpa.boot.internal.PersistenceUnitInfoDescriptor;
 import org.hibernate.jpa.boot.spi.EntityManagerFactoryBuilder;
@@ -50,6 +47,7 @@ import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.httpunit.Constants;
 import com.robo4j.db.sql.jpa.PersistenceDescriptorProvider;
 import com.robo4j.db.sql.model.Robo4JUnit;
+import com.robo4j.db.sql.model.RoboEntity;
 import com.robo4j.db.sql.support.DataSourceContext;
 import com.robo4j.db.sql.support.DataSourceProxy;
 
@@ -65,6 +63,8 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 
 	private static final String PERSISTENCE_UNIT = "persistenceUnit";
 	private static final String PACKAGES = "packages";
+
+	private List<Class<?>> registeredClasses;
 	private String persistenceUnit;
 	private String[] packages;
 	private DataSourceContext dataSourceContext;
@@ -101,12 +101,15 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 	@Override
 	public void start() {
 		setState(LifecycleState.STARTING);
-		PersistenceUnitInfo persistenceUnitInfo = new PersistenceDescriptorProvider()
+
+		PersistenceDescriptorProvider persistenceDescriptorProvider = new PersistenceDescriptorProvider();
+		PersistenceUnitInfo persistenceUnitInfo = persistenceDescriptorProvider
 				.getH2(RoboClassLoader.getInstance().getClassLoader(), packages);
 		PersistenceUnitDescriptor persistenceUnitDescriptor = new PersistenceUnitInfoDescriptor(persistenceUnitInfo);
 		EntityManagerFactoryBuilder builder = new EntityManagerFactoryBuilderImpl(persistenceUnitDescriptor,
 				new HashMap());
 
+		registeredClasses = persistenceDescriptorProvider.registeredClasses();
 		emf = builder.build();
 		dataSourceContext = new DataSourceProxy(Collections.singleton(emf.createEntityManager()));
 		setState(LifecycleState.STARTED);
@@ -130,25 +133,17 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
 		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_NAME)
 				&& descriptor.getAttributeType() == List.class) {
-			EntityManager em = dataSourceContext.getEntityManager(Robo4JUnit.class);
-			CriteriaBuilder cb1 = em.getCriteriaBuilder();
-			CriteriaQuery<Robo4JUnit> q1 = cb1.createQuery(Robo4JUnit.class);
-			Root<Robo4JUnit> rs1 = q1.from(Robo4JUnit.class);
-			CriteriaQuery c1 = q1.select(rs1);
+			return (R) registeredClasses.stream().map(rc -> {
+				EntityManager em = dataSourceContext.getEntityManager(rc);
+				CriteriaBuilder cb = em.getCriteriaBuilder();
+				CriteriaQuery cq = cb.createQuery(rc);
+				Root<Robo4JUnit> rs = cq.from(rc);
+				CriteriaQuery cq2 = cq.select(rs);
 
-			CriteriaBuilder cb2 = em.getCriteriaBuilder();
-			CriteriaQuery<Robo4JSystem> q2 = cb2.createQuery(Robo4JSystem.class);
-			Root<Robo4JSystem> rs2 = q2.from(Robo4JSystem.class);
-			CriteriaQuery c2 = q2.select(rs2);
+				TypedQuery<Robo4JUnit> tq = em.createQuery(cq2);
+				return tq.getResultList();
 
-			TypedQuery<Robo4JUnit> query1 = em.createQuery(c1);
-			TypedQuery<Robo4JSystem> query2 = em.createQuery(c2);
-
-			List<Object> result = new ArrayList<>();
-			result.addAll(query1.getResultList());
-			result.addAll(query2.getResultList());
-			return (R) result;
-
+			}).flatMap(List::stream).collect(Collectors.toList());
 		}
 		return super.onGetAttribute(descriptor);
 	}
