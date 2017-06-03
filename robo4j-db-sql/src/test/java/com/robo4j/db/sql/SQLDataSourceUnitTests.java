@@ -20,6 +20,7 @@ package com.robo4j.db.sql;
 import java.util.Arrays;
 import java.util.List;
 
+import com.robo4j.db.sql.model.RoboEntity;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -45,7 +46,7 @@ public class SQLDataSourceUnitTests {
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
 		SQLDataSourceUnit sqlDataSourceUnit = new SQLDataSourceUnit(system, "dbSQLUnit");
-		config.setString("persistenceUnit", "h2");
+		config.setString("sourceType", "h2");
 		config.setString("packages", "com.robo4j.db.sql.model");
 		sqlDataSourceUnit.initialize(config);
 		system.addUnits(sqlDataSourceUnit);
@@ -72,14 +73,21 @@ public class SQLDataSourceUnitTests {
 		sqlDataSourceUnit.onMessage(robo4JUnit2);
 		sqlDataSourceUnit.onMessage(robo4JSystem);
 
-		AttributeDescriptor<List> descriptor = DefaultAttributeDescriptor.create(List.class, "units");
-		List<Robo4JUnit> list = (List<Robo4JUnit>) sqlDataSourceUnit.onGetAttribute(descriptor);
-		System.out.println("Stored entities = " + list);
+		AttributeDescriptor<List> descriptor1 = DefaultAttributeDescriptor.create(List.class, "units");
+		List<RoboEntity> list1 = (List<RoboEntity>) sqlDataSourceUnit.onGetAttribute(descriptor1);
+		System.out.println("Stored entities = " + list1);
 
-		Assert.assertTrue(Arrays.asList(robo4JUnit1, robo4JUnit2, robo4JSystem).size() == list.size());
-		Assert.assertTrue(list.contains(robo4JUnit1));
-		Assert.assertTrue(list.contains(robo4JUnit2));
-		Assert.assertTrue(list.contains(robo4JSystem));
+		AttributeDescriptor<List> descriptor2 = DefaultAttributeDescriptor.create(List.class, "system");
+		List<RoboEntity> list2 = (List<RoboEntity>) sqlDataSourceUnit.onGetAttribute(descriptor2);
+		System.out.println("Stored system1 = " + list2);
+
+		Assert.assertTrue(Arrays.asList(robo4JUnit1, robo4JUnit2, robo4JSystem).size() == list1.size());
+		Assert.assertTrue(list1.contains(robo4JUnit1));
+		Assert.assertTrue(list1.contains(robo4JUnit2));
+		Assert.assertTrue(list1.contains(robo4JSystem));
+
+		Assert.assertTrue(Arrays.asList(robo4JSystem).size() == list2.size());
+		Assert.assertTrue(list2.contains(robo4JSystem));
 
 		system.shutdown();
 		System.out.println("systemPong: State after shutdown:");

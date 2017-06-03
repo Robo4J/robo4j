@@ -31,7 +31,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "ROBO4J_SYSTEM")
-public class Robo4JSystem implements RoboEntity {
+public class Robo4JSystem implements RoboEntity<Long> {
 
 	private static final long serialVersionUID = 1;
 
@@ -41,6 +41,7 @@ public class Robo4JSystem implements RoboEntity {
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Override
 	public Long getId() {
 		return id;
 	}

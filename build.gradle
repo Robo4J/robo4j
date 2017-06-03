@@ -178,7 +178,7 @@ project("robo4j-hw-rpi") {
         manifest {
             attributes 'Implementation-Title': 'robo4j-hw-rpi',
                     'Implementation-Version': version,
-                    'Main-Class': ' com.robo4j.hw.rpi.pad.LF710PadExample'
+                    'Main-Class': 'com.robo4j.hw.rpi.i2c.magnetometer.MagnetometerLSM303Test'
         }
         //baseName = project.name + '-all'
         baseName = 'robo4j-hw-rpi'

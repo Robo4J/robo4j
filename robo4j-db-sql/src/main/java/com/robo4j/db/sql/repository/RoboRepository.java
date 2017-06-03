@@ -15,23 +15,23 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.db.sql;
+package com.robo4j.db.sql.repository;
+
+import java.util.List;
+import java.util.Map;
 
 /**
- *
- * Default Exception thrown by DB
- *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class Robo4DbException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
+public interface RoboRepository {
 
-	public Robo4DbException(String message) {
-		super(message);
-	}
+    <T> List<T> findAllByClass(Class<T> clazz);
 
-	public Robo4DbException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    <T, ID> T findById(Class<T> clazz, ID id);
+
+    <T> List<T> findByFields(Class<T> clazz, Map<String, Object> map);
+
+    <T> T save(T entity);
+    
 }

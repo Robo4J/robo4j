@@ -19,9 +19,11 @@ package com.robo4j.db.sql.support;
 
 import com.robo4j.db.sql.repository.JpaDataSourceContext;
 
+import java.util.Collections;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -29,11 +31,13 @@ import javax.persistence.EntityManager;
  */
 public class DataSourceProxy implements DataSourceContext {
 
+	private final EntityManagerFactory emf;
 	private Set<EntityManager> entityManagers;
 	private DataSourceContext dataSourceContext;
 
-	public DataSourceProxy(Set<EntityManager> entityManagers) {
-		this.entityManagers = entityManagers;
+	public DataSourceProxy( EntityManagerFactory emf) {
+		this.emf = emf;
+		this.entityManagers = Collections.singleton(emf.createEntityManager());
 	}
 
 	@Override
@@ -47,5 +51,8 @@ public class DataSourceProxy implements DataSourceContext {
 	@Override
 	public void close() {
 		dataSourceContext.close();
+		emf.close();
 	}
+
+
 }

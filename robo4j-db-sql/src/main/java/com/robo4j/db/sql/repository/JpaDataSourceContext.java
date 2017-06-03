@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.metamodel.ManagedType;
 
-import com.robo4j.db.sql.Robo4DbException;
+import com.robo4j.db.sql.RoboDbException;
 import com.robo4j.db.sql.support.DataSourceContext;
 import com.robo4j.db.sql.support.DbEm;
 
@@ -55,10 +55,12 @@ public class JpaDataSourceContext implements DataSourceContext {
 	@Override
 	public EntityManager getEntityManager(Class<?> clazz) {
 		if (clazz == null) {
-			throw new Robo4DbException("not allowed state clazz: " + clazz);
+			throw new RoboDbException("not allowed: state null clazz");
 		}
 		return entityManagerCache.get(clazz);
 	}
+
+
 
 	/**
 	 * close all entity managers
@@ -69,6 +71,7 @@ public class JpaDataSourceContext implements DataSourceContext {
 		entityManagerCache.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .map(EntityManager.class::cast)
+				.filter(EntityManager::isOpen)
 				.forEach(EntityManager::close);
 		//@formatter:on
 	}

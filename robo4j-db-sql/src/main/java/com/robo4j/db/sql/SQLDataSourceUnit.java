@@ -17,20 +17,29 @@
 
 package com.robo4j.db.sql;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.persistence.spi.PersistenceUnitInfo;
 
+import com.robo4j.core.RoboSystem;
+import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.db.sql.jpa.PersistenceDescriptorFactory;
+import com.robo4j.db.sql.model.Robo4JSystem;
+import com.robo4j.db.sql.repository.DefaultRepository;
+import com.robo4j.db.sql.repository.RoboRepository;
+import com.robo4j.db.sql.support.DataSourceType;
+import com.robo4j.db.sql.support.PersistenceContextBuilder;
 import org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl;
 import org.hibernate.jpa.boot.internal.PersistenceUnitInfoDescriptor;
 import org.hibernate.jpa.boot.spi.EntityManagerFactoryBuilder;
@@ -45,7 +54,6 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.util.RoboClassLoader;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.httpunit.Constants;
-import com.robo4j.db.sql.jpa.PersistenceDescriptorProvider;
 import com.robo4j.db.sql.model.Robo4JUnit;
 import com.robo4j.db.sql.model.RoboEntity;
 import com.robo4j.db.sql.support.DataSourceContext;
@@ -58,17 +66,19 @@ import com.robo4j.db.sql.support.DataSourceProxy;
 public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 
 	private static final String ATTRIBUTE_ROBO_UNIT_NAME = "units";
-	private static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
-			.singleton(DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_NAME));
+	private static final String ATTRIBUTE_ROBO_SYSTEM_NAME = "system";
+	private static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Arrays.asList(
+					DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_NAME),
+					DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_SYSTEM_NAME));
 
-	private static final String PERSISTENCE_UNIT = "persistenceUnit";
+	private static final String PERSISTENCE_UNIT = "sourceType";
 	private static final String PACKAGES = "packages";
 
 	private List<Class<?>> registeredClasses;
-	private String persistenceUnit;
+	private DataSourceType sourceType;
 	private String[] packages;
 	private DataSourceContext dataSourceContext;
-	private EntityManagerFactory emf;
+	private RoboRepository repository;
 
 	public SQLDataSourceUnit(RoboContext context, String id) {
 		super(RoboEntity.class, context, id);
@@ -76,42 +86,34 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		persistenceUnit = configuration.getString(PERSISTENCE_UNIT, null);
-		if (persistenceUnit == null) {
+		String tmpSourceType = configuration.getString(PERSISTENCE_UNIT, null);
+		if (tmpSourceType == null) {
 			throw ConfigurationException.createMissingConfigNameException(PERSISTENCE_UNIT);
 		}
+		sourceType = DataSourceType.getByName(tmpSourceType);
 
 		String tmpPackages = configuration.getString(PACKAGES, null);
 		if (tmpPackages == null) {
 			throw ConfigurationException.createMissingConfigNameException(PACKAGES);
 		}
-		//@formatter:off
 		packages = tmpPackages.split(Constants.UTF8_COMMA);
-		//@formatter:on
 	}
 
 	@Override
 	public void onMessage(RoboEntity message) {
-		EntityManager em = dataSourceContext.getEntityManager(message.getClass());
-		em.getTransaction().begin();
-		em.persist(message);
-		em.getTransaction().commit();
+		Object id = repository.save(message);
+		if(id == null) {
+			SimpleLoggingUtil.error(getClass(), "entity not stored: " + message);
+		}
 	}
 
 	@Override
 	public void start() {
 		setState(LifecycleState.STARTING);
-
-		PersistenceDescriptorProvider persistenceDescriptorProvider = new PersistenceDescriptorProvider();
-		PersistenceUnitInfo persistenceUnitInfo = persistenceDescriptorProvider
-				.getH2(RoboClassLoader.getInstance().getClassLoader(), packages);
-		PersistenceUnitDescriptor persistenceUnitDescriptor = new PersistenceUnitInfoDescriptor(persistenceUnitInfo);
-		EntityManagerFactoryBuilder builder = new EntityManagerFactoryBuilderImpl(persistenceUnitDescriptor,
-				new HashMap<>());
-
-		registeredClasses = persistenceDescriptorProvider.registeredClasses();
-		emf = builder.build();
-		dataSourceContext = new DataSourceProxy(Collections.singleton(emf.createEntityManager()));
+		PersistenceContextBuilder builder = new PersistenceContextBuilder(sourceType, packages).build();
+		registeredClasses = builder.getRegisteredClasses();
+		dataSourceContext = builder.getDataSourceContext();
+		repository = new DefaultRepository(dataSourceContext);
 		setState(LifecycleState.STARTED);
 	}
 
@@ -124,7 +126,7 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 	@Override
 	public void shutdown() {
 		setState(LifecycleState.SHUTTING_DOWN);
-		emf.close();
+		dataSourceContext.close();
 		setState(LifecycleState.SHUTDOWN);
 	}
 
@@ -133,20 +135,24 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
 		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_NAME)
 				&& descriptor.getAttributeType() == List.class) {
-			return (R) registeredClasses.stream().map(rc -> {
-				EntityManager em = dataSourceContext.getEntityManager(rc);
-				CriteriaBuilder cb = em.getCriteriaBuilder();
-				CriteriaQuery cq = cb.createQuery(rc);
-				Root<Robo4JUnit> rs = cq.from(rc);
-				CriteriaQuery<?> cq2 = cq.select(rs);
-
-				TypedQuery<?> tq = em.createQuery(cq2);
-				return tq.getResultList();
-
-			}).flatMap(List::stream).collect(Collectors.toList());
+			return (R) registeredClasses.stream().map(rc ->
+				repository.findAllByClass(rc))
+					.flatMap(List::stream)
+					.collect(Collectors.toList());
 		}
+
+		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_SYSTEM_NAME)
+				&& descriptor.getAttributeType() == List.class) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("uid", "mainSystem");
+
+			return (R) repository.findByFields(Robo4JSystem.class, map);
+		}
+
 		return super.onGetAttribute(descriptor);
 	}
+
+	
 
 	@Override
 	public Collection<AttributeDescriptor<?>> getKnownAttributes() {

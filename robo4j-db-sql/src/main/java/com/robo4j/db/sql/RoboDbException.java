@@ -15,34 +15,23 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.db.sql.support;
+package com.robo4j.db.sql;
 
 /**
+ *
+ * Default Exception thrown by DB
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum UnitType {
+public class RoboDbException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
-    //@formatter::off
-    H2              ("h2"),
-    POSTGRESQL      ("postgresql")
-    ;
-    //@formatter::off
+	public RoboDbException(String message) {
+		super(message);
+	}
 
-    final String value;
-
-    UnitType(String value) {
-        this.value = value;
-    }
-
-    public String getValue(){
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return "UnitType{" +
-                "value='" + value + '\'' +
-                '}';
-    }
+	public RoboDbException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

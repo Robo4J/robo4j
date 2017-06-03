@@ -28,21 +28,37 @@ import javax.persistence.spi.PersistenceUnitInfo;
 import com.robo4j.core.client.util.RoboClassLoader;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.reflect.ReflectionScan;
-import com.robo4j.db.sql.support.UnitType;
+import com.robo4j.db.sql.RoboDbException;
+import com.robo4j.db.sql.support.DataSourceType;
 
 /**
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class PersistenceDescriptorProvider {
+public final class PersistenceDescriptorFactory {
 
 	private List<Class<?>> registeredClasses = null;
 
-	public PersistenceDescriptorProvider() {
+	public PersistenceDescriptorFactory() {
 	}
 
-	public PersistenceUnitInfo getH2(ClassLoader classloader, String... entityPackages) {
+	public PersistenceUnitInfo get(ClassLoader classloader, DataSourceType type, String... entityPackages) {
+		switch (type) {
+		case H2:
+			return getH2(classloader, entityPackages);
+		case POSTGRESQL:
+		default:
+			throw new RoboDbException("not supported datasource," + type);
+		}
+	}
+
+	public List<Class<?>> registeredClasses() {
+		return registeredClasses;
+	}
+
+	// Private Methods
+	private PersistenceUnitInfo getH2(ClassLoader classloader, String... entityPackages) {
 		final Properties properties = new Properties();
 		properties.setProperty("hibernate.archive.autodetection", "class, hbm");
 		properties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
@@ -55,7 +71,7 @@ public final class PersistenceDescriptorProvider {
 
 		//@formatter:off
         return PersistenceUnitInfoBuilder.Builder()
-                .addProperty("name", UnitType.H2.getValue())
+                .addProperty("name", DataSourceType.H2.getName())
                 .addProperty("transaction-type", "RESOURCE_LOCAL")
                 .addProperty("classes", scanForEntities(classloader, entityPackages))
                 .addProperty("provider", "org.hibernate.jpa.HibernatePersistenceProvider")
@@ -65,11 +81,6 @@ public final class PersistenceDescriptorProvider {
         //@formatter:on
 	}
 
-	public List<Class<?>> registeredClasses() {
-		return registeredClasses;
-	}
-
-	// Private Methods
 	private List<String> scanForEntities(ClassLoader loader, String... entityPackages) {
 		ReflectionScan scan = new ReflectionScan(loader);
 		List<String> classesNames = processClassesWithAnnotation(loader, scan.scanForEntities(entityPackages));
