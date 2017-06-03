@@ -20,7 +20,6 @@ package com.robo4j.db.sql;
 import java.util.Arrays;
 import java.util.List;
 
-import com.robo4j.db.sql.model.RoboEntity;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,6 +31,7 @@ import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.util.SystemUtil;
 import com.robo4j.db.sql.model.Robo4JSystem;
 import com.robo4j.db.sql.model.Robo4JUnit;
+import com.robo4j.db.sql.model.RoboEntity;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -74,11 +74,11 @@ public class SQLDataSourceUnitTests {
 		sqlDataSourceUnit.onMessage(robo4JSystem);
 
 		AttributeDescriptor<List> descriptor1 = DefaultAttributeDescriptor.create(List.class, "units");
-		List<RoboEntity> list1 = (List<RoboEntity>) sqlDataSourceUnit.onGetAttribute(descriptor1);
+		List<RoboEntity<Long>> list1 = (List<RoboEntity<Long>>) sqlDataSourceUnit.onGetAttribute(descriptor1);
 		System.out.println("Stored entities = " + list1);
 
 		AttributeDescriptor<List> descriptor2 = DefaultAttributeDescriptor.create(List.class, "system");
-		List<RoboEntity> list2 = (List<RoboEntity>) sqlDataSourceUnit.onGetAttribute(descriptor2);
+		List<RoboEntity<Long>> list2 = sqlDataSourceUnit.onGetAttribute(descriptor2);
 		System.out.println("Stored system1 = " + list2);
 
 		Assert.assertTrue(Arrays.asList(robo4JUnit1, robo4JUnit2, robo4JSystem).size() == list1.size());

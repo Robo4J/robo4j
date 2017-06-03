@@ -19,31 +19,10 @@ package com.robo4j.db.sql;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import javax.persistence.spi.PersistenceUnitInfo;
-
-import com.robo4j.core.RoboSystem;
-import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.db.sql.jpa.PersistenceDescriptorFactory;
-import com.robo4j.db.sql.model.Robo4JSystem;
-import com.robo4j.db.sql.repository.DefaultRepository;
-import com.robo4j.db.sql.repository.RoboRepository;
-import com.robo4j.db.sql.support.DataSourceType;
-import com.robo4j.db.sql.support.PersistenceContextBuilder;
-import org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl;
-import org.hibernate.jpa.boot.internal.PersistenceUnitInfoDescriptor;
-import org.hibernate.jpa.boot.spi.EntityManagerFactoryBuilder;
-import org.hibernate.jpa.boot.spi.PersistenceUnitDescriptor;
 
 import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.ConfigurationException;
@@ -51,13 +30,16 @@ import com.robo4j.core.DefaultAttributeDescriptor;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
-import com.robo4j.core.client.util.RoboClassLoader;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.httpunit.Constants;
-import com.robo4j.db.sql.model.Robo4JUnit;
+import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.db.sql.model.Robo4JSystem;
 import com.robo4j.db.sql.model.RoboEntity;
+import com.robo4j.db.sql.repository.DefaultRepository;
+import com.robo4j.db.sql.repository.RoboRepository;
 import com.robo4j.db.sql.support.DataSourceContext;
-import com.robo4j.db.sql.support.DataSourceProxy;
+import com.robo4j.db.sql.support.DataSourceType;
+import com.robo4j.db.sql.support.PersistenceContextBuilder;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -68,8 +50,8 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 	private static final String ATTRIBUTE_ROBO_UNIT_NAME = "units";
 	private static final String ATTRIBUTE_ROBO_SYSTEM_NAME = "system";
 	private static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Arrays.asList(
-					DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_NAME),
-					DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_SYSTEM_NAME));
+			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_NAME),
+			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_SYSTEM_NAME));
 
 	private static final String PERSISTENCE_UNIT = "sourceType";
 	private static final String PACKAGES = "packages";
@@ -102,7 +84,7 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 	@Override
 	public void onMessage(RoboEntity message) {
 		Object id = repository.save(message);
-		if(id == null) {
+		if (id == null) {
 			SimpleLoggingUtil.error(getClass(), "entity not stored: " + message);
 		}
 	}
@@ -135,9 +117,7 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
 		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_NAME)
 				&& descriptor.getAttributeType() == List.class) {
-			return (R) registeredClasses.stream().map(rc ->
-				repository.findAllByClass(rc))
-					.flatMap(List::stream)
+			return (R) registeredClasses.stream().map(rc -> repository.findAllByClass(rc)).flatMap(List::stream)
 					.collect(Collectors.toList());
 		}
 
@@ -151,8 +131,6 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 
 		return super.onGetAttribute(descriptor);
 	}
-
-	
 
 	@Override
 	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
