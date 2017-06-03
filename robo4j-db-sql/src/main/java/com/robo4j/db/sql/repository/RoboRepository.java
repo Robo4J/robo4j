@@ -20,18 +20,20 @@ package com.robo4j.db.sql.repository;
 import java.util.List;
 import java.util.Map;
 
+import com.robo4j.db.sql.support.SortType;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public interface RoboRepository {
 
-    <T> List<T> findAllByClass(Class<T> clazz);
+	<T> List<T> findAllByClass(Class<T> clazz);
 
-    <T, ID> T findById(Class<T> clazz, ID id);
+	<T, ID> T findById(Class<T> clazz, ID id);
 
-    <T> List<T> findByFields(Class<T> clazz, Map<String, Object> map);
+	<T> List<T> findByFields(Class<T> clazz, Map<String, Object> map, int limit, SortType sort);
 
-    <T> T save(T entity);
-    
+	<T> T save(T entity);
+
 }

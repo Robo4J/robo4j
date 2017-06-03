@@ -24,7 +24,8 @@ import java.io.Serializable;
  * @author Miro Wengner (@miragemiko)
  */
 public interface RoboEntity<ID> extends Serializable {
-    long serialVersionUID = 1;
+	long serialVersionUID = 1;
 
-    ID getId();
+	ID getId();
+
 }

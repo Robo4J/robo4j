@@ -48,6 +48,8 @@ public class SQLDataSourceUnitTests {
 		SQLDataSourceUnit sqlDataSourceUnit = new SQLDataSourceUnit(system, "dbSQLUnit");
 		config.setString("sourceType", "h2");
 		config.setString("packages", "com.robo4j.db.sql.model");
+		config.setInteger("limit", 2);
+		config.setString("sorted", "asc");
 		sqlDataSourceUnit.initialize(config);
 		system.addUnits(sqlDataSourceUnit);
 
@@ -94,4 +96,49 @@ public class SQLDataSourceUnitTests {
 		System.out.println(SystemUtil.printStateReport(system));
 
 	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testEntityOrderWithLimit() throws Exception {
+		final int max = 5;
+		final int limit = 2;
+		final RoboSystem system = new RoboSystem();
+		Configuration config = ConfigurationFactory.createEmptyConfiguration();
+
+		SQLDataSourceUnit sqlDataSourceUnit = new SQLDataSourceUnit(system, "dbSQLUnit");
+		config.setString("sourceType", "h2");
+		config.setString("packages", "com.robo4j.db.sql.model");
+		config.setInteger("limit", limit);
+		config.setString("sorted", "desc");
+		sqlDataSourceUnit.initialize(config);
+		system.addUnits(sqlDataSourceUnit);
+
+		System.out.println("systemPong: State before start:");
+		System.out.println(SystemUtil.printStateReport(system));
+
+		system.start();
+
+		System.out.println("systemPong: State after start:");
+		System.out.println(SystemUtil.printStateReport(system));
+
+		Robo4JSystem robo4JSystem = null;
+		for (int i = 0; i < max; i++) {
+			robo4JSystem = new Robo4JSystem();
+			robo4JSystem.setUid("mainSystem");
+			sqlDataSourceUnit.onMessage(robo4JSystem);
+		}
+
+		AttributeDescriptor<List> descriptor1 = DefaultAttributeDescriptor.create(List.class, "system");
+		List<RoboEntity<Long>> list1 = sqlDataSourceUnit.onGetAttribute(descriptor1);
+		System.out.println("Stored system1 = " + list1);
+
+		Assert.assertNotNull(robo4JSystem);
+		Assert.assertTrue(list1.size() == limit);
+		Assert.assertTrue(list1.get(0).getId() == max);
+
+		system.shutdown();
+		System.out.println("systemPong: State after shutdown:");
+		System.out.println(SystemUtil.printStateReport(system));
+	}
+
 }

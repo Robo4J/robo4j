@@ -25,10 +25,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import com.robo4j.db.sql.support.DataSourceContext;
+import com.robo4j.db.sql.support.SortType;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -36,6 +38,7 @@ import com.robo4j.db.sql.support.DataSourceContext;
  */
 public class DefaultRepository implements RoboRepository {
 
+	private static final String FIELD_ID = "id";
 	private final DataSourceContext dataSourceContext;
 
 	public DefaultRepository(DataSourceContext dataSourceContext) {
@@ -62,7 +65,7 @@ public class DefaultRepository implements RoboRepository {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> List<T> findByFields(Class<T> clazz, Map<String, Object> map) {
+	public <T> List<T> findByFields(Class<T> clazz, Map<String, Object> map, int limit, SortType sort) {
 		EntityManager em = dataSourceContext.getEntityManager(clazz);
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery cq = cb.createQuery(clazz);
@@ -70,10 +73,14 @@ public class DefaultRepository implements RoboRepository {
 		Root<T> rs = cq.from(clazz);
 		List<Predicate> predicates = map.entrySet().stream().map(e -> cb.equal(rs.get(e.getKey()), e.getValue()))
 				.collect(Collectors.toList());
-		CriteriaQuery<T> cq2 = cq.where(predicates.toArray(new Predicate[predicates.size()])).select(rs);
+		CriteriaQuery<T> cq2 = cq.where(predicates.toArray(new Predicate[predicates.size()]))
+				.orderBy(getOrderById(cb, rs, sort)).select(rs);
 
 		TypedQuery<T> tq = em.createQuery(cq2);
-		return tq.getResultList();
+		//@formatter:off
+		return tq.setMaxResults(limit)
+				.getResultList();
+		//@formatter:on
 	}
 
 	@Override
@@ -83,6 +90,11 @@ public class DefaultRepository implements RoboRepository {
 		em.persist(entity);
 		em.getTransaction().commit();
 		return entity;
+	}
+
+	// Private Methods
+	private Order getOrderById(CriteriaBuilder cb, Root rs, SortType sortType) {
+		return sortType.equals(SortType.ASC) ? cb.asc(rs.get(FIELD_ID)) : cb.desc(rs.get(FIELD_ID));
 	}
 
 }

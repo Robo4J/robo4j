@@ -40,6 +40,7 @@ import com.robo4j.db.sql.repository.RoboRepository;
 import com.robo4j.db.sql.support.DataSourceContext;
 import com.robo4j.db.sql.support.DataSourceType;
 import com.robo4j.db.sql.support.PersistenceContextBuilder;
+import com.robo4j.db.sql.support.SortType;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -58,6 +59,8 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 
 	private List<Class<?>> registeredClasses;
 	private DataSourceType sourceType;
+	private int limit;
+	private SortType sorted;
 	private String[] packages;
 	private DataSourceContext dataSourceContext;
 	private RoboRepository repository;
@@ -79,6 +82,8 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 			throw ConfigurationException.createMissingConfigNameException(PACKAGES);
 		}
 		packages = tmpPackages.split(Constants.UTF8_COMMA);
+		limit = configuration.getInteger("limit", 2);
+		sorted = SortType.getByName(configuration.getString("sorted", "desc"));
 	}
 
 	@Override
@@ -126,7 +131,7 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 			Map<String, Object> map = new HashMap<>();
 			map.put("uid", "mainSystem");
 
-			return (R) repository.findByFields(Robo4JSystem.class, map);
+			return (R) repository.findByFields(Robo4JSystem.class, map, limit, sorted);
 		}
 
 		return super.onGetAttribute(descriptor);
