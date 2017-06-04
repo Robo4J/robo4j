@@ -38,6 +38,7 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 	public static final int AXIS_ENABLE_Z = 4;
 	public static final int AXIS_ENABLE_ALL = AXIS_ENABLE_X | AXIS_ENABLE_Y | AXIS_ENABLE_Z;
 
+	private static final int DEFAULT_I2C_ADDRESS = 0x19;
 	private static final int CTRL_REG1_A = 0x20;
 	private static final int CTRL_REG4_A = 0x23;
 	private static final int OUT_X_L_A = 0x28;
@@ -52,7 +53,7 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 	}
 
 	public AccelerometerLSM303Device(PowerMode mode, DataRate rate, FullScale scale, boolean highres) throws IOException {
-		this(I2CBus.BUS_1, 0x19, mode, rate, AXIS_ENABLE_ALL, scale, highres);
+		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, mode, rate, AXIS_ENABLE_ALL, scale, highres);
 	}
 
 	public AccelerometerLSM303Device(int bus, int address, PowerMode mode, DataRate rate, int axisEnable, FullScale scale,
