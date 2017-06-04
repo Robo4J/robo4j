@@ -93,7 +93,7 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 	}
 
 	public void setGain(Gain gain) throws IOException {
-		writeByte(CRB_REG_M, (byte) gain.getGain());
+		writeByte(CRB_REG_M, gain.getCtrlCode());
 		this.gain = gain;
 	}
 
@@ -103,18 +103,18 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 				400), GAIN_4_7(4.7f, 0xA0, 400, 350), GAIN_5_6(5.6f, 0xC0, 330, 295), GAIN_8_1(8.1f, 0xE0, 230, 205);
 
 		private float gain;
-		private int ctrlCode;
+		private byte ctrlCode;
 		private float xy;
 		private float z;
 
 		Gain(float gain, int ctrlCode, float xy, float z) {
 			this.gain = gain;
-			this.ctrlCode = ctrlCode;
+			this.ctrlCode = (byte) ctrlCode;
 			this.xy = xy;
 			this.z = z;
 		}
 
-		public int getCtrlCode() {
+		public byte getCtrlCode() {
 			return ctrlCode;
 		}
 
