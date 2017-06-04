@@ -50,11 +50,12 @@ import com.robo4j.db.sql.support.SortType;
 public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 
 	private static final String ATTRIBUTE_ROBO_ALL_NAME = "all";
-	private static final String ATTRIBUTE_ROBO_UNIT_NAME = "units";
+	private static final String ATTRIBUTE_ROBO_UNIT_ASC_NAME = "units_asc";
+	private static final String ATTRIBUTE_ROBO_UNIT_DESC_NAME = "units_desc";
 	private static final String ATTRIBUTE_ROBO_SYSTEM_NAME = "system";
 	private static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Arrays.asList(
 			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_ALL_NAME),
-			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_NAME),
+			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_ASC_NAME),
 			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_SYSTEM_NAME));
 
 	private static final String PERSISTENCE_UNIT = "sourceType";
@@ -126,16 +127,23 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_ALL_NAME)
 				&& descriptor.getAttributeType() == List.class) {
 			//@formatter:off
-			return (R) registeredClasses.stream().map(rc -> repository.findAllByClass(rc))
+			return (R) registeredClasses.stream().map(rc -> repository.findAllByClass(rc, SortType.ASC))
 					.flatMap(List::stream)
 					.collect(Collectors.toList());
 			//@formatter:on
 		}
 
-		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_NAME)
+		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_ASC_NAME)
 				&& descriptor.getAttributeType() == List.class) {
 			//@formatter:off
-			return (R) repository.findAllByClass(Robo4JUnit.class);
+			return (R) repository.findAllByClass(Robo4JUnit.class, SortType.ASC);
+			//@formatter:on
+		}
+
+		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_DESC_NAME)
+				&& descriptor.getAttributeType() == List.class) {
+			//@formatter:off
+			return (R) repository.findAllByClass(Robo4JUnit.class, SortType.DESC);
 			//@formatter:on
 		}
 

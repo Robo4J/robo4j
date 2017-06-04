@@ -103,7 +103,7 @@ public class SQLDataSourceUnitTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testOnlyRoboUnitWithPointsInDB() throws Exception {
+	public void testOnlyRoboUnitASCWithPointsInDB() throws Exception {
 		final RoboSystem system = new RoboSystem();
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
@@ -140,7 +140,7 @@ public class SQLDataSourceUnitTests {
 		sqlDataSourceUnit.onMessage(robo4JUnit2);
 		sqlDataSourceUnit.onMessage(robo4JSystem);
 
-		AttributeDescriptor<List> descriptor1 = DefaultAttributeDescriptor.create(List.class, "units");
+		AttributeDescriptor<List> descriptor1 = DefaultAttributeDescriptor.create(List.class, "units_asc");
 		List<RoboEntity<Long>> list1 = (List<RoboEntity<Long>>) sqlDataSourceUnit.onGetAttribute(descriptor1);
 		System.out.println("Stored entities = " + list1.size());
 		System.out.println("Stored entities = " + list1);
@@ -155,6 +155,67 @@ public class SQLDataSourceUnitTests {
 		Assert.assertTrue(unit1.getPoints().size() == 2);
 		Assert.assertTrue(!unit2.getPoints().isEmpty());
 		Assert.assertTrue(unit2.getPoints().size() == 1);
+
+
+		system.shutdown();
+		System.out.println("systemPong: State after shutdown:");
+		System.out.println(SystemUtil.printStateReport(system));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testOnlyRoboUnitDESCWithPointsInDB() throws Exception {
+		final RoboSystem system = new RoboSystem();
+		Configuration config = ConfigurationFactory.createEmptyConfiguration();
+
+		SQLDataSourceUnit sqlDataSourceUnit = new SQLDataSourceUnit(system, "dbSQLUnit");
+		config.setString("sourceType", "h2");
+		config.setString("packages", "com.robo4j.db.sql.model");
+		config.setInteger("limit", 2);
+		config.setString("sorted", "asc");
+		sqlDataSourceUnit.initialize(config);
+		system.addUnits(sqlDataSourceUnit);
+
+		System.out.println("systemPong: State before start:");
+		System.out.println(SystemUtil.printStateReport(system));
+
+		system.start();
+
+		System.out.println("systemPong: State after start:");
+		System.out.println(SystemUtil.printStateReport(system));
+
+		Robo4JUnit robo4JUnit1 = new Robo4JUnit();
+		robo4JUnit1.setUid("system1");
+		robo4JUnit1.setConfig("dbSQLUnit,httpClient");
+		robo4JUnit1.setPoints(getRoboPoint(robo4JUnit1, 2));
+
+		Robo4JUnit robo4JUnit2 = new Robo4JUnit();
+		robo4JUnit2.setUid("system2");
+		robo4JUnit2.setConfig("httpServer");
+		robo4JUnit2.setPoints(getRoboPoint(robo4JUnit2, 1));
+
+		Robo4JSystem robo4JSystem = new Robo4JSystem();
+		robo4JSystem.setUid("mainSystem");
+
+		sqlDataSourceUnit.onMessage(robo4JUnit1);
+		sqlDataSourceUnit.onMessage(robo4JUnit2);
+		sqlDataSourceUnit.onMessage(robo4JSystem);
+
+		AttributeDescriptor<List> descriptor1 = DefaultAttributeDescriptor.create(List.class, "units_desc");
+		List<RoboEntity<Long>> list1 = (List<RoboEntity<Long>>) sqlDataSourceUnit.onGetAttribute(descriptor1);
+		System.out.println("Stored entities = " + list1.size());
+		System.out.println("Stored entities = " + list1);
+
+		Assert.assertTrue(Arrays.asList(robo4JUnit1, robo4JUnit2).size() == list1.size());
+		Assert.assertTrue(list1.contains(robo4JUnit1));
+		Assert.assertTrue(list1.contains(robo4JUnit2));
+
+		Robo4JUnit unit1 = (Robo4JUnit)list1.get(0);
+		Robo4JUnit unit2 = (Robo4JUnit)list1.get(1);
+		Assert.assertTrue(!unit1.getPoints().isEmpty());
+		Assert.assertTrue(unit1.getPoints().size() == 1);
+		Assert.assertTrue(!unit2.getPoints().isEmpty());
+		Assert.assertTrue(unit2.getPoints().size() == 2);
 
 
 		system.shutdown();
