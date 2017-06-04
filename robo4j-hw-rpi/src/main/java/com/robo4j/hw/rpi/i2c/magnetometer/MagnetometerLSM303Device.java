@@ -75,7 +75,26 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 		rawData.z = read16bitSigned(data, 4);
 		return rawData;
 	}
-	
+
+	/**
+	 * Helper function to convert the result to a compass heading. Note that
+	 * this only works if the device is lying flat. For a better result, use
+	 * accelerometer readings, and properly calculate the heading.
+	 * 
+	 * @param magResult
+	 *            a result to use to calculate the compass heading.
+	 * 
+	 * @return the (XY) compass heading.
+	 */
+	public static float getCompassHeading(Int3D magResult) {
+		float heading = (float) ((Math.atan2(magResult.y, magResult.x) * 180.0) / Math.PI);
+
+		if (heading < 0) {
+			heading = 360 + heading;
+		}
+		return heading;
+	}
+
 	private short read16bitSigned(byte[] data, int i) {
 		short val = (short) (data[i] << 8 | (data[i + 1] & 0xFF));
 		return val;
@@ -98,8 +117,7 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 	}
 
 	public enum Gain {
-		GAIN_1_3(1.3f, 0x20, 1100, 980), GAIN_1_9(1.9f, 0x40, 855, 760), GAIN_2_5(2.5f, 0x60, 670, 600), GAIN_4_0(4.0f,
-				0x80, 450,
+		GAIN_1_3(1.3f, 0x20, 1100, 980), GAIN_1_9(1.9f, 0x40, 855, 760), GAIN_2_5(2.5f, 0x60, 670, 600), GAIN_4_0(4.0f, 0x80, 450,
 				400), GAIN_4_7(4.7f, 0xA0, 400, 350), GAIN_5_6(5.6f, 0xC0, 330, 295), GAIN_8_1(8.1f, 0xE0, 230, 205);
 
 		private float gain;
@@ -132,8 +150,8 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 	}
 
 	public enum Rate {
-		RATE_0_75(0.75f, 0x00), RATE_1_5(1.5f, 0x01), RATE_3_0(3.0f, 0x62), RATE_7_5(7.5f, 0x03), RATE_15(15f,
-				0x04), RATE_30(30f, 0x05), RATE_75(75f, 0x06), RATE_220(220f, 0x07);
+		RATE_0_75(0.75f, 0x00), RATE_1_5(1.5f, 0x01), RATE_3_0(3.0f, 0x62), RATE_7_5(7.5f, 0x03), RATE_15(15f, 0x04), RATE_30(30f,
+				0x05), RATE_75(75f, 0x06), RATE_220(220f, 0x07);
 
 		private float rate;
 		private int ctrlCode;

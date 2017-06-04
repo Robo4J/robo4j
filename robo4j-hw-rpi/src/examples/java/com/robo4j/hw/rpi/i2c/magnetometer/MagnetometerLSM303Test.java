@@ -46,7 +46,7 @@ public class MagnetometerLSM303Test {
 			if (count % modulo == 0) {
 				if (printRaw) {
 					Int3D fl = device.readRaw();
-					System.out.println(String.format("Raw Value %d = %s", count, fl.toString()));					
+					System.out.println(String.format("Raw Value %d = %s\tHeading:%000.0f", count, fl.toString(), MagnetometerLSM303Device.getCompassHeading(fl)));					
 				} else {
 					Float3D fl = device.read();
 					System.out.println(String.format("Value %d = %s", count, fl.toString()));
