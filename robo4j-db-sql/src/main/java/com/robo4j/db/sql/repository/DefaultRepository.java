@@ -47,14 +47,15 @@ public class DefaultRepository implements RoboRepository {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> List<T> findAllByClass(Class<T> clazz) {
+	public <T> List<T> findAllByClass(Class<T> clazz, SortType sort) {
 		EntityManager em = dataSourceContext.getEntityManager(clazz);
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery cq = cb.createQuery(clazz);
 		Root<T> rs = cq.from(clazz);
-		CriteriaQuery<T> cq2 = cq.select(rs);
+		CriteriaQuery<T> cq2 = cq.select(rs).orderBy(getOrderById(cb, rs, sort));
 
 		TypedQuery<T> tq = em.createQuery(cq2);
+
 		return tq.getResultList();
 	}
 

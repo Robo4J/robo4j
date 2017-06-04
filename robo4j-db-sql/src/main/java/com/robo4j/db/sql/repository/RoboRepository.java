@@ -28,7 +28,7 @@ import com.robo4j.db.sql.support.SortType;
  */
 public interface RoboRepository {
 
-	<T> List<T> findAllByClass(Class<T> clazz);
+	<T> List<T> findAllByClass(Class<T> clazz, SortType sort);
 
 	<T, ID> T findById(Class<T> clazz, ID id);
 
