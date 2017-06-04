@@ -87,9 +87,9 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 		writeByte(CRA_REG_M, (byte) ((rate.getCtrlCode() | cra) & 0xFF));
 
 		setGain(gain);
-		if (gain.getCtrlCode() == readByte(CRB_REG_M)) {
-			throw new IOException("Could not communicate with the magnetometer");
-		}
+//		if (gain.getCtrlCode() == readByte(CRB_REG_M)) {
+//			throw new IOException("Could not communicate with the magnetometer");
+//		}
 	}
 
 	public void setGain(Gain gain) throws IOException {
