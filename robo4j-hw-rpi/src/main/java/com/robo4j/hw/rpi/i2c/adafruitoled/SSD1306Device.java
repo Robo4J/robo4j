@@ -38,6 +38,7 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
  * @author Miro Wengner (@miragemiko)
  */
 public class SSD1306Device extends AbstractI2CDevice {
+	private static final int DEFAULT_I2C_ADDRESS = 0x3c;
 	private static final byte CHARGE_PUMP_VALUE_ENABLE = 0x14;
 	private static final byte CHARGE_PUMP_VALUE_DISABLE = 0x10;
 	private static final int DEFAULT_CONTRAST = 0x88;
@@ -147,7 +148,7 @@ public class SSD1306Device extends AbstractI2CDevice {
 	 *             if there was a communication problem.
 	 */
 	public SSD1306Device(OLEDVariant variant, Pin resetPin) throws IOException {
-		this(I2CBus.BUS_1, 0x3c, variant, resetPin, false);
+		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, variant, resetPin, false);
 	}
 
 	/**
