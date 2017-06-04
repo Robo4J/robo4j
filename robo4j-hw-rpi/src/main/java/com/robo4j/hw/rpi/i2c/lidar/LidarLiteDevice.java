@@ -28,6 +28,9 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
  * @author Miro Wengner (@miragemiko)
  */
 public final class LidarLiteDevice extends AbstractI2CDevice {
+	// 0x62 is the default address of the Lidar-Lite Device
+	// This can be changed (see the operation manual)
+	private static final int DEFAULT_I2C_ADDRESS = 0x62;
 	private static final int REGISTER_COMMAND = 0x0;
 	private static final int REGISTER_RESULT = 0x8f;
 	private static final byte COMMAND_ACQUIRE_RANGE = 0x4;
@@ -39,8 +42,7 @@ public final class LidarLiteDevice extends AbstractI2CDevice {
 	 *             if there was communication problem
 	 */
 	public LidarLiteDevice() throws IOException {
-		// 0x62 is the hardwired address of the Lidar-Lite Device
-		super(I2CBus.BUS_1, 0x62);
+		super(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS);
 	}
 
 	/**
