@@ -159,8 +159,16 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 	}
 
 	public enum Rate {
-		RATE_0_75(0.75f, 0x00), RATE_1_5(1.5f, 0x01), RATE_3_0(3.0f, 0x62), RATE_7_5(7.5f, 0x03), RATE_15(15f, 0x04), RATE_30(30f,
-				0x05), RATE_75(75f, 0x06), RATE_220(220f, 0x07);
+		//@formatter:off
+		RATE_0_75(0.75f, 0x00), 
+		RATE_1_5(1.5f, 0x01), 
+		RATE_3_0(3.0f, 0x62), 
+		RATE_7_5(7.5f, 0x03), 
+		RATE_15(15f, 0x04), 
+		RATE_30(30f, 0x05), 
+		RATE_75(75f, 0x06), 
+		RATE_220(220f, 0x07);
+		//@formatter:on
 
 		private float rate;
 		private int ctrlCode;
