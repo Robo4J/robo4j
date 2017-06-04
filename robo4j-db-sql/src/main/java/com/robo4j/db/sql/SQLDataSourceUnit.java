@@ -34,6 +34,7 @@ import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.httpunit.Constants;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.db.sql.model.Robo4JSystem;
+import com.robo4j.db.sql.model.Robo4JUnit;
 import com.robo4j.db.sql.model.RoboEntity;
 import com.robo4j.db.sql.repository.DefaultRepository;
 import com.robo4j.db.sql.repository.RoboRepository;
@@ -48,9 +49,11 @@ import com.robo4j.db.sql.support.SortType;
  */
 public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 
+	private static final String ATTRIBUTE_ROBO_ALL_NAME = "all";
 	private static final String ATTRIBUTE_ROBO_UNIT_NAME = "units";
 	private static final String ATTRIBUTE_ROBO_SYSTEM_NAME = "system";
 	private static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Arrays.asList(
+			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_ALL_NAME),
 			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_NAME),
 			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_SYSTEM_NAME));
 
@@ -120,10 +123,20 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
+		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_ALL_NAME)
+				&& descriptor.getAttributeType() == List.class) {
+			//@formatter:off
+			return (R) registeredClasses.stream().map(rc -> repository.findAllByClass(rc))
+					.flatMap(List::stream)
+					.collect(Collectors.toList());
+			//@formatter:on
+		}
+
 		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_NAME)
 				&& descriptor.getAttributeType() == List.class) {
-			return (R) registeredClasses.stream().map(rc -> repository.findAllByClass(rc)).flatMap(List::stream)
-					.collect(Collectors.toList());
+			//@formatter:off
+			return (R) repository.findAllByClass(Robo4JUnit.class);
+			//@formatter:on
 		}
 
 		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_SYSTEM_NAME)

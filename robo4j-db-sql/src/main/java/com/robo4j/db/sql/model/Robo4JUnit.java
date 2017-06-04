@@ -27,10 +27,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.List;
 
 @Entity
-@Table(name = "ROBO4J_UNIT")
+@Table(name = "ROBO_UNIT")
 public class Robo4JUnit implements RoboEntity<Long> {
 
 	private static final long serialVersionUID = 1;
@@ -38,9 +40,11 @@ public class Robo4JUnit implements RoboEntity<Long> {
 	private Long id;
 	private String uid;
 	private String config;
+	private List<Robo4JUnitPoint> points;
+
 
 	@Id
-	@Column(name = "id")
+	@Column(name = "ID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Override
 	public Long getId() {
@@ -51,7 +55,7 @@ public class Robo4JUnit implements RoboEntity<Long> {
 		this.id = id;
 	}
 
-	@Column(name = "uid")
+	@Column(name = "UID")
 	public String getUid() {
 		return uid;
 	}
@@ -60,7 +64,7 @@ public class Robo4JUnit implements RoboEntity<Long> {
 		this.uid = uid;
 	}
 
-	@Column(name = "config")
+	@Column(name = "CONFIG")
 	public String getConfig() {
 		return config;
 	}
@@ -69,8 +73,22 @@ public class Robo4JUnit implements RoboEntity<Long> {
 		this.config = config;
 	}
 
+	@OneToMany(mappedBy="unit")
+	public List<Robo4JUnitPoint> getPoints() {
+		return points;
+	}
+
+	public void setPoints(List<Robo4JUnitPoint> points) {
+		this.points = points;
+	}
+
 	@Override
 	public String toString() {
-		return "Robo4JUnit{" + "id=" + id + ", uid='" + uid + '\'' + ", config='" + config + '\'' + '}';
+		return "Robo4JUnit{" +
+				"id=" + id +
+				", uid='" + uid + '\'' +
+				", config='" + config + '\'' +
+				", points=" + points +
+				'}';
 	}
 }
