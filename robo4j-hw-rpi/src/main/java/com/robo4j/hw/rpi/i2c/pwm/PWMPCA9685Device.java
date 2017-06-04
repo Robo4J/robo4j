@@ -31,6 +31,8 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 //Not using all commands - yet.
 @SuppressWarnings("unused")
 public class PWMPCA9685Device extends AbstractI2CDevice {
+	private static final int DEFAULT_I2C_ADDRESS = 0x40;
+
 	private static final double PRESCALE_FACTOR = 25000000.0 / 4096.0;
 	
 	private static final int MODE1 = 0x00;
@@ -64,7 +66,7 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 	 */
 	public PWMPCA9685Device() throws IOException {
 		// 0x40 is the default address used by the AdaFruit PWM board.
-		this(I2CBus.BUS_1, 0x40);
+		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS);
 	}
 
 	/**
