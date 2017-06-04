@@ -33,18 +33,18 @@ import com.robo4j.math.geometry.Int3D;
  */
 // FIXME(Marcus/Dec 5, 2016): Verify that this one works.
 public class MagnetometerLSM303Device extends AbstractI2CDevice implements ReadableDevice<Float3D> {
-	private static final int MAGNETO_ADDRESS = 0x1e;
+	private static final int DEFAULT_I2C_ADDRESS = 0x1e;
 	private static final int CRA_REG_M = 0x00;
 	private static final int CRB_REG_M = 0x01;
 	private static final int MR_REG_M = 0x02;
 	private static final int OUT_X_H_M = 0x03;
 
-	private static final int BUFFER_SIZE = 6;
+	private static final int RESULT_BUFFER_SIZE = 6;
 	private static final int ENABLE_TEMP = 0x80;
 	private Gain gain = Gain.GAIN_1_3;
 
 	public MagnetometerLSM303Device() throws IOException {
-		this(I2CBus.BUS_1, MAGNETO_ADDRESS, Mode.CONTINUOUS_CONVERSION, Rate.RATE_1_5, false);
+		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, Mode.CONTINUOUS_CONVERSION, Rate.RATE_1_5, false);
 	}
 
 	public MagnetometerLSM303Device(int bus, int address, Mode mode, Rate rate, boolean enableTemp) throws IOException {
@@ -54,9 +54,9 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 
 	public synchronized Float3D read() throws IOException {
 		Float3D rawData = new Float3D();
-		byte[] data = new byte[BUFFER_SIZE];
-		int n = i2cDevice.read(OUT_X_H_M, data, 0, BUFFER_SIZE);
-		if (n != BUFFER_SIZE) {
+		byte[] data = new byte[RESULT_BUFFER_SIZE];
+		int n = i2cDevice.read(OUT_X_H_M, data, 0, RESULT_BUFFER_SIZE);
+		if (n != RESULT_BUFFER_SIZE) {
 			getLogger().warning("Failed to read all data from accelerometer. Should have read 6, could only read " + n);
 		}
 		rawData.x = read16bitSigned(data, 0) / gain.getXY();
@@ -67,9 +67,9 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 
 	public synchronized Int3D readRaw() throws IOException {
 		Int3D rawData = new Int3D();
-		byte[] data = new byte[BUFFER_SIZE];
-		int n = i2cDevice.read(OUT_X_H_M, data, 0, BUFFER_SIZE);
-		if (n != BUFFER_SIZE) {
+		byte[] data = new byte[RESULT_BUFFER_SIZE];
+		int n = i2cDevice.read(OUT_X_H_M, data, 0, RESULT_BUFFER_SIZE);
+		if (n != RESULT_BUFFER_SIZE) {
 			getLogger().warning("Failed to read all data from accelerometer. Should have read 6, could only read " + n);
 		}
 		rawData.x = read16bitSigned(data, 0);
