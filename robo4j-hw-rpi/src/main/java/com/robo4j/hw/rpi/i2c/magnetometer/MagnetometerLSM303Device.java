@@ -105,7 +105,7 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 	private void initialize(Mode mode, Rate rate, boolean enableTemp) throws IOException {
 		writeByte(MR_REG_M, (byte) mode.getCtrlCode());
 		int cra = enableTemp ? ENABLE_TEMP : 0x0;
-		writeByte(CRA_REG_M, (byte) ((rate.getCtrlCode() | cra) & 0xFF));
+		writeByte(CRA_REG_M, (byte) ((rate.getCtrlCode() << 2 | cra) & 0xFF));
 
 		setGain(gain);
 		if (gain.getCtrlCode() != (byte) readByte(CRB_REG_M)) {
@@ -162,7 +162,7 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 		//@formatter:off
 		RATE_0_75(0.75f, 0x00), 
 		RATE_1_5(1.5f, 0x01), 
-		RATE_3_0(3.0f, 0x62), 
+		RATE_3_0(3.0f, 0x02), 
 		RATE_7_5(7.5f, 0x03), 
 		RATE_15(15f, 0x04), 
 		RATE_30(30f, 0x05), 
