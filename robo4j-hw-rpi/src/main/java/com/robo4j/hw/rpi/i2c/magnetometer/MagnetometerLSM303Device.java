@@ -72,9 +72,10 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 		if (n != RESULT_BUFFER_SIZE) {
 			getLogger().warning("Failed to read all data from accelerometer. Should have read 6, could only read " + n);
 		}
+		// Yep, this is indeed the correct order ;)
 		rawData.x = read16bitSigned(data, 0);
-		rawData.y = read16bitSigned(data, 2);
-		rawData.z = read16bitSigned(data, 4);
+		rawData.z = read16bitSigned(data, 2);
+		rawData.y = read16bitSigned(data, 4);
 		return rawData;
 	}
 
