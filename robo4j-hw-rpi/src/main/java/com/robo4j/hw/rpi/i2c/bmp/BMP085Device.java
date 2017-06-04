@@ -31,6 +31,7 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
  * @author Miro Wengner (@miragemiko)
  */
 public final class BMP085Device extends AbstractI2CDevice {
+	private static final int DEFAULT_I2C_ADDRESS = 0x77;
 	private static final int PRESSURE_SEA_LEVEL = 101325;
 	private static final double POW_FACT = 1.0 / 5.225;
 	// Calibration data
@@ -67,7 +68,7 @@ public final class BMP085Device extends AbstractI2CDevice {
 	 */
 	public BMP085Device(OperatingMode mode) throws IOException {
 		// 0x77 is the default address used by the AdaFruit BMP board.
-		this(I2CBus.BUS_1, 0x77, mode);
+		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, mode);
 	}
 
 	/**
