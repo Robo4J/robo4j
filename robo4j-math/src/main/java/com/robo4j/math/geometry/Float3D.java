@@ -45,7 +45,7 @@ public class Float3D {
 	}
 
 	public String toString() {
-		return String.format("x:%2.3f, y:%2.3f, z:%2.3f", x, y, z);
+		return String.format("x:%02.4f, y:%02.4f, z:%02.4f", x, y, z);
 	}
 
 	public void subtract(Float3D f) {

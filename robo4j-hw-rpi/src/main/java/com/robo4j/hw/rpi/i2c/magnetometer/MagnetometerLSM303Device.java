@@ -22,6 +22,7 @@ import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
 import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Int3D;
 
 /**
  * Represents a LSM303 magnetometer, for example the one on the Adafruit IMU
@@ -62,6 +63,19 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 		return rawData;
 	}
 
+	public synchronized Int3D readRaw() throws IOException {
+		Int3D rawData = new Int3D();
+		byte[] data = new byte[6];
+		int n = i2cDevice.read(OUT_X_H_M, data, 0, 6);
+		if (n != 6) {
+			getLogger().warning("Failed to read all data from accelerometer. Should have read 6, could only read " + n);
+		}
+		rawData.x = read16bitSigned(data, 0);
+		rawData.y = read16bitSigned(data, 2);
+		rawData.z = read16bitSigned(data, 4);
+		return rawData;
+	}
+	
 	private short read16bitSigned(byte[] data, int i) {
 		short val = (short) (data[i] << 8 | (data[i + 1] & 0xFF));
 		return val;

@@ -19,6 +19,7 @@ package com.robo4j.hw.rpi.i2c.magnetometer;
 import java.io.IOException;
 
 import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Int3D;
 
 /**
  * Sanity check every 500ms to see that data is being retrieved.
@@ -29,20 +30,29 @@ import com.robo4j.math.geometry.Float3D;
 public class MagnetometerLSM303Test {
 	// FIXME(Marcus/Dec 5, 2016): Verify that this one works.
 	public static void main(String[] args) throws IOException, InterruptedException {
-		if (args.length != 2) {
-			System.out.println("Usage: MagnetometerLSM303Test <delay between reads (ms)> <print every Nth read>");	
+		if (args.length <= 2) {
+			System.out.println("Usage: MagnetometerLSM303Test <delay between reads (ms)> <print every Nth read> [<print raw (true|false)>] ");	
 			System.exit(1);
 		}
 		int delay = Integer.parseInt(args[0]);
 		int modulo = Integer.parseInt(args[1]);
-		
+		boolean printRaw = false;
+		if (args.length >= 3) {
+			printRaw = Boolean.parseBoolean(args[2]);
+		}
 		MagnetometerLSM303Device device = new MagnetometerLSM303Device();
 		int count = 0;
 		while (true) {
-			Float3D fl = device.read();
-			if (count++ % modulo == 0) {
-				System.out.println(String.format("Value %d = %s", count, fl.toString()));
+			if (count % modulo == 0) {
+				if (printRaw) {
+					Int3D fl = device.readRaw();
+					System.out.println(String.format("Raw Value %d = %s", count, fl.toString()));					
+				} else {
+					Float3D fl = device.read();
+					System.out.println(String.format("Value %d = %s", count, fl.toString()));
+				}
 			}
+			count++;
 			Thread.sleep(delay);
 		}
 	}
