@@ -30,7 +30,7 @@ import com.robo4j.math.geometry.Int3D;
 public class MagnetometerLSM303Test {
 	// FIXME(Marcus/Dec 5, 2016): Verify that this one works.
 	public static void main(String[] args) throws IOException, InterruptedException {
-		if (args.length <= 2) {
+		if (args.length < 2) {
 			System.out.println("Usage: MagnetometerLSM303Test <delay between reads (ms)> <print every Nth read> [<print raw (true|false)>] ");	
 			System.exit(1);
 		}
