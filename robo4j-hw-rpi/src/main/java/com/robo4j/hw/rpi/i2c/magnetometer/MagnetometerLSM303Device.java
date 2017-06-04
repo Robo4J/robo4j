@@ -33,16 +33,18 @@ import com.robo4j.math.geometry.Int3D;
  */
 // FIXME(Marcus/Dec 5, 2016): Verify that this one works.
 public class MagnetometerLSM303Device extends AbstractI2CDevice implements ReadableDevice<Float3D> {
+	private static final int MAGNETO_ADDRESS = 0x1e;
 	private static final int CRA_REG_M = 0x00;
 	private static final int CRB_REG_M = 0x01;
 	private static final int MR_REG_M = 0x02;
 	private static final int OUT_X_H_M = 0x03;
 
+	private static final int BUFFER_SIZE = 6;
 	private static final int ENABLE_TEMP = 0x80;
 	private Gain gain = Gain.GAIN_1_3;
 
 	public MagnetometerLSM303Device() throws IOException {
-		this(I2CBus.BUS_1, 0x1e, Mode.CONTINUOUS_CONVERSION, Rate.RATE_1_5, false);
+		this(I2CBus.BUS_1, MAGNETO_ADDRESS, Mode.CONTINUOUS_CONVERSION, Rate.RATE_1_5, false);
 	}
 
 	public MagnetometerLSM303Device(int bus, int address, Mode mode, Rate rate, boolean enableTemp) throws IOException {
@@ -52,9 +54,9 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 
 	public synchronized Float3D read() throws IOException {
 		Float3D rawData = new Float3D();
-		byte[] data = new byte[6];
-		int n = i2cDevice.read(OUT_X_H_M, data, 0, 6);
-		if (n != 6) {
+		byte[] data = new byte[BUFFER_SIZE];
+		int n = i2cDevice.read(OUT_X_H_M, data, 0, BUFFER_SIZE);
+		if (n != BUFFER_SIZE) {
 			getLogger().warning("Failed to read all data from accelerometer. Should have read 6, could only read " + n);
 		}
 		rawData.x = read16bitSigned(data, 0) / gain.getXY();
@@ -65,9 +67,9 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 
 	public synchronized Int3D readRaw() throws IOException {
 		Int3D rawData = new Int3D();
-		byte[] data = new byte[6];
-		int n = i2cDevice.read(OUT_X_H_M, data, 0, 6);
-		if (n != 6) {
+		byte[] data = new byte[BUFFER_SIZE];
+		int n = i2cDevice.read(OUT_X_H_M, data, 0, BUFFER_SIZE);
+		if (n != BUFFER_SIZE) {
 			getLogger().warning("Failed to read all data from accelerometer. Should have read 6, could only read " + n);
 		}
 		rawData.x = read16bitSigned(data, 0);
@@ -117,8 +119,15 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 	}
 
 	public enum Gain {
-		GAIN_1_3(1.3f, 0x20, 1100, 980), GAIN_1_9(1.9f, 0x40, 855, 760), GAIN_2_5(2.5f, 0x60, 670, 600), GAIN_4_0(4.0f, 0x80, 450,
-				400), GAIN_4_7(4.7f, 0xA0, 400, 350), GAIN_5_6(5.6f, 0xC0, 330, 295), GAIN_8_1(8.1f, 0xE0, 230, 205);
+		//@formatter:off
+		GAIN_1_3	(1.3f, 0x20, 1100, 980),
+		GAIN_1_9	(1.9f, 0x40, 855, 760),
+		GAIN_2_5	(2.5f, 0x60, 670, 600),
+		GAIN_4_0	(4.0f,0x80, 450, 400),
+		GAIN_4_7	(4.7f, 0xA0, 400, 350),
+		GAIN_5_6	(5.6f, 0xC0, 330, 295),
+		GAIN_8_1	(8.1f, 0xE0, 230, 205);
+		//@formatter:on
 
 		private float gain;
 		private byte ctrlCode;
@@ -172,7 +181,11 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 	}
 
 	public enum Mode {
-		CONTINUOUS_CONVERSION(0x0), SINGLE_CONVERSION(0x1), SLEEP(0x2);
+		//@formatter:off
+		CONTINUOUS_CONVERSION	(0x0),
+		SINGLE_CONVERSION		(0x1),
+		SLEEP					(0x2);
+		//@formatter:on
 		private int ctrlCode;
 
 		Mode(int ctrlCode) {
