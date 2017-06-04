@@ -32,6 +32,7 @@ import com.robo4j.math.geometry.Float3D;
  */
 public class GyroL3GD20Device extends AbstractI2CDevice implements
 		ReadableDevice<Float3D> {
+	private static final int DEFAULT_I2C_ADDRESS = 0x6b;
 
 	private final Sensitivity sensitivity;
 
@@ -69,7 +70,7 @@ public class GyroL3GD20Device extends AbstractI2CDevice implements
 	private final int L3GD20H_ID = 0xD7;
 
 	public GyroL3GD20Device(Sensitivity sensitivity) throws IOException {
-		this(I2CBus.BUS_1, 0x6b, sensitivity, true);
+		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, sensitivity, true);
 	}
 
 	public GyroL3GD20Device(int bus, int address, Sensitivity sensitivity, boolean enableHighPassFilter)
