@@ -48,15 +48,14 @@ public class DefaultRepository implements RoboRepository {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> List<T> findAllByClass(Class<T> clazz, SortType sort) {
-		EntityManager em = dataSourceContext.getEntityManager(clazz);
-		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery cq = cb.createQuery(clazz);
-		Root<T> rs = cq.from(clazz);
-		CriteriaQuery<T> cq2 = cq.select(rs).orderBy(getOrderById(cb, rs, sort));
-
-		TypedQuery<T> tq = em.createQuery(cq2);
-
+		final TypedQuery<T> tq = getTypeQueryAllByClass(clazz, sort);
 		return tq.getResultList();
+	}
+
+	@Override
+	public <T> List<T> findByClassWithLimit(Class<T> clazz, int limit, SortType sort) {
+		final TypedQuery<T> tq = getTypeQueryAllByClass(clazz, sort);
+		return tq.setMaxResults(limit).getResultList();
 	}
 
 	@Override
@@ -97,5 +96,16 @@ public class DefaultRepository implements RoboRepository {
 	private Order getOrderById(CriteriaBuilder cb, Root rs, SortType sortType) {
 		return sortType.equals(SortType.ASC) ? cb.asc(rs.get(FIELD_ID)) : cb.desc(rs.get(FIELD_ID));
 	}
+
+	@SuppressWarnings("unchecked")
+	private <T> TypedQuery<T> getTypeQueryAllByClass(Class<T> clazz, SortType sort){
+		EntityManager em = dataSourceContext.getEntityManager(clazz);
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery cq = cb.createQuery(clazz);
+		Root<T> rs = cq.from(clazz);
+		CriteriaQuery<T> cq2 = cq.select(rs).orderBy(getOrderById(cb, rs, sort));
+		return em.createQuery(cq2);
+	}
+
 
 }

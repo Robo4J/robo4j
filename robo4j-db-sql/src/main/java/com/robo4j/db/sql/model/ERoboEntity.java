@@ -17,50 +17,15 @@
 
 package com.robo4j.db.sql.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+public interface ERoboEntity<ID> extends Serializable {
+	long serialVersionUID = 1;
 
-@Entity
-@Table(name = "ROBO_SYSTEM")
-public class Robo4JSystem implements RoboEntity<Long> {
+	ID getId();
 
-	private static final long serialVersionUID = 1;
-
-	private Long id;
-	private String uid;
-
-	@Id
-	@Column(name = "ID")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Override
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	@Column(name = "UID")
-	public String getUid() {
-		return uid;
-	}
-
-	public void setUid(String uid) {
-		this.uid = uid;
-	}
-
-	@Override
-	public String toString() {
-		return "Robo4JSystem{" + "id=" + id + ", uid='" + uid + '\'' + '}';
-	}
 }

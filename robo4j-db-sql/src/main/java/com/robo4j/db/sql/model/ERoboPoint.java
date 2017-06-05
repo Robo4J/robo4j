@@ -17,31 +17,28 @@
 
 package com.robo4j.db.sql.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import java.util.List;
-
 @Entity
-@Table(name = "ROBO_UNIT")
-public class Robo4JUnit implements RoboEntity<Long> {
-
-	private static final long serialVersionUID = 1;
+@Table(name = "ROBO_POINT")
+public class ERoboPoint implements ERoboEntity<Long> {
 
 	private Long id;
-	private String uid;
-	private String config;
-	private List<Robo4JUnitPoint> points;
-
+	private ERoboUnit unit;
+	private String valueType;
+	private String values;
 
 	@Id
 	@Column(name = "ID")
@@ -55,40 +52,36 @@ public class Robo4JUnit implements RoboEntity<Long> {
 		this.id = id;
 	}
 
-	@Column(name = "UID")
-	public String getUid() {
-		return uid;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "ROBO_UNIT_ID")
+	public ERoboUnit getUnit() {
+		return unit;
 	}
 
-	public void setUid(String uid) {
-		this.uid = uid;
+	public void setUnit(ERoboUnit unit) {
+		this.unit = unit;
 	}
 
-	@Column(name = "CONFIG")
-	public String getConfig() {
-		return config;
+	@Column(name = "VALUE_TYPE")
+	public String getValueType() {
+		return valueType;
 	}
 
-	public void setConfig(String config) {
-		this.config = config;
+	public void setValueType(String valueType) {
+		this.valueType = valueType;
 	}
 
-	@OneToMany(mappedBy="unit")
-	public List<Robo4JUnitPoint> getPoints() {
-		return points;
+	@Column(name = "VALUES")
+	public String getValues() {
+		return values;
 	}
 
-	public void setPoints(List<Robo4JUnitPoint> points) {
-		this.points = points;
+	public void setValues(String values) {
+		this.values = values;
 	}
 
 	@Override
 	public String toString() {
-		return "Robo4JUnit{" +
-				"id=" + id +
-				", uid='" + uid + '\'' +
-				", config='" + config + '\'' +
-				", points=" + points +
-				'}';
+		return "ERoboPoint{" + "id=" + id + ", valueType='" + valueType + '\'' + ", values='" + values + '\'' + '}';
 	}
 }
