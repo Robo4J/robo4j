@@ -123,7 +123,7 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 		GAIN_1_3	(1.3f, 0x20, 1100, 980),
 		GAIN_1_9	(1.9f, 0x40, 855, 760),
 		GAIN_2_5	(2.5f, 0x60, 670, 600),
-		GAIN_4_0	(4.0f,0x80, 450, 400),
+		GAIN_4_0	(4.0f, 0x80, 450, 400),
 		GAIN_4_7	(4.7f, 0xA0, 400, 350),
 		GAIN_5_6	(5.6f, 0xC0, 330, 295),
 		GAIN_8_1	(8.1f, 0xE0, 230, 205);
