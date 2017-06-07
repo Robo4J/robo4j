@@ -36,12 +36,13 @@ import com.robo4j.db.sql.model.ERoboPoint;
 import com.robo4j.db.sql.model.ERoboUnit;
 
 /**
+ * SQL database focused tests
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class SQLDataSourceUnitTests {
 
-	private static String UNIT_SQL_NAME = "dbSQLUnit";
 	private static String UNIT_SYSTEM_1_NAME = "system1";
 	private static String UNIT_SYSTEM_2_NAME = "system2";
 	private static String UNIT_SYSTEM_3_NAME = "system3";
@@ -229,7 +230,7 @@ public class SQLDataSourceUnitTests {
 
 		AttributeDescriptor<List> descriptor1 = DefaultAttributeDescriptor.create(List.class, "units_desc");
 		List<ERoboEntity<Long>> list1 = sqlDataSourceUnit.onGetAttribute(descriptor1);
-		
+
 		Assert.assertTrue(list1.size() == limit);
 		Assert.assertTrue(list1.get(0).getId() == max);
 

@@ -92,7 +92,7 @@ public class ERoboUnit implements ERoboEntity<Long> {
 		this.parent = parent;
 	}
 
-	@OneToMany(mappedBy = "parent")
+	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
 	public List<ERoboUnit> getParts() {
 		return parts;
 	}
@@ -109,7 +109,7 @@ public class ERoboUnit implements ERoboEntity<Long> {
 		this.parts.addAll(units);
 	}
 
-	@OneToMany(mappedBy = "unit")
+	@OneToMany(mappedBy = "unit", cascade = CascadeType.ALL, orphanRemoval = true)
 	public List<ERoboPoint> getPoints() {
 		return points;
 	}
