@@ -40,8 +40,6 @@ import javax.persistence.Table;
 @Table(name = "ROBO_UNIT")
 public class ERoboUnit implements ERoboEntity<Long> {
 
-	private static final long serialVersionUID = 1;
-
 	private Long id;
 	private String uid;
 	private String config;

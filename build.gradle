@@ -78,21 +78,8 @@ project("robo4j-db-sql") {
 
     //main db
     flyway {
-        url = 'jdbc:h2:~/data/robo4jh2'
+        url = 'jdbc:h2:~/data/robo4j1h2'
         user = 'sa'
-    }
-
-    task('postgres') {
-        doLast {
-            println 'executing PostgreSQL'
-
-            flyway {
-                url = 'jdbc:postgresql://localhost:5433/robo4j1'
-                user = 'postgres'
-                password = 'post'
-            }
-
-        }
     }
 }
 
