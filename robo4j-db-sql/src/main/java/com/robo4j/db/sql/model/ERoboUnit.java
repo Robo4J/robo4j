@@ -28,6 +28,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -92,7 +93,7 @@ public class ERoboUnit implements ERoboEntity<Long> {
 		this.parent = parent;
 	}
 
-	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "parent", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	public List<ERoboUnit> getParts() {
 		return parts;
 	}
@@ -109,7 +110,7 @@ public class ERoboUnit implements ERoboEntity<Long> {
 		this.parts.addAll(units);
 	}
 
-	@OneToMany(mappedBy = "unit", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "unit", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	public List<ERoboPoint> getPoints() {
 		return points;
 	}

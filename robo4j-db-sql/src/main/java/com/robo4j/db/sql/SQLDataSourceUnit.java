@@ -19,7 +19,9 @@ package com.robo4j.db.sql;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.robo4j.core.AttributeDescriptor;
@@ -32,6 +34,7 @@ import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.httpunit.Constants;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.db.sql.model.ERoboEntity;
+import com.robo4j.db.sql.model.ERoboPoint;
 import com.robo4j.db.sql.model.ERoboUnit;
 import com.robo4j.db.sql.repository.DefaultRepository;
 import com.robo4j.db.sql.repository.RoboRepository;
@@ -51,13 +54,15 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 	private static final String ATTRIBUTE_ROBO_UNIT_ALL_DESC_NAME = "units_all_desc";
 	private static final String ATTRIBUTE_ROBO_UNIT_ASC_NAME = "units_asc";
 	private static final String ATTRIBUTE_ROBO_UNIT_DESC_NAME = "units_desc";
-	private static final String ATTRIBUTE_ROBO_UNIT_ID_NAME = "unit_id";
+	private static final String ATTRIBUTE_ROBO_UNIT_POINTS_NAME = "unit_points";
 	private static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Arrays.asList(
 			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_ALL_NAME),
 			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_ALL_ASC_NAME),
-			DefaultAttributeDescriptor.create(ERoboEntity.class, ATTRIBUTE_ROBO_UNIT_ID_NAME));
+			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_POINTS_NAME));
+	private Map<String, Object> targetUnitSearchMap = new HashMap<>();
 
 	private static final String PERSISTENCE_UNIT = "sourceType";
+	private static final String TARGET_UNIT = "targetUnit";
 	private static final String PACKAGES = "packages";
 
 	private List<Class<?>> registeredClasses;
@@ -84,9 +89,17 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 		if (tmpPackages == null) {
 			throw ConfigurationException.createMissingConfigNameException(PACKAGES);
 		}
+
+		String targetUnit = configuration.getString(TARGET_UNIT, null);
+		if (targetUnit == null) {
+			throw ConfigurationException.createMissingConfigNameException(TARGET_UNIT);
+		}
+		targetUnitSearchMap.put("unit", targetUnit);
+
 		packages = tmpPackages.split(Constants.UTF8_COMMA);
 		limit = configuration.getInteger("limit", 2);
 		sorted = SortType.getByName(configuration.getString("sorted", "desc"));
+
 	}
 
 	@Override
@@ -152,9 +165,9 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 			return (R) repository.findByClassWithLimit(ERoboUnit.class, limit, SortType.DESC);
 		}
 
-		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_ID_NAME)
-				&& descriptor.getAttributeType() == ERoboEntity.class) {
-			return (R) repository.findById(ERoboUnit.class, SortType.ASC);
+		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_POINTS_NAME)
+				&& descriptor.getAttributeType() == List.class) {
+			return (R) repository.findByFields(ERoboPoint.class, targetUnitSearchMap, limit, sorted);
 		}
 
 		return super.onGetAttribute(descriptor);

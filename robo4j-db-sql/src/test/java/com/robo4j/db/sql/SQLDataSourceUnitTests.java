@@ -79,6 +79,7 @@ public class SQLDataSourceUnitTests {
 		config.setString("packages", "com.robo4j.db.sql.model");
 		config.setInteger("limit", 2);
 		config.setString("sorted", "asc");
+		config.setString("targetUnit", UNIT_SYSTEM_2_NAME);
 		sqlDataSourceUnit.initialize(config);
 		system.addUnits(sqlDataSourceUnit);
 
@@ -135,6 +136,7 @@ public class SQLDataSourceUnitTests {
 		config.setString("packages", "com.robo4j.db.sql.model");
 		config.setInteger("limit", 2);
 		config.setString("sorted", "asc");
+		config.setString("targetUnit", UNIT_SYSTEM_2_NAME);
 		sqlDataSourceUnit.initialize(config);
 		system.addUnits(sqlDataSourceUnit);
 
@@ -194,6 +196,7 @@ public class SQLDataSourceUnitTests {
 		config.setString("packages", "com.robo4j.db.sql.model");
 		config.setInteger("limit", limit);
 		config.setString("sorted", "desc");
+		config.setString("targetUnit", UNIT_SYSTEM_2_NAME);
 		sqlDataSourceUnit.initialize(config);
 		system.addUnits(sqlDataSourceUnit);
 
@@ -208,12 +211,12 @@ public class SQLDataSourceUnitTests {
 		ERoboUnit eRoboUnit1 = new ERoboUnit();
 		eRoboUnit1.setUid(UNIT_SYSTEM_1_NAME);
 		eRoboUnit1.setConfig("dbSQLUnit,httpClient");
-		eRoboUnit1.addPoints(getRoboPoint(eRoboUnit1, 3));
+		eRoboUnit1.addPoints(getRoboPoint(eRoboUnit1, max));
 
 		ERoboUnit eRoboUnit2 = new ERoboUnit();
 		eRoboUnit2.setUid(UNIT_SYSTEM_2_NAME);
 		eRoboUnit2.setConfig("httpServer");
-		eRoboUnit2.addPoints(getRoboPoint(eRoboUnit2, 1));
+		eRoboUnit2.addPoints(getRoboPoint(eRoboUnit2, max));
 		eRoboUnit2.addPart(eRoboUnit1);
 		eRoboUnit2.setParent(eRoboUnit1);
 
@@ -229,17 +232,20 @@ public class SQLDataSourceUnitTests {
 		sqlDataSourceUnit.onMessage(eRoboUnit3);
 
 		AttributeDescriptor<List> descriptor1 = DefaultAttributeDescriptor.create(List.class, "units_desc");
+		AttributeDescriptor<List> descriptor2 = DefaultAttributeDescriptor.create(List.class, "unit_points");
 		List<ERoboEntity<Long>> list1 = sqlDataSourceUnit.onGetAttribute(descriptor1);
+		List<ERoboPoint> list2 = sqlDataSourceUnit.onGetAttribute(descriptor2);
 
 		Assert.assertTrue(list1.size() == limit);
 		Assert.assertTrue(list1.get(0).getId() == max);
 
-		ERoboUnit roboUnit1 = (ERoboUnit)list1.get(0);
+		ERoboUnit roboUnit1 = (ERoboUnit) list1.get(0);
 		Assert.assertTrue(roboUnit1.getUid().equals(UNIT_SYSTEM_3_NAME));
 		Assert.assertTrue(roboUnit1.getPoints().size() == roboUnit3Points);
 		Assert.assertTrue(roboUnit1.getParts().size() == 2);
 		Assert.assertTrue(roboUnit1.getParent().getUid().equals(UNIT_SYSTEM_1_NAME));
-
+		Assert.assertTrue(list2.size() == limit);
+		System.out.println("LIST2: " + list2);
 
 		system.shutdown();
 		System.out.println("systemPong: State after shutdown:");
@@ -268,6 +274,7 @@ public class SQLDataSourceUnitTests {
 		config.setString("packages", "com.robo4j.db.sql.model");
 		config.setInteger("limit", 2);
 		config.setString("sorted", "asc");
+		config.setString("targetUnit", UNIT_SYSTEM_2_NAME);
 		result.initialize(config);
 		system.addUnits(result);
 

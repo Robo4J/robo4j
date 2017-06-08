@@ -26,9 +26,11 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import com.robo4j.db.sql.model.ERoboUnit;
 import com.robo4j.db.sql.support.DataSourceContext;
 import com.robo4j.db.sql.support.SortType;
 
@@ -39,6 +41,7 @@ import com.robo4j.db.sql.support.SortType;
 public class DefaultRepository implements RoboRepository {
 
 	private static final String FIELD_ID = "id";
+	private static final String ROBO_UNIT_UID = "uid";
 	private final DataSourceContext dataSourceContext;
 
 	public DefaultRepository(DataSourceContext dataSourceContext) {
@@ -71,8 +74,15 @@ public class DefaultRepository implements RoboRepository {
 		CriteriaQuery cq = cb.createQuery(clazz);
 
 		Root<T> rs = cq.from(clazz);
-		List<Predicate> predicates = map.entrySet().stream().map(e -> cb.equal(rs.get(e.getKey()), e.getValue()))
-				.collect(Collectors.toList());
+		//@formatter:on
+		List<Predicate> predicates = map.entrySet().stream().map(e -> {
+			Path p = rs.get(e.getKey());
+			if (p.getJavaType().equals(ERoboUnit.class)) {
+				return cb.equal(rs.get(e.getKey()).get(ROBO_UNIT_UID), e.getValue());
+			}
+			return cb.equal(rs.get(e.getKey()), e.getValue());
+		}).collect(Collectors.toList());
+		//@formatter:on
 		CriteriaQuery<T> cq2 = cq.where(predicates.toArray(new Predicate[predicates.size()]))
 				.orderBy(getOrderById(cb, rs, sort)).select(rs);
 
@@ -98,7 +108,7 @@ public class DefaultRepository implements RoboRepository {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> TypedQuery<T> getTypeQueryAllByClass(Class<T> clazz, SortType sort){
+	private <T> TypedQuery<T> getTypeQueryAllByClass(Class<T> clazz, SortType sort) {
 		EntityManager em = dataSourceContext.getEntityManager(clazz);
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery cq = cb.createQuery(clazz);
@@ -106,6 +116,5 @@ public class DefaultRepository implements RoboRepository {
 		CriteriaQuery<T> cq2 = cq.select(rs).orderBy(getOrderById(cb, rs, sort));
 		return em.createQuery(cq2);
 	}
-
 
 }
