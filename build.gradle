@@ -72,6 +72,7 @@ project("robo4j-db-sql") {
         compile "org.postgresql:postgresql:${postgresqlVersion}"
         compile "org.hibernate:hibernate-entitymanager:${hibernateVersion}"
         compile "com.h2database:h2:${h2Version}"
+        testCompile project(':robo4j-core').sourceSets.test.output
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
     }
