@@ -177,4 +177,9 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
 		return KNOWN_ATTRIBUTES;
 	}
+
+	@SuppressWarnings("unchecked")
+	public <R> R getByMap(Class<?> c, Map<String, Object> map) {
+		return (R) repository.findByFields(c, map, limit, sorted);
+	}
 }

@@ -47,6 +47,7 @@ public class SQLDBHttpServerUnitTests {
 		roboSystemClient.start();
 		System.out.println("RoboSystem Client after start:");
 		System.out.println(SystemUtil.printStateReport(roboSystemClient));
+
 		RoboReference<SQLDataSourceUnit> sqlUnit = roboSystemClient.getReference("dbSqlUnit");
 
 		AttributeDescriptor<List> descriptor1 = DefaultAttributeDescriptor.create(List.class, "all");

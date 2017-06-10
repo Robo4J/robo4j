@@ -24,7 +24,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +36,7 @@ import com.pi4j.io.serial.SerialFactory;
  * FIXME(Marcus/Dec 5, 2016): Should perhaps be moved to type specific package /
  * MTK3339 FIXME(Marcus/May 25, 2017): This thing cannot be allowed to have its
  * own thread...
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
@@ -54,18 +53,18 @@ public class GPS {
 
 	private static final String POSITION_TAG = "$GPGGA";
 	private static final String VELOCITY_TAG = "$GPVTG";
+	private static final String GPS_PORT = "/dev/serial0";
+	private static final int BAUD_DEFAULT = 9600;
 
 	private final Serial serial;
 	private final GPSDataRetriever dataRetriever;
 	private final int readInterval;
 
-	private final ScheduledExecutorService internalExecutor = Executors.newScheduledThreadPool(1, new ThreadFactory() {
-		@Override
-		public Thread newThread(Runnable r) {
+	private final ScheduledExecutorService internalExecutor = Executors.newScheduledThreadPool(1, (r) -> {
 			Thread t = new Thread(r, "GPS Internal Executor");
 			t.setDaemon(true);
 			return t;
-		}
+
 	});
 	private final List<GPSListener> listeners = new CopyOnWriteArrayList<GPSListener>();
 
@@ -75,7 +74,7 @@ public class GPS {
 	/**
 	 * Creates a new GPS instance. Will use an internal thread to read data, and
 	 * the default read interval.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public GPS() throws IOException {
@@ -84,7 +83,7 @@ public class GPS {
 
 	/**
 	 * Creates a new GPS instance.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public GPS(int readInterval) throws IOException {
@@ -96,10 +95,10 @@ public class GPS {
 
 	/**
 	 * Adds a new listener to listen for GPS data.
-	 * 
+	 *
 	 * @param gpsListener
 	 *            the new listener to add.
-	 * 
+	 *
 	 * @see GPSListener
 	 */
 	public void addListener(GPSListener gpsListener) {
@@ -108,10 +107,10 @@ public class GPS {
 
 	/**
 	 * Removes a previously added listener.
-	 * 
+	 *
 	 * @param gpsListener
 	 *            the listener to remove.
-	 * 
+	 *
 	 * @see GPSListener
 	 */
 	public void removeListener(GPSListener gpsListener) {
@@ -168,7 +167,7 @@ public class GPS {
 		// Since RaspberryPi 3 nabbed the /dev/ttyAMA0 for the bluetooth,
 		// serial0 should be the new logical name to use for the rx/tx pins.
 		// This is supposedly compatible with the older raspberry pis as well.
-		serial.open("/dev/serial0", 9600);
+		serial.open(GPS_PORT, BAUD_DEFAULT);
 	}
 
 	private static boolean hasValidCheckSum(String data) {

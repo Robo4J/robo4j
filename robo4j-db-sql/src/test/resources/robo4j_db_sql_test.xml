@@ -41,6 +41,13 @@
             <value name="limit" type="Integer">2</value>
             <value name="sorted" type="String">asc</value>
             <value name="targetUnit" type="String">dbSqlUnit</value>
+            <value name="registeredUnits" type="String">system1,system2</value>
+        </config>
+    </roboUnit>
+    <roboUnit id="dbRegisterController">
+        <class>com.robo4j.db.sql.unit.SQLRegisterController</class>
+        <config name="com.robo4j.core.root">
+            <value name="dataSourceName" type="String">dbSqlUnit</value>
         </config>
     </roboUnit>
 </robo4j>

@@ -17,8 +17,9 @@
 
 package com.robo4j.db.sql;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -43,21 +44,28 @@ import com.robo4j.db.sql.model.ERoboUnit;
  */
 public class SQLDataSourceUnitTests {
 
-	private static String UNIT_SYSTEM_1_NAME = "system1";
-	private static String UNIT_SYSTEM_2_NAME = "system2";
-	private static String UNIT_SYSTEM_3_NAME = "system3";
+	private static final int DEFAULT_LIMIT = 2;
+	private static final String DEFAULT_SORTED = "asc";
+	private static final String UNIT_SYSTEM_1_NAME = "system1";
+	private static final String UNIT_SYSTEM_2_NAME = "system2";
+	private static final String UNIT_SYSTEM_3_NAME = "system3";
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testAllRoboReferencesInDatabase() throws Exception {
-		final SQLDataSourceUnit sqlDataSourceUnit = prepareSystemWithSQLUnit();
+		final SQLDataSourceUnit sqlDataSourceUnit = prepareSystemWithSQLUnit(DEFAULT_SORTED, DEFAULT_LIMIT);
 
 		AttributeDescriptor<List> descriptor1 = DefaultAttributeDescriptor.create(List.class, "all");
 		List<ERoboEntity<Long>> list1 = (List<ERoboEntity<Long>>) sqlDataSourceUnit.onGetAttribute(descriptor1);
 		System.out.println("Stored entities = " + list1);
 
-		List<String> nameList = list1.stream().map(ERoboUnit.class::cast).map(ERoboUnit::getUid)
+		//@formatter:off
+		List<String> nameList = list1.stream()
+				.map(ERoboUnit.class::cast)
+				.map(ERoboUnit::getUid)
 				.collect(Collectors.toList());
+		//@formatter:on
+
 		Assert.assertTrue(list1.size() == 2);
 		Assert.assertTrue(nameList.contains(UNIT_SYSTEM_1_NAME));
 		Assert.assertTrue(nameList.contains(UNIT_SYSTEM_2_NAME));
@@ -71,185 +79,127 @@ public class SQLDataSourceUnitTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnlyRoboUnitASCWithPointsInDB() throws Exception {
-		final RoboSystem system = new RoboSystem();
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
+		final SQLDataSourceUnit sqlDataSourceUnit = prepareSystemWithSQLUnit(DEFAULT_SORTED, DEFAULT_LIMIT);
+		Map<String, Object> map = new HashMap<>();
+		map.put("likeUid", "system");
+		List<ERoboUnit> units = sqlDataSourceUnit.getByMap(ERoboUnit.class, map);
 
-		SQLDataSourceUnit sqlDataSourceUnit = new SQLDataSourceUnit(system, "dbSQLUnit");
-		config.setString("sourceType", "h2");
-		config.setString("packages", "com.robo4j.db.sql.model");
-		config.setInteger("limit", 2);
-		config.setString("sorted", "asc");
-		config.setString("targetUnit", UNIT_SYSTEM_2_NAME);
-		sqlDataSourceUnit.initialize(config);
-		system.addUnits(sqlDataSourceUnit);
+		AttributeDescriptor<List> descriptor1 = DefaultAttributeDescriptor.create(List.class, "units_all_desc");
+		List<ERoboEntity<Long>> allUnitsList = (List<ERoboEntity<Long>>) sqlDataSourceUnit.onGetAttribute(descriptor1);
 
-		System.out.println("systemPong: State before start:");
-		System.out.println(SystemUtil.printStateReport(system));
+		ERoboUnit eRoboUnit1 = units.get(0);
+		eRoboUnit1.addPoints(getRoboPoint(eRoboUnit1, 2));
+		sqlDataSourceUnit.onMessage(eRoboUnit1);
 
-		system.start();
+		ERoboUnit eRoboUnit2 = units.get(1);
+		eRoboUnit2.addPoints(getRoboPoint(eRoboUnit2, 1));
+		sqlDataSourceUnit.onMessage(eRoboUnit2);
 
-		System.out.println("systemPong: State after start:");
-		System.out.println(SystemUtil.printStateReport(system));
+		AttributeDescriptor<List> descriptorLimitPoints = DefaultAttributeDescriptor.create(List.class, "unit_points");
+		List<ERoboPoint> pointsList = sqlDataSourceUnit.onGetAttribute(descriptorLimitPoints);
 
-		ERoboUnit ERoboUnit1 = new ERoboUnit();
-		ERoboUnit1.setUid("system1");
-		ERoboUnit1.setConfig("dbSQLUnit,httpClient");
-		ERoboUnit1.addPoints(getRoboPoint(ERoboUnit1, 2));
+		Assert.assertTrue(!units.isEmpty());
+		Assert.assertTrue(!allUnitsList.isEmpty());
+		Assert.assertTrue(allUnitsList.size() == units.size());
+		Assert.assertTrue(eRoboUnit1.getUid().equals(UNIT_SYSTEM_1_NAME));
+		Assert.assertTrue(eRoboUnit2.getUid().equals(UNIT_SYSTEM_2_NAME));
+		Assert.assertTrue(pointsList.size() == 1);
 
-		ERoboUnit ERoboUnit2 = new ERoboUnit();
-		ERoboUnit2.setUid("system2");
-		ERoboUnit2.setConfig("httpServer");
-		ERoboUnit2.addPoints(getRoboPoint(ERoboUnit2, 1));
-
-		sqlDataSourceUnit.onMessage(ERoboUnit1);
-		sqlDataSourceUnit.onMessage(ERoboUnit2);
-
-		AttributeDescriptor<List> descriptor1 = DefaultAttributeDescriptor.create(List.class, "units_all_asc");
-		List<ERoboEntity<Long>> list1 = (List<ERoboEntity<Long>>) sqlDataSourceUnit.onGetAttribute(descriptor1);
-		System.out.println("Stored entities = " + list1.size());
-		System.out.println("Stored entities = " + list1);
-
-		Assert.assertTrue(Arrays.asList(ERoboUnit1, ERoboUnit2).size() == list1.size());
-		Assert.assertTrue(list1.contains(ERoboUnit1));
-		Assert.assertTrue(list1.contains(ERoboUnit2));
-
-		ERoboUnit unit1 = (ERoboUnit) list1.get(0);
-		ERoboUnit unit2 = (ERoboUnit) list1.get(1);
-		Assert.assertTrue(!unit1.getPoints().isEmpty());
-		Assert.assertTrue(unit1.getPoints().size() == 2);
-		Assert.assertTrue(!unit2.getPoints().isEmpty());
-		Assert.assertTrue(unit2.getPoints().size() == 1);
-
-		system.shutdown();
-		System.out.println("systemPong: State after shutdown:");
-		System.out.println(SystemUtil.printStateReport(system));
+		sqlDataSourceUnit.getContext().shutdown();
+		System.out.println("System: State after shutdown:");
+		System.out.println(SystemUtil.printStateReport(sqlDataSourceUnit.getContext()));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnlyRoboUnitDESCWithPointsInDB() throws Exception {
-		final RoboSystem system = new RoboSystem();
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
-		SQLDataSourceUnit sqlDataSourceUnit = new SQLDataSourceUnit(system, "dbSQLUnit");
-		config.setString("sourceType", "h2");
-		config.setString("packages", "com.robo4j.db.sql.model");
-		config.setInteger("limit", 2);
-		config.setString("sorted", "asc");
-		config.setString("targetUnit", UNIT_SYSTEM_2_NAME);
-		sqlDataSourceUnit.initialize(config);
-		system.addUnits(sqlDataSourceUnit);
-
-		System.out.println("systemPong: State before start:");
-		System.out.println(SystemUtil.printStateReport(system));
-
-		system.start();
-
-		System.out.println("systemPong: State after start:");
-		System.out.println(SystemUtil.printStateReport(system));
-
-		ERoboUnit ERoboUnit1 = new ERoboUnit();
-		ERoboUnit1.setUid("system1");
-		ERoboUnit1.setConfig("dbSQLUnit,httpClient");
-		ERoboUnit1.addPoints(getRoboPoint(ERoboUnit1, 2));
-
-		ERoboUnit ERoboUnit2 = new ERoboUnit();
-		ERoboUnit2.setUid("system2");
-		ERoboUnit2.setConfig("httpServer");
-		ERoboUnit2.addPoints(getRoboPoint(ERoboUnit2, 1));
-
-		sqlDataSourceUnit.onMessage(ERoboUnit1);
-		sqlDataSourceUnit.onMessage(ERoboUnit2);
+		final SQLDataSourceUnit sqlDataSourceUnit = prepareSystemWithSQLUnit("desc", DEFAULT_LIMIT);
+		Map<String, Object> map = new HashMap<>();
+		map.put("likeUid", "system");
+		List<ERoboUnit> units = sqlDataSourceUnit.getByMap(ERoboUnit.class, map);
 
 		AttributeDescriptor<List> descriptor1 = DefaultAttributeDescriptor.create(List.class, "units_all_desc");
-		List<ERoboEntity<Long>> list1 = (List<ERoboEntity<Long>>) sqlDataSourceUnit.onGetAttribute(descriptor1);
-		System.out.println("Stored entities = " + list1.size());
-		System.out.println("Stored entities = " + list1);
+		List<ERoboEntity<Long>> allUnitsList = (List<ERoboEntity<Long>>) sqlDataSourceUnit.onGetAttribute(descriptor1);
 
-		Assert.assertTrue(Arrays.asList(ERoboUnit1, ERoboUnit2).size() == list1.size());
-		Assert.assertTrue(list1.contains(ERoboUnit1));
-		Assert.assertTrue(list1.contains(ERoboUnit2));
+		ERoboUnit eRoboUnit1 = units.get(0);
+		eRoboUnit1.addPoints(getRoboPoint(eRoboUnit1, 2));
+		sqlDataSourceUnit.onMessage(eRoboUnit1);
 
-		ERoboUnit unit1 = (ERoboUnit) list1.get(0);
-		ERoboUnit unit2 = (ERoboUnit) list1.get(1);
-		Assert.assertTrue(!unit1.getPoints().isEmpty());
-		Assert.assertTrue(unit1.getPoints().size() == 1);
-		Assert.assertTrue(!unit2.getPoints().isEmpty());
-		Assert.assertTrue(unit2.getPoints().size() == 2);
+		ERoboUnit eRoboUnit2 = units.get(1);
+		eRoboUnit2.addPoints(getRoboPoint(eRoboUnit2, 1));
+		sqlDataSourceUnit.onMessage(eRoboUnit2);
 
-		system.shutdown();
-		System.out.println("systemPong: State after shutdown:");
-		System.out.println(SystemUtil.printStateReport(system));
+		AttributeDescriptor<List> descriptorLimitPoints = DefaultAttributeDescriptor.create(List.class, "unit_points");
+		List<ERoboPoint> pointsList = sqlDataSourceUnit.onGetAttribute(descriptorLimitPoints);
+
+		Assert.assertTrue(!units.isEmpty());
+		Assert.assertTrue(!allUnitsList.isEmpty());
+		Assert.assertTrue(allUnitsList.size() == units.size());
+		Assert.assertTrue(eRoboUnit1.getUid().equals(UNIT_SYSTEM_2_NAME));
+		Assert.assertTrue(eRoboUnit2.getUid().equals(UNIT_SYSTEM_1_NAME));
+		Assert.assertTrue(pointsList.size() == 2);
+
+		sqlDataSourceUnit.getContext().shutdown();
+		System.out.println("System: State after shutdown:");
+		System.out.println(SystemUtil.printStateReport(sqlDataSourceUnit.getContext()));
+	}
+
+	/**
+	 * Test updates target entity by adding points limit is set
+	 */
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testEntityOrderWithLimitLower() throws Exception {
+		int maxPoints = 1;
+		final SQLDataSourceUnit sqlDataSourceUnit = prepareSystemWithSQLUnit(DEFAULT_SORTED, DEFAULT_LIMIT);
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("uid", UNIT_SYSTEM_2_NAME);
+		List<ERoboUnit> units = sqlDataSourceUnit.getByMap(ERoboUnit.class, map);
+		ERoboUnit system2Enity = units.get(0);
+		system2Enity.addPoints(getRoboPoint(system2Enity, maxPoints));
+		sqlDataSourceUnit.onMessage(system2Enity);
+
+		AttributeDescriptor<List> descriptorLimitPoints = DefaultAttributeDescriptor.create(List.class, "unit_points");
+		List<ERoboPoint> pointsList = sqlDataSourceUnit.onGetAttribute(descriptorLimitPoints);
+
+		Assert.assertTrue(!units.isEmpty());
+		Assert.assertTrue(units.size() == 1);
+		Assert.assertTrue(system2Enity.getUid().equals(UNIT_SYSTEM_2_NAME));
+		Assert.assertTrue(system2Enity.getPoints().size() == maxPoints);
+		Assert.assertTrue(pointsList.size() == maxPoints);
+
+		sqlDataSourceUnit.getContext().shutdown();
+		System.out.println("System: State after shutdown:");
+		System.out.println(SystemUtil.printStateReport(sqlDataSourceUnit.getContext()));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testEntityOrderWithLimit() throws Exception {
-		final int max = 3;
-		final int limit = 2;
-		final int roboUnit3Points = 5;
-		final RoboSystem system = new RoboSystem();
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
+	public void testEntityOrderWithLimitHigher() throws Exception {
+		int maxPoints = 3;
+		final SQLDataSourceUnit sqlDataSourceUnit = prepareSystemWithSQLUnit(DEFAULT_SORTED, DEFAULT_LIMIT);
 
-		SQLDataSourceUnit sqlDataSourceUnit = new SQLDataSourceUnit(system, "dbSQLUnit");
-		config.setString("sourceType", "h2");
-		config.setString("packages", "com.robo4j.db.sql.model");
-		config.setInteger("limit", limit);
-		config.setString("sorted", "desc");
-		config.setString("targetUnit", UNIT_SYSTEM_2_NAME);
-		sqlDataSourceUnit.initialize(config);
-		system.addUnits(sqlDataSourceUnit);
+		Map<String, Object> map = new HashMap<>();
+		map.put("uid", UNIT_SYSTEM_2_NAME);
+		List<ERoboUnit> units = sqlDataSourceUnit.getByMap(ERoboUnit.class, map);
+		ERoboUnit system2Enity = units.get(0);
+		system2Enity.addPoints(getRoboPoint(system2Enity, maxPoints));
+		sqlDataSourceUnit.onMessage(system2Enity);
 
-		System.out.println("systemPong: State before start:");
-		System.out.println(SystemUtil.printStateReport(system));
+		AttributeDescriptor<List> descriptorLimitPoints = DefaultAttributeDescriptor.create(List.class, "unit_points");
+		List<ERoboPoint> pointsList = sqlDataSourceUnit.onGetAttribute(descriptorLimitPoints);
 
-		system.start();
+		Assert.assertTrue(!units.isEmpty());
+		Assert.assertTrue(units.size() == 1);
+		Assert.assertTrue(system2Enity.getUid().equals(UNIT_SYSTEM_2_NAME));
+		Assert.assertTrue(system2Enity.getPoints().size() == maxPoints);
+		Assert.assertTrue(pointsList.size() == DEFAULT_LIMIT);
 
-		System.out.println("systemPong: State after start:");
-		System.out.println(SystemUtil.printStateReport(system));
-
-		ERoboUnit eRoboUnit1 = new ERoboUnit();
-		eRoboUnit1.setUid(UNIT_SYSTEM_1_NAME);
-		eRoboUnit1.setConfig("dbSQLUnit,httpClient");
-		eRoboUnit1.addPoints(getRoboPoint(eRoboUnit1, max));
-
-		ERoboUnit eRoboUnit2 = new ERoboUnit();
-		eRoboUnit2.setUid(UNIT_SYSTEM_2_NAME);
-		eRoboUnit2.setConfig("httpServer");
-		eRoboUnit2.addPoints(getRoboPoint(eRoboUnit2, max));
-		eRoboUnit2.addPart(eRoboUnit1);
-		eRoboUnit2.setParent(eRoboUnit1);
-
-		ERoboUnit eRoboUnit3 = new ERoboUnit();
-		eRoboUnit3.setUid(UNIT_SYSTEM_3_NAME);
-		eRoboUnit3.setConfig("httpServer,httpClient");
-		eRoboUnit3.addPoints(getRoboPoint(eRoboUnit3, roboUnit3Points));
-		eRoboUnit3.addParts(Arrays.asList(eRoboUnit1, eRoboUnit2));
-		eRoboUnit3.setParent(eRoboUnit1);
-
-		sqlDataSourceUnit.onMessage(eRoboUnit1);
-		sqlDataSourceUnit.onMessage(eRoboUnit2);
-		sqlDataSourceUnit.onMessage(eRoboUnit3);
-
-		AttributeDescriptor<List> descriptor1 = DefaultAttributeDescriptor.create(List.class, "units_desc");
-		AttributeDescriptor<List> descriptor2 = DefaultAttributeDescriptor.create(List.class, "unit_points");
-		List<ERoboEntity<Long>> list1 = sqlDataSourceUnit.onGetAttribute(descriptor1);
-		List<ERoboPoint> list2 = sqlDataSourceUnit.onGetAttribute(descriptor2);
-
-		Assert.assertTrue(list1.size() == limit);
-		Assert.assertTrue(list1.get(0).getId() == max);
-
-		ERoboUnit roboUnit1 = (ERoboUnit) list1.get(0);
-		Assert.assertTrue(roboUnit1.getUid().equals(UNIT_SYSTEM_3_NAME));
-		Assert.assertTrue(roboUnit1.getPoints().size() == roboUnit3Points);
-		Assert.assertTrue(roboUnit1.getParts().size() == 2);
-		Assert.assertTrue(roboUnit1.getParent().getUid().equals(UNIT_SYSTEM_1_NAME));
-		Assert.assertTrue(list2.size() == limit);
-		System.out.println("LIST2: " + list2);
-
-		system.shutdown();
-		System.out.println("systemPong: State after shutdown:");
-		System.out.println(SystemUtil.printStateReport(system));
+		sqlDataSourceUnit.getContext().shutdown();
+		System.out.println("System: State after shutdown:");
+		System.out.println(SystemUtil.printStateReport(sqlDataSourceUnit.getContext()));
 	}
 
 	// Private Methods
@@ -265,15 +215,15 @@ public class SQLDataSourceUnitTests {
 		//@formatter:on
 	}
 
-	private SQLDataSourceUnit prepareSystemWithSQLUnit() throws Exception {
+	private SQLDataSourceUnit prepareSystemWithSQLUnit(String sorted, int limit) throws Exception {
 		final RoboSystem system = new RoboSystem();
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
 		SQLDataSourceUnit result = new SQLDataSourceUnit(system, "dbSQLUnit");
 		config.setString("sourceType", "h2");
 		config.setString("packages", "com.robo4j.db.sql.model");
-		config.setInteger("limit", 2);
-		config.setString("sorted", "asc");
+		config.setInteger("limit", limit);
+		config.setString("sorted", sorted);
 		config.setString("targetUnit", UNIT_SYSTEM_2_NAME);
 		result.initialize(config);
 		system.addUnits(result);
