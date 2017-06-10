@@ -38,7 +38,7 @@ import com.robo4j.core.util.SystemUtil;
  */
 public class SQLDBHttpServerUnitTests {
 
-	@Test
+//	@Test
 	public void sqlHttpServerImageSendTest() throws Exception {
 
 		RoboBuilder builder = new RoboBuilder()
