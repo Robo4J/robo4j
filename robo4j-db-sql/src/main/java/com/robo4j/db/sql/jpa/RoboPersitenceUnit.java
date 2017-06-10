@@ -17,8 +17,12 @@
 
 package com.robo4j.db.sql.jpa;
 
+import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
+import com.robo4j.core.configuration.Configuration;
+import com.robo4j.db.sql.SQLDataSourceUnit;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -26,7 +30,31 @@ import com.robo4j.core.RoboUnit;
  */
 public abstract class RoboPersitenceUnit<T> extends RoboUnit<T> {
 
-    public RoboPersitenceUnit(Class<T> messageType, RoboContext context, String id) {
-        super(messageType, context, id);
-    }
+	private static final String PERSISTENCE_UNIT_NAME = "persistenceUnit";
+
+	/**
+	 * Constructor
+	 */
+	public RoboPersitenceUnit(Class<T> messageType, RoboContext context, String id) {
+		super(messageType, context, id);
+	}
+
+	@Override
+	public void initialize(Configuration configuration) throws ConfigurationException {
+		registerUnit(configuration);
+		super.initialize(configuration);
+	}
+
+	private void registerUnit(Configuration configuration) throws ConfigurationException {
+		String tmpName = configuration.getString(PERSISTENCE_UNIT_NAME, null);
+		if (tmpName == null) {
+			throw ConfigurationException.createMissingConfigNameException(PERSISTENCE_UNIT_NAME);
+		}
+		RoboReference<SQLDataSourceUnit> sqlUnitReference = getContext().getReference(tmpName);
+		if(sqlUnitReference == null){
+            throw ConfigurationException.createMissingConfigNameException(PERSISTENCE_UNIT_NAME);
+        }
+
+
+	}
 }
