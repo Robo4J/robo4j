@@ -44,6 +44,7 @@ public class TestPersistUnit extends RoboPersitenceUnit<TestPersistPointDTO> {
     public void onMessage(TestPersistPointDTO message) {
         ERoboUnit roboUnit = getEntity();
         ERoboPoint point = new ERoboPoint();
+        point.setUnit(roboUnit);
         point.setValueType(message.getValueType());
         point.setValues(message.getValue());
         roboUnit.addPoint(point);

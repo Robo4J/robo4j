@@ -20,7 +20,9 @@ package com.robo4j.db.sql;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
+import com.robo4j.core.RoboUnit;
 import com.robo4j.db.sql.model.ERoboEntity;
 import com.robo4j.db.sql.model.ERoboPoint;
 import com.robo4j.db.sql.model.ERoboUnit;
@@ -49,6 +51,8 @@ import com.robo4j.db.sql.unit.TestPersistUnit;
  */
 public class SQLDBHttpServerUnitTests {
 
+	private static final int DEFAULT_INDEX = 0;
+
 	// @Test
 	public void sqlHttpServerImageSendTest() throws Exception {
 
@@ -68,21 +72,26 @@ public class SQLDBHttpServerUnitTests {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void createSystem() throws Exception {
+
+		final int maxPoints = 3;
+		final String targetUnit = "testSystem";
+		final String dataSourceName = "dbSQLUnit";
 		final RoboSystem system = new RoboSystem();
 		Configuration sqlConfig = ConfigurationFactory.createEmptyConfiguration();
 
-		SQLDataSourceUnit sqlUnit = new SQLDataSourceUnit(system, "dbSQLUnit");
+		SQLDataSourceUnit sqlUnit = new SQLDataSourceUnit(system, dataSourceName);
 		sqlConfig.setString("sourceType", "h2");
 		sqlConfig.setString("packages", "com.robo4j.db.sql.model");
 		sqlConfig.setInteger("limit", 3);
 		sqlConfig.setString("sorted", "asc");
-		sqlConfig.setString("targetUnit", "testSystem");
+		sqlConfig.setString("targetUnit", targetUnit);
 
-		TestPersistUnit testRoboUnitOne = new TestPersistUnit(system, "testSystem");
+		TestPersistUnit testRoboUnitOne = new TestPersistUnit(system, targetUnit);
 		Configuration testConfig = ConfigurationFactory.createEmptyConfiguration();
-		testConfig.setString("persistenceUnit", "dbSQLUnit");
+		testConfig.setString("persistenceUnit", dataSourceName);
 		testConfig.setString("config", "magic config");
 
 		/* specific configuration */
@@ -92,27 +101,35 @@ public class SQLDBHttpServerUnitTests {
 
 		system.start();
 
-
 		System.out.println("System: State after start:");
 		System.out.println(SystemUtil.printStateReport(system));
 
 
-		testRoboUnitOne.onMessage(new TestPersistPointDTO("testType1", "testValue1"));
-		testRoboUnitOne.onMessage(new TestPersistPointDTO("testType2", "testValue2"));
-		testRoboUnitOne.onMessage(new TestPersistPointDTO("testType3", "testValue3"));
-
+		IntStream.range(DEFAULT_INDEX, maxPoints)
+				.forEach(i -> testRoboUnitOne.onMessage(new TestPersistPointDTO("testType" + i, "testValue" + i)));
+		
 		AttributeDescriptor<List> descriptorAllPoints = DefaultAttributeDescriptor.create(List.class, "unit_points");
 		List<ERoboPoint> allPointsList = (List<ERoboPoint>) sqlUnit.onGetAttribute(descriptorAllPoints);
-		System.out.println("allPointsList: " + allPointsList);
 
 		Map<String, Object> tmpMap= new HashMap<>();
-		tmpMap.put("unit", "testSystem");
-		List<ERoboPoint> points = sqlUnit.getByMap(ERoboPoint.class, tmpMap);
-		System.out.println("DIRECT points= " + points);
+		tmpMap.put("unit", targetUnit);
+		List<ERoboPoint> directBySQLUnit = sqlUnit.getByMap(ERoboPoint.class, tmpMap);
 
 		AttributeDescriptor<List> descriptorAllUnits = DefaultAttributeDescriptor.create(List.class, "units_all_desc");
 		List<ERoboEntity<Long>> allUnitsList = (List<ERoboEntity<Long>>) sqlUnit.onGetAttribute(descriptorAllUnits);
-		System.out.println("allUnitsList: " + allUnitsList);
+
+
+		Assert.assertNotNull(directBySQLUnit);
+		Assert.assertNotNull(allPointsList);
+		Assert.assertNotNull(allUnitsList);
+
+		Assert.assertTrue(allUnitsList.size() == 1);
+		Assert.assertTrue(((ERoboUnit)allUnitsList.get(DEFAULT_INDEX)).getUid().equals(targetUnit));
+		Assert.assertTrue(directBySQLUnit.size() == allPointsList.size());
+
+		Assert.assertTrue(allPointsList.size() == maxPoints);
+		IntStream.range(DEFAULT_INDEX, directBySQLUnit.size())
+				.forEach(i -> Assert.assertTrue(directBySQLUnit.get(i).equals(allPointsList.get(i))));
 
 		system.shutdown();
 		System.out.println("System: State after shutdown:");
