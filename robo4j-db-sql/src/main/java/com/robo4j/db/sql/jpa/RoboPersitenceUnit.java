@@ -17,12 +17,22 @@
 
 package com.robo4j.db.sql.jpa;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
+import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.ConfigurationException;
+import com.robo4j.core.DefaultAttributeDescriptor;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.db.sql.SQLDataSourceUnit;
+import com.robo4j.db.sql.model.ERoboEntity;
+import com.robo4j.db.sql.model.ERoboUnit;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -31,6 +41,9 @@ import com.robo4j.db.sql.SQLDataSourceUnit;
 public abstract class RoboPersitenceUnit<T> extends RoboUnit<T> {
 
 	private static final String PERSISTENCE_UNIT_NAME = "persistenceUnit";
+	private static final int DEFAULT_INDEX = 0;
+	private Map<String, Object> entityMap = new HashMap<>();
+	private SQLDataSourceUnit dataSourceUnit;
 
 	/**
 	 * Constructor
@@ -42,7 +55,17 @@ public abstract class RoboPersitenceUnit<T> extends RoboUnit<T> {
 	@Override
 	public void initialize(Configuration configuration) throws ConfigurationException {
 		registerUnit(configuration);
-		super.initialize(configuration);
+		// super.initialize(configuration);
+	}
+
+	@SuppressWarnings("unchecked")
+	protected ERoboUnit getEntity() {
+		List<ERoboUnit> tmpList = dataSourceUnit.getByMap(ERoboUnit.class, entityMap);
+		return tmpList.isEmpty() ? null : tmpList.get(DEFAULT_INDEX);
+	}
+
+	protected void save(ERoboUnit unit){
+		dataSourceUnit.onMessage(unit);
 	}
 
 	private void registerUnit(Configuration configuration) throws ConfigurationException {
@@ -50,11 +73,24 @@ public abstract class RoboPersitenceUnit<T> extends RoboUnit<T> {
 		if (tmpName == null) {
 			throw ConfigurationException.createMissingConfigNameException(PERSISTENCE_UNIT_NAME);
 		}
-		RoboReference<SQLDataSourceUnit> sqlUnitReference = getContext().getReference(tmpName);
-		if(sqlUnitReference == null){
-            throw ConfigurationException.createMissingConfigNameException(PERSISTENCE_UNIT_NAME);
-        }
+		RoboReference<ERoboEntity> sqlUnitReference = getContext().getReference(tmpName);
+		if (sqlUnitReference == null) {
+			throw ConfigurationException.createMissingConfigNameException(PERSISTENCE_UNIT_NAME);
+		}
+		AttributeDescriptor<SQLDataSourceUnit> descriptor = DefaultAttributeDescriptor.create(SQLDataSourceUnit.class,
+				"robo_sql_unit");
+		entityMap.put("uid", getId());
+		try {
+			dataSourceUnit = sqlUnitReference.getAttribute(descriptor).get();
+		} catch (InterruptedException | ExecutionException e) {
+			SimpleLoggingUtil.error(getClass(), "error", e);
+		}
 
+		ERoboUnit entity = new ERoboUnit();
+		entity.setUid(getId());
+		entity.setConfig(configuration.getString("config", null));
+		sqlUnitReference.sendMessage(entity);
 
 	}
+
 }

@@ -113,7 +113,7 @@ public class SQLDataSourceUnitTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnlyRoboUnitDESCWithPointsInDB() throws Exception {
-
+		int maxPoints = 2;
 		final SQLDataSourceUnit sqlDataSourceUnit = prepareSystemWithSQLUnit("desc", DEFAULT_LIMIT);
 		Map<String, Object> map = new HashMap<>();
 		map.put("likeUid", "system");
@@ -123,7 +123,7 @@ public class SQLDataSourceUnitTests {
 		List<ERoboEntity<Long>> allUnitsList = (List<ERoboEntity<Long>>) sqlDataSourceUnit.onGetAttribute(descriptor1);
 
 		ERoboUnit eRoboUnit1 = units.get(0);
-		eRoboUnit1.addPoints(getRoboPoint(eRoboUnit1, 2));
+		eRoboUnit1.addPoints(getRoboPoint(eRoboUnit1, maxPoints));
 		sqlDataSourceUnit.onMessage(eRoboUnit1);
 
 		ERoboUnit eRoboUnit2 = units.get(1);
@@ -138,8 +138,14 @@ public class SQLDataSourceUnitTests {
 		Assert.assertTrue(allUnitsList.size() == units.size());
 		Assert.assertTrue(eRoboUnit1.getUid().equals(UNIT_SYSTEM_2_NAME));
 		Assert.assertTrue(eRoboUnit2.getUid().equals(UNIT_SYSTEM_1_NAME));
-		Assert.assertTrue(pointsList.size() == 2);
+		Assert.assertTrue(pointsList.size() == maxPoints);
+		pointsList.forEach(p -> {
+			Assert.assertNotNull(p.getCreatedOn());
+			Assert.assertNotNull(p.getUpdatedOn());
+			Assert.assertTrue(p.getCreatedOn().equals(p.getUpdatedOn()));
+		});
 
+		System.out.println("LIST : " + pointsList);
 		sqlDataSourceUnit.getContext().shutdown();
 		System.out.println("System: State after shutdown:");
 		System.out.println(SystemUtil.printStateReport(sqlDataSourceUnit.getContext()));
@@ -169,6 +175,12 @@ public class SQLDataSourceUnitTests {
 		Assert.assertTrue(system2Enity.getUid().equals(UNIT_SYSTEM_2_NAME));
 		Assert.assertTrue(system2Enity.getPoints().size() == maxPoints);
 		Assert.assertTrue(pointsList.size() == maxPoints);
+		pointsList.forEach(p -> {
+			Assert.assertNotNull(p.getCreatedOn());
+			Assert.assertNotNull(p.getUpdatedOn());
+			Assert.assertTrue(p.getCreatedOn().equals(p.getUpdatedOn()));
+		});
+
 
 		sqlDataSourceUnit.getContext().shutdown();
 		System.out.println("System: State after shutdown:");

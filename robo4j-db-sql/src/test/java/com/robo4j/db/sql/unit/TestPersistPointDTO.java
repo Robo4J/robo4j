@@ -15,21 +15,43 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.db.sql.model;
-
-import java.io.Serializable;
-import java.time.ZonedDateTime;
+package com.robo4j.db.sql.unit;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public interface ERoboEntity<ID> extends Serializable {
-	long serialVersionUID = 1;
+public class TestPersistPointDTO {
 
-	ID getId();
+    private String valueType;
+    private String value;
 
-	ZonedDateTime getCreatedOn();
+    public TestPersistPointDTO(String valueType, String value) {
+        this.valueType = valueType;
+        this.value = value;
+    }
 
-	ZonedDateTime getUpdatedOn();
+    public String getValueType() {
+        return valueType;
+    }
+
+    public void setValueType(String valueType) {
+        this.valueType = valueType;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "TestPersistPointDTO{" +
+                "valueType='" + valueType + '\'' +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }

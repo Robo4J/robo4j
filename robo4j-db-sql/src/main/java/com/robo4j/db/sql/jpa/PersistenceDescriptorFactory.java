@@ -18,6 +18,7 @@
 package com.robo4j.db.sql.jpa;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -39,8 +40,10 @@ import com.robo4j.db.sql.support.DataSourceType;
 public final class PersistenceDescriptorFactory {
 
 	private List<Class<?>> registeredClasses = null;
+	private Map<String, Object> params;
 
-	public PersistenceDescriptorFactory() {
+	public PersistenceDescriptorFactory(Map<String, Object> params) {
+		this.params = params;
 	}
 
 	public PersistenceUnitInfo get(ClassLoader classloader, DataSourceType type, String... entityPackages) {
@@ -48,6 +51,7 @@ public final class PersistenceDescriptorFactory {
 		case H2:
 			return getH2(classloader, entityPackages);
 		case POSTGRESQL:
+			return getPosgreSQL(classloader, entityPackages);
 		default:
 			throw new RoboDbException("not supported datasource," + type);
 		}
@@ -58,24 +62,61 @@ public final class PersistenceDescriptorFactory {
 	}
 
 	// Private Methods
+	private String propertyToString(String key, String defValue) {
+		return params.containsKey(key) ? params.get(key).toString() : defValue;
+	}
+
 	private PersistenceUnitInfo getH2(ClassLoader classloader, String... entityPackages) {
 		final Properties properties = new Properties();
-		properties.setProperty("hibernate.archive.autodetection", "class, hbm");
-		properties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-		properties.setProperty("hibernate.connection.driver_class", "org.h2.Driver");
-		properties.setProperty("hibernate.connection.url", "jdbc:h2:mem:robo4jh2");
-		properties.setProperty("hibernate.connection.user", "sa");
-		properties.setProperty("hibernate.show_sql", "true");
-		properties.setProperty("hibernate.flushMode", "FLUSH_AUTO");
-		properties.setProperty("hibernate.hbm2ddl.auto", "create-drop");
+		properties.setProperty("hibernate.archive.autodetection",
+				propertyToString("hibernate.archive.autodetection", "class, hbm"));
+		properties.setProperty("hibernate.dialect",
+				propertyToString("hibernate.dialect", "org.hibernate.dialect.H2Dialect"));
+		properties.setProperty("hibernate.connection.driver_class",
+				propertyToString("hibernate.connection.driver_class", "org.h2.Driver"));
+		properties.setProperty("hibernate.connection.url",
+				propertyToString("hibernate.connection.url", "jdbc:h2:mem:robo4jh2"));
+		properties.setProperty("hibernate.connection.user", propertyToString("hibernate.connection.user", "sa"));
+		properties.setProperty("hibernate.show_sql", propertyToString("hibernate.show_sql", "true"));
+		properties.setProperty("hibernate.flushMode", propertyToString("hibernate.flushMode", "FLUSH_AUTO"));
+		properties.setProperty("hibernate.hbm2ddl.auto", propertyToString("hibernate.hbm2ddl.auto", "create-drop"));
 
 		//@formatter:off
         return PersistenceUnitInfoBuilder.Builder()
-                .addProperty("name", DataSourceType.H2.getName())
-                .addProperty("transaction-type", "RESOURCE_LOCAL")
+                .addProperty("name", params.getOrDefault("persistence_name", DataSourceType.H2.getName()))
+                .addProperty("transaction-type", params.getOrDefault("transaction-type","RESOURCE_LOCAL"))
                 .addProperty("classes", scanForEntities(classloader, entityPackages))
                 .addProperty("provider", "org.hibernate.jpa.HibernatePersistenceProvider")
-                .addProperty("exclude-unlisted-classes", false)
+                .addProperty("exclude-unlisted-classes", params.getOrDefault("exclude-unlisted-classes", false))
+                .addProperty("properties", properties)
+                .build();
+        //@formatter:on
+	}
+
+	private PersistenceUnitInfo getPosgreSQL(ClassLoader classloader, String... entityPackages) {
+		final Properties properties = new Properties();
+		properties.setProperty("hibernate.archive.autodetection",
+				propertyToString("hibernate.archive.autodetection", "class, hbm"));
+		properties.setProperty("hibernate.dialect",
+				propertyToString("hibernate.dialect", "org.hibernate.dialect.PostgreSQL94Dialect"));
+		properties.setProperty("hibernate.connection.driver_class",
+				propertyToString("hibernate.connection.driver_class", "org.postgresql.Driver"));
+		properties.setProperty("hibernate.connection.url",
+				propertyToString("hibernate.connection.url", "jdbc:postgresql://localhost:5433/robo4j1"));
+		properties.setProperty("hibernate.connection.user", propertyToString("hibernate.connection.user", "postgres"));
+		properties.setProperty("hibernate.connection.password",
+				propertyToString("hibernate.connection.password", "post"));
+		properties.setProperty("hibernate.show_sql", propertyToString("hibernate.show_sql", "true"));
+		properties.setProperty("hibernate.flushMode", propertyToString("hibernate.flushMode", "FLUSH_AUTO"));
+		properties.setProperty("hibernate.hbm2ddl.auto", propertyToString("hibernate.hbm2ddl.auto", "create-drop"));
+
+		//@formatter:off
+        return PersistenceUnitInfoBuilder.Builder()
+                .addProperty("name", params.getOrDefault("persistence_name", DataSourceType.POSTGRESQL.getName()))
+                .addProperty("transaction-type", params.getOrDefault("transaction-type", "RESOURCE_LOCAL"))
+                .addProperty("classes", scanForEntities(classloader, entityPackages))
+                .addProperty("provider", "org.hibernate.jpa.HibernatePersistenceProvider")
+                .addProperty("exclude-unlisted-classes",params.getOrDefault("exclude-unlisted-classes", false))
                 .addProperty("properties", properties)
                 .build();
         //@formatter:on

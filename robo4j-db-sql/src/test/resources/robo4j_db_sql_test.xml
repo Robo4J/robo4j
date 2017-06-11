@@ -46,8 +46,8 @@
     </roboUnit>
     <roboUnit id="dbRegisterController">
         <class>com.robo4j.db.sql.unit.SQLRegisterController</class>
-        <config name="com.robo4j.core.root">
-            <value name="dataSourceName" type="String">dbSqlUnit</value>
-        </config>
-    </roboUnit>
+    <config name="com.robo4j.core.root">
+        <value name="dataSourceName" type="String">dbSqlUnit</value>
+    </config>
+</roboUnit>
 </robo4j>

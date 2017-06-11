@@ -19,6 +19,8 @@ package com.robo4j.db.sql.support;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import javax.persistence.spi.PersistenceUnitInfo;
 
@@ -42,14 +44,27 @@ public final class PersistenceContextBuilder {
 	private final String[] packages;
 	private DataSourceContext dataSourceContext;
 	private List<Class<?>> registeredClasses;
+	/**
+	 * additional parameters
+	 */
+	private Map<String, Object> params;
 
 	public PersistenceContextBuilder(DataSourceType sourceType, String[] packages) {
+		this(sourceType, packages, new WeakHashMap<>());
+	}
+
+	public PersistenceContextBuilder(DataSourceType sourceType, String[] packages, Map<String, Object> params) {
 		this.sourceType = sourceType;
 		this.packages = packages;
+		this.params = params;
+	}
+
+	public void addParamater(String key, Object value){
+		params.put(key, value);
 	}
 
 	public PersistenceContextBuilder build() {
-		PersistenceDescriptorFactory persistenceDescriptorFactory = new PersistenceDescriptorFactory();
+		PersistenceDescriptorFactory persistenceDescriptorFactory = new PersistenceDescriptorFactory(params);
 		PersistenceUnitInfo persistenceUnitInfo = persistenceDescriptorFactory
 				.get(RoboClassLoader.getInstance().getClassLoader(), sourceType, packages);
 		PersistenceUnitDescriptor persistenceUnitDescriptor = new PersistenceUnitInfoDescriptor(persistenceUnitInfo);

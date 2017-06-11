@@ -22,6 +22,11 @@ package com.robo4j.db.sql.model;
  * @author Miro Wengner (@miragemiko)
  */
 
+import com.sun.istack.internal.NotNull;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,13 +40,18 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "ROBO_UNIT")
 public class ERoboUnit implements ERoboEntity<Long> {
 
 	private Long id;
+	private ZonedDateTime createdOn;
+	private ZonedDateTime updatedOn;
 	private String uid;
 	private String config;
 	private ERoboUnit parent;
@@ -55,7 +65,8 @@ public class ERoboUnit implements ERoboEntity<Long> {
 
 	@Id
 	@Column(name = "ID")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@SequenceGenerator(name = "robo_unit_generator", sequenceName = "robo_unit_sequence", allocationSize = 1)
+	@GeneratedValue(generator = "robo_unit_generator")
 	@Override
 	public Long getId() {
 		return id;
@@ -63,6 +74,29 @@ public class ERoboUnit implements ERoboEntity<Long> {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	@CreationTimestamp
+	@Column(name = "CREATED_ON", columnDefinition= "TIMESTAMP WITH TIME ZONE")
+	@Override
+	public ZonedDateTime getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(ZonedDateTime createdOn) {
+		this.createdOn = createdOn;
+	}
+
+
+	@UpdateTimestamp
+	@Column(name = "UPDATED_ON", columnDefinition= "TIMESTAMP WITH TIME ZONE")
+	@Override
+	public ZonedDateTime getUpdatedOn() {
+		return updatedOn;
+	}
+
+	public void setUpdatedOn(ZonedDateTime updateddOn) {
+		this.updatedOn = updateddOn;
 	}
 
 	@Column(name = "UID")
@@ -110,7 +144,7 @@ public class ERoboUnit implements ERoboEntity<Long> {
 		this.parts.addAll(units);
 	}
 
-	@OneToMany(mappedBy = "unit", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "unit", cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = ERoboPoint.class)
 	public List<ERoboPoint> getPoints() {
 		return points;
 	}
@@ -129,7 +163,45 @@ public class ERoboUnit implements ERoboEntity<Long> {
 
 	@Override
 	public String toString() {
-		return "ERoboUnit{" + "id=" + id + ", uid='" + uid + '\'' + ", config='" + config + '\'' + ", parent=" + parent
-				+ ", parts=" + parts + ", points=" + points + '}';
+		return "ERoboUnit{" +
+				"id=" + id +
+				", createdOn=" + createdOn +
+				", updatedOn=" + updatedOn +
+				", uid='" + uid + '\'' +
+				", config='" + config + '\'' +
+				", parent=" + parent +
+				", parts=" + parts +
+				", points=" + points +
+				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof ERoboUnit)) return false;
+
+		ERoboUnit roboUnit = (ERoboUnit) o;
+
+		if (id != null ? !id.equals(roboUnit.id) : roboUnit.id != null) return false;
+		if (createdOn != null ? !createdOn.equals(roboUnit.createdOn) : roboUnit.createdOn != null) return false;
+		if (updatedOn != null ? !updatedOn.equals(roboUnit.updatedOn) : roboUnit.updatedOn != null) return false;
+		if (uid != null ? !uid.equals(roboUnit.uid) : roboUnit.uid != null) return false;
+		if (config != null ? !config.equals(roboUnit.config) : roboUnit.config != null) return false;
+		if (parent != null ? !parent.equals(roboUnit.parent) : roboUnit.parent != null) return false;
+		if (parts != null ? !parts.equals(roboUnit.parts) : roboUnit.parts != null) return false;
+		return points != null ? points.equals(roboUnit.points) : roboUnit.points == null;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = id != null ? id.hashCode() : 0;
+		result = 31 * result + (createdOn != null ? createdOn.hashCode() : 0);
+		result = 31 * result + (updatedOn != null ? updatedOn.hashCode() : 0);
+		result = 31 * result + (uid != null ? uid.hashCode() : 0);
+		result = 31 * result + (config != null ? config.hashCode() : 0);
+		result = 31 * result + (parent != null ? parent.hashCode() : 0);
+		result = 31 * result + (parts != null ? parts.hashCode() : 0);
+		result = 31 * result + (points != null ? points.hashCode() : 0);
+		return result;
 	}
 }

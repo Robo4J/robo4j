@@ -49,6 +49,7 @@ import com.robo4j.db.sql.support.SortType;
  */
 public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 
+	private static final String ATTRIBUTE_ROBO_SQL_UNIT = "robo_sql_unit";
 	private static final String ATTRIBUTE_ROBO_ALL_NAME = "all";
 	private static final String ATTRIBUTE_ROBO_UNIT_ALL_ASC_NAME = "units_all_asc";
 	private static final String ATTRIBUTE_ROBO_UNIT_ALL_DESC_NAME = "units_all_desc";
@@ -56,6 +57,7 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 	private static final String ATTRIBUTE_ROBO_UNIT_DESC_NAME = "units_desc";
 	private static final String ATTRIBUTE_ROBO_UNIT_POINTS_NAME = "unit_points";
 	private static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Arrays.asList(
+			DefaultAttributeDescriptor.create(SQLDataSourceUnit.class, ATTRIBUTE_ROBO_SQL_UNIT),
 			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_ALL_NAME),
 			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_ALL_ASC_NAME),
 			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_POINTS_NAME));
@@ -99,7 +101,6 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 		packages = tmpPackages.split(Constants.UTF8_COMMA);
 		limit = configuration.getInteger("limit", 2);
 		sorted = SortType.getByName(configuration.getString("sorted", "desc"));
-
 	}
 
 	@Override
@@ -111,12 +112,17 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 	}
 
 	@Override
-	public void start() {
-		setState(LifecycleState.STARTING);
+	public void initialize(Configuration configuration) throws ConfigurationException {
+		super.initialize(configuration);
 		PersistenceContextBuilder builder = new PersistenceContextBuilder(sourceType, packages).build();
 		registeredClasses = builder.getRegisteredClasses();
 		dataSourceContext = builder.getDataSourceContext();
 		repository = new DefaultRepository(dataSourceContext);
+	}
+
+	@Override
+	public void start() {
+		setState(LifecycleState.STARTING);
 		setState(LifecycleState.STARTED);
 	}
 
@@ -145,29 +151,34 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 			//@formatter:on
 		}
 
-		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_ALL_ASC_NAME)
+		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_UNIT_ALL_ASC_NAME)
 				&& descriptor.getAttributeType() == List.class) {
 			return (R) repository.findAllByClass(ERoboUnit.class, SortType.ASC);
 		}
 
-		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_ASC_NAME)
+		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_UNIT_ASC_NAME)
 				&& descriptor.getAttributeType() == List.class) {
 			return (R) repository.findByClassWithLimit(ERoboUnit.class, limit, SortType.ASC);
 		}
 
-		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_ALL_DESC_NAME)
+		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_UNIT_ALL_DESC_NAME)
 				&& descriptor.getAttributeType() == List.class) {
 			return (R) repository.findAllByClass(ERoboUnit.class, SortType.DESC);
 		}
 
-		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_DESC_NAME)
+		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_UNIT_DESC_NAME)
 				&& descriptor.getAttributeType() == List.class) {
 			return (R) repository.findByClassWithLimit(ERoboUnit.class, limit, SortType.DESC);
 		}
 
-		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_POINTS_NAME)
+		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_UNIT_POINTS_NAME)
 				&& descriptor.getAttributeType() == List.class) {
 			return (R) repository.findByFields(ERoboPoint.class, targetUnitSearchMap, limit, sorted);
+		}
+
+		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_SQL_UNIT)
+				&& descriptor.getAttributeType() == SQLDataSourceUnit.class) {
+			return (R) this;
 		}
 
 		return super.onGetAttribute(descriptor);
