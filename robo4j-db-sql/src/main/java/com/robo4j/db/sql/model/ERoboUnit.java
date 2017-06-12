@@ -42,7 +42,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Table(name = "ROBO_UNIT")
+@Table(name = "robo_unit")
 public class ERoboUnit implements ERoboEntity<Long> {
 
 	private Long id;
@@ -60,7 +60,7 @@ public class ERoboUnit implements ERoboEntity<Long> {
 	}
 
 	@Id
-	@Column(name = "ID")
+	@Column(name = "id")
 	@SequenceGenerator(name = "robo_unit_generator", sequenceName = "robo_unit_sequence", allocationSize = 1)
 	@GeneratedValue(generator = "robo_unit_generator")
 	@Override
@@ -73,7 +73,7 @@ public class ERoboUnit implements ERoboEntity<Long> {
 	}
 
 	@CreationTimestamp
-	@Column(name = "CREATED_ON", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+	@Column(name = "created_on", columnDefinition = "TIMESTAMP WITH TIME ZONE")
 	@Override
 	public ZonedDateTime getCreatedOn() {
 		return createdOn;
@@ -84,7 +84,7 @@ public class ERoboUnit implements ERoboEntity<Long> {
 	}
 
 	@UpdateTimestamp
-	@Column(name = "UPDATED_ON", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+	@Column(name = "updated_on", columnDefinition = "TIMESTAMP WITH TIME ZONE")
 	@Override
 	public ZonedDateTime getUpdatedOn() {
 		return updatedOn;
@@ -94,7 +94,7 @@ public class ERoboUnit implements ERoboEntity<Long> {
 		this.updatedOn = updateddOn;
 	}
 
-	@Column(name = "UID")
+	@Column(name = "uid")
 	public String getUid() {
 		return uid;
 	}
@@ -103,7 +103,7 @@ public class ERoboUnit implements ERoboEntity<Long> {
 		this.uid = uid;
 	}
 
-	@Column(name = "CONFIG")
+	@Column(name = "config")
 	public String getConfig() {
 		return config;
 	}
@@ -113,7 +113,7 @@ public class ERoboUnit implements ERoboEntity<Long> {
 	}
 
 	@ManyToOne(cascade = { CascadeType.ALL })
-	@JoinColumn(name = "PARENT_ID")
+	@JoinColumn(name = "parent_id")
 	public ERoboUnit getParent() {
 		return parent;
 	}
@@ -139,7 +139,7 @@ public class ERoboUnit implements ERoboEntity<Long> {
 		this.parts.addAll(units);
 	}
 
-	@OneToMany(mappedBy = "unit", cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = ERoboPoint.class)
+	@OneToMany(mappedBy = "unit", cascade = CascadeType.ALL, orphanRemoval = true)
 	public List<ERoboPoint> getPoints() {
 		return points;
 	}

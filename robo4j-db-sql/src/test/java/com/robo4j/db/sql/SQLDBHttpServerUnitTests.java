@@ -48,6 +48,7 @@ import com.robo4j.db.sql.unit.TestPersistUnit;
  */
 public class SQLDBHttpServerUnitTests {
 
+	private static final String DB_PROVIDER = "h2";
 	private static final int DEFAULT_INDEX = 0;
 
 	@SuppressWarnings("unchecked")
@@ -62,11 +63,11 @@ public class SQLDBHttpServerUnitTests {
 		Configuration sqlConfig = ConfigurationFactory.createEmptyConfiguration();
 
 		SQLDataSourceUnit sqlUnit = new SQLDataSourceUnit(system, dataSourceName);
-		sqlConfig.setString("sourceType", "h2");
+		sqlConfig.setString("sourceType", DB_PROVIDER);
 		sqlConfig.setString("packages", "com.robo4j.db.sql.model");
 		sqlConfig.setInteger("limit", 3);
 		sqlConfig.setString("sorted", "asc");
-		sqlConfig.setString("hibernate.hbm2ddl.auto", "create-drop");
+		sqlConfig.setString("hibernate.hbm2ddl.auto", "create");
 		sqlConfig.setString("targetUnit", targetUnit);
 
 		TestPersistUnit testRoboUnitOne = new TestPersistUnit(system, targetUnit);

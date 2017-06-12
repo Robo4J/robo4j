@@ -89,18 +89,22 @@ public abstract class RoboPersitenceUnit<T> extends RoboUnit<T> {
 			SimpleLoggingUtil.error(getClass(), "error", e);
 		}
 
-		ERoboUnit entity = new ERoboUnit();
-		entity.setUid(getId());
-
-		String configString = configuration.getValueNames().stream().map(n -> {
-			StringBuilder sb = new StringBuilder();
-			sb.append(n);
-			sb.append(CONST_COLON);
-			sb.append(configuration.getValue(n, null));
-			return sb.toString();
-		}).collect(Collectors.joining(CONST_COMMA));
-		entity.setConfig(configString);
-		sqlUnitReference.sendMessage(entity);
+		ERoboUnit entity = getEntity();
+		if(entity == null){
+			entity = new ERoboUnit();
+			entity.setUid(getId());
+			String configString = configuration.getValueNames().stream().map(n -> {
+				StringBuilder sb = new StringBuilder();
+				sb.append(n);
+				sb.append(CONST_COLON);
+				sb.append(configuration.getValue(n, null));
+				return sb.toString();
+			}).collect(Collectors.joining(CONST_COMMA));
+			entity.setConfig(configString);
+			dataSourceUnit.onMessage(entity);
+		} else {
+			SimpleLoggingUtil.debug(getClass(), "robo_unit exists: " + entity);
+		}
 
 	}
 

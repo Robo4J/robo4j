@@ -37,7 +37,7 @@ import org.hibernate.annotations.UpdateTimestamp;
  * @author Miro Wengner (@miragemiko)
  */
 @Entity
-@Table(name = "ROBO_POINT")
+@Table(name = "robo_point")
 public class ERoboPoint implements ERoboEntity<Long> {
 
 	private Long id;
@@ -48,7 +48,7 @@ public class ERoboPoint implements ERoboEntity<Long> {
 	private String values;
 
 	@Id
-	@Column(name = "ID")
+	@Column(name = "id")
 	@SequenceGenerator(name = "robo_point_generator", sequenceName = "robo_point_sequence", allocationSize = 1)
 	@GeneratedValue(generator = "robo_point_generator")
 	@Override
@@ -61,7 +61,7 @@ public class ERoboPoint implements ERoboEntity<Long> {
 	}
 
 	@CreationTimestamp
-	@Column(name = "CREATED_ON", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+	@Column(name = "created_on", columnDefinition = "TIMESTAMP WITH TIME ZONE")
 	@Override
 	public ZonedDateTime getCreatedOn() {
 		return createdOn;
@@ -72,7 +72,7 @@ public class ERoboPoint implements ERoboEntity<Long> {
 	}
 
 	@UpdateTimestamp
-	@Column(name = "UPDATED_ON", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+	@Column(name = "updated_on", columnDefinition = "TIMESTAMP WITH TIME ZONE")
 	@Override
 	public ZonedDateTime getUpdatedOn() {
 		return updatedOn;
@@ -83,7 +83,7 @@ public class ERoboPoint implements ERoboEntity<Long> {
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "ROBO_UNIT_ID")
+	@JoinColumn(name = "robo_unit_id")
 	public ERoboUnit getUnit() {
 		return unit;
 	}
@@ -92,7 +92,7 @@ public class ERoboPoint implements ERoboEntity<Long> {
 		this.unit = unit;
 	}
 
-	@Column(name = "VALUE_TYPE")
+	@Column(name = "value_type")
 	public String getValueType() {
 		return valueType;
 	}
@@ -101,7 +101,7 @@ public class ERoboPoint implements ERoboEntity<Long> {
 		this.valueType = valueType;
 	}
 
-	@Column(name = "VALUES")
+	@Column(name = "values")
 	public String getValues() {
 		return values;
 	}

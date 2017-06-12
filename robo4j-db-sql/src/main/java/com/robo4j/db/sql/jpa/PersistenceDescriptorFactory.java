@@ -109,6 +109,7 @@ public final class PersistenceDescriptorFactory {
 		properties.setProperty("hibernate.show_sql", propertyToString("hibernate.show_sql", "true"));
 		properties.setProperty("hibernate.flushMode", propertyToString("hibernate.flushMode", "FLUSH_AUTO"));
 		properties.setProperty("hibernate.hbm2ddl.auto", propertyToString("hibernate.hbm2ddl.auto", "create-drop"));
+		properties.setProperty("hibernate.default_schema", propertyToString("hibernate.default_schema", "public"));
 
 		//@formatter:off
         return PersistenceUnitInfoBuilder.Builder()
