@@ -142,7 +142,6 @@ public class SQLDataSourceUnitTests {
 		pointsList.forEach(p -> {
 			Assert.assertNotNull(p.getCreatedOn());
 			Assert.assertNotNull(p.getUpdatedOn());
-			Assert.assertTrue(p.getCreatedOn().equals(p.getUpdatedOn()));
 		});
 
 		System.out.println("LIST : " + pointsList);
