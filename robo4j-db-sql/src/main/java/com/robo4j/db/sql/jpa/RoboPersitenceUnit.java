@@ -17,10 +17,11 @@
 
 package com.robo4j.db.sql.jpa;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.ConfigurationException;
@@ -42,7 +43,9 @@ public abstract class RoboPersitenceUnit<T> extends RoboUnit<T> {
 
 	private static final String PERSISTENCE_UNIT_NAME = "persistenceUnit";
 	private static final int DEFAULT_INDEX = 0;
-	private Map<String, Object> entityMap = new HashMap<>();
+	private static final String CONST_COLON = ":";
+	private static final String CONST_COMMA = ",";
+	private Map<String, Object> entityMap = new WeakHashMap<>();
 	private SQLDataSourceUnit dataSourceUnit;
 
 	/**
@@ -64,7 +67,7 @@ public abstract class RoboPersitenceUnit<T> extends RoboUnit<T> {
 		return tmpList.isEmpty() ? null : tmpList.get(DEFAULT_INDEX);
 	}
 
-	protected void save(ERoboUnit unit){
+	protected void save(ERoboUnit unit) {
 		dataSourceUnit.onMessage(unit);
 	}
 
@@ -88,7 +91,15 @@ public abstract class RoboPersitenceUnit<T> extends RoboUnit<T> {
 
 		ERoboUnit entity = new ERoboUnit();
 		entity.setUid(getId());
-		entity.setConfig(configuration.getString("config", null));
+
+		String configString = configuration.getValueNames().stream().map(n -> {
+			StringBuilder sb = new StringBuilder();
+			sb.append(n);
+			sb.append(CONST_COLON);
+			sb.append(configuration.getValue(n, null));
+			return sb.toString();
+		}).collect(Collectors.joining(CONST_COMMA));
+		entity.setConfig(configString);
 		sqlUnitReference.sendMessage(entity);
 
 	}

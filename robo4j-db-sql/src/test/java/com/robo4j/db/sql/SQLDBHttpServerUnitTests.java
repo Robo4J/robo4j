@@ -22,25 +22,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-import com.robo4j.core.RoboUnit;
+import javax.transaction.Transactional;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.postgresql.util.PSQLException;
+
+import com.robo4j.core.AttributeDescriptor;
+import com.robo4j.core.DefaultAttributeDescriptor;
+import com.robo4j.core.RoboSystem;
+import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.configuration.ConfigurationFactory;
+import com.robo4j.core.util.SystemUtil;
 import com.robo4j.db.sql.model.ERoboEntity;
 import com.robo4j.db.sql.model.ERoboPoint;
 import com.robo4j.db.sql.model.ERoboUnit;
 import com.robo4j.db.sql.unit.TestPersistPointDTO;
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.robo4j.core.AttributeDescriptor;
-import com.robo4j.core.DefaultAttributeDescriptor;
-import com.robo4j.core.RoboBuilder;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboSystem;
-import com.robo4j.core.client.util.RoboClassLoader;
-import com.robo4j.core.client.util.RoboHttpUtils;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.configuration.ConfigurationFactory;
-import com.robo4j.core.util.SystemUtil;
 import com.robo4j.db.sql.unit.TestPersistUnit;
 
 /**
@@ -53,27 +50,9 @@ public class SQLDBHttpServerUnitTests {
 
 	private static final int DEFAULT_INDEX = 0;
 
-	// @Test
-	public void sqlHttpServerImageSendTest() throws Exception {
-
-		RoboBuilder builder = new RoboBuilder()
-				.add(RoboClassLoader.getInstance().getResource("robo4j_db_sql_test.xml"));
-		RoboContext roboSystemClient = builder.build();
-		roboSystemClient.start();
-		System.out.println("RoboSystem Client after start:");
-		System.out.println(SystemUtil.printStateReport(roboSystemClient));
-
-		RoboReference<SQLDataSourceUnit> sqlUnit = roboSystemClient.getReference("dbSqlUnit");
-
-		AttributeDescriptor<List> descriptor1 = DefaultAttributeDescriptor.create(List.class, "all");
-
-		Assert.assertNotNull(sqlUnit);
-		Assert.assertTrue(sqlUnit.getAttribute(descriptor1).get().size() == 0);
-
-	}
-
 	@SuppressWarnings("unchecked")
 	@Test
+	@Transactional(rollbackOn = PSQLException.class)
 	public void createSystem() throws Exception {
 
 		final int maxPoints = 3;
@@ -87,6 +66,7 @@ public class SQLDBHttpServerUnitTests {
 		sqlConfig.setString("packages", "com.robo4j.db.sql.model");
 		sqlConfig.setInteger("limit", 3);
 		sqlConfig.setString("sorted", "asc");
+		sqlConfig.setString("hibernate.hbm2ddl.auto", "create-drop");
 		sqlConfig.setString("targetUnit", targetUnit);
 
 		TestPersistUnit testRoboUnitOne = new TestPersistUnit(system, targetUnit);
@@ -104,27 +84,25 @@ public class SQLDBHttpServerUnitTests {
 		System.out.println("System: State after start:");
 		System.out.println(SystemUtil.printStateReport(system));
 
-
 		IntStream.range(DEFAULT_INDEX, maxPoints)
 				.forEach(i -> testRoboUnitOne.onMessage(new TestPersistPointDTO("testType" + i, "testValue" + i)));
-		
+
 		AttributeDescriptor<List> descriptorAllPoints = DefaultAttributeDescriptor.create(List.class, "unit_points");
 		List<ERoboPoint> allPointsList = (List<ERoboPoint>) sqlUnit.onGetAttribute(descriptorAllPoints);
 
-		Map<String, Object> tmpMap= new HashMap<>();
+		Map<String, Object> tmpMap = new HashMap<>();
 		tmpMap.put("unit", targetUnit);
 		List<ERoboPoint> directBySQLUnit = sqlUnit.getByMap(ERoboPoint.class, tmpMap);
 
 		AttributeDescriptor<List> descriptorAllUnits = DefaultAttributeDescriptor.create(List.class, "units_all_desc");
 		List<ERoboEntity<Long>> allUnitsList = (List<ERoboEntity<Long>>) sqlUnit.onGetAttribute(descriptorAllUnits);
 
-
 		Assert.assertNotNull(directBySQLUnit);
 		Assert.assertNotNull(allPointsList);
 		Assert.assertNotNull(allUnitsList);
 
 		Assert.assertTrue(allUnitsList.size() == 1);
-		Assert.assertTrue(((ERoboUnit)allUnitsList.get(DEFAULT_INDEX)).getUid().equals(targetUnit));
+		Assert.assertTrue(((ERoboUnit) allUnitsList.get(DEFAULT_INDEX)).getUid().equals(targetUnit));
 		Assert.assertTrue(directBySQLUnit.size() == allPointsList.size());
 
 		Assert.assertTrue(allPointsList.size() == maxPoints);

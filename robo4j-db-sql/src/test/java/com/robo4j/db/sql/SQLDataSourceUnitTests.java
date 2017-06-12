@@ -181,7 +181,6 @@ public class SQLDataSourceUnitTests {
 			Assert.assertTrue(p.getCreatedOn().equals(p.getUpdatedOn()));
 		});
 
-
 		sqlDataSourceUnit.getContext().shutdown();
 		System.out.println("System: State after shutdown:");
 		System.out.println(SystemUtil.printStateReport(sqlDataSourceUnit.getContext()));

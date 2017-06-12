@@ -17,24 +17,20 @@
 
 package com.robo4j.db.sql.model;
 
-import com.sun.istack.internal.NotNull;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import java.time.ZonedDateTime;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import java.time.ZonedDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -65,7 +61,7 @@ public class ERoboPoint implements ERoboEntity<Long> {
 	}
 
 	@CreationTimestamp
-	@Column(name = "CREATED_ON", columnDefinition= "TIMESTAMP WITH TIME ZONE")
+	@Column(name = "CREATED_ON", columnDefinition = "TIMESTAMP WITH TIME ZONE")
 	@Override
 	public ZonedDateTime getCreatedOn() {
 		return createdOn;
@@ -76,7 +72,7 @@ public class ERoboPoint implements ERoboEntity<Long> {
 	}
 
 	@UpdateTimestamp
-	@Column(name = "UPDATED_ON", columnDefinition= "TIMESTAMP WITH TIME ZONE")
+	@Column(name = "UPDATED_ON", columnDefinition = "TIMESTAMP WITH TIME ZONE")
 	@Override
 	public ZonedDateTime getUpdatedOn() {
 		return updatedOn;
@@ -87,7 +83,7 @@ public class ERoboPoint implements ERoboEntity<Long> {
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "roboUnit_id")
+	@JoinColumn(name = "ROBO_UNIT_ID")
 	public ERoboUnit getUnit() {
 		return unit;
 	}
@@ -116,27 +112,29 @@ public class ERoboPoint implements ERoboEntity<Long> {
 
 	@Override
 	public String toString() {
-		return "ERoboPoint{" +
-				"id=" + id +
-				", createdOn=" + createdOn +
-				", updatedOn=" + updatedOn +
-				", valueType='" + valueType + '\'' +
-				", values='" + values + '\'' +
-				'}';
+		return "ERoboPoint{" + "id=" + id + ", createdOn=" + createdOn + ", updatedOn=" + updatedOn + ", valueType='"
+				+ valueType + '\'' + ", values='" + values + '\'' + '}';
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof ERoboPoint)) return false;
+		if (this == o)
+			return true;
+		if (!(o instanceof ERoboPoint))
+			return false;
 
 		ERoboPoint roboPoint = (ERoboPoint) o;
 
-		if (id != null ? !id.equals(roboPoint.id) : roboPoint.id != null) return false;
-		if (createdOn != null ? !createdOn.equals(roboPoint.createdOn) : roboPoint.createdOn != null) return false;
-		if (updatedOn != null ? !updatedOn.equals(roboPoint.updatedOn) : roboPoint.updatedOn != null) return false;
-		if (unit != null ? !unit.equals(roboPoint.unit) : roboPoint.unit != null) return false;
-		if (valueType != null ? !valueType.equals(roboPoint.valueType) : roboPoint.valueType != null) return false;
+		if (id != null ? !id.equals(roboPoint.id) : roboPoint.id != null)
+			return false;
+		if (createdOn != null ? !createdOn.equals(roboPoint.createdOn) : roboPoint.createdOn != null)
+			return false;
+		if (updatedOn != null ? !updatedOn.equals(roboPoint.updatedOn) : roboPoint.updatedOn != null)
+			return false;
+		if (unit != null ? !unit.equals(roboPoint.unit) : roboPoint.unit != null)
+			return false;
+		if (valueType != null ? !valueType.equals(roboPoint.valueType) : roboPoint.valueType != null)
+			return false;
 		return values != null ? values.equals(roboPoint.values) : roboPoint.values == null;
 	}
 

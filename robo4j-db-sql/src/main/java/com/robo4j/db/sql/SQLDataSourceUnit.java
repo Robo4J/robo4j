@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
 import com.robo4j.core.AttributeDescriptor;
@@ -66,6 +67,7 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 	private static final String PERSISTENCE_UNIT = "sourceType";
 	private static final String TARGET_UNIT = "targetUnit";
 	private static final String PACKAGES = "packages";
+	private static final String HIBERNATE_HBM2DDL = "hibernate.hbm2ddl.auto";
 
 	private List<Class<?>> registeredClasses;
 	private DataSourceType sourceType;
@@ -74,6 +76,7 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 	private String[] packages;
 	private DataSourceContext dataSourceContext;
 	private RoboRepository repository;
+	private Map<String, Object> persistenceMap = new WeakHashMap<>();
 
 	public SQLDataSourceUnit(RoboContext context, String id) {
 		super(ERoboEntity.class, context, id);
@@ -101,6 +104,11 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 		packages = tmpPackages.split(Constants.UTF8_COMMA);
 		limit = configuration.getInteger("limit", 2);
 		sorted = SortType.getByName(configuration.getString("sorted", "desc"));
+
+		String hibernateHbm2ddlAuto = configuration.getString(HIBERNATE_HBM2DDL, null);
+		if (hibernateHbm2ddlAuto != null) {
+			persistenceMap.put(HIBERNATE_HBM2DDL, hibernateHbm2ddlAuto);
+		}
 	}
 
 	@Override
@@ -114,7 +122,10 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 	@Override
 	public void initialize(Configuration configuration) throws ConfigurationException {
 		super.initialize(configuration);
-		PersistenceContextBuilder builder = new PersistenceContextBuilder(sourceType, packages).build();
+
+		PersistenceContextBuilder builder = persistenceMap.isEmpty()
+				? new PersistenceContextBuilder(sourceType, packages).build()
+				: new PersistenceContextBuilder(sourceType, packages, persistenceMap).build();
 		registeredClasses = builder.getRegisteredClasses();
 		dataSourceContext = builder.getDataSourceContext();
 		repository = new DefaultRepository(dataSourceContext);
