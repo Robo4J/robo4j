@@ -15,43 +15,26 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.db.sql.unit;
+package com.robo4j.db.sql;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class TestPersistPointDTO {
+public class AnimationTestMain {
 
-    private String valueType;
-    private String value;
+    public static void main(String[] argv) throws Exception{
 
-    public TestPersistPointDTO(String valueType, String value) {
-        this.valueType = valueType;
-        this.value = value;
+        System.out.write("|".getBytes());
+        for(int x = 0; x < 10; x++){
+            String data = "=";
+            System.out.write(data.getBytes());
+            Thread.sleep(100);
+        }
+        System.out.write("| 100%".getBytes());
+
     }
 
-    public String getValueType() {
-        return valueType;
-    }
-
-    public void setValueType(String valueType) {
-        this.valueType = valueType;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return "TestPersistPointDTO{" +
-                "valueType='" + valueType + '\'' +
-                ", value='" + value + '\'' +
-                '}';
-    }
 }
+
+

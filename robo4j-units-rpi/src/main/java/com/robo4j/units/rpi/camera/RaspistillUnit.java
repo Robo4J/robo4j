@@ -173,7 +173,7 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 			getContext().getReference(storeTarget).sendMessage(image);
 		}
 		try {
-			return new String(Base64.getEncoder().encode(image), RaspistillUtils.DEFAULT_ENCODING);
+			return new String(Base64.getEncoder().encode(image), Constants.DEFAULT_ENCODING);
 		} catch (UnsupportedEncodingException e) {
 			throw new CameraClientException("IMAGE GENERATION", e);
 		}

@@ -34,11 +34,10 @@ import com.robo4j.core.RoboSystem;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.util.SystemUtil;
+import com.robo4j.db.sql.dto.ERoboPointDTO;
 import com.robo4j.db.sql.model.ERoboEntity;
 import com.robo4j.db.sql.model.ERoboPoint;
 import com.robo4j.db.sql.model.ERoboUnit;
-import com.robo4j.db.sql.unit.TestPersistPointDTO;
-import com.robo4j.db.sql.unit.TestPersistUnit;
 
 /**
  * DB SQL unit attached to other units to safe entities
@@ -46,12 +45,12 @@ import com.robo4j.db.sql.unit.TestPersistUnit;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@SuppressWarnings(value = { "unchecked", "rawtypes" })
 public class SQLDBHttpServerUnitTests {
 
 	private static final String DB_PROVIDER = "h2";
 	private static final int DEFAULT_INDEX = 0;
 
-	@SuppressWarnings("unchecked")
 	@Test
 	@Transactional(rollbackOn = PSQLException.class)
 	public void createSystem() throws Exception {
@@ -70,15 +69,15 @@ public class SQLDBHttpServerUnitTests {
 		sqlConfig.setString("hibernate.hbm2ddl.auto", "create");
 		sqlConfig.setString("targetUnit", targetUnit);
 
-		TestPersistUnit testRoboUnitOne = new TestPersistUnit(system, targetUnit);
+		ImageSQLPersistenceUnit imageSQLPersistenceUnit = new ImageSQLPersistenceUnit(system, targetUnit);
 		Configuration testConfig = ConfigurationFactory.createEmptyConfiguration();
 		testConfig.setString("persistenceUnit", dataSourceName);
 		testConfig.setString("config", "magic config");
 
 		/* specific configuration */
-		system.addUnits(sqlUnit, testRoboUnitOne);
+		system.addUnits(sqlUnit, imageSQLPersistenceUnit);
 		sqlUnit.initialize(sqlConfig);
-		testRoboUnitOne.initialize(testConfig);
+		imageSQLPersistenceUnit.initialize(testConfig);
 
 		system.start();
 
@@ -86,7 +85,7 @@ public class SQLDBHttpServerUnitTests {
 		System.out.println(SystemUtil.printStateReport(system));
 
 		IntStream.range(DEFAULT_INDEX, maxPoints)
-				.forEach(i -> testRoboUnitOne.onMessage(new TestPersistPointDTO("testType" + i, "testValue" + i)));
+				.forEach(i -> imageSQLPersistenceUnit.onMessage(new ERoboPointDTO("testType" + i, "testValue" + i)));
 
 		AttributeDescriptor<List> descriptorAllPoints = DefaultAttributeDescriptor.create(List.class, "unit_points");
 		List<ERoboPoint> allPointsList = (List<ERoboPoint>) sqlUnit.onGetAttribute(descriptorAllPoints);

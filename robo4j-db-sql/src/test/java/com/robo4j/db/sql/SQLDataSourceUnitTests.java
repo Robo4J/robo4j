@@ -42,6 +42,7 @@ import com.robo4j.db.sql.model.ERoboUnit;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@SuppressWarnings(value = {"unchecked", "rawtypes"})
 public class SQLDataSourceUnitTests {
 
 	private static final int DEFAULT_LIMIT = 2;
@@ -50,7 +51,6 @@ public class SQLDataSourceUnitTests {
 	private static final String UNIT_SYSTEM_2_NAME = "system2";
 	private static final String UNIT_SYSTEM_3_NAME = "system3";
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testAllRoboReferencesInDatabase() throws Exception {
 		final SQLDataSourceUnit sqlDataSourceUnit = prepareSystemWithSQLUnit(DEFAULT_SORTED, DEFAULT_LIMIT);
@@ -76,7 +76,6 @@ public class SQLDataSourceUnitTests {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnlyRoboUnitASCWithPointsInDB() throws Exception {
 		final SQLDataSourceUnit sqlDataSourceUnit = prepareSystemWithSQLUnit(DEFAULT_SORTED, DEFAULT_LIMIT);
@@ -110,7 +109,6 @@ public class SQLDataSourceUnitTests {
 		System.out.println(SystemUtil.printStateReport(sqlDataSourceUnit.getContext()));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnlyRoboUnitDESCWithPointsInDB() throws Exception {
 		int maxPoints = 2;
@@ -153,7 +151,6 @@ public class SQLDataSourceUnitTests {
 	/**
 	 * Test updates target entity by adding points limit is set
 	 */
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testEntityOrderWithLimitLower() throws Exception {
 		int maxPoints = 1;
@@ -185,7 +182,6 @@ public class SQLDataSourceUnitTests {
 		System.out.println(SystemUtil.printStateReport(sqlDataSourceUnit.getContext()));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testEntityOrderWithLimitHigher() throws Exception {
 		int maxPoints = 3;
@@ -218,8 +214,8 @@ public class SQLDataSourceUnitTests {
 		return IntStream.range(0, number).mapToObj(i -> {
 							ERoboPoint point = new ERoboPoint();
 							point.setUnit(unit);
-							point.setValues("value: " + i);
 							point.setValueType("magicType: " + i);
+							point.setValues("value: " + i);
 							return point;})
 						.collect(Collectors.toList());
 		//@formatter:on

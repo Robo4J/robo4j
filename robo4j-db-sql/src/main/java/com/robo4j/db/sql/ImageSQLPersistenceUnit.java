@@ -15,24 +15,27 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.db.sql.unit;
+package com.robo4j.db.sql;
 
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.configuration.Configuration;
+import com.robo4j.db.sql.dto.ERoboPointDTO;
 import com.robo4j.db.sql.jpa.RoboPersitenceUnit;
 import com.robo4j.db.sql.model.ERoboPoint;
 import com.robo4j.db.sql.model.ERoboUnit;
 
 /**
+ *
+ * Simple unit storing Image to database as EUnitPoint
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class TestPersistUnit extends RoboPersitenceUnit<TestPersistPointDTO> {
+public class ImageSQLPersistenceUnit extends RoboPersitenceUnit<ERoboPointDTO> {
 
-
-    public TestPersistUnit(RoboContext context, String id) {
-        super(TestPersistPointDTO.class, context, id);
+    public ImageSQLPersistenceUnit(RoboContext context, String id) {
+        super(ERoboPointDTO.class, context, id);
     }
 
     @Override
@@ -41,7 +44,7 @@ public class TestPersistUnit extends RoboPersitenceUnit<TestPersistPointDTO> {
     }
 
     @Override
-    public void onMessage(TestPersistPointDTO message) {
+    public void onMessage(ERoboPointDTO message) {
         ERoboUnit roboUnit = getEntity();
         ERoboPoint point = new ERoboPoint();
         point.setUnit(roboUnit);

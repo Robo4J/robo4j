@@ -16,7 +16,7 @@ CREATE TABLE robo_point (
   updated_on TIMESTAMP NOT NULL,
   robo_unit_id BIGINT REFERENCES ROBO_UNIT(ID),
   value_type VARCHAR (255) NOT NULL,
-  values VARCHAR (255) NOT NULL
+  values VARCHAR (800000) NOT NULL
 );
 
 create sequence robo_point_sequence start with 1 increment by 1;

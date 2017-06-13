@@ -68,7 +68,6 @@ project("robo4j-db-sql") {
         compile(project(":robo4j-core"))
         compile "org.flywaydb:flyway-core:${flywayVersion}"
         compile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:${hibernateJpaVersion}"
-        compile "javax.persistence:persistence-api:${persistanceVersion}"
         compile "org.postgresql:postgresql:${postgresqlVersion}"
         compile "org.hibernate:hibernate-core:${hibernateVersion}"
         compile "com.h2database:h2:${h2Version}"

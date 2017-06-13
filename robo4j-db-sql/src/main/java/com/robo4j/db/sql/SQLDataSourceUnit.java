@@ -48,6 +48,7 @@ import com.robo4j.db.sql.support.SortType;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@SuppressWarnings(value = {"rawtypes"})
 public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 
 	private static final String ATTRIBUTE_ROBO_SQL_UNIT = "robo_sql_unit";
@@ -68,6 +69,7 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 	private static final String TARGET_UNIT = "targetUnit";
 	private static final String PACKAGES = "packages";
 	private static final String HIBERNATE_HBM2DDL = "hibernate.hbm2ddl.auto";
+	private static final String HIBERNATE_CONNECTION_URL = "hibernate.connection.url";
 
 	private List<Class<?>> registeredClasses;
 	private DataSourceType sourceType;
@@ -108,6 +110,11 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 		String hibernateHbm2ddlAuto = configuration.getString(HIBERNATE_HBM2DDL, null);
 		if (hibernateHbm2ddlAuto != null) {
 			persistenceMap.put(HIBERNATE_HBM2DDL, hibernateHbm2ddlAuto);
+		}
+
+		String hibernateConnectionUrl = configuration.getString(HIBERNATE_CONNECTION_URL, null);
+		if(hibernateConnectionUrl != null){
+			persistenceMap.put(HIBERNATE_CONNECTION_URL, hibernateConnectionUrl);
 		}
 	}
 

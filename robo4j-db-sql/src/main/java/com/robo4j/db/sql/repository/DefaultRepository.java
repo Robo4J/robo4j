@@ -39,6 +39,7 @@ import com.robo4j.db.sql.support.SortType;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@SuppressWarnings(value = { "unchecked", "rawtypes" })
 public class DefaultRepository implements RoboRepository {
 
 	private static final String FIELD_ID = "id";
@@ -51,7 +52,6 @@ public class DefaultRepository implements RoboRepository {
 		this.dataSourceContext = dataSourceContext;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public <T> List<T> findAllByClass(Class<T> clazz, SortType sort) {
 		final TypedQuery<T> tq = getTypeQueryAllByClass(clazz, sort);
@@ -69,7 +69,6 @@ public class DefaultRepository implements RoboRepository {
 		return dataSourceContext.getEntityManager(clazz).getReference(clazz, id);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public <T> List<T> findByFields(Class<T> clazz, Map<String, Object> map, int limit, SortType sort) {
 		EntityManager em = dataSourceContext.getEntityManager(clazz);
@@ -119,7 +118,6 @@ public class DefaultRepository implements RoboRepository {
 		return sortType.equals(SortType.ASC) ? cb.asc(rs.get(FIELD_ID)) : cb.desc(rs.get(FIELD_ID));
 	}
 
-	@SuppressWarnings("unchecked")
 	private <T> TypedQuery<T> getTypeQueryAllByClass(Class<T> clazz, SortType sort) {
 		EntityManager em = dataSourceContext.getEntityManager(clazz);
 		CriteriaBuilder cb = em.getCriteriaBuilder();

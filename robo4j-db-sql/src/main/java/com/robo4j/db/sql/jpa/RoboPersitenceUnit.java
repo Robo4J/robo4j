@@ -76,7 +76,7 @@ public abstract class RoboPersitenceUnit<T> extends RoboUnit<T> {
 		if (tmpName == null) {
 			throw ConfigurationException.createMissingConfigNameException(PERSISTENCE_UNIT_NAME);
 		}
-		RoboReference<ERoboEntity> sqlUnitReference = getContext().getReference(tmpName);
+		RoboReference<ERoboEntity<?>> sqlUnitReference = getContext().getReference(tmpName);
 		if (sqlUnitReference == null) {
 			throw ConfigurationException.createMissingConfigNameException(PERSISTENCE_UNIT_NAME);
 		}
