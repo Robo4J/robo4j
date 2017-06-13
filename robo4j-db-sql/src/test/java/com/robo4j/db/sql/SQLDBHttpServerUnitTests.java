@@ -69,15 +69,15 @@ public class SQLDBHttpServerUnitTests {
 		sqlConfig.setString("hibernate.hbm2ddl.auto", "create");
 		sqlConfig.setString("targetUnit", targetUnit);
 
-		ImageSQLPersistenceUnit imageSQLPersistenceUnit = new ImageSQLPersistenceUnit(system, targetUnit);
+		RoboPointSQLPersistenceUnit roboPointSQLPersistenceUnit = new RoboPointSQLPersistenceUnit(system, targetUnit);
 		Configuration testConfig = ConfigurationFactory.createEmptyConfiguration();
 		testConfig.setString("persistenceUnit", dataSourceName);
 		testConfig.setString("config", "magic config");
 
 		/* specific configuration */
-		system.addUnits(sqlUnit, imageSQLPersistenceUnit);
+		system.addUnits(sqlUnit, roboPointSQLPersistenceUnit);
 		sqlUnit.initialize(sqlConfig);
-		imageSQLPersistenceUnit.initialize(testConfig);
+		roboPointSQLPersistenceUnit.initialize(testConfig);
 
 		system.start();
 
@@ -85,7 +85,7 @@ public class SQLDBHttpServerUnitTests {
 		System.out.println(SystemUtil.printStateReport(system));
 
 		IntStream.range(DEFAULT_INDEX, maxPoints)
-				.forEach(i -> imageSQLPersistenceUnit.onMessage(new ERoboPointDTO("testType" + i, "testValue" + i)));
+				.forEach(i -> roboPointSQLPersistenceUnit.onMessage(new ERoboPointDTO("testType" + i, "testValue" + i)));
 
 		AttributeDescriptor<List> descriptorAllPoints = DefaultAttributeDescriptor.create(List.class, "unit_points");
 		List<ERoboPoint> allPointsList = (List<ERoboPoint>) sqlUnit.onGetAttribute(descriptorAllPoints);

@@ -27,14 +27,15 @@ import com.robo4j.db.sql.model.ERoboUnit;
 
 /**
  *
- * Simple unit storing Image to database as EUnitPoint
+ * Simple unit storing RoboPoint to database as {@see EUnitPoint}
+ * note: {@see ERoboPointDTO} may contains value of image, gps or any values
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class ImageSQLPersistenceUnit extends RoboPersitenceUnit<ERoboPointDTO> {
+public class RoboPointSQLPersistenceUnit extends RoboPersitenceUnit<ERoboPointDTO> {
 
-    public ImageSQLPersistenceUnit(RoboContext context, String id) {
+    public RoboPointSQLPersistenceUnit(RoboContext context, String id) {
         super(ERoboPointDTO.class, context, id);
     }
 
