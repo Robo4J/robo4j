@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,30 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.robo4j.hw.rpi.serial.gps;
 
 /**
- * Abstract super class for event classes.
- * implements {@see GPSVisitable} interface to simplify reacting on
- * GPS specific event
+ *
+ * used by visitable event on GPS module
  *
  * @see PositionEvent
  * @see VelocityEvent
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public abstract class GPSEvent implements GPSVisitable {
-	public static final float INVALID_VALUE = Float.NaN;
-
-	private final GPS source;
-
-	GPSEvent(GPS source) {
-		this.source = source;
-	}
-
-	public final GPS getSource() {
-		return source;
-	}
-
+public interface GPSVisitable<R> {
+	R visit(GPSVisitor visitor);
 }

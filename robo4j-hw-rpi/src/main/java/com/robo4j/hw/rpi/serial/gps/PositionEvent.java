@@ -27,7 +27,7 @@ import java.util.TimeZone;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class PositionEvent extends GPSEvent {
+public final class PositionEvent<R> extends GPSEvent {
 	private Date time;
 	private FixQuality fixQuality;
 	private Location location;
@@ -150,7 +150,13 @@ public final class PositionEvent extends GPSEvent {
 	public float getMaxError() {
 		return hdop * GPS.UNAIDED_POSITION_ACCURACY;
 	}
-	
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public R visit(GPSVisitor visitor) {
+		return (R)visitor.visit(this);
+	}
+
 	@Override
 	public String toString() {
 		return "Coordinates: " + getLocation() + " alt: " + getAltitude() + "m altWGS84: " + getElipsoidAltitude() + "m FixQuality: "

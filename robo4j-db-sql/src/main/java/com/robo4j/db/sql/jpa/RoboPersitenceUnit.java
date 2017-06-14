@@ -34,6 +34,7 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.db.sql.SQLDataSourceUnit;
 import com.robo4j.db.sql.model.ERoboEntity;
 import com.robo4j.db.sql.model.ERoboUnit;
+import com.robo4j.db.sql.util.DBSQLConstants;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -41,7 +42,6 @@ import com.robo4j.db.sql.model.ERoboUnit;
  */
 public abstract class RoboPersitenceUnit<T> extends RoboUnit<T> {
 
-	private static final String PERSISTENCE_UNIT_NAME = "persistenceUnit";
 	private static final int DEFAULT_INDEX = 0;
 	private static final String CONST_COLON = ":";
 	private static final String CONST_COMMA = ",";
@@ -72,13 +72,13 @@ public abstract class RoboPersitenceUnit<T> extends RoboUnit<T> {
 	}
 
 	private void registerUnit(Configuration configuration) throws ConfigurationException {
-		String tmpName = configuration.getString(PERSISTENCE_UNIT_NAME, null);
+		String tmpName = configuration.getString(DBSQLConstants.KEY_PERSISTENCE_UNIT, null);
 		if (tmpName == null) {
-			throw ConfigurationException.createMissingConfigNameException(PERSISTENCE_UNIT_NAME);
+			throw ConfigurationException.createMissingConfigNameException(DBSQLConstants.KEY_PERSISTENCE_UNIT);
 		}
 		RoboReference<ERoboEntity<?>> sqlUnitReference = getContext().getReference(tmpName);
 		if (sqlUnitReference == null) {
-			throw ConfigurationException.createMissingConfigNameException(PERSISTENCE_UNIT_NAME);
+			throw ConfigurationException.createMissingConfigNameException(DBSQLConstants.KEY_PERSISTENCE_UNIT);
 		}
 		AttributeDescriptor<SQLDataSourceUnit> descriptor = DefaultAttributeDescriptor.create(SQLDataSourceUnit.class,
 				"robo_sql_unit");

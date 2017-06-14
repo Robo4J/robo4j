@@ -24,6 +24,7 @@ import java.util.stream.IntStream;
 
 import javax.transaction.Transactional;
 
+import com.robo4j.db.sql.util.DBSQLConstants;
 import org.junit.Assert;
 import org.junit.Test;
 import org.postgresql.util.PSQLException;
@@ -71,7 +72,7 @@ public class SQLDBHttpServerUnitTests {
 
 		RoboPointSQLPersistenceUnit roboPointSQLPersistenceUnit = new RoboPointSQLPersistenceUnit(system, targetUnit);
 		Configuration testConfig = ConfigurationFactory.createEmptyConfiguration();
-		testConfig.setString("persistenceUnit", dataSourceName);
+		testConfig.setString(DBSQLConstants.KEY_PERSISTENCE_UNIT, dataSourceName);
 		testConfig.setString("config", "magic config");
 
 		/* specific configuration */
