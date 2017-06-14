@@ -91,6 +91,7 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 	// The future, if scheduled with the platform scheduler
 	private volatile ScheduledFuture<?> scheduledFuture;
 
+	@SuppressWarnings("rawtypes")
 	private static class GPSEventListener implements GPSListener {
 		private RoboReference<GPSEvent> target;
 

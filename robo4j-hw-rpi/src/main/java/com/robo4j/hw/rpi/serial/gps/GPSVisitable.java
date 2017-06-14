@@ -21,6 +21,9 @@ package com.robo4j.hw.rpi.serial.gps;
  *
  * used by visitable event on GPS module
  *
+ * return type R corresponds to the result provided by visitor implementation
+ * It may be some DTO or MessageType, R varies based on usage
+ *
  * @see PositionEvent
  * @see VelocityEvent
  *
