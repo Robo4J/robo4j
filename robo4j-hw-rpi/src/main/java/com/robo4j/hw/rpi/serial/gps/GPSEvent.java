@@ -27,6 +27,7 @@ package com.robo4j.hw.rpi.serial.gps;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@SuppressWarnings(value = {"rawtypes"})
 public abstract class GPSEvent implements GPSVisitable {
 	public static final float INVALID_VALUE = Float.NaN;
 

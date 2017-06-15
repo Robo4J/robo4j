@@ -32,7 +32,7 @@ public interface GPSListener {
 	 *            an event describing the position.
 	 * @see PositionEvent
 	 */
-	void onEvent(PositionEvent event);
+	void onEvent(PositionEvent<?> event);
 
 	/**
 	 * Callback for receiving velocity updates.
@@ -41,5 +41,5 @@ public interface GPSListener {
 	 *            an event describing the velocity.
 	 * @see VelocityEvent
 	 */
-	void onEvent(VelocityEvent event);
+	void onEvent(VelocityEvent<?> event);
 }

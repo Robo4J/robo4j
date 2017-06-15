@@ -23,6 +23,7 @@ package com.robo4j.hw.rpi.serial.gps;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@SuppressWarnings(value = {"rawtypes"})
 public interface GPSVisitor<R> {
     R visit(VelocityEvent event);
     R visit(PositionEvent event);

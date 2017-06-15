@@ -29,6 +29,7 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.transaction.Transactional;
 
 import com.robo4j.core.httpunit.Constants;
 import com.robo4j.db.sql.model.ERoboUnit;
@@ -104,11 +105,16 @@ public class DefaultRepository implements RoboRepository {
 		//@formatter:on
 	}
 
+	@Transactional
 	@Override
 	public <T> T save(T entity) {
 		EntityManager em = dataSourceContext.getEntityManager(entity.getClass());
 		em.getTransaction().begin();
-		em.persist(entity);
+		if(em.contains(entity)){
+			em.merge(entity);
+		} else {
+			em.persist(entity);
+		}
 		em.getTransaction().commit();
 		return entity;
 	}

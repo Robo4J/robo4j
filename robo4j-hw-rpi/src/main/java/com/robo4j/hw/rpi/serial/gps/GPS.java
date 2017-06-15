@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.pi4j.concurrent.ExecutorServiceFactory;
 import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialFactory;
 
@@ -40,6 +41,7 @@ import com.pi4j.io.serial.SerialFactory;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@SuppressWarnings(value = {"rawtypes"})
 public class GPS {
 	/**
 	 * The position accuracy without any
@@ -57,6 +59,7 @@ public class GPS {
 	private static final int BAUD_DEFAULT = 9600;
 
 	private final Serial serial;
+	private final ExecutorServiceFactory serviceFactory;
 	private final GPSDataRetriever dataRetriever;
 	private final int readInterval;
 
@@ -89,6 +92,7 @@ public class GPS {
 	public GPS(int readInterval) throws IOException {
 		this.readInterval = readInterval;
 		serial = SerialFactory.createInstance();
+		serviceFactory = SerialFactory.getExecutorServiceFactory();
 		dataRetriever = new GPSDataRetriever();
 		initialize();
 	}
@@ -130,6 +134,7 @@ public class GPS {
 		}
 		try {
 			serial.close();
+			serviceFactory.shutdown();
 		} catch (IllegalStateException | IOException e) {
 			// Don't care, we're shutting down.
 		}
@@ -138,6 +143,7 @@ public class GPS {
 	private void awaitTermination() {
 		try {
 			internalExecutor.awaitTermination(10, TimeUnit.MILLISECONDS);
+			internalExecutor.shutdown();
 		} catch (InterruptedException e) {
 			// Don't care if we were interrupted.
 		}
@@ -188,13 +194,13 @@ public class GPS {
 		return checksum == valid;
 	}
 
-	private void notifyListeners(PositionEvent event) {
+	private void notifyListeners(PositionEvent<?> event) {
 		for (GPSListener listener : listeners) {
 			listener.onEvent(event);
 		}
 	}
 
-	private void notifyListeners(VelocityEvent event) {
+	private void notifyListeners(VelocityEvent<?> event) {
 		for (GPSListener listener : listeners) {
 			listener.onEvent(event);
 		}

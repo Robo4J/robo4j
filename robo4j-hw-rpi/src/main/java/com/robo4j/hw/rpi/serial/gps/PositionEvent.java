@@ -27,6 +27,7 @@ import java.util.TimeZone;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@SuppressWarnings(value = "rawtypes")
 public final class PositionEvent<R> extends GPSEvent {
 	private Date time;
 	private FixQuality fixQuality;

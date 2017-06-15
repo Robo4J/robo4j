@@ -22,6 +22,7 @@ package com.robo4j.hw.rpi.serial.gps;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@SuppressWarnings(value = "rawtypes")
 public final class VelocityEvent<R> extends GPSEvent {
 	private float trueTrackMadeGood = Float.NaN;
 	private float magneticTrackMadeGood = Float.NaN;

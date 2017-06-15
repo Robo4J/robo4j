@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class QueueFIFOEntry<FIFOTransferType extends Comparable<FIFOTransferType>>
-		implements Comparable<QueueFIFOEntry<FIFOTransferType>>, TransferSignal {
+		implements Comparable<QueueFIFOEntry<FIFOTransferType>> {
 
 	private static final AtomicLong seq = new AtomicLong(0);
 	private final long seqNum;

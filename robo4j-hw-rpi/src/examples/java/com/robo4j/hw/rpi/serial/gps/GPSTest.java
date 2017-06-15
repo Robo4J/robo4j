@@ -29,6 +29,7 @@ import com.robo4j.hw.rpi.serial.gps.VelocityEvent;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
+@SuppressWarnings(value = {"rawtypes"})
 public class GPSTest {
 	public static void main(String[] args) throws InterruptedException, IOException {
 		GPS gps = new GPS();
