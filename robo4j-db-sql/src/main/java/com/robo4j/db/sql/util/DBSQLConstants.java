@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,37 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.client.io;
 
-import java.io.InputStream;
+package com.robo4j.db.sql.util;
 
 /**
- * InputStream resource for reading files currently default web response
+ * Constants used by DB-SQL module
  *
- * @author Miroslav Wengner (@miragemiko)
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
  */
-public class InputStreamResource implements Resource {
+public final class DBSQLConstants {
 
-	private final InputStream source;
-	private boolean reading;
+    public static String KEY_PERSISTENCE_UNIT = "persistenceUnit";
 
-	public InputStreamResource(InputStream source) {
-		this.source = source;
-		this.reading = false;
-	}
-
-	@Override
-	public boolean isReading() {
-		return reading;
-	}
-
-	@Override
-	public InputStream getInputStream() {
-		if (!reading) {
-			reading = true;
-			return source;
-		} else {
-			throw new ClientException("INPUT STREAM LOAD FAILURE");
-		}
-	}
 }

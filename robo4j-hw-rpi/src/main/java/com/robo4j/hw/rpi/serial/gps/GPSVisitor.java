@@ -15,17 +15,16 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.db.sql.model;
-
-import java.io.Serializable;
+package com.robo4j.hw.rpi.serial.gps;
 
 /**
+ * Visitor Interface
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public interface RoboEntity<ID> extends Serializable {
-	long serialVersionUID = 1;
-
-	ID getId();
-
+@SuppressWarnings(value = {"rawtypes"})
+public interface GPSVisitor<R> {
+    R visit(VelocityEvent event);
+    R visit(PositionEvent event);
 }

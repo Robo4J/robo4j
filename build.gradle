@@ -68,31 +68,18 @@ project("robo4j-db-sql") {
         compile(project(":robo4j-core"))
         compile "org.flywaydb:flyway-core:${flywayVersion}"
         compile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:${hibernateJpaVersion}"
-        compile "javax.persistence:persistence-api:${persistanceVersion}"
         compile "org.postgresql:postgresql:${postgresqlVersion}"
-        compile "org.hibernate:hibernate-entitymanager:${hibernateVersion}"
+        compile "org.hibernate:hibernate-core:${hibernateVersion}"
         compile "com.h2database:h2:${h2Version}"
+        testCompile project(':robo4j-core').sourceSets.test.output
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
     }
 
     //main db
     flyway {
-        url = 'jdbc:h2:~/data/robo4jh2'
+        url = 'jdbc:h2:~/data/robo4j1h2'
         user = 'sa'
-    }
-
-    task('postgres') {
-        doLast {
-            println 'executing PostgreSQL'
-
-            flyway {
-                url = 'jdbc:postgresql://localhost:5433/robo4j1'
-                user = 'postgres'
-                password = 'post'
-            }
-
-        }
     }
 }
 
@@ -344,7 +331,7 @@ project("robo4j-units-rpi") {
         manifest {
             attributes 'Implementation-Title': 'robo4j-units-rpi',
                     'Implementation-Version': version,
-                    'Main-Class': 'com.robo4j.units.rpi.pad.LF710PadExample'
+                    'Main-Class': 'com.robo4j.units.rpi.gps.GPSExample'
         }
         //baseName = project.name + '-all'
         baseName = 'robo4j-units-rpi'

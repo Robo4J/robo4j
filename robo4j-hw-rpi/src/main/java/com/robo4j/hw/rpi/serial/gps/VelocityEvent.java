@@ -22,7 +22,8 @@ package com.robo4j.hw.rpi.serial.gps;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class VelocityEvent extends GPSEvent {
+@SuppressWarnings(value = "rawtypes")
+public final class VelocityEvent<R> extends GPSEvent {
 	private float trueTrackMadeGood = Float.NaN;
 	private float magneticTrackMadeGood = Float.NaN;
 	private float groundSpeed = Float.NaN;
@@ -68,6 +69,12 @@ public final class VelocityEvent extends GPSEvent {
 		return groundSpeed;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public R visit(GPSVisitor visitor) {
+		return (R)visitor.visit(this);
+	}
+
 	@Override
 	public String toString() {
 		return String.format("True: %.1f\u00B0 Magnetic: %.1f\u00B0 Speed: %.1f km/h", getTrueTrackMadeGood(), getMagneticTrackMadeGood(),
@@ -82,6 +89,7 @@ public final class VelocityEvent extends GPSEvent {
 			groundSpeed = getFloat(args[7]);
 		}
 	}
+
 
 	private float getFloat(String string) {
 		if (string == null || "".equals(string)) {

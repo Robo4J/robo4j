@@ -39,122 +39,121 @@ import com.robo4j.core.client.util.RoboClassLoader;
  */
 public final class PersistenceUnitInfoBuilder {
 
-    private Map<String, Object> map = new WeakHashMap<>();
+	private Map<String, Object> map = new WeakHashMap<>();
 
-    private PersistenceUnitInfoBuilder(){
+	private PersistenceUnitInfoBuilder() {
 
-    }
+	}
 
-    public static PersistenceUnitInfoBuilder Builder(){
-        return new PersistenceUnitInfoBuilder();
-    }
+	public static PersistenceUnitInfoBuilder Builder() {
+		return new PersistenceUnitInfoBuilder();
+	}
 
-    public PersistenceUnitInfoBuilder addPropertiesAll(Map<String, Object> map){
-        map.putAll(map);
-        return this;
-    }
+	public PersistenceUnitInfoBuilder addPropertiesAll(Map<String, Object> map) {
+		map.putAll(map);
+		return this;
+	}
 
-    public PersistenceUnitInfoBuilder addProperty(String key, Object value){
-        map.put(key, value);
-        return this;
-    }
+	public PersistenceUnitInfoBuilder addProperty(String key, Object value) {
+		map.put(key, value);
+		return this;
+	}
 
+	public PersistenceUnitInfo build() {
+		return new PersistenceUnitInfo() {
+			@Override
+			public String getPersistenceUnitName() {
+				return simpleCheck().apply(map.get("name"));
+			}
 
-    public PersistenceUnitInfo build(){
-        return new PersistenceUnitInfo() {
-            @Override
-            public String getPersistenceUnitName() {
-                return simpleCheck().apply(map.get("name"));
-            }
+			@Override
+			public String getPersistenceProviderClassName() {
+				return simpleCheck().apply(map.get("provider"));
+			}
 
-            @Override
-            public String getPersistenceProviderClassName() {
-                return simpleCheck().apply(map.get("provider"));
-            }
+			@Override
+			public PersistenceUnitTransactionType getTransactionType() {
+				return PersistenceUnitTransactionType.valueOf(simpleCheck().apply(map.get("transaction-type")));
+			}
 
-            @Override
-            public PersistenceUnitTransactionType getTransactionType() {
-                return PersistenceUnitTransactionType.valueOf(simpleCheck().apply(map.get("transaction-type")));
-            }
+			@Override
+			public DataSource getJtaDataSource() {
+				return null;
+			}
 
-            @Override
-            public DataSource getJtaDataSource() {
-                return null;
-            }
+			@Override
+			public DataSource getNonJtaDataSource() {
+				return null;
+			}
 
-            @Override
-            public DataSource getNonJtaDataSource() {
-                return null;
-            }
+			@Override
+			public List<String> getMappingFileNames() {
+				return null;
+			}
 
-            @Override
-            public List<String> getMappingFileNames() {
-                return null;
-            }
+			@Override
+			public List<URL> getJarFileUrls() {
+				return null;
+			}
 
-            @Override
-            public List<URL> getJarFileUrls() {
-                return null;
-            }
+			@Override
+			public URL getPersistenceUnitRootUrl() {
+				return null;
+			}
 
-            @Override
-            public URL getPersistenceUnitRootUrl() {
-                return null;
-            }
+			@Override
+			public List<String> getManagedClassNames() {
+				return toListCheck().apply(map.get("classes"));
+			}
 
-            @Override
-            public List<String> getManagedClassNames() {
-                return toListCheck().apply(map.get("classes")) ;
-            }
+			@Override
+			public boolean excludeUnlistedClasses() {
+				return map.containsKey("exclude-unlisted-classes") && (boolean) map.get("exclude-unlisted-classes");
+			}
 
-            @Override
-            public boolean excludeUnlistedClasses() {
-                return map.containsKey("exclude-unlisted-classes") && (boolean)map.get("exclude-unlisted-classes");
-            }
+			@Override
+			public SharedCacheMode getSharedCacheMode() {
+				return null;
+			}
 
-            @Override
-            public SharedCacheMode getSharedCacheMode() {
-                return null;
-            }
+			@Override
+			public ValidationMode getValidationMode() {
+				return null;
+			}
 
-            @Override
-            public ValidationMode getValidationMode() {
-                return null;
-            }
+			@Override
+			public Properties getProperties() {
+				return map.containsKey("properties") ? (Properties) map.get("properties") : new Properties();
+			}
 
-            @Override
-            public Properties getProperties() {
-                return map.containsKey("properties") ? (Properties)map.get("properties") : new Properties();
-            }
+			@Override
+			public String getPersistenceXMLSchemaVersion() {
+				return null;
+			}
 
-            @Override
-            public String getPersistenceXMLSchemaVersion() {
-                return null;
-            }
+			@Override
+			public ClassLoader getClassLoader() {
+				return RoboClassLoader.getInstance().getClassLoader();
+			}
 
-            @Override
-            public ClassLoader getClassLoader() {
-                return RoboClassLoader.getInstance().getClassLoader();
-            }
+			@Override
+			public void addTransformer(ClassTransformer transformer) {
 
-            @Override
-            public void addTransformer(ClassTransformer transformer) {
+			}
 
-            }
+			@Override
+			public ClassLoader getNewTempClassLoader() {
+				return null;
+			}
+		};
+	}
 
-            @Override
-            public ClassLoader getNewTempClassLoader() {
-                return null;
-            }
-        };
-    }
+	private Function<Object, String> simpleCheck() {
+		return (input) -> input != null ? input.toString() : null;
+	}
 
-    private Function<Object, String > simpleCheck() {
-        return (input) -> input != null ? input.toString() : null;
-    }
-
-    @SuppressWarnings(value = "unchecked")
-    private Function<Object, List<String>> toListCheck(){
-        return (input) -> input != null ? (List<String>)input : null;
-    }
+	@SuppressWarnings(value = "unchecked")
+	private Function<Object, List<String>> toListCheck() {
+		return (input) -> input != null ? (List<String>) input : null;
+	}
 }

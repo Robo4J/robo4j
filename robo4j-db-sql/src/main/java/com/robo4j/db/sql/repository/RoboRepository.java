@@ -30,6 +30,8 @@ public interface RoboRepository {
 
 	<T> List<T> findAllByClass(Class<T> clazz, SortType sort);
 
+	<T> List<T> findByClassWithLimit(Class<T> clazz, int limit, SortType sort);
+
 	<T, ID> T findById(Class<T> clazz, ID id);
 
 	<T> List<T> findByFields(Class<T> clazz, Map<String, Object> map, int limit, SortType sort);

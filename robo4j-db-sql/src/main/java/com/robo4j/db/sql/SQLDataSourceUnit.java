@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
 import com.robo4j.core.AttributeDescriptor;
@@ -33,9 +34,9 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.httpunit.Constants;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.db.sql.model.Robo4JSystem;
-import com.robo4j.db.sql.model.Robo4JUnit;
-import com.robo4j.db.sql.model.RoboEntity;
+import com.robo4j.db.sql.model.ERoboEntity;
+import com.robo4j.db.sql.model.ERoboPoint;
+import com.robo4j.db.sql.model.ERoboUnit;
 import com.robo4j.db.sql.repository.DefaultRepository;
 import com.robo4j.db.sql.repository.RoboRepository;
 import com.robo4j.db.sql.support.DataSourceContext;
@@ -47,19 +48,28 @@ import com.robo4j.db.sql.support.SortType;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
+@SuppressWarnings(value = {"rawtypes"})
+public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 
+	private static final String ATTRIBUTE_ROBO_SQL_UNIT = "robo_sql_unit";
 	private static final String ATTRIBUTE_ROBO_ALL_NAME = "all";
+	private static final String ATTRIBUTE_ROBO_UNIT_ALL_ASC_NAME = "units_all_asc";
+	private static final String ATTRIBUTE_ROBO_UNIT_ALL_DESC_NAME = "units_all_desc";
 	private static final String ATTRIBUTE_ROBO_UNIT_ASC_NAME = "units_asc";
 	private static final String ATTRIBUTE_ROBO_UNIT_DESC_NAME = "units_desc";
-	private static final String ATTRIBUTE_ROBO_SYSTEM_NAME = "system";
+	private static final String ATTRIBUTE_ROBO_UNIT_POINTS_NAME = "unit_points";
 	private static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Arrays.asList(
+			DefaultAttributeDescriptor.create(SQLDataSourceUnit.class, ATTRIBUTE_ROBO_SQL_UNIT),
 			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_ALL_NAME),
-			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_ASC_NAME),
-			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_SYSTEM_NAME));
+			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_ALL_ASC_NAME),
+			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_POINTS_NAME));
+	private Map<String, Object> targetUnitSearchMap = new HashMap<>();
 
 	private static final String PERSISTENCE_UNIT = "sourceType";
+	private static final String TARGET_UNIT = "targetUnit";
 	private static final String PACKAGES = "packages";
+	private static final String HIBERNATE_HBM2DDL = "hibernate.hbm2ddl.auto";
+	private static final String HIBERNATE_CONNECTION_URL = "hibernate.connection.url";
 
 	private List<Class<?>> registeredClasses;
 	private DataSourceType sourceType;
@@ -68,9 +78,10 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 	private String[] packages;
 	private DataSourceContext dataSourceContext;
 	private RoboRepository repository;
+	private Map<String, Object> persistenceMap = new WeakHashMap<>();
 
 	public SQLDataSourceUnit(RoboContext context, String id) {
-		super(RoboEntity.class, context, id);
+		super(ERoboEntity.class, context, id);
 	}
 
 	@Override
@@ -85,13 +96,30 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 		if (tmpPackages == null) {
 			throw ConfigurationException.createMissingConfigNameException(PACKAGES);
 		}
+
+		String targetUnit = configuration.getString(TARGET_UNIT, null);
+		if (targetUnit == null) {
+			throw ConfigurationException.createMissingConfigNameException(TARGET_UNIT);
+		}
+		targetUnitSearchMap.put("unit", targetUnit);
+
 		packages = tmpPackages.split(Constants.UTF8_COMMA);
 		limit = configuration.getInteger("limit", 2);
 		sorted = SortType.getByName(configuration.getString("sorted", "desc"));
+
+		String hibernateHbm2ddlAuto = configuration.getString(HIBERNATE_HBM2DDL, null);
+		if (hibernateHbm2ddlAuto != null) {
+			persistenceMap.put(HIBERNATE_HBM2DDL, hibernateHbm2ddlAuto);
+		}
+
+		String hibernateConnectionUrl = configuration.getString(HIBERNATE_CONNECTION_URL, null);
+		if(hibernateConnectionUrl != null){
+			persistenceMap.put(HIBERNATE_CONNECTION_URL, hibernateConnectionUrl);
+		}
 	}
 
 	@Override
-	public void onMessage(RoboEntity message) {
+	public void onMessage(ERoboEntity message) {
 		Object id = repository.save(message);
 		if (id == null) {
 			SimpleLoggingUtil.error(getClass(), "entity not stored: " + message);
@@ -99,12 +127,20 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 	}
 
 	@Override
-	public void start() {
-		setState(LifecycleState.STARTING);
-		PersistenceContextBuilder builder = new PersistenceContextBuilder(sourceType, packages).build();
+	public void initialize(Configuration configuration) throws ConfigurationException {
+		super.initialize(configuration);
+
+		PersistenceContextBuilder builder = persistenceMap.isEmpty()
+				? new PersistenceContextBuilder(sourceType, packages).build()
+				: new PersistenceContextBuilder(sourceType, packages, persistenceMap).build();
 		registeredClasses = builder.getRegisteredClasses();
 		dataSourceContext = builder.getDataSourceContext();
 		repository = new DefaultRepository(dataSourceContext);
+	}
+
+	@Override
+	public void start() {
+		setState(LifecycleState.STARTING);
 		setState(LifecycleState.STARTED);
 	}
 
@@ -133,26 +169,34 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 			//@formatter:on
 		}
 
-		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_ASC_NAME)
+		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_UNIT_ALL_ASC_NAME)
 				&& descriptor.getAttributeType() == List.class) {
-			//@formatter:off
-			return (R) repository.findAllByClass(Robo4JUnit.class, SortType.ASC);
-			//@formatter:on
+			return (R) repository.findAllByClass(ERoboUnit.class, SortType.ASC);
 		}
 
-		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_UNIT_DESC_NAME)
+		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_UNIT_ASC_NAME)
 				&& descriptor.getAttributeType() == List.class) {
-			//@formatter:off
-			return (R) repository.findAllByClass(Robo4JUnit.class, SortType.DESC);
-			//@formatter:on
+			return (R) repository.findByClassWithLimit(ERoboUnit.class, limit, SortType.ASC);
 		}
 
-		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_SYSTEM_NAME)
+		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_UNIT_ALL_DESC_NAME)
 				&& descriptor.getAttributeType() == List.class) {
-			Map<String, Object> map = new HashMap<>();
-			map.put("uid", "mainSystem");
+			return (R) repository.findAllByClass(ERoboUnit.class, SortType.DESC);
+		}
 
-			return (R) repository.findByFields(Robo4JSystem.class, map, limit, sorted);
+		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_UNIT_DESC_NAME)
+				&& descriptor.getAttributeType() == List.class) {
+			return (R) repository.findByClassWithLimit(ERoboUnit.class, limit, SortType.DESC);
+		}
+
+		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_UNIT_POINTS_NAME)
+				&& descriptor.getAttributeType() == List.class) {
+			return (R) repository.findByFields(ERoboPoint.class, targetUnitSearchMap, limit, sorted);
+		}
+
+		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_SQL_UNIT)
+				&& descriptor.getAttributeType() == SQLDataSourceUnit.class) {
+			return (R) this;
 		}
 
 		return super.onGetAttribute(descriptor);
@@ -161,5 +205,10 @@ public class SQLDataSourceUnit extends RoboUnit<RoboEntity> {
 	@Override
 	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
 		return KNOWN_ATTRIBUTES;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <R> R getByMap(Class<?> c, Map<String, Object> map) {
+		return (R) repository.findByFields(c, map, limit, sorted);
 	}
 }

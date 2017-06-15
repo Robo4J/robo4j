@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,27 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.client.io;
 
-import java.io.InputStream;
-
-import com.robo4j.core.client.util.RoboClassLoader;
+package com.robo4j.db.sql;
 
 /**
- *
- * Class responsible for loading appropriate resources
- *
- * @author Miroslav Wengner (@miragemiko)
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
  */
-public final class ResourceLoader {
+public class AnimationTestMain {
 
-	public Resource getInputStream(String name) {
-		final InputStream source = RoboClassLoader.getInstance().getResource(name);
-		if (source != null) {
-			return new InputStreamResource(source);
-		} else {
-			throw new ClientException("RESOURCE LOADER FAILED");
-		}
-	}
+    public static void main(String[] argv) throws Exception{
+
+        System.out.write("|".getBytes());
+        for(int x = 0; x < 10; x++){
+            String data = "=";
+            System.out.write(data.getBytes());
+            Thread.sleep(100);
+        }
+        System.out.write("| 100%".getBytes());
+
+    }
 
 }
+
+

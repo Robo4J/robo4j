@@ -91,6 +91,7 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 	// The future, if scheduled with the platform scheduler
 	private volatile ScheduledFuture<?> scheduledFuture;
 
+	@SuppressWarnings("rawtypes")
 	private static class GPSEventListener implements GPSListener {
 		private RoboReference<GPSEvent> target;
 
@@ -117,7 +118,7 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		readInterval = configuration.getInteger("readInterval", DEFAULT_READ_INTERVAL);
 		String scheduler = configuration.getString("scheduler", PROPERTY_VALUE_PLATFORM_SCHEDULER);
-		boolean usePlatformScheduler = PROPERTY_VALUE_PLATFORM_SCHEDULER.equals(scheduler) ? true : false;
+		boolean usePlatformScheduler = PROPERTY_VALUE_PLATFORM_SCHEDULER.equals(scheduler);
 
 		try {
 			gps = new GPS(readInterval);
@@ -125,12 +126,7 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 			throw new ConfigurationException("Could not instantiate GPS!", e);
 		}
 		if (usePlatformScheduler) {
-			scheduledFuture = getContext().getScheduler().scheduleAtFixedRate(new Runnable() {
-				@Override
-				public void run() {
-					gps.update();
-				}
-			}, 10, readInterval, TimeUnit.MILLISECONDS);
+			scheduledFuture = getContext().getScheduler().scheduleAtFixedRate(() -> gps.update(), 10, readInterval, TimeUnit.MILLISECONDS);
 		} else {
 			gps.startAutoUpdate();
 		}
@@ -158,24 +154,6 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 		}
 	}
 
-	private synchronized void unregister(RoboReference<GPSEvent> targetReference) {
-		List<GPSEventListener> copy = new ArrayList<>(listeners);
-		for (GPSEventListener listener : copy) {
-			if (targetReference.equals(listener.target)) {
-				listeners.remove(listener);
-				gps.removeListener(listener);
-				// I guess you could theoretically have several registered to
-				// the same target, so let's keep checking...
-			}
-		}
-	}
-
-	private synchronized void register(RoboReference<GPSEvent> targetReference) {
-		GPSEventListener listener = new GPSEventListener(targetReference);
-		listeners.add(listener);
-		gps.addListener(listener);
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
@@ -192,5 +170,24 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 		}
 		gps.shutdown();
 		super.shutdown();
+	}
+
+	// Private Methods
+	private synchronized void unregister(RoboReference<GPSEvent> targetReference) {
+		List<GPSEventListener> copy = new ArrayList<>(listeners);
+		for (GPSEventListener listener : copy) {
+			if (targetReference.equals(listener.target)) {
+				listeners.remove(listener);
+				gps.removeListener(listener);
+				// I guess you could theoretically have several registered to
+				// the same target, so let's keep checking...
+			}
+		}
+	}
+
+	private synchronized void register(RoboReference<GPSEvent> targetReference) {
+		GPSEventListener listener = new GPSEventListener(targetReference);
+		listeners.add(listener);
+		gps.addListener(listener);
 	}
 }

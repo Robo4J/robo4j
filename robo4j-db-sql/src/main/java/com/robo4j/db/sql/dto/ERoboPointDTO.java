@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,31 +14,44 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.serial.gps;
+
+package com.robo4j.db.sql.dto;
 
 /**
- * Abstract super class for event classes.
- * implements {@see GPSVisitable} interface to simplify reacting on
- * GPS specific event
- *
- * @see PositionEvent
- * @see VelocityEvent
- * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-@SuppressWarnings(value = {"rawtypes"})
-public abstract class GPSEvent implements GPSVisitable {
-	public static final float INVALID_VALUE = Float.NaN;
+public class ERoboPointDTO {
 
-	private final GPS source;
+    private String valueType;
+    private String value;
 
-	GPSEvent(GPS source) {
-		this.source = source;
-	}
+    public ERoboPointDTO(String valueType, String value) {
+        this.valueType = valueType;
+        this.value = value;
+    }
 
-	public final GPS getSource() {
-		return source;
-	}
+    public String getValueType() {
+        return valueType;
+    }
 
+    public void setValueType(String valueType) {
+        this.valueType = valueType;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "ERoboPointDTO{" +
+                "valueType='" + valueType + '\'' +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }

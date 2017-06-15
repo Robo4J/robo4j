@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,19 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.client.io;
 
-import java.io.InputStream;
+package com.robo4j.core.concurrency;
 
 /**
- *
- * interface represents resources
- *
- * @author Miroslav Wengner (@miragemiko)
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
  */
-public interface Resource {
-
-	InputStream getInputStream();
-
-	boolean isReading();
+@SuppressWarnings(value = {"rawtypes"})
+public class RoboProdConQueue extends RoboBusQueue {
+    public RoboProdConQueue(int awaitSeconds, int capacity) {
+        super(awaitSeconds, capacity);
+    }
 }

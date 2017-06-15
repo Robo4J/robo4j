@@ -16,7 +16,6 @@
  */
 package com.robo4j.core.concurrency;
 
-
 import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -27,13 +26,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.robo4j.core.logging.SimpleLoggingUtil;
+
 /**
+ * FIFO Queue structure
  *
- *
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends TransferSignal>>
-		extends PriorityBlockingQueue<TransferType> implements TransferQueue<TransferType> {
+@SuppressWarnings(value = {"rawtypes"})
+public abstract class RoboBusQueue<TransferType extends QueueFIFOEntry<?>> extends PriorityBlockingQueue<TransferType>
+		implements TransferQueue<TransferType> {
 
 	// Class can be serialized/deserialized at runtime. Sender/Receiver class
 	// loading
@@ -57,11 +60,12 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
 	/* setup for platform bus */
 	private int awaitSeconds;
 
-	public CoreBusQueue(int awaitSeconds) {
+	public RoboBusQueue(int awaitSeconds, int capacity) {
+		super(capacity);
 		counter = new AtomicInteger(INIT_COUNTER);
 		active = new AtomicBoolean(INIT_BUS);
 		lock = new ReentrantLock();
-		transfer = new LinkedBlockingQueue<>();
+		transfer = new LinkedBlockingQueue<>(capacity);
 		conditionTrans = lock.newCondition();
 
 		// TODO :: remove this
@@ -97,7 +101,8 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
 				put(e);
 				conditionElement.signalAll();
 			} else {
-				transfer.add(e);
+//				transfer.add(e);
+				put(e);
 				conditionElement.signalAll();
 			}
 		} finally {
@@ -134,7 +139,8 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
 				result = true;
 				conditionElement.signalAll();
 			} else {
-				transfer.add(e);
+//				transfer.add(e);
+				put(e);
 				conditionElement.signalAll();
 			}
 		} finally {
@@ -169,7 +175,7 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
 	@Override
 	public TransferType take() throws InterruptedException {
 		lock.lock();
-		TransferType result = transfer.poll();
+		TransferType result = super.poll();
 		try {
 			counter.incrementAndGet();
 			while (Objects.isNull(result) && active.get()) {
@@ -185,7 +191,7 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
 				result.notifyAll();
 			}
 		} catch (InterruptedException e) {
-			// System.out.println("TAKE error= " + e);
+			SimpleLoggingUtil.error(getClass(), "queue error", e);
 		} finally {
 			counter.decrementAndGet();
 			lock.unlock();
@@ -223,8 +229,9 @@ public abstract class CoreBusQueue<TransferType extends QueueFIFOEntry<? extends
 
 	protected TransferType peekCommand() {
 		TransferType commandMain = super.peek();
-		TransferType commandTrans = transfer.peek();
-		return Objects.nonNull(commandMain) ? commandMain : commandTrans;
+//		TransferType commandTrans = transfer.peek();
+//		return Objects.nonNull(commandMain) ? commandMain : commandTrans;
+		return commandMain;
 	}
 
 	@Override

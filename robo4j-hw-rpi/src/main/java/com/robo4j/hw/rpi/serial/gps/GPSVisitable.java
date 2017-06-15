@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,14 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.concurrency;
+
+package com.robo4j.hw.rpi.serial.gps;
 
 /**
  *
- * Currently Marker interface Signal represents Robot Platform or Sensor
- * Information
+ * used by visitable event on GPS module
  *
- * @author Miroslav Wengner (@miragemiko)
+ * return type R corresponds to the result provided by visitor implementation
+ * It may be some DTO or MessageType, R varies based on usage
+ *
+ * @see PositionEvent
+ * @see VelocityEvent
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
  */
-public interface TransferSignal {
+@SuppressWarnings(value = "rawtypes")
+public interface GPSVisitable<R> {
+	R visit(GPSVisitor visitor);
 }

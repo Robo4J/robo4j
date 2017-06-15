@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,19 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.client.io;
+
+package com.robo4j.db.sql.model;
+
+import java.io.Serializable;
+import java.time.ZonedDateTime;
 
 /**
- * @author Miroslav Wengner (@miragemiko)
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
  */
-public class ClientException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
+public interface ERoboEntity<ID> extends Serializable {
+	long serialVersionUID = 1;
 
-	public ClientException(String message) {
-		super(message);
-	}
+	ID getId();
 
-	public ClientException(String message, Throwable cause) {
-		super(message, cause);
-	}
+	ZonedDateTime getCreatedOn();
+
+	ZonedDateTime getUpdatedOn();
 }

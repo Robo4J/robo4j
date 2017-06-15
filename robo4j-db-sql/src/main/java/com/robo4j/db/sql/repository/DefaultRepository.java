@@ -26,9 +26,13 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.transaction.Transactional;
 
+import com.robo4j.core.httpunit.Constants;
+import com.robo4j.db.sql.model.ERoboUnit;
 import com.robo4j.db.sql.support.DataSourceContext;
 import com.robo4j.db.sql.support.SortType;
 
@@ -36,27 +40,29 @@ import com.robo4j.db.sql.support.SortType;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@SuppressWarnings(value = { "unchecked", "rawtypes" })
 public class DefaultRepository implements RoboRepository {
 
 	private static final String FIELD_ID = "id";
+	private static final String ROBO_UNIT_UID = "uid";
+	private static final String PREFIX_LIKE = "like";
+	private static final String SIGN_PERCENTAGE = "%";
 	private final DataSourceContext dataSourceContext;
 
 	public DefaultRepository(DataSourceContext dataSourceContext) {
 		this.dataSourceContext = dataSourceContext;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public <T> List<T> findAllByClass(Class<T> clazz, SortType sort) {
-		EntityManager em = dataSourceContext.getEntityManager(clazz);
-		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery cq = cb.createQuery(clazz);
-		Root<T> rs = cq.from(clazz);
-		CriteriaQuery<T> cq2 = cq.select(rs).orderBy(getOrderById(cb, rs, sort));
-
-		TypedQuery<T> tq = em.createQuery(cq2);
-
+		final TypedQuery<T> tq = getTypeQueryAllByClass(clazz, sort);
 		return tq.getResultList();
+	}
+
+	@Override
+	public <T> List<T> findByClassWithLimit(Class<T> clazz, int limit, SortType sort) {
+		final TypedQuery<T> tq = getTypeQueryAllByClass(clazz, sort);
+		return tq.setMaxResults(limit).getResultList();
 	}
 
 	@Override
@@ -64,7 +70,6 @@ public class DefaultRepository implements RoboRepository {
 		return dataSourceContext.getEntityManager(clazz).getReference(clazz, id);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public <T> List<T> findByFields(Class<T> clazz, Map<String, Object> map, int limit, SortType sort) {
 		EntityManager em = dataSourceContext.getEntityManager(clazz);
@@ -72,8 +77,24 @@ public class DefaultRepository implements RoboRepository {
 		CriteriaQuery cq = cb.createQuery(clazz);
 
 		Root<T> rs = cq.from(clazz);
-		List<Predicate> predicates = map.entrySet().stream().map(e -> cb.equal(rs.get(e.getKey()), e.getValue()))
-				.collect(Collectors.toList());
+		//@formatter:on
+		List<Predicate> predicates = map.entrySet().stream().map(e -> {
+
+			// like check
+			if (e.getKey().startsWith(PREFIX_LIKE)) {
+				String rootKey = e.getKey().replace(PREFIX_LIKE, Constants.EMPTY_STRING).toLowerCase();
+				return cb.like(rs.get(rootKey), likeString(e.getValue()));
+			}
+
+			Path p = rs.get(e.getKey());
+			if (p.getJavaType().equals(ERoboUnit.class)) {
+				return cb.equal(rs.get(e.getKey()).get(ROBO_UNIT_UID), e.getValue());
+			}
+
+			return cb.equal(rs.get(e.getKey()), e.getValue());
+
+		}).collect(Collectors.toList());
+		//@formatter:on
 		CriteriaQuery<T> cq2 = cq.where(predicates.toArray(new Predicate[predicates.size()]))
 				.orderBy(getOrderById(cb, rs, sort)).select(rs);
 
@@ -84,11 +105,16 @@ public class DefaultRepository implements RoboRepository {
 		//@formatter:on
 	}
 
+	@Transactional
 	@Override
 	public <T> T save(T entity) {
 		EntityManager em = dataSourceContext.getEntityManager(entity.getClass());
 		em.getTransaction().begin();
-		em.persist(entity);
+		if(em.contains(entity)){
+			em.merge(entity);
+		} else {
+			em.persist(entity);
+		}
 		em.getTransaction().commit();
 		return entity;
 	}
@@ -96,6 +122,19 @@ public class DefaultRepository implements RoboRepository {
 	// Private Methods
 	private Order getOrderById(CriteriaBuilder cb, Root rs, SortType sortType) {
 		return sortType.equals(SortType.ASC) ? cb.asc(rs.get(FIELD_ID)) : cb.desc(rs.get(FIELD_ID));
+	}
+
+	private <T> TypedQuery<T> getTypeQueryAllByClass(Class<T> clazz, SortType sort) {
+		EntityManager em = dataSourceContext.getEntityManager(clazz);
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery cq = cb.createQuery(clazz);
+		Root<T> rs = cq.from(clazz);
+		CriteriaQuery<T> cq2 = cq.select(rs).orderBy(getOrderById(cb, rs, sort));
+		return em.createQuery(cq2);
+	}
+
+	private String likeString(Object value) {
+		return new StringBuilder(SIGN_PERCENTAGE).append(value).append(SIGN_PERCENTAGE).toString();
 	}
 
 }
