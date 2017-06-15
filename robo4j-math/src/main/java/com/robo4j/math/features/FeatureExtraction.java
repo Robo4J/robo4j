@@ -26,7 +26,7 @@ import com.robo4j.math.geometry.Line2f;
 import com.robo4j.math.geometry.Point2f;
 
 /**
- * Simple and fast feature extraction from lists of Point2D.
+ * Simple and fast feature extraction from lists of Point2f.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -69,14 +69,14 @@ public class FeatureExtraction {
 
 	/**
 	 * Calculates the segments in the scan, using the Borg & Aldon adaptive
-	 * break Point2D algorithm.
+	 * break algorithm.
 	 * 
 	 * @param Point2fs
-	 *            the Point2D to segment.
+	 *            the Point2fs to segment.
 	 * @param angularResolution
 	 *            of the scan in radians.
 	 * 
-	 * @return the Point2Ds broken up into segments.
+	 * @return the Point2fs broken up into segments.
 	 */
 	public static List<List<Point2f>> segment(List<Point2f> Point2fs, float angularResolution) {
 		List<List<Point2f>> segments = new ArrayList<List<Point2f>>(10);
