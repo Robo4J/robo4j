@@ -21,6 +21,7 @@ import java.io.IOException;
 import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
+import com.robo4j.math.geometry.Matrix3f;
 import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.math.geometry.Tuple3i;
 
@@ -43,26 +44,33 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 	private static final int ENABLE_TEMP = 0x80;
 	private Gain gain = Gain.GAIN_1_3;
 
+	private final Tuple3f bias;
+	private final Matrix3f calibrationMatrix;
+	
 	public MagnetometerLSM303Device() throws IOException {
 		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, Mode.CONTINUOUS_CONVERSION, Rate.RATE_1_5, false);
 	}
 
 	public MagnetometerLSM303Device(int bus, int address, Mode mode, Rate rate, boolean enableTemp) throws IOException {
+		this(bus, address, mode, rate, enableTemp, new Tuple3f(0, 0, 0), Matrix3f.createIdentity());
+	}
+
+	public MagnetometerLSM303Device(int bus, int address, Mode mode, Rate rate, boolean enableTemp, Tuple3f bias, Matrix3f calibrationMatrix) throws IOException {
 		super(bus, address);
 		initialize(mode, rate, enableTemp);
+		this.bias = bias;
+		this.calibrationMatrix = calibrationMatrix;
 	}
 
 	public synchronized Tuple3f read() throws IOException {
-		Tuple3f rawData = new Tuple3f();
-		byte[] data = new byte[RESULT_BUFFER_SIZE];
-		int n = i2cDevice.read(OUT_X_H_M, data, 0, RESULT_BUFFER_SIZE);
-		if (n != RESULT_BUFFER_SIZE) {
-			getLogger().warning("Failed to read all data from accelerometer. Should have read 6, could only read " + n);
-		}
-		rawData.x = read16bitSigned(data, 0) / gain.getXY();
-		rawData.y = read16bitSigned(data, 2) / gain.getXY();
-		rawData.z = read16bitSigned(data, 4) / gain.getZ();
-		return rawData;
+		Tuple3i rawData = readRaw();
+		float x = rawData.x / gain.getXY();
+		float y = rawData.y / gain.getXY();
+		float z = rawData.z / gain.getZ();
+		Tuple3f result = new Tuple3f(x, y, z);
+		result.subtract(bias);
+		calibrationMatrix.transform(result);
+		return result;
 	}
 
 	public synchronized Tuple3i readRaw() throws IOException {
