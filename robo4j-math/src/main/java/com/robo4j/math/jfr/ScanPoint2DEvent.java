@@ -19,7 +19,7 @@ package com.robo4j.math.jfr;
 import com.oracle.jrockit.jfr.EventDefinition;
 import com.oracle.jrockit.jfr.InstantEvent;
 import com.oracle.jrockit.jfr.ValueDefinition;
-import com.robo4j.math.geometry.Point2D;
+import com.robo4j.math.geometry.Point2f;
 
 /**
  * This is the JFR event definition for a single scan point.
@@ -58,7 +58,7 @@ public class ScanPoint2DEvent extends InstantEvent {
 		return scanID;
 	}
 
-	public void setPoint(Point2D point) {
+	public void setPoint(Point2f point) {
 		x = (float) point.getX();
 		y = (float) point.getY();
 	}

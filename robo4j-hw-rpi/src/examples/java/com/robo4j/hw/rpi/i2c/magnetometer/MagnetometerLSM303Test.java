@@ -18,8 +18,8 @@ package com.robo4j.hw.rpi.i2c.magnetometer;
 
 import java.io.IOException;
 
-import com.robo4j.math.geometry.Float3D;
-import com.robo4j.math.geometry.Int3D;
+import com.robo4j.math.geometry.Tuple3f;
+import com.robo4j.math.geometry.Tuple3i;
 
 /**
  * Sanity check every 500ms to see that data is being retrieved.
@@ -45,10 +45,10 @@ public class MagnetometerLSM303Test {
 		while (true) {
 			if (count % modulo == 0) {
 				if (printRaw) {
-					Int3D fl = device.readRaw();
+					Tuple3i fl = device.readRaw();
 					System.out.println(String.format("Raw Value %d = %s\tHeading:%000.0f", count, fl.toString(), MagnetometerLSM303Device.getCompassHeading(fl)));					
 				} else {
-					Float3D fl = device.read();
+					Tuple3f fl = device.read();
 					System.out.println(String.format("Value %d = %s", count, fl.toString()));
 				}
 			}

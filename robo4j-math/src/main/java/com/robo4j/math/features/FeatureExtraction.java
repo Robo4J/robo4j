@@ -21,9 +21,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.robo4j.math.geometry.CurvaturePoint2D;
-import com.robo4j.math.geometry.Line2D;
-import com.robo4j.math.geometry.Point2D;
+import com.robo4j.math.geometry.CurvaturePoint2f;
+import com.robo4j.math.geometry.Line2f;
+import com.robo4j.math.geometry.Point2f;
 
 /**
  * Simple and fast feature extraction from lists of Point2D.
@@ -71,29 +71,29 @@ public class FeatureExtraction {
 	 * Calculates the segments in the scan, using the Borg & Aldon adaptive
 	 * break Point2D algorithm.
 	 * 
-	 * @param Point2Ds
+	 * @param Point2fs
 	 *            the Point2D to segment.
 	 * @param angularResolution
 	 *            of the scan in radians.
 	 * 
 	 * @return the Point2Ds broken up into segments.
 	 */
-	public static List<List<Point2D>> segment(List<Point2D> Point2Ds, float angularResolution) {
-		List<List<Point2D>> segments = new ArrayList<List<Point2D>>(10);
+	public static List<List<Point2f>> segment(List<Point2f> Point2fs, float angularResolution) {
+		List<List<Point2f>> segments = new ArrayList<List<Point2f>>(10);
 
-		Iterator<Point2D> iterator = Point2Ds.iterator();
-		List<Point2D> currentSegment = new ArrayList<Point2D>();
+		Iterator<Point2f> iterator = Point2fs.iterator();
+		List<Point2f> currentSegment = new ArrayList<Point2f>();
 		segments.add(currentSegment);
 
-		Point2D lastPoint2D = iterator.next();
+		Point2f lastPoint2D = iterator.next();
 		currentSegment.add(lastPoint2D);
 
 		while (iterator.hasNext()) {
-			Point2D nextPoint2D = iterator.next();
+			Point2f nextPoint2D = iterator.next();
 			float delta = nextPoint2D.distance(lastPoint2D);
 			double maxRange = segmentMaxRange(lastPoint2D.getRange(), angularResolution);
 			if (delta > maxRange) {
-				currentSegment = new ArrayList<Point2D>();
+				currentSegment = new ArrayList<Point2f>();
 				segments.add(currentSegment);
 			}
 			currentSegment.add(nextPoint2D);
@@ -102,7 +102,7 @@ public class FeatureExtraction {
 		return segments;
 	}
 	
-	public static float calculateVectorAngle(Point2D b, Point2D center, Point2D f) {
+	public static float calculateVectorAngle(Point2f b, Point2f center, Point2f f) {
 		if (b.equals(center) || f.equals(center)) {
 			return 0;
 		}
@@ -120,42 +120,42 @@ public class FeatureExtraction {
 		return lastRange * Math.sin(angularResolution) / Math.sin(AUXILIARY_CONSTANT - angularResolution) + 3 * RESIDUAL_VARIANCE;
 	}
 
-	public static float[] calculateSimpleVectorAngles(List<Point2D> Point2Ds) {
-		if (Point2Ds.size() < 5) {
+	public static float[] calculateSimpleVectorAngles(List<Point2f> Point2fs) {
+		if (Point2fs.size() < 5) {
 			return null;
 		}
 
-		float[] alphas = new float[Point2Ds.size()];
-		for (int i = 0; i < Point2Ds.size(); i++) {
-			Point2D before = i == 0 ? Point2Ds.get(0) : Point2Ds.get(i - 1);
-			Point2D center = Point2Ds.get(i);
-			Point2D following = i == Point2Ds.size() - 1 ? Point2Ds.get(i) : Point2Ds.get(i + 1);
+		float[] alphas = new float[Point2fs.size()];
+		for (int i = 0; i < Point2fs.size(); i++) {
+			Point2f before = i == 0 ? Point2fs.get(0) : Point2fs.get(i - 1);
+			Point2f center = Point2fs.get(i);
+			Point2f following = i == Point2fs.size() - 1 ? Point2fs.get(i) : Point2fs.get(i + 1);
 			alphas[i] = calculateVectorAngle(before, center, following);
 		}
 		return alphas;
 	}
 	
-	public static FeatureSet getFeatures(List<Point2D> sample, float angularResolution) {
-		List<List<Point2D>> segments = segment(sample, angularResolution);
-		List<CurvaturePoint2D> corners = new ArrayList<>(); 
-		List<Line2D> Line2Ds = new ArrayList<>();
-		for (List<Point2D> Point2Ds: segments) {
-			if (Point2Ds.size() < MIN_Line2D_SAMPLES) {
+	public static FeatureSet getFeatures(List<Point2f> sample, float angularResolution) {
+		List<List<Point2f>> segments = segment(sample, angularResolution);
+		List<CurvaturePoint2f> corners = new ArrayList<>(); 
+		List<Line2f> Line2fs = new ArrayList<>();
+		for (List<Point2f> Point2fs: segments) {
+			if (Point2fs.size() < MIN_Line2D_SAMPLES) {
 				continue;
 			}
-			float [] deltaAngles = calculateSamplePoint2DDeltaAngles(Point2Ds);
+			float [] deltaAngles = calculateSamplePoint2DDeltaAngles(Point2fs);
 			if (deltaAngles == null) {
 				continue;
 			}
-			Line2Ds.addAll(extractLine2Ds(Point2Ds, deltaAngles));
-			corners.addAll(extractCorners(Point2Ds, deltaAngles));
+			Line2fs.addAll(extractLine2Ds(Point2fs, deltaAngles));
+			corners.addAll(extractCorners(Point2fs, deltaAngles));
 		}	
-		return new FeatureSet(Line2Ds, corners);
+		return new FeatureSet(Line2fs, corners);
 	}
 
 	@SuppressWarnings("unused")
-	private static Collection<? extends CurvaturePoint2D> extractCornersOld(List<Point2D> Point2Ds, float[] deltaAngles) {
-		List<CurvaturePoint2D> corners = new ArrayList<>();
+	private static Collection<? extends CurvaturePoint2f> extractCornersOld(List<Point2f> Point2fs, float[] deltaAngles) {
+		List<CurvaturePoint2f> corners = new ArrayList<>();
 		for (int i = 0; i < deltaAngles.length; i++) {
 			if (Math.abs(deltaAngles[i]) > CURVATURE_THRESHOLD) {
 				int maxIndex = i;
@@ -177,15 +177,15 @@ public class FeatureExtraction {
 				}
 				
 				if (Math.abs(totalPhi) > CORNER_THRESHOLD) {
-					corners.add(new CurvaturePoint2D(Point2Ds.get(maxIndex), totalPhi));
+					corners.add(new CurvaturePoint2f(Point2fs.get(maxIndex), totalPhi));
 				}
 			}
 		}
 		return corners;
 	}
 
-	private static Collection<? extends CurvaturePoint2D> extractCorners(List<Point2D> Point2Ds, float[] deltaAngles) {
-		List<CurvaturePoint2D> corners = new ArrayList<>();
+	private static Collection<? extends CurvaturePoint2f> extractCorners(List<Point2f> Point2fs, float[] deltaAngles) {
+		List<CurvaturePoint2f> corners = new ArrayList<>();
 		for (int i = 0; i < deltaAngles.length; i++) {
 			if (Math.abs(deltaAngles[i]) > CURVATURE_THRESHOLD) {
 				int maxIndex = i;
@@ -202,12 +202,12 @@ public class FeatureExtraction {
 				}
 
 				if (Math.abs(totalPhi) > CORNER_THRESHOLD && Math.signum(totalPhi) == Math.signum(maxPhi) && maxIndex - 3 >= 0 && maxIndex + 4 < deltaAngles.length) {
-					Point2D p = Point2Ds.get(maxIndex);
-					Point2D b = Point2Ds.get(maxIndex - 3);
-					Point2D f = Point2Ds.get(maxIndex + 3);
+					Point2f p = Point2fs.get(maxIndex);
+					Point2f b = Point2fs.get(maxIndex - 3);
+					Point2f f = Point2fs.get(maxIndex + 3);
 					float cornerAlpha = calculateVectorAngle(b, p, f); 
 					if (cornerAlpha > CORNER_THRESHOLD) {
-						corners.add(new CurvaturePoint2D(p, cornerAlpha));	
+						corners.add(new CurvaturePoint2f(p, cornerAlpha));	
 					}
 				}
 			}
@@ -215,38 +215,38 @@ public class FeatureExtraction {
 		return corners;
 	}
 
-	public static float[] calculateSamplePoint2DDeltaAngles(List<Point2D> Point2Ds) {
-		if (Point2Ds.size() < 5) {
+	public static float[] calculateSamplePoint2DDeltaAngles(List<Point2f> Point2fs) {
+		if (Point2fs.size() < 5) {
 			return null;
 		}
 
-		float[] alphas = new float[Point2Ds.size()];
-		for (int i = 0; i < Point2Ds.size(); i++) {
-			if (i == 0 || i == Point2Ds.size() -1) {
+		float[] alphas = new float[Point2fs.size()];
+		for (int i = 0; i < Point2fs.size(); i++) {
+			if (i == 0 || i == Point2fs.size() -1) {
 				alphas[i] = 0;
 				continue;
 			}
-			int kb = calculateKB(Point2Ds, i);
-			int kf = calculateKF(Point2Ds, i);
-			Point2D before = Point2Ds.get(i - kb);
-			Point2D center = Point2Ds.get(i);
-			Point2D following = Point2Ds.get(i + kf);
+			int kb = calculateKB(Point2fs, i);
+			int kf = calculateKF(Point2fs, i);
+			Point2f before = Point2fs.get(i - kb);
+			Point2f center = Point2fs.get(i);
+			Point2f following = Point2fs.get(i + kf);
 			alphas[i] = calculateVectorAngle(before, center, following);
 		}
 		return alphas;
 	}
 	
-	public static int calculateKF(List<Point2D> Point2Ds, int Point2DIndex) {
-		if (Point2DIndex >= Point2Ds.size() - 1) {
+	public static int calculateKF(List<Point2f> Point2fs, int Point2DIndex) {
+		if (Point2DIndex >= Point2fs.size() - 1) {
 			return 0;
 		}
 		double length = 0;
 		double distance = 0;
-		Point2D startPoint2D = Point2Ds.get(Point2DIndex);
+		Point2f startPoint2D = Point2fs.get(Point2DIndex);
 		int i = Point2DIndex;
-		while (i < Point2Ds.size() -1) {			
-			length += Point2Ds.get(i + 1).distance(Point2Ds.get(i));
-			distance = Point2Ds.get(i + 1).distance(startPoint2D);
+		while (i < Point2fs.size() -1) {			
+			length += Point2fs.get(i + 1).distance(Point2fs.get(i));
+			distance = Point2fs.get(i + 1).distance(startPoint2D);
 			if ( (length - Uk) >= distance) {
 				break;
 			}
@@ -255,17 +255,17 @@ public class FeatureExtraction {
 		return i - Point2DIndex;
 	}
 
-	public static int calculateKB(List<Point2D> Point2Ds, int Point2DIndex) {
+	public static int calculateKB(List<Point2f> Point2fs, int Point2DIndex) {
 		if (Point2DIndex < 1) {
 			return 0;
 		}
 		float length = 0;
 		float distance = 0;
-		Point2D startPoint2D = Point2Ds.get(Point2DIndex);
+		Point2f startPoint2D = Point2fs.get(Point2DIndex);
 		int i = Point2DIndex;
 		while (i > 0) {
-			length += Point2Ds.get(i - 1).distance(Point2Ds.get(i));
-			distance = Point2Ds.get(i - 1).distance(startPoint2D);
+			length += Point2fs.get(i - 1).distance(Point2fs.get(i));
+			distance = Point2fs.get(i - 1).distance(startPoint2D);
 			if ((length - Uk) >= distance) {
 				break;
 			}
@@ -275,16 +275,16 @@ public class FeatureExtraction {
 	}
 	
 	public static final void main(String[] args) {
-		Point2D b = new Point2D(18, 18);
-		Point2D center = new Point2D(19, 19);
-		Point2D f = new Point2D(20, 20);
+		Point2f b = new Point2f(18, 18);
+		Point2f center = new Point2f(19, 19);
+		Point2f f = new Point2f(20, 20);
 		float radians = calculateVectorAngle(b, center, f);
 
 		System.out.println("Vec angle: " + Math.toDegrees(radians) + " radians: " + radians);
 	}
 	
-	private static List<Line2D> extractLine2Ds(List<Point2D> Point2Ds, float[] deltaAngles) {	
-		List<Line2D> Line2Ds = new ArrayList<>();
+	private static List<Line2f> extractLine2Ds(List<Point2f> Point2fs, float[] deltaAngles) {	
+		List<Line2f> Line2fs = new ArrayList<>();
 		for (int i = 0; i < deltaAngles.length - MIN_Line2D_SAMPLES; ) {
 			while (i < deltaAngles.length - 1 && Math.abs(deltaAngles[i]) > Line2D_ANGLE_THRESHOLD) {
 				i++;
@@ -294,20 +294,20 @@ public class FeatureExtraction {
 				j++;
 			}
 			if (j - i - 1 >= MIN_Line2D_SAMPLES) {
-				Line2Ds.add(new Line2D(Point2Ds.get(i), Point2Ds.get(j)));			
+				Line2fs.add(new Line2f(Point2fs.get(i), Point2fs.get(j)));			
 			}
 			i = j;
 		}
-		return Line2Ds;
+		return Line2fs;
 	}
 
-	public static float getAngularResolution(List<Point2D> Point2Ds) {
-		return Point2Ds.get(1).getAngle() - Point2Ds.get(0).getAngle();
+	public static float getAngularResolution(List<Point2f> Point2fs) {
+		return Point2fs.get(1).getAngle() - Point2fs.get(0).getAngle();
 	}
 
-	public static float calculateNoGoRadius(Point2D p, float defaultNoGoRadius) {
-		if (p instanceof CurvaturePoint2D) {
-			CurvaturePoint2D cp = (CurvaturePoint2D) p;
+	public static float calculateNoGoRadius(Point2f p, float defaultNoGoRadius) {
+		if (p instanceof CurvaturePoint2f) {
+			CurvaturePoint2f cp = (CurvaturePoint2f) p;
 			if (cp.getCurvature() < 0) {
 				return defaultNoGoRadius;
 			} else {

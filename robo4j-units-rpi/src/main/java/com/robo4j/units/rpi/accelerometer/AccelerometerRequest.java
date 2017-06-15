@@ -19,7 +19,7 @@ package com.robo4j.units.rpi.accelerometer;
 import java.util.function.Predicate;
 
 import com.robo4j.core.RoboReference;
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * Class to request a specific accelerometer notification.
@@ -30,12 +30,12 @@ import com.robo4j.math.geometry.Float3D;
 public class AccelerometerRequest {
 	private final RoboReference<AccelerometerEvent> target;
 	private final boolean continuous;
-	private final Predicate<Float3D> predicate;
+	private final Predicate<Tuple3f> predicate;
 
 	/**
 	 * Constructor.
 	 */
-	public AccelerometerRequest(RoboReference<AccelerometerEvent> target, boolean continuous, Predicate<Float3D> predicate) {
+	public AccelerometerRequest(RoboReference<AccelerometerEvent> target, boolean continuous, Predicate<Tuple3f> predicate) {
 		this.target = target;
 		this.continuous = continuous;
 		this.predicate = predicate;
@@ -44,7 +44,7 @@ public class AccelerometerRequest {
 	/**
 	 * @return the predicate to check to see if a notification should be sent.
 	 */
-	public Predicate<Float3D> getPredicate() {
+	public Predicate<Tuple3f> getPredicate() {
 		return predicate;
 	}
 

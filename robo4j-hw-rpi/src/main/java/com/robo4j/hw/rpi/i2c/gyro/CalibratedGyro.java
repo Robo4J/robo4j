@@ -21,19 +21,19 @@ import java.util.Arrays;
 
 import com.robo4j.hw.rpi.i2c.CalibratedFloat3DDevice;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 public class CalibratedGyro extends CalibratedFloat3DDevice {
 	private static final int NUMBER_OF_CALIBRATION_READINGS = 40;
 	private static final int NUMBER_OF_CALIBRATION_READINGS_TO_DROP = 5;
-	private static final Float3D RANGE_MULTIPLIERS = new Float3D(1, 1, -1);
+	private static final Tuple3f RANGE_MULTIPLIERS = new Tuple3f(1, 1, -1);
 	
 
-	public CalibratedGyro(ReadableDevice<Float3D> device) {
-		super(device, new Float3D(), RANGE_MULTIPLIERS.copy());
+	public CalibratedGyro(ReadableDevice<Tuple3f> device) {
+		super(device, new Tuple3f(), RANGE_MULTIPLIERS.copy());
 	}
 
-	public CalibratedGyro(ReadableDevice<Float3D> device, Float3D offsets, Float3D multipliers) {
+	public CalibratedGyro(ReadableDevice<Tuple3f> device, Tuple3f offsets, Tuple3f multipliers) {
 		super(device, offsets, multipliers);
 	}
 
@@ -43,19 +43,19 @@ public class CalibratedGyro extends CalibratedFloat3DDevice {
 	 * @throws IOException
 	 */
 	public void calibrate() throws IOException {
-		setCalibration(new Float3D(), Float3D.createIdentity());
+		setCalibration(new Tuple3f(), Tuple3f.createIdentity());
 		float[] xvalues = new float[NUMBER_OF_CALIBRATION_READINGS];
 		float[] yvalues = new float[NUMBER_OF_CALIBRATION_READINGS];
 		float[] zvalues = new float[NUMBER_OF_CALIBRATION_READINGS];
 
 		for (int i = 0; i < NUMBER_OF_CALIBRATION_READINGS; i++) {
-			Float3D tmp = read();
+			Tuple3f tmp = read();
 			xvalues[i] = tmp.x;
 			yvalues[i] = tmp.y;
 			zvalues[i] = tmp.z;
 			sleep(20);
 		}
-		Float3D calibration = new Float3D();
+		Tuple3f calibration = new Tuple3f();
 		calibration.x = calibrate(xvalues, NUMBER_OF_CALIBRATION_READINGS_TO_DROP);
 		calibration.y = calibrate(yvalues, NUMBER_OF_CALIBRATION_READINGS_TO_DROP);
 		calibration.z = calibrate(zvalues, NUMBER_OF_CALIBRATION_READINGS_TO_DROP);

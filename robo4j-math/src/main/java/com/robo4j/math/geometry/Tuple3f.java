@@ -17,24 +17,24 @@
 package com.robo4j.math.geometry;
 
 /**
- * 3D vector of floats.
+ * A tuple of floats.
  *  
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Float3D {
+public class Tuple3f {
 	public float x;
 	public float y;
 	public float z;
 
-	public Float3D() {
+	public Tuple3f() {
 	}
 
-	public Float3D(float x, float y, float z) {
+	public Tuple3f(float x, float y, float z) {
 		set(x, y, z);
 	}
 
-	public Float3D(Float3D val) {
+	public Tuple3f(Tuple3f val) {
 		set(val);
 	}
 
@@ -48,32 +48,32 @@ public class Float3D {
 		return String.format("x:%02.4f, y:%02.4f, z:%02.4f", x, y, z);
 	}
 
-	public void subtract(Float3D f) {
+	public void subtract(Tuple3f f) {
 		x -= f.x;
 		y -= f.y;
 		z -= f.z;
 	}
 
-	public void add(Float3D f) {
+	public void add(Tuple3f f) {
 		x += f.x;
 		y += f.y;
 		z += f.z;
 	}
 
-	public void multiply(Float3D f) {
+	public void multiply(Tuple3f f) {
 		x *= f.x;
 		y *= f.y;
 		z *= f.z;
 	}
 
-	public void set(Float3D f) {
+	public void set(Tuple3f f) {
 		x = f.x;
 		y = f.y;
 		z = f.z;	
 	}
 
-	public static Float3D createIdentity() {
-		return new Float3D(1, 1, 1);
+	public static Tuple3f createIdentity() {
+		return new Tuple3f(1, 1, 1);
 	}
 
 	public void multiplyScalar(float f) {
@@ -82,11 +82,11 @@ public class Float3D {
 		z *= f;		
 	}
 
-	public Float3D diff(Float3D f) {
-		return new Float3D(f.x - x, f.y - y, f.z - z);
+	public Tuple3f diff(Tuple3f f) {
+		return new Tuple3f(f.x - x, f.y - y, f.z - z);
 	}
 	
-	public Float3D copy() {
-		return new Float3D(x, y, z);
+	public Tuple3f copy() {
+		return new Tuple3f(x, y, z);
 	}
 }

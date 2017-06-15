@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.robo4j.math.jfr.ScanPoint2DEvent;
-import com.robo4j.math.geometry.Point2D;
+import com.robo4j.math.geometry.Point2f;
 import com.robo4j.math.geometry.ScanResult2D;
 
 /**
@@ -37,7 +37,7 @@ public class ScanResultImpl implements ScanResult2D {
 	private static final PointComparator POINT_COMPARATOR = new PointComparator();
 	private static final AtomicInteger SCANCOUNTER = new AtomicInteger(0);
 
-	private final List<Point2D> points;
+	private final List<Point2f> points;
 
 	private double maxX;
 	private double minX;
@@ -45,8 +45,8 @@ public class ScanResultImpl implements ScanResult2D {
 	private double minY;
 	private int scanID;
 
-	private Point2D farthestPoint;
-	private Point2D closestPoint;
+	private Point2f farthestPoint;
+	private Point2f closestPoint;
 
 	private final ScanPoint2DEvent scanPointEvent = new ScanPoint2DEvent();
 
@@ -56,7 +56,7 @@ public class ScanResultImpl implements ScanResult2D {
 
 	public ScanResultImpl(int size) {
 		scanID = SCANCOUNTER.incrementAndGet();
-		points = new ArrayList<Point2D>(size);
+		points = new ArrayList<Point2f>(size);
 	}
 
 	public double getMaxX() {
@@ -79,7 +79,7 @@ public class ScanResultImpl implements ScanResult2D {
 		return scanID;
 	}
 
-	public void addPoint(Point2D p) {
+	public void addPoint(Point2f p) {
 		if (p.getRange() < 0.05) {
 			return;
 		}
@@ -89,14 +89,14 @@ public class ScanResultImpl implements ScanResult2D {
 	}
 
 	@SuppressWarnings("deprecation")
-	private void emitEvent(Point2D p) {
+	private void emitEvent(Point2f p) {
 		scanPointEvent.reset();
 		scanPointEvent.setPoint(p);
 		scanPointEvent.setScanID(scanID);
 		scanPointEvent.commit();
 	}
 
-	private void updateBoundaries(Point2D p) {
+	private void updateBoundaries(Point2f p) {
 		maxX = Math.max(maxX, p.getX());
 		maxY = Math.max(maxY, p.getY());
 		minX = Math.min(minX, p.getX());
@@ -117,25 +117,25 @@ public class ScanResultImpl implements ScanResult2D {
 		}
 	}
 
-	public List<Point2D> getPoints() {
+	public List<Point2f> getPoints() {
 		return points;
 	}
 
 	public void addPoint(float range, float angle) {
-		addPoint(new Point2D(range, angle));
+		addPoint(new Point2f(range, angle));
 	}
 
 	public void addResult(ScanResultImpl result) {
-		for (Point2D p : result.getPoints()) {
+		for (Point2f p : result.getPoints()) {
 			addPoint(p);
 		}
 	}
 
-	public Point2D getNearestPoint() {
+	public Point2f getNearestPoint() {
 		return closestPoint;
 	}
 
-	public Point2D getFarthestPoint() {
+	public Point2f getFarthestPoint() {
 		return farthestPoint;
 	}
 
@@ -143,9 +143,9 @@ public class ScanResultImpl implements ScanResult2D {
 		Collections.sort(points, POINT_COMPARATOR);
 	}
 
-	private static class PointComparator implements Comparator<Point2D> {
+	private static class PointComparator implements Comparator<Point2f> {
 		@Override
-		public int compare(Point2D o1, Point2D o2) {
+		public int compare(Point2f o1, Point2f o2) {
 			return Float.compare(o1.getAngle(), o2.getAngle());
 		}
 	}

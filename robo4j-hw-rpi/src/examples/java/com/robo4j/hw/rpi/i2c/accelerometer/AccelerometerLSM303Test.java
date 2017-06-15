@@ -19,7 +19,7 @@ package com.robo4j.hw.rpi.i2c.accelerometer;
 import java.io.IOException;
 
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * Example useful to check if your accelerometer is working properly.
@@ -29,11 +29,11 @@ import com.robo4j.math.geometry.Float3D;
  */
 public class AccelerometerLSM303Test {
 	public static void main(String[] args) throws IOException, InterruptedException {
-		ReadableDevice<Float3D> device = new AccelerometerLSM303Device();		
+		ReadableDevice<Tuple3f> device = new AccelerometerLSM303Device();		
 		getReading(device, "Place the device in the position(s) you want to measure");
 	}
 
-	private static void getReading(ReadableDevice<Float3D> device, String message)
+	private static void getReading(ReadableDevice<Tuple3f> device, String message)
 			throws IOException, InterruptedException {
 		prompt(message);
 		print(readValues(device));
@@ -50,10 +50,10 @@ public class AccelerometerLSM303Test {
 		System.in.read();
 	}
 
-	private static Stats readValues(ReadableDevice<Float3D> device) throws IOException, InterruptedException {
+	private static Stats readValues(ReadableDevice<Tuple3f> device) throws IOException, InterruptedException {
 		Stats stats = new Stats();
 		for (int i = 0; i < 250; i++) {
-			Float3D fl = device.read();
+			Tuple3f fl = device.read();
 			stats.addValue(fl);
 			Thread.sleep(20);
 			if (i % 25 == 0) {

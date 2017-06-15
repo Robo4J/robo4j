@@ -21,8 +21,8 @@ import java.io.IOException;
 import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
-import com.robo4j.math.geometry.Float3D;
-import com.robo4j.math.geometry.Int3D;
+import com.robo4j.math.geometry.Tuple3f;
+import com.robo4j.math.geometry.Tuple3i;
 
 /**
  * Represents a LSM303 magnetometer, for example the one on the Adafruit IMU
@@ -32,7 +32,7 @@ import com.robo4j.math.geometry.Int3D;
  * @author Miro Wengner (@miragemiko)
  */
 // FIXME(Marcus/Dec 5, 2016): Verify that this one works.
-public class MagnetometerLSM303Device extends AbstractI2CDevice implements ReadableDevice<Float3D> {
+public class MagnetometerLSM303Device extends AbstractI2CDevice implements ReadableDevice<Tuple3f> {
 	private static final int DEFAULT_I2C_ADDRESS = 0x1e;
 	private static final int CRA_REG_M = 0x00;
 	private static final int CRB_REG_M = 0x01;
@@ -52,8 +52,8 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 		initialize(mode, rate, enableTemp);
 	}
 
-	public synchronized Float3D read() throws IOException {
-		Float3D rawData = new Float3D();
+	public synchronized Tuple3f read() throws IOException {
+		Tuple3f rawData = new Tuple3f();
 		byte[] data = new byte[RESULT_BUFFER_SIZE];
 		int n = i2cDevice.read(OUT_X_H_M, data, 0, RESULT_BUFFER_SIZE);
 		if (n != RESULT_BUFFER_SIZE) {
@@ -65,8 +65,8 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 		return rawData;
 	}
 
-	public synchronized Int3D readRaw() throws IOException {
-		Int3D rawData = new Int3D();
+	public synchronized Tuple3i readRaw() throws IOException {
+		Tuple3i rawData = new Tuple3i();
 		byte[] data = new byte[RESULT_BUFFER_SIZE];
 		int n = i2cDevice.read(OUT_X_H_M, data, 0, RESULT_BUFFER_SIZE);
 		if (n != RESULT_BUFFER_SIZE) {
@@ -89,7 +89,7 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 	 * 
 	 * @return the (XY) compass heading.
 	 */
-	public static float getCompassHeading(Int3D magResult) {
+	public static float getCompassHeading(Tuple3i magResult) {
 		float heading = (float) ((Math.atan2(magResult.y, magResult.x) * 180.0) / Math.PI);
 
 		if (heading < 0) {

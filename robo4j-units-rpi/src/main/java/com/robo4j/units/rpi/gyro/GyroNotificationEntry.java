@@ -17,7 +17,7 @@
 package com.robo4j.units.rpi.gyro;
 
 import com.robo4j.core.RoboReference;
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * Internal interface for book keeping required for the gyro unit.
@@ -29,7 +29,7 @@ interface GyroNotificationEntry {
 	/**
 	 * @return the current delta angles.
 	 */
-	Float3D getDelta();
+	Tuple3f getDelta();
 
 	/**
 	 * @return the robo unit to get the notifications.
@@ -45,5 +45,5 @@ interface GyroNotificationEntry {
 	 * @param data
 	 *            the delta measurement to add to the current angles.
 	 */
-	void addDelta(Float3D data);
+	void addDelta(Tuple3f data);
 }

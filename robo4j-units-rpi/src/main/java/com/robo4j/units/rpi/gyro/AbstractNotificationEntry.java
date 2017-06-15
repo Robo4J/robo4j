@@ -17,7 +17,7 @@
 package com.robo4j.units.rpi.gyro;
 
 import com.robo4j.core.RoboReference;
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * This is the abstract base class for notification entries (used for internal
@@ -28,7 +28,7 @@ import com.robo4j.math.geometry.Float3D;
  */
 abstract class AbstractNotificationEntry implements GyroNotificationEntry {
 	private final RoboReference<GyroEvent> target;
-	private final Float3D delta = new Float3D();
+	private final Tuple3f delta = new Tuple3f();
 
 	/**
 	 * Constructor.
@@ -46,7 +46,7 @@ abstract class AbstractNotificationEntry implements GyroNotificationEntry {
 	}
 
 	@Override
-	public Float3D getDelta() {
+	public Tuple3f getDelta() {
 		return delta;
 	}
 
@@ -56,7 +56,7 @@ abstract class AbstractNotificationEntry implements GyroNotificationEntry {
 	 * @param angles
 	 *            the angles to report.
 	 */
-	protected void report(Float3D angles) {
+	protected void report(Tuple3f angles) {
 		getTarget().sendMessage(new GyroEvent(angles));
 	}
 }

@@ -17,7 +17,7 @@
 package com.robo4j.hw.rpi.i2c.accelerometer;
 
 
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * Helper class for gathering stats.
@@ -26,9 +26,9 @@ import com.robo4j.math.geometry.Float3D;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class Stats {
-	private Float3D min = new Float3D();
-	private Float3D max = new Float3D();
-	private Float3D sum = new Float3D();
+	private Tuple3f min = new Tuple3f();
+	private Tuple3f max = new Tuple3f();
+	private Tuple3f sum = new Tuple3f();
 
 	private int count = 0;
 	
@@ -41,34 +41,34 @@ public class Stats {
 		min.z = Float.MAX_VALUE;
 	}
 	
-	public void addValue(Float3D f) {
+	public void addValue(Tuple3f f) {
 		updateMin(f);
 		updateMax(f);
 		sum.add(f);
 		count++;
 	}
 	
-	public Float3D getMin() {
+	public Tuple3f getMin() {
 		return min;
 	}
 	
-	public Float3D getMax() {
+	public Tuple3f getMax() {
 		return max;
 	}
 	
-	public Float3D getSum() {
+	public Tuple3f getSum() {
 		return sum;
 	}
 	
-	public Float3D getAvg() {
-		Float3D avg = new Float3D();
+	public Tuple3f getAvg() {
+		Tuple3f avg = new Tuple3f();
 		avg.x = sum.x / count;
 		avg.y = sum.y / count;
 		avg.z = sum.z / count;
 		return avg;
 	}
 	
-	private boolean updateMin(Float3D newVal) {
+	private boolean updateMin(Tuple3f newVal) {
 		boolean isUpdated = false;
 		
 		if (newVal.x < min.x) {
@@ -86,7 +86,7 @@ public class Stats {
 		return isUpdated;
 	}
 
-	private boolean updateMax(Float3D newVal) {
+	private boolean updateMax(Tuple3f newVal) {
 		boolean isUpdated = false;
 		
 		if (newVal.x > max.x) {

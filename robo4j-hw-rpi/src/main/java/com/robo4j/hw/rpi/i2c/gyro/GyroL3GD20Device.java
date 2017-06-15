@@ -21,7 +21,7 @@ import java.io.IOException;
 import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * Abstraction to read angular change from a L3GD20 Gyro, for example the Gyro 
@@ -31,7 +31,7 @@ import com.robo4j.math.geometry.Float3D;
  * @author Miro Wengner (@miragemiko)
  */
 public class GyroL3GD20Device extends AbstractI2CDevice implements
-		ReadableDevice<Float3D> {
+		ReadableDevice<Tuple3f> {
 	private static final int DEFAULT_I2C_ADDRESS = 0x6b;
 
 	private final Sensitivity sensitivity;
@@ -129,9 +129,9 @@ public class GyroL3GD20Device extends AbstractI2CDevice implements
 		}		
 	}
 
-	public Float3D read() throws IOException {
+	public Tuple3f read() throws IOException {
 		byte[] xyz = new byte[6];
-		Float3D data = new Float3D();
+		Tuple3f data = new Tuple3f();
 		i2cDevice.write((byte) (REGISTER_OUT_X_L | 0x80));
 		i2cDevice.read(REGISTER_OUT_X_H | 0x80, xyz, 0, 6);
 		int x = (xyz[1] & 0xFF | (xyz[0] << 8));

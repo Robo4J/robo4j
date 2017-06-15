@@ -18,7 +18,7 @@ package com.robo4j.hw.rpi.i2c.accelerometer;
 
 import com.robo4j.hw.rpi.i2c.CalibratedFloat3DDevice;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * Strictly not required, but provided for symmetry with the gyro package.
@@ -27,7 +27,7 @@ import com.robo4j.math.geometry.Float3D;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class CalibratedAccelerometer extends CalibratedFloat3DDevice {
-	public CalibratedAccelerometer(ReadableDevice<Float3D> device, Float3D offsets, Float3D multipliers) {
+	public CalibratedAccelerometer(ReadableDevice<Tuple3f> device, Tuple3f offsets, Tuple3f multipliers) {
 		super(device, offsets, multipliers);
 	}
 }

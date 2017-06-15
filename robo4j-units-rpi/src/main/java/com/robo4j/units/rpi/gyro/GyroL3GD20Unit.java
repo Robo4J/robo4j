@@ -36,7 +36,7 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.hw.rpi.i2c.gyro.CalibratedGyro;
 import com.robo4j.hw.rpi.i2c.gyro.GyroL3GD20Device;
 import com.robo4j.hw.rpi.i2c.gyro.GyroL3GD20Device.Sensitivity;
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.units.rpi.lcd.I2CRoboUnit;
 
 /**
@@ -71,12 +71,12 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 	public static final String PROPERTY_KEY_PERIOD = "period";
 
 	/**
-	 * This attribute will provide the state of the gyro as a {@link Float3D}.
+	 * This attribute will provide the state of the gyro as a {@link Tuple3f}.
 	 */
 	public static final String ATTRIBUTE_NAME_STATE = "state";
 
 	public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
-			.unmodifiableCollection(Arrays.asList(DefaultAttributeDescriptor.create(Float3D.class, ATTRIBUTE_NAME_STATE)));
+			.unmodifiableCollection(Arrays.asList(DefaultAttributeDescriptor.create(Tuple3f.class, ATTRIBUTE_NAME_STATE)));
 
 	private final Map<RoboReference<GyroEvent>, GyroNotificationEntry> activeThresholds = new HashMap<>();
 
@@ -90,15 +90,15 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 
 	private class GyroScanner implements Runnable {
 		private long lastReadingTime = System.currentTimeMillis();
-		private Float3D lastReading;
+		private Tuple3f lastReading;
 
 		@Override
 		public void run() {
-			Float3D data = read();
+			Tuple3f data = read();
 			long newTime = System.currentTimeMillis();
 
 			// Trapezoid
-			Float3D tmp = new Float3D(data);
+			Tuple3f tmp = new Tuple3f(data);
 			long deltaTime = newTime - lastReadingTime;
 			data.add(lastReading);
 			data.multiplyScalar(deltaTime / 2000.0f);
@@ -108,7 +108,7 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 			lastReadingTime = newTime;
 		}
 
-		private void addToDeltas(Float3D data) {
+		private void addToDeltas(Tuple3f data) {
 			synchronized (GyroL3GD20Unit.this) {
 				for (GyroNotificationEntry notificationEntry : activeThresholds.values()) {
 					notificationEntry.addDelta(data);
@@ -121,7 +121,7 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 			lastReading = read();
 		}
 
-		private Float3D read() {
+		private Tuple3f read() {
 			try {
 				return gyro.read();
 			} catch (IOException e) {
@@ -181,7 +181,7 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
-		if (descriptor.getAttributeType() == Float3D.class && descriptor.getAttributeName().equals(ATTRIBUTE_NAME_STATE)) {
+		if (descriptor.getAttributeType() == Tuple3f.class && descriptor.getAttributeName().equals(ATTRIBUTE_NAME_STATE)) {
 			try {
 				return (R) gyro.read();
 			} catch (IOException e) {

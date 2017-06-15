@@ -39,7 +39,7 @@ import com.robo4j.hw.rpi.serial.gps.GPSEvent;
 import com.robo4j.hw.rpi.serial.gps.GPSListener;
 import com.robo4j.hw.rpi.serial.gps.PositionEvent;
 import com.robo4j.hw.rpi.serial.gps.VelocityEvent;
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * Unit for getting GPS data.
@@ -82,7 +82,7 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 	public static final String ATTRIBUTE_NAME_READ_INTERVAL = "readInterval";
 
 	public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
-			.unmodifiableCollection(Arrays.asList(DefaultAttributeDescriptor.create(Float3D.class, ATTRIBUTE_NAME_READ_INTERVAL)));
+			.unmodifiableCollection(Arrays.asList(DefaultAttributeDescriptor.create(Tuple3f.class, ATTRIBUTE_NAME_READ_INTERVAL)));
 
 	private GPS gps;
 	private int readInterval = DEFAULT_READ_INTERVAL;

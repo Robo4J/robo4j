@@ -16,7 +16,7 @@
  */
 package com.robo4j.units.rpi.accelerometer;
 
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * This event will be sent when a notification threshold has been passed.
@@ -28,7 +28,7 @@ import com.robo4j.math.geometry.Float3D;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class AccelerometerEvent {
-	private final Float3D angles;
+	private final Tuple3f angles;
 
 	/**
 	 * Constructor.
@@ -36,7 +36,7 @@ public class AccelerometerEvent {
 	 * @param angles
 	 *            the angular delta to report.
 	 */
-	public AccelerometerEvent(Float3D angles) {
+	public AccelerometerEvent(Tuple3f angles) {
 		this.angles = angles;
 	}
 
@@ -44,7 +44,7 @@ public class AccelerometerEvent {
 	 * @return the angular (in angular degrees) deltas since originally asking
 	 *         for notifications.
 	 */
-	public Float3D getAngles() {
+	public Tuple3f getAngles() {
 		return angles;
 	}
 

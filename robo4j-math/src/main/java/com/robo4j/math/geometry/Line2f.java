@@ -22,20 +22,20 @@ package com.robo4j.math.geometry;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Line2D {
-	private final Point2D p1;
-	private final Point2D p2;
+public class Line2f {
+	private final Point2f p1;
+	private final Point2f p2;
 	
-	public Line2D(Point2D p1, Point2D p2) {
+	public Line2f(Point2f p1, Point2f p2) {
 		this.p1 = p1;
 		this.p2 = p2;
 	}
 
-	public Point2D getP1() {
+	public Point2f getP1() {
 		return p1;
 	}
 
-	public Point2D getP2() {
+	public Point2f getP2() {
 		return p2;
 	}
 }

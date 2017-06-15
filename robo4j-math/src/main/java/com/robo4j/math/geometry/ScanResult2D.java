@@ -24,9 +24,9 @@ import java.util.List;
  * @author Miroslav Wengner (@miragemiko)
  */
 public interface ScanResult2D {
-	List<Point2D> getPoints();
-	Point2D getNearestPoint();
-	Point2D getFarthestPoint();
+	List<Point2f> getPoints();
+	Point2f getNearestPoint();
+	Point2f getFarthestPoint();
 	double getMaxX();
 	double getMinX();
 	double getMaxY();

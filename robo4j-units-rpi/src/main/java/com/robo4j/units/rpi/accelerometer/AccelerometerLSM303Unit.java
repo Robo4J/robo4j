@@ -38,7 +38,7 @@ import com.robo4j.hw.rpi.i2c.accelerometer.AccelerometerLSM303Device.DataRate;
 import com.robo4j.hw.rpi.i2c.accelerometer.AccelerometerLSM303Device.FullScale;
 import com.robo4j.hw.rpi.i2c.accelerometer.AccelerometerLSM303Device.PowerMode;
 import com.robo4j.hw.rpi.i2c.accelerometer.CalibratedAccelerometer;
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.units.rpi.lcd.I2CRoboUnit;
 
 /**
@@ -90,12 +90,12 @@ public class AccelerometerLSM303Unit extends I2CRoboUnit<AccelerometerRequest> {
 
 	/**
 	 * This attribute will provide the state of the accelerometer as a
-	 * {@link Float3D}.
+	 * {@link Tuple3f}.
 	 */
 	public static final String ATTRIBUTE_NAME_STATE = "state";
 
 	public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
-			.unmodifiableCollection(Arrays.asList(DefaultAttributeDescriptor.create(Float3D.class, ATTRIBUTE_NAME_STATE)));
+			.unmodifiableCollection(Arrays.asList(DefaultAttributeDescriptor.create(Tuple3f.class, ATTRIBUTE_NAME_STATE)));
 
 	private final Scanner scanner = new Scanner();
 
@@ -109,7 +109,7 @@ public class AccelerometerLSM303Unit extends I2CRoboUnit<AccelerometerRequest> {
 		@Override
 		public void run() {
 			try {
-				Float3D value = accelerometer.read();
+				Tuple3f value = accelerometer.read();
 				for (AccelerometerRequest request : requests) {
 					if (request.getPredicate().test(value)) {
 						notify(request.getTarget(), value);
@@ -120,7 +120,7 @@ public class AccelerometerLSM303Unit extends I2CRoboUnit<AccelerometerRequest> {
 			}
 		}
 
-		private void notify(RoboReference<AccelerometerEvent> target, Float3D value) {
+		private void notify(RoboReference<AccelerometerEvent> target, Tuple3f value) {
 			target.sendMessage(new AccelerometerEvent(value));
 		}
 	}
@@ -145,8 +145,8 @@ public class AccelerometerLSM303Unit extends I2CRoboUnit<AccelerometerRequest> {
 		Integer axisEnable = configuration.getInteger(PROPERTY_KEY_AXIS_ENABLE, AccelerometerLSM303Device.AXIS_ENABLE_ALL);
 		FullScale fullScale = FullScale.valueOf(configuration.getString(PROPERTY_KEY_FULL_SCALE, FullScale.G_2.name()));
 		Boolean enableHighRes = configuration.getBoolean(PROPERTY_KEY_ENABLE_HIGH_RES, false);
-		Float3D offsets = readFloat3D(configuration.getChildConfiguration("offsets"));
-		Float3D multipliers = readFloat3D(configuration.getChildConfiguration("multipliers"));
+		Tuple3f offsets = readFloat3D(configuration.getChildConfiguration("offsets"));
+		Tuple3f multipliers = readFloat3D(configuration.getChildConfiguration("multipliers"));
 		period = configuration.getInteger(PROPERTY_KEY_PERIOD, 200);
 
 		try {
@@ -159,8 +159,8 @@ public class AccelerometerLSM303Unit extends I2CRoboUnit<AccelerometerRequest> {
 		}
 	}
 
-	private Float3D readFloat3D(Configuration config) {
-		return new Float3D(config.getFloat("x", 0f), config.getFloat("y", 0f), config.getFloat("z", 0f));
+	private Tuple3f readFloat3D(Configuration config) {
+		return new Tuple3f(config.getFloat("x", 0f), config.getFloat("y", 0f), config.getFloat("z", 0f));
 	}
 
 	@Override
@@ -181,7 +181,7 @@ public class AccelerometerLSM303Unit extends I2CRoboUnit<AccelerometerRequest> {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
-		if (descriptor.getAttributeType() == Float3D.class && descriptor.getAttributeName().equals(ATTRIBUTE_NAME_STATE)) {
+		if (descriptor.getAttributeType() == Tuple3f.class && descriptor.getAttributeName().equals(ATTRIBUTE_NAME_STATE)) {
 			try {
 				return (R) accelerometer.read();
 			} catch (IOException e) {

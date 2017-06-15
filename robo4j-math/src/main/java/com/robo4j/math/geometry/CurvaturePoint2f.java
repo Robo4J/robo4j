@@ -17,17 +17,25 @@
 package com.robo4j.math.geometry;
 
 /**
- * 3D vector of ints.
+ * A point used when establishing curvature in points. Used when doing feature
+ * extraction, such as detecting corners.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Int3D {
-	public int x;
-	public int y;
-	public int z;
-	
-	public String toString() {
-		return "x:" + x + " y:" + y +  " z:" + z;
+public class CurvaturePoint2f extends Point2f {
+	private final float curvature;
+
+	public CurvaturePoint2f(float range, float angle, float curvature) {
+		super(range, angle);
+		this.curvature = curvature;
+	}
+
+	public CurvaturePoint2f(Point2f point, float totalPhi) {
+		this(point.getRange(), point.getAngle(), totalPhi);
+	}
+
+	public float getCurvature() {
+		return curvature;
 	}
 }

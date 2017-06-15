@@ -17,7 +17,7 @@
 package com.robo4j.units.rpi.gyro;
 
 import com.robo4j.core.RoboReference;
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * Notification entry for the required book keeping when sending notifications
@@ -27,8 +27,8 @@ import com.robo4j.math.geometry.Float3D;
  * @author Miroslav Wengner (@miragemiko)
  */
 class ContinuousGyroNotificationEntry extends AbstractNotificationEntry implements GyroNotificationEntry {
-	private final Float3D deltaToNotify;
-	private final Float3D lastReported = new Float3D();
+	private final Tuple3f deltaToNotify;
+	private final Tuple3f lastReported = new Tuple3f();
 
 	/**
 	 * Constructor.
@@ -41,7 +41,7 @@ class ContinuousGyroNotificationEntry extends AbstractNotificationEntry implemen
 	 *            1) will cause notifications whenever a one degree change has
 	 *            been detected around the Z-axis).
 	 */
-	public ContinuousGyroNotificationEntry(RoboReference<GyroEvent> target, Float3D deltaToNotify) {
+	public ContinuousGyroNotificationEntry(RoboReference<GyroEvent> target, Tuple3f deltaToNotify) {
 		super(target);
 		this.deltaToNotify = deltaToNotify;
 	}
@@ -54,23 +54,23 @@ class ContinuousGyroNotificationEntry extends AbstractNotificationEntry implemen
 	/**
 	 * @return the last reported angles.
 	 */
-	public Float3D getLastReported() {
+	public Tuple3f getLastReported() {
 		return lastReported;
 	}
 
 	/**
 	 * @return the delta angle required to notify the target.
 	 */
-	public Float3D getDeltaToNotify() {
+	public Tuple3f getDeltaToNotify() {
 		return deltaToNotify;
 	}
 
 	@Override
-	public void addDelta(Float3D data) {
+	public void addDelta(Tuple3f data) {
 		getDelta().add(data);
-		Float3D diff = getDelta().diff(lastReported);
+		Tuple3f diff = getDelta().diff(lastReported);
 		if (Math.abs(diff.x) > deltaToNotify.x || Math.abs(diff.y) > deltaToNotify.y || Math.abs(diff.z) > deltaToNotify.z) {
-			Float3D reportedInstance = getDelta().copy();
+			Tuple3f reportedInstance = getDelta().copy();
 			lastReported.set(reportedInstance);
 			report(reportedInstance);
 		}

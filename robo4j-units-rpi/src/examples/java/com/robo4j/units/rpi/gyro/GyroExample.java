@@ -24,7 +24,7 @@ import com.robo4j.core.RoboBuilderException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.util.SystemUtil;
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * Runs the gyro continuously.
@@ -58,7 +58,7 @@ public class GyroExample {
 
 		System.out.println("Let the gyro unit be absolutely still, then press enter to calibrate and start!");
 		System.in.read();
-		gyro.sendMessage(new GyroRequest(processor, true, true, new Float3D(1.0f, 1.0f, 1.0f)));
+		gyro.sendMessage(new GyroRequest(processor, true, true, new Tuple3f(1.0f, 1.0f, 1.0f)));
 		System.out.println("Will report angular changes indefinitely.\nPress enter to quit!");
 		System.in.read();
 	}

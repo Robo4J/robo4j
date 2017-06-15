@@ -21,7 +21,7 @@ import java.io.IOException;
 import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * Abstraction for reading data from a LSM303 accelerometer, for example the one
@@ -30,7 +30,7 @@ import com.robo4j.math.geometry.Float3D;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class AccelerometerLSM303Device extends AbstractI2CDevice implements ReadableDevice<Float3D> {
+public class AccelerometerLSM303Device extends AbstractI2CDevice implements ReadableDevice<Tuple3f> {
 	public static final float GRAVITY_ZURICH = 9.807f;
 
 	public static final int AXIS_ENABLE_X = 1;
@@ -67,8 +67,8 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 	 * @return current acceleration, m/s^2
 	 * @throws IOException
 	 */
-	public synchronized Float3D read() throws IOException {
-		Float3D rawData = new Float3D();
+	public synchronized Tuple3f read() throws IOException {
+		Tuple3f rawData = new Tuple3f();
 		byte[] data = new byte[6];
 		int n = i2cDevice.read(OUT_X_L_A | 0x80, data, 0, 6);
 		if (n != 6) {

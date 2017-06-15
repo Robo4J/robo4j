@@ -17,7 +17,7 @@
 package com.robo4j.units.rpi.gyro;
 
 import com.robo4j.core.RoboReference;
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * Class to request a specific gyro notification.
@@ -29,12 +29,12 @@ public class GyroRequest {
 	private final RoboReference<GyroEvent> target;
 	private final boolean calibrate;
 	private final boolean continuous;
-	private final Float3D notificationThreshold;
+	private final Tuple3f notificationThreshold;
 
 	/**
 	 * Constructor.
 	 */
-	public GyroRequest(RoboReference<GyroEvent> target, boolean calibrate, boolean continuous, Float3D notificationThreshold) {
+	public GyroRequest(RoboReference<GyroEvent> target, boolean calibrate, boolean continuous, Tuple3f notificationThreshold) {
 		this.target = target;
 		this.calibrate = calibrate;
 		this.continuous = continuous;
@@ -55,7 +55,7 @@ public class GyroRequest {
 	 * @return the notification threshold for when to send a message to the
 	 *         target.
 	 */
-	public Float3D getNotificationThreshold() {
+	public Tuple3f getNotificationThreshold() {
 		return notificationThreshold;
 	}
 

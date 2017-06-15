@@ -18,8 +18,8 @@ package com.robo4j.math.features;
 
 import java.util.List;
 
-import com.robo4j.math.geometry.CurvaturePoint2D;
-import com.robo4j.math.geometry.Line2D;
+import com.robo4j.math.geometry.CurvaturePoint2f;
+import com.robo4j.math.geometry.Line2f;
 
 /**
  * The features found when doing a feature extraction pass.
@@ -28,19 +28,19 @@ import com.robo4j.math.geometry.Line2D;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class FeatureSet {
-	private final List<Line2D> lines;
-	private final List<CurvaturePoint2D> corners;
+	private final List<Line2f> lines;
+	private final List<CurvaturePoint2f> corners;
 	
-	public FeatureSet(List<Line2D> lines, List<CurvaturePoint2D> corners) {
+	public FeatureSet(List<Line2f> lines, List<CurvaturePoint2f> corners) {
 		this.lines = lines;
 		this.corners = corners;
 	}
 
-	public List<Line2D> getLines() {
+	public List<Line2f> getLines() {
 		return lines;
 	}
 	
-	public final List<CurvaturePoint2D> getCorners() {
+	public final List<CurvaturePoint2f> getCorners() {
 		return corners;
 	}
 }

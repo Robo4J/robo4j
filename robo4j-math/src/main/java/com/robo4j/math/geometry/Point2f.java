@@ -22,7 +22,7 @@ package com.robo4j.math.geometry;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Point2D {
+public class Point2f {
 	/**
 	 * Range in meters
 	 */
@@ -42,7 +42,7 @@ public class Point2D {
 	 * @param range in meters
 	 * @param angle in radians
 	 */
-	public Point2D(float range, float angle) {
+	public Point2f(float range, float angle) {
 		this.range = range;
 		this.angle = angle;
 		this.x = (float) Math.sin(angle) * range;
@@ -77,11 +77,11 @@ public class Point2D {
 		return y;
 	}
 	
-	public boolean closer(Point2D p) {
+	public boolean closer(Point2f p) {
 		return this.range <= p.getRange();
 	}
 	
-	public boolean farther(Point2D p) {
+	public boolean farther(Point2f p) {
 		return this.range > p.getRange();
 	}
 	
@@ -89,7 +89,7 @@ public class Point2D {
 		return String.format("x:%2.1f, y:%2.1f, range:%2.1f, angle:%2.1f", x, y, range, angle);
 	}
 
-	public float distance(Point2D p) {
+	public float distance(Point2f p) {
 		double deltaX = p.getX() - x;
 		double deltaY = p.getY() - y;
 		return (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -110,9 +110,9 @@ public class Point2D {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof Point2D))
+		if (!(obj instanceof Point2f))
 			return false;
-		Point2D other = (Point2D) obj;
+		Point2f other = (Point2f) obj;
 		if (Float.floatToIntBits(angle) != Float.floatToIntBits(other.angle))
 			return false;
 		if (Float.floatToIntBits(range) != Float.floatToIntBits(other.range))
@@ -126,7 +126,7 @@ public class Point2D {
 	 * @param p the point to compare with
 	 * @return zero or above.
 	 */
-	public double rangeDifference(Point2D p) {
+	public double rangeDifference(Point2f p) {
 		return Math.abs(p.getRange() - getRange());
 	}
 }

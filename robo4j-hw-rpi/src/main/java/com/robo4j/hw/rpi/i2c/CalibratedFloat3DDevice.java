@@ -18,7 +18,7 @@ package com.robo4j.hw.rpi.i2c;
 
 import java.io.IOException;
 
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * Wrapper class for readable devices returning Float3D, allowing for calibration.
@@ -26,36 +26,36 @@ import com.robo4j.math.geometry.Float3D;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class CalibratedFloat3DDevice implements ReadableDevice<Float3D> {
-	private final Float3D centerOffsets; 
-	private final Float3D rangeMultipliers;
-	private final ReadableDevice<Float3D> device;
+public class CalibratedFloat3DDevice implements ReadableDevice<Tuple3f> {
+	private final Tuple3f centerOffsets; 
+	private final Tuple3f rangeMultipliers;
+	private final ReadableDevice<Tuple3f> device;
 
-	public CalibratedFloat3DDevice(ReadableDevice<Float3D> device, Float3D offsets, Float3D multipliers) {
+	public CalibratedFloat3DDevice(ReadableDevice<Tuple3f> device, Tuple3f offsets, Tuple3f multipliers) {
 		this.device = device;
 		this.centerOffsets = offsets;
 		this.rangeMultipliers = multipliers;
 	}
 	
-	public Float3D read() throws IOException {
-		Float3D value = device.read();
+	public Tuple3f read() throws IOException {
+		Tuple3f value = device.read();
 		value.add(centerOffsets);
 		value.multiply(rangeMultipliers);
 		return value;
 	}
 	
-	public void setCalibration(Float3D offsets, Float3D multipliers) {
+	public void setCalibration(Tuple3f offsets, Tuple3f multipliers) {
 		centerOffsets.set(offsets);
 		rangeMultipliers.set(multipliers);
 		System.out.println("Gyro offsets: " + centerOffsets);
 		System.out.println("Gyro multipliers: " + rangeMultipliers);
 	}
 	
-	protected Float3D getRangeMultipliers() {
+	protected Tuple3f getRangeMultipliers() {
 		return rangeMultipliers;
 	}
 	
-	protected Float3D getCenterOffsets() {
+	protected Tuple3f getCenterOffsets() {
 		return centerOffsets;
 	}
 }

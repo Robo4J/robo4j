@@ -17,7 +17,7 @@
 package com.robo4j.units.rpi.gyro;
 
 import com.robo4j.core.RoboReference;
-import com.robo4j.math.geometry.Float3D;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * Notification entry for a one-off notification.
@@ -26,7 +26,7 @@ import com.robo4j.math.geometry.Float3D;
  * @author Miroslav Wengner (@miragemiko)
  */
 class FixedGyroNotificationEntry extends AbstractNotificationEntry implements GyroNotificationEntry {
-	private final Float3D notificationThreshold;
+	private final Tuple3f notificationThreshold;
 
 	/**
 	 * Constructor.
@@ -36,12 +36,12 @@ class FixedGyroNotificationEntry extends AbstractNotificationEntry implements Gy
 	 * @param notificationThreshold
 	 *            the threshold to be reached for a notification to be sent.
 	 */
-	public FixedGyroNotificationEntry(RoboReference<GyroEvent> target, Float3D notificationThreshold) {
+	public FixedGyroNotificationEntry(RoboReference<GyroEvent> target, Tuple3f notificationThreshold) {
 		super(target);
 		this.notificationThreshold = notificationThreshold;
 	}
 
-	public Float3D getNotificationThreshold() {
+	public Tuple3f getNotificationThreshold() {
 		return notificationThreshold;
 	}
 
@@ -51,14 +51,14 @@ class FixedGyroNotificationEntry extends AbstractNotificationEntry implements Gy
 	}
 
 	@Override
-	public void addDelta(Float3D data) {
+	public void addDelta(Tuple3f data) {
 		getDelta().add(data);
 		if (shouldNotify(getDelta())) {
 			report(getDelta().copy());
 		}
 	}
 
-	private boolean shouldNotify(Float3D delta) {
+	private boolean shouldNotify(Tuple3f delta) {
 		if (notificationThreshold.x != 0) {
 			if (checkNotify(notificationThreshold.x, delta.x)) {
 				return true;

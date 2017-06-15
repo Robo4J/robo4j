@@ -17,25 +17,17 @@
 package com.robo4j.math.geometry;
 
 /**
- * A point used when establishing curvature in points. Used when doing feature
- * extraction, such as detecting corners.
+ * A tuple of three integers.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class CurvaturePoint2D extends Point2D {
-	private final float curvature;
-
-	public CurvaturePoint2D(float range, float angle, float curvature) {
-		super(range, angle);
-		this.curvature = curvature;
-	}
-
-	public CurvaturePoint2D(Point2D point, float totalPhi) {
-		this(point.getRange(), point.getAngle(), totalPhi);
-	}
-
-	public float getCurvature() {
-		return curvature;
+public class Tuple3i {
+	public int x;
+	public int y;
+	public int z;
+	
+	public String toString() {
+		return "x:" + x + " y:" + y +  " z:" + z;
 	}
 }
