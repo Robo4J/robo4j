@@ -22,38 +22,55 @@ import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.math.geometry.Tuple3i;
 
 /**
- * Sanity check every 500ms to see that data is being retrieved.
+ * Example program that can be used to produce csv data that can be used for calibration.
+ * 
+ * <p>
+ * Example: MagnetometerLSM303Test 100 1 csv
+ * </p>
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class MagnetometerLSM303Test {
+	private enum PrintStyle {
+		PRETTY, RAW, CSV
+	}
+
 	// FIXME(Marcus/Dec 5, 2016): Verify that this one works.
 	public static void main(String[] args) throws IOException, InterruptedException {
 		if (args.length < 2) {
-			System.out.println("Usage: MagnetometerLSM303Test <delay between reads (ms)> <print every Nth read> [<print raw (true|false)>] ");	
+			System.out.println(
+					"Usage: MagnetometerLSM303Test <delay between reads (ms)> <print every Nth read> [<print style (pretty|raw|csv)>] ");
 			System.exit(1);
 		}
 		int delay = Integer.parseInt(args[0]);
 		int modulo = Integer.parseInt(args[1]);
-		boolean printRaw = false;
+		PrintStyle printStyle = PrintStyle.PRETTY;
 		if (args.length >= 3) {
-			printRaw = Boolean.parseBoolean(args[2]);
+			printStyle = PrintStyle.valueOf(args[2].toUpperCase());
 		}
 		MagnetometerLSM303Device device = new MagnetometerLSM303Device();
 		int count = 0;
 		while (true) {
+			Tuple3i fl;
 			if (count % modulo == 0) {
-				if (printRaw) {
-					Tuple3i fl = device.readRaw();
-					System.out.println(String.format("Raw Value %d = %s\tHeading:%000.0f", count, fl.toString(), MagnetometerLSM303Device.getCompassHeading(fl)));					
-				} else {
-					Tuple3f fl = device.read();
-					System.out.println(String.format("Value %d = %s", count, fl.toString()));
+				switch (printStyle) {
+				case RAW:
+					fl = device.readRaw();
+					System.out.println(String.format("Raw Value %d = %s\tHeading:%000.0f", count, fl.toString(),
+							MagnetometerLSM303Device.getCompassHeading(fl)));
+					break;
+				case CSV:
+					fl = device.readRaw();
+					System.out.println(String.format("%d;%d;%d", fl.x, fl.y, fl.z));
+					break;
+				default:
+					Tuple3f val = device.read();
+					System.out.println(String.format("Value %d = %s", count, val.toString()));
 				}
+				count++;
+				Thread.sleep(delay);
 			}
-			count++;
-			Thread.sleep(delay);
 		}
 	}
 }
