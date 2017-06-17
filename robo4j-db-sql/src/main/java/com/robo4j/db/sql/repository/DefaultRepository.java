@@ -105,7 +105,6 @@ public class DefaultRepository implements RoboRepository {
 		//@formatter:on
 	}
 
-	@Transactional
 	@Override
 	public <T> T save(T entity) {
 		EntityManager em = dataSourceContext.getEntityManager(entity.getClass());

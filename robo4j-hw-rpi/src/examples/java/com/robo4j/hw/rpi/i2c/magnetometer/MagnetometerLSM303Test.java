@@ -68,9 +68,9 @@ public class MagnetometerLSM303Test {
 					Tuple3f val = device.read();
 					System.out.println(String.format("Value %d = %s", count, val.toString()));
 				}
-				count++;
 				Thread.sleep(delay);
 			}
+			count++;
 		}
 	}
 }
