@@ -26,8 +26,31 @@ public class Tuple3i {
 	public int x;
 	public int y;
 	public int z;
-	
+
+	public Tuple3i() {
+	}
+
+	public Tuple3i(int x, int y, int z) {
+		set(x, y, z);
+	}
+
+	public Tuple3i(Tuple3i val) {
+		set(val);
+	}
+
+	public void set(int x, int y, int z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+
+	public void set(Tuple3i f) {
+		x = f.x;
+		y = f.y;
+		z = f.z;
+	}
+
 	public String toString() {
-		return "x:" + x + " y:" + y +  " z:" + z;
+		return String.format("x:%d, y:%d, z:%d", x, y, z);
 	}
 }

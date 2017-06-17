@@ -22,7 +22,8 @@ import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.math.geometry.Tuple3i;
 
 /**
- * Example program that can be used to produce csv data that can be used for calibration.
+ * Example program that can be used to produce csv data that can be used for
+ * calibration.
  * 
  * <p>
  * Example: MagnetometerLSM303Test 100 1 csv
@@ -32,7 +33,7 @@ import com.robo4j.math.geometry.Tuple3i;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class MagnetometerLSM303Test {
-	private enum PrintStyle {
+	enum PrintStyle {
 		PRETTY, RAW, CSV
 	}
 

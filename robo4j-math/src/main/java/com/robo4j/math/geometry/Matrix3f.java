@@ -84,11 +84,17 @@ public class Matrix3f {
 		float z = m31 * tuple.x + m32 * tuple.y + m33 * tuple.z;
 		return new Tuple3f(x, y, z);
 	}
-	
+
 	/**
 	 * Creates an identity matrix.
 	 */
 	public static Matrix3f createIdentity() {
 		return new Matrix3f(1, 0, 0, 0, 1, 0, 0, 0, 1);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("m11:%f, m12:%f, m13:%f, m21:%f, m22:%f, m23:%f, m31:%f, m32:%f, m33:%f", m11, m12, m13,
+				m21, m22, m23, m31, m32, m33);
 	}
 }
