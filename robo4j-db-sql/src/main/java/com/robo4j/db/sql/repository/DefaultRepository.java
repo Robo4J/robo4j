@@ -19,6 +19,7 @@ package com.robo4j.db.sql.repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -48,6 +49,7 @@ public class DefaultRepository implements RoboRepository {
 	private static final String PREFIX_LIKE = "like";
 	private static final String SIGN_PERCENTAGE = "%";
 	private final DataSourceContext dataSourceContext;
+	private final ReentrantLock lock = new ReentrantLock();
 
 	public DefaultRepository(DataSourceContext dataSourceContext) {
 		this.dataSourceContext = dataSourceContext;
@@ -107,15 +109,20 @@ public class DefaultRepository implements RoboRepository {
 
 	@Override
 	public <T> T save(T entity) {
-		EntityManager em = dataSourceContext.getEntityManager(entity.getClass());
-		em.getTransaction().begin();
-		if(em.contains(entity)){
-			em.merge(entity);
-		} else {
-			em.persist(entity);
+		lock.lock();
+		try {
+			EntityManager em = dataSourceContext.getEntityManager(entity.getClass());
+			em.getTransaction().begin();
+			if(em.contains(entity)){
+				em.merge(entity);
+			} else {
+				em.persist(entity);
+			}
+			em.getTransaction().commit();
+			return entity;
+		} finally {
+			lock.unlock();
 		}
-		em.getTransaction().commit();
-		return entity;
 	}
 
 	// Private Methods
