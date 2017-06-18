@@ -1,0 +1,126 @@
+/*
+ * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
+ * 
+ * Robo4J is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Robo4J is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.robo4j.math.geometry;
+
+/**
+ * A four dimensional matrix. (The things we do to save the array size field
+ * bytes... ;))
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
+public class Matrix4d {
+	public float m11;
+	public float m12;
+	public float m13;
+	public float m14;
+	public float m21;
+	public float m22;
+	public float m23;
+	public float m24;
+	public float m31;
+	public float m32;
+	public float m33;
+	public float m34;
+	public float m41;
+	public float m42;
+	public float m43;
+	public float m44;
+
+	public Matrix4d(float m11, float m12, float m13, float m14, float m21, float m22, float m23, float m24, float m31, float m32, float m33,
+			float m34, float m41, float m42, float m43, float m44) {
+		this.m11 = m11;
+		this.m12 = m12;
+		this.m13 = m13;
+		this.m14 = m14;
+		this.m21 = m21;
+		this.m22 = m22;
+		this.m23 = m23;
+		this.m24 = m24;
+		this.m31 = m31;
+		this.m32 = m32;
+		this.m33 = m33;
+		this.m34 = m34;
+		this.m41 = m31;
+		this.m42 = m32;
+		this.m43 = m33;
+		this.m44 = m34;
+	}
+
+	public Matrix4d(float[] matrix) {
+		if (matrix.length != 16) {
+			throw new IllegalArgumentException("Array argument for Matrix3f must be 9 elements long");
+		}
+		m11 = matrix[0];
+		m12 = matrix[1];
+		m13 = matrix[2];
+		m14 = matrix[3];
+		m21 = matrix[4];
+		m22 = matrix[5];
+		m23 = matrix[6];
+		m24 = matrix[7];
+		m31 = matrix[8];
+		m32 = matrix[9];
+		m33 = matrix[10];
+		m34 = matrix[11];
+		m41 = matrix[12];
+		m42 = matrix[13];
+		m43 = matrix[14];
+		m44 = matrix[15];
+	}
+
+	/**
+	 * Transforms the tuple by multiplying with this matrix.
+	 * 
+	 * @param tuple
+	 *            the tuple to multiply with this matrix.
+	 */
+	public void transform(Tuple4d tuple) {
+		tuple.set(m11 * tuple.x + m12 * tuple.y + m13 * tuple.z + m14 * tuple.t,
+				m21 * tuple.x + m22 * tuple.y + m23 * tuple.z + m24 * tuple.t,
+				m31 * tuple.x + m32 * tuple.y + m33 * tuple.z + +m34 * tuple.t,
+				m41 * tuple.x + m42 * tuple.y + m43 * tuple.z + +m44 * tuple.t);
+	}
+
+	/**
+	 * Like transform, but creating a new tuple without changing the old one.
+	 * 
+	 * @param tuple
+	 *            the tuple to multiply with.
+	 * @return the result from multiplying this matrix with the tuple.
+	 */
+	public Tuple3f multiply(Tuple3f tuple) {
+		float x = m11 * tuple.x + m12 * tuple.y + m13 * tuple.z;
+		float y = m21 * tuple.x + m22 * tuple.y + m23 * tuple.z;
+		float z = m31 * tuple.x + m32 * tuple.y + m33 * tuple.z;
+		return new Tuple3f(x, y, z);
+	}
+
+	/**
+	 * Creates an identity matrix.
+	 */
+	public static Matrix4d createIdentity() {
+		return new Matrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+	}
+
+	@Override
+	public String toString() {
+		return String.format(
+				"m11:%f, m12:%f, m13:%f, m14:%f, m21:%f, m22:%f, m23:%f, m24:%f, m31:%f, m32:%f, m33:%f, m34:%f, m41:%f, 42:%f, m43:%f, m44:%f",
+				m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44);
+	}
+}
