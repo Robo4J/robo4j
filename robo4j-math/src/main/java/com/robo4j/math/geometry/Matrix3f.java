@@ -86,6 +86,21 @@ public class Matrix3f {
 	}
 
 	/**
+	 * Transposes the matrix.
+	 */
+	public void transpose() {
+		float tmp = m12;
+		m12 = m21;
+		m21 = tmp;
+		tmp = m13;
+		m13 = m31;
+		m31 = tmp;
+		tmp = m23;
+		m23 = m32;
+		m32 = tmp;
+	}
+
+	/**
 	 * Creates an identity matrix.
 	 */
 	public static Matrix3f createIdentity() {
@@ -94,7 +109,7 @@ public class Matrix3f {
 
 	@Override
 	public String toString() {
-		return String.format("m11:%f, m12:%f, m13:%f, m21:%f, m22:%f, m23:%f, m31:%f, m32:%f, m33:%f", m11, m12, m13,
-				m21, m22, m23, m31, m32, m33);
+		return String.format("m11:%f, m12:%f, m13:%f, m21:%f, m22:%f, m23:%f, m31:%f, m32:%f, m33:%f", m11, m12, m13, m21, m22, m23, m31,
+				m32, m33);
 	}
 }

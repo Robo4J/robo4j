@@ -95,6 +95,27 @@ public class Matrix4d {
 				m31 * tuple.x + m32 * tuple.y + m33 * tuple.z + +m34 * tuple.t,
 				m41 * tuple.x + m42 * tuple.y + m43 * tuple.z + +m44 * tuple.t);
 	}
+	
+	/**
+	 * Transposes the matrix.
+	 */
+	public void transpose() {
+		float tmp = m12;
+		m12 = m21;
+		m21 = tmp;
+		tmp = m13;
+		m13 = m31;
+		m31 = tmp;
+		tmp = m14;
+		m14 = m41;
+		m41 = tmp;
+		tmp = m23;
+		m23 = m32;
+		m32 = tmp;
+		tmp = m34;
+		m34 = m43;
+		m43 = tmp;
+	}
 
 	/**
 	 * Like transform, but creating a new tuple without changing the old one.
