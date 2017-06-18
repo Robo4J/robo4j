@@ -92,10 +92,10 @@ public class Matrix4d {
 	public void transform(Tuple4d tuple) {
 		tuple.set(m11 * tuple.x + m12 * tuple.y + m13 * tuple.z + m14 * tuple.t,
 				m21 * tuple.x + m22 * tuple.y + m23 * tuple.z + m24 * tuple.t,
-				m31 * tuple.x + m32 * tuple.y + m33 * tuple.z + +m34 * tuple.t,
-				m41 * tuple.x + m42 * tuple.y + m43 * tuple.z + +m44 * tuple.t);
+				m31 * tuple.x + m32 * tuple.y + m33 * tuple.z + m34 * tuple.t,
+				m41 * tuple.x + m42 * tuple.y + m43 * tuple.z + m44 * tuple.t);
 	}
-	
+
 	/**
 	 * Transposes the matrix.
 	 */
@@ -124,11 +124,12 @@ public class Matrix4d {
 	 *            the tuple to multiply with.
 	 * @return the result from multiplying this matrix with the tuple.
 	 */
-	public Tuple3f multiply(Tuple3f tuple) {
-		float x = m11 * tuple.x + m12 * tuple.y + m13 * tuple.z;
-		float y = m21 * tuple.x + m22 * tuple.y + m23 * tuple.z;
-		float z = m31 * tuple.x + m32 * tuple.y + m33 * tuple.z;
-		return new Tuple3f(x, y, z);
+	public Tuple4d multiply(Tuple4d tuple) {
+		double x = m11 * tuple.x + m12 * tuple.y + m13 * tuple.z + m14 * tuple.t;
+		double y = m21 * tuple.x + m22 * tuple.y + m23 * tuple.z + m24 * tuple.t;
+		double z = m31 * tuple.x + m32 * tuple.y + m33 * tuple.z + m34 * tuple.t;
+		double t = m41 * tuple.x + m42 * tuple.y + m43 * tuple.z + m44 * tuple.t;
+		return new Tuple4d(x, y, z, t);
 	}
 
 	/**
