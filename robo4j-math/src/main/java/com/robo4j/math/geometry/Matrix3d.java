@@ -22,7 +22,7 @@ package com.robo4j.math.geometry;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Matrix3d {
+public class Matrix3d implements Matrix {
 	public double m11;
 	public double m12;
 	public double m13;
@@ -216,5 +216,20 @@ public class Matrix3d {
 		if (Double.doubleToLongBits(m33) != Double.doubleToLongBits(other.m33))
 			return false;
 		return true;
+	}
+
+	@Override
+	public int getRows() {
+		return 3;
+	}
+
+	@Override
+	public int getColumns() {
+		return 3;
+	}
+
+	@Override
+	public Number getNumber(int row, int column) {
+		return getValue(row, column);
 	}
 }

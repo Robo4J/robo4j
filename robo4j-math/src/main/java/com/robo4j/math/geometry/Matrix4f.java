@@ -23,7 +23,7 @@ package com.robo4j.math.geometry;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Matrix4f {
+public class Matrix4f implements Matrix {
 	public float m11;
 	public float m12;
 	public float m13;
@@ -279,5 +279,20 @@ public class Matrix4f {
 		if (Float.floatToIntBits(m44) != Float.floatToIntBits(other.m44))
 			return false;
 		return true;
+	}
+	
+	@Override
+	public int getRows() {
+		return 4;
+	}
+
+	@Override
+	public int getColumns() {
+		return 4;
+	}
+
+	@Override
+	public Number getNumber(int row, int column) {
+		return getValue(row, column);
 	}
 }

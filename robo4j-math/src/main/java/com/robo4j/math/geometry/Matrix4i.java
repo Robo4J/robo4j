@@ -23,7 +23,7 @@ package com.robo4j.math.geometry;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Matrix4i {
+public class Matrix4i implements Matrix {
 	public int m11;
 	public int m12;
 	public int m13;
@@ -279,5 +279,20 @@ public class Matrix4i {
 		if (m44 != other.m44)
 			return false;
 		return true;
+	}
+
+	@Override
+	public int getRows() {
+		return 3;
+	}
+
+	@Override
+	public int getColumns() {
+		return 3;
+	}
+
+	@Override
+	public Number getNumber(int row, int column) {
+		return getValue(row, column);
 	}
 }
