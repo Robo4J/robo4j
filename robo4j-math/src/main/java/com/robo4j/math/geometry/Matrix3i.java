@@ -47,6 +47,38 @@ public class Matrix3i implements Matrix {
 		this.m33 = m33;
 	}
 
+	public Matrix3i(int[] matrix) {
+		if (matrix.length != 9) {
+			throw new IllegalArgumentException("Array argument for Matrix3f must be 9 elements long");
+		}
+		m11 = matrix[0];
+		m12 = matrix[1];
+		m13 = matrix[2];
+		m21 = matrix[3];
+		m22 = matrix[4];
+		m23 = matrix[5];
+		m31 = matrix[6];
+		m32 = matrix[7];
+		m33 = matrix[8];
+	}
+	
+
+	/**
+	 * Transposes the matrix.
+	 */
+	public void transpose() {
+		int tmp = m12;
+		m12 = m21;
+		m21 = tmp;
+		tmp = m13;
+		m13 = m31;
+		m31 = tmp;
+		tmp = m23;
+		m23 = m32;
+		m32 = tmp;
+	}
+
+	
 	/**
 	 * Transforms the tuple by multiplying with this matrix.
 	 *

@@ -112,6 +112,9 @@ public class Matrix4i implements Matrix {
 		tmp = m23;
 		m23 = m32;
 		m32 = tmp;
+		tmp = m24;
+		m24 = m42;
+		m42 = tmp;
 		tmp = m34;
 		m34 = m43;
 		m43 = tmp;
@@ -210,7 +213,7 @@ public class Matrix4i implements Matrix {
 	@Override
 	public String toString() {
 		return String.format(
-				"m11:%f, m12:%f, m13:%f, m14:%f, m21:%f, m22:%f, m23:%f, m24:%f, m31:%f, m32:%f, m33:%f, m34:%f, m41:%f, 42:%f, m43:%f, m44:%f",
+				"m11:%d, m12:%d, m13:%d, m14:%d, m21:%d, m22:%d, m23:%d, m24:%d, m31:%d, m32:%d, m33:%d, m34:%d, m41:%d, 42:%d, m43:%d, m44:%d",
 				m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44);
 	}
 
@@ -283,12 +286,12 @@ public class Matrix4i implements Matrix {
 
 	@Override
 	public int getRows() {
-		return 3;
+		return 4;
 	}
 
 	@Override
 	public int getColumns() {
-		return 3;
+		return 4;
 	}
 
 	@Override

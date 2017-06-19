@@ -112,6 +112,9 @@ public class Matrix4d implements Matrix {
 		tmp = m23;
 		m23 = m32;
 		m32 = tmp;
+		tmp = m24;
+		m24 = m42;
+		m42 = tmp;
 		tmp = m34;
 		m34 = m43;
 		m43 = tmp;

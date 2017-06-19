@@ -46,4 +46,9 @@ public interface Matrix {
 	 * @return the Number at the position specified.
 	 */
 	Number getNumber(int row, int column);
+	
+	/**
+	 * Transposes the matrix.
+	 */
+	void transpose();
 }
