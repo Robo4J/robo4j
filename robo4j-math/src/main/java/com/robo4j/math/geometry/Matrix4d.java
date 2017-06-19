@@ -41,8 +41,8 @@ public class Matrix4d {
 	public double m43;
 	public double m44;
 
-	public Matrix4d(double m11, double m12, double m13, double m14, double m21, double m22, double m23, double m24, double m31, double m32, double m33,
-			double m34, double m41, double m42, double m43, double m44) {
+	public Matrix4d(double m11, double m12, double m13, double m14, double m21, double m22, double m23, double m24, double m31, double m32,
+			double m33, double m34, double m41, double m42, double m43, double m44) {
 		this.m11 = m11;
 		this.m12 = m12;
 		this.m13 = m13;
@@ -137,6 +137,74 @@ public class Matrix4d {
 	 */
 	public static Matrix4d createIdentity() {
 		return new Matrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+	}
+
+	/**
+	 * Returns the value for the row and the column.
+	 * 
+	 * @param row
+	 *            the row
+	 * @param column
+	 *            the column
+	 * @return
+	 */
+	public double getValue(int row, int column) {
+		switch (row) {
+		case 0:
+			switch (column) {
+			case 0:
+				return m11;
+			case 1:
+				return m12;
+			case 2:
+				return m13;
+			case 3:
+				return m14;
+			default:
+				throw new IllegalArgumentException("Column does not exist: " + column);
+			}
+		case 1:
+			switch (column) {
+			case 0:
+				return m21;
+			case 1:
+				return m22;
+			case 2:
+				return m23;
+			case 3:
+				return m24;
+			default:
+				throw new IllegalArgumentException("Column does not exist: " + column);
+			}
+		case 2:
+			switch (column) {
+			case 0:
+				return m31;
+			case 1:
+				return m32;
+			case 2:
+				return m33;
+			case 3:
+				return m34;
+			default:
+				throw new IllegalArgumentException("Column does not exist: " + column);
+			}
+		case 3:
+			switch (column) {
+			case 0:
+				return m41;
+			case 1:
+				return m42;
+			case 2:
+				return m43;
+			case 3:
+				return m44;
+			default:
+				throw new IllegalArgumentException("Column does not exist: " + column);
+			}
+		default:
+			throw new IllegalArgumentException("Row does not exist: " + row);
+		}
 	}
 
 	@Override

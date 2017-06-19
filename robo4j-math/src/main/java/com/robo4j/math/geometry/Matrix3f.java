@@ -107,6 +107,55 @@ public class Matrix3f {
 		return new Matrix3f(1, 0, 0, 0, 1, 0, 0, 0, 1);
 	}
 
+	/**
+	 * Returns the value for the row and the column.
+	 * 
+	 * @param row
+	 *            the row
+	 * @param column
+	 *            the column
+	 * @return
+	 */
+	public float getValue(int row, int column) {
+		switch (row) {
+		case 0:
+			switch (column) {
+			case 0:
+				return m11;
+			case 1:
+				return m12;
+			case 2:
+				return m13;
+			default:
+				throw new IllegalArgumentException("Column does not exist: " + column);
+			}
+		case 1:
+			switch (column) {
+			case 0:
+				return m21;
+			case 1:
+				return m22;
+			case 2:
+				return m23;
+			default:
+				throw new IllegalArgumentException("Column does not exist: " + column);
+			}
+		case 2:
+			switch (column) {
+			case 0:
+				return m31;
+			case 1:
+				return m32;
+			case 2:
+				return m33;
+			default:
+				throw new IllegalArgumentException("Column does not exist: " + column);
+			}
+		default:
+			throw new IllegalArgumentException("Row does not exist: " + row);
+		}
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("m11:%f, m12:%f, m13:%f, m21:%f, m22:%f, m23:%f, m31:%f, m32:%f, m33:%f", m11, m12, m13, m21, m22, m23, m31,

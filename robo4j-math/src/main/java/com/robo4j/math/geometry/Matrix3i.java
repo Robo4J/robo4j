@@ -100,10 +100,59 @@ public class Matrix3i {
 		return new Matrix3i(r11, r12, r13, r21, r22, r23, r31, r32, r33);
 	}
 
+	/**
+	 * Returns the value for the row and the column.
+	 * 
+	 * @param row
+	 *            the row
+	 * @param column
+	 *            the column
+	 * @return
+	 */
+	public int getValue(int row, int column) {
+		switch (row) {
+		case 0:
+			switch (column) {
+			case 0:
+				return m11;
+			case 1:
+				return m12;
+			case 2:
+				return m13;
+			default:
+				throw new IllegalArgumentException("Column does not exist: " + column);
+			}
+		case 1:
+			switch (column) {
+			case 0:
+				return m21;
+			case 1:
+				return m22;
+			case 2:
+				return m23;
+			default:
+				throw new IllegalArgumentException("Column does not exist: " + column);
+			}
+		case 2:
+			switch (column) {
+			case 0:
+				return m31;
+			case 1:
+				return m32;
+			case 2:
+				return m33;
+			default:
+				throw new IllegalArgumentException("Column does not exist: " + column);
+			}
+		default:
+			throw new IllegalArgumentException("Row does not exist: " + row);
+		}
+	}
+
 	@Override
 	public String toString() {
-		return String.format("m11:%d, m12:%d, m13:%d, m21:%d, m22:%d, m23:%d, m31:%d, m32:%d, m33:%d", m11, m12, m13,
-				m21, m22, m23, m31, m32, m33);
+		return String.format("m11:%d, m12:%d, m13:%d, m21:%d, m22:%d, m23:%d, m31:%d, m32:%d, m33:%d", m11, m12, m13, m21, m22, m23, m31,
+				m32, m33);
 	}
 
 	@Override
