@@ -112,4 +112,60 @@ public class Matrix3d {
 		return String.format("m11:%f, m12:%f, m13:%f, m21:%f, m22:%f, m23:%f, m31:%f, m32:%f, m33:%f", m11, m12, m13, m21, m22, m23, m31,
 				m32, m33);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(m11);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m12);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m13);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m21);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m22);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m23);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m31);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m32);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m33);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Matrix3d other = (Matrix3d) obj;
+		if (Double.doubleToLongBits(m11) != Double.doubleToLongBits(other.m11))
+			return false;
+		if (Double.doubleToLongBits(m12) != Double.doubleToLongBits(other.m12))
+			return false;
+		if (Double.doubleToLongBits(m13) != Double.doubleToLongBits(other.m13))
+			return false;
+		if (Double.doubleToLongBits(m21) != Double.doubleToLongBits(other.m21))
+			return false;
+		if (Double.doubleToLongBits(m22) != Double.doubleToLongBits(other.m22))
+			return false;
+		if (Double.doubleToLongBits(m23) != Double.doubleToLongBits(other.m23))
+			return false;
+		if (Double.doubleToLongBits(m31) != Double.doubleToLongBits(other.m31))
+			return false;
+		if (Double.doubleToLongBits(m32) != Double.doubleToLongBits(other.m32))
+			return false;
+		if (Double.doubleToLongBits(m33) != Double.doubleToLongBits(other.m33))
+			return false;
+		return true;
+	}
 }

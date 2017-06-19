@@ -38,4 +38,26 @@ public class CurvaturePoint2f extends Point2f {
 	public float getCurvature() {
 		return curvature;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Float.floatToIntBits(curvature);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CurvaturePoint2f other = (CurvaturePoint2f) obj;
+		if (Float.floatToIntBits(curvature) != Float.floatToIntBits(other.curvature))
+			return false;
+		return true;
+	}
 }

@@ -112,4 +112,50 @@ public class Matrix3f {
 		return String.format("m11:%f, m12:%f, m13:%f, m21:%f, m22:%f, m23:%f, m31:%f, m32:%f, m33:%f", m11, m12, m13, m21, m22, m23, m31,
 				m32, m33);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Float.floatToIntBits(m11);
+		result = prime * result + Float.floatToIntBits(m12);
+		result = prime * result + Float.floatToIntBits(m13);
+		result = prime * result + Float.floatToIntBits(m21);
+		result = prime * result + Float.floatToIntBits(m22);
+		result = prime * result + Float.floatToIntBits(m23);
+		result = prime * result + Float.floatToIntBits(m31);
+		result = prime * result + Float.floatToIntBits(m32);
+		result = prime * result + Float.floatToIntBits(m33);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Matrix3f other = (Matrix3f) obj;
+		if (Float.floatToIntBits(m11) != Float.floatToIntBits(other.m11))
+			return false;
+		if (Float.floatToIntBits(m12) != Float.floatToIntBits(other.m12))
+			return false;
+		if (Float.floatToIntBits(m13) != Float.floatToIntBits(other.m13))
+			return false;
+		if (Float.floatToIntBits(m21) != Float.floatToIntBits(other.m21))
+			return false;
+		if (Float.floatToIntBits(m22) != Float.floatToIntBits(other.m22))
+			return false;
+		if (Float.floatToIntBits(m23) != Float.floatToIntBits(other.m23))
+			return false;
+		if (Float.floatToIntBits(m31) != Float.floatToIntBits(other.m31))
+			return false;
+		if (Float.floatToIntBits(m32) != Float.floatToIntBits(other.m32))
+			return false;
+		if (Float.floatToIntBits(m33) != Float.floatToIntBits(other.m33))
+			return false;
+		return true;
+	}
 }

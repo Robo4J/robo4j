@@ -105,4 +105,50 @@ public class Matrix3i {
 		return String.format("m11:%d, m12:%d, m13:%d, m21:%d, m22:%d, m23:%d, m31:%d, m32:%d, m33:%d", m11, m12, m13,
 				m21, m22, m23, m31, m32, m33);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + m11;
+		result = prime * result + m12;
+		result = prime * result + m13;
+		result = prime * result + m21;
+		result = prime * result + m22;
+		result = prime * result + m23;
+		result = prime * result + m31;
+		result = prime * result + m32;
+		result = prime * result + m33;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Matrix3i other = (Matrix3i) obj;
+		if (m11 != other.m11)
+			return false;
+		if (m12 != other.m12)
+			return false;
+		if (m13 != other.m13)
+			return false;
+		if (m21 != other.m21)
+			return false;
+		if (m22 != other.m22)
+			return false;
+		if (m23 != other.m23)
+			return false;
+		if (m31 != other.m31)
+			return false;
+		if (m32 != other.m32)
+			return false;
+		if (m33 != other.m33)
+			return false;
+		return true;
+	}
 }

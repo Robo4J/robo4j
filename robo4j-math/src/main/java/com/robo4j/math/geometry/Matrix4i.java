@@ -145,4 +145,71 @@ public class Matrix4i {
 				"m11:%f, m12:%f, m13:%f, m14:%f, m21:%f, m22:%f, m23:%f, m24:%f, m31:%f, m32:%f, m33:%f, m34:%f, m41:%f, 42:%f, m43:%f, m44:%f",
 				m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + m11;
+		result = prime * result + m12;
+		result = prime * result + m13;
+		result = prime * result + m14;
+		result = prime * result + m21;
+		result = prime * result + m22;
+		result = prime * result + m23;
+		result = prime * result + m24;
+		result = prime * result + m31;
+		result = prime * result + m32;
+		result = prime * result + m33;
+		result = prime * result + m34;
+		result = prime * result + m41;
+		result = prime * result + m42;
+		result = prime * result + m43;
+		result = prime * result + m44;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Matrix4i other = (Matrix4i) obj;
+		if (m11 != other.m11)
+			return false;
+		if (m12 != other.m12)
+			return false;
+		if (m13 != other.m13)
+			return false;
+		if (m14 != other.m14)
+			return false;
+		if (m21 != other.m21)
+			return false;
+		if (m22 != other.m22)
+			return false;
+		if (m23 != other.m23)
+			return false;
+		if (m24 != other.m24)
+			return false;
+		if (m31 != other.m31)
+			return false;
+		if (m32 != other.m32)
+			return false;
+		if (m33 != other.m33)
+			return false;
+		if (m34 != other.m34)
+			return false;
+		if (m41 != other.m41)
+			return false;
+		if (m42 != other.m42)
+			return false;
+		if (m43 != other.m43)
+			return false;
+		if (m44 != other.m44)
+			return false;
+		return true;
+	}
 }

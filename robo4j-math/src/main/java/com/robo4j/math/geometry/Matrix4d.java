@@ -145,4 +145,88 @@ public class Matrix4d {
 				"m11:%f, m12:%f, m13:%f, m14:%f, m21:%f, m22:%f, m23:%f, m24:%f, m31:%f, m32:%f, m33:%f, m34:%f, m41:%f, 42:%f, m43:%f, m44:%f",
 				m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(m11);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m12);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m13);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m14);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m21);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m22);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m23);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m24);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m31);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m32);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m33);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m34);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m41);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m42);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m43);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m44);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Matrix4d other = (Matrix4d) obj;
+		if (Double.doubleToLongBits(m11) != Double.doubleToLongBits(other.m11))
+			return false;
+		if (Double.doubleToLongBits(m12) != Double.doubleToLongBits(other.m12))
+			return false;
+		if (Double.doubleToLongBits(m13) != Double.doubleToLongBits(other.m13))
+			return false;
+		if (Double.doubleToLongBits(m14) != Double.doubleToLongBits(other.m14))
+			return false;
+		if (Double.doubleToLongBits(m21) != Double.doubleToLongBits(other.m21))
+			return false;
+		if (Double.doubleToLongBits(m22) != Double.doubleToLongBits(other.m22))
+			return false;
+		if (Double.doubleToLongBits(m23) != Double.doubleToLongBits(other.m23))
+			return false;
+		if (Double.doubleToLongBits(m24) != Double.doubleToLongBits(other.m24))
+			return false;
+		if (Double.doubleToLongBits(m31) != Double.doubleToLongBits(other.m31))
+			return false;
+		if (Double.doubleToLongBits(m32) != Double.doubleToLongBits(other.m32))
+			return false;
+		if (Double.doubleToLongBits(m33) != Double.doubleToLongBits(other.m33))
+			return false;
+		if (Double.doubleToLongBits(m34) != Double.doubleToLongBits(other.m34))
+			return false;
+		if (Double.doubleToLongBits(m41) != Double.doubleToLongBits(other.m41))
+			return false;
+		if (Double.doubleToLongBits(m42) != Double.doubleToLongBits(other.m42))
+			return false;
+		if (Double.doubleToLongBits(m43) != Double.doubleToLongBits(other.m43))
+			return false;
+		if (Double.doubleToLongBits(m44) != Double.doubleToLongBits(other.m44))
+			return false;
+		return true;
+	}
 }
