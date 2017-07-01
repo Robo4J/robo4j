@@ -21,13 +21,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
-
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-@SuppressWarnings(value = {"unchecked", "rawtypes"})
+@SuppressWarnings(value = {"unchecked"})
 public class RoboBusQueueTests {
 
 //	@Test

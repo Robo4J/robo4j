@@ -62,7 +62,6 @@ public class TestClientImageController extends RoboUnit<Boolean> {
 	private static final Map<String, String> raspistillProperties = PropertyMapBuilder.Builder().put(KEY_WIDTH, "-w")
 			.put(KEY_HEIGHT, "-h").put(KEY_TIMEOUT, "-t").put(KEY_QUALITY, "-q").put(KEY_SHARPNESS, "-sh")
 			.put(KEY_BRIGHTNESS, "-br").put(KEY_CONTRAST, "-co").put(KEY_SATURATION, "-sa").create();
-	private static final int CONTENT_END = -1;
 	private static final String DEFAULT_SETUP = "-n -e jpg -vf -hf -o -";
 	private static String cameraCommand;
 	private String targetOut;
@@ -151,7 +150,7 @@ public class TestClientImageController extends RoboUnit<Boolean> {
 		final InputStream imageData = RoboClassLoader.getInstance().getResource(IMAGE_FILE);
 		try {
 			byte[] imageArray = new byte[imageData.available()];
-			int  c = imageData.read(imageArray);
+			imageData.read(imageArray);
 			return new String(Base64.getEncoder().encode(imageArray), Constants.DEFAULT_ENCODING);
 		} catch (IOException e) {
 			throw new RuntimeException("error: ", e);

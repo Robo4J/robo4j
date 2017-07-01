@@ -46,7 +46,6 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			RoboHttpUtils.DEFAULT_THREAD_POOL_SIZE, RoboHttpUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
 			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J HttpClientUnit", true));
 	private InetSocketAddress address;
-	private String uri;
 	private String responseUnit;
 	private Integer responseSize;
 
@@ -79,7 +78,7 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			client.configureBlocking(true);
 
 			ByteBuffer buffer = ByteBuffer.wrap(((String)message).getBytes());
-			int c = client.write(buffer);
+			client.write(buffer);
 			if(responseUnit != null && responseSize != null){
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
 				client.read(readBuffer);
