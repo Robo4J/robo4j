@@ -5,3 +5,4 @@ licence.idea
 /build/
 *.bak
 
+/.DS_Store
