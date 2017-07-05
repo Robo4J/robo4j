@@ -34,7 +34,6 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-@SuppressWarnings(value = {"rawtypes"})
 public abstract class RoboBusQueue<TransferType extends QueueFIFOEntry<?>> extends PriorityBlockingQueue<TransferType>
 		implements TransferQueue<TransferType> {
 

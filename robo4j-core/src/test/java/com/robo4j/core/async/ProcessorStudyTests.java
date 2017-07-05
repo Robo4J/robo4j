@@ -17,12 +17,11 @@
 
 package com.robo4j.core.async;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -56,7 +55,6 @@ public class ProcessorStudyTests {
         }
 
         int numberAllAsync = processor.getAllAsync();
-        Map<String, String> ticketAndResultMap = processor.getTicketAndResults();
         Assert.assertEquals(SYNC_MESSAGES, numberAllAsync);
     }
 

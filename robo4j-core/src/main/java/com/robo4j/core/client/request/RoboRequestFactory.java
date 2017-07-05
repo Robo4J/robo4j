@@ -19,7 +19,6 @@
 
 package com.robo4j.core.client.request;
 
-import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -45,7 +44,6 @@ import com.robo4j.http.HttpVersion;
  */
 // TODO discuss how to use URIs
 public class RoboRequestFactory implements DefaultRequestFactory<Object> {
-	private static final int unitNameSize = 20;
 	private final HttpCodecRegistry codecRegistry;
 
 	public RoboRequestFactory(final HttpCodecRegistry codecRegistry) {
@@ -81,7 +79,6 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	public Object processGet(final RoboReference<?> desiredReference, final String path,
 			final HttpMessageWrapper<?> wrapper) {
 		if (HttpVersion.containsValue(wrapper.message().version())) {
-			final URI uri = wrapper.message().uri();
 			/* currently is supported only */
 			final HttpUriRegister register = HttpUriRegister.getInstance();
 			if (register.isUnitAvailable(path)) {

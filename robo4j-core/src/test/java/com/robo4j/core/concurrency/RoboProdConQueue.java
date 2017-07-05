@@ -23,7 +23,9 @@ package com.robo4j.core.concurrency;
  */
 @SuppressWarnings(value = {"rawtypes"})
 public class RoboProdConQueue extends RoboBusQueue {
-    public RoboProdConQueue(int awaitSeconds, int capacity) {
+	private static final long serialVersionUID = 1L;
+
+	public RoboProdConQueue(int awaitSeconds, int capacity) {
         super(awaitSeconds, capacity);
     }
 }
