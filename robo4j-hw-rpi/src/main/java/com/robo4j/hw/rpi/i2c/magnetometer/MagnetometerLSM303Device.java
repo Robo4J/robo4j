@@ -48,7 +48,7 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 	private final Matrix3f calibrationMatrix;
 	
 	public MagnetometerLSM303Device() throws IOException {
-		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, Mode.CONTINUOUS_CONVERSION, Rate.RATE_1_5, false);
+		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, Mode.CONTINUOUS_CONVERSION, Rate.RATE_7_5, false);
 	}
 
 	public MagnetometerLSM303Device(int bus, int address, Mode mode, Rate rate, boolean enableTemp) throws IOException {

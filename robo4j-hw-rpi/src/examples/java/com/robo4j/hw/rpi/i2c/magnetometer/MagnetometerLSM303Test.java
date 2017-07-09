@@ -56,20 +56,19 @@ public class MagnetometerLSM303Test {
 
 		@Override
 		public void run() {
-			Tuple3i fl;
 			if (count % modulo == 0) {
 				switch (printStyle) {
 				case RAW:
-					fl = readRaw();
-					System.out.println(String.format("Raw Value %d = %s\tHeading:%000.0f", count, fl.toString(),
-							MagnetometerLSM303Device.getCompassHeading(fl)));
+					Tuple3i raw = readRaw();
+					System.out.println(String.format("Raw Value %d = %s\tHeading:%000.0f", count, raw.toString(),
+							MagnetometerLSM303Device.getCompassHeading(raw)));
 					break;
 				case CSV:
-					fl = readRaw();
-					System.out.println(String.format("%d;%d;%d", fl.x, fl.y, fl.z));
+					Tuple3f val = read();
+					System.out.println(String.format("%f;%f;%f", val.x, val.y, val.z));
 					break;
 				default:
-					Tuple3f val = read();
+					val = read();
 					System.out.println(String.format("Value %d = %s", count, val.toString()));
 				}
 			}
