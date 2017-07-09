@@ -107,7 +107,8 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 	}
 
 	private short read16bitSigned(byte[] data, int offset) {
-		int n = ((data[offset + 1] & 0xFF) << 8 | (data[offset] & 0xFF));
+		// Yes, this really is the byte order for the magnetometer...
+		int n = ((data[offset] & 0xFF) << 8 | (data[offset + 1] & 0xFF));
 		return (short) (n < 32768 ? n : n - 65536);
 	}
 
