@@ -107,7 +107,8 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 	}
 
 	private short read16bitSigned(byte[] data, int offset) {
-		return (short) ((data[offset + 1] & 0xFF) << 8 | (data[offset] & 0xFF));
+		int n = ((data[offset + 1] & 0xFF) << 8 | (data[offset] & 0xFF));
+		return (short) (n < 32768 ? n : n - 65536);
 	}
 
 	private void initialize(Mode mode, Rate rate, boolean enableTemp) throws IOException {
