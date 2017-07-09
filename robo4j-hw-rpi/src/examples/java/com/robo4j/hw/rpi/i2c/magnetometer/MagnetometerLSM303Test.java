@@ -17,6 +17,9 @@
 package com.robo4j.hw.rpi.i2c.magnetometer;
 
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.math.geometry.Tuple3i;
@@ -33,45 +36,100 @@ import com.robo4j.math.geometry.Tuple3i;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class MagnetometerLSM303Test {
+	private final static ScheduledExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor();
+
 	enum PrintStyle {
 		PRETTY, RAW, CSV
+	}
+
+	private static class DataGatherer implements Runnable {
+		private final MagnetometerLSM303Device device;
+		private final int modulo;
+		private int count;
+		private final PrintStyle printStyle;
+
+		public DataGatherer(int modulo, PrintStyle printStyle) throws IOException {
+			this.modulo = modulo;
+			this.printStyle = printStyle;
+			device = new MagnetometerLSM303Device();
+		}
+
+		@Override
+		public void run() {
+			Tuple3i fl;
+			if (count % modulo == 0) {
+				switch (printStyle) {
+				case RAW:
+					fl = readRaw();
+					System.out.println(String.format("Raw Value %d = %s\tHeading:%000.0f", count, fl.toString(),
+							MagnetometerLSM303Device.getCompassHeading(fl)));
+					break;
+				case CSV:
+					fl = readRaw();
+					System.out.println(String.format("%d;%d;%d", fl.x, fl.y, fl.z));
+					break;
+				default:
+					Tuple3f val = read();
+					System.out.println(String.format("Value %d = %s", count, val.toString()));
+				}
+			}
+			count++;
+		}
+
+		private Tuple3i readRaw() {
+			try {
+				return device.readRaw();
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.exit(3);
+			}
+			return null;
+		}
+
+		private Tuple3f read() {
+			try {
+				return device.read();
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.exit(4);
+			}
+			return null;
+		}
+
+		public int getCount() {
+			return count;
+		}
 	}
 
 	// FIXME(Marcus/Dec 5, 2016): Verify that this one works.
 	public static void main(String[] args) throws IOException, InterruptedException {
 		if (args.length < 2) {
 			System.out.println(
-					"Usage: MagnetometerLSM303Test <delay between reads (ms)> <print every Nth read> [<print style (pretty|raw|csv)>] ");
+					"Usage: MagnetometerLSM303Test <read periodicity (ms)> <print every Nth read> [<print style (pretty|raw|csv)>] ");
 			System.exit(1);
 		}
-		int delay = Integer.parseInt(args[0]);
+		int period = Integer.parseInt(args[0]);
 		int modulo = Integer.parseInt(args[1]);
 		PrintStyle printStyle = PrintStyle.PRETTY;
 		if (args.length >= 3) {
 			printStyle = PrintStyle.valueOf(args[2].toUpperCase());
 		}
-		MagnetometerLSM303Device device = new MagnetometerLSM303Device();
-		int count = 0;
-		while (true) {
-			Tuple3i fl;
-			if (count % modulo == 0) {
-				switch (printStyle) {
-				case RAW:
-					fl = device.readRaw();
-					System.out.println(String.format("Raw Value %d = %s\tHeading:%000.0f", count, fl.toString(),
-							MagnetometerLSM303Device.getCompassHeading(fl)));
-					break;
-				case CSV:
-					fl = device.readRaw();
-					System.out.println(String.format("%d;%d;%d", fl.x, fl.y, fl.z));
-					break;
-				default:
-					Tuple3f val = device.read();
-					System.out.println(String.format("Value %d = %s", count, val.toString()));
-				}
-				Thread.sleep(delay);
-			}
-			count++;
-		}
+		DataGatherer dg = new DataGatherer(modulo, printStyle);
+		printMessage(printStyle, "Starting to collect data...");
+		printMessage(printStyle, "Press <Enter> to stop!");
+		EXECUTOR_SERVICE.scheduleAtFixedRate(dg, 0, period, TimeUnit.MILLISECONDS);
+		System.in.read();
+		EXECUTOR_SERVICE.shutdown();
+		EXECUTOR_SERVICE.awaitTermination(1, TimeUnit.SECONDS);
+		printMessage(printStyle, "Collected " + dg.getCount() + " values!");
+	}
+
+	private static void printMessage(PrintStyle printStyle, String message) {
+		System.out.println(getPrefix(printStyle) + message);
+		
+	}
+
+	private static String getPrefix(PrintStyle printStyle) {
+		return printStyle == PrintStyle.CSV ? "# " : "";
 	}
 }
