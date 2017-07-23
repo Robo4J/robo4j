@@ -46,7 +46,7 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 
 	private final Tuple3f bias;
 	private final Matrix3f calibrationMatrix;
-	
+
 	public MagnetometerLSM303Device() throws IOException {
 		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, Mode.CONTINUOUS_CONVERSION, Rate.RATE_7_5, false);
 	}
@@ -55,7 +55,8 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 		this(bus, address, mode, rate, enableTemp, new Tuple3f(0, 0, 0), Matrix3f.createIdentity());
 	}
 
-	public MagnetometerLSM303Device(int bus, int address, Mode mode, Rate rate, boolean enableTemp, Tuple3f bias, Matrix3f calibrationMatrix) throws IOException {
+	public MagnetometerLSM303Device(int bus, int address, Mode mode, Rate rate, boolean enableTemp, Tuple3f bias,
+			Matrix3f calibrationMatrix) throws IOException {
 		super(bus, address);
 		initialize(mode, rate, enableTemp);
 		this.bias = bias;
@@ -89,15 +90,15 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 
 	/**
 	 * Helper function to convert the result to a compass heading. Note that
-	 * this only works if the device is lying flat. For a better result, use
-	 * accelerometer readings, and properly calculate the heading.
+	 * this only works if the device is lying flat in the XY-plane. For a better
+	 * result, use accelerometer readings, and properly calculate the heading.
 	 * 
 	 * @param magResult
 	 *            a result to use to calculate the compass heading.
 	 * 
-	 * @return the (XY) compass heading.
+	 * @return the (XY) compass heading in angular degrees.
 	 */
-	public static float getCompassHeading(Tuple3i magResult) {
+	public static float getCompassHeading(Tuple3f magResult) {
 		float heading = (float) ((Math.atan2(magResult.y, magResult.x) * 180.0) / Math.PI);
 
 		if (heading < 0) {
