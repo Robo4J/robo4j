@@ -60,8 +60,7 @@ public class MagnetometerLSM303Test {
 				switch (printStyle) {
 				case RAW:
 					Tuple3i raw = readRaw();
-					System.out.println(String.format("Raw Value %d = %s\tHeading:%000.0f", count, raw.toString(),
-							MagnetometerLSM303Device.getCompassHeading(raw)));
+					System.out.println(String.format("Raw Value %d = %s", count, raw.toString()));
 					break;
 				case CSV:
 					Tuple3f val = read();
@@ -69,7 +68,7 @@ public class MagnetometerLSM303Test {
 					break;
 				default:
 					val = read();
-					System.out.println(String.format("Value %d = %s", count, val.toString()));
+					System.out.println(String.format("Value %d = %s\\tHeading:%000.0f", count, val.toString(), MagnetometerLSM303Device.getCompassHeading(val)));
 				}
 			}
 			count++;
