@@ -36,37 +36,37 @@ public class GyroL3GD20Device extends AbstractI2CDevice implements ReadableDevic
 	private final Sensitivity sensitivity;
 
 	// Registers
-	private final int REGISTER_WHO_AM_I = 0x0F;
-	private final int REGISTER_CTRL_REG1 = 0x20;
-	// private final int REGISTER_CTRL_REG2 = 0x21;
-	// private final int REGISTER_CTRL_REG3 = 0x22;
-	private final int REGISTER_CTRL_REG4 = 0x23;
-	private final int REGISTER_CTRL_REG5 = 0x24;
-	// private final int REGISTER_REFERENCE = 0x25;
-	// private final int REGISTER_OUT_TEMP = 0x26;
-	// private final int REGISTER_STATUS_REG = 0x27;
-	private final int REGISTER_OUT_X_L = 0x28;
-	private final int REGISTER_OUT_X_H = 0x29;
-	// private final int REGISTER_OUT_Y_L = 0x2A;
-	// private final int REGISTER_OUT_Y_H = 0x2B;
-	// private final int REGISTER_OUT_Z_L = 0x2C;
-	// private final int REGISTER_OUT_Z_H = 0x2D;
-	// private final int REGISTER_FIFO_CTRL_REG = 0x2E;
-	// private final int REGISTER_FIFO_SRC_REG = 0x2F;
-	// private final int REGISTER_INT1_CFG = 0x30;
-	// private final int REGISTER_INT1_SRC = 0x31;
-	// private final int REGISTER_TSH_XH = 0x32;
-	// private final int REGISTER_TSH_XL = 0x33;
-	// private final int REGISTER_TSH_YH = 0x34;
-	// private final int REGISTER_TSH_YL = 0x35;
-	// private final int REGISTER_TSH_ZH = 0x36;
-	// private final int REGISTER_TSH_ZL = 0x37;
-	// private final int REGISTER_INT1_DURATION = 0x38;
-	private final int REGISTER_LOW_ODR = 0x39;
+	private static final int REGISTER_WHO_AM_I = 0x0F;
+	private static final int REGISTER_CTRL_REG1 = 0x20;
+	// private static final int REGISTER_CTRL_REG2 = 0x21;
+	// private static final int REGISTER_CTRL_REG3 = 0x22;
+	private static final int REGISTER_CTRL_REG4 = 0x23;
+	private static final int REGISTER_CTRL_REG5 = 0x24;
+	// private static final int REGISTER_REFERENCE = 0x25;
+	// private static final int REGISTER_OUT_TEMP = 0x26;
+	// private static final int REGISTER_STATUS_REG = 0x27;
+	private static final int REGISTER_OUT_X_L = 0x28;
+	private static final int REGISTER_OUT_X_H = 0x29;
+	// private static final int REGISTER_OUT_Y_L = 0x2A;
+	// private static final int REGISTER_OUT_Y_H = 0x2B;
+	// private static final int REGISTER_OUT_Z_L = 0x2C;
+	// private static final int REGISTER_OUT_Z_H = 0x2D;
+	// private static final int REGISTER_FIFO_CTRL_REG = 0x2E;
+	// private static final int REGISTER_FIFO_SRC_REG = 0x2F;
+	// private static final int REGISTER_INT1_CFG = 0x30;
+	// private static final int REGISTER_INT1_SRC = 0x31;
+	// private static final int REGISTER_TSH_XH = 0x32;
+	// private static final int REGISTER_TSH_XL = 0x33;
+	// private static final int REGISTER_TSH_YH = 0x34;
+	// private static final int REGISTER_TSH_YL = 0x35;
+	// private static final int REGISTER_TSH_ZH = 0x36;
+	// private static final int REGISTER_TSH_ZL = 0x37;
+	// private static final int REGISTER_INT1_DURATION = 0x38;
+	private static final int REGISTER_LOW_ODR = 0x39;
 
 	// Constants
-	private final int L3GD20_ID = 0xD4;
-	private final int L3GD20H_ID = 0xD7;
+	private static final int L3GD20_ID = 0xD4;
+	private static final int L3GD20H_ID = 0xD7;
 
 	public enum OperationMode {
 		BYPASS, FIFO, STREAM, BYPASS_TO_STREAM, STREAM_TO_FIFO;
