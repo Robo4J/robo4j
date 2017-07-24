@@ -59,6 +59,57 @@ public final class BMP085Device extends AbstractI2CDevice {
 	private short MD;
 
 	/**
+	 * Available operating modes for the BMP085.
+	 */
+	public enum OperatingMode {
+		/**
+		 * Max conversion time (pressure): 4.5ms Current draw: 3µA
+		 */
+		ULTRA_LOW_POWER(45, 3),
+		/**
+		 * Max conversion time (pressure): 7.5ms Current draw: 5µA
+		 */
+		STANDARD(75, 5),
+		/**
+		 * Max conversion time (pressure): 13.5ms Current draw: 7µA
+		 */
+		HIGH_RES(135, 7),
+		/**
+		 * Max conversion time (pressure): 25.5ms Current draw: 12µA
+		 */
+		ULTRA_HIGH_RES(255, 12);
+	
+		int waitTime;
+		int currentDraw;
+	
+		OperatingMode(int maxConversionTime, int currentDraw) {
+			this.waitTime = (maxConversionTime + 5) / 10;
+			this.currentDraw = currentDraw;
+		}
+	
+		/**
+		 * @return the over sampling setting.
+		 */
+		public int getOverSamplingSetting() {
+			return this.ordinal();
+		}
+	
+		/**
+		 * @return time to wait for a result, in ms.
+		 */
+		public int getWaitTime() {
+			return waitTime;
+		}
+	
+		/**
+		 * @return the average typical current at 1 sample per second, in µA.
+		 */
+		public int getCurrentDraw() {
+			return currentDraw;
+		}
+	}
+
+	/**
 	 * Constructs a BMPDevice using the default settings. (I2CBUS.BUS_1, 0x77)
 	 * 
 	 * @see #BMPDevice(int, int, OperatingMode)
@@ -209,57 +260,6 @@ public final class BMP085Device extends AbstractI2CDevice {
 		if (Boolean.getBoolean("se.hirt.pi.adafruit.debug")) {
 			System.out.println(String.format("AC1:%d, AC2:%d, AC3:%d, AC4:%d, AC5:%d, AC6:%d, B1:%d, B2:%d, MC:%d, MD:%d", AC1, AC2, AC3,
 					AC4, AC5, AC6, B1, B2, MC, MD));
-		}
-	}
-
-	/**
-	 * Available operating modes for the BMP085.
-	 */
-	public enum OperatingMode {
-		/**
-		 * Max conversion time (pressure): 4.5ms Current draw: 3µA
-		 */
-		ULTRA_LOW_POWER(45, 3),
-		/**
-		 * Max conversion time (pressure): 7.5ms Current draw: 5µA
-		 */
-		STANDARD(75, 5),
-		/**
-		 * Max conversion time (pressure): 13.5ms Current draw: 7µA
-		 */
-		HIGH_RES(135, 7),
-		/**
-		 * Max conversion time (pressure): 25.5ms Current draw: 12µA
-		 */
-		ULTRA_HIGH_RES(255, 12);
-
-		int waitTime;
-		int currentDraw;
-
-		OperatingMode(int maxConversionTime, int currentDraw) {
-			this.waitTime = (maxConversionTime + 5) / 10;
-			this.currentDraw = currentDraw;
-		}
-
-		/**
-		 * @return the over sampling setting.
-		 */
-		public int getOverSamplingSetting() {
-			return this.ordinal();
-		}
-
-		/**
-		 * @return time to wait for a result, in ms.
-		 */
-		public int getWaitTime() {
-			return waitTime;
-		}
-
-		/**
-		 * @return the average typical current at 1 sample per second, in µA.
-		 */
-		public int getCurrentDraw() {
-			return currentDraw;
 		}
 	}
 }

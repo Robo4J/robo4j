@@ -43,35 +43,41 @@ public class SSD1306Device extends AbstractI2CDevice {
 	private static final byte CHARGE_PUMP_VALUE_DISABLE = 0x10;
 	private static final int DEFAULT_CONTRAST = 0x88;
 
+	private final BufferedImage image;
+	private final GpioController gpio = GpioFactory.getInstance();
+	private final GpioPinDigitalOutput resetPin;
+	private final boolean useExtenalVCC;
+	private final OLEDVariant oledType;
+
 	public enum OLEDVariant {
 		Type96x16(96, 16, 0x2, 1),
 		Type128x32(128, 32, 0x2, 3),
 		Type128x64(128, 64, 0x12, 7);
-
+	
 		private final int width;
 		private final int height;
 		private final int comPins;
 		private final int pageEnd;
-
+	
 		OLEDVariant(int width, int height, int comPins, int pageEnd) {
 			this.width = width;
 			this.height = height;
 			this.comPins = comPins;
 			this.pageEnd = pageEnd;
 		}
-
+	
 		public int getWidth() {
 			return width;
 		}
-
+	
 		public int getHeight() {
 			return height;
 		}
-
+	
 		public int getComPins() {
 			return comPins;
 		}
-
+	
 		public int getPageEnd() {
 			return pageEnd;
 		}
@@ -101,13 +107,13 @@ public class SSD1306Device extends AbstractI2CDevice {
 		DEACTIVATE_SCROLL((byte) 0x2e),
 		SET_COLUMN_ADDRESS((byte) 0x21),
 		SET_PAGE_ADDRESS((byte) 0x22);
-
+	
 		private byte commandValue;
-
+	
 		Commands(byte commandValue) {
 			this.commandValue = commandValue;
 		}
-
+	
 		public byte getCommandValue() {
 			return commandValue;
 		}
@@ -117,24 +123,18 @@ public class SSD1306Device extends AbstractI2CDevice {
 		HORIZONTAL((byte) 0),
 		VERTICAL((byte) 1),
 		PAGE((byte) 2);
-
+	
 		private byte value;
-
+	
 		MemoryModes(byte value) {
 			this.value = value;
 		}
-
+	
 		public byte getValue() {
 			return value;
 		}
-
+	
 	}
-
-	private final BufferedImage image;
-	private final GpioController gpio = GpioFactory.getInstance();
-	private final GpioPinDigitalOutput resetPin;
-	private final boolean useExtenalVCC;
-	private final OLEDVariant oledType;
 
 	/**
 	 * Constructor.

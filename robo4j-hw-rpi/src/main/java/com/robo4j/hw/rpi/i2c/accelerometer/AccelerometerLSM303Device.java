@@ -48,6 +48,56 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 
 	private final FullScale scale;
 
+	public enum DataRate {
+		POWER_DOWN(0x0), HZ_1(0x10), HZ_10(0x20), HZ_25(0x30), HZ_50(0x40), HZ_100(0x50), HZ_200(0x60), HZ_400(
+				0x70), HZ_LP_1620(0x80), HZ_N_1354_LP_5376(0x81);
+	
+		private int ctrlCode;
+	
+		DataRate(int ctrlCode) {
+			this.ctrlCode = ctrlCode;
+		}
+	
+		public int getCtrlCode() {
+			return ctrlCode;
+		}
+	}
+
+	public enum PowerMode {
+		NORMAL(0x0), LOW_POWER(0x8);
+		private int ctrlCode;
+	
+		PowerMode(int ctrlCode) {
+			this.ctrlCode = ctrlCode;
+		}
+	
+		public int getCtrlCode() {
+			return ctrlCode;
+		}
+	}
+
+	public enum FullScale {
+		G_2(0x0, 1), G_4(0x10, 1), G_8(0x20, 4), G_16(0x30, 12);
+		private int ctrlCode;
+		private int sensitivity;
+	
+		FullScale(int ctrlCode, int sensitivity) {
+			this.ctrlCode = ctrlCode;
+			this.sensitivity = sensitivity;
+		}
+	
+		public int getCtrlCode() {
+			return ctrlCode;
+		}
+	
+		/**
+		 * @return the sensitivity in mg/LSB.
+		 */
+		public int getSensitivity() {
+			return sensitivity;
+		}
+	}
+
 	public AccelerometerLSM303Device() throws IOException {
 		this(PowerMode.NORMAL, DataRate.HZ_10, FullScale.G_2, false);
 	}
@@ -99,55 +149,5 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 		config = (byte) ((scale.getCtrlCode() | hfact) & 0xFF);
 		System.out.println(config);
 		writeByte(CTRL_REG4_A, config);
-	}
-
-	public enum DataRate {
-		POWER_DOWN(0x0), HZ_1(0x10), HZ_10(0x20), HZ_25(0x30), HZ_50(0x40), HZ_100(0x50), HZ_200(0x60), HZ_400(
-				0x70), HZ_LP_1620(0x80), HZ_N_1354_LP_5376(0x81);
-
-		private int ctrlCode;
-
-		DataRate(int ctrlCode) {
-			this.ctrlCode = ctrlCode;
-		}
-
-		public int getCtrlCode() {
-			return ctrlCode;
-		}
-	}
-
-	public enum PowerMode {
-		NORMAL(0x0), LOW_POWER(0x8);
-		private int ctrlCode;
-
-		PowerMode(int ctrlCode) {
-			this.ctrlCode = ctrlCode;
-		}
-
-		public int getCtrlCode() {
-			return ctrlCode;
-		}
-	}
-
-	public enum FullScale {
-		G_2(0x0, 1), G_4(0x10, 1), G_8(0x20, 4), G_16(0x30, 12);
-		private int ctrlCode;
-		private int sensitivity;
-
-		FullScale(int ctrlCode, int sensitivity) {
-			this.ctrlCode = ctrlCode;
-			this.sensitivity = sensitivity;
-		}
-
-		public int getCtrlCode() {
-			return ctrlCode;
-		}
-
-		/**
-		 * @return the sensitivity in mg/LSB.
-		 */
-		public int getSensitivity() {
-			return sensitivity;
-		}
 	}
 }

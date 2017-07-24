@@ -47,6 +47,93 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 	private final Tuple3f bias;
 	private final Matrix3f calibrationMatrix;
 
+	public enum Gain {
+		//@formatter:off
+		GAIN_1_3	(1.3f, 0x20, 1100, 980),
+		GAIN_1_9	(1.9f, 0x40, 855, 760),
+		GAIN_2_5	(2.5f, 0x60, 670, 600),
+		GAIN_4_0	(4.0f, 0x80, 450, 400),
+		GAIN_4_7	(4.7f, 0xA0, 400, 350),
+		GAIN_5_6	(5.6f, 0xC0, 330, 295),
+		GAIN_8_1	(8.1f, 0xE0, 230, 205);
+		//@formatter:on
+	
+		private float gain;
+		private byte ctrlCode;
+		private float xy;
+		private float z;
+	
+		Gain(float gain, int ctrlCode, float xy, float z) {
+			this.gain = gain;
+			this.ctrlCode = (byte) ctrlCode;
+			this.xy = xy;
+			this.z = z;
+		}
+	
+		public byte getCtrlCode() {
+			return ctrlCode;
+		}
+	
+		public float getGain() {
+			return gain;
+		}
+	
+		public float getXY() {
+			return xy;
+		}
+	
+		public float getZ() {
+			return z;
+		}
+	}
+
+	public enum Rate {
+		//@formatter:off
+		RATE_0_75(0.75f, 0x00), 
+		RATE_1_5(1.5f, 0x01), 
+		RATE_3_0(3.0f, 0x02), 
+		RATE_7_5(7.5f, 0x03), 
+		RATE_15(15f, 0x04), 
+		RATE_30(30f, 0x05), 
+		RATE_75(75f, 0x06), 
+		RATE_220(220f, 0x07);
+		//@formatter:on
+	
+		private float rate;
+		private int ctrlCode;
+	
+		Rate(float rate, int ctrlCode) {
+			this.rate = rate;
+			this.ctrlCode = ctrlCode;
+	
+		}
+	
+		public int getCtrlCode() {
+			return ctrlCode;
+		}
+	
+		public float getRate() {
+			return rate;
+		}
+	}
+
+	public enum Mode {
+		//@formatter:off
+		CONTINUOUS_CONVERSION	(0x0),
+		SINGLE_CONVERSION		(0x1),
+		SLEEP					(0x2);
+		//@formatter:on
+		private int ctrlCode;
+	
+		Mode(int ctrlCode) {
+			this.ctrlCode = ctrlCode;
+		}
+	
+		public int getCtrlCode() {
+			return ctrlCode;
+		}
+	}
+
 	public MagnetometerLSM303Device() throws IOException {
 		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, Mode.CONTINUOUS_CONVERSION, Rate.RATE_7_5, false);
 	}
@@ -127,92 +214,5 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 	public void setGain(Gain gain) throws IOException {
 		writeByte(CRB_REG_M, gain.getCtrlCode());
 		this.gain = gain;
-	}
-
-	public enum Gain {
-		//@formatter:off
-		GAIN_1_3	(1.3f, 0x20, 1100, 980),
-		GAIN_1_9	(1.9f, 0x40, 855, 760),
-		GAIN_2_5	(2.5f, 0x60, 670, 600),
-		GAIN_4_0	(4.0f, 0x80, 450, 400),
-		GAIN_4_7	(4.7f, 0xA0, 400, 350),
-		GAIN_5_6	(5.6f, 0xC0, 330, 295),
-		GAIN_8_1	(8.1f, 0xE0, 230, 205);
-		//@formatter:on
-
-		private float gain;
-		private byte ctrlCode;
-		private float xy;
-		private float z;
-
-		Gain(float gain, int ctrlCode, float xy, float z) {
-			this.gain = gain;
-			this.ctrlCode = (byte) ctrlCode;
-			this.xy = xy;
-			this.z = z;
-		}
-
-		public byte getCtrlCode() {
-			return ctrlCode;
-		}
-
-		public float getGain() {
-			return gain;
-		}
-
-		public float getXY() {
-			return xy;
-		}
-
-		public float getZ() {
-			return z;
-		}
-	}
-
-	public enum Rate {
-		//@formatter:off
-		RATE_0_75(0.75f, 0x00), 
-		RATE_1_5(1.5f, 0x01), 
-		RATE_3_0(3.0f, 0x02), 
-		RATE_7_5(7.5f, 0x03), 
-		RATE_15(15f, 0x04), 
-		RATE_30(30f, 0x05), 
-		RATE_75(75f, 0x06), 
-		RATE_220(220f, 0x07);
-		//@formatter:on
-
-		private float rate;
-		private int ctrlCode;
-
-		Rate(float rate, int ctrlCode) {
-			this.rate = rate;
-			this.ctrlCode = ctrlCode;
-
-		}
-
-		public int getCtrlCode() {
-			return ctrlCode;
-		}
-
-		public float getRate() {
-			return rate;
-		}
-	}
-
-	public enum Mode {
-		//@formatter:off
-		CONTINUOUS_CONVERSION	(0x0),
-		SINGLE_CONVERSION		(0x1),
-		SLEEP					(0x2);
-		//@formatter:on
-		private int ctrlCode;
-
-		Mode(int ctrlCode) {
-			this.ctrlCode = ctrlCode;
-		}
-
-		public int getCtrlCode() {
-			return ctrlCode;
-		}
 	}
 }

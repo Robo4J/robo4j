@@ -34,10 +34,6 @@ import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
  * @author Miro Wengner (@miragemiko)
  */
 public class PololuMC33926HBridgeEngine implements IMotor {
-	public enum Direction {
-		FORWARD, REVERSE
-	}
-
 	private final String name;
 	private final PWMChannel channel;
 	private final boolean invert;
@@ -46,6 +42,10 @@ public class PololuMC33926HBridgeEngine implements IMotor {
 
 	private Direction direction = Direction.FORWARD;
 	private float speed = 0;
+
+	public enum Direction {
+		FORWARD, REVERSE
+	}
 
 	public PololuMC33926HBridgeEngine(String name, PWMChannel channel, Pin in1, Pin in2, boolean invert) {
 		this.name = name;

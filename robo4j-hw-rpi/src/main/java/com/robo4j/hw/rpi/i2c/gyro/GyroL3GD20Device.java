@@ -24,14 +24,13 @@ import com.robo4j.hw.rpi.i2c.ReadableDevice;
 import com.robo4j.math.geometry.Tuple3f;
 
 /**
- * Abstraction to read angular change from a L3GD20 Gyro, for example the Gyro 
+ * Abstraction to read angular change from a L3GD20 Gyro, for example the Gyro
  * available on the Adafruit 10DOF breakout board.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class GyroL3GD20Device extends AbstractI2CDevice implements
-		ReadableDevice<Tuple3f> {
+public class GyroL3GD20Device extends AbstractI2CDevice implements ReadableDevice<Tuple3f> {
 	private static final int DEFAULT_I2C_ADDRESS = 0x6b;
 
 	private final Sensitivity sensitivity;
@@ -69,35 +68,6 @@ public class GyroL3GD20Device extends AbstractI2CDevice implements
 	private final int L3GD20_ID = 0xD4;
 	private final int L3GD20H_ID = 0xD7;
 
-	public GyroL3GD20Device(Sensitivity sensitivity) throws IOException {
-		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, sensitivity, true);
-	}
-
-	public GyroL3GD20Device(int bus, int address, Sensitivity sensitivity, boolean enableHighPassFilter)
-			throws IOException {
-		super(bus, address);
-		this.sensitivity = sensitivity;
-		initialize(enableHighPassFilter);
-	}
-
-	private void initialize(boolean enableHighPassFilter) throws IOException {
-		int id = i2cDevice.read(REGISTER_WHO_AM_I);
-		if ((id != L3GD20_ID) && (id != L3GD20H_ID)) {
-			throw new IOException(String.format("Did not find L3GD20 chip on the address %02X. Read ID was %02X.", getAddress(), id));
-		}
-		// Reset / Power down
-		i2cDevice.write(REGISTER_CTRL_REG1, (byte) 0x00);
-		// Enable all three channels + normal mode (also sets data rate and bandwidth, see chip docs)
-		i2cDevice.write(REGISTER_CTRL_REG1, (byte) 0x0F);
-		// Set sensitivity
-		i2cDevice.write(REGISTER_CTRL_REG4,
-				(byte) sensitivity.fullScaleSelectionMask);
-		if (enableHighPassFilter) {
-			i2cDevice.write(REGISTER_CTRL_REG5, (byte) 0x10);			
-		}
-		i2cDevice.write(REGISTER_LOW_ODR, (byte) 0x1);
-	}
-
 	public enum OperationMode {
 		BYPASS, FIFO, STREAM, BYPASS_TO_STREAM, STREAM_TO_FIFO;
 	}
@@ -126,7 +96,35 @@ public class GyroL3GD20Device extends AbstractI2CDevice implements
 
 		public float getSensitivityFactor() {
 			return sensitivityFactor;
-		}		
+		}
+	}
+
+	public GyroL3GD20Device(Sensitivity sensitivity) throws IOException {
+		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, sensitivity, true);
+	}
+
+	public GyroL3GD20Device(int bus, int address, Sensitivity sensitivity, boolean enableHighPassFilter) throws IOException {
+		super(bus, address);
+		this.sensitivity = sensitivity;
+		initialize(enableHighPassFilter);
+	}
+
+	private void initialize(boolean enableHighPassFilter) throws IOException {
+		int id = i2cDevice.read(REGISTER_WHO_AM_I);
+		if ((id != L3GD20_ID) && (id != L3GD20H_ID)) {
+			throw new IOException(String.format("Did not find L3GD20 chip on the address %02X. Read ID was %02X.", getAddress(), id));
+		}
+		// Reset / Power down
+		i2cDevice.write(REGISTER_CTRL_REG1, (byte) 0x00);
+		// Enable all three channels + normal mode (also sets data rate and
+		// bandwidth, see chip docs)
+		i2cDevice.write(REGISTER_CTRL_REG1, (byte) 0x0F);
+		// Set sensitivity
+		i2cDevice.write(REGISTER_CTRL_REG4, (byte) sensitivity.fullScaleSelectionMask);
+		if (enableHighPassFilter) {
+			i2cDevice.write(REGISTER_CTRL_REG5, (byte) 0x10);
+		}
+		i2cDevice.write(REGISTER_LOW_ODR, (byte) 0x1);
 	}
 
 	public Tuple3f read() throws IOException {
