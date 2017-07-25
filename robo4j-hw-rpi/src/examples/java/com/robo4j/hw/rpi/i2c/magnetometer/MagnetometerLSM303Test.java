@@ -68,7 +68,8 @@ public class MagnetometerLSM303Test {
 					break;
 				default:
 					val = read();
-					System.out.println(String.format("Value %d = %s\\tHeading:%000.0f", count, val.toString(), MagnetometerLSM303Device.getCompassHeading(val)));
+					System.out.println(String.format("Value %d = %s\\tHeading:%000.0f", count, val.toString(),
+							MagnetometerLSM303Device.getCompassHeading(val)));
 				}
 			}
 			count++;
@@ -124,7 +125,7 @@ public class MagnetometerLSM303Test {
 
 	private static void printMessage(PrintStyle printStyle, String message) {
 		System.out.println(getPrefix(printStyle) + message);
-		
+
 	}
 
 	private static String getPrefix(PrintStyle printStyle) {
