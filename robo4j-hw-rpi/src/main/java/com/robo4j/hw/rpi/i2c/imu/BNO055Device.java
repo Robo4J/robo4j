@@ -22,6 +22,7 @@ import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
 import com.robo4j.math.geometry.Tuple3f;
+import com.robo4j.math.geometry.Tuple4f;
 
 /**
  * Abstraction for a BN0055 absolute orientation device.
@@ -30,6 +31,9 @@ import com.robo4j.math.geometry.Tuple3f;
  * @author Miro Wengner (@miragemiko)
  */
 public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tuple3f> {
+	private static final int WAIT_STEP_MILLIS = 5;
+	// Spec 3.6.5.5
+	private static final float QUAT_SCALE = (float) (1.0 / (1 << 14));
 	private static final int DEFAULT_I2C_ADDRESS = 0x28;
 	// Registers
 	private static final int REGISTER_SYS_TRIGGER = 0x3F;
@@ -40,7 +44,27 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 	private static final int REGISTER_CALIB_STAT = 0x35;
 	private static final int REGISTER_TEMP = 0x34;
 
+	// Gravity vector
+	private static final int REGISTER_GRV_DATA_X = 0x2E;
+	// Linear acceleration
+	private static final int REGISTER_LIA_DATA_X = 0x28;
+	// Quaternion w, x, y, z
+	private static final int REGISTER_QUA_DATA_W = 0x20;
 	private static final int REGISTER_EUL_DATA_X = 0x1A;
+	private static final int REGISTER_GYR_DATA_X = 0x14;
+	private static final int REGISTER_MAG_DATA_X = 0x0E;
+	private static final int REGISTER_ACC_DATA_X = 0x08;
+
+	private static final int REGISTER_SYS_ERR = 0x3A;
+	private static final int REGISTER_SYS_STATUS = 0x39;
+
+	// Caching these to minimize the I2C traffic. Assumes that noone else is
+	// tinkering with the hardware.
+	private Unit currentAccelerationUnit = Unit.M_PER_S_SQUARED;
+	private Unit currentAngularRateUnit = Unit.DEGREES_PER_SECOND;
+	private Unit currentEuelerAngleUnit = Unit.DEGREES;
+	private Unit currentTemperatureUnit = Unit.CELCIUS;
+	private Orientation currentOrientation = Orientation.Windows;
 
 	/**
 	 * The power mode can be used to
@@ -129,20 +153,52 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 		}
 	}
 
-	public enum UnitsAcceleration {
-		M_PER_S_SQUARED, MILI_G
-	}
+	public enum Unit {
+		/**
+		 * Acceleration unit (meter per seconds squared)
+		 */
+		M_PER_S_SQUARED(100f),
+		/**
+		 * Acceleration unit (milli g)
+		 */
+		MILI_G(1f),
+		/**
+		 * Angular rate unit (angular degrees per second)
+		 */
+		DEGREES_PER_SECOND(16f),
+		/**
+		 * Angular rate unit (radians per second)
+		 */
+		RADIANS_PER_SECOND(900f),
+		/**
+		 * Angular unit (angular degrees)
+		 */
+		DEGREES(16f),
+		/**
+		 * Angular unit (radians)
+		 */
+		RADIANS(900f),
+		/**
+		 * Magnetic field strength unit (micro Tesla)
+		 */
+		MICROTESLA(16f),
+		/**
+		 * Temperature unit (Celcius)
+		 */
+		CELCIUS(1f),
+		/**
+		 * Temperature unit (Fahrenheit)
+		 */
+		FAHRENHEIT(2f);
+		private float factor;
 
-	public enum UnitsAngularRate {
-		DEGREES_PER_SECOND, RADIANS_PER_SECOND
-	}
+		Unit(float factor) {
+			this.factor = factor;
+		}
 
-	public enum UnitsEulerAngles {
-		DEGREES, RADIANS
-	}
-
-	public enum UnitsTemperature {
-		Celcius, Fahrenheit
+		public float getFactor() {
+			return factor;
+		}
 	}
 
 	public enum Orientation {
@@ -181,6 +237,7 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 
 	public void setOperatingMode(OperatingMode operatingMode) throws IOException {
 		i2cDevice.write(REGISTER_OPR_MODE, operatingMode.getCtrlCode());
+		waitForOk(20);
 	}
 
 	public OperatingMode getOperatingMode() throws IOException {
@@ -205,14 +262,21 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 	}
 
 	/**
-	 * Returns the temperature. Note that is the temperature unit is set to
-	 * Fahrenheit, then multiply the result by 2.
+	 * @return the system status.
+	 * @throws IOException
+	 */
+	public BNO055SystemStatus getSystemStatus() throws IOException {
+		return BNO055SystemStatus.fromErrorCode(i2cDevice.read(REGISTER_SYS_STATUS));
+	}
+
+	/**
+	 * Returns the temperature.
 	 * 
 	 * @return the temperature.
 	 * @throws IOException
 	 */
-	public byte getTemperature() throws IOException {
-		return (byte) i2cDevice.read(REGISTER_TEMP);
+	public float getTemperature() throws IOException {
+		return i2cDevice.read(REGISTER_TEMP) / currentTemperatureUnit.getFactor();
 	}
 
 	private void initialize(PowerMode powerMode, OperatingMode operatingMode) throws IOException {
@@ -235,7 +299,12 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 		}
 		i2cDevice.write(REGISTER_SYS_TRIGGER, (byte) 0x8);
 		sleep(20);
-		BNO055SelfTestResult result = new BNO055SelfTestResult(i2cDevice.read(REGISTER_ST_RESULT));
+		int resultCode = i2cDevice.read(REGISTER_ST_RESULT);
+		int errorCode = 0;
+		if (resultCode != 0) {
+			errorCode = i2cDevice.read(REGISTER_SYS_ERR);
+		}
+		BNO055SelfTestResult result = new BNO055SelfTestResult(resultCode, errorCode);
 		if (previousOperatingMode != OperatingMode.CONFIG) {
 			setOperatingMode(previousOperatingMode);
 			sleep(20);
@@ -248,52 +317,187 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 	 * angular degrees, celsius and windows orientation will be used.
 	 * 
 	 * @param accelerationUnit
-	 * @param rate
-	 * @param angles
-	 * @param temp
+	 * @param angularRateUnit
+	 * @param angleUnit
+	 * @param temperatureUnit
 	 * @param orientation
 	 * @throws IOException
 	 */
-	public void setUnits(UnitsAcceleration accelerationUnit, UnitsAngularRate rate, UnitsEulerAngles angles, UnitsTemperature temp,
-			Orientation orientation) throws IOException {
+	public void setUnits(Unit accelerationUnit, Unit angularRateUnit, Unit angleUnit, Unit temperatureUnit, Orientation orientation)
+			throws IOException {
 		int val = 0;
-		if (accelerationUnit == UnitsAcceleration.MILI_G) {
+		if (accelerationUnit == Unit.MILI_G) {
 			val |= 0x01;
+		} else if (accelerationUnit != Unit.MICROTESLA) {
+			throw new IllegalArgumentException(accelerationUnit + " is not an acceleration unit!");
 		}
-		if (rate == UnitsAngularRate.RADIANS_PER_SECOND) {
+		if (angularRateUnit == Unit.RADIANS_PER_SECOND) {
 			val |= 0x02;
+		} else if (angularRateUnit != Unit.DEGREES_PER_SECOND) {
+			throw new IllegalArgumentException(angularRateUnit + " is not an angular rate unit!");
 		}
-		if (angles == UnitsEulerAngles.RADIANS) {
+		if (angleUnit == Unit.RADIANS) {
 			val |= 0x04;
+		} else if (angleUnit != Unit.DEGREES) {
+			throw new IllegalArgumentException(angleUnit + " is not an angle unit!");
 		}
-		if (temp == UnitsTemperature.Fahrenheit) {
+		if (temperatureUnit == Unit.FAHRENHEIT) {
 			val |= 0x10;
+		} else if (temperatureUnit != Unit.CELCIUS) {
+			throw new IllegalArgumentException(temperatureUnit + " is not a temperature unit!");
 		}
 		if (orientation == Orientation.Android) {
 			val |= 0x80;
 		}
 		i2cDevice.write(REGISTER_UNIT_SELECT, (byte) val);
+		currentAccelerationUnit = accelerationUnit;
+		currentAngularRateUnit = angularRateUnit;
+		currentEuelerAngleUnit = angleUnit;
+		currentTemperatureUnit = temperatureUnit;
+		currentOrientation = orientation;
 	}
 
 	/**
 	 * This method returns the absolute orientation: X will contain heading, Y
 	 * will contain roll data, Z will contain pitch. The units will be the ones
 	 * selected with
-	 * {@link #setUnits(UnitsAcceleration, UnitsAngularRate, UnitsEulerAngles, UnitsTemperature, Orientation)}.
+	 * {@link #setUnits(AccelerationUnit, AngularRateUnit, EulerAngleUnit, TemperatureUnit, Orientation)}.
 	 */
 	@Override
 	public Tuple3f read() throws IOException {
-		byte[] eulerVals = new byte[6];
-		i2cDevice.read(REGISTER_EUL_DATA_X, eulerVals, 0, 6);
+		return readVector(REGISTER_EUL_DATA_X, currentEuelerAngleUnit);
+	}
+
+	/**
+	 * The fusion algorithm offset and tilt compensated absolute orientation
+	 * data in Euler angles. x = magnetic heading, y = roll, z = pitch. Note
+	 * that this is only available in one of the fusion modes.
+	 * 
+	 * @return a tuple containing x = magnetic heading, y = roll, z = pitch.
+	 * @throws IOException
+	 */
+	public Tuple3f readEulerAngles() throws IOException {
+		return read();
+	}
+
+	/**
+	 * @return the magnetometer values in x,y,z in {@link Unit#MICROTESLA}.
+	 * @throws IOException
+	 */
+	public Tuple3f readMagnetometer() throws IOException {
+		return readVector(REGISTER_MAG_DATA_X, Unit.MICROTESLA);
+	}
+
+	/**
+	 * @return the accelerometer information for the accelerometer in the
+	 *         currently set acceleration unit.
+	 * @throws IOException
+	 */
+	public Tuple3f readAccelerometer() throws IOException {
+		return readVector(REGISTER_ACC_DATA_X, currentAccelerationUnit);
+	}
+
+	/**
+	 * @return the gyro information in the currently set angular rate unit.
+	 * @throws IOException
+	 */
+	public Tuple3f readGyro() throws IOException {
+		return readVector(REGISTER_GYR_DATA_X, currentAngularRateUnit);
+	}
+
+	/**
+	 * Reads the quaternion data for the absolute orientation into a Tuple4f.
+	 * Note that w will be in the t field.
+	 * 
+	 * @return the quaternion data for the absolute orientation.
+	 * @throws IOException
+	 */
+	public Tuple4f readQuaternion() throws IOException {
+		return readQuaternion(REGISTER_QUA_DATA_W);
+	}
+
+	/**
+	 * The fusion algorithm output for the linear acceleration data for each
+	 * axis in currently set acceleration unit. Note that this is only available
+	 * in one of the fusion modes.
+	 * 
+	 * @return the fusion algorithm output for the linear acceleration data for
+	 *         each axis in currently set acceleration unit.
+	 * @throws IOException
+	 */
+	public Tuple3f readLinearAcceleration() throws IOException {
+		return readVector(REGISTER_LIA_DATA_X, currentAccelerationUnit);
+	}
+
+	/**
+	 * The fusion algorithm output for the gravity vector in the currently set
+	 * acceleration unit. Note that this is only available in one of the fusion
+	 * modes.
+	 * 
+	 * @return the fusion algorithm output for the gravity vector in the
+	 *         currently set acceleration unit.
+	 * @throws IOException
+	 */
+	public Tuple3f readGravityVector() throws IOException {
+		return readVector(REGISTER_GRV_DATA_X, currentAccelerationUnit);
+	}
+
+	/**
+	 * Will attempt to reset the device.
+	 * @throws IOException
+	 */
+	public void reset() throws IOException {
+		i2cDevice.write(REGISTER_SYS_TRIGGER, (byte) 0x8);
+		waitForOk(50);
+	}
+
+	private void waitForOk(int maxWaitTimeMillis) throws IOException {
+		int waitTime = 0;
+		while (true) {
+			BNO055SystemStatus systemStatus = getSystemStatus();
+			if (systemStatus == BNO055SystemStatus.IDLE || systemStatus == BNO055SystemStatus.RUNNING_NO_SENSOR_FUSION
+					|| systemStatus == BNO055SystemStatus.RUNNING_SENSOR_FUSION || waitTime >= maxWaitTimeMillis) {
+			}
+			sleep(WAIT_STEP_MILLIS);
+			maxWaitTimeMillis += WAIT_STEP_MILLIS;
+		}
+	}
+
+	public Orientation getCurrentOrientation() {
+		return currentOrientation;
+	}
+
+	private Tuple3f readVector(int register, Unit unit) throws IOException {
+		byte[] data = new byte[6];
+		i2cDevice.read(register, data, 0, data.length);
 		Tuple3f tuple = new Tuple3f();
-		tuple.x = read16bitSigned(eulerVals, 0);
-		tuple.y = read16bitSigned(eulerVals, 2);
-		tuple.z = read16bitSigned(eulerVals, 4);
+		tuple.x = read16bitSigned(data, 0);
+		tuple.y = read16bitSigned(data, 2);
+		tuple.z = read16bitSigned(data, 4);
+		if (unit.getFactor() != 1f) {
+			tuple.x /= unit.getFactor();
+			tuple.y /= unit.getFactor();
+			tuple.z /= unit.getFactor();
+		}
+		return tuple;
+	}
+
+	private Tuple4f readQuaternion(int register) throws IOException {
+		byte[] data = new byte[8];
+		i2cDevice.read(register, data, 0, data.length);
+		Tuple4f tuple = new Tuple4f();
+		tuple.t = read16bitSigned(data, 0);
+		tuple.x = read16bitSigned(data, 2);
+		tuple.y = read16bitSigned(data, 4);
+		tuple.z = read16bitSigned(data, 6);
+		tuple.t *= QUAT_SCALE;
+		tuple.x *= QUAT_SCALE;
+		tuple.y *= QUAT_SCALE;
+		tuple.z *= QUAT_SCALE;
 		return tuple;
 	}
 
 	private short read16bitSigned(byte[] data, int offset) {
-		int n = ((data[offset + 1] & 0xFF) << 8 | (data[offset] & 0xFF));
-		return (short) (n < 32768 ? n : n - 65536);
+		return (short) (data[offset + 1] << 8 | data[offset]);
 	}
 }

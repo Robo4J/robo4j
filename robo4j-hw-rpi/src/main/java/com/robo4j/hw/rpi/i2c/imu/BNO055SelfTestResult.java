@@ -23,17 +23,18 @@ package com.robo4j.hw.rpi.i2c.imu;
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class BNO055SelfTestResult {
-
 	private final int registerContent;
+	private final BNO055SystemError error;
 
 	public enum TestResult {
 		FAILED, PASSED
 	}
-	
-	public BNO055SelfTestResult(int registerContent) {
+
+	public BNO055SelfTestResult(int registerContent, int errorCode) {
 		this.registerContent = registerContent;
+		this.error = BNO055SystemError.fromErrorCode(errorCode);
 	}
-	
+
 	public TestResult getAccelerometerResult() {
 		return (registerContent & 1) == 0 ? TestResult.FAILED : TestResult.PASSED;
 	}
@@ -49,5 +50,9 @@ public final class BNO055SelfTestResult {
 	public TestResult getMicroControllerResult() {
 		return (registerContent & 8) == 0 ? TestResult.FAILED : TestResult.PASSED;
 	}
-	
+
+	public BNO055SystemError getError() {
+		return error;
+	}
+
 }
