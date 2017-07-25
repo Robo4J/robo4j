@@ -58,7 +58,8 @@ public class BNO055Example {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		BNO055Device bno = new BNO055Device();
-
+		System.out.println("Resetting device...");
+		bno.reset();
 		System.out.println("Starting calibration sequence...");
 		BNO055CalibrationStatus calibrationStatus = null;
 		while ((calibrationStatus = bno.getCalibrationStatus())
