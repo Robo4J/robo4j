@@ -240,7 +240,8 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 	}
 
 	public OperatingMode getOperatingMode() throws IOException {
-		return OperatingMode.fromCtrlCode(i2cDevice.read(REGISTER_OPR_MODE));
+		// For some reason, the topmost bit can be 1 every once in a while.
+		return OperatingMode.fromCtrlCode(i2cDevice.read(REGISTER_OPR_MODE) & 0x7F);
 	}
 
 	public void setPowerMode(PowerMode powerMode) throws IOException {
