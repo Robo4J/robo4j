@@ -294,9 +294,9 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 		}
 		i2cDevice.write(REGISTER_SYS_TRIGGER, (byte) 0x8);
 		sleep(20);
-		int resultCode = i2cDevice.read(REGISTER_ST_RESULT);
+		int resultCode = i2cDevice.read(REGISTER_ST_RESULT) & 0x0F;
 		int errorCode = 0;
-		if (resultCode != 0) {
+		if (resultCode != 0x0F) {
 			errorCode = i2cDevice.read(REGISTER_SYS_ERR);
 		}
 		BNO055SelfTestResult result = new BNO055SelfTestResult(resultCode, errorCode);
