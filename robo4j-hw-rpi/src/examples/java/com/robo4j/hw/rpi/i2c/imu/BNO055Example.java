@@ -70,7 +70,7 @@ public class BNO055Example {
 		
 		System.out.println("Starting calibration sequence...");
 		BNO055CalibrationStatus calibrationStatus = null;
-		while ((calibrationStatus = bno.getCalibrationStatus()).isFullyCalibrated()) {
+		while (!(calibrationStatus = bno.getCalibrationStatus()).isFullyCalibrated()) {
 			System.out.println(String.format("Calibration status: system:%s, gyro:%s, accelerometer:%s, magnetometer:%s",
 					calibrationStatus.getSystemCalibrationStatus(), calibrationStatus.getGyroCalibrationStatus(),
 					calibrationStatus.getAccelerometerCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus()));
