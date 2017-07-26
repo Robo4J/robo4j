@@ -46,7 +46,7 @@ public class BNO055Example {
 				Tuple3f orientation = device.read();
 				float temperature = device.getTemperature();
 
-				System.out.println(String.format("heading: %f, roll: %f, pitch: %f - temp:%d", orientation.x, orientation.y, orientation.z,
+				System.out.println(String.format("heading: %f, roll: %f, pitch: %f - temp:%f", orientation.x, orientation.y, orientation.z,
 						temperature));
 			} catch (Throwable e) {
 				e.printStackTrace();
