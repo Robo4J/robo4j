@@ -460,7 +460,7 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 				break;
 			}
 			sleep(WAIT_STEP_MILLIS);
-			maxWaitTimeMillis += WAIT_STEP_MILLIS;
+			waitTime += WAIT_STEP_MILLIS;
 		}
 	}
 
