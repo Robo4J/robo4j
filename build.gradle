@@ -114,7 +114,6 @@ project("robo4j-hw-lego") {
         }
     }
 
-    //sources
     sourceSets {
         main {
             java {
@@ -124,8 +123,18 @@ project("robo4j-hw-lego") {
                 srcDirs = ['src/main/resources', 'src/examples/resources', 'src/test/resources']
             }
         }
+
+        test {
+            java {
+                srcDirs = ['src/test/java']
+            }
+            resources {
+                srcDirs = ['src/test/resources']
+            }
+        }
     }
 
+    //sources
     dependencies {
         compile fileTree(dir: 'libs', include: 'ev3classes-9.1.jar')
         compile(project(":robo4j-math"))
@@ -165,7 +174,7 @@ project("robo4j-hw-rpi") {
         manifest {
             attributes 'Implementation-Title': 'robo4j-hw-rpi',
                     'Implementation-Version': version,
-                    'Main-Class': 'com.robo4j.hw.rpi.i2c.magnetometer.MagnetometerLSM303Test'
+                    'Main-Class': 'com.robo4j.hw.rpi.i2c.adafruitled.GraphBarTest'
         }
         //baseName = project.name + '-all'
         baseName = 'robo4j-hw-rpi'
@@ -177,10 +186,19 @@ project("robo4j-hw-rpi") {
     sourceSets {
         main {
             java {
-                srcDirs = ['src/main/java', 'src/examples/java', 'src/test/java']
+                srcDirs = ['src/main/java', 'src/examples/java']
             }
             resources {
-                srcDirs = ['src/main/resources', 'src/examples/resources', 'src/test/resources']
+                srcDirs = ['src/main/resources', 'src/examples/resources']
+            }
+        }
+
+        test {
+            java {
+                srcDirs = ['src/test/java']
+            }
+            resources {
+                srcDirs = ['src/test/resources']
             }
         }
     }
@@ -331,7 +349,7 @@ project("robo4j-units-rpi") {
         manifest {
             attributes 'Implementation-Title': 'robo4j-units-rpi',
                     'Implementation-Version': version,
-                    'Main-Class': 'com.robo4j.units.rpi.gps.GPSExample'
+                    'Main-Class': 'com.robo4j.units.rpi.pwm.CalibrationUtility'
         }
         //baseName = project.name + '-all'
         baseName = 'robo4j-units-rpi'
@@ -343,10 +361,19 @@ project("robo4j-units-rpi") {
     sourceSets {
         main {
             java {
-                srcDirs = ['src/main/java', 'src/examples/java', 'src/test/java']
+                srcDirs = ['src/main/java', 'src/examples/java']
             }
             resources {
-                srcDirs = ['src/main/resources', 'src/examples/resources', 'src/test/resources']
+                srcDirs = ['src/main/resources', 'src/examples/resources']
+            }
+        }
+
+        test {
+            java {
+                srcDirs = ['src/test/java']
+            }
+            resources {
+                srcDirs = ['src/test/resources']
             }
         }
     }

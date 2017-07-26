@@ -16,10 +16,9 @@
  */
 package com.robo4j.hw.rpi.i2c.imu;
 
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.robo4j.hw.rpi.i2c.imu.BNO055SystemStatus.StatusFlag;
 
 public class BNOSystemStatusTests {
 
@@ -27,14 +26,14 @@ public class BNOSystemStatusTests {
 	public void testFlags() {
 		BNO055SystemStatus status = new BNO055SystemStatus(1);
 		Assert.assertTrue(status.getStatusFlags().length == 1);
-		Assert.assertArrayEquals(createFlags(StatusFlag.IDLE), status.getStatusFlags());
+		Assert.assertArrayEquals(createFlags(BNO055SystemStatus.StatusFlag.IDLE), status.getStatusFlags());
 		status = new BNO055SystemStatus(65);
 		Assert.assertTrue(status.getStatusFlags().length == 2);
-		Assert.assertArrayEquals(createFlags(StatusFlag.IDLE, StatusFlag.RUNNING_NO_SENSOR_FUSION), status.getStatusFlags());
+		Assert.assertArrayEquals(createFlags(BNO055SystemStatus.StatusFlag.IDLE, BNO055SystemStatus.StatusFlag.RUNNING_NO_SENSOR_FUSION), status.getStatusFlags());
 
 	}
 
-	private StatusFlag[] createFlags(StatusFlag ... flags) {
+	private BNO055SystemStatus.StatusFlag[] createFlags(BNO055SystemStatus.StatusFlag... flags) {
 		return flags;
 	}
 }

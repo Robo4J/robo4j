@@ -6,3 +6,5 @@ licence.idea
 *.bak
 
 /.DS_Store
+robo4j-hw-rpi/out
+robo4j-math/out
