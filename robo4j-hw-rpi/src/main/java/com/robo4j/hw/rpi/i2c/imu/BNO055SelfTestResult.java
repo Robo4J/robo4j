@@ -56,7 +56,7 @@ public final class BNO055SelfTestResult {
 	}
 	
 	public String toString() {
-		if (getError() == null) {
+		if (getError() == BNO055SystemError.NO_ERROR) {
 			return String.format("Accelerometer: %s, Magnetometer: %s, Gyro: %s, Microcontroller: %s", getAccelerometerResult(), getMagnetometerResult(), getGyroResult(), getMicroControllerResult());
 		} else {
 			return String.format("Accelerometer: %s, Magnetometer: %s, Gyro: %s, Microcontroller: %s - Error: ", getAccelerometerResult(), getMagnetometerResult(), getGyroResult(), getMicroControllerResult(), getError());
