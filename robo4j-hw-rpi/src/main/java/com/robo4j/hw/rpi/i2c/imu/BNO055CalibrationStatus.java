@@ -93,4 +93,11 @@ public final class BNO055CalibrationStatus {
 	public CalibrationStatus getSystemCalibrationStatus() {
 		return CalibrationStatus.fromStatusValue((status >> 6) & 3);
 	}
+	
+	/**
+	 * @return true only if all sensors are fully calibrated.
+	 */
+	public boolean isFullyCalibrated() {
+		return getMagnetometerCalibrationStatus() == CalibrationStatus.FULLY_CALIBRATED && getAccelerometerCalibrationStatus() == CalibrationStatus.FULLY_CALIBRATED && getGyroCalibrationStatus() == CalibrationStatus.FULLY_CALIBRATED && getSystemCalibrationStatus() == CalibrationStatus.FULLY_CALIBRATED;
+	}
 }
