@@ -20,6 +20,12 @@ package com.robo4j.hw.rpi.i2c.imu;
 import org.junit.Assert;
 import org.junit.Test;
 
+
+/**
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
 public class BNOSystemStatusTests {
 
 	@Test
