@@ -96,6 +96,10 @@ public class BNO055SystemStatus {
 	 * @return true if idle or running.
 	 */
 	public boolean isReady() {
+		// Seems 0 can be read after reset
+		if (flags.length == 0) {
+			return true;
+		}
 		return containsOneOf(StatusFlag.IDLE, StatusFlag.RUNNING_SENSOR_FUSION, StatusFlag.RUNNING_NO_SENSOR_FUSION);
 	}
 
