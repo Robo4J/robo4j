@@ -48,10 +48,9 @@ public class BNO055Example {
 
 				System.out.println(String.format("heading: %f, roll: %f, pitch: %f - temp:%d", orientation.x, orientation.y, orientation.z,
 						temperature));
-			} catch (IOException e) {
+			} catch (Throwable e) {
 				e.printStackTrace();
 			}
-			System.out.println();
 		}
 
 	}
