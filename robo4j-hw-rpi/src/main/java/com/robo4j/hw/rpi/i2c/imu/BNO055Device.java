@@ -279,11 +279,6 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 		return i2cDevice.read(REGISTER_TEMP) / currentTemperatureUnit.getFactor();
 	}
 
-	private void initialize(PowerMode powerMode, OperatingMode operatingMode) throws IOException {
-		setPowerMode(powerMode);
-		setOperatingMode(operatingMode);
-	}
-
 	/**
 	 * Runs a self test, performing the necessary mode changes as needed. Note
 	 * that this operating can block the calling thread for a little while.
@@ -466,6 +461,11 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 
 	public Orientation getCurrentOrientation() {
 		return currentOrientation;
+	}
+
+	private void initialize(PowerMode powerMode, OperatingMode operatingMode) throws IOException {
+		setPowerMode(powerMode);
+		setOperatingMode(operatingMode);
 	}
 
 	private Tuple3f readVector(int register, Unit unit) throws IOException {
