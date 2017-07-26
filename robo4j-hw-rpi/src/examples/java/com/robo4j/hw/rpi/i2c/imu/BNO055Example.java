@@ -60,6 +60,8 @@ public class BNO055Example {
 		BNO055Device bno = new BNO055Device();
 		System.out.println("Resetting device...");
 		bno.reset();
+		System.out.println("");
+		
 		System.out.println("Starting calibration sequence...");
 		BNO055CalibrationStatus calibrationStatus = null;
 		while ((calibrationStatus = bno.getCalibrationStatus())

@@ -214,7 +214,7 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 	 * @see OperatingMode
 	 */
 	public BNO055Device() throws IOException {
-		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, PowerMode.NORMAL, OperatingMode.NDOF);
+		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, OperatingMode.NDOF);
 	}
 
 	/**
@@ -224,15 +224,13 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 	 *            the i2c bus on which the BNO is.
 	 * @param address
 	 *            the address to which the BNO is configured.
-	 * @param powerMode
-	 *            the {@link PowerMode} to initialize to.
 	 * @param operatingMode
 	 *            the {@link OperatingMode} to initialize to.
 	 * @throws IOException
 	 */
-	public BNO055Device(int bus, int address, PowerMode powerMode, OperatingMode operatingMode) throws IOException {
+	public BNO055Device(int bus, int address, OperatingMode operatingMode) throws IOException {
 		super(bus, address);
-		initialize(powerMode, operatingMode);
+		initialize(operatingMode);
 	}
 
 	public void setOperatingMode(OperatingMode operatingMode) throws IOException {
@@ -446,6 +444,10 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 		waitForOk(50);
 	}
 
+	public Orientation getCurrentOrientation() {
+		return currentOrientation;
+	}
+
 	private void waitForOk(int maxWaitTimeMillis) throws IOException {
 		int waitTime = 0;
 		while (true) {
@@ -459,12 +461,7 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 		}
 	}
 
-	public Orientation getCurrentOrientation() {
-		return currentOrientation;
-	}
-
-	private void initialize(PowerMode powerMode, OperatingMode operatingMode) throws IOException {
-		setPowerMode(powerMode);
+	private void initialize(OperatingMode operatingMode) throws IOException {
 		setOperatingMode(operatingMode);
 	}
 
