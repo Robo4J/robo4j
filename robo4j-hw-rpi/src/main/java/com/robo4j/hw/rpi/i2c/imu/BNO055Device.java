@@ -457,6 +457,7 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 			BNO055SystemStatus systemStatus = getSystemStatus();
 			if (systemStatus == BNO055SystemStatus.IDLE || systemStatus == BNO055SystemStatus.RUNNING_NO_SENSOR_FUSION
 					|| systemStatus == BNO055SystemStatus.RUNNING_SENSOR_FUSION || waitTime >= maxWaitTimeMillis) {
+				break;
 			}
 			sleep(WAIT_STEP_MILLIS);
 			maxWaitTimeMillis += WAIT_STEP_MILLIS;
