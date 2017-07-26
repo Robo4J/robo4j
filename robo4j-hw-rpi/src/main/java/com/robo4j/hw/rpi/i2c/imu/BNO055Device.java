@@ -131,7 +131,8 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 		COMPASS (0x9),
 		M4G (0xA),
 		NDOF_FMC_OFF (0xB),
-		NDOF (0xC);
+		NDOF (0xC),
+		UNKNOWN(-1);
 		//@formatter:on
 		private byte ctrlCode;
 
@@ -149,7 +150,7 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 					return mode;
 				}
 			}
-			return null;
+			return OperatingMode.UNKNOWN;
 		}
 	}
 
