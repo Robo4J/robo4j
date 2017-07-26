@@ -17,44 +17,119 @@
 package com.robo4j.hw.rpi.i2c.imu;
 
 /**
- * System error results.
+ * System status result.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public enum BNO055SystemStatus {
-	//@formatter:off
-	IDLE(0, "Idle"), 
-	SYSTEM_ERROR(1, "System error"), 
-	INIT_PERIPHERALS(2, "Initializing Peripherals"), 
-	INIT_SYSTEM(3, "System Initilization"), 
-	SELF_TEST(4, "Executing Self Test"), 
-	RUNNING_SENSOR_FUSION(5, "System running with sensor fusion"), 
-	RUNNING_NO_SENSOR_FUSION(6, "System running with no sensor fusion");
-	//@formatter:on
+public class BNO055SystemStatus {
+	private final StatusFlag[] flags;
 
-	int statusCode;
-	String statusMessage;
+	public enum StatusFlag {
+		//@formatter:off
+		IDLE(0, "Idle"), 
+		SYSTEM_ERROR(1, "System error"), 
+		INIT_PERIPHERALS(2, "Initializing Peripherals"), 
+		INIT_SYSTEM(3, "System Initilization"), 
+		SELF_TEST(4, "Executing Self Test"), 
+		RUNNING_SENSOR_FUSION(5, "System running with sensor fusion"), 
+		RUNNING_NO_SENSOR_FUSION(6, "System running with no sensor fusion");
+		//@formatter:on
 
-	BNO055SystemStatus(int errorCode, String errorMessage) {
-		this.statusCode = errorCode;
-		this.statusMessage = errorMessage;
+		int bitPosition;
+		String statusMessage;
+
+		StatusFlag(int bitPosition, String errorMessage) {
+			this.bitPosition = bitPosition;
+			this.statusMessage = errorMessage;
+		}
+
+		public int getBitPosition() {
+			return bitPosition;
+		}
+
+		public String getStatusMessage() {
+			return statusMessage;
+		}
+
+		public static StatusFlag fromBitPosition(int bitPosition) {
+			for (StatusFlag flag : values()) {
+				if (flag.getBitPosition() == bitPosition) {
+					return flag;
+				}
+			}
+			return null;
+		}
 	}
 
-	public int getStatusCode() {
-		return statusCode;
+	public BNO055SystemStatus(int registerValue) {
+		flags = deriveFlags(registerValue);
 	}
 
-	public String getStatusMessage() {
-		return statusMessage;
+	public BNO055SystemStatus(StatusFlag[] flags) {
+		this.flags = flags;
 	}
 
-	public static BNO055SystemStatus fromErrorCode(int errorCode) {
-		for (BNO055SystemStatus error : values()) {
-			if (error.getStatusCode() == errorCode) {
-				return error;
+	private StatusFlag[] deriveFlags(int registerValue) {
+		int count = 0;
+		StatusFlag[] tmpFlags = new StatusFlag[7];
+
+		for (int i = 0; i < tmpFlags.length; i++) {
+			if (isBitSet(i, registerValue)) {
+				tmpFlags[count++] = StatusFlag.fromBitPosition(i);
 			}
 		}
-		return null;
+		StatusFlag[] resultFlags = new StatusFlag[count];
+		System.arraycopy(tmpFlags, 0, resultFlags, 0, count);
+		return resultFlags;
+	}
+
+	private boolean isBitSet(int i, int registerValue) {
+		return (registerValue & (1 << i)) > 0;
+	}
+
+	public StatusFlag[] getStatusFlags() {
+		return flags;
+	}
+
+	/**
+	 * @return true if idle or running.
+	 */
+	public boolean isReady() {
+		return containsOneOf(StatusFlag.IDLE, StatusFlag.RUNNING_SENSOR_FUSION, StatusFlag.RUNNING_NO_SENSOR_FUSION);
+	}
+
+	/**
+	 * @return true on system error.
+	 */
+	public boolean hasError() {
+		return containsOneOf(StatusFlag.SYSTEM_ERROR);
+	}
+
+	/**
+	 * Returns true if initializing or running self tests.
+	 * 
+	 * @return true if initializing or running self tests.
+	 */
+	public boolean isBusy() {
+		return containsOneOf(StatusFlag.INIT_PERIPHERALS, StatusFlag.INIT_SYSTEM, StatusFlag.SELF_TEST);
+	}
+
+	private boolean containsOneOf(StatusFlag... flagsToCheck) {
+		for (StatusFlag flag : flagsToCheck) {
+			if (contains(flag)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean contains(StatusFlag flagToCheck) {
+		for (StatusFlag flag : flags) {
+			if (flag == flagToCheck) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

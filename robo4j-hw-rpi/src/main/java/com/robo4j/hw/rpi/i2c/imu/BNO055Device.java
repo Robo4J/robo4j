@@ -264,7 +264,7 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 	 * @throws IOException
 	 */
 	public BNO055SystemStatus getSystemStatus() throws IOException {
-		return BNO055SystemStatus.fromErrorCode(i2cDevice.read(REGISTER_SYS_STATUS));
+		return new BNO055SystemStatus(i2cDevice.read(REGISTER_SYS_STATUS));
 	}
 
 	/**
@@ -437,6 +437,7 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 
 	/**
 	 * Will attempt to reset the device.
+	 * 
 	 * @throws IOException
 	 */
 	public void reset() throws IOException {
@@ -448,13 +449,26 @@ public class BNO055Device extends AbstractI2CDevice implements ReadableDevice<Tu
 		return currentOrientation;
 	}
 
-	private void waitForOk(int maxWaitTimeMillis) throws IOException {
+	/**
+	 * Will wait until the system is ready, an error occurs or the max wait was
+	 * exceeded.
+	 * 
+	 * @param maxWaitTimeMillis
+	 *            max time to wait for the system to be ready.
+	 * @return returns true if the system is ready, false if the system is
+	 *         reporting an error or if the timeout was reached.
+	 * @throws IOException
+	 */
+	private boolean waitForOk(int maxWaitTimeMillis) throws IOException {
 		int waitTime = 0;
 		while (true) {
 			BNO055SystemStatus systemStatus = getSystemStatus();
-			if (systemStatus == BNO055SystemStatus.IDLE || systemStatus == BNO055SystemStatus.RUNNING_NO_SENSOR_FUSION
-					|| systemStatus == BNO055SystemStatus.RUNNING_SENSOR_FUSION || waitTime >= maxWaitTimeMillis) {
-				break;
+			if (systemStatus.isReady() || systemStatus.hasError() || waitTime >= maxWaitTimeMillis) {
+				if (systemStatus.isReady()) {
+					return true;
+				} else {
+					return false;
+				}
 			}
 			sleep(WAIT_STEP_MILLIS);
 			waitTime += WAIT_STEP_MILLIS;

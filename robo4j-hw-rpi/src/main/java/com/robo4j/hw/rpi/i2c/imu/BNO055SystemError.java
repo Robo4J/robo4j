@@ -61,4 +61,8 @@ public enum BNO055SystemError {
 		}
 		return null;
 	}
+	
+	public String toString() {
+		return errorMessage;
+	}
 }
