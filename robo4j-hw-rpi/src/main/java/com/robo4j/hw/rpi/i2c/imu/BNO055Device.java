@@ -27,6 +27,12 @@ import com.robo4j.math.geometry.Tuple4f;
 /**
  * Abstraction for a BN0055 absolute orientation device.
  * 
+ * NOTE(Marcus/Jul 27, 2017): Note that the Rasperry Pi does not properly
+ * support clock stretching yet (Raspberry Pi 3), so this particular class does
+ * not work until that has been fixed in the i2c implementation on the Raspberry
+ * Pi. Until then, wire the BNO055 to use serial tty communication as described
+ * in that data sheet, and use the com.robo4j.hw.rpi.serial.imu classes instead.
+ * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
