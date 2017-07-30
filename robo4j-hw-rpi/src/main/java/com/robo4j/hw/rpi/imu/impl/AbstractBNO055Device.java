@@ -190,9 +190,10 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	/**
 	 * Reads a byte (signed or unsigned) from the provided register.
 	 * 
-	 * @param register the address of the register to read from.
+	 * @param register
+	 *            the address of the register to read from.
 	 * @return the value read.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	protected abstract int read(int register) throws IOException;
 
@@ -203,11 +204,11 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 *            the register to write to.
 	 * @param b
 	 *            the byte to write.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	protected abstract void write(int register, byte b) throws IOException;
 
-	protected void sleep(int millis) {
+	protected void sleep(long millis) {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
@@ -413,9 +414,9 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 *            the register to read
 	 * @param length
 	 *            the total length of values to read.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	protected abstract byte [] read(int register, int length) throws IOException;
+	protected abstract byte[] read(int register, int length) throws IOException;
 
 	protected Tuple4f readQuaternion(int register) throws IOException {
 		byte[] data = read(register, 8);

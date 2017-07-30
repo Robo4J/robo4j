@@ -62,14 +62,17 @@ public class BNO055Example {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		System.out.println("Starting the BNO055 Example.");
 		BNO055Device bno = BNO055Factory.createDefaultSerialDevice();
-
+		Thread.sleep(20);
+		
 		System.out.println("Resetting device...");
 		bno.reset();
-
+		Thread.sleep(20);
+		
 		System.out.println("Running Self Test...");
-		BNO055SelfTestResult testResult = bno.performSelfTest();
+		BNO055SelfTestResult testResult = bno.performSelfTest();		
 		System.out.println("Result of self test: ");
 		System.out.println(testResult);
+		Thread.sleep(20);
 
 		System.out.println("Starting calibration sequence...");
 		BNO055CalibrationStatus calibrationStatus = null;
