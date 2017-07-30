@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.i2c.imu;
+package com.robo4j.hw.rpi.imu;
 
 /**
  * The calibration status.
@@ -92,5 +92,12 @@ public final class BNO055CalibrationStatus {
 	 */
 	public CalibrationStatus getSystemCalibrationStatus() {
 		return CalibrationStatus.fromStatusValue((status >> 6) & 3);
+	}
+	
+	/**
+	 * @return true only if all sensors are fully calibrated.
+	 */
+	public boolean isFullyCalibrated() {
+		return getMagnetometerCalibrationStatus() == CalibrationStatus.FULLY_CALIBRATED && getAccelerometerCalibrationStatus() == CalibrationStatus.FULLY_CALIBRATED && getGyroCalibrationStatus() == CalibrationStatus.FULLY_CALIBRATED && getSystemCalibrationStatus() == CalibrationStatus.FULLY_CALIBRATED;
 	}
 }

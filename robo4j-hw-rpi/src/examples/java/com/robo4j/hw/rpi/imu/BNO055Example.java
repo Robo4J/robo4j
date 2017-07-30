@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.i2c.imu;
+package com.robo4j.hw.rpi.imu;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
@@ -46,32 +46,34 @@ public class BNO055Example {
 				Tuple3f orientation = device.read();
 				float temperature = device.getTemperature();
 
-				System.out.println(String.format("heading: %f, roll: %f, pitch: %f - temp:%d", orientation.x, orientation.y, orientation.z,
+				System.out.println(String.format("heading: %f, roll: %f, pitch: %f - temp:%f", orientation.x, orientation.y, orientation.z,
 						temperature));
-			} catch (IOException e) {
+			} catch (Throwable e) {
 				e.printStackTrace();
 			}
-			System.out.println();
 		}
 
 	}
 
+	/**
+	 * Runs an example for the BNO running in serial. Use the appropriate
+	 * factory method to instead use I2C.
+	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
 		System.out.println("Starting the BNO055 Example.");
-		BNO055Device bno = new BNO055Device();
-		
+		BNO055Device bno = BNO055Factory.createDefaultSerialDevice();
+
+		System.out.println("Resetting device...");
+		bno.reset();
+
 		System.out.println("Running Self Test...");
 		BNO055SelfTestResult testResult = bno.performSelfTest();
 		System.out.println("Result of self test: ");
 		System.out.println(testResult);
-		
-		System.out.println("Resetting device...");
-		bno.reset();
-		
+
 		System.out.println("Starting calibration sequence...");
 		BNO055CalibrationStatus calibrationStatus = null;
-		while ((calibrationStatus = bno.getCalibrationStatus())
-				.getSystemCalibrationStatus() != BNO055CalibrationStatus.CalibrationStatus.FULLY_CALIBRATED) {
+		while (!(calibrationStatus = bno.getCalibrationStatus()).isFullyCalibrated()) {
 			System.out.println(String.format("Calibration status: system:%s, gyro:%s, accelerometer:%s, magnetometer:%s",
 					calibrationStatus.getSystemCalibrationStatus(), calibrationStatus.getGyroCalibrationStatus(),
 					calibrationStatus.getAccelerometerCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus()));

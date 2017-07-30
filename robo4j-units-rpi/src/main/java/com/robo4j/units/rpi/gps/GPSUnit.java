@@ -74,7 +74,12 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 	/**
 	 * This is the default value for the read interval.
 	 */
-	public static final int DEFAULT_READ_INTERVAL = 550;
+	public static final int DEFAULT_READ_INTERVAL = GPS.DEFAULT_READ_INTERVAL;
+
+	/**
+	 * This is the default value for the serial port.
+	 */
+	public static final String DEFAULT_SERIAL_PORT = GPS.DEFAULT_GPS_PORT;
 
 	/**
 	 * This attribute will provide the state of the read interval.
@@ -85,6 +90,7 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 			.unmodifiableCollection(Arrays.asList(DefaultAttributeDescriptor.create(Tuple3f.class, ATTRIBUTE_NAME_READ_INTERVAL)));
 
 	private GPS gps;
+	private String serialPort;
 	private int readInterval = DEFAULT_READ_INTERVAL;
 	private List<GPSEventListener> listeners = new ArrayList<>();
 
@@ -116,12 +122,13 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		serialPort = configuration.getString("serialPort", DEFAULT_SERIAL_PORT);
 		readInterval = configuration.getInteger("readInterval", DEFAULT_READ_INTERVAL);
 		String scheduler = configuration.getString("scheduler", PROPERTY_VALUE_PLATFORM_SCHEDULER);
 		boolean usePlatformScheduler = PROPERTY_VALUE_PLATFORM_SCHEDULER.equals(scheduler);
 
 		try {
-			gps = new GPS(readInterval);
+			gps = new GPS(serialPort, readInterval);
 		} catch (IOException e) {
 			throw new ConfigurationException("Could not instantiate GPS!", e);
 		}

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.i2c.imu;
+package com.robo4j.hw.rpi.imu;
 
 /**
  * The result of a BNO055 self test.
@@ -56,7 +56,7 @@ public final class BNO055SelfTestResult {
 	}
 	
 	public String toString() {
-		if (getError() == null) {
+		if (getError() == BNO055SystemError.NO_ERROR) {
 			return String.format("Accelerometer: %s, Magnetometer: %s, Gyro: %s, Microcontroller: %s", getAccelerometerResult(), getMagnetometerResult(), getGyroResult(), getMicroControllerResult());
 		} else {
 			return String.format("Accelerometer: %s, Magnetometer: %s, Gyro: %s, Microcontroller: %s - Error: ", getAccelerometerResult(), getMagnetometerResult(), getGyroResult(), getMicroControllerResult(), getError());

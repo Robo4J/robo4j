@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.i2c.imu;
+package com.robo4j.hw.rpi.imu;
 
 /**
  * System status result.
@@ -96,6 +96,10 @@ public class BNO055SystemStatus {
 	 * @return true if idle or running.
 	 */
 	public boolean isReady() {
+		// Seems 0 can be read after reset
+		if (flags.length == 0) {
+			return true;
+		}
 		return containsOneOf(StatusFlag.IDLE, StatusFlag.RUNNING_SENSOR_FUSION, StatusFlag.RUNNING_NO_SENSOR_FUSION);
 	}
 
