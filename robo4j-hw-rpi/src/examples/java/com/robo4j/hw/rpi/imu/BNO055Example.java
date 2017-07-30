@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.robo4j.hw.rpi.imu.BNO055Device.OperatingMode;
 import com.robo4j.math.geometry.Tuple3f;
 
 /**
@@ -74,6 +75,13 @@ public class BNO055Example {
 		System.out.println(testResult);
 		Thread.sleep(20);
 
+		System.out.println("Operating mode: " + bno.getOperatingMode());
+		if (bno.getOperatingMode() != OperatingMode.NDOF) {
+			System.out.println("Switching mode to NDOF");
+			bno.setOperatingMode(OperatingMode.NDOF);
+			System.out.println("Operating mode: " + bno.getOperatingMode());
+		}
+		
 		System.out.println("Starting calibration sequence...");
 		BNO055CalibrationStatus calibrationStatus = null;
 		while (!(calibrationStatus = bno.getCalibrationStatus()).isFullyCalibrated()) {

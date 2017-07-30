@@ -110,7 +110,6 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 */
 	@Override
 	public OperatingMode getOperatingMode() throws IOException {
-		// For some reason, the topmost bit can be 1 every once in a while.
 		return OperatingMode.fromCtrlCode(read(REGISTER_OPR_MODE) & 0x7F);
 	}
 
