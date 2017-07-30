@@ -76,9 +76,9 @@ public class BNO055Example {
 		Thread.sleep(20);
 
 		System.out.println("Operating mode: " + bno.getOperatingMode());
-		if (bno.getOperatingMode() != OperatingMode.NDOF) {
-			System.out.println("Switching mode to NDOF");
-			bno.setOperatingMode(OperatingMode.NDOF);
+		if (bno.getOperatingMode() != OperatingMode.CONFIG) {
+			System.out.println("Switching mode to CONFIG");
+			bno.setOperatingMode(OperatingMode.CONFIG);
 			System.out.println("Operating mode: " + bno.getOperatingMode());
 		}
 		
@@ -88,9 +88,10 @@ public class BNO055Example {
 			System.out.println(String.format("Calibration status: system:%s, gyro:%s, accelerometer:%s, magnetometer:%s",
 					calibrationStatus.getSystemCalibrationStatus(), calibrationStatus.getGyroCalibrationStatus(),
 					calibrationStatus.getAccelerometerCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus()));
-			Thread.sleep(1000);
+			Thread.sleep(500);
 		}
 		System.out.println("System fully calibrated. Now printing data. Press enter to quit!");
+		bno.setOperatingMode(OperatingMode.NDOF);
 		EXECUTOR.scheduleAtFixedRate(new BNOPrinter(bno), 40, 500, TimeUnit.MILLISECONDS);
 		System.in.read();
 		EXECUTOR.shutdown();

@@ -408,13 +408,24 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 		// This may be a bit unnecessary, but let's make sure we are in config
 		// first.
 		OperatingMode currentOperatingMode = getOperatingMode();
+		if (currentOperatingMode != OperatingMode.CONFIG) {
+			setOperatingMode(OperatingMode.CONFIG);
+			waitForOk(20);
+		}
+		setUseExternalChrystal(true);
 		if (currentOperatingMode != operatingMode) {
-			if (currentOperatingMode != OperatingMode.CONFIG) {
-				setOperatingMode(OperatingMode.CONFIG);
-				waitForOk(20);
-			}
 			setOperatingMode(operatingMode);
 		}
+	}
+
+	@Override
+	public void setUseExternalChrystal(boolean b) throws IOException {
+		write(REGISTER_SYS_TRIGGER, (byte) 0x80); 
+	}
+	
+	@Override
+	public boolean isUseExternalChrystal() throws IOException {
+		return (read(REGISTER_SYS_TRIGGER) & 0x80) > 0;
 	}
 
 	private Tuple3f readVector(int register, Unit unit) throws IOException {

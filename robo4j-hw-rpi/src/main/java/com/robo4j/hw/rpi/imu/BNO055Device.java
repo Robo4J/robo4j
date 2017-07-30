@@ -80,21 +80,100 @@ public interface BNO055Device {
 	 */
 	public enum OperatingMode {
 		//@formatter:off
+		/**
+		 * This mode is used to configure BNO, wherein all output data is reset to zero and sensor
+		 * fusion is halted. This is the only mode in which all the writable register map entries can be
+		 * changed. (Exceptions from this rule are the interrupt registers (INT and INT_MSK) and the
+		 * operation mode register (OPR_MODE), which can be modified in any operation mode.)
+		 */
 		CONFIG	(0x0),
 		// Non fusion modes
+		/**
+		 * If the application requires only raw accelerometer data, this mode can be chosen. In this
+		 * mode the other sensors (magnetometer, gyro) are suspended to lower the power
+ 		 * consumption. In this mode, the BNO055 behaves like a stand-alone acceleration sensor.
+		 */
 		ACCONLY (0x1),
+		/**
+		 * In MAGONLY mode, the BNO055 behaves like a stand-alone magnetometer, with
+		 * acceleration sensor and gyroscope being suspended.
+		 */
 		MAGONLY (0x2),
+		/**
+		 * In GYROONLY mode, the BNO055 behaves like a stand-alone gyroscope, with acceleration
+		 * sensor and magnetometer being suspended.
+		 */
 		GYROONLY (0x3),
+		/**
+		 * Both accelerometer and magnetometer are switched on, the user can read the data from
+		 * these two sensors.
+		 */
 		ACCMAG (0x4),
+		/** 
+		 * Both accelerometer and gyroscope are switched on; the user can read the data from these
+		 * two sensors.
+		 */
 		ACCGYRO (0x5),
+		/**
+		 * Both magnetometer and gyroscope are switched on, the user can read the data from these
+		 * two sensors.
+		 */
 		MAGGYRO (0x6),
+		/**
+		 * All three sensors accelerometer, magnetometer and gyroscope are switched on.
+		 */
 		AMG (0x7),
 		// Fusion modes
+		/**
+		 * In the IMU mode the relative orientation of the BNO055 in space is calculated from the
+		 * accelerometer and gyroscope data. The calculation is fast (i.e. high output data rate).
+		 */
 		IMU (0x8),
+		/**
+		 * The COMPASS mode is intended to measure the magnetic earth field and calculate the
+		 * geographic direction.
+		 * The earth magnetic field is a vector with the horizontal components x,y and the vertical z
+		 * component. It depends on the position on the globe and natural iron occurrence. For
+		 * heading calculation (direction of compass pointer) only the horizontal components x and y
+		 * are used. Therefore the vector components of the earth magnetic field must be transformed
+		 * in the horizontal plane, which requires the knowledge of the direction of the gravity vector.
+		 * To summarize, the heading can only be calculated when considering gravity and magnetic
+		 * field at the same time.
+		 * However, the measurement accuracy depends on the stability of the surrounding magnetic
+		 * field. Furthermore, since the earth magnetic field is usually much smaller than the magnetic
+		 * fields that occur around and inside electronic devices, the compass mode requires
+		 * calibration.
+		 */
 		COMPASS (0x9),
+		/**
+		 * The M4G mode is similar to the IMU mode, but instead of using the gyroscope signal to
+		 * detect rotation, the changing orientation of the magnetometer in the magnetic field is used.
+		 * Since the magnetometer has much lower power consumption than the gyroscope, this mode
+		 * is less power consuming in comparison to the IMU mode. There are no drift effects in this
+		 * mode which are inherent to the gyroscope.
+		 * However, as for compass mode, the measurement accuracy depends on the stability of the
+		 * surrounding magnetic field.
+		 * For this mode no magnetometer calibration is required and also not available.
+		 */
 		M4G (0xA),
+		/**
+		 * This fusion mode is same as NDOF mode, but with the Fast Magnetometer Calibration
+		 * turned ‘OFF’.
+		 */
 		NDOF_FMC_OFF (0xB),
+		/**
+		 * This is a fusion mode with 9 degrees of freedom where the fused absolute orientation data
+		 * is calculated from accelerometer, gyroscope and the magnetometer. The advantages of
+		 * combining all three sensors are a fast calculation, resulting in high output data rate, and high
+		 * robustness from magnetic field distortions. In this mode the Fast Magnetometer calibration
+		 * is turned ON and thereby resulting in quick calibration of the magnetometer and higher
+		 * output data accuracy. The current consumption is slightly higher in comparison to the
+		 * NDOF_FMC_OFF fusion mode.
+		 */
 		NDOF (0xC),
+		/**
+		 * Reading this operating mode is indicative of an error.
+		 */
 		UNKNOWN(-1);
 		//@formatter:on
 		private byte ctrlCode;
@@ -170,15 +249,15 @@ public interface BNO055Device {
 	 */
 	public enum OrientationMode {
 		/**
-		 * Pitch: -180° to +180° (turing clockwise increases values)
-		 * Roll: -90° to +90° (increasing with increasing inclination)
-		 * Heading (Yaw): 0° to 360° (turning clockwise increases values) 
+		 * Pitch: -180° to +180° (turing clockwise increases values) Roll: -90°
+		 * to +90° (increasing with increasing inclination) Heading (Yaw): 0° to
+		 * 360° (turning clockwise increases values)
 		 */
 		Windows,
 		/**
-		 * Pitch: +180° to -180° (turning clockwise decreases values)
-		 * Roll: -90° to +90° (increasing with increasing inclination)
-		 * Heading (Yaw): 0° to 360° (turning clockwise increases values) 
+		 * Pitch: +180° to -180° (turning clockwise decreases values) Roll: -90°
+		 * to +90° (increasing with increasing inclination) Heading (Yaw): 0° to
+		 * 360° (turning clockwise increases values)
 		 */
 		Android
 	}
@@ -351,4 +430,8 @@ public interface BNO055Device {
 	 * Shutdown the device, releasing any resources.
 	 */
 	void shutdown();
+
+	boolean isUseExternalChrystal() throws IOException;
+
+	void setUseExternalChrystal(boolean b) throws IOException;
 }
