@@ -40,8 +40,8 @@ import com.robo4j.math.geometry.Tuple3f;
 public class BNO055SerialDevice extends AbstractBNO055Device implements ReadableDevice<Tuple3f>, BNO055Device {
 	private static final byte BUFFER_OVERRUN = 0x07;
 	private static final byte START_BYTE = (byte) 0xAA;
-	private static final byte CMD_READ = 0x00;
-	private static final byte CMD_WRITE = 0x01;
+	private static final byte CMD_READ = 0x01;
+	private static final byte CMD_WRITE = 0x00;
 
 	private static final int WRITE_RESPONSE_HEADER = 0xEE;
 	private static final int READ_RESPONSE_SUCCESS = 0xBB;
