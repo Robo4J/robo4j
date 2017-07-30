@@ -96,6 +96,7 @@ public class BNO055Example {
 		EXECUTOR.shutdown();
 		EXECUTOR.awaitTermination(1000, TimeUnit.MILLISECONDS);
 		System.out.println("Bye, bye!");
+		bno.shutdown();
 	}
 
 }
