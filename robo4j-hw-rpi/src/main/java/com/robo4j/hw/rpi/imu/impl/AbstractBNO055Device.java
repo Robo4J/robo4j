@@ -110,7 +110,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 */
 	@Override
 	public OperatingMode getOperatingMode() throws IOException {
-		return OperatingMode.fromCtrlCode(read(REGISTER_OPR_MODE) & 0x7F);
+		return OperatingMode.fromCtrlCode(read(REGISTER_OPR_MODE) & 0x0F);
 	}
 
 	/*
@@ -412,8 +412,8 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 		if (currentOperatingMode != operatingMode) {
 			if (currentOperatingMode != OperatingMode.CONFIG) {
 				setOperatingMode(OperatingMode.CONFIG);
+				waitForOk(20);
 			}
-			waitForOk(20);
 			setOperatingMode(operatingMode);
 		}		
 	}
