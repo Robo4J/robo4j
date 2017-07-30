@@ -291,7 +291,8 @@ public interface BNO055Device {
 	Tuple3f readGravityVector() throws IOException;
 
 	/**
-	 * Will attempt to reset the device.
+	 * Will attempt to reset the device. Note that this can be a lengthy,
+	 * blocking operation.
 	 * 
 	 * @throws IOException
 	 */

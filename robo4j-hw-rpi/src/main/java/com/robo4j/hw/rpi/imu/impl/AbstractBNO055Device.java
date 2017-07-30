@@ -355,7 +355,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	@Override
 	public void reset() throws IOException {
 		write(REGISTER_SYS_TRIGGER, (byte) 0x20);
-		waitForOk(50);
+		sleep(650);
 	}
 
 	/*
