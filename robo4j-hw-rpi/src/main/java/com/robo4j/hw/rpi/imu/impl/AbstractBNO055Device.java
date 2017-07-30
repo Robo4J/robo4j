@@ -42,6 +42,8 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	// Spec 3.6.5.5
 	private static final float QUAT_SCALE = (float) (1.0 / (1 << 14));
 	// Registers
+	private static final int REGISTER_CHIP_ID = 0x00;
+	private static final int REGISTER_PAGE_ID = 0x07;
 	private static final int REGISTER_SYS_TRIGGER = 0x3F;
 	private static final int REGISTER_PWR_MODE = 0x3E;
 	private static final int REGISTER_OPR_MODE = 0x3D;
@@ -64,6 +66,10 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	private static final int REGISTER_SYS_ERR = 0x3A;
 	private static final int REGISTER_SYS_STATUS = 0x39;
 
+	// The constant value of the chip id register for the BNO055
+	private static final byte CHIP_ID_VALUE = (byte) 0xA0;
+
+	
 	// Caching these to minimize the I2C traffic. Assumes that noone else is
 	// tinkering with the hardware.
 	private Unit currentAccelerationUnit = Unit.M_PER_S_SQUARED;
@@ -104,8 +110,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 */
 	@Override
 	public OperatingMode getOperatingMode() throws IOException {
-		// For some reason, the topmost bit can be 1 every once in a while.
-		return OperatingMode.fromCtrlCode(read(REGISTER_OPR_MODE) & 0x7F);
+		return OperatingMode.fromCtrlCode(read(REGISTER_OPR_MODE) & 0x0F);
 	}
 
 	/*
@@ -190,9 +195,10 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	/**
 	 * Reads a byte (signed or unsigned) from the provided register.
 	 * 
-	 * @param register the address of the register to read from.
+	 * @param register
+	 *            the address of the register to read from.
 	 * @return the value read.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	protected abstract int read(int register) throws IOException;
 
@@ -203,11 +209,11 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 *            the register to write to.
 	 * @param b
 	 *            the byte to write.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	protected abstract void write(int register, byte b) throws IOException;
 
-	protected void sleep(int millis) {
+	protected void sleep(long millis) {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
@@ -348,8 +354,8 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 */
 	@Override
 	public void reset() throws IOException {
-		write(REGISTER_SYS_TRIGGER, (byte) 0x8);
-		waitForOk(50);
+		write(REGISTER_SYS_TRIGGER, (byte) 0x20);
+		sleep(650);
 	}
 
 	/*
@@ -389,7 +395,27 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	}
 
 	protected void initialize(OperatingMode operatingMode) throws IOException {
-		setOperatingMode(operatingMode);
+		// First check that we are really communicating with the BNO.
+		if (read(REGISTER_CHIP_ID) != CHIP_ID_VALUE) {
+			throw new IOException("Not a BNO connected to the defined endpoint!");
+		}
+		
+		try {
+			write(REGISTER_PAGE_ID, (byte) 0);
+		} catch (IOException ioe) {
+			// Seems sometimes the first one fails, so just ignore.
+		}
+		write(REGISTER_PAGE_ID, (byte) 0);				
+		// This may be a bit unnecessary, but let's make sure we are in config
+		// first.
+		OperatingMode currentOperatingMode = getOperatingMode();
+		if (currentOperatingMode != operatingMode) {
+			if (currentOperatingMode != OperatingMode.CONFIG) {
+				setOperatingMode(OperatingMode.CONFIG);
+				waitForOk(20);
+			}
+			setOperatingMode(operatingMode);
+		}		
 	}
 
 	private Tuple3f readVector(int register, Unit unit) throws IOException {
@@ -413,9 +439,9 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 *            the register to read
 	 * @param length
 	 *            the total length of values to read.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	protected abstract byte [] read(int register, int length) throws IOException;
+	protected abstract byte[] read(int register, int length) throws IOException;
 
 	protected Tuple4f readQuaternion(int register) throws IOException {
 		byte[] data = read(register, 8);

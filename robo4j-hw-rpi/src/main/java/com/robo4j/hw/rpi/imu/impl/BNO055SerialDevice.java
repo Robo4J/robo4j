@@ -38,9 +38,10 @@ import com.robo4j.math.geometry.Tuple3f;
  * @author Miro Wengner (@miragemiko)
  */
 public class BNO055SerialDevice extends AbstractBNO055Device implements ReadableDevice<Tuple3f>, BNO055Device {
+	private static final byte BUFFER_OVERRUN = 0x07;
 	private static final byte START_BYTE = (byte) 0xAA;
-	private static final byte CMD_READ = 0x00;
-	private static final byte CMD_WRITE = 0x01;
+	private static final byte CMD_READ = 0x01;
+	private static final byte CMD_WRITE = 0x00;
 
 	private static final int WRITE_RESPONSE_HEADER = 0xEE;
 	private static final int READ_RESPONSE_SUCCESS = 0xBB;
@@ -53,10 +54,24 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 	 * Raspberry Pis as well.
 	 */
 	public static final String DEFAULT_SERIAL_PORT = "/dev/serial0";
+
+	/**
+	 * The default timeout between retrying commands on buffer overruns, in ms.
+	 */
+	public static final int DEFAULT_RETRY_TIMEOUT = 2;
+
+	/**
+	 * The default number of times to retry a command before throwing an
+	 * exception.
+	 */
+	public static final int DEFAULT_NO_OF_RETRIES = 3;
+
 	private static final int BAUD_DEFAULT = 115200;
 	private final String serialPort;
 	private final Serial serial;
 	private final ExecutorServiceFactory serviceFactory;
+	private final long retryTimeout;
+	private final int noOfRetries;
 
 	/**
 	 * Constructor. Uses defaults.
@@ -64,7 +79,7 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 	 * @throws IOException
 	 */
 	public BNO055SerialDevice() throws IOException {
-		this(DEFAULT_SERIAL_PORT, OperatingMode.NDOF);
+		this(DEFAULT_SERIAL_PORT, OperatingMode.NDOF, DEFAULT_RETRY_TIMEOUT, DEFAULT_NO_OF_RETRIES);
 	}
 
 	/**
@@ -73,11 +88,14 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 	 * @param operatingMode
 	 * @throws IOException
 	 */
-	public BNO055SerialDevice(String serialPort, OperatingMode operatingMode) throws IOException {
+	public BNO055SerialDevice(String serialPort, OperatingMode operatingMode, long retryTimeout, int noOfRetries) throws IOException {
 		this.serialPort = serialPort;
+		this.retryTimeout = retryTimeout;
+		this.noOfRetries = noOfRetries;
 		this.serial = SerialFactory.createInstance();
 		this.serviceFactory = SerialFactory.getExecutorServiceFactory();
 		initializeComms();
+		super.initialize(operatingMode);
 	}
 
 	private void initializeComms() throws IOException {
@@ -85,11 +103,20 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 	}
 
 	protected byte[] read(int register, int length) throws IOException {
+		return internalRead(register, length, 0);
+	}
+
+	private byte[] internalRead(int register, int length, int retryCount) throws IOException {
 		byte[] readRequest = createReadRequest(register, length);
 		serial.write(readRequest);
 		byte[] response = serial.read(2);
 		if ((0xFF & response[0]) == READ_RESPONSE_FAIL) {
-			throw createErrorCodeException(response[1]);
+			if (isRetryable(response[1]) && retryCount < noOfRetries) {
+				sleep(retryTimeout);
+				return internalRead(register, length, ++retryCount);
+			} else {
+				throw createErrorCodeException(response[1]);
+			}
 		} else if ((0xFF & response[0]) != READ_RESPONSE_SUCCESS) {
 			throw new IOException("Communication error - expected read response!");
 		} else if (response[1] != length) {
@@ -100,16 +127,28 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 		return serial.read(response[1]);
 	}
 
+	private static boolean isRetryable(byte b) {
+		// Only retry on buffer overruns. See Bosch application notes.
+		return b == BUFFER_OVERRUN;
+	}
+
 	@Override
 	protected void write(int register, byte b) throws IOException {
+		internalWrite(register, b, 0);
+	}
+
+	private void internalWrite(int register, byte b, int retryCount) throws IOException {
 		byte[] writeRequest = createWriteRequest(register, b);
 		serial.write(writeRequest);
 		byte[] response = serial.read(2);
 		if ((0xFF & response[0]) != WRITE_RESPONSE_HEADER) {
-			throw new IOException("Communication error - expected read response!");
-		} else if ((0xFF & response[1]) != 0x01) {
+			throw new IOException("Communication error - expected write response!");
+		} else if (isRetryable(response[1]) && retryCount < noOfRetries) {
+			sleep(retryTimeout);
+			internalWrite(register, b, ++retryCount);
+		} else if (!((0xFF & response[1]) == 0x01 || (0xFF & response[1]) == 0x00)) {
 			throw createErrorCodeException(response[1]);
-		} 
+		}
 	}
 
 	private IOException createWrongLengthException(int expectedLength, byte responseLength) {
@@ -134,7 +173,7 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 		case 0x06:
 			message = "Wrong start byte";
 			break;
-		case 0x07:
+		case BUFFER_OVERRUN:
 			message = "Buffer overrun error";
 			break;
 		case 0x08:
@@ -178,6 +217,6 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 
 	@Override
 	public void shutdown() {
-		serviceFactory.shutdown();	
+		serviceFactory.shutdown();
 	}
 }

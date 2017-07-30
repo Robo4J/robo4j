@@ -52,12 +52,39 @@ public final class BNO055Factory {
 		return new BNO055SerialDevice();
 	}
 
+	/**
+	 * Will create an I2C connected BNO055 device.
+	 * 
+	 * @param bus
+	 *            the I2C bus to use.
+	 * @param address
+	 *            the I2C address to use.
+	 * @param operatingMode
+	 *            the (initial) operating mode.
+	 * @returnan I2C connected BNO055Device
+	 * @throws IOException
+	 */
 	public static BNO055Device createDevice(int bus, int address, OperatingMode operatingMode) throws IOException {
 		return new BNO055I2CDevice(bus, address, operatingMode);
 	}
 
-	public static BNO055Device createDevice(String serialPort, OperatingMode operatingMode) throws IOException {
-		return new BNO055SerialDevice(serialPort, operatingMode);
+	/**
+	 * Will create a BNO055 device connected over serial.
+	 * 
+	 * @param serialPort
+	 *            the serial port to use.
+	 * @param operatingMode
+	 *            the (initial) operating mode to use.
+	 * @param retryTimeout
+	 *            the timeout on buffer overruns before trying again.
+	 * @param noOfRetries
+	 *            the number of times to retry.
+	 * @return a serial connected BNO55 device.
+	 * @throws IOException
+	 */
+	public static BNO055Device createDevice(String serialPort, OperatingMode operatingMode, long retryTimeout, int noOfRetries)
+			throws IOException {
+		return new BNO055SerialDevice(serialPort, operatingMode, retryTimeout, noOfRetries);
 	}
 
 }
