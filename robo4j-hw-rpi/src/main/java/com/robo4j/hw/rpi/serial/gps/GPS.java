@@ -41,7 +41,7 @@ import com.pi4j.io.serial.SerialFactory;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-@SuppressWarnings(value = {"rawtypes"})
+@SuppressWarnings(value = { "rawtypes" })
 public class GPS {
 	/**
 	 * The position accuracy without any
@@ -51,22 +51,31 @@ public class GPS {
 	/**
 	 * The default read interval to use when auto updating.
 	 */
-	private static final int DEFAULT_READ_INTERVAL = 550;
+	public static final int DEFAULT_READ_INTERVAL = 550;
+
+	/**
+	 * The default serial port is /dev/serial0. Since Raspberry Pi 3 nabbed the
+	 * /dev/ttyAMA0 for the bluetooth, serial0 should be the new logical name to
+	 * use for the rx/tx pins. This is supposedly compatible with the older
+	 * Raspberry Pis as well.
+	 */
+	public static final String DEFAULT_GPS_PORT = "/dev/serial0";
 
 	private static final String POSITION_TAG = "$GPGGA";
 	private static final String VELOCITY_TAG = "$GPVTG";
-	private static final String GPS_PORT = "/dev/serial0";
+
 	private static final int BAUD_DEFAULT = 9600;
 
+	private final String serialPort;
 	private final Serial serial;
 	private final ExecutorServiceFactory serviceFactory;
 	private final GPSDataRetriever dataRetriever;
 	private final int readInterval;
 
 	private final ScheduledExecutorService internalExecutor = Executors.newScheduledThreadPool(1, (r) -> {
-			Thread t = new Thread(r, "GPS Internal Executor");
-			t.setDaemon(true);
-			return t;
+		Thread t = new Thread(r, "GPS Internal Executor");
+		t.setDaemon(true);
+		return t;
 
 	});
 	private final List<GPSListener> listeners = new CopyOnWriteArrayList<GPSListener>();
@@ -81,7 +90,7 @@ public class GPS {
 	 * @throws IOException
 	 */
 	public GPS() throws IOException {
-		this(DEFAULT_READ_INTERVAL);
+		this(DEFAULT_GPS_PORT, DEFAULT_READ_INTERVAL);
 	}
 
 	/**
@@ -89,7 +98,8 @@ public class GPS {
 	 *
 	 * @throws IOException
 	 */
-	public GPS(int readInterval) throws IOException {
+	public GPS(String serialPort, int readInterval) throws IOException {
+		this.serialPort = serialPort;
 		this.readInterval = readInterval;
 		serial = SerialFactory.createInstance();
 		serviceFactory = SerialFactory.getExecutorServiceFactory();
@@ -134,6 +144,7 @@ public class GPS {
 		}
 		try {
 			serial.close();
+			// // FIXME(Marcus/Jul 30, 2017): This is kinda scary to do in a component!
 			serviceFactory.shutdown();
 		} catch (IllegalStateException | IOException e) {
 			// Don't care, we're shutting down.
@@ -170,10 +181,7 @@ public class GPS {
 	}
 
 	private void initialize() throws IOException {
-		// Since RaspberryPi 3 nabbed the /dev/ttyAMA0 for the bluetooth,
-		// serial0 should be the new logical name to use for the rx/tx pins.
-		// This is supposedly compatible with the older raspberry pis as well.
-		serial.open(GPS_PORT, BAUD_DEFAULT);
+		serial.open(serialPort, BAUD_DEFAULT);
 	}
 
 	private static boolean hasValidCheckSum(String data) {

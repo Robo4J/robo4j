@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.i2c.imu;
+package com.robo4j.hw.rpi.imu;
 
 /**
  * The result of a BNO055 self test.
