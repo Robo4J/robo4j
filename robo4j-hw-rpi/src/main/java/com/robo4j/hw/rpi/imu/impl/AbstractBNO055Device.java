@@ -42,6 +42,8 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	// Spec 3.6.5.5
 	private static final float QUAT_SCALE = (float) (1.0 / (1 << 14));
 	// Registers
+	private static final int REGISTER_CHIP_ID = 0x00;
+	private static final int REGISTER_PAGE_ID = 0x07;
 	private static final int REGISTER_SYS_TRIGGER = 0x3F;
 	private static final int REGISTER_PWR_MODE = 0x3E;
 	private static final int REGISTER_OPR_MODE = 0x3D;
@@ -64,6 +66,10 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	private static final int REGISTER_SYS_ERR = 0x3A;
 	private static final int REGISTER_SYS_STATUS = 0x39;
 
+	// The constant value of the chip id register for the BNO055
+	private static final byte CHIP_ID_VALUE = (byte) 0xA0;
+
+	
 	// Caching these to minimize the I2C traffic. Assumes that noone else is
 	// tinkering with the hardware.
 	private Unit currentAccelerationUnit = Unit.M_PER_S_SQUARED;
@@ -390,6 +396,26 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	}
 
 	protected void initialize(OperatingMode operatingMode) throws IOException {
+		// First check that we are really communicating with the BNO.
+		if (read(REGISTER_CHIP_ID) != CHIP_ID_VALUE) {
+			throw new IOException("Not a BNO connected to the defined endpoint!");
+		}
+		
+		try {
+			write(REGISTER_PAGE_ID, (byte) 0);
+		} catch (IOException ioe) {
+			// Seems sometimes the first one fails, so just ignore.
+		}
+		write(REGISTER_PAGE_ID, (byte) 0);				
+		// This may be a bit unnecessary, but let's make sure we are in config
+		// first.
+		OperatingMode currentOperatingMode = getOperatingMode();
+		if (currentOperatingMode != operatingMode) {
+			if (currentOperatingMode != OperatingMode.CONFIG) {
+				setOperatingMode(OperatingMode.CONFIG);
+			}
+			waitForOk(20);
+		}		
 		setOperatingMode(operatingMode);
 	}
 
