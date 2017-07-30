@@ -30,37 +30,43 @@ import java.io.IOException;
 public class BarGraphBiLed extends AbstractI2CDevice {
 
 
-    private static final byte TURN_ON_OSCILLATOR = (byte) 0x21;
+    private static final char TURN_ON_OSCILLATOR = 0x21;
     private static final byte ENABLE_DISPLAY_NO_BLINKING = (byte)0x81;
-    private static final byte HT16K33_BLINK_CMD = (byte)0x80;
-    private static final byte HT16K33_BLINK_OFF = (byte) 0;
-    private static final byte HT16K33_CMD_BRIGHTNESS = (byte) 0xE0;
-    private static final byte HT16K33_BLINK_DISPLAY_ON = (byte)0x01;
     private static final byte DISABLE_DISPLAY_NO_BLINKING = (byte)0x80;
-    private static final byte BRIGHTNESS_FULL = (byte) 0xef;
-    private static final byte LED_RED = 1;
-    private static final byte LED_OFF = 0;
 
-    final byte[] displayBuffer = new byte[8];
+    private static final char HT16K33_BLINK_CMD = 0x80;
+    private static final char HT16K33_BLINK_DISPLAY_ON = 0x01;
+    private static final char HT16K33_BLINK_OFF = 0;
+    private static final char HT16K33_BLINK_2HZ = 1;
+    private static final char HT16K33_BLINK_1HZ = 2;
+    private static final char HT16K33_BLINK_HALFHZ = 3;
+    private static final char HT16K33_CMD_BRIGHTNESS = 0xE0;
+    private static final char LED_OFF = 0;
+    private static final char LED_ON = 1;
+    private static final byte LED_RED = 1;
+    private static final byte LED_YELLOW = 2;
+    private static final byte LED_GREEN = 3;
+
+    private static final char FULL_BRIGHTNESS = 15;
+
+    final short[] displayBuffer = new short[8];
 
     public BarGraphBiLed(int bus, int address) throws Exception {
         super(bus, address);
 
         begin();
-        System.out.println("BEGIN");
+        System.out.println("BEGIN1");
 
-        for(byte b=0; b<24;b++){
-            setBar(b, LED_RED);
-        }
-        writeDisplay();
+//        for(byte b=0; b<24;b++){
+//            setBar(b, LED_RED);
+//        }
+//        writeDisplay();
 
         Thread.sleep(2000);
-        System.out.println("DONE -> RED");
+        System.out.println("DONE -> NOWAY");
 
-        for(byte b=0; b<24;b++){
-            setBar(b, LED_OFF);
-        }
-        writeDisplay();
+//        clearDisplay();
+//        writeDisplay();
 //
         System.out.println("DONE -> CLEANED");
         Thread.sleep(2000);
@@ -70,46 +76,56 @@ public class BarGraphBiLed extends AbstractI2CDevice {
     }
 
     private void begin() throws IOException{
-        i2cDevice.write(TURN_ON_OSCILLATOR);
-        i2cDevice.write(ENABLE_DISPLAY_NO_BLINKING);
-//        blinkRate(HT16K33_BLINK_OFF);
-        setBrightness(BRIGHTNESS_FULL);
+        i2cDevice.write((byte)TURN_ON_OSCILLATOR);
+        blinkRate(HT16K33_BLINK_OFF);
+        setBrightness(FULL_BRIGHTNESS);
     }
 
-    private void blinkRate(byte b) throws IOException{
-        if(b > (byte)3){
-            b = (byte)0;
+    private void blinkRate(char b) throws IOException{
+        if(b > 3){
+            b = 0;
         }
-        i2cDevice.write((byte) (HT16K33_BLINK_CMD | HT16K33_BLINK_DISPLAY_ON | (b << (byte)1)));
+        i2cDevice.write((byte) (HT16K33_BLINK_CMD | HT16K33_BLINK_DISPLAY_ON | (b << 1)));
     }
 
-    private void setBrightness(byte b) throws IOException{
-        if(b > (byte) 15){
-            b = (byte)15;
+    private void setBrightness(char b) throws IOException{
+        if(b > 15){
+            b = 15;
         }
         i2cDevice.write((byte) (HT16K33_CMD_BRIGHTNESS |  b));
     }
 
-    private void writeDisplay() throws Exception {
+    private void writeDisplay() throws IOException {
         i2cDevice.write((byte)0x00);
 
         for(byte i=0; i<8;i++){
-            i2cDevice.write((byte)(displayBuffer[i] & (byte)0xFF));
-            i2cDevice.write((byte)(displayBuffer[i] >> (byte)8));
+            int ui = i & 0xFF;
+            byte val1 = (byte)(displayBuffer[ui] & 0xFF);
+            byte val2 = (byte)(displayBuffer[ui] >> 8);
+            i2cDevice.write(val1);
+            i2cDevice.write(val2);
+        }
+    }
+
+    private void clearDisplay() throws IOException {
+        for(byte i=0; i<8;i++){
+            int ui = i & 0xFF;
+            displayBuffer[ui] = (byte) 0;
         }
     }
 
 
-    private byte BV(short bit){
-        byte result = (byte) (((byte)1) << bit);
-        return result;
+    private short BV(short bit){
+        return (byte) (((byte)1) << bit);
     }
+
+
 
     private void setBar(byte bar, byte color){
         short a, c;
-        byte const12 = 12;
-        byte const4 = 4;
-        byte const8 = 8;
+        byte const12 = (byte)(12 & 0xFF) ;
+        byte const4 = (byte)(4 & 0xFF);
+        byte const8 = (byte)(8 & 0xFF);
         if(bar < const12){
             c = (short) ((bar / const4));
         } else {
@@ -121,14 +137,14 @@ public class BarGraphBiLed extends AbstractI2CDevice {
            a += const4;
         }
 
-        if (color == 1){
-            displayBuffer[c] =  (byte)(displayBuffer[c] | BV(a));
-            short tmp1 = (short) (a + const8);
-            displayBuffer[c] =  (byte)(displayBuffer[c] << ~BV(tmp1));
-        } else {
-            short tmp1 = (short) (a + const8);
-            displayBuffer[c] = (byte)(displayBuffer[c] << (BV(a) + ~BV(tmp1)));
-        }
+//        if (color == 1){
+//            displayBuffer[c] =  (displayBuffer[c] | BV(a));
+//            short tmp1 = (short) (a + const8);
+//            displayBuffer[c] =  (char)(displayBuffer[c] << ~BV(tmp1));
+//        } else {
+//            short tmp1 = (short) (a + const8);
+//            displayBuffer[c] = (char)(displayBuffer[c] << (BV(a) + ~BV(tmp1)));
+//        }
     }
 
 
