@@ -95,6 +95,7 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 		this.serial = SerialFactory.createInstance();
 		this.serviceFactory = SerialFactory.getExecutorServiceFactory();
 		initializeComms();
+		super.initialize(operatingMode);
 	}
 
 	private void initializeComms() throws IOException {
@@ -141,7 +142,7 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 		serial.write(writeRequest);
 		byte[] response = serial.read(2);
 		if ((0xFF & response[0]) != WRITE_RESPONSE_HEADER) {
-			throw new IOException("Communication error - expected read response!");
+			throw new IOException("Communication error - expected write response!");
 		} else if (isRetryable(response[1]) && retryCount < noOfRetries) {
 			sleep(retryTimeout);
 			internalWrite(register, b, ++retryCount);
