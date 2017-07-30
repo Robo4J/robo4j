@@ -29,7 +29,6 @@ import com.robo4j.math.geometry.Tuple4f;
  * @author Miroslav Wengner (@miragemiko)
  */
 public interface BNO055Device {
-
 	/**
 	 * The power mode can be used to
 	 */
@@ -166,16 +165,59 @@ public interface BNO055Device {
 		}
 	}
 
-	public enum Orientation {
-		Windows, Android
+	/**
+	 * Describes how Euler angle results are defined.
+	 */
+	public enum OrientationMode {
+		/**
+		 * Pitch: -180° to +180° (turing clockwise increases values)
+		 * Roll: -90° to +90° (increasing with increasing inclination)
+		 * Heading (Yaw): 0° to 360° (turning clockwise increases values) 
+		 */
+		Windows,
+		/**
+		 * Pitch: +180° to -180° (turning clockwise decreases values)
+		 * Roll: -90° to +90° (increasing with increasing inclination)
+		 * Heading (Yaw): 0° to 360° (turning clockwise increases values) 
+		 */
+		Android
 	}
 
+	/**
+	 * Sets the device {@link OperatingMode}. Note that
+	 * {@link OperatingMode#CONFIG} is required for writing many registers.
+	 * 
+	 * @param operatingMode
+	 *            the OperatingMode to set.
+	 * @throws IOException
+	 */
 	void setOperatingMode(OperatingMode operatingMode) throws IOException;
 
+	/**
+	 * Returns the device {@link OperatingMode} currently in use.
+	 * 
+	 * @return the current {@link OperatingMode}.
+	 * @throws IOException
+	 */
 	OperatingMode getOperatingMode() throws IOException;
 
+	/**
+	 * Sets the {@link PowerMode} of the device.
+	 * 
+	 * @param powerMode
+	 *            the current {@link PowerMode}
+	 * @throws IOException
+	 */
 	void setPowerMode(PowerMode powerMode) throws IOException;
 
+	/**
+	 * Returns the current {@link PowerMode} of the device. Note that this can
+	 * change automatically depending on the device configuration. For example,
+	 * if the device has not been disturbed for 5 minutes.
+	 * 
+	 * @return the current {@link PowerMode} of the device
+	 * @throws IOException
+	 */
 	PowerMode getPowerMode() throws IOException;
 
 	/**
@@ -216,17 +258,17 @@ public interface BNO055Device {
 	 * @param angularRateUnit
 	 * @param angleUnit
 	 * @param temperatureUnit
-	 * @param orientation
+	 * @param orientationMode
 	 * @throws IOException
 	 */
-	void setUnits(Unit accelerationUnit, Unit angularRateUnit, Unit angleUnit, Unit temperatureUnit, Orientation orientation)
+	void setUnits(Unit accelerationUnit, Unit angularRateUnit, Unit angleUnit, Unit temperatureUnit, OrientationMode orientationMode)
 			throws IOException;
 
 	/**
 	 * This method returns the absolute orientation: X will contain heading, Y
 	 * will contain roll data, Z will contain pitch. The units will be the ones
 	 * selected with
-	 * {@link #setUnits(AccelerationUnit, AngularRateUnit, EulerAngleUnit, TemperatureUnit, Orientation)}.
+	 * {@link #setUnits(AccelerationUnit, AngularRateUnit, EulerAngleUnit, TemperatureUnit, OrientationMode)}.
 	 */
 	Tuple3f read() throws IOException;
 
@@ -298,7 +340,12 @@ public interface BNO055Device {
 	 */
 	void reset() throws IOException;
 
-	Orientation getCurrentOrientation();
+	/**
+	 * Returns the orientation (used for interpret the Euler angles)
+	 * 
+	 * @return the configured orientation of the device.
+	 */
+	OrientationMode getCurrentOrientation();
 
 	/**
 	 * Shutdown the device, releasing any resources.

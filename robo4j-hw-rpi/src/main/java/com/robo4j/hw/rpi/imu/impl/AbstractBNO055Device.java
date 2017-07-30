@@ -69,14 +69,13 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	// The constant value of the chip id register for the BNO055
 	private static final byte CHIP_ID_VALUE = (byte) 0xA0;
 
-	
 	// Caching these to minimize the I2C traffic. Assumes that noone else is
 	// tinkering with the hardware.
 	private Unit currentAccelerationUnit = Unit.M_PER_S_SQUARED;
 	private Unit currentAngularRateUnit = Unit.DEGREES_PER_SECOND;
 	private Unit currentEuelerAngleUnit = Unit.DEGREES;
 	private Unit currentTemperatureUnit = Unit.CELCIUS;
-	private Orientation currentOrientation = Orientation.Windows;
+	private OrientationMode currentOrientation = OrientationMode.Windows;
 
 	/**
 	 * Creates a BNO055Device with the default settings.
@@ -233,7 +232,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 * com.robo4j.hw.rpi.i2c.imu.BNO055I2CDevice.Orientation)
 	 */
 	@Override
-	public void setUnits(Unit accelerationUnit, Unit angularRateUnit, Unit angleUnit, Unit temperatureUnit, Orientation orientation)
+	public void setUnits(Unit accelerationUnit, Unit angularRateUnit, Unit angleUnit, Unit temperatureUnit, OrientationMode orientationMode)
 			throws IOException {
 		int val = 0;
 		if (accelerationUnit == Unit.MILI_G) {
@@ -256,7 +255,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 		} else if (temperatureUnit != Unit.CELCIUS) {
 			throw new IllegalArgumentException(temperatureUnit + " is not a temperature unit!");
 		}
-		if (orientation == Orientation.Android) {
+		if (orientationMode == OrientationMode.Android) {
 			val |= 0x80;
 		}
 		write(REGISTER_UNIT_SELECT, (byte) val);
@@ -264,7 +263,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 		currentAngularRateUnit = angularRateUnit;
 		currentEuelerAngleUnit = angleUnit;
 		currentTemperatureUnit = temperatureUnit;
-		currentOrientation = orientation;
+		currentOrientation = orientationMode;
 	}
 
 	/*
@@ -364,7 +363,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 * @see com.robo4j.hw.rpi.i2c.imu.BNO055Device#getCurrentOrientation()
 	 */
 	@Override
-	public Orientation getCurrentOrientation() {
+	public OrientationMode getCurrentOrientation() {
 		return currentOrientation;
 	}
 
@@ -399,13 +398,13 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 		if (read(REGISTER_CHIP_ID) != CHIP_ID_VALUE) {
 			throw new IOException("Not a BNO connected to the defined endpoint!");
 		}
-		
+
 		try {
 			write(REGISTER_PAGE_ID, (byte) 0);
 		} catch (IOException ioe) {
 			// Seems sometimes the first one fails, so just ignore.
 		}
-		write(REGISTER_PAGE_ID, (byte) 0);				
+		write(REGISTER_PAGE_ID, (byte) 0);
 		// This may be a bit unnecessary, but let's make sure we are in config
 		// first.
 		OperatingMode currentOperatingMode = getOperatingMode();
@@ -415,7 +414,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 				waitForOk(20);
 			}
 			setOperatingMode(operatingMode);
-		}		
+		}
 	}
 
 	private Tuple3f readVector(int register, Unit unit) throws IOException {
