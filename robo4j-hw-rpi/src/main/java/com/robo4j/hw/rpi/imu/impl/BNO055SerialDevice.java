@@ -146,7 +146,7 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 		} else if (isRetryable(response[1]) && retryCount < noOfRetries) {
 			sleep(retryTimeout);
 			internalWrite(register, b, ++retryCount);
-		} else if ((0xFF & response[1]) != 0x01) {
+		} else if (!((0xFF & response[1]) == 0x01 || (0xFF & response[1]) == 0x00)) {
 			throw createErrorCodeException(response[1]);
 		}
 	}
