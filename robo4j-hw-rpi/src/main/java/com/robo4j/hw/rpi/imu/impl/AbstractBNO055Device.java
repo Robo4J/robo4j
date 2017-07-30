@@ -415,8 +415,8 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 				setOperatingMode(OperatingMode.CONFIG);
 			}
 			waitForOk(20);
+			setOperatingMode(operatingMode);
 		}		
-		setOperatingMode(operatingMode);
 	}
 
 	private Tuple3f readVector(int register, Unit unit) throws IOException {
