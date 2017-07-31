@@ -419,8 +419,8 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	}
 
 	@Override
-	public void setUseExternalChrystal(boolean b) throws IOException {
-		write(REGISTER_SYS_TRIGGER, (byte) 0x80); 
+	public void setUseExternalChrystal(boolean useExternalChrystal) throws IOException {
+		write(REGISTER_SYS_TRIGGER, useExternalChrystal ? (byte) 0x80 : 0x00); 
 	}
 	
 	@Override
