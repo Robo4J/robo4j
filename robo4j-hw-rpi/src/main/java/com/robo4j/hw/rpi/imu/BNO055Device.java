@@ -19,7 +19,7 @@ package com.robo4j.hw.rpi.imu;
 import java.io.IOException;
 
 import com.robo4j.math.geometry.Tuple3f;
-import com.robo4j.math.geometry.Tuple4f;
+import com.robo4j.math.geometry.Tuple4d;
 
 /**
  * Interface for the BNO055 Devices. This is shared between the I2C and Serial
@@ -381,13 +381,13 @@ public interface BNO055Device {
 	Tuple3f readGyro() throws IOException;
 
 	/**
-	 * Reads the quaternion data for the absolute orientation into a Tuple4f.
+	 * Reads the quaternion data for the absolute orientation into a Tuple4d.
 	 * Note that w will be in the t field.
 	 * 
 	 * @return the quaternion data for the absolute orientation.
 	 * @throws IOException
 	 */
-	Tuple4f readQuaternion() throws IOException;
+	Tuple4d readQuaternion() throws IOException;
 
 	/**
 	 * The fusion algorithm output for the linear acceleration data for each

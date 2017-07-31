@@ -23,7 +23,7 @@ import com.robo4j.hw.rpi.imu.BNO055Device;
 import com.robo4j.hw.rpi.imu.BNO055SelfTestResult;
 import com.robo4j.hw.rpi.imu.BNO055SystemStatus;
 import com.robo4j.math.geometry.Tuple3f;
-import com.robo4j.math.geometry.Tuple4f;
+import com.robo4j.math.geometry.Tuple4d;
 
 /**
  * Abstraction for a BN0055 absolute orientation device.
@@ -322,7 +322,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 * @see com.robo4j.hw.rpi.i2c.imu.BNO055Device#readQuaternion()
 	 */
 	@Override
-	public Tuple4f readQuaternion() throws IOException {
+	public Tuple4d readQuaternion() throws IOException {
 		return readQuaternion(REGISTER_QUA_DATA_W);
 	}
 
@@ -453,9 +453,9 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 */
 	protected abstract byte[] read(int register, int length) throws IOException;
 
-	protected Tuple4f readQuaternion(int register) throws IOException {
+	protected Tuple4d readQuaternion(int register) throws IOException {
 		byte[] data = read(register, 8);
-		Tuple4f tuple = new Tuple4f();
+		Tuple4d tuple = new Tuple4d();
 		tuple.t = read16bitSigned(data, 0);
 		tuple.x = read16bitSigned(data, 2);
 		tuple.y = read16bitSigned(data, 4);

@@ -33,7 +33,6 @@ public class MatrixTest {
 	public static Integer [] TESTVALUES_4D_INT = new Integer[] {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53};
 	public static Float [] TESTVALUES_4D_FLOAT = new Float[] {2.0f, 3.0f, 5.0f, 7.0f, 11.0f, 13.0f, 17.0f, 19.0f, 23.0f, 29.0f, 31.0f, 37.0f, 41.0f, 43.0f, 47.0f, 53.0f};
 	public static Double [] TESTVALUES_4D_DOUBLE = new Double[] {2.0, 3.0, 5.0, 7.0, 11.0, 13.0, 17.0, 19.0, 23.0, 29.0, 31.0, 37.0, 41.0, 43.0, 47.0, 53.0};
-		
 	
 	@Test
 	public void testCreation() {

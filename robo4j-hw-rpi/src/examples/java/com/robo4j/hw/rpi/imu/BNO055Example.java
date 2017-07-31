@@ -22,7 +22,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.robo4j.hw.rpi.imu.BNO055Device.OperatingMode;
+import com.robo4j.math.geometry.QuaternionUtils;
+import com.robo4j.math.geometry.Tuple3d;
 import com.robo4j.math.geometry.Tuple3f;
+import com.robo4j.math.geometry.Tuple4d;
 
 /**
  * An example for the BNO device.
@@ -45,10 +48,14 @@ public class BNO055Example {
 		public void run() {
 			try {
 				Tuple3f orientation = device.read();
+				Tuple4d quaternion = device.readQuaternion();
+				Tuple3d fromQuat = QuaternionUtils.toEuler(quaternion);
+				
 				float temperature = device.getTemperature();
 
 				System.out.println(String.format("heading: %f, roll: %f, pitch: %f - temp:%f", orientation.x, orientation.y, orientation.z,
 						temperature));
+				System.out.println(String.format("Calculated from quaternion: heading: %f, roll: %f, pitch: %f", fromQuat.x, fromQuat.y, fromQuat.z));
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}
@@ -76,9 +83,9 @@ public class BNO055Example {
 		Thread.sleep(20);
 
 		System.out.println("Operating mode: " + bno.getOperatingMode());
-		if (bno.getOperatingMode() != OperatingMode.CONFIG) {
-			System.out.println("Switching mode to CONFIG");
-			bno.setOperatingMode(OperatingMode.CONFIG);
+		if (bno.getOperatingMode() != OperatingMode.NDOF) {
+			System.out.println("Switching mode to NDOF");
+			bno.setOperatingMode(OperatingMode.NDOF);
 			System.out.println("Operating mode: " + bno.getOperatingMode());
 		}
 		
