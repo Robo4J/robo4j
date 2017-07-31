@@ -50,12 +50,13 @@ public class BNO055Example {
 				Tuple3f orientation = device.read();
 				Tuple4d quaternion = device.readQuaternion();
 				Tuple3d fromQuat = QuaternionUtils.toEuler(quaternion);
-				
+
 				float temperature = device.getTemperature();
 
 				System.out.println(String.format("heading: %f, roll: %f, pitch: %f - temp:%f", orientation.x, orientation.y, orientation.z,
 						temperature));
-				System.out.println(String.format("Calculated from quaternion: heading: %f, roll: %f, pitch: %f", fromQuat.x, fromQuat.y, fromQuat.z));
+				System.out.println(String.format("Calculated from quaternion: heading: %f, roll: %f, pitch: %f", Math.toDegrees(fromQuat.x),
+						Math.toDegrees(fromQuat.y), Math.toDegrees(fromQuat.z)));
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}
@@ -71,13 +72,13 @@ public class BNO055Example {
 		System.out.println("Starting the BNO055 Example.");
 		BNO055Device bno = BNO055Factory.createDefaultSerialDevice();
 		Thread.sleep(20);
-		
+
 		System.out.println("Resetting device...");
 		bno.reset();
 		Thread.sleep(20);
-		
+
 		System.out.println("Running Self Test...");
-		BNO055SelfTestResult testResult = bno.performSelfTest();		
+		BNO055SelfTestResult testResult = bno.performSelfTest();
 		System.out.println("Result of self test: ");
 		System.out.println(testResult);
 		Thread.sleep(20);
@@ -88,7 +89,7 @@ public class BNO055Example {
 			bno.setOperatingMode(OperatingMode.NDOF);
 			System.out.println("Operating mode: " + bno.getOperatingMode());
 		}
-		
+
 		System.out.println("Starting calibration sequence...");
 		BNO055CalibrationStatus calibrationStatus = null;
 		while (!(calibrationStatus = bno.getCalibrationStatus()).isFullyCalibrated()) {
@@ -98,7 +99,7 @@ public class BNO055Example {
 			Thread.sleep(500);
 		}
 		System.out.println("System fully calibrated. Now printing data. Press enter to quit!");
-		bno.setOperatingMode(OperatingMode.NDOF);
+
 		EXECUTOR.scheduleAtFixedRate(new BNOPrinter(bno), 40, 500, TimeUnit.MILLISECONDS);
 		System.in.read();
 		EXECUTOR.shutdown();
