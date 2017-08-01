@@ -21,6 +21,9 @@ import java.awt.Graphics2D;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -41,12 +44,13 @@ public class SSD1306DeviceTest {
 		final SSD1306Device oled = new SSD1306Device(OLEDVariant.Type128x32,
 				RaspiPin.GPIO_25);
 
+		String text = args.length > 0 ? Stream.of(args).collect(Collectors.joining(" ")) : "Hello World!";
 		Graphics2D gc = oled.getGraphicsContext();
 		gc.setColor(Color.white);
 		gc.setBackground(Color.black);
 		gc.clearRect(0, 0, 127, 31);
 		gc.drawLine(0, 0, 127, 31);
-		gc.drawString("Hello World!", 0, 32);
+		gc.drawString(text, 0, 30);
 		gc.setBackground(Color.white);
 		gc.fillOval(127 - 16, -16, 32, 32);
 		oled.pushImage();
