@@ -39,10 +39,25 @@ import com.robo4j.units.rpi.I2CRoboUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
+	/**
+	 * The key used to configure which channel to use.
+	 */
 	public static String CONFIGURATION_KEY_CHANNEL = "channel";
+	/**
+	 * The key used to configure how much trim to use.
+	 */
 	public static String CONFIGURATION_KEY_TRIM = "trim";
+	/**
+	 * The key used to configure if the servo should be inverted.
+	 */
 	public static String CONFIGURATION_KEY_INVERTED = "inverted";
+	/**
+	 * The key used to configure the dual rate to use.
+	 */
 	public static String CONFIGURATION_KEY_DUAL_RATE = "dualRate";
+	/**
+	 * The key used to configure the expo to use.
+	 */
 	public static String CONFIGURATION_KEY_EXPO = "expo";
 
 	public static final AttributeDescriptor<Float> ATTRIBUTE_SERVO_INPUT = DefaultAttributeDescriptor.create(Float.class, "input");
@@ -51,6 +66,14 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 	private PCA9685Servo servo;
 	private Integer channel;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param context
+	 *            the RoboContext in which to define the unit
+	 * @param id
+	 *            the id of the unit
+	 */
 	public PCA9685ServoUnit(RoboContext context, String id) {
 		super(Float.class, context, id);
 	}
@@ -58,7 +81,7 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 	/**
 	 *
 	 * @param configuration
-	 *            - unit configuration
+	 *            unit configuration
 	 * @throws ConfigurationException
 	 */
 	@Override
