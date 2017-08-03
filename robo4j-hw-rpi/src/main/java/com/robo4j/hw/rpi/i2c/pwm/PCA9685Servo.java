@@ -18,6 +18,7 @@ package com.robo4j.hw.rpi.i2c.pwm;
 
 import java.io.IOException;
 
+import com.robo4j.hw.rpi.Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
 
 /**
@@ -31,7 +32,7 @@ import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class Servo {
+public class PCA9685Servo implements Servo {
 	private static final int TRIM_STEPS = 200;
 
 	private final PWMChannel channel;
@@ -48,7 +49,7 @@ public class Servo {
 	 * 
 	 * @param channel
 	 */
-	public Servo(PWMChannel channel) {
+	public PCA9685Servo(PWMChannel channel) {
 		this.channel = channel;
 		reset();
 	}
@@ -62,6 +63,7 @@ public class Servo {
 	 * @throws IOException
 	 *             if there was a problem communicating with the device.
 	 */
+	@Override
 	public void setInput(float input) throws IOException {
 		float actualInput = calculateExpo(input);
 		actualInput = (actualInput * dualRate) + trim / TRIM_STEPS;
@@ -75,10 +77,8 @@ public class Servo {
 		this.input = input;
 	}
 
-	/**
-	 * @return the last input used for this servo.
-	 * @throws IOException
-	 */
+
+	@Override
 	public float getInput() throws IOException {
 		return input;
 	}
@@ -116,9 +116,8 @@ public class Servo {
 		max = calculatePulseWidth(2, frequency);
 	}
 
-	/**
-	 * @return the trim settings for the servo.
-	 */
+
+	@Override
 	public float getTrim() {
 		return trim;
 	}
@@ -129,6 +128,7 @@ public class Servo {
 	 * @param steps
 	 *            the absolute position to set the trim to.
 	 */
+	@Override
 	public void setTrim(float trim) {
 		this.trim = trim;
 	}
@@ -138,6 +138,7 @@ public class Servo {
 	 * 
 	 * @param invert
 	 */
+	@Override
 	public void setInverted(boolean invert) {
 		this.invert = invert;
 	}
@@ -145,6 +146,7 @@ public class Servo {
 	/**
 	 * If set to true, input will be treated as inverted for this servo.
 	 */
+	@Override
 	public boolean isInverted() {
 		return invert;
 	}

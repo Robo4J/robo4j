@@ -24,7 +24,7 @@ import java.io.IOException;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public interface IMotor {
+public interface Motor {
 	/**
 	 * Returns the normalized speed of the motor.
 	 * 

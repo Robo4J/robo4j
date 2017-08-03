@@ -23,7 +23,7 @@ import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
-import com.robo4j.hw.rpi.IMotor;
+import com.robo4j.hw.rpi.Motor;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
 
 /**
@@ -33,7 +33,7 @@ import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class PololuMC33926HBridgeEngine implements IMotor {
+public class PololuMC33926HBridgeEngine implements Motor {
 	private final String name;
 	private final PWMChannel channel;
 	private final boolean invert;

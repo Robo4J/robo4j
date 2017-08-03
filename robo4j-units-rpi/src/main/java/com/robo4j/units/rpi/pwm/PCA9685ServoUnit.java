@@ -27,7 +27,7 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
-import com.robo4j.hw.rpi.i2c.pwm.Servo;
+import com.robo4j.hw.rpi.i2c.pwm.PCA9685Servo;
 import com.robo4j.units.rpi.I2CEndPoint;
 import com.robo4j.units.rpi.I2CRegistry;
 import com.robo4j.units.rpi.lcd.I2CRoboUnit;
@@ -48,7 +48,7 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 	public static final AttributeDescriptor<Float> ATTRIBUTE_SERVO_INPUT = DefaultAttributeDescriptor.create(Float.class, "input");
 	public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections.singleton(ATTRIBUTE_SERVO_INPUT);
 
-	private Servo servo;
+	private PCA9685Servo servo;
 	private Integer channel;
 
 	public PCA9685ServoUnit(RoboContext context, String id) {
@@ -81,7 +81,7 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 		if (channel == -1) {
 			throw ConfigurationException.createMissingConfigNameException(CONFIGURATION_KEY_CHANNEL);
 		}
-		servo = new Servo(pcaDevice.getChannel(channel));
+		servo = new PCA9685Servo(pcaDevice.getChannel(channel));
 		servo.setTrim(configuration.getFloat(CONFIGURATION_KEY_TRIM, 0f));
 		servo.setInverted(configuration.getBoolean(CONFIGURATION_KEY_INVERTED, false));
 		servo.setDualRate(configuration.getFloat(CONFIGURATION_KEY_DUAL_RATE, 1.0f));

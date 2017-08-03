@@ -19,7 +19,8 @@ package com.robo4j.hw.rpi.i2c.pwm;
 import java.io.IOException;
 
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
-import com.robo4j.hw.rpi.i2c.pwm.Servo;
+import com.robo4j.hw.rpi.Servo;
+import com.robo4j.hw.rpi.i2c.pwm.PCA9685Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
 
 /**
@@ -44,8 +45,8 @@ public class PWMPCA9685DeviceTest {
 		System.out.println("Creating device...");
 		PWMPCA9685Device device = new PWMPCA9685Device();
 		device.setPWMFrequency(SERVO_FREQUENCY);
-		Servo servo0 = new Servo(device.getChannel(0));
-		Servo servo1 = new Servo(device.getChannel(1));
+		Servo servo0 = new PCA9685Servo(device.getChannel(0));
+		Servo servo1 = new PCA9685Servo(device.getChannel(1));
 		PWMChannel motor0 = device.getChannel(2);
 		PWMChannel motor1 = device.getChannel(3);
 		
