@@ -30,7 +30,7 @@ import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
 import com.robo4j.hw.rpi.i2c.pwm.PCA9685Servo;
 import com.robo4j.units.rpi.I2CEndPoint;
 import com.robo4j.units.rpi.I2CRegistry;
-import com.robo4j.units.rpi.lcd.I2CRoboUnit;
+import com.robo4j.units.rpi.I2CRoboUnit;
 
 /**
  * Servo unit associated with the PCA9685 PWM driver.

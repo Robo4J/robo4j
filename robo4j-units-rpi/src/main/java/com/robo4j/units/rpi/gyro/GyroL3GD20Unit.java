@@ -37,7 +37,7 @@ import com.robo4j.hw.rpi.i2c.gyro.CalibratedGyro;
 import com.robo4j.hw.rpi.i2c.gyro.GyroL3GD20Device;
 import com.robo4j.hw.rpi.i2c.gyro.GyroL3GD20Device.Sensitivity;
 import com.robo4j.math.geometry.Tuple3f;
-import com.robo4j.units.rpi.lcd.I2CRoboUnit;
+import com.robo4j.units.rpi.I2CRoboUnit;
 
 /**
  * Gyro unit based on the {@link GyroL3GD20Device}. Note that there can only be

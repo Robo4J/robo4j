@@ -39,7 +39,7 @@ import com.robo4j.hw.rpi.i2c.accelerometer.AccelerometerLSM303Device.FullScale;
 import com.robo4j.hw.rpi.i2c.accelerometer.AccelerometerLSM303Device.PowerMode;
 import com.robo4j.hw.rpi.i2c.accelerometer.CalibratedAccelerometer;
 import com.robo4j.math.geometry.Tuple3f;
-import com.robo4j.units.rpi.lcd.I2CRoboUnit;
+import com.robo4j.units.rpi.I2CRoboUnit;
 
 /**
  * Accelerometer unit.

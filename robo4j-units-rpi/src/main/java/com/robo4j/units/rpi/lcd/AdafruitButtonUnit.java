@@ -29,6 +29,7 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Button;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonListener;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonPressedObserver;
+import com.robo4j.units.rpi.I2CRoboUnit;
 
 /**
  * A {@link RoboUnit} for the button part of the Adafruit 16x2 character LCD

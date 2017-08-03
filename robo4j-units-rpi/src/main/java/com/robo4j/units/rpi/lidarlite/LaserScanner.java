@@ -31,7 +31,7 @@ import com.robo4j.math.geometry.ScanResult2D;
 import com.robo4j.math.geometry.impl.ScanResultImpl;
 import com.robo4j.math.jfr.JfrUtils;
 import com.robo4j.math.jfr.ScanEvent;
-import com.robo4j.units.rpi.lcd.I2CRoboUnit;
+import com.robo4j.units.rpi.I2CRoboUnit;
 import com.robo4j.units.rpi.pwm.PCA9685ServoUnit;
 
 /**

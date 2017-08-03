@@ -36,6 +36,7 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.LcdFactory;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd.Direction;
 import com.robo4j.units.rpi.I2CEndPoint;
 import com.robo4j.units.rpi.I2CRegistry;
+import com.robo4j.units.rpi.I2CRoboUnit;
 
 /**
  * A {@link RoboUnit} for the Adafruit 16x2 character LCD shield.

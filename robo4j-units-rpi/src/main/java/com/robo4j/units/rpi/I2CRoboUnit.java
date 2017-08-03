@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.units.rpi.lcd;
+package com.robo4j.units.rpi;
 
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
@@ -29,7 +29,7 @@ import com.robo4j.core.configuration.Configuration;
  */
 public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
 	// For all Raspberry Pi's except the first model, this is always the case.
-	private static final int _DEFAULT_BUS = 1;
+	private static final int DEFAULT_BUS = 1;
 	public static final String PROPERTY_KEY_BUS = "bus";
 	public static final String PROPERTY_KEY_ADDRESS = "address";
 
@@ -46,7 +46,7 @@ public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		bus = configuration.getInteger("bus", _DEFAULT_BUS);
+		bus = configuration.getInteger("bus", DEFAULT_BUS);
 		address = configuration.getInteger("address", null);
 		if (address == null) {
 			throw ConfigurationException.createMissingConfigNameException("address");
