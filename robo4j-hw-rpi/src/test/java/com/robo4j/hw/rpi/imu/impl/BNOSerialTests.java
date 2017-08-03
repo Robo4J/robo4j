@@ -19,14 +19,18 @@ package com.robo4j.hw.rpi.imu.impl;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
 public class BNOSerialTests {
 
-//	@Test
-// FIXME: (Marcus 31.07.17) we need to fix the test :)
+	@Test
 	public void testBNOSerialReadRequest() {
 		byte[] readRequest = BNO055SerialDevice.createReadRequest(0x20, 2);
 		Assert.assertEquals(0xAA, 0xFF & readRequest[0]);
-		Assert.assertEquals(0x00, readRequest[1]);
+		Assert.assertEquals(0x01, readRequest[1]);
 		Assert.assertEquals(0x20, readRequest[2]);
 		Assert.assertEquals(2, readRequest[3]);
 	}

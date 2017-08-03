@@ -16,12 +16,10 @@
  */
 package com.robo4j.hw.rpi.imu;
 
-
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.robo4j.hw.rpi.imu.BNO055SystemStatus;
-
 
 /**
  *
