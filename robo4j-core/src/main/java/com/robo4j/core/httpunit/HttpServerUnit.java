@@ -72,7 +72,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private Integer port;
 	private List<String> target;
 	private ServerSocketChannel server;
-	private Selector selector;
 
 	public HttpServerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -158,7 +157,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			/* selector is multiplexor to SelectableChannel */
 			// Selects a set of keys whose corresponding channels are ready for
 			// I/O operations
-			selector = Selector.open();
+			final Selector selector = Selector.open();
 			server = ServerSocketChannel.open();
 			server.socket().bind(new InetSocketAddress(port));
 			server.configureBlocking(false);
@@ -166,47 +165,50 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			int selectorOpt = server.validOps();
 			server.register(selector, selectorOpt, null);
 			while (activeStates.contains(getState())) {
-				selector.select();
+				int channelReady = selector.select();
 
-				/*
-				 * token representing the registration of a SelectableChannel
-				 * with a Selector
-				 */
-				Set<SelectionKey> selectedKeys = selector.selectedKeys();
-				Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
+				if(channelReady == 0){
+					/*
+					 * token representing the registration of a SelectableChannel
+					 * with a Selector
+					 */
+					Set<SelectionKey> selectedKeys = selector.selectedKeys();
+					Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
 
-				while (selectedIterator.hasNext()) {
-					SelectionKey selectedKey = selectedIterator.next();
-					if (selectedKey.isAcceptable()) {
-						SocketChannel requestChannel = server.accept();
-						requestChannel.configureBlocking(true);
-						// TODO: miro -> improve multi-channels, selectors
-						// electionKey.OP_READ, etc. option
+					while (selectedIterator.hasNext()) {
+						final SelectionKey selectedKey = selectedIterator.next();
 
-						//@formatter:off
-						//Here is the problem
-						HttpUriRegister.getInstance().updateUnits(getContext());
-						final Future<?> futureResult = executor
-								.submit(new RoboRequestCallable(this, requestChannel.socket(),
-								new RoboRequestFactory(CODEC_REGISTRY)));
-						//@formatter:on
+						if (selectedKey.isAcceptable()) {
+							SocketChannel requestChannel = server.accept();
+							requestChannel.configureBlocking(true);
 
-						/* here can be parallel, but we need to keep channel */
-						final Object result = futureResult.get();
+							//@formatter:off
+							// TODO: (miro: 03.08.17): remove socket dependency in RoboRequestCallable
+							HttpUriRegister.getInstance().updateUnits(getContext());
+							final Future<?> futureResult = executor
+									.submit(new RoboRequestCallable(this, requestChannel.socket(),
+									new RoboRequestFactory(CODEC_REGISTRY)));
+							//@formatter:on
 
-						for (RoboReference<Object> ref : targetRefs) {
-							if (result != null && ref.getMessageType() != null
-									&& ref.getMessageType().equals(result.getClass())) {
-								ref.sendMessage(result);
+							final Object result = futureResult.get();
+
+							for (RoboReference<Object> ref : targetRefs) {
+								if (result != null && ref.getMessageType() != null
+										&& ref.getMessageType().equals(result.getClass())) {
+									ref.sendMessage(result);
+								}
 							}
-						}
 
-						requestChannel.close();
-					} else {
-						SimpleLoggingUtil.error(getClass(), "something is not right: " + selectedKey);
+							requestChannel.close();
+						} else {
+							SimpleLoggingUtil.error(getClass(), "something is not right: " + selectedKey);
+						}
+						selectedIterator.remove();
 					}
-					selectedIterator.remove();
+					selectedKeys.clear();
 				}
+
+
 			}
 		} catch (InterruptedException | ExecutionException | IOException e) {
 			SimpleLoggingUtil.error(getClass(), "SERVER CLOSED", e);
