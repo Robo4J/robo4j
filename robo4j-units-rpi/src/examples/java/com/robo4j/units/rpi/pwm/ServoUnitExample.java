@@ -24,6 +24,12 @@ import com.robo4j.core.RoboBuilderException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 
+/**
+ * Small example panning and tilting two servos in a pan/tilt setup.
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
 public class ServoUnitExample {
 	private static final int PAN_STEPS = 30;
 	private static final int TILT_STEPS = 10;
@@ -67,7 +73,7 @@ public class ServoUnitExample {
 		});
 		thread.setDaemon(true);
 		thread.start();
-		
+
 		System.out.println("Press enter to quit!");
 		try {
 			System.in.read();

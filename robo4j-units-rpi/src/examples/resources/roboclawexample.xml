@@ -1,0 +1,14 @@
+<!-- Example - Update parameters to suit your set up, especially servo trimming 
+	and inversion! -->
+<robo4j>
+	<roboUnit id="tank">
+		<class>com.robo4j.units.rpi.roboclaw.RoboClawRCTankUnit</class>
+		<config name="com.robo4j.core.root">
+			<value name="bus" type="int">1</value>
+			<!-- 0x40 hex -->
+			<value name="address" type="int">0x40</value>
+			<value name="leftChannel" type="int">6</value>
+			<value name="rightChannel" type="float">7</value>
+		</config>
+	</roboUnit>
+</robo4j>
