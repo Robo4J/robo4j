@@ -8,3 +8,6 @@ licence.idea
 /.DS_Store
 robo4j-hw-rpi/out
 robo4j-math/out
+robo4j-core/out
+robo4j-http/out
+robo4j-page/out

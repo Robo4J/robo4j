@@ -51,18 +51,19 @@ public class RoboBuilderTests {
         }
         Assert.assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
 
+
         RoboReference<String> consumer = system.getReference("consumer");
         Assert.assertNotNull(consumer);
 
-        //TODO: is this correct ?
-        synchronized ( consumer.getAttribute(descriptor).get()){
+        synchronized (consumer){
             int receivedMessages = consumer.getAttribute(descriptor).get();
             Assert.assertEquals(MESSAGES, receivedMessages);
         }
 
-
         system.stop();
         system.shutdown();
+
+
     }
 
     @Test
@@ -84,6 +85,8 @@ public class RoboBuilderTests {
         RoboContext system = builder.build();
         system.start();
         RoboReference<Object> reference = system.getReference("consumer");
+        system.stop();
+        system.shutdown();
         Assert.assertNotNull(reference);
     }
   
