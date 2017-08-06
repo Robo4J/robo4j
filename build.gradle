@@ -349,7 +349,7 @@ project("robo4j-units-rpi") {
         manifest {
             attributes 'Implementation-Title': 'robo4j-units-rpi',
                     'Implementation-Version': version,
-                    'Main-Class': 'com.robo4j.units.rpi.pwm.CalibrationUtility'
+                    'Main-Class': 'com.robo4j.units.rpi.roboclaw.RoboClawUnitExample'
         }
         //baseName = project.name + '-all'
         baseName = 'robo4j-units-rpi'

@@ -46,10 +46,10 @@ public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		bus = configuration.getInteger("bus", DEFAULT_BUS);
-		address = configuration.getInteger("address", null);
+		bus = configuration.getInteger(PROPERTY_KEY_BUS, DEFAULT_BUS);
+		address = configuration.getInteger(PROPERTY_KEY_ADDRESS, null);
 		if (address == null) {
-			throw ConfigurationException.createMissingConfigNameException("address");
+			throw ConfigurationException.createMissingConfigNameException(PROPERTY_KEY_ADDRESS);
 		}
 	}
 
