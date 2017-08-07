@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutionException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboBuilderTests {
-    private static final int MESSAGES = 1000;
+    private static final int MESSAGES = 10;
 
     @Test
     public void testParsingFile() throws RoboBuilderException, InterruptedException, ExecutionException {
@@ -55,7 +55,7 @@ public class RoboBuilderTests {
         RoboReference<String> consumer = system.getReference("consumer");
         Assert.assertNotNull(consumer);
 
-        synchronized (consumer){
+        synchronized (consumer.getAttribute(descriptor)){
             int receivedMessages = consumer.getAttribute(descriptor).get();
             Assert.assertEquals(MESSAGES, receivedMessages);
         }
