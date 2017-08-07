@@ -18,30 +18,6 @@ repositories {
     mavenLocal()
 }
 
-project("robo4j-center") {
-    description = "Robo4J Center"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
-
-    sourceCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
-    dependencies {
-        testCompile "junit:junit:${junitVersion}@jar"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
-    }
-}
-
 project("robo4j-core") {
     description = "Robo4J Core"
 
