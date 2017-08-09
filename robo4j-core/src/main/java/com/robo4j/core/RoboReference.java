@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -30,12 +30,14 @@ import com.robo4j.core.configuration.Configuration;
  */
 public interface RoboReference<T> {
 	/**
-	 * @return the {@link RoboSystem} unique identifier for this unit.
+	 * Returns the {@link RoboContext} unique identifier for this unit.
+	 * 
+	 * @return the id for the unit.
 	 */
 	String getId();
-	
+
 	/**
-	 * Returns the state of this unit.
+	 * Returns the life cycle state (@see {@link LifecycleState}) of this unit.
 	 * 
 	 * @return the state in the life cycle of this unit.
 	 */
@@ -46,36 +48,46 @@ public interface RoboReference<T> {
 	 * 
 	 * @param message
 	 *            the message to send.
-	 * @return the RoboUnit specific response.
 	 */
 	void sendMessage(T message);
 
 	/**
-	 * @return the type of messages this RoboUnit accepts. This should never
-	 *         change in runtime.
+	 * Returns the type of messages this RoboUnit accepts. This should never
+	 * change in runtime.
+	 * 
+	 * @return the type of messages this RoboUnit accepts.
 	 */
 	Class<T> getMessageType();
 
 	/**
+	 * Returns the configuration for this RoboUnit.
+	 * 
 	 * @return the configuration.
 	 */
 	Configuration getConfiguration();
 
 	/**
-	 * @return the value for a certain attribute.
+	 * Returns the value of the specified attribute.
+	 * 
+	 * @param attribute
+	 *            the attribute to read.
+	 * 
+	 * @return the value of the attribute.
 	 */
 	<R> Future<R> getAttribute(AttributeDescriptor<R> attribute);
 
 	/**
-	 * @return the attributes that this RoboUnit knows about. Should not change,
-	 *         and AttributeDescriptiors may be cached.
+	 * Returns the attributes that this RoboUnit knows about. Should not change,
+	 * and AttributeDescriptors may be cached.
+	 * 
+	 * @return the known attributes.
 	 */
 	Collection<AttributeDescriptor<?>> getKnownAttributes();
 
 	/**
-	 * @return the values of all attributes in a go, providing the state of the
-	 *         RoboUnit.
+	 * Returns the values of all attributes in one read.
+	 * 
+	 * @return the values of all attributes.
 	 */
 	Future<Map<AttributeDescriptor<?>, Object>> getAttributes();
 }
-

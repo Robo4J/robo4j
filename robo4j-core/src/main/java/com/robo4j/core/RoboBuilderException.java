@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -25,12 +25,25 @@ package com.robo4j.core;
 public class RoboBuilderException extends Exception {
 	private static final long serialVersionUID = 1L;
 
-	public RoboBuilderException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
+	/**
+	 * Constructor.
+	 * 
+	 * @param message
+	 *            the exception message.
+	 */
 	public RoboBuilderException(String message) {
 		super(message);
 	}
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param message
+	 *            the exception message.
+	 * @param cause
+	 *            the exception cause.
+	 */
+	public RoboBuilderException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -23,6 +23,17 @@ package com.robo4j.core;
  * @author Miroslav Wengner (@miragemiko)
  */
 public interface AttributeDescriptor<T> {
+	/**
+	 * Returns the type of the attribute.
+	 * 
+	 * @return the attribute type.
+	 */
 	Class<T> getAttributeType();
+
+	/**
+	 * Returns the name of the attribute.
+	 * 
+	 * @return the attribute name.
+	 */
 	String getAttributeName();
 }

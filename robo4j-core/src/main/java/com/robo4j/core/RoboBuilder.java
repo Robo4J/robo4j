@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -47,6 +47,10 @@ public final class RoboBuilder {
 	private final Set<RoboUnit<?>> units = new HashSet<>();
 	private final RoboSystem system = new RoboSystem();
 
+	/**
+	 * Class responsible for the XML parsing. Using SAX to keep down resource
+	 * requirements.
+	 */
 	private class RoboXMLHandler extends DefaultHandler {
 		private String currentId = "";
 		private String currentClassName = "";
@@ -118,7 +122,6 @@ public final class RoboBuilder {
 			}
 		}
 
-		// Private Methods
 		private Object toString(Attributes attributes) {
 			return String.format("%s=\"%s\" %s=\"%s\" %s=\"%s\" %s=\"%s\"", XmlConfigurationFactory.ATTRIBUTE_NAME,
 					attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_NAME), XmlConfigurationFactory.ATTRIBUTE_TYPE,
@@ -233,14 +236,14 @@ public final class RoboBuilder {
 	}
 
 	// FIXME(Marcus/Jan 22, 2017): Implement.
-	public RoboBuilder add(ClassLoader loader) throws RoboBuilderException {
-		throw new UnsupportedOperationException("Not yet supported");
-	}
+	//public RoboBuilder add(ClassLoader loader) throws RoboBuilderException {
+	//	throw new UnsupportedOperationException("Not yet supported");
+	//}
 
 	// FIXME(Marcus/Jan 22, 2017): Implement.
-	public RoboBuilder add(ClassLoader loader, String match) throws RoboBuilderException {
-		throw new UnsupportedOperationException("Not yet supported");
-	}
+	//public RoboBuilder add(ClassLoader loader, String match) throws RoboBuilderException {
+	//	throw new UnsupportedOperationException("Not yet supported");
+	//}
 
 	private void internalAddUnit(RoboUnit<?> unit) throws RoboBuilderException {
 		if (unit == null) {

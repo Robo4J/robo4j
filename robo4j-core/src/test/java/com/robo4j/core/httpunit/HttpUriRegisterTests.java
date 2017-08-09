@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -25,6 +25,7 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
+import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboSystem;
 import com.robo4j.core.httpunit.test.HttpCommandTestController;
 
@@ -42,7 +43,7 @@ public class HttpUriRegisterTests {
 	@Test
 	public void registerSimpleTest() {
 		/* tested system configuration */
-		RoboSystem system = new RoboSystem();
+		RoboContext system = new RoboSystem();
 
 		HttpUriRegister register = HttpUriRegister.getInstance();
 

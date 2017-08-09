@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -29,6 +29,15 @@ public class DefaultAttributeDescriptor<T> implements AttributeDescriptor<T>, Se
 	private final Class<T> attributeType;
 	private String attributeName;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param attributeType
+	 *            the type of the attribute. Needed since the generic type is
+	 *            erased.
+	 * @param attributeName
+	 *            the name of the attribute.
+	 */
 	public DefaultAttributeDescriptor(Class<T> attributeType, String attributeName) {
 		this.attributeType = attributeType;
 		this.attributeName = attributeName;
@@ -44,15 +53,21 @@ public class DefaultAttributeDescriptor<T> implements AttributeDescriptor<T>, Se
 		return attributeName;
 	}
 
-	public static<T> DefaultAttributeDescriptor<T> create(Class<T> attributeType, String attributeName) {
+	/**
+	 * Factory method for creating attribute descriptors.
+	 * 
+	 * @param attributeType
+	 *            the type of the attribute.
+	 * @param attributeName
+	 *            the name of the attribute.
+	 * @return
+	 */
+	public static <T> DefaultAttributeDescriptor<T> create(Class<T> attributeType, String attributeName) {
 		return new DefaultAttributeDescriptor<>(attributeType, attributeName);
 	}
 
 	@Override
 	public String toString() {
-		return "DefaultAttributeDescriptor{" +
-				"attributeType=" + attributeType +
-				", attributeName='" + attributeName + '\'' +
-				'}';
+		return "DefaultAttributeDescriptor{" + "attributeType=" + attributeType + ", attributeName='" + attributeName + '\'' + '}';
 	}
 }
