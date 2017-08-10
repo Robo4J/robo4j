@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -16,6 +16,7 @@
  */
 package com.robo4j.core;
 
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -28,11 +29,20 @@ import java.util.ResourceBundle;
 public class Messages {
 	private static final String BUNDLE_NAME = "messages"; //$NON-NLS-1$
 
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
 
 	private Messages() {
 	}
 
+	/**
+	 * Returns the localized string associated with a key. Note that we only
+	 * support the default locale. Always make sure to start the JVM with the
+	 * appropriate locale.
+	 * 
+	 * @param key
+	 *            the key for which to return the string.
+	 * @return the localized string.
+	 */
 	public static String getString(String key) {
 		try {
 			return RESOURCE_BUNDLE.getString(key);

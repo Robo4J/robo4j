@@ -8,13 +8,14 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.robo4j.core;
+
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -22,8 +23,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Annotate the  with this annotation to declare that the unit will get messages delivered 
- * one at a time.
+ * Annotate the with this annotation to declare that the unit will get messages
+ * delivered one at a time.
+ * 
+ * FIXME(Marcus/Aug 9, 2017): Not used yet.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

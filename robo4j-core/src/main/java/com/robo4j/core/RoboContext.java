@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -22,47 +22,61 @@ import com.robo4j.core.scheduler.Scheduler;
 
 /**
  * The execution context available for a unit. Contains a simple lookup service,
- * and life cycle management.
+ * and life cycle management. Can be thought of as a system reference.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public interface RoboContext {
 	/**
+	 * Returns the current state of the system represented by the context.
+	 * 
 	 * @return the state of the system.
 	 */
 	LifecycleState getState();
 
 	/**
-	 * Shuts the entire system down. There is no return from this.
+	 * Shuts down the system. There is no returning from this.
 	 */
 	void shutdown();
 
 	/**
-	 * Stops the system. Can be started again with start.
+	 * Stops (suspends) the system. Can be started again with start.
 	 */
 	void stop();
 
 	/**
-	 * Starts the system. Can be stopped again with stop.
+	 * Starts the system. Can be stopped (suspended) again with stop.
 	 */
 	void start();
 
 	/**
-	 * Returns a reference to a specific RoboUnit.
+	 * Returns a reference to a specific robo unit.
 	 * 
 	 * @param id
-	 * @return
+	 *            the unique id of the robo unit for which to get a reference.
+	 * @return the reference to the robo unit.
 	 */
 	<T> RoboReference<T> getReference(String id);
 
 	/**
+	 * Returns the units available in the context.
+	 * 
 	 * @return the available units.
 	 */
 	Collection<RoboReference<?>> getUnits();
 
 	/**
+	 * Returns the system scheduler.
+	 * 
 	 * @return the system scheduler.
 	 */
 	Scheduler getScheduler();
+
+	/**
+	 * Returns the globally unique id for the context.
+	 * 
+	 * @return the globally unique id for the context.
+	 */
+	String getId();
 }

@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.robo4j.core.DefaultAttributeDescriptor;
+import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboSystem;
 import com.robo4j.core.StringConsumer;
@@ -53,8 +54,8 @@ public class RoboHttpPingPongTest {
 	@Test
 	public void pingPongTest() throws Exception {
 
-		RoboSystem systemPong = configurePongSystem();
-		RoboSystem systemPing = configurePingSystem();
+		RoboContext systemPong = configurePongSystem();
+		RoboContext systemPing = configurePingSystem();
 
 		System.out.println("systemPong: State before start:");
 		System.out.println(SystemUtil.printStateReport(systemPong));
@@ -93,7 +94,7 @@ public class RoboHttpPingPongTest {
 	}
 
 	// Private Methods
-	private RoboSystem configurePongSystem() throws Exception {
+	private RoboContext configurePongSystem() throws Exception {
 		final RoboSystem result = new RoboSystem();
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
@@ -119,7 +120,7 @@ public class RoboHttpPingPongTest {
 		return result;
 	}
 
-	private RoboSystem configurePingSystem() throws Exception {
+	private RoboContext configurePingSystem() throws Exception {
 		final RoboSystem result = new RoboSystem();
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 

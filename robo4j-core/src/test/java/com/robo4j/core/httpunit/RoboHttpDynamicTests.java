@@ -10,7 +10,7 @@
  *
  * robo4j is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.robo4j.core.LifecycleState;
+import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboSystem;
 import com.robo4j.core.StringConsumer;
@@ -60,12 +61,12 @@ public class RoboHttpDynamicTests {
 	public void simpleHttpNonUnitTest() throws Exception {
 
 		/* tested system configuration */
-		RoboSystem mainSystem = getServerRoboSystem();
+		RoboContext mainSystem = getServerRoboSystem();
 		System.out.println(SystemUtil.printStateReport(mainSystem));
 		System.out.println("Server start after start:");
 
 		/* system which is testing main system */
-		RoboSystem clientSystem = getClientRoboSystem();
+		RoboContext clientSystem = getClientRoboSystem();
 		RoboReference<Object> httpClientReference = clientSystem.getReference(CLIENT_UNIT_ID);
 
 		System.out.println(SystemUtil.printStateReport(clientSystem));
@@ -91,7 +92,7 @@ public class RoboHttpDynamicTests {
 	}
 
 	// Private Methods
-	private RoboSystem getServerRoboSystem() throws Exception {
+	private RoboContext getServerRoboSystem() throws Exception {
 		/* tested system configuration */
 		RoboSystem result = new RoboSystem();
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
@@ -122,7 +123,7 @@ public class RoboHttpDynamicTests {
 		return result;
 	}
 
-	private RoboSystem getClientRoboSystem() throws Exception {
+	private RoboContext getClientRoboSystem() throws Exception {
 		/* system which is testing main system */
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		RoboSystem result = new RoboSystem();

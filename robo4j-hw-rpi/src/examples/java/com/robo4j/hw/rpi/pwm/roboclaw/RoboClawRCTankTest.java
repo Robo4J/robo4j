@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -59,6 +59,7 @@ public class RoboClawRCTankTest {
 
 		RoboClawRCTank tank = new RoboClawRCTank(leftEngine, rightEngine);
 		tank.setDirection(direction);
+		tank.setSpeed(speed);
 		Thread.sleep(duration);
 		tank.setSpeed(0);
 	}

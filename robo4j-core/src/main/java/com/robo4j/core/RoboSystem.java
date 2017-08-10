@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -28,7 +28,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
@@ -37,7 +36,9 @@ import com.robo4j.core.scheduler.DefaultScheduler;
 import com.robo4j.core.scheduler.Scheduler;
 
 /**
- * Contains RoboUnits, a lookup service for references to RoboUnits, and a system level life cycle.
+ * This is the default implementation for a local {@link RoboContext}. Contains
+ * RoboUnits, a lookup service for references to RoboUnits, and a system level
+ * life cycle.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -55,10 +56,10 @@ public class RoboSystem implements RoboContext {
 	private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
 	private final String uid = UUID.randomUUID().toString();
 
-	private class ReferenceImplementation<T> implements RoboReference<T> {
+	private class LocalRoboReference<T> implements RoboReference<T> {
 		private final RoboUnit<T> unit;
 
-		ReferenceImplementation(RoboUnit<T> unit) {
+		LocalRoboReference(RoboUnit<T> unit) {
 			this.unit = unit;
 		}
 
@@ -103,20 +104,43 @@ public class RoboSystem implements RoboContext {
 		}
 	}
 
+	/**
+	 * Constructor.
+	 */
 	public RoboSystem() {
 		this(DEFAULT_THREAD_POOL_SIZE);
 	}
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param threadPoolSize
+	 *            the size of the messaging thread pool.
+	 */
 	public RoboSystem(int threadPoolSize) {
-		systemExecutor = new ThreadPoolExecutor(threadPoolSize, threadPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-				workQueue, new RoboThreadFactory("Robo4J System", true));
+		systemExecutor = new ThreadPoolExecutor(threadPoolSize, threadPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
+				new RoboThreadFactory("Robo4J System", true));
 	}
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param threadPoolSize
+	 *            the size of the messaging thread pool.
+	 * @param unitSet
+	 *            a set of units to add to the system.
+	 */
 	public RoboSystem(int threadPoolSize, Set<RoboUnit<?>> unitSet) {
 		this(threadPoolSize);
 		addToMap(unitSet);
 	}
 
+	/**
+	 * Adds the specified units to the system.
+	 * 
+	 * @param unitSet
+	 *            the units to add.
+	 */
 	public void addUnits(Set<RoboUnit<?>> unitSet) {
 		if (state.get() != LifecycleState.UNINITIALIZED) {
 			throw new UnsupportedOperationException("All units must be registered up front for now.");
@@ -124,19 +148,17 @@ public class RoboSystem implements RoboContext {
 		addToMap(unitSet);
 	}
 
+	/**
+	 * Adds the specified units to the system.
+	 * 
+	 * @param units
+	 *            the units to add.
+	 */
 	public void addUnits(RoboUnit<?>... units) {
 		if (state.get() != LifecycleState.UNINITIALIZED) {
 			throw new UnsupportedOperationException("All units must be registered up front for now.");
 		}
 		addToMap(units);
-	}
-
-	public void addToMap(Set<RoboUnit<?>> unitSet) {
-		unitSet.forEach(unit -> units.put(unit.getId(), unit));
-	}
-
-	public void addToMap(RoboUnit<?>... unitArray) {
-		Stream.of(unitArray).forEach(unit -> units.put(unit.getId(), unit));
 	}
 
 	@Override
@@ -173,20 +195,12 @@ public class RoboSystem implements RoboContext {
 		return state.get();
 	}
 
-	/**
-	 * Returns all the units in the system.
-	 */
+	@Override
 	public Collection<RoboReference<?>> getUnits() {
 		return units.values().stream().map(unit -> getReference(unit)).collect(Collectors.toList());
 	}
 
-	/**
-	 * 
-	 * @param id
-	 * 
-	 * @return returns the reference to the specified RoboUnit. The reference
-	 *         can be kept and
-	 */
+	@Override
 	public <T> RoboReference<T> getReference(String id) {
 		@SuppressWarnings("unchecked")
 		RoboUnit<T> roboUnit = (RoboUnit<T>) units.get(id);
@@ -196,12 +210,23 @@ public class RoboSystem implements RoboContext {
 		return getReference(roboUnit);
 	}
 
-	private <T> RoboReference<T> createReference(RoboUnit<T> roboUnit) {
-		return new ReferenceImplementation<>(roboUnit);
+	@Override
+	public Scheduler getScheduler() {
+		return scheduler;
 	}
 
-	// NOTE(Marcus/Jan 24, 2017): We're only making sure that the reference is
-	// around, no more, no less.
+	@Override
+	public String getId() {
+		return uid;
+	}
+
+	/**
+	 * Returns the reference for a specific unit.
+	 * 
+	 * @param roboUnit
+	 *            the robo unit for which to retrieve a reference.
+	 * @return the {@link RoboReference} to the unit.
+	 */
 	public <T> RoboReference<T> getReference(RoboUnit<T> roboUnit) {
 		@SuppressWarnings("unchecked")
 		RoboReference<T> reference = (RoboReference<T>) referenceCache.get(roboUnit);
@@ -212,15 +237,19 @@ public class RoboSystem implements RoboContext {
 		return reference;
 	}
 
-	/**
-	 * @return the unique id of this {@link RoboSystem}.
-	 */
-	public String getId() {
-		return uid;
+
+	private <T> RoboReference<T> createReference(RoboUnit<T> roboUnit) {
+		return new LocalRoboReference<>(roboUnit);
 	}
 
-	@Override
-	public Scheduler getScheduler() {
-		return scheduler;
+	private void addToMap(Set<RoboUnit<?>> unitSet) {
+		unitSet.forEach(unit -> units.put(unit.getId(), unit));
+	}
+
+	private void addToMap(RoboUnit<?>... unitArray) {
+		// NOTE(Marcus/Aug 9, 2017): Do not streamify...
+		for (RoboUnit<?> unit : unitArray) {
+			units.put(unit.getId(), unit);
+		}
 	}
 }

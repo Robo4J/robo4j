@@ -10,7 +10,7 @@
  *
  * robo4j is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.robo4j.core.DefaultAttributeDescriptor;
+import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboSystem;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
@@ -36,7 +37,7 @@ public class SimpleTankUnitTests {
 
     @Test
     public void simpleTankUnitMockTest() throws Exception {
-        RoboSystem system = new RoboSystem();
+        RoboContext system = new RoboSystem();
         SimpleTankUnitMock tank  = new SimpleTankUnitMock(system, "tank");
         Configuration config = ConfigurationFactory.createEmptyConfiguration();
 

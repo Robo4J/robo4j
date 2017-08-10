@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -26,6 +26,8 @@ import java.lang.annotation.Target;
  * Annotate units with this annotation to declare that their onMessage methods
  * may take some time to finish. The messages will be delivered using a separate
  * work pool with a higher number of maximum threads.
+ * 
+ * NOTE(Marcus/Aug 9, 2017): Not in use yet.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

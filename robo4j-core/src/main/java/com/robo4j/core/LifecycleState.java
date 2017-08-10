@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -47,8 +47,7 @@ public enum LifecycleState {
 	STOPPED(5, Messages.getString("LifecycleState.STATE_NAME_STOPPED"), Messages.getString("LifecycleState.STATE_DESCRIPTION_STOPPED")),  //$NON-NLS-1$ //$NON-NLS-2$
 	SHUTTING_DOWN(6, Messages.getString("LifecycleState.STATE_NAME_SHUTTING_DOWN"), Messages.getString("LifecycleState.STATE_DESCRIPTION_SHUTTING_DOWN")),  //$NON-NLS-1$ //$NON-NLS-2$
 	SHUTDOWN(7, Messages.getString("LifecycleState.STATE_NAME_SHUTDOWN"), Messages.getString("LifecycleState.STATE_DESCRIPTION_STOPPED")),  //$NON-NLS-1$ //$NON-NLS-2$
-	FAILED(8, Messages.getString("LifecycleState.STATE_NAME_FAILED"), Messages.getString("LifecycleState.STATE_DESCRIPTION_FAILED")), 
-	; //$NON-NLS-1$ //$NON-NLS-2$
+	FAILED(8, Messages.getString("LifecycleState.STATE_NAME_FAILED"), Messages.getString("LifecycleState.STATE_DESCRIPTION_FAILED")); //$NON-NLS-1$ //$NON-NLS-2$
 	// @formatter:on
 
 	private final Integer stateId;
@@ -71,13 +70,20 @@ public enum LifecycleState {
 	}
 
 	/**
-	 * @return the localized name of the
+	 * Returns the localized name of the life cycle state.
+	 * 
+	 * @return the localized name of the life cycle state.
 	 */
 	public String getLocalizedName() {
 		return localizedName;
 	}
 
-	public String getDescription() {
+	/**
+	 * Returns a localized description of the life cycle state.
+	 * 
+	 * @return the description of the life cycle state.
+	 */
+	public String getLocalizedDescription() {
 		return description;
 	}
 
