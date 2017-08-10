@@ -310,6 +310,17 @@ project("robo4j-units-lego") {
         }
     }
 
+    //create a single Jar with all dependencies
+    task fatJar(type: Jar) {
+        manifest {
+            attributes 'Implementation-Title': 'robo4j-units-lego',
+                    'Implementation-Version': version
+        }
+        baseName = 'robo4j-units-lego'
+        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+        with jar
+    }
+
     dependencies {
         compile(project(":robo4j-hw-lego"))
         compile(project(":robo4j-core"))

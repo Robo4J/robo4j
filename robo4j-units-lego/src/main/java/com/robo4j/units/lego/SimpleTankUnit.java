@@ -55,7 +55,7 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	/* test visible  */
 	protected volatile ILegoMotor rightMotor;
 	protected volatile ILegoMotor leftMotor;
-	private ExecutorService executor = new ThreadPoolExecutor(LegoUtils.DEFAULT_THREAD_POOL_SIZE, LegoUtils.DEFAULT_THREAD_POOL_SIZE,
+	private ExecutorService executor = new ThreadPoolExecutor(LegoUtils.PLATFORM_THREAD_POOL_SIZE, LegoUtils.PLATFORM_THREAD_POOL_SIZE,
 			LegoUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
 			new RoboThreadFactory("Robo4J Lego Platform", true));
 

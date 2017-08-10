@@ -29,8 +29,10 @@ public final class LegoUtils {
 
     public static final int DEFAULT_1 = 1;
     public static final int DEFAULT_0 = 0;
-    public static final int DEFAULT_THREAD_POOL_SIZE = 2;
+    public static final int PLATFORM_THREAD_POOL_SIZE = 2;
+    public static final int SINGLE_THREAD_POOL_SIZE = 1;
     public static final int TERMINATION_TIMEOUT = 2;
     public static final int KEEP_ALIVE_TIME = 10;
+
 
 }
