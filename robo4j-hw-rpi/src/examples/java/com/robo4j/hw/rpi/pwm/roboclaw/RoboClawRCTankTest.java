@@ -59,6 +59,7 @@ public class RoboClawRCTankTest {
 
 		RoboClawRCTank tank = new RoboClawRCTank(leftEngine, rightEngine);
 		tank.setDirection(direction);
+		tank.setSpeed(speed);
 		Thread.sleep(duration);
 		tank.setSpeed(0);
 	}
