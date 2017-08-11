@@ -32,7 +32,7 @@ import com.robo4j.math.geometry.Tuple3i;
  * Example: MagnetometerLSM303Test 100 1 csv
  * </p>
  * 
- * <p>See the MagViz utiliy.</p>
+ * <p>See the MagViz utility.</p>
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
