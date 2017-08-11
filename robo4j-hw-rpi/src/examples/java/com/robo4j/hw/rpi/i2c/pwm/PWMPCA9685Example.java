@@ -39,7 +39,6 @@ public class PWMPCA9685Example {
 	private static final int MOTOR_MEDIUM = 2048;
 	private static final int MOTOR_MAX = 4095;
 
-
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
 		System.out.println("Creating device...");
