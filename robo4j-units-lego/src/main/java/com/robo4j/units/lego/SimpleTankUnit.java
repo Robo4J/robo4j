@@ -30,7 +30,6 @@ import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboResult;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
@@ -52,12 +51,12 @@ import com.robo4j.units.lego.utils.LegoUtils;
  */
 public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements RoboReference<LegoPlatformMessage> {
 
-	/* test visible  */
+	/* test visible */
 	protected volatile ILegoMotor rightMotor;
 	protected volatile ILegoMotor leftMotor;
-	private ExecutorService executor = new ThreadPoolExecutor(LegoUtils.DEFAULT_THREAD_POOL_SIZE, LegoUtils.DEFAULT_THREAD_POOL_SIZE,
-			LegoUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
-			new RoboThreadFactory("Robo4J Lego Platform", true));
+	private ExecutorService executor = new ThreadPoolExecutor(LegoUtils.PLATFORM_THREAD_POOL_SIZE,
+			LegoUtils.PLATFORM_THREAD_POOL_SIZE, LegoUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
+			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J Lego Platform", true));
 
 	public SimpleTankUnit(RoboContext context, String id) {
 		super(LegoPlatformMessage.class, context, id);
@@ -117,26 +116,27 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	}
 
 	// Private Methods
-	private RoboResult<LegoPlatformMessage, Boolean> processPlatformMessage(LegoPlatformMessage message) {
+	private void processPlatformMessage(LegoPlatformMessage message) {
 		switch (message.getType()) {
 		case STOP:
-			return createResult(executeBothEnginesStop(rightMotor, leftMotor));
+			executeBothEnginesStop(rightMotor, leftMotor);
+			break;
 		case MOVE:
-			return createResult(executeBothEngines(MotorRotationEnum.FORWARD, rightMotor, leftMotor));
+			executeBothEngines(MotorRotationEnum.FORWARD, rightMotor, leftMotor);
+			break;
 		case BACK:
-			return createResult(executeBothEngines(MotorRotationEnum.BACKWARD, rightMotor, leftMotor));
+			executeBothEngines(MotorRotationEnum.BACKWARD, rightMotor, leftMotor);
+			break;
 		case LEFT:
-			return createResult(executeTurn(leftMotor, rightMotor));
+			executeTurn(leftMotor, rightMotor);
+			break;
 		case RIGHT:
-			return createResult(executeTurn(rightMotor, leftMotor));
+			executeTurn(rightMotor, leftMotor);
+			break;
 		default:
 			SimpleLoggingUtil.error(getClass(), message.getType() + " not supported!");
 			throw new LegoUnitException("PLATFORM COMMAND: " + message);
 		}
-	}
-
-	private RoboResult<LegoPlatformMessage, Boolean> createResult(boolean result) {
-		return new RoboResult<>(this, result);
 	}
 
 	private boolean executeTurn(ILegoMotor... motors) {

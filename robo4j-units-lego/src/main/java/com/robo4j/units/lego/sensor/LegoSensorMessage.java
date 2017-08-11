@@ -19,11 +19,11 @@
 
 package com.robo4j.units.lego.sensor;
 
-import com.robo4j.core.RoboReference;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
 
 /**
- * Lego Sensor Message is generic for all available sesnors
+ * Lego Sensor Message is generic for all available sensors
+ * 
  * @see {@link SensorTypeEnum}
  *
  * @author Marcus Hirt (@hirt)
@@ -31,39 +31,24 @@ import com.robo4j.hw.lego.enums.SensorTypeEnum;
  */
 public class LegoSensorMessage {
 
-    private final RoboReference<?> source;
-    private final SensorTypeEnum type;
-    private final String value;
+	private final SensorTypeEnum type;
+	private final String value;
 
-    public LegoSensorMessage(SensorTypeEnum type, String value) {
-        this(null, type, value);
-    }
+	public LegoSensorMessage(SensorTypeEnum type, String value) {
+		this.type = type;
+		this.value = value;
+	}
 
-    public LegoSensorMessage(RoboReference<?> source, SensorTypeEnum type, String value) {
-        this.source = source;
-        this.type = type;
-        this.value = value;
-    }
+	public SensorTypeEnum getType() {
+		return type;
+	}
 
-    public RoboReference<?> getSource() {
-        return source;
-    }
+	public String getValue() {
+		return value;
+	}
 
-    public SensorTypeEnum getType() {
-        return type;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    /*
-         * (non-Javadoc)
-         *
-         * @see java.lang.Object#toString()
-         */
-    @Override
-    public String toString() {
-        return String.format("Type: %s, Value: %s, Source: %s", type, value, String.valueOf(source));
-    }
+	@Override
+	public String toString() {
+		return String.format("Type: %s, Value: %s", type, value);
+	}
 }

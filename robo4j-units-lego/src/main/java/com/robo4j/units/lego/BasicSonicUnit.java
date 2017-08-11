@@ -55,13 +55,15 @@ import com.robo4j.units.lego.utils.LegoUtils;
  *
  * Simple Sonic unit with servo
  *
+ * unit is capable to communicate with it self by passing {@link LegoSonicMessage}
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboReference<LegoSonicMessage> {
 
-	private final ExecutorService executor = new ThreadPoolExecutor(LegoUtils.DEFAULT_THREAD_POOL_SIZE,
-			LegoUtils.DEFAULT_THREAD_POOL_SIZE, LegoUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
+	private final ExecutorService executor = new ThreadPoolExecutor(LegoUtils.PLATFORM_THREAD_POOL_SIZE,
+			LegoUtils.PLATFORM_THREAD_POOL_SIZE, LegoUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
 			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J Lego BasicSonic", true));
 	private static final int POSITION_START = 0;
 	private static final int POSITION_STEP = 30;

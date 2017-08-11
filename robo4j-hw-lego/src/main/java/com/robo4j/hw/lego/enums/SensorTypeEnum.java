@@ -34,7 +34,7 @@ public enum SensorTypeEnum {
 	// @formatter:off
 	// type id mode source elements
 	/**
-	 * Touch pressed 1 : free 0
+	 * Touch pressed 1.0 : free 0.0 (string of float)
 	 */
 	TOUCH		(0, "Touch", "lejos.hardware.sensor.EV3TouchSensor", 1),
 	/**
