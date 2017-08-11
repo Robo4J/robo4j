@@ -1,5 +1,4 @@
-<!-- Example - Update parameters to suit your set up, especially servo trimming 
-	and inversion! -->
+<!-- Example - Update parameters to suit your set up, especially inversion! -->
 <robo4j>
 	<roboUnit id="tank">
 		<class>com.robo4j.units.rpi.roboclaw.RoboClawRCTankUnit</class>
