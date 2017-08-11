@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import com.robo4j.hw.rpi.Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PCA9685Servo;
-import com.robo4j.hw.rpi.i2c.pwm.PCA9685Device;
+import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
 
 /**
  * This example assumes two servos connected to specific channels (6 and 7). It
@@ -52,7 +52,7 @@ public class RoboClawRCTankTest {
 
 	public static void testEngine(float speed, float direction, int duration) throws IOException, InterruptedException {
 		System.out.println(String.format("Running for %d ms with speed %f and direction %f.", duration, speed, direction));
-		PCA9685Device device = new PCA9685Device();
+		PWMPCA9685Device device = new PWMPCA9685Device();
 		device.setPWMFrequency(SERVO_FREQUENCY);
 		Servo leftEngine = new PCA9685Servo(device.getChannel(6));
 		Servo rightEngine = new PCA9685Servo(device.getChannel(7));

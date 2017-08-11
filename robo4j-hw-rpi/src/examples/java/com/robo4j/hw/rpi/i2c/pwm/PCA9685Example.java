@@ -18,10 +18,10 @@ package com.robo4j.hw.rpi.i2c.pwm;
 
 import java.io.IOException;
 
-import com.robo4j.hw.rpi.i2c.pwm.PCA9685Device;
+import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
 import com.robo4j.hw.rpi.Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PCA9685Servo;
-import com.robo4j.hw.rpi.i2c.pwm.PCA9685Device.PWMChannel;
+import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
 
 /**
  * This example assumes two servos connected to channel 0 and 1, and two H bridges controlling DC engines on channel 2 and 3. 
@@ -42,7 +42,7 @@ public class PCA9685Example {
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
 		System.out.println("Creating device...");
-		PCA9685Device device = new PCA9685Device();
+		PWMPCA9685Device device = new PWMPCA9685Device();
 		device.setPWMFrequency(SERVO_FREQUENCY);
 		Servo servo0 = new PCA9685Servo(device.getChannel(0));
 		Servo servo1 = new PCA9685Servo(device.getChannel(1));

@@ -19,7 +19,7 @@ package com.robo4j.hw.rpi.i2c.pwm;
 import java.io.IOException;
 
 import com.robo4j.hw.rpi.Servo;
-import com.robo4j.hw.rpi.i2c.pwm.PCA9685Device.PWMChannel;
+import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
 
 /**
  * Simple wrapper class for simplifying working with a PWM Channel having a

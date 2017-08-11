@@ -24,7 +24,7 @@ import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
 import com.robo4j.hw.rpi.Motor;
-import com.robo4j.hw.rpi.i2c.pwm.PCA9685Device.PWMChannel;
+import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
 
 /**
  * Motor controller for the Pololu H-bridge motor controller based on
@@ -33,7 +33,7 @@ import com.robo4j.hw.rpi.i2c.pwm.PCA9685Device.PWMChannel;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class MC33926HBridgeDevice implements Motor {
+public class HBridgeMC33926Device implements Motor {
 	private final String name;
 	private final PWMChannel channel;
 	private final boolean invert;
@@ -47,7 +47,7 @@ public class MC33926HBridgeDevice implements Motor {
 		FORWARD, REVERSE
 	}
 
-	public MC33926HBridgeDevice(String name, PWMChannel channel, Pin in1, Pin in2, boolean invert) {
+	public HBridgeMC33926Device(String name, PWMChannel channel, Pin in1, Pin in2, boolean invert) {
 		this.name = name;
 		this.channel = channel;
 		this.invert = invert;

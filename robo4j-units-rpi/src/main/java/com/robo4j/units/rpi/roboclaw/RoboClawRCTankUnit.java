@@ -23,7 +23,7 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.hw.rpi.i2c.pwm.PCA9685Servo;
-import com.robo4j.hw.rpi.i2c.pwm.PCA9685Device;
+import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
 import com.robo4j.hw.rpi.pwm.roboclaw.RoboClawRCTank;
 import com.robo4j.units.rpi.I2CEndPoint;
 import com.robo4j.units.rpi.I2CRegistry;
@@ -77,14 +77,14 @@ public class RoboClawRCTankUnit extends I2CRoboUnit<MotionEvent> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		super.onInitialization(configuration);
 		Object pwmDevice = I2CRegistry.getI2CDeviceByEndPoint(new I2CEndPoint(getBus(), getAddress()));
-		PCA9685Device pcaDevice = null;
+		PWMPCA9685Device pcaDevice = null;
 		try {
 			if (pwmDevice == null) {
-				pcaDevice = new PCA9685Device(getBus(), getAddress());
+				pcaDevice = new PWMPCA9685Device(getBus(), getAddress());
 				I2CRegistry.registerI2CDevice(pcaDevice, new I2CEndPoint(getBus(), getAddress()));
 				pcaDevice.setPWMFrequency(50);
 			} else {
-				pcaDevice = (PCA9685Device) pwmDevice;
+				pcaDevice = (PWMPCA9685Device) pwmDevice;
 			}
 		} catch (IOException e) {
 			throw new ConfigurationException("Could not initialize hardware", e);

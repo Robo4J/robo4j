@@ -45,8 +45,8 @@ public class MC33926Example {
 	}
 
 	private static void runEngine(float speed, int duration) throws IOException, InterruptedException {
-		PCA9685Device pwm = new PCA9685Device();
-		MC33926HBridgeDevice engine = new MC33926HBridgeDevice("Engine", pwm.getChannel(4), RaspiPin.GPIO_02, RaspiPin.GPIO_03, true);
+		PWMPCA9685Device pwm = new PWMPCA9685Device();
+		HBridgeMC33926Device engine = new HBridgeMC33926Device("Engine", pwm.getChannel(4), RaspiPin.GPIO_02, RaspiPin.GPIO_03, true);
 
 		System.out.println(String.format("Running for %d ms at speed %f...", duration, speed));
 

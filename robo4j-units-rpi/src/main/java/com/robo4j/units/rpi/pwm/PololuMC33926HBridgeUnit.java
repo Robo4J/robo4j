@@ -24,14 +24,14 @@ import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.hw.rpi.i2c.pwm.PCA9685Device;
-import com.robo4j.hw.rpi.i2c.pwm.MC33926HBridgeDevice;
+import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
+import com.robo4j.hw.rpi.i2c.pwm.HBridgeMC33926Device;
 import com.robo4j.units.rpi.I2CEndPoint;
 import com.robo4j.units.rpi.I2CRegistry;
 import com.robo4j.units.rpi.I2CRoboUnit;
 
 /**
- * Motor unit associated with the {@link MC33926HBridgeDevice} driver.
+ * Motor unit associated with the {@link HBridgeMC33926Device} driver.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -68,7 +68,7 @@ public class PololuMC33926HBridgeUnit extends I2CRoboUnit<Float> {
 	/**
 	 * The engine.
 	 */
-	private MC33926HBridgeDevice engine;
+	private HBridgeMC33926Device engine;
 
 	public PololuMC33926HBridgeUnit(RoboContext context, String id) {
 		super(Float.class, context, id);
@@ -84,14 +84,14 @@ public class PololuMC33926HBridgeUnit extends I2CRoboUnit<Float> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		super.onInitialization(configuration);
 		Object pwmDevice = I2CRegistry.getI2CDeviceByEndPoint(new I2CEndPoint(getBus(), getAddress()));
-		PCA9685Device pcaDevice = null;
+		PWMPCA9685Device pcaDevice = null;
 		try {
 			if (pwmDevice == null) {
-				pcaDevice = new PCA9685Device(getBus(), getAddress());
+				pcaDevice = new PWMPCA9685Device(getBus(), getAddress());
 				I2CRegistry.registerI2CDevice(pcaDevice, new I2CEndPoint(getBus(), getAddress()));
 				pcaDevice.setPWMFrequency(50);
 			} else {
-				pcaDevice = (PCA9685Device) pwmDevice;
+				pcaDevice = (PWMPCA9685Device) pwmDevice;
 			}
 		} catch (IOException e) {
 			throw new ConfigurationException("Could not initialize hardware", e);
@@ -115,7 +115,7 @@ public class PololuMC33926HBridgeUnit extends I2CRoboUnit<Float> {
 
 		boolean invert = configuration.getBoolean(CONFIGURATION_KEY_INVERT, false);
 
-		engine = new MC33926HBridgeDevice(configuration.getString(CONFIGURATION_KEY_NAME, "MC33926"), pcaDevice.getChannel(channel),
+		engine = new HBridgeMC33926Device(configuration.getString(CONFIGURATION_KEY_NAME, "MC33926"), pcaDevice.getChannel(channel),
 				in1, in2, invert);
 	}
 
