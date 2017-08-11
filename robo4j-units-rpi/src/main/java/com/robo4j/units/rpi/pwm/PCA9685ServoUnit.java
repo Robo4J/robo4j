@@ -42,23 +42,23 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 	/**
 	 * The key used to configure which channel to use.
 	 */
-	public static String CONFIGURATION_KEY_CHANNEL = "channel";
+	public static final String CONFIGURATION_KEY_CHANNEL = "channel";
 	/**
 	 * The key used to configure how much trim to use.
 	 */
-	public static String CONFIGURATION_KEY_TRIM = "trim";
+	public static final String CONFIGURATION_KEY_TRIM = "trim";
 	/**
 	 * The key used to configure if the servo should be inverted.
 	 */
-	public static String CONFIGURATION_KEY_INVERTED = "inverted";
+	public static final String CONFIGURATION_KEY_INVERTED = "inverted";
 	/**
 	 * The key used to configure the dual rate to use.
 	 */
-	public static String CONFIGURATION_KEY_DUAL_RATE = "dualRate";
+	public static final String CONFIGURATION_KEY_DUAL_RATE = "dualRate";
 	/**
 	 * The key used to configure the expo to use.
 	 */
-	public static String CONFIGURATION_KEY_EXPO = "expo";
+	public static final String CONFIGURATION_KEY_EXPO = "expo";
 
 	public static final AttributeDescriptor<Float> ATTRIBUTE_SERVO_INPUT = DefaultAttributeDescriptor.create(Float.class, "input");
 	public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections.singleton(ATTRIBUTE_SERVO_INPUT);
