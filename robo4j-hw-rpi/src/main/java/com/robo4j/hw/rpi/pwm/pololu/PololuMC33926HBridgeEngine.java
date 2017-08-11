@@ -61,36 +61,6 @@ public class PololuMC33926HBridgeEngine implements Motor {
 		return name;
 	}
 
-	public void internalSetSpeed(float speed) throws IOException {
-		int width = Math.round(speed * 4095);
-		channel.setPWM(0, width);
-		this.speed = speed;
-	}
-
-	public float internalGetSpeed() {
-		return speed;
-	}
-
-	public Direction getDirection() {
-		return direction;
-	}
-
-	public void setDirection(Direction direction) {
-		boolean forward = direction == Direction.FORWARD;
-		if (invert) {
-			forward = !forward;
-		}
-
-		if (forward) {
-			in1.setState(PinState.HIGH);
-			in2.setState(PinState.LOW);
-		} else {
-			in1.setState(PinState.LOW);
-			in2.setState(PinState.HIGH);
-		}
-		this.direction = direction;
-	}
-
 	@Override
 	public float getSpeed() throws IOException {
 		return (this.getDirection() == Direction.FORWARD ? 1 : -1) * internalGetSpeed();
@@ -108,5 +78,35 @@ public class PololuMC33926HBridgeEngine implements Motor {
 			}
 		}
 		internalSetSpeed(speed);
+	}
+	
+	private void internalSetSpeed(float speed) throws IOException {
+		int width = Math.round(speed * 4095);
+		channel.setPWM(0, width);
+		this.speed = speed;
+	}
+
+	private float internalGetSpeed() {
+		return speed;
+	}
+
+	private Direction getDirection() {
+		return direction;
+	}
+
+	private void setDirection(Direction direction) {
+		boolean forward = direction == Direction.FORWARD;
+		if (invert) {
+			forward = !forward;
+		}
+
+		if (forward) {
+			in1.setState(PinState.HIGH);
+			in2.setState(PinState.LOW);
+		} else {
+			in1.setState(PinState.LOW);
+			in2.setState(PinState.HIGH);
+		}
+		this.direction = direction;
 	}
 }
