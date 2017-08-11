@@ -25,7 +25,7 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
-import com.robo4j.hw.rpi.pwm.pololu.PololuMC33926HBridgeEngine;
+import com.robo4j.hw.rpi.i2c.pwm.PololuMC33926HBridgeEngine;
 import com.robo4j.units.rpi.I2CEndPoint;
 import com.robo4j.units.rpi.I2CRegistry;
 import com.robo4j.units.rpi.I2CRoboUnit;
