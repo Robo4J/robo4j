@@ -30,7 +30,7 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
  */
 //Not using all commands - yet.
 @SuppressWarnings("unused")
-public class PWMPCA9685Device extends AbstractI2CDevice {
+public class PCA9685Device extends AbstractI2CDevice {
 	private static final int DEFAULT_I2C_ADDRESS = 0x40;
 
 	private static final double PRESCALE_FACTOR = 25000000.0 / 4096.0;
@@ -64,7 +64,7 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 	 * @throws IOException
 	 *             if there was communication problem
 	 */
-	public PWMPCA9685Device() throws IOException {
+	public PCA9685Device() throws IOException {
 		// 0x40 is the default address used by the AdaFruit PWM board.
 		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS);
 	}
@@ -83,7 +83,7 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 	 * @throws IOException
 	 *             if there was communication problem
 	 */
-	public PWMPCA9685Device(int bus, int address) throws IOException {
+	public PCA9685Device(int bus, int address) throws IOException {
 		super(bus, address);
 		initialize();
 	}
@@ -151,7 +151,7 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 	/**
 	 * Use to control a PWM channel on the PWM device.
 	 * 
-	 * @see PWMPCA9685Device#getChannel(int)
+	 * @see PCA9685Device#getChannel(int)
 	 */
 	public class PWMChannel {
 		private final int channel;
@@ -186,8 +186,8 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 		/**
 		 * @return the PWM device that this channel is associated with.
 		 */
-		public PWMPCA9685Device getPWMDevice() {
-			return PWMPCA9685Device.this;
+		public PCA9685Device getPWMDevice() {
+			return PCA9685Device.this;
 		}
 
 		/**
