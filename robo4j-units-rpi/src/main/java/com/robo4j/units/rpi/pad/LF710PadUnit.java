@@ -73,7 +73,11 @@ public class LF710PadUnit extends RoboUnit<Object>{
         observer = new LF710ButtonObserver(pad);
         listener = (LF710Message response) -> {
             if(getState() == LifecycleState.STARTED){
-                targetRef.sendMessage(response);
+                if(targetRef == null){
+                    System.out.println("PAD pressed: " + response);
+                } else {
+                    targetRef.sendMessage(response);
+                }
             }
         };
         observer.addButtonListener(listener);
