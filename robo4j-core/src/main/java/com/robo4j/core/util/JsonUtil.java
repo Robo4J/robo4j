@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.robo4j.core.httpunit.Constants;
+import com.robo4j.core.units.httpunit.Constants;
 
 /**
  *

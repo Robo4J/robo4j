@@ -44,10 +44,10 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.client.util.RoboHttpUtils;
 import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.httpunit.Constants;
-import com.robo4j.core.httpunit.codec.CameraMessage;
-import com.robo4j.core.httpunit.codec.CameraMessageCodec;
 import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.units.httpunit.Constants;
+import com.robo4j.core.units.httpunit.codec.CameraMessage;
+import com.robo4j.core.units.httpunit.codec.CameraMessageCodec;
 import com.robo4j.hw.rpi.camera.CameraClientException;
 import com.robo4j.hw.rpi.camera.RaspistilDevice;
 

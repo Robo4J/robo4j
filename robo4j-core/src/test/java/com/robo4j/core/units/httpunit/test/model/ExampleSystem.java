@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,38 +14,51 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.client.request;
 
-import com.robo4j.core.units.httpunit.Constants;
-import com.robo4j.http.util.HttpMessageUtil;
+package com.robo4j.core.units.httpunit.test.model;
+
+import java.util.List;
 
 /**
+ * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RoboBasicMapEntry {
+public class ExampleSystem {
 
-    private String key;
-    private String value;
+    private Long id;
+    private String uid;
+    private List<String> config;
 
-    public RoboBasicMapEntry(String text) {
-        final String[] values = text.split(HttpMessageUtil.getHttpSeparator(3));
-        key = values[Constants.DEFAULT_VALUE_0];
-        value = values[Constants.DEFAULT_VALUE_1];
+    public Long getId() {
+        return id;
     }
 
-    public String getKey() {
-        return key;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public String getValue() {
-        return value;
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public List<String> getConfig() {
+        return config;
+    }
+
+    public void setConfig(List<String> config) {
+        this.config = config;
     }
 
     @Override
     public String toString() {
-        return "RoboBasicMapEntry{" +
-                "key='" + key + '\'' +
-                ", value='" + value + '\'' +
+        return "ExampleSystem{" +
+                "id=" + id +
+                ", uid='" + uid + '\'' +
+                ", config='" + config + '\'' +
                 '}';
     }
 }

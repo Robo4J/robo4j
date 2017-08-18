@@ -32,7 +32,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 
-import com.robo4j.core.httpunit.Constants;
+import com.robo4j.core.units.httpunit.Constants;
 import com.robo4j.db.sql.model.ERoboUnit;
 import com.robo4j.db.sql.support.DataSourceContext;
 import com.robo4j.db.sql.support.SortType;

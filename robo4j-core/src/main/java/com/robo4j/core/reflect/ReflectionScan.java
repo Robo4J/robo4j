@@ -32,14 +32,13 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import com.robo4j.core.httpunit.CodecRegistryException;
-import com.robo4j.core.httpunit.Constants;
 import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.units.httpunit.CodecRegistryException;
+import com.robo4j.core.units.httpunit.Constants;
 import com.robo4j.core.util.StreamUtils;
 
 /**
- *
- * Util class for reflection scan
+ * Util class for reflection scan.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)

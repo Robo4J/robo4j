@@ -80,7 +80,9 @@ public class RoboSystem implements RoboContext {
 
 		@Override
 		public void sendMessage(T message) {
-			systemExecutor.submit(() -> unit.onMessage(message));
+			if (getState() == LifecycleState.STARTED) {
+				systemExecutor.submit(() -> unit.onMessage(message));
+			}
 		}
 
 		@Override
@@ -186,7 +188,7 @@ public class RoboSystem implements RoboContext {
 			SimpleLoggingUtil.error(getClass(), "Was interrupted when shutting down.", e);
 		}
 		state.set(LifecycleState.SHUTTING_DOWN);
-		units.values().forEach(RoboUnit::shutdown);
+		units.values().forEach(RoboSystem::shutdownUnit);
 		state.set(LifecycleState.SHUTDOWN);
 	}
 
@@ -237,7 +239,6 @@ public class RoboSystem implements RoboContext {
 		return reference;
 	}
 
-
 	private <T> RoboReference<T> createReference(RoboUnit<T> roboUnit) {
 		return new LocalRoboReference<>(roboUnit);
 	}
@@ -251,5 +252,12 @@ public class RoboSystem implements RoboContext {
 		for (RoboUnit<?> unit : unitArray) {
 			units.put(unit.getId(), unit);
 		}
+	}
+
+	private static void shutdownUnit(RoboUnit<?> unit) {
+		unit.setState(LifecycleState.SHUTTING_DOWN);
+		// NOTE(Marcus/Aug 11, 2017): Should really be scheduled and done in
+		// parallel.
+		unit.shutdown();
 	}
 }

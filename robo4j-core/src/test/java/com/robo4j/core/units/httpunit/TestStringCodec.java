@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- *
+ * 
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,38 +14,43 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-
-package com.robo4j.units.lego.example.codec;
+package com.robo4j.core.units.httpunit;
 
 import com.robo4j.core.units.httpunit.HttpDecoder;
 import com.robo4j.core.units.httpunit.HttpEncoder;
 import com.robo4j.core.units.httpunit.HttpProducer;
-import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
 
 /**
+ * Test class implementing both an encoder and decoder.
+ * 
  * @author Marcus Hirt (@hirt)
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  */
 @HttpProducer
-public class LegoPlatformMessageTypeEnumToStringTestCodec implements HttpDecoder<LegoPlatformMessageTypeEnum>, HttpEncoder<LegoPlatformMessageTypeEnum> {
+public class TestStringCodec implements HttpDecoder<String>, HttpEncoder<String> {
+	@Override
+	public String decode(String json) {
+		String withoutStart = json.replace("data:", "");
+		String withoutBrackets = withoutStart.replaceAll("[\\[\\]\\{\\}]", "");
+		return withoutBrackets;
+	}
 
-    @Override
-    public String encode(LegoPlatformMessageTypeEnum stuff) {
-        return null;
-    }
+	@Override
+	public Class<String> getDecodedClass() {
+		return String.class;
+	}
 
-    @Override
-    public LegoPlatformMessageTypeEnum decode(String json) {
-        return LegoPlatformMessageTypeEnum.getByName(json);
-    }
+	@Override
+	public String encode(String data) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("{data:");
+		builder.append(data);
+		builder.append("}");
+		return builder.toString();
+	}
 
-    @Override
-    public Class<LegoPlatformMessageTypeEnum> getEncodedClass() {
-        return LegoPlatformMessageTypeEnum.class;
-    }
-
-    @Override
-    public Class<LegoPlatformMessageTypeEnum> getDecodedClass() {
-        return LegoPlatformMessageTypeEnum.class;
-    }
+	@Override
+	public Class<String> getEncodedClass() {
+		return String.class;
+	}
 }

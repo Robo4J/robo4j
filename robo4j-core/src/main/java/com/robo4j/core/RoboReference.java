@@ -44,7 +44,8 @@ public interface RoboReference<T> {
 	LifecycleState getState();
 
 	/**
-	 * Sends a message to this RoboUnit.
+	 * Sends a message to this RoboUnit. Messages will only be delivered to
+	 * started units.
 	 * 
 	 * @param message
 	 *            the message to send.

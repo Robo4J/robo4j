@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.robo4j.core.client.request.RoboBasicMapEntry;
-import com.robo4j.core.httpunit.Constants;
+import com.robo4j.core.units.httpunit.Constants;
 import com.robo4j.http.HttpHeaderNames;
 import com.robo4j.http.util.HttpFirstLineBuilder;
 import com.robo4j.http.util.HttpHeaderBuilder;

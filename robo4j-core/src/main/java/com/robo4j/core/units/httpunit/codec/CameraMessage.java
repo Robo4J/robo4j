@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,38 +14,48 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.client.request;
 
-import com.robo4j.core.units.httpunit.Constants;
-import com.robo4j.http.util.HttpMessageUtil;
+package com.robo4j.core.units.httpunit.codec;
 
 /**
+ * Camera message contains description and image as byte array
+ * used for http codec.
+ *
+ * note: example joystick example
+ *
+ * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RoboBasicMapEntry {
+public class CameraMessage {
 
-    private String key;
-    private String value;
+    private final String type;
+    private final String value;
+    private final String image;
 
-    public RoboBasicMapEntry(String text) {
-        final String[] values = text.split(HttpMessageUtil.getHttpSeparator(3));
-        key = values[Constants.DEFAULT_VALUE_0];
-        value = values[Constants.DEFAULT_VALUE_1];
+    public CameraMessage(String type, String value, String image) {
+        this.type = type;
+        this.value = value;
+        this.image = image;
     }
 
-    public String getKey() {
-        return key;
+    public String getType() {
+        return type;
     }
 
     public String getValue() {
         return value;
     }
 
+    public String getImage() {
+        return image;
+    }
+
     @Override
     public String toString() {
-        return "RoboBasicMapEntry{" +
-                "key='" + key + '\'' +
+        return "CameraMessage{" +
+                "type='" + type + '\'' +
                 ", value='" + value + '\'' +
+                ", image=" + image +
                 '}';
     }
 }
