@@ -59,7 +59,7 @@ public class RoboSchedulerTests {
 			// Expected - using this to wait for completion.
 		}
 
-		Assert.assertEquals(consumer.getReceivedMessages().size(), 3);
+		Assert.assertEquals(3,consumer.getReceivedMessages().size());
 		Assert.assertTrue(listener.wasFinalCalled);
 		system.shutdown();
 	}
