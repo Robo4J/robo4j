@@ -174,16 +174,19 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 				SimpleLoggingUtil.error(getClass(), "Failed to calibrate!", e);
 			}
 			break;
+		case STOP:
+			activeThresholds.remove(message.getTarget());
+			if (activeThresholds.isEmpty()) {
+				readings.cancel(false);
+				readings = null;
+			}
+			break;
+		case ONCE:
 		case CONTINUOUS:
 			if (message.getNotificationThreshold() != null) {
 				setUpNotification(message.getTarget(), message);
 			}
 			break;
-		case ONCE:
-			throw new UnsupportedOperationException("Huäääää");
-		case STOP:
-			readings.cancel(false);
-			readings = null;
 		}
 		super.onMessage(message);
 	}
