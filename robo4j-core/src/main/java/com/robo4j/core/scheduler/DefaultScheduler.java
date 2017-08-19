@@ -16,6 +16,8 @@
  */
 package com.robo4j.core.scheduler;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -59,8 +61,7 @@ public class DefaultScheduler implements Scheduler {
 	 */
 	public DefaultScheduler(RoboContext context, int numberOfThreads) {
 		this.context = context;
-		this.executor = new ScheduledThreadPoolExecutor(numberOfThreads,
-				new RoboThreadFactory("Robo4J Scheduler", true));
+		this.executor = new ScheduledThreadPoolExecutor(numberOfThreads, new RoboThreadFactory("Robo4J Scheduler", true));
 	}
 
 	@Override
@@ -84,9 +85,8 @@ public class DefaultScheduler implements Scheduler {
 	}
 
 	@Override
-	public <T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval,
-			TimeUnit unit) {
-		return executor.scheduleAtFixedRate( () -> sendMessage(target, message), delay, interval, unit);
+	public <T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval, TimeUnit unit) {
+		return executor.scheduleAtFixedRate(() -> deliverMessage(target, message), delay, interval, unit);
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class DefaultScheduler implements Scheduler {
 		executor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
 	}
 
-	static <T> void sendMessage(final RoboReference<T> reference, final T message) {
+	static <T> void deliverMessage(final RoboReference<T> reference, final T message) {
 		// Performance optimization - let the scheduling thread deliver the
 		// message directly if this is robo unit implementation, instead of
 		// enqueuing it with the message executor.
@@ -110,9 +110,20 @@ public class DefaultScheduler implements Scheduler {
 	public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long delay, long interval, TimeUnit unit) {
 		return executor.scheduleAtFixedRate(runnable, delay, interval, unit);
 	}
-	
+
 	@Override
 	public void schedule(Runnable runnable, long delay, TimeUnit unit) {
 		executor.schedule(runnable, delay, unit);
-	}	
+	}
+
+	@Override
+	public void execute(Runnable r) {
+		executor.execute(r);
+
+	}
+
+	@Override
+	public <T> Future<T> submit(Callable<T> r) {
+		return executor.submit(r);
+	}
 }

@@ -45,7 +45,7 @@ public class RoboSchedulerTests {
 
 	@Test
 	public void testScheduler() throws InterruptedException, ExecutionException {
-		RoboSystem system = new RoboSystem(2);
+		RoboSystem system = new RoboSystem();
 		StringConsumer consumer = new StringConsumer(system, "consumer");
 		system.addUnits(consumer);
 
@@ -66,7 +66,7 @@ public class RoboSchedulerTests {
 
 	@Test
 	public void testSchedulerWithPressureAndMultipleTasks() throws InterruptedException, ExecutionException {
-		RoboSystem system = new RoboSystem(2);
+		RoboSystem system = new RoboSystem();
 		StringConsumer consumer = new StringConsumer(system, "consumer");
 		system.addUnits(consumer);
 

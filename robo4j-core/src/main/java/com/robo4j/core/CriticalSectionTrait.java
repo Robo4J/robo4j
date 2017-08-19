@@ -26,8 +26,6 @@ import java.lang.annotation.Target;
  * Annotate the with this annotation to declare that the unit will get messages
  * delivered one at a time.
  * 
- * FIXME(Marcus/Aug 9, 2017): Not used yet.
- * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */

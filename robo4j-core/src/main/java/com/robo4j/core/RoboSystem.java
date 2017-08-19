@@ -44,23 +44,66 @@ import com.robo4j.core.scheduler.Scheduler;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboSystem implements RoboContext {
-	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
+	private static final String KEY_SCHEDULER_POOL_SIZE = "poolSizeScheduler";
+	private static final String KEY_WORKER_POOL_SIZE = "poolSizeWorker";
+	private static final String KEY_BLOCKING_POOL_SIZE = "poolSizeBlocking";
+
+	private static final int DEFAULT_BLOCKING_POOL_SIZE = 4;
+	private static final int DEFAULT_WORKING_POOL_SIZE = 2;
+	private static final int DEFAULT_SCHEDULER_POOL_SIZE = 2;
 	private static final int TERMINATION_TIMEOUT = 5;
 	private static final int KEEP_ALIVE_TIME = 10;
+
 	private volatile AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
 	private final Map<String, RoboUnit<?>> units = new HashMap<>();
 	private final Map<RoboUnit<?>, RoboReference<?>> referenceCache = new WeakHashMap<>();
 
-	private final ThreadPoolExecutor systemExecutor;
-	private final Scheduler scheduler = new DefaultScheduler(this);
+	private final Scheduler systemScheduler;
+
+	private final ThreadPoolExecutor workExecutor;
 	private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
-	private final String uid = UUID.randomUUID().toString();
+
+	private final ThreadPoolExecutor blockingExecutor;
+	private final LinkedBlockingQueue<Runnable> blockingQueue = new LinkedBlockingQueue<>();
+
+	private final String uid;
+
+	private enum DeliveryPolicy {
+		SYSTEM, WORK, BLOCKING
+	}
+
+	private enum ThreadingPolicy {
+		NORMAL, CRITICAL
+	}
 
 	private class LocalRoboReference<T> implements RoboReference<T> {
 		private final RoboUnit<T> unit;
+		private final DeliveryPolicy deliveryPolicy;
+		private final ThreadingPolicy threadingPolicy;
 
 		LocalRoboReference(RoboUnit<T> unit) {
 			this.unit = unit;
+			@SuppressWarnings("unchecked")
+			Class<? extends RoboUnit<?>> clazz = (Class<? extends RoboUnit<?>>) unit.getClass();
+			this.deliveryPolicy = deriveDeliveryPolicy(clazz);
+			this.threadingPolicy = deriveThreadingPolicy(clazz);
+		}
+
+		private ThreadingPolicy deriveThreadingPolicy(Class<? extends RoboUnit<?>> clazz) {
+			if (clazz.getAnnotation(CriticalSectionTrait.class) != null) {
+				return ThreadingPolicy.CRITICAL;
+			}
+			return ThreadingPolicy.NORMAL;
+		}
+
+		private DeliveryPolicy deriveDeliveryPolicy(Class<? extends RoboUnit<?>> clazz) {
+			if (clazz.getAnnotation(WorkTrait.class) != null) {
+				return DeliveryPolicy.WORK;
+			}
+			if (clazz.getAnnotation(BlockingTrait.class) != null) {
+				return DeliveryPolicy.BLOCKING;
+			}
+			return DeliveryPolicy.SYSTEM;
 		}
 
 		@Override
@@ -81,13 +124,33 @@ public class RoboSystem implements RoboContext {
 		@Override
 		public void sendMessage(T message) {
 			if (getState() == LifecycleState.STARTED) {
-				systemExecutor.submit(() -> unit.onMessage(message));
+				if (threadingPolicy != ThreadingPolicy.CRITICAL) {
+					deliverOnQueue(message);
+				} else {
+					synchronized (unit) {
+						deliverOnQueue(message);
+					}
+				}
+			}
+		}
+
+		private void deliverOnQueue(T message) {
+			switch (deliveryPolicy) {
+			case SYSTEM:
+				systemScheduler.execute(() -> unit.onMessage(message));
+				break;
+			case WORK:
+				workExecutor.execute(() -> unit.onMessage(message));
+				break;
+			case BLOCKING:
+				blockingExecutor.execute(() -> unit.onMessage(message));
+				break;
 			}
 		}
 
 		@Override
 		public <R> Future<R> getAttribute(AttributeDescriptor<R> attribute) {
-			return systemExecutor.submit(() -> unit.onGetAttribute(attribute));
+			return systemScheduler.submit(() -> unit.onGetAttribute(attribute));
 		}
 
 		@Override
@@ -97,7 +160,7 @@ public class RoboSystem implements RoboContext {
 
 		@Override
 		public Future<Map<AttributeDescriptor<?>, Object>> getAttributes() {
-			return systemExecutor.submit(() -> unit.onGetAttributes());
+			return systemScheduler.submit(() -> unit.onGetAttributes());
 		}
 
 		@Override
@@ -110,31 +173,51 @@ public class RoboSystem implements RoboContext {
 	 * Constructor.
 	 */
 	public RoboSystem() {
-		this(DEFAULT_THREAD_POOL_SIZE);
+		this(UUID.randomUUID().toString());
 	}
 
 	/**
 	 * Constructor.
-	 * 
-	 * @param threadPoolSize
-	 *            the size of the messaging thread pool.
 	 */
-	public RoboSystem(int threadPoolSize) {
-		systemExecutor = new ThreadPoolExecutor(threadPoolSize, threadPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
-				new RoboThreadFactory("Robo4J System", true));
+	public RoboSystem(String uid) {
+		this(uid, DEFAULT_SCHEDULER_POOL_SIZE, DEFAULT_WORKING_POOL_SIZE, DEFAULT_BLOCKING_POOL_SIZE);
 	}
 
 	/**
 	 * Constructor.
-	 * 
-	 * @param threadPoolSize
-	 *            the size of the messaging thread pool.
-	 * @param unitSet
-	 *            a set of units to add to the system.
 	 */
-	public RoboSystem(int threadPoolSize, Set<RoboUnit<?>> unitSet) {
-		this(threadPoolSize);
+	public RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize) {
+		this.uid = uid;
+		workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
+				new RoboThreadFactory("Robo4J Worker Pool", true));
+		blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, blockingQueue,
+				new RoboThreadFactory("Robo4J Blocking Pool", true));
+
+		systemScheduler = new DefaultScheduler(this, schedulerPoolSize);
+	}
+
+	/**
+	 * Constructor.
+	 */
+	public RoboSystem(String uid, Configuration systemConfig) {
+		this(uid, systemConfig.getInteger(KEY_SCHEDULER_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE),
+				systemConfig.getInteger(KEY_WORKER_POOL_SIZE, DEFAULT_WORKING_POOL_SIZE),
+				systemConfig.getInteger(KEY_BLOCKING_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE));
+	}
+	
+	/**
+	 * Constructor.
+	 */
+	public RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize, Set<RoboUnit<?>> unitSet) {
+		this(uid, schedulerPoolSize, workerPoolSize, blockingPoolSize);
 		addToMap(unitSet);
+	}
+
+	/**
+	 * Constructor.
+	 */
+	public RoboSystem(Configuration config) {
+		this(UUID.randomUUID().toString(), config);
 	}
 
 	/**
@@ -181,9 +264,9 @@ public class RoboSystem implements RoboContext {
 	public void shutdown() {
 		stop();
 		try {
-			systemExecutor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
-			systemExecutor.shutdown();
-			scheduler.shutdown();
+			workExecutor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
+			workExecutor.shutdown();
+			systemScheduler.shutdown();
 		} catch (InterruptedException e) {
 			SimpleLoggingUtil.error(getClass(), "Was interrupted when shutting down.", e);
 		}
@@ -214,7 +297,7 @@ public class RoboSystem implements RoboContext {
 
 	@Override
 	public Scheduler getScheduler() {
-		return scheduler;
+		return systemScheduler;
 	}
 
 	@Override

@@ -16,6 +16,8 @@
  */
 package com.robo4j.core.scheduler;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -49,8 +51,8 @@ public interface Scheduler {
 	 *         and whose get() method will throw an exception upon completing
 	 *         the number of invocations.
 	 */
-	<T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long period, TimeUnit unit,
-			int numberOfInvocations, FinalInvocationListener listener);
+	<T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long period, TimeUnit unit, int numberOfInvocations,
+			FinalInvocationListener listener);
 
 	/**
 	 * Schedules a message to the target.
@@ -71,8 +73,7 @@ public interface Scheduler {
 	 *         and whose get() method will throw an exception upon completing
 	 *         the number of invocations.
 	 */
-	<T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval, TimeUnit unit,
-			int numberOfInvocations);
+	<T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval, TimeUnit unit, int numberOfInvocations);
 
 	/**
 	 * Schedules a message to the target. Will run the message until cancelled.
@@ -94,6 +95,22 @@ public interface Scheduler {
 	<T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval, TimeUnit unit);
 
 	/**
+	 * Execute something on the scheduler thread as soon as possible.
+	 * 
+	 * @param r
+	 *            the runnable to execute.
+	 */
+	void execute(Runnable r);
+
+	/**
+	 * Execute something on the scheduler thread as soon as possible.
+	 * 
+	 * @param r
+	 *            the runnable to execute.
+	 */
+	<T> Future<T> submit(Callable<T> r);
+
+	/**
 	 * 
 	 * @param runnable
 	 *            the command to execute.
@@ -107,7 +124,7 @@ public interface Scheduler {
 	 *            the listener to execute once the last one has been run.
 	 */
 	void schedule(Runnable runnable, long delay, TimeUnit unit);
-	
+
 	/**
 	 * 
 	 * @param runnable
@@ -120,7 +137,7 @@ public interface Scheduler {
 	 *            the listener to execute once the last one has been run.
 	 */
 	ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long delay, long interval, TimeUnit unit);
-	
+
 	/**
 	 * Scheduler shutdown
 	 */

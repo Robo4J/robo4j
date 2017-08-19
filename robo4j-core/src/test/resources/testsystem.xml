@@ -1,0 +1,21 @@
+<!-- Robo4J Unit Definition file for JUnit Tests -->
+<robo4j>
+	<roboSystem id="mySystem">
+		<config name="com.robo4j.core.root">
+			<value name="poolSizeScheduler" type="Integer">3</value>
+			<value name="poolSizeWorker" type="Integer">1</value>
+			<value name="poolSizeBlocking" type="Integer">10</value>
+		</config>		
+	</roboSystem>
+	
+	<roboUnit id="producer">
+		<class>com.robo4j.core.StringProducer</class>
+		<config name="com.robo4j.core.root">
+			<value name="target" type="String">consumer</value>
+		</config>
+	</roboUnit>
+
+	<roboUnit id="consumer">
+		<class>com.robo4j.core.StringConsumer</class>
+	</roboUnit>
+</robo4j>

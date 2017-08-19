@@ -24,14 +24,15 @@ import java.lang.annotation.Target;
 
 /**
  * Annotate units with this annotation to declare that their onMessage methods
- * may take some time to finish. The messages will be delivered using a separate
- * work pool.
+ * may take some time to finish, and that it will spend most of the time blocked
+ * (for example on synchronous IO). The messages will be delivered using a
+ * separate work pool.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 @Retention(RUNTIME)
 @Target(TYPE)
-public @interface WorkTrait {
+public @interface BlockingTrait {
 
 }

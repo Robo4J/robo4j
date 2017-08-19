@@ -35,6 +35,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
+import com.robo4j.core.configuration.ConfigurationFactoryException;
 import com.robo4j.core.configuration.XmlConfigurationFactory;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 
@@ -46,27 +47,32 @@ import com.robo4j.core.logging.SimpleLoggingUtil;
  */
 public final class RoboBuilder {
 	private final Set<RoboUnit<?>> units = new HashSet<>();
-	private final RoboSystem system = new RoboSystem();
+	private final RoboSystem system;
 
 	/**
 	 * Class responsible for the XML parsing. Using SAX to keep down resource
 	 * requirements.
 	 */
 	private class RoboXMLHandler extends DefaultHandler {
+		private static final String ELEMENT_ROBO_UNIT = "roboUnit";
 		private String currentId = "";
 		private String currentClassName = "";
 		private String currentConfiguration = "";
 		private String lastElement = "";
 		private boolean configState = false;
-
+		private boolean inSystemElement = false;
+		
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 			switch (qName) {
-			case "roboUnit":
+			case ELEMENT_ROBO_UNIT:
 				currentId = attributes.getValue("id");
 				break;
+			case SystemXMLHandler.ELEMENT_SYSTEM:
+				inSystemElement = true;
+				break;
 			case XmlConfigurationFactory.ELEMENT_CONFIG:
-				if (!configState) {
+				if (!configState && !inSystemElement) {
 					currentConfiguration = "";
 					configState = true;
 					break;
@@ -80,7 +86,9 @@ public final class RoboBuilder {
 
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
-			if (qName.equals("roboUnit")) {
+			if (qName.equals(SystemXMLHandler.ELEMENT_SYSTEM)) {
+				inSystemElement = false;
+			} else if (qName.equals(ELEMENT_ROBO_UNIT)) {
 				if (!verifyUnit()) {
 					clearCurrentVariables();
 				} else {
@@ -152,6 +160,115 @@ public final class RoboBuilder {
 		private String toString(char[] data, int offset, int count) {
 			return String.valueOf(data, offset, count);
 		}
+	}
+
+	/**
+	 * Separate handler for reading the system part.
+	 */
+	private class SystemXMLHandler extends DefaultHandler {
+		private static final String ELEMENT_SYSTEM = "roboSystem";
+		private String currentId = "";
+		private String currentConfiguration = "";
+		private String lastElement = "";
+		private boolean configState = false;
+		private RoboSystem system;
+
+		@Override
+		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+			switch (qName) {
+			case ELEMENT_SYSTEM:
+				currentId = attributes.getValue("id");
+				break;
+			case XmlConfigurationFactory.ELEMENT_CONFIG:
+				if (!configState) {
+					currentConfiguration = "";
+					configState = true;
+					break;
+				}
+			}
+			lastElement = qName;
+			if (configState) {
+				currentConfiguration += String.format("<%s %s>", qName, toString(attributes));
+			}
+		}
+
+		@Override
+		public void endElement(String uri, String localName, String qName) throws SAXException {
+			if (qName.equals(ELEMENT_SYSTEM)) {
+				SimpleLoggingUtil.debug(getClass(), "Loading system id=" + currentId);
+				Configuration config;
+				try {
+					config = currentConfiguration.trim().equals("") ? null : XmlConfigurationFactory.fromXml(currentConfiguration);
+					system = currentId == null ? new RoboSystem(config) : new RoboSystem(currentId, config);
+				} catch (ConfigurationFactoryException e) {
+					SimpleLoggingUtil.error(getClass(), "Error parsing system", e);
+				}
+				configState = false;
+			}
+
+			if (configState) {
+				currentConfiguration += String.format("</%s>", qName);
+			}
+		}
+
+		@Override
+		public void characters(char[] ch, int start, int length) throws SAXException {
+			if (configState) {
+				currentConfiguration += toString(ch, start, length);
+			}
+			// NOTE(Marcus/Jan 22, 2017): Seems these can be called repeatedly
+			// for a single text() node.
+			switch (lastElement) {
+			case XmlConfigurationFactory.ELEMENT_CONFIG:
+				currentConfiguration += toString(ch, start, length);
+				break;
+			default:
+				break;
+			}
+		}
+
+		private Object toString(Attributes attributes) {
+			return String.format("%s=\"%s\" %s=\"%s\" %s=\"%s\" %s=\"%s\"", XmlConfigurationFactory.ATTRIBUTE_NAME,
+					attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_NAME), XmlConfigurationFactory.ATTRIBUTE_TYPE,
+					attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_TYPE), XmlConfigurationFactory.ATTRIBUTE_PATH,
+					attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_PATH), XmlConfigurationFactory.ATTRIBUTE_METHOD,
+					attributes.getValue(XmlConfigurationFactory.ATTRIBUTE_METHOD));
+		}
+
+		private String toString(char[] data, int offset, int count) {
+			return String.valueOf(data, offset, count);
+		}
+
+		public RoboSystem createSystem() {
+			return system == null ? new RoboSystem() : system;
+		}
+	}
+
+	/**
+	 * Constructor.
+	 */
+	public RoboBuilder() {
+		system = new RoboSystem();
+	}
+
+	/**
+	 * Use this builder constructor to configure the system.
+	 * 
+	 * @param systemConfig
+	 */
+	public RoboBuilder(Configuration systemConfig) {
+		system = new RoboSystem(systemConfig);
+	}
+
+	/**
+	 * Use this builder constructor to configure the RoboSystem.
+	 * 
+	 * @param systemConfig
+	 *            the configuration settings for the system
+	 * @throws RoboBuilderException
+	 */
+	public RoboBuilder(InputStream systemConfig) throws RoboBuilderException {
+		system = readSystemFromXML(systemConfig);
 	}
 
 	/**
@@ -325,5 +442,16 @@ public final class RoboBuilder {
 			}
 		}
 		return unit;
+	}
+
+	private RoboSystem readSystemFromXML(InputStream stream) throws RoboBuilderException {
+		try {
+			SystemXMLHandler handler = new SystemXMLHandler();
+			SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
+			saxParser.parse(stream, handler);
+			return handler.createSystem();
+		} catch (SAXException | IOException | ParserConfigurationException e) {
+			throw new RoboBuilderException("Could not initialize system from xml", e);
+		}
 	}
 }

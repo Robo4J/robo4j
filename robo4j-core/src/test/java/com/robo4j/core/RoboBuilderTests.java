@@ -29,65 +29,95 @@ import java.util.concurrent.ExecutionException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboBuilderTests {
-    private static final int MESSAGES = 10;
+	private static final int MESSAGES = 10;
 
-    @Test
-    public void testParsingFile() throws RoboBuilderException, InterruptedException, ExecutionException {
-        RoboBuilder builder = new RoboBuilder();
-        builder.add(RoboClassLoader.getInstance().getResource("test.xml"));
-        RoboContext system = builder.build();
-        Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
-        system.start();
-        Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
+	@Test
+	public void testParsingFile() throws RoboBuilderException, InterruptedException, ExecutionException {
+		RoboBuilder builder = new RoboBuilder();
+		builder.add(RoboClassLoader.getInstance().getResource("test.xml"));
+		RoboContext system = builder.build();
+		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+		system.start();
+		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 
-        /* descriptor is similar for both units */
-        final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor
-                .create(Integer.class, "getNumberOfSentMessages");
+		/* descriptor is similar for both units */
+		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class, "getNumberOfSentMessages");
 
-        RoboReference<String> producer = system.getReference("producer");
-        Assert.assertNotNull(producer);
-        for (int i = 0; i < MESSAGES; i++) {
-            producer.sendMessage("sendRandomMessage");
-        }
-        Assert.assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
+		RoboReference<String> producer = system.getReference("producer");
+		Assert.assertNotNull(producer);
+		for (int i = 0; i < MESSAGES; i++) {
+			producer.sendMessage("sendRandomMessage");
+		}
+		Assert.assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
 
+		RoboReference<String> consumer = system.getReference("consumer");
+		Assert.assertNotNull(consumer);
 
-        RoboReference<String> consumer = system.getReference("consumer");
-        Assert.assertNotNull(consumer);
+		synchronized (consumer.getAttribute(descriptor)) {
+			int receivedMessages = consumer.getAttribute(descriptor).get();
+			Assert.assertEquals(MESSAGES, receivedMessages);
+		}
 
-        synchronized (consumer.getAttribute(descriptor)){
-            int receivedMessages = consumer.getAttribute(descriptor).get();
-            Assert.assertEquals(MESSAGES, receivedMessages);
-        }
+		system.stop();
+		system.shutdown();
+	}
 
-        system.stop();
-        system.shutdown();
+	@Test
+	public void testParsingFileWithSystemConfig() throws RoboBuilderException, InterruptedException, ExecutionException {
+		RoboBuilder builder = new RoboBuilder(RoboClassLoader.getInstance().getResource("testsystem.xml"));
+		// NOTE(Marcus/Aug 19, 2017): We have the system settings and the units
+		// in the same file.
+		builder.add(RoboClassLoader.getInstance().getResource("testsystem.xml"));
+		RoboContext system = builder.build();
+		Assert.assertEquals("mySystem", system.getId());
+		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+		system.start();
+		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 
+		/* descriptor is similar for both units */
+		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class, "getNumberOfSentMessages");
 
-    }
+		RoboReference<String> producer = system.getReference("producer");
+		Assert.assertNotNull(producer);
+		for (int i = 0; i < MESSAGES; i++) {
+			producer.sendMessage("sendRandomMessage");
+		}
+		Assert.assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
 
-    @Test
-    public void testAddingNonUnique() {
-        RoboBuilder builder = new RoboBuilder();
-        boolean gotException = false;
-        try {
-            builder.add(RoboClassLoader.getInstance().getResource("double.xml"));
-        } catch (RoboBuilderException e) {
-            gotException = true;
-        }
-        Assert.assertTrue(gotException);
-    }
+		RoboReference<String> consumer = system.getReference("consumer");
+		Assert.assertNotNull(consumer);
 
-    @Test
-    public void testComplexConfiguration() throws RoboBuilderException {
-        RoboBuilder builder = new RoboBuilder();
-        builder.add(RoboClassLoader.getInstance().getResource("testsubconfig.xml"));
-        RoboContext system = builder.build();
-        system.start();
-        RoboReference<Object> reference = system.getReference("consumer");
-        system.stop();
-        system.shutdown();
-        Assert.assertNotNull(reference);
-    }
-  
+		synchronized (consumer.getAttribute(descriptor)) {
+			int receivedMessages = consumer.getAttribute(descriptor).get();
+			Assert.assertEquals(MESSAGES, receivedMessages);
+		}
+
+		system.stop();
+		system.shutdown();
+	}
+
+	@Test
+	public void testAddingNonUnique() {
+		RoboBuilder builder = new RoboBuilder();
+		boolean gotException = false;
+		try {
+			builder.add(RoboClassLoader.getInstance().getResource("double.xml"));
+		} catch (RoboBuilderException e) {
+			gotException = true;
+		}
+		Assert.assertTrue(gotException);
+	}
+
+	@Test
+	public void testComplexConfiguration() throws RoboBuilderException {
+		RoboBuilder builder = new RoboBuilder();
+		builder.add(RoboClassLoader.getInstance().getResource("testsubconfig.xml"));
+		RoboContext system = builder.build();
+		system.start();
+		RoboReference<Object> reference = system.getReference("consumer");
+		system.stop();
+		system.shutdown();
+		Assert.assertNotNull(reference);
+	}
+
 }
