@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -171,6 +172,42 @@ public final class RoboBuilder {
 	}
 
 	/**
+	 * Adds a collection of Robo4J units to the builder.
+	 * 
+	 * @param units
+	 *            a collection of units to add.
+	 * 
+	 * @return the builder.
+	 * @throws RoboBuilderException
+	 * 
+	 * @see RoboUnit#initialize(java.util.Map)
+	 */
+	public RoboBuilder addAll(Collection<RoboUnit<?>> units) throws RoboBuilderException {
+		for (RoboUnit<?> unit : units) {
+			add(unit);
+		}
+		return this;
+	}
+
+	/**
+	 * Adds an array of Robo4J units to the builder.
+	 * 
+	 * @param units
+	 *            a collection of units to add.
+	 * 
+	 * @return the builder.
+	 * @throws RoboBuilderException
+	 * 
+	 * @see RoboUnit#initialize(java.util.Map)
+	 */
+	public RoboBuilder addAll(RoboUnit<?>... units) throws RoboBuilderException {
+		for (RoboUnit<?> unit : units) {
+			add(unit);
+		}
+		return this;
+	}
+
+	/**
 	 * Instantiates a RoboUnit from the provided class using the provided id and
 	 * adds it. The instance will be initialized using an empty configuration.
 	 * 
@@ -216,6 +253,17 @@ public final class RoboBuilder {
 	}
 
 	/**
+	 * Returns the context being built. This should only be used so that units
+	 * can be instantiated with more control outside the builder. Note that you
+	 * should then add the instances to the builder through add.
+	 * 
+	 * @return the context being built.
+	 */
+	public RoboContext getContext() {
+		return system;
+	}
+
+	/**
 	 * Will load all the units from the definitions found in the XML file and
 	 * add them to the builder.
 	 * 
@@ -236,14 +284,15 @@ public final class RoboBuilder {
 	}
 
 	// FIXME(Marcus/Jan 22, 2017): Implement.
-	//public RoboBuilder add(ClassLoader loader) throws RoboBuilderException {
-	//	throw new UnsupportedOperationException("Not yet supported");
-	//}
+	// public RoboBuilder add(ClassLoader loader) throws RoboBuilderException {
+	// throw new UnsupportedOperationException("Not yet supported");
+	// }
 
 	// FIXME(Marcus/Jan 22, 2017): Implement.
-	//public RoboBuilder add(ClassLoader loader, String match) throws RoboBuilderException {
-	//	throw new UnsupportedOperationException("Not yet supported");
-	//}
+	// public RoboBuilder add(ClassLoader loader, String match) throws
+	// RoboBuilderException {
+	// throw new UnsupportedOperationException("Not yet supported");
+	// }
 
 	private void internalAddUnit(RoboUnit<?> unit) throws RoboBuilderException {
 		if (unit == null) {

@@ -38,6 +38,7 @@ import com.robo4j.hw.rpi.i2c.gyro.GyroL3GD20Device;
 import com.robo4j.hw.rpi.i2c.gyro.GyroL3GD20Device.Sensitivity;
 import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.units.rpi.I2CRoboUnit;
+import com.robo4j.units.rpi.gyro.GyroRequest.GyroAction;
 
 /**
  * Gyro unit based on the {@link GyroL3GD20Device}. Note that there can only be
@@ -164,16 +165,25 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 
 	@Override
 	public void onMessage(GyroRequest message) {
-		if (message.calibrate() == true) {
+		switch (message.getAction()) {
+		case CALIBRATE:
 			try {
 				gyro.calibrate();
 				scanner.reset();
 			} catch (IOException e) {
 				SimpleLoggingUtil.error(getClass(), "Failed to calibrate!", e);
 			}
-		}
-		if (message.getNotificationThreshold() != null) {
-			setUpNotification(message.getTarget(), message);
+			break;
+		case CONTINUOUS:
+			if (message.getNotificationThreshold() != null) {
+				setUpNotification(message.getTarget(), message);
+			}
+			break;
+		case ONCE:
+			throw new UnsupportedOperationException("Huäääää");
+		case STOP:
+			readings.cancel(false);
+			readings = null;
 		}
 		super.onMessage(message);
 	}
@@ -193,7 +203,7 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 
 	private void setUpNotification(RoboReference<GyroEvent> target, GyroRequest request) {
 		synchronized (this) {
-			if (request.isContinuous()) {
+			if (request.getAction() == GyroAction.CONTINUOUS) {
 				activeThresholds.put(target, new ContinuousGyroNotificationEntry(target, request.getNotificationThreshold()));
 			} else {
 				activeThresholds.put(target, new FixedGyroNotificationEntry(target, request.getNotificationThreshold()));

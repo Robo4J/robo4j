@@ -24,7 +24,18 @@ package com.robo4j.units.rpi.lidarlite;
  */
 public class ScanRequest {
 	public enum ScanAction {
-		STOP, ONCE, CONTINUOUSLY
+		/**
+		 * Stops scanning. Used in conjunction with CONTINUOUSLY.
+		 */
+		STOP,
+		/**
+		 * Just scans once.
+		 */
+		ONCE,
+		/**
+		 * Keeps sending scans continuously.
+		 */
+		CONTINUOUSLY
 	}
 
 	private final String receiverId;
@@ -35,6 +46,23 @@ public class ScanRequest {
 	private final float abortRange;
 
 	/**
+	 * Constructor.
+	 * 
+	 * @param action
+	 *            what action to take.
+	 * 
+	 * @param startAngle
+	 *            the angle relative to the centerline to start from. Note that
+	 *            if is more efficient to travel to startAngle + range and scan
+	 *            in the reverse direction, that will happen automatically and
+	 *            transparently.
+	 * 
+	 * @param range
+	 *            startAngle + range is the other boundary for the scan.
+	 * 
+	 * @param step
+	 *            the angular resolution for the scan.
+	 * 
 	 * @param receiverId
 	 *            the id of the receiver for the result of the scan.
 	 * @param servoRange
@@ -43,16 +71,34 @@ public class ScanRequest {
 	 */
 	public ScanRequest(String receiverId, ScanAction action, float startAngle, float range, float step) {
 		this(receiverId, action, startAngle, range, step, Float.MAX_VALUE);
-
 	}
 
-	
 	/**
+	 * Constructor.
+	 * 
+	 * @param action
+	 *            what action to take.
+	 * 
+	 * @param startAngle
+	 *            the angle relative to the centerline to start from. Note that
+	 *            if is more efficient to travel to startAngle + range and scan
+	 *            in the reverse direction, that will happen automatically and
+	 *            transparently.
+	 * 
+	 * @param range
+	 *            startAngle + range is the other boundary for the scan.
+	 * 
+	 * @param step
+	 *            the angular resolution for the scan.
+	 * 
 	 * @param receiverId
 	 *            the id of the receiver for the result of the scan.
 	 * @param servoRange
 	 *            how much of the full servo range should be scanned (in
 	 *            radians).
+	 * @param abortRange
+	 *            will abort and send, the possibly incomplete, scan early if a
+	 *            range measurement is shorter than this value.
 	 */
 	public ScanRequest(String receiverId, ScanAction action, float startAngle, float range, float step, float abortRange) {
 		this.receiverId = receiverId;
@@ -63,7 +109,6 @@ public class ScanRequest {
 		this.abortRange = abortRange;
 	}
 
-	
 	/**
 	 * @return the start angle in degrees for the scan.
 	 */
@@ -98,7 +143,6 @@ public class ScanRequest {
 	public String getReceiverId() {
 		return receiverId;
 	}
-
 
 	public float getAbortRange() {
 		return abortRange;

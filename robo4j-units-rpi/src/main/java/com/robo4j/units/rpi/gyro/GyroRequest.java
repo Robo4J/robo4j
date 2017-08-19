@@ -26,29 +26,35 @@ import com.robo4j.math.geometry.Tuple3f;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GyroRequest {
+	public enum GyroAction {
+		/**
+		 * Performs a calibration. Note that the notification threshold can also
+		 * be set, which result in the threshold being set right after
+		 * calibration has completed.
+		 */
+		CALIBRATE, ONCE, CONTINUOUS, STOP
+	}
+
 	private final RoboReference<GyroEvent> target;
-	private final boolean calibrate;
-	private final boolean continuous;
 	private final Tuple3f notificationThreshold;
+	private final GyroAction action;
 
 	/**
 	 * Constructor.
 	 */
-	public GyroRequest(RoboReference<GyroEvent> target, boolean calibrate, boolean continuous, Tuple3f notificationThreshold) {
+	public GyroRequest(RoboReference<GyroEvent> target, GyroAction action, Tuple3f notificationThreshold) {
 		this.target = target;
-		this.calibrate = calibrate;
-		this.continuous = continuous;
+		this.action = action;
 		this.notificationThreshold = notificationThreshold;
 	}
 
 	/**
-	 * @return true to force a calibration. Can be paired with setting the
-	 *         {@link #getNotificationThreshold()}, which will cause the
-	 *         notification threshold to be set as soon as the calibration is
-	 *         complete.
+	 * The action for the gyro to take.
+	 * 
+	 * @return the action
 	 */
-	public boolean calibrate() {
-		return calibrate;
+	public GyroAction getAction() {
+		return action;
 	}
 
 	/**
@@ -65,12 +71,4 @@ public class GyroRequest {
 	public RoboReference<GyroEvent> getTarget() {
 		return target;
 	}
-
-	/**
-	 * @return true if this is a request for continuous notifications. false, if
-	 *         this is a request for a one-off notification.
-	 */
-	public boolean isContinuous() {
-		return continuous;
 	}
-}
