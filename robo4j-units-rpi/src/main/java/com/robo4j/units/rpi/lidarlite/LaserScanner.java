@@ -84,9 +84,11 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		/**
 		 * 
 		 * @param lowToHigh
-		 * @param minimumServoMovementTime the minimum time for the servo to complete the movement over the range, in seconds
+		 * @param minimumServoMovementTime
+		 *            the minimum time for the servo to complete the movement
+		 *            over the range, in seconds
 		 * @param minimumAcquisitionTime
-		 * @param trim 
+		 * @param trim
 		 * @param request
 		 * @param servo
 		 * @param servoRange
@@ -187,9 +189,10 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		// physical model.
 		private long calculateDelay(float minimumAcquisitionTime, float minimumServoMovementTime) {
 			float delayPerStep = minimumServoMovementTime * 1000 / calculateNumberOfScans();
-			// If we have a slow servo, we will need to wait for the servo to move. If we have a slow acquisition, 
+			// If we have a slow servo, we will need to wait for the servo to
+			// move. If we have a slow acquisition,
 			// we will need to the laser before continuing
-			float actualDelay = Math.max(delayPerStep, minimumAcquisitionTime); 
+			float actualDelay = Math.max(delayPerStep, minimumAcquisitionTime);
 			return Math.round(actualDelay * 1000.0d);
 		}
 
@@ -218,7 +221,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 
 		// Trim to align left to right and right to left scans (in degrees)
 		trim = configuration.getFloat("trim", 0.0f);
-		
+
 		try {
 			lidar = new LidarLiteDevice(getBus(), getAddress());
 		} catch (IOException e) {
@@ -230,9 +233,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	@Override
 	public void onMessage(ScanRequest message) {
 		RoboReference<Float> servo = getReference(pan);
-
-		RoboReference<ScanResult2D> receiverRef = getContext().getReference(message.getReceiverId());
-		scheduleScan(message, servo, receiverRef);
+		scheduleScan(message, servo, message.getReceiver());
 	}
 
 	private void scheduleScan(ScanRequest message, RoboReference<Float> servo, RoboReference<ScanResult2D> recipient) {
@@ -257,7 +258,8 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		long actualDelayMicros = job.delayMicros;
 		// One extra for first servo move.
 		for (int i = 0; i < job.numberOfScans + 1; i++) {
-			// FIXME(Marcus/Apr 4, 2017): Simplified - need to take angular speed of the servo into account. 
+			// FIXME(Marcus/Apr 4, 2017): Simplified - need to take angular
+			// speed of the servo into account.
 			getContext().getScheduler().schedule(job, actualDelayMicros, TimeUnit.MICROSECONDS);
 			actualDelayMicros += job.delayMicros;
 		}

@@ -16,6 +16,9 @@
  */
 package com.robo4j.units.rpi.lidarlite;
 
+import com.robo4j.core.RoboReference;
+import com.robo4j.math.geometry.ScanResult2D;
+
 /**
  * This defines how to perform a scan.
  * 
@@ -38,7 +41,7 @@ public class ScanRequest {
 		CONTINUOUSLY
 	}
 
-	private final String receiverId;
+	private final RoboReference<ScanResult2D> receiver;
 	private final ScanAction action;
 	private final float startAngle;
 	private final float range;
@@ -63,14 +66,14 @@ public class ScanRequest {
 	 * @param step
 	 *            the angular resolution for the scan.
 	 * 
-	 * @param receiverId
-	 *            the id of the receiver for the result of the scan.
+	 * @param receiver
+	 *            the reference to the receiver of the scans.
 	 * @param servoRange
 	 *            how much of the full servo range should be scanned (in
 	 *            radians).
 	 */
-	public ScanRequest(String receiverId, ScanAction action, float startAngle, float range, float step) {
-		this(receiverId, action, startAngle, range, step, Float.MAX_VALUE);
+	public ScanRequest(RoboReference<ScanResult2D> receiver, ScanAction action, float startAngle, float range, float step) {
+		this(receiver, action, startAngle, range, step, Float.MAX_VALUE);
 	}
 
 	/**
@@ -91,7 +94,7 @@ public class ScanRequest {
 	 * @param step
 	 *            the angular resolution for the scan.
 	 * 
-	 * @param receiverId
+	 * @param receiver
 	 *            the id of the receiver for the result of the scan.
 	 * @param servoRange
 	 *            how much of the full servo range should be scanned (in
@@ -100,8 +103,9 @@ public class ScanRequest {
 	 *            will abort and send, the possibly incomplete, scan early if a
 	 *            range measurement is shorter than this value.
 	 */
-	public ScanRequest(String receiverId, ScanAction action, float startAngle, float range, float step, float abortRange) {
-		this.receiverId = receiverId;
+	public ScanRequest(RoboReference<ScanResult2D> receiver, ScanAction action, float startAngle, float range, float step,
+			float abortRange) {
+		this.receiver = receiver;
 		this.action = action;
 		this.startAngle = startAngle;
 		this.range = range;
@@ -140,8 +144,8 @@ public class ScanRequest {
 	/**
 	 * @return the receiver id to receive the result of the scan.
 	 */
-	public String getReceiverId() {
-		return receiverId;
+	public RoboReference<ScanResult2D> getReceiver() {
+		return receiver;
 	}
 
 	public float getAbortRange() {
