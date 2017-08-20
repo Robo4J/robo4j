@@ -89,7 +89,8 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	 *            the {@link Configuration} provided.
 	 * @throws ConfigurationException
 	 */
-	protected abstract void onInitialization(Configuration configuration) throws ConfigurationException;
+	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+	}
 
 	/**
 	 * Should be overridden in subclasses which need to do some initialization
