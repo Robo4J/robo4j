@@ -45,6 +45,7 @@ public class RoboSchedulerTests {
 
 	@Test
 	public void testScheduler() throws InterruptedException, ExecutionException {
+		// FIXME: 20.08.17 (miro,marcus): when notification implemented, correct the test
 		RoboSystem system = new RoboSystem();
 		StringConsumer consumer = new StringConsumer(system, "consumer");
 		system.addUnits(consumer);
@@ -53,13 +54,14 @@ public class RoboSchedulerTests {
 		Scheduler scheduler = system.getScheduler();
 		RoboReference<Object> reference = system.getReference("consumer");
 		SchedulerListener listener = new SchedulerListener();
-		ScheduledFuture<?> schedule = scheduler.schedule(reference, "Lalalala", 2, 4, TimeUnit.SECONDS, 3, listener);
+		ScheduledFuture<?> schedule = scheduler.schedule(reference, "Lalalala", 1, 4, TimeUnit.SECONDS, 3, listener);
 		try {
 			schedule.get();
 		} catch (CancellationException e) {
 			// Expected - using this to wait for completion.
 		}
 
+		Thread.sleep(1000);
 		Assert.assertEquals(3,consumer.getReceivedMessages().size());
 		Assert.assertTrue(listener.wasFinalCalled);
 		system.shutdown();
