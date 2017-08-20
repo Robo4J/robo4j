@@ -78,7 +78,7 @@ public class RoboSchedulerTests {
 		get(f1);
 		get(f2);
 
-		Assert.assertEquals(consumer.getReceivedMessages().size(), 3000);
+		Assert.assertEquals(3000, consumer.getReceivedMessages().size());
 		Assert.assertTrue(listener.wasFinalCalled);
 		system.shutdown();
 	}
