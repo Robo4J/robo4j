@@ -523,12 +523,12 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 			throw new IllegalArgumentException("Pattern length should be 8, array supplied has invalid length: " + pattern.length);
 		}
 		
-		// send ccgram update command
+		// Send ccgram update command
         location &= 0x7; // only position 0..7 are allowed
         int command = LCD_SETCGRAMADDR | (location << 3);
         write(command);
         
-        // send custom character definition
+        // Send custom character definition
         internalWrite(new String(pattern));
 	}
 }
