@@ -52,21 +52,21 @@ public class RoboHttpPingPongTest {
 	private static final int MESSAGES = 3;
 
 	// FIXME: 20.08.17 miro -> review
-//	@Test
+	@Test
 	public void pingPongTest() throws Exception {
 
 		RoboContext systemPong = configurePongSystem();
 		RoboContext systemPing = configurePingSystem();
 
 
+		System.out.println("systemPong: State before start:");
+		System.out.println(SystemUtil.printStateReport(systemPong));
+		systemPong.start();
 
 		System.out.println("systemPing: State before start:");
 		System.out.println(SystemUtil.printStateReport(systemPing));
 		systemPing.start();
 
-		System.out.println("systemPong: State before start:");
-		System.out.println(SystemUtil.printStateReport(systemPong));
-		systemPong.start();
 		System.out.println("systemPong: State after start:");
 		System.out.println(SystemUtil.printStateReport(systemPong));
 
@@ -81,6 +81,8 @@ public class RoboHttpPingPongTest {
 
 		RoboReference<Object> pongConsumer = systemPong.getReference("request_consumer");
 
+		// FIXME, TODO: 20.08.17 (miro,markus) please implement notification
+		Thread.sleep(1000);
 		System.out.println("systemPing : Going Down!");
 		systemPing.stop();
 		systemPing.shutdown();
