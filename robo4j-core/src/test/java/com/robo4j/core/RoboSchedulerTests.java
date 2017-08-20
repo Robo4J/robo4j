@@ -48,6 +48,7 @@ public class RoboSchedulerTests {
 		RoboSystem system = new RoboSystem();
 		StringConsumer consumer = new StringConsumer(system, "consumer");
 		system.addUnits(consumer);
+		consumer.setState(LifecycleState.STARTED);
 
 		Scheduler scheduler = system.getScheduler();
 		RoboReference<Object> reference = system.getReference("consumer");
