@@ -52,6 +52,7 @@ public class CounterUnitTests {
 
 	@Test
 	public void test() throws RoboBuilderException, InterruptedException, ExecutionException {
+		// FIXME(Marcus/Aug 20, 2017): We really should get rid of the sleeps here and use waits with timeouts... 
 		RoboBuilder builder = new RoboBuilder();
 		builder.add(IntegerConsumer.class, ID_CONSUMER);
 		builder.add(CounterUnit.class, getCounterConfiguration(ID_CONSUMER, 1000), ID_COUNTER);
@@ -72,8 +73,8 @@ public class CounterUnitTests {
 		Assert.assertNotEquals(0, messages.size());
 		Assert.assertNotEquals(0, (int) messages.get(messages.size() - 1));
 		counter.sendMessage(CounterCommand.RESET);
+		Thread.sleep(1000);
 		Assert.assertEquals(0, (int) counter.getAttribute(COUNTER).get());
-
 	}
 
 	private Configuration getCounterConfiguration(String target, int interval) {
