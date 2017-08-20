@@ -66,7 +66,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	private static final int LCD_DISPLAYCONTROL = 0x08;
 	private static final int LCD_CURSORSHIFT = 0x10;
 	// private static final int LCD_FUNCTIONSET = 0x20;
-	// private static final int LCD_SETCGRAMADDR = 0x40;
+	private static final int LCD_SETCGRAMADDR = 0x40;
 	private static final int LCD_SETDDRAMADDR = 0x80;
 
 	// Flags for display on/off control
@@ -512,5 +512,23 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	@Override
 	public synchronized void reset() throws IOException {
 		initialize();
+	}
+
+	@Override
+	public void createChar(int location, byte[] pattern) throws IOException {
+		if(location < 0 || location > 7) {
+			throw new IllegalArgumentException("location should be between 0 and 7, value supplied is invalid: " + location);
+		}
+		if(pattern.length != 8) {
+			throw new IllegalArgumentException("pattern length should be 8, array supplied has invalid length: " + pattern.length);
+		}
+		
+		// send ccgram update command
+        location &= 0x7; // only position 0..7 are allowed
+        int command = LCD_SETCGRAMADDR | (location << 3);
+        write(command);
+        
+        // send custom character definition
+        internalWrite(new String(pattern));
 	}
 }

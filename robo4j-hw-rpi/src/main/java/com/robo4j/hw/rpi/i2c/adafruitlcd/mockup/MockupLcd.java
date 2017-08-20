@@ -271,6 +271,16 @@ public class MockupLcd implements AdafruitLcd {
 		// TODO Auto-generated method stub
 
 	}
+
+	@Override
+	public void createChar(int location, byte[] pattern) {
+		if(location < 0 || location > 7) {
+			throw new IllegalArgumentException("location should be between 0 and 7, value supplied is invalid: " + location);
+		}
+		if(pattern.length != 8) {
+			throw new IllegalArgumentException("pattern length should be 8, array supplied has invalid length: " + pattern.length);
+		}
+	}
 }
 
 

@@ -193,4 +193,20 @@ public interface AdafruitLcd {
 	 * @throws IOException
 	 */
 	void reset() throws IOException;
+
+	/**
+	 * Fill one of the first 8 CGRAM locations with custom characters. The
+	 * location parameter should be between 0 and 7 and pattern should provide
+	 * an array of 8 bytes containing the pattern. e.g. you can design your
+	 * custom character at <a
+	 * href=http://www.quinapalus.com/hd44780udg.html>http://www.quinapalus.com/hd44780udg.html<a/>.
+	 * To show your custom character obtain the string representation for the
+	 * location e.g. String.format("custom char=%c", 0).
+	 * 
+	 * @param location
+	 *            storage location for this character, between 0 and 7
+	 * @param pattern
+	 *            array of 8 bytes containing the character's pattern
+	 */
+	void createChar(int location, byte[] pattern) throws IOException;
 }
