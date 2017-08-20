@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -8,34 +8,40 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.units.httpunit;
+package com.robo4j.core.units.httpunit.test.codec;
 
-import com.robo4j.core.units.httpunit.HttpDecoder;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import com.robo4j.core.units.httpunit.HttpEncoder;
 import com.robo4j.core.units.httpunit.HttpProducer;
 
 /**
- * Simple decoder that decodes json to an array of string.
+ * Simple encoder that encodes an array of string to Json.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 @HttpProducer
-public class TestArrayDecoder implements HttpDecoder<String[]> {
+public class TestArrayEncoder implements HttpEncoder<String[]> {
+
 	@Override
-	public String[] decode(String json) {
-		String withoutStart = json.replace("array:", "");
-		String withoutBrackets = withoutStart.replaceAll("[\\[\\]\\{\\}]", "");
-		return withoutBrackets.split(",");
+	public String encode(String[] stuff) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("{array:[");
+		builder.append(Stream.of(stuff).collect(Collectors.joining(",")));
+		builder.append("]}");
+		return builder.toString();
 	}
 
 	@Override
-	public Class<String[]> getDecodedClass() {
+	public Class<String[]> getEncodedClass() {
 		return String[].class;
 	}
 }
