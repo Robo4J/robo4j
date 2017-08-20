@@ -280,15 +280,4 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		}
 		return getContext().getReference(unit);
 	}
-
-	/**
-	 * if (minimumSampleAquisitionTime < minimumServoMovementTime) { // We are
-	 * constrained by the servo movement speed, simply sample whilst moving //
-	 * So, start with setting a servo movement from min to max (or max to min,
-	 * depending on scan direction and current angle), } else { // We are
-	 * constrained by the time it takes to acquire the samples. Move the servo
-	 * with the calculated delays and acquire samples in between
-	 * 
-	 * }
-	 */
 }
