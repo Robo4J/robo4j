@@ -524,7 +524,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		}
 		
 		// Send ccgram update command
-        location &= 0x7; // only position 0..7 are allowed
+        location &= 0x7; // Only position 0..7 are allowed
         int command = LCD_SETCGRAMADDR | (location << 3);
         write(command);
         
