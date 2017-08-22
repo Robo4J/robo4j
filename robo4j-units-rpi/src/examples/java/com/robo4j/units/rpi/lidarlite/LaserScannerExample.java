@@ -67,6 +67,7 @@ public class LaserScannerExample {
 				"processor");
 		RoboContext ctx = builder.build();
 		RoboReference<String> reference = ctx.getReference("controller");
+		ctx.start();
 		System.out.println("Starting scanning for ever\nPress enter to quit");
 		reference.sendMessage("scan");
 		System.in.read();
