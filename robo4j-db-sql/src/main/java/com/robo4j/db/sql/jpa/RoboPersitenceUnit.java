@@ -61,7 +61,6 @@ public abstract class RoboPersitenceUnit<T> extends RoboUnit<T> {
 		// super.initialize(configuration);
 	}
 
-	@SuppressWarnings("unchecked")
 	protected ERoboUnit getEntity() {
 		List<ERoboUnit> tmpList = dataSourceUnit.getByMap(ERoboUnit.class, entityMap);
 		return tmpList.isEmpty() ? null : tmpList.get(DEFAULT_INDEX);

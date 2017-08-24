@@ -49,7 +49,6 @@ public class SQLDataSourceUnitTests {
 	private static final String DEFAULT_SORTED = "asc";
 	private static final String UNIT_SYSTEM_1_NAME = "system1";
 	private static final String UNIT_SYSTEM_2_NAME = "system2";
-	private static final String UNIT_SYSTEM_3_NAME = "system3";
 
 	@Test
 	public void testAllRoboReferencesInDatabase() throws Exception {

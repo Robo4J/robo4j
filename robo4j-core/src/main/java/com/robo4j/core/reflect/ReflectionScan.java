@@ -33,8 +33,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.units.httpunit.CodecRegistryException;
-import com.robo4j.core.units.httpunit.Constants;
 import com.robo4j.core.util.StreamUtils;
 
 /**
@@ -44,6 +42,7 @@ import com.robo4j.core.util.StreamUtils;
  * @author Miro Wengner (@miragemiko)
  */
 public final class ReflectionScan {
+	private static final CharSequence EMPTY_STRING = "";
 
     private static final String FILE = "file:";
     private static final String SUFFIX = ".class";
@@ -90,25 +89,25 @@ public final class ReflectionScan {
 
         StreamUtils.enumerationAsStream(resources, false).map(url -> {
             try {
-                String jarFile = url.getFile().split(EXCLAMATION)[0].replace(FILE, Constants.EMPTY_STRING);
+                String jarFile = url.getFile().split(EXCLAMATION)[0].replace(FILE, EMPTY_STRING);
                 if (new File(jarFile).isDirectory()) {
                     return null;
                 }
                 return new ZipInputStream(new FileInputStream(jarFile));
             } catch (FileNotFoundException e) {
-                throw new CodecRegistryException("Problem finding file", e);
+                throw new ReflectionScanException("Problem finding file", e);
             }
         }).filter(Objects::nonNull).forEach(e -> {
             try {
                 for (ZipEntry entry = e.getNextEntry(); entry != null; entry = e.getNextEntry()) {
                     if (!entry.isDirectory() && entry.getName().contains(slashifyPackage)
                             && entry.getName().endsWith(SUFFIX)) {
-                        String cName = entry.getName().replace(SLASH, DOT).replace(SUFFIX, Constants.EMPTY_STRING);
+                        String cName = entry.getName().replace(SLASH, DOT).replace(SUFFIX, EMPTY_STRING);
                         classes.add(cName);
                     }
                 }
             } catch (IOException e1) {
-                throw new CodecRegistryException("Error reading jar", e1);
+                throw new ReflectionScanException("Error reading jar", e1);
             }
         });
         return classes;

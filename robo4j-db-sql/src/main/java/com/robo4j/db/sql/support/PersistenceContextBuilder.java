@@ -29,7 +29,6 @@ import org.hibernate.jpa.boot.internal.PersistenceUnitInfoDescriptor;
 import org.hibernate.jpa.boot.spi.EntityManagerFactoryBuilder;
 import org.hibernate.jpa.boot.spi.PersistenceUnitDescriptor;
 
-import com.robo4j.core.client.util.RoboClassLoader;
 import com.robo4j.db.sql.jpa.PersistenceDescriptorFactory;
 
 /**
@@ -59,17 +58,16 @@ public final class PersistenceContextBuilder {
 		this.params = params;
 	}
 
-	public void addParamater(String key, Object value){
+	public void addParamater(String key, Object value) {
 		params.put(key, value);
 	}
 
 	public PersistenceContextBuilder build() {
 		PersistenceDescriptorFactory persistenceDescriptorFactory = new PersistenceDescriptorFactory(params);
-		PersistenceUnitInfo persistenceUnitInfo = persistenceDescriptorFactory
-				.get(RoboClassLoader.getInstance().getClassLoader(), sourceType, packages);
+		PersistenceUnitInfo persistenceUnitInfo = persistenceDescriptorFactory.get(Thread.currentThread().getContextClassLoader(),
+				sourceType, packages);
 		PersistenceUnitDescriptor persistenceUnitDescriptor = new PersistenceUnitInfoDescriptor(persistenceUnitInfo);
-		EntityManagerFactoryBuilder builder = new EntityManagerFactoryBuilderImpl(persistenceUnitDescriptor,
-				new HashMap<>());
+		EntityManagerFactoryBuilder builder = new EntityManagerFactoryBuilderImpl(persistenceUnitDescriptor, new HashMap<>());
 		registeredClasses = persistenceDescriptorFactory.registeredClasses();
 		dataSourceContext = new DataSourceProxy(builder.build());
 		return this;

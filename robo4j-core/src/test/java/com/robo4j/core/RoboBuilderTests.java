@@ -16,11 +16,10 @@
  */
 package com.robo4j.core;
 
-import com.robo4j.core.client.util.RoboClassLoader;
+import java.util.concurrent.ExecutionException;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.concurrent.ExecutionException;
 
 /**
  * Test(s) for the builder.
@@ -34,7 +33,7 @@ public class RoboBuilderTests {
 	@Test
 	public void testParsingFile() throws RoboBuilderException, InterruptedException, ExecutionException {
 		RoboBuilder builder = new RoboBuilder();
-		builder.add(RoboClassLoader.getInstance().getResource("test.xml"));
+		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("test.xml"));
 		RoboContext system = builder.build();
 		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
 		system.start();
@@ -64,10 +63,10 @@ public class RoboBuilderTests {
 
 	@Test
 	public void testParsingFileWithSystemConfig() throws RoboBuilderException, InterruptedException, ExecutionException {
-		RoboBuilder builder = new RoboBuilder(RoboClassLoader.getInstance().getResource("testsystem.xml"));
+		RoboBuilder builder = new RoboBuilder(Thread.currentThread().getContextClassLoader().getResourceAsStream("testsystem.xml"));
 		// NOTE(Marcus/Aug 19, 2017): We have the system settings and the units
 		// in the same file.
-		builder.add(RoboClassLoader.getInstance().getResource("testsystem.xml"));
+		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("testsystem.xml"));
 		RoboContext system = builder.build();
 		Assert.assertEquals("mySystem", system.getId());
 		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
@@ -101,7 +100,7 @@ public class RoboBuilderTests {
 		RoboBuilder builder = new RoboBuilder();
 		boolean gotException = false;
 		try {
-			builder.add(RoboClassLoader.getInstance().getResource("double.xml"));
+			builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("double.xml"));
 		} catch (RoboBuilderException e) {
 			gotException = true;
 		}
@@ -111,7 +110,7 @@ public class RoboBuilderTests {
 	@Test
 	public void testComplexConfiguration() throws RoboBuilderException {
 		RoboBuilder builder = new RoboBuilder();
-		builder.add(RoboClassLoader.getInstance().getResource("testsubconfig.xml"));
+		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("testsubconfig.xml"));
 		RoboContext system = builder.build();
 		system.start();
 		RoboReference<Object> reference = system.getReference("consumer");

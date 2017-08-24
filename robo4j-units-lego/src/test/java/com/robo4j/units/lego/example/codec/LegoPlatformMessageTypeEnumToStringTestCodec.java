@@ -17,9 +17,9 @@
 
 package com.robo4j.units.lego.example.codec;
 
-import com.robo4j.core.units.httpunit.HttpDecoder;
-import com.robo4j.core.units.httpunit.HttpEncoder;
-import com.robo4j.core.units.httpunit.HttpProducer;
+import com.robo4j.http.units.HttpDecoder;
+import com.robo4j.http.units.HttpEncoder;
+import com.robo4j.http.units.HttpProducer;
 import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
 
 /**

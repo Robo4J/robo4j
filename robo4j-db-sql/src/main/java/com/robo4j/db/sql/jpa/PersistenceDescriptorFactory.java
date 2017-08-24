@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.spi.PersistenceUnitInfo;
 
-import com.robo4j.core.client.util.RoboClassLoader;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.reflect.ReflectionScan;
 import com.robo4j.db.sql.RoboDbException;
@@ -128,7 +127,7 @@ public final class PersistenceDescriptorFactory {
 		List<String> classesNames = processClassesWithAnnotation(loader, scan.scanForEntities(entityPackages));
 		registeredClasses = classesNames.stream().map(cn -> {
 			try {
-				return RoboClassLoader.getInstance().getClassLoader().loadClass(cn);
+				return Thread.currentThread().getContextClassLoader().loadClass(cn);
 			} catch (ClassNotFoundException e) {
 				SimpleLoggingUtil.error(getClass(), "failed to load class: ", e);
 				return null;

@@ -39,7 +39,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Table(name = "robo_point")
 public class ERoboPoint implements ERoboEntity<Long> {
-
+	private static final long serialVersionUID = 1L;
 	private Long id;
 	private ZonedDateTime createdOn;
 	private ZonedDateTime updatedOn;

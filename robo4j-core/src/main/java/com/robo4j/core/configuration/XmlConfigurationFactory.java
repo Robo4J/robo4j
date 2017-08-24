@@ -29,9 +29,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.robo4j.core.client.util.RoboHttpUtils;
-import com.robo4j.core.units.httpunit.Constants;
-
 /**
  * Factory for creating configurations from XML and vice versa.
  * 
@@ -39,6 +36,7 @@ import com.robo4j.core.units.httpunit.Constants;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class XmlConfigurationFactory {
+	private static final String ENCODING = "UTF-8";
 	public static final String ELEMENT_CONFIG = "config";
 	public static final String ATTRIBUTE_NAME = "name";
 	public static final String ATTRIBUTE_TYPE = "type";
@@ -76,10 +74,7 @@ public class XmlConfigurationFactory {
 					configStack.push(currentConfig);
 					currentConfig = currentConfig.createChildConfiguration(value);
 				}
-			} else if (qName.equals(RoboHttpUtils.HTTP_TARGET_UNITS)){
-				configStack.push(currentConfig);
-				currentConfig = currentConfig.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
-			}  else if (qName.equals(ELEMENT_VALUE)) {
+			} else if (qName.equals(ELEMENT_VALUE)) {
 				currentName = attributes.getValue(ATTRIBUTE_NAME);
 				currentType = attributes.getValue(ATTRIBUTE_TYPE);
 			}
@@ -96,11 +91,6 @@ public class XmlConfigurationFactory {
 			case ELEMENT_CONFIG:
 				if (!configStack.isEmpty()) { // Closing of the last config...
 					currentConfig = configStack.pop();					
-				}
-				break;
-			case RoboHttpUtils.HTTP_TARGET_UNITS:
-				if (!configStack.isEmpty()) { // Closing of the last commands...
-					currentConfig = configStack.pop();
 				}
 				break;
 			}
@@ -152,7 +142,7 @@ public class XmlConfigurationFactory {
 		SAXParser saxParser;
 		try {
 			saxParser = SAXParserFactory.newInstance().newSAXParser();
-			saxParser.parse(new ByteArrayInputStream(xml.getBytes(Constants.DEFAULT_ENCODING)), new ConfigurationHandler(config));
+			saxParser.parse(new ByteArrayInputStream(xml.getBytes(ENCODING)), new ConfigurationHandler(config));
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			throw new ConfigurationFactoryException("Could not parse the configuration", e);
 		}

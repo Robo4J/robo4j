@@ -20,8 +20,8 @@ package com.robo4j.units.rpi.pad;
 import com.robo4j.core.RoboBuilder;
 import com.robo4j.core.RoboBuilderException;
 import com.robo4j.core.RoboContext;
-import com.robo4j.core.client.util.RoboClassLoader;
 import com.robo4j.core.util.SystemUtil;
+import com.robo4j.http.client.util.RoboClassLoader;
 
 import java.io.IOException;
 import java.io.InputStream;

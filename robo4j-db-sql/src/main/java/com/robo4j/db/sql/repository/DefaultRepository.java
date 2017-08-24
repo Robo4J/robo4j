@@ -30,9 +30,7 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.transaction.Transactional;
 
-import com.robo4j.core.units.httpunit.Constants;
 import com.robo4j.db.sql.model.ERoboUnit;
 import com.robo4j.db.sql.support.DataSourceContext;
 import com.robo4j.db.sql.support.SortType;
@@ -48,6 +46,8 @@ public class DefaultRepository implements RoboRepository {
 	private static final String ROBO_UNIT_UID = "uid";
 	private static final String PREFIX_LIKE = "like";
 	private static final String SIGN_PERCENTAGE = "%";
+	private static final CharSequence EMPTY_STRING = "";
+	
 	private final DataSourceContext dataSourceContext;
 	private final ReentrantLock lock = new ReentrantLock();
 
@@ -84,7 +84,7 @@ public class DefaultRepository implements RoboRepository {
 
 			// like check
 			if (e.getKey().startsWith(PREFIX_LIKE)) {
-				String rootKey = e.getKey().replace(PREFIX_LIKE, Constants.EMPTY_STRING).toLowerCase();
+				String rootKey = e.getKey().replace(PREFIX_LIKE, EMPTY_STRING).toLowerCase();
 				return cb.like(rs.get(rootKey), likeString(e.getValue()));
 			}
 

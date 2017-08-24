@@ -33,7 +33,6 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.units.httpunit.Constants;
 import com.robo4j.db.sql.model.ERoboEntity;
 import com.robo4j.db.sql.model.ERoboPoint;
 import com.robo4j.db.sql.model.ERoboUnit;
@@ -50,7 +49,7 @@ import com.robo4j.db.sql.support.SortType;
  */
 @SuppressWarnings(value = {"rawtypes"})
 public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
-
+	private static final String UTF8_COMMA = "\u002C";
 	private static final String ATTRIBUTE_ROBO_SQL_UNIT = "robo_sql_unit";
 	private static final String ATTRIBUTE_ROBO_ALL_NAME = "all";
 	private static final String ATTRIBUTE_ROBO_UNIT_ALL_ASC_NAME = "units_all_asc";
@@ -103,7 +102,7 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboEntity> {
 		}
 		targetUnitSearchMap.put("unit", targetUnit);
 
-		packages = tmpPackages.split(Constants.UTF8_COMMA);
+		packages = tmpPackages.split(UTF8_COMMA);
 		limit = configuration.getInteger("limit", 2);
 		sorted = SortType.getByName(configuration.getString("sorted", "desc"));
 

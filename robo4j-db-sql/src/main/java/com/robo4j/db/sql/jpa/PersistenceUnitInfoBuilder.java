@@ -31,8 +31,6 @@ import javax.persistence.spi.PersistenceUnitInfo;
 import javax.persistence.spi.PersistenceUnitTransactionType;
 import javax.sql.DataSource;
 
-import com.robo4j.core.client.util.RoboClassLoader;
-
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -133,7 +131,7 @@ public final class PersistenceUnitInfoBuilder {
 
 			@Override
 			public ClassLoader getClassLoader() {
-				return RoboClassLoader.getInstance().getClassLoader();
+				return Thread.currentThread().getContextClassLoader();
 			}
 
 			@Override
