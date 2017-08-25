@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -33,6 +35,7 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.socket.http.client.util.RoboHttpUtils;
+import com.robo4j.socket.http.util.JsonUtil;
 
 /**
  * Http NIO Client to communicate with external system/Robo4J units
@@ -61,8 +64,8 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		responseUnit = configuration.getString("responseUnit", null);
 		responseSize = configuration.getInteger("responseSize", null);
 
-		final Configuration targetUnits = configuration.getChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
-		if (confAddress == null || targetUnits == null) {
+		Map<String, Object> targetUnitsMap = JsonUtil.getMapNyJson(configuration.getString("targetUnits", null));
+		if (confAddress == null || targetUnitsMap.isEmpty()) {
 			throw ConfigurationException.createMissingConfigNameException("address, path, commands...");
 		}
 		address = new InetSocketAddress(confAddress, confPort);

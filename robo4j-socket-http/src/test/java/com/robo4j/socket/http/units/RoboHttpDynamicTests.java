@@ -19,6 +19,8 @@
 
 package com.robo4j.socket.http.units;
 
+import java.util.Collections;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,6 +34,7 @@ import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.util.SystemUtil;
 import com.robo4j.socket.http.client.util.RoboHttpUtils;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
+import com.robo4j.socket.http.util.JsonUtil;
 
 /**
  *
@@ -101,8 +104,7 @@ public class RoboHttpDynamicTests {
 		config.setString("target", TARGET_UNIT);
 		config.setInteger("port", PORT);
 		config.setString("packages", "com.robo4j.socket.http.units.test.codec");
-		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
-		targetUnits.setString(TARGET_UNIT, "POST");
+		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS, JsonUtil.getJsonByMap(Collections.singletonMap(TARGET_UNIT, "POST")));
 		httpServer.initialize(config);
 
 		HttpCommandTestController ctrl = new HttpCommandTestController(result, TARGET_UNIT);
@@ -132,8 +134,7 @@ public class RoboHttpDynamicTests {
 		config.setString("address", HOST_SYSTEM);
 		config.setInteger("port", PORT);
 		/* specific configuration */
-		Configuration configuration = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
-		configuration.setString("controller", "POST");
+		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS, JsonUtil.getJsonByMap(Collections.singletonMap(TARGET_UNIT, "POST")));
 		httpClient.initialize(config);
 		result.addUnits(httpClient);
 		System.out.println("Client State after start:");

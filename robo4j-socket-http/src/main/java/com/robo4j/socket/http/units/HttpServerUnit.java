@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -50,7 +51,7 @@ import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.client.request.RoboRequestCallable;
 import com.robo4j.socket.http.client.request.RoboRequestFactory;
-import com.robo4j.socket.http.client.util.RoboHttpUtils;
+import com.robo4j.socket.http.util.JsonUtil;
 
 /**
  * Http NIO unit allows to configure format of the requests currently is only
@@ -91,15 +92,13 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		}
 
 		//@formatter:off
-		final Configuration targetUnits = configuration.getChildConfiguration("targetUnits");
-		if(targetUnits == null){
+		Map<String, Object> targetUnitsMap = JsonUtil.getMapNyJson(configuration.getString("targetUnits", null));
+
+		if(targetUnitsMap.isEmpty()){
 			SimpleLoggingUtil.error(getClass(), "no targetUnits");
 		} else {
-			for(Iterator<String> it =  targetUnits.getValueNames().iterator(); it.hasNext();){
-				final String key = it.next();
-				final String value = targetUnits.getString(key, RoboHttpUtils._EMPTY_STRING);
-				HttpUriRegister.getInstance().addNote(key, value);
-			}
+			targetUnitsMap.forEach((key, value) ->
+				HttpUriRegister.getInstance().addNote(key, value.toString()));
 		}
         //@formatter:on
 
@@ -169,10 +168,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			while (activeStates.contains(getState())) {
 				int channelReady = selector.select();
 
-				if(channelReady == 0){
+				if (channelReady == 0) {
 					/*
-					 * token representing the registration of a SelectableChannel
-					 * with a Selector
+					 * token representing the registration of a SelectableChannel with a Selector
 					 */
 					Set<SelectionKey> selectedKeys = selector.selectedKeys();
 					Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
@@ -212,7 +210,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 					}
 					selectedKeys.clear();
 				}
-
 
 			}
 		} catch (InterruptedException | ExecutionException | IOException e) {

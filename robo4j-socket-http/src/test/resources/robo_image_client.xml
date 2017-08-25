@@ -21,9 +21,7 @@
         <config name="com.robo4j.core.root">
             <value name="address" type="String">0.0.0.0</value>
             <value name="port" type="int">8027</value>
-            <targetUnits>
-                <value name="imageController" type="String">POST</value>
-            </targetUnits>
+            <value name="targetUnits" type="String">{"imageController":"POST"}</value>
         </config>
     </roboUnit>
 

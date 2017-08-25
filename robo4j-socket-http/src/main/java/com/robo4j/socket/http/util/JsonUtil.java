@@ -17,6 +17,8 @@
 
 package com.robo4j.socket.http.util;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -55,6 +57,22 @@ public final class JsonUtil {
 			return sb2.toString();
 		}).collect(Collectors.joining(Constants.UTF8_COMMA))).append(Constants.UTF8_CURLY_BRACKET_RIGHT);
 		return sb.toString();
+	}
+
+	public static Map<String, Object> getMapNyJson(String json){
+		final Map<String, Object> result = new HashMap<>();
+		if(json == null){
+			return result;
+		}
+
+		final String[] parts = json.replaceAll("^\\{\\s*\"|\"\\s*\\}$", Constants.EMPTY_STRING)
+				.split("\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?");
+
+		for (int i = 0; i < parts.length - 1; i += 2) {
+			result.put(parts[i], parts[i + 1]);
+		}
+		return result;
+
 	}
 
 	// Private Methods

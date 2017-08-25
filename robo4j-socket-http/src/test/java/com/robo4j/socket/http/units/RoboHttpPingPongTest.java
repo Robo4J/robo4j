@@ -18,6 +18,7 @@
 package com.robo4j.socket.http.units;
 
 import com.robo4j.socket.http.util.HttpStringProducer;
+import com.robo4j.socket.http.util.JsonUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,6 +32,8 @@ import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.util.SystemUtil;
 import com.robo4j.socket.http.client.util.RoboHttpUtils;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
+
+import java.util.Collections;
 
 /**
  * Ping Pong test from outside/foreign unit is send signal. The signal has been
@@ -107,8 +110,7 @@ public class RoboHttpPingPongTest {
 		config.setInteger("port", PORT);
 		config.setString("packages", PACKAGE_CODECS);
 		/* specific configuration */
-		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
-		targetUnits.setString(CONTROLLER_PING_PONG, "POST");
+		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS, JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, "POST")));
 		httpServer.initialize(config);
 
 		StringConsumer consumer = new StringConsumer(result, REQUEST_CONSUMER);
@@ -132,9 +134,7 @@ public class RoboHttpPingPongTest {
 		config.setString("address", HOST_SYSTEM);
 		config.setInteger("port", PORT);
 		/* specific configuration */
-		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
-		targetUnits.setString(CONTROLLER_PING_PONG, "POST");
-
+		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS, JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, "POST")));
 		httpClient.initialize(config);
 
 		HttpStringProducer producer = new HttpStringProducer(result, "http_producer");

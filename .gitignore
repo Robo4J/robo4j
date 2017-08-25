@@ -14,3 +14,5 @@ robo4j-page/out
 robo4j-hw-lego/out
 robo4j-units-lego/out
 robo4j-socket-http/out
+robo4j-db-sql/out
+robo4j-units-rpi/out

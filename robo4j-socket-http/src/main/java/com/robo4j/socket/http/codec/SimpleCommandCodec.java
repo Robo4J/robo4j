@@ -17,13 +17,13 @@
 
 package com.robo4j.socket.http.codec;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpEncoder;
 import com.robo4j.socket.http.units.HttpProducer;
+import com.robo4j.socket.http.util.JsonUtil;
 
 /**
  * default simple codec for simple commands Simple codec is currently used for
@@ -52,17 +52,10 @@ public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncod
 
 	@Override
 	public SimpleCommand decode(String json) {
-		final Map<String, String> map = new HashMap<>();
-		//@formatter:off
-		final String[] parts = json.replaceAll("^\\{\\s*\"|\"\\s*\\}$", Constants.EMPTY_STRING)
-				.split("\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?");
-		//@formatter:on
-		for (int i = 0; i < parts.length - 1; i += 2) {
-			map.put(parts[i], parts[i + 1]);
-		}
-
-		return map.containsKey(KEY_TYPE) ? new SimpleCommand(map.get(KEY_VALUE).trim(), map.get(KEY_TYPE).trim())
-				: new SimpleCommand(map.get(KEY_VALUE).trim());
+		Map<String, Object> map = JsonUtil.getMapNyJson(json);
+		return map.containsKey(KEY_TYPE) ?
+				new SimpleCommand(objectToString(map.get(KEY_VALUE)), objectToString(map.get(KEY_TYPE)))
+				: new SimpleCommand(objectToString(map.get(KEY_VALUE)));
 	}
 
 	@Override
@@ -73,5 +66,10 @@ public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncod
 	@Override
 	public Class<SimpleCommand> getDecodedClass() {
 		return SimpleCommand.class;
+	}
+
+	// Private Methods
+	private String objectToString(Object object) {
+		return object != null ? object.toString().trim() : Constants.EMPTY_STRING;
 	}
 }
