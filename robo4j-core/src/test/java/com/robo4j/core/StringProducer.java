@@ -60,11 +60,6 @@ public class StringProducer extends RoboUnit<String> {
                 case "sendRandomMessage":
                     sendRandomMessage();
                     break;
-                case "sendPostMessage":
-                    String tmpMessage = input[1];
-                    System.out.println(getClass().getSimpleName() + ":" + tmpMessage + " target:" + target);
-                    getContext().getReference(target).sendMessage(tmpMessage);
-                    break;
                 default:
                     System.out.println("don't understand message: " + message);
 

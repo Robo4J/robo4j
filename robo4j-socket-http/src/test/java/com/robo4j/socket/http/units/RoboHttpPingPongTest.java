@@ -19,6 +19,7 @@ package com.robo4j.socket.http.units;
 
 import com.robo4j.socket.http.codec.SimpleCommand;
 import com.robo4j.socket.http.codec.SimpleCommandCodec;
+import com.robo4j.socket.http.util.HttpStringProducer;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -48,7 +49,6 @@ import com.robo4j.socket.http.units.test.HttpCommandTestController;
  */
 public class RoboHttpPingPongTest {
 
-	public static final String SEND_POST_MESSAGE = "sendPostMessage";
 	private static final String CONTROLLER_PING_PONG = "controller";
 	private static final String HOST_SYSTEM = "0.0.0.0";
 	private static final int PORT = 8042;
@@ -65,6 +65,22 @@ public class RoboHttpPingPongTest {
 		System.in.read();
 	}
 
+	@Test
+	public void testPing() throws Exception {
+		RoboContext systemPing = configurePingSystem();
+		systemPing.start();
+		System.out.println("systemPing: State after start:");
+		System.out.println(SystemUtil.printStateReport(systemPing));
+
+		System.out.println("Press Key...");
+		System.out.println("systemPing: send messages");
+		RoboReference<Object> systemPingProducer = systemPing.getReference("http_producer");
+		for (int i = 0; i < MESSAGES; i++) {
+			systemPingProducer.sendMessage((HttpStringProducer.SEND_POST_MESSAGE + "::").concat(RoboHttpDynamicTests.JSON_STRING));
+		}
+		System.in.read();
+	}
+
 	// FIXME: 20.08.17 miro -> review
 	@Test
 	public void pingPongTest() throws Exception {
@@ -78,7 +94,7 @@ public class RoboHttpPingPongTest {
 		System.out.println("systemPong: State after start:");
 		System.out.println(SystemUtil.printStateReport(systemPong));
 
-
+		Thread.sleep(100);
 		systemPing.start();
 		System.out.println("systemPing: State after start:");
 		System.out.println(SystemUtil.printStateReport(systemPing));
@@ -86,12 +102,13 @@ public class RoboHttpPingPongTest {
 		System.out.println("systemPing: send messages");
 		RoboReference<Object> systemPingProducer = systemPing.getReference("http_producer");
 		for (int i = 0; i < MESSAGES; i++) {
-			systemPingProducer.sendMessage((SEND_POST_MESSAGE + "::").concat(RoboHttpDynamicTests.JSON_STRING));
+			systemPingProducer.sendMessage((HttpStringProducer.SEND_POST_MESSAGE + "::").concat(RoboHttpDynamicTests.JSON_STRING));
 		}
 
 		RoboReference<Object> pongConsumer = systemPong.getReference("request_consumer");
 
 		// FIXME, TODO: 20.08.17 (miro,markus) please implement notification
+		System.in.read();
 		Thread.sleep(3000);
 		System.out.println("systemPing : Going Down!");
 		systemPing.stop();
@@ -108,7 +125,6 @@ public class RoboHttpPingPongTest {
 		systemPong.stop();
 		Assert.assertEquals(number, MESSAGES);
 		System.out.println("PingPong is down!");
-		System.in.read();
 		systemPong.shutdown();
 
 	}
@@ -153,7 +169,7 @@ public class RoboHttpPingPongTest {
 
 		httpClient.initialize(config);
 
-		StringProducer producer = new StringProducer(result, "http_producer");
+		HttpStringProducer producer = new HttpStringProducer(result, "http_producer");
 		config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("target", "http_client");
 		config.setString("method", "POST");

@@ -47,7 +47,7 @@ public class HttpCommandTestController extends RoboUnit<TestCommandEnum> {
 
 	@Override
 	public void onMessage(TestCommandEnum message) {
-		System.out.println(getClass().getSimpleName() + ": " + message);
+		System.out.println(getClass().getSimpleName() + ": " + message + " target: " + target);
 		processTestMessage(message);
 	}
 
