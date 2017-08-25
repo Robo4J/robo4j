@@ -22,8 +22,8 @@ import org.junit.Test;
 import com.robo4j.core.RoboSystem;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
-import com.robo4j.http.client.util.RoboHttpUtils;
-import com.robo4j.http.units.HttpServerUnit;
+import com.robo4j.socket.http.client.util.RoboHttpUtils;
+import com.robo4j.socket.http.units.HttpServerUnit;
 import com.robo4j.units.lego.LcdTestUnit;
 import com.robo4j.units.lego.SimpleTankTestUnit;
 

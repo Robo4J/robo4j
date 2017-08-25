@@ -160,7 +160,7 @@ public class RoboSystem implements RoboContext {
 
 		@Override
 		public Future<Map<AttributeDescriptor<?>, Object>> getAttributes() {
-			return systemScheduler.submit(() -> unit.onGetAttributes());
+			return systemScheduler.submit(unit::onGetAttributes);
 		}
 
 		@Override

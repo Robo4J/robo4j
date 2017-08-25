@@ -24,7 +24,7 @@ import com.robo4j.core.RoboBuilderException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.util.SystemUtil;
-import com.robo4j.http.client.util.RoboClassLoader;
+import com.robo4j.socket.http.client.util.RoboClassLoader;
 
 /**
  * Runs the accelerometer continuously and always prints what it reads.

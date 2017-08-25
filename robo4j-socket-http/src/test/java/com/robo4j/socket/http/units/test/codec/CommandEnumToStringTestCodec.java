@@ -15,37 +15,42 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.lego.example.codec;
+package com.robo4j.socket.http.units.test.codec;
 
 import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpEncoder;
 import com.robo4j.socket.http.units.HttpProducer;
-import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
+import com.robo4j.socket.http.codec.SimpleCommand;
+import com.robo4j.socket.http.codec.SimpleCommandCodec;
+import com.robo4j.socket.http.units.test.TestCommandEnum;
 
 /**
  * @author Marcus Hirt (@hirt)
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  */
 @HttpProducer
-public class LegoPlatformMessageTypeEnumToStringTestCodec implements HttpDecoder<LegoPlatformMessageTypeEnum>, HttpEncoder<LegoPlatformMessageTypeEnum> {
+public class CommandEnumToStringTestCodec implements HttpDecoder<TestCommandEnum>, HttpEncoder<TestCommandEnum> {
 
+    private final SimpleCommandCodec codec = new SimpleCommandCodec();
     @Override
-    public String encode(LegoPlatformMessageTypeEnum stuff) {
-        return null;
+    public String encode(TestCommandEnum stuff) {
+        final SimpleCommand simpleCommand = new SimpleCommand(stuff.getName());
+        return codec.encode(simpleCommand);
     }
 
     @Override
-    public LegoPlatformMessageTypeEnum decode(String json) {
-        return LegoPlatformMessageTypeEnum.getByName(json);
+    public TestCommandEnum decode(String json) {
+        final SimpleCommand simpleCommand = codec.decode(json);
+        return TestCommandEnum.getByName(simpleCommand.getValue());
     }
 
     @Override
-    public Class<LegoPlatformMessageTypeEnum> getEncodedClass() {
-        return LegoPlatformMessageTypeEnum.class;
+    public Class<TestCommandEnum> getEncodedClass() {
+        return TestCommandEnum.class;
     }
 
     @Override
-    public Class<LegoPlatformMessageTypeEnum> getDecodedClass() {
-        return LegoPlatformMessageTypeEnum.class;
+    public Class<TestCommandEnum> getDecodedClass() {
+        return TestCommandEnum.class;
     }
 }

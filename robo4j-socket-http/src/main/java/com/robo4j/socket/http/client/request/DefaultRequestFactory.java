@@ -1,0 +1,37 @@
+/*
+ * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
+ * 
+ * Robo4J is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Robo4J is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.robo4j.socket.http.client.request;
+
+import com.robo4j.core.AttributeDescriptor;
+import com.robo4j.core.RoboReference;
+import com.robo4j.core.RoboUnit;
+import com.robo4j.socket.http.HttpMessageWrapper;
+
+/**
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ */
+public interface DefaultRequestFactory<ResponseType> {
+
+	ResponseType processGet(RoboUnit<?> desiredUnit, HttpMessageWrapper<?> wrapper);
+
+	ResponseType processGet(RoboReference<?> desiredReference, AttributeDescriptor<?> attributeDescriptor);
+
+	ResponseType processGet(RoboReference<?> desiredReference, String path, HttpMessageWrapper<?> wrapper);
+
+	ResponseType processPost(RoboReference<?> desiredUnit, String path, HttpMessageWrapper<?> wrapper);
+}

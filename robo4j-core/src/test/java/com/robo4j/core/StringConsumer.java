@@ -47,6 +47,7 @@ public class StringConsumer extends RoboUnit<String> {
 	
 	@Override
 	public synchronized void onMessage(String message) {
+		System.out.println(getClass().getSimpleName()+ "message:"+message);
 		counter.incrementAndGet();
 		receivedMessages.add(message);
 	}
