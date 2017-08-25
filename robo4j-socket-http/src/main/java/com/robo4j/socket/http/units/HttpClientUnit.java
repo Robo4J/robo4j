@@ -67,15 +67,12 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		}
 		address = new InetSocketAddress(confAddress, confPort);
 
-		System.out.println(getClass().getSimpleName() + " initiated");
 		setState(LifecycleState.INITIALIZED);
 	}
 
 	@Override
 	public void onMessage(Object message) {
 		try {
-			System.out.println(getClass().getSimpleName() + " message: " + message + " targetUnit: " + responseUnit);
-			System.out.println(getClass().getSimpleName() + " address: " + address);
 			SocketChannel client = SocketChannel.open(address);
 			client.configureBlocking(true);
 
@@ -107,7 +104,6 @@ public class HttpClientUnit extends RoboUnit<Object> {
 
 	//Private Methods
 	private void sendMessageToResponseUnit(ByteBuffer byteBuffer){
-		System.out.println(getClass() + "responseUnit: " + responseSize + " bufferArray:"+ byteBuffer.array());
 		getContext().getReference(responseUnit).sendMessage(byteBuffer.array());
 	}
 

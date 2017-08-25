@@ -166,7 +166,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 			int selectorOpt = server.validOps();
 			server.register(selector, selectorOpt, null);
-			System.out.println(getClass().getSimpleName() + " SERVER UP");
 			while (activeStates.contains(getState())) {
 				int channelReady = selector.select();
 

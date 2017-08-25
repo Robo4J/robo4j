@@ -17,8 +17,6 @@
 
 package com.robo4j.socket.http.units;
 
-import com.robo4j.socket.http.codec.SimpleCommand;
-import com.robo4j.socket.http.codec.SimpleCommandCodec;
 import com.robo4j.socket.http.util.HttpStringProducer;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,7 +26,6 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboSystem;
 import com.robo4j.core.StringConsumer;
-import com.robo4j.core.StringProducer;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.util.SystemUtil;
@@ -54,32 +51,8 @@ public class RoboHttpPingPongTest {
 	private static final int PORT = 8042;
 	private static final int MESSAGES = 3;
 	private static final String REQUEST_CONSUMER = "request_consumer";
+	private static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
 
-
-	@Test
-	public void testPong() throws Exception {
-		RoboContext systemPong = configurePongSystem();
-		systemPong.start();
-
-		System.out.println("Press Key...");
-		System.in.read();
-	}
-
-	@Test
-	public void testPing() throws Exception {
-		RoboContext systemPing = configurePingSystem();
-		systemPing.start();
-		System.out.println("systemPing: State after start:");
-		System.out.println(SystemUtil.printStateReport(systemPing));
-
-		System.out.println("Press Key...");
-		System.out.println("systemPing: send messages");
-		RoboReference<Object> systemPingProducer = systemPing.getReference("http_producer");
-		for (int i = 0; i < MESSAGES; i++) {
-			systemPingProducer.sendMessage((HttpStringProducer.SEND_POST_MESSAGE + "::").concat(RoboHttpDynamicTests.JSON_STRING));
-		}
-		System.in.read();
-	}
 
 	// FIXME: 20.08.17 miro -> review
 	@Test
@@ -88,13 +61,10 @@ public class RoboHttpPingPongTest {
 		RoboContext systemPong = configurePongSystem();
 		RoboContext systemPing = configurePingSystem();
 
-
-
 		systemPong.start();
 		System.out.println("systemPong: State after start:");
 		System.out.println(SystemUtil.printStateReport(systemPong));
 
-		Thread.sleep(100);
 		systemPing.start();
 		System.out.println("systemPing: State after start:");
 		System.out.println(SystemUtil.printStateReport(systemPing));
@@ -105,20 +75,18 @@ public class RoboHttpPingPongTest {
 			systemPingProducer.sendMessage((HttpStringProducer.SEND_POST_MESSAGE + "::").concat(RoboHttpDynamicTests.JSON_STRING));
 		}
 
-		RoboReference<Object> pongConsumer = systemPong.getReference("request_consumer");
+		RoboReference<Object> pongConsumer = systemPong.getReference(REQUEST_CONSUMER);
 
 		// FIXME, TODO: 20.08.17 (miro,markus) please implement notification
-		System.in.read();
-		Thread.sleep(3000);
+		Thread.sleep(1000);
 		System.out.println("systemPing : Going Down!");
 		systemPing.stop();
 		systemPing.shutdown();
 
 
 		System.out.println("systemPong : Going Down!");
-
 		final DefaultAttributeDescriptor<Integer> messagesNumberDescriptor = DefaultAttributeDescriptor
-				.create(Integer.class, "getNumberOfSentMessages");
+				.create(Integer.class, StringConsumer.PROP_GET_NUMBER_OF_SENT_MESSAGES);
 		final int number = pongConsumer.getAttribute(messagesNumberDescriptor).get();
 		// NOTE: Not working
 
@@ -137,7 +105,7 @@ public class RoboHttpPingPongTest {
 		HttpServerUnit httpServer = new HttpServerUnit(result, "http_server");
 		config.setString("target", CONTROLLER_PING_PONG);
 		config.setInteger("port", PORT);
-		config.setString("packages", "com.robo4j.socket.http.units.test.codec");
+		config.setString("packages", PACKAGE_CODECS);
 		/* specific configuration */
 		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
 		targetUnits.setString(CONTROLLER_PING_PONG, "POST");

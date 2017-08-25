@@ -76,7 +76,6 @@ public class RoboRequestCallable implements Callable<Object> {
 						new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
 
 			final String line = in.readLine();
-			System.out.println(getClass().getSimpleName() + " firstLine: " + line);
 			final String firstLine = RoboHttpUtils.correctLine(line);
 			final String[] tokens = firstLine.split(Constants.HTTP_EMPTY_SEP);
 			final HttpMethod method = HttpMethod.getByName(tokens[HttpMessageUtil.METHOD_KEY_POSITION]);

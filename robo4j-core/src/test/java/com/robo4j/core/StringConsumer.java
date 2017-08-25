@@ -29,6 +29,7 @@ import com.robo4j.core.configuration.Configuration;
  */
 public class StringConsumer extends RoboUnit<String> {
 	private static final int DEFAULT = 0;
+	public static final String PROP_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
 	private AtomicInteger counter;
 	private List<String> receivedMessages = new ArrayList<>();
 
@@ -47,7 +48,6 @@ public class StringConsumer extends RoboUnit<String> {
 	
 	@Override
 	public synchronized void onMessage(String message) {
-		System.out.println(getClass().getSimpleName()+ "message:"+message);
 		counter.incrementAndGet();
 		receivedMessages.add(message);
 	}
@@ -56,11 +56,10 @@ public class StringConsumer extends RoboUnit<String> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		
 	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
+		if (attribute.getAttributeName().equals(PROP_GET_NUMBER_OF_SENT_MESSAGES) && attribute.getAttributeType() == Integer.class) {
 			return (R) (Integer)counter.get();
 		}
 		if (attribute.getAttributeName().equals("getReceivedMessages")

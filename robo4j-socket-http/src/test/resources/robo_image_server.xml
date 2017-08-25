@@ -17,7 +17,7 @@
 
 <robo4j>
     <roboUnit id="httpServer">
-        <class>com.robo4j.core.httpunit.HttpServerUnit</class>
+        <class>com.robo4j.socket.http.units.HttpServerUnit</class>
         <config name="com.robo4j.core.root">
             <value name="port" type="int">8027</value>
             <value name="target" type="String">imageController</value>
@@ -28,13 +28,13 @@
         </config>
     </roboUnit>
     <roboUnit id="imageController">
-        <class>com.robo4j.core.httpunit.test.TestServerImageController</class>
+        <class>com.robo4j.socket.http.units.test.TestServerImageController</class>
         <config name="com.robo4j.core.root">
             <value name="target" type="String">imageProcessor</value>
         </config>
     </roboUnit>
     <roboUnit id="imageProcessor">
-        <class>com.robo4j.core.httpunit.test.TestServerImageProcessor</class>
+        <class>com.robo4j.socket.http.units.test.TestServerImageProcessor</class>
         <config name="com.robo4j.core.root">
             <value name="output" type="String">file</value>
         </config>

@@ -56,6 +56,7 @@ public class HttpStringProducer extends StringProducer{
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
         super.onInitialization(configuration);
 
+        target = configuration.getString("target", null);
         method = configuration.getString("method", null);
         uri = configuration.getString("uri", null);
         targetAddress = configuration.getString("targetAddress", "0.0.0.0");
@@ -66,7 +67,6 @@ public class HttpStringProducer extends StringProducer{
 
     @Override
     public void onMessage(String message) {
-        System.out.println(getClass().getSimpleName() + " message: " + message + " targetAddress: " + targetAddress + " uri: " + uri);
         if (message == null) {
             System.out.println("No Message!");
         } else {
