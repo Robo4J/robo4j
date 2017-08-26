@@ -24,6 +24,7 @@ import java.util.List;
 import com.robo4j.math.geometry.CurvaturePoint2f;
 import com.robo4j.math.geometry.Line2f;
 import com.robo4j.math.geometry.Point2f;
+import com.robo4j.math.jfr.FeatureExtractionEvent;
 
 /**
  * Simple and fast feature extraction from lists of Point2f.
@@ -51,7 +52,7 @@ public class FeatureExtraction {
 	 * Minimal samples for a Line2D
 	 */
 	private static final int MIN_Line2D_SAMPLES = 4;
-	
+
 	/**
 	 * Minimal angle deviation for a Line2D
 	 */
@@ -101,7 +102,7 @@ public class FeatureExtraction {
 		}
 		return segments;
 	}
-	
+
 	public static float calculateVectorAngle(Point2f b, Point2f center, Point2f f) {
 		if (b.equals(center) || f.equals(center)) {
 			return 0;
@@ -113,7 +114,7 @@ public class FeatureExtraction {
 		double fDeltaX = f.getX() - center.getX();
 		double fDeltaY = f.getY() - center.getY();
 
-		return (float) (Math.atan2(fDeltaX, fDeltaY) - Math.atan2(bDeltaX, bDeltaY));		
+		return (float) (Math.atan2(fDeltaX, fDeltaY) - Math.atan2(bDeltaX, bDeltaY));
 	}
 
 	private static double segmentMaxRange(float lastRange, float angularResolution) {
@@ -134,23 +135,35 @@ public class FeatureExtraction {
 		}
 		return alphas;
 	}
-	
+
+	@SuppressWarnings("deprecation")
 	public static FeatureSet getFeatures(List<Point2f> sample, float angularResolution) {
+		FeatureExtractionEvent event = new FeatureExtractionEvent(sample.size(), angularResolution);
+		event.begin();
+		FeatureSet result = extractFeatures(sample, angularResolution);
+		event.end();
+		event.commit();
+		return result;
+	}
+
+	private static FeatureSet extractFeatures(List<Point2f> sample, float angularResolution) {
 		List<List<Point2f>> segments = segment(sample, angularResolution);
-		List<CurvaturePoint2f> corners = new ArrayList<>(); 
+		List<CurvaturePoint2f> corners = new ArrayList<>();
 		List<Line2f> Line2fs = new ArrayList<>();
-		for (List<Point2f> Point2fs: segments) {
+		for (List<Point2f> Point2fs : segments) {
 			if (Point2fs.size() < MIN_Line2D_SAMPLES) {
 				continue;
 			}
-			float [] deltaAngles = calculateSamplePoint2DDeltaAngles(Point2fs);
+			float[] deltaAngles = calculateSamplePoint2DDeltaAngles(Point2fs);
 			if (deltaAngles == null) {
 				continue;
 			}
 			Line2fs.addAll(extractLine2Ds(Point2fs, deltaAngles));
 			corners.addAll(extractCorners(Point2fs, deltaAngles));
-		}	
-		return new FeatureSet(Line2fs, corners);
+		}
+
+		FeatureSet result = new FeatureSet(Line2fs, corners);
+		return result;
 	}
 
 	@SuppressWarnings("unused")
@@ -168,14 +181,14 @@ public class FeatureExtraction {
 						if (deltaAngles[j] > maxPhi) {
 							maxPhi = deltaAngles[j];
 							maxIndex = j;
-						}						
+						}
 						j++;
 					} else {
 						i = j;
 						break;
 					}
 				}
-				
+
 				if (Math.abs(totalPhi) > CORNER_THRESHOLD) {
 					corners.add(new CurvaturePoint2f(Point2fs.get(maxIndex), totalPhi));
 				}
@@ -201,13 +214,14 @@ public class FeatureExtraction {
 					i = k;
 				}
 
-				if (Math.abs(totalPhi) > CORNER_THRESHOLD && Math.signum(totalPhi) == Math.signum(maxPhi) && maxIndex - 3 >= 0 && maxIndex + 4 < deltaAngles.length) {
+				if (Math.abs(totalPhi) > CORNER_THRESHOLD && Math.signum(totalPhi) == Math.signum(maxPhi) && maxIndex - 3 >= 0
+						&& maxIndex + 4 < deltaAngles.length) {
 					Point2f p = Point2fs.get(maxIndex);
 					Point2f b = Point2fs.get(maxIndex - 3);
 					Point2f f = Point2fs.get(maxIndex + 3);
-					float cornerAlpha = calculateVectorAngle(b, p, f); 
+					float cornerAlpha = calculateVectorAngle(b, p, f);
 					if (cornerAlpha > CORNER_THRESHOLD) {
-						corners.add(new CurvaturePoint2f(p, cornerAlpha));	
+						corners.add(new CurvaturePoint2f(p, cornerAlpha));
 					}
 				}
 			}
@@ -222,7 +236,7 @@ public class FeatureExtraction {
 
 		float[] alphas = new float[Point2fs.size()];
 		for (int i = 0; i < Point2fs.size(); i++) {
-			if (i == 0 || i == Point2fs.size() -1) {
+			if (i == 0 || i == Point2fs.size() - 1) {
 				alphas[i] = 0;
 				continue;
 			}
@@ -235,7 +249,7 @@ public class FeatureExtraction {
 		}
 		return alphas;
 	}
-	
+
 	public static int calculateKF(List<Point2f> Point2fs, int Point2DIndex) {
 		if (Point2DIndex >= Point2fs.size() - 1) {
 			return 0;
@@ -244,10 +258,10 @@ public class FeatureExtraction {
 		double distance = 0;
 		Point2f startPoint2D = Point2fs.get(Point2DIndex);
 		int i = Point2DIndex;
-		while (i < Point2fs.size() -1) {			
+		while (i < Point2fs.size() - 1) {
 			length += Point2fs.get(i + 1).distance(Point2fs.get(i));
 			distance = Point2fs.get(i + 1).distance(startPoint2D);
-			if ( (length - Uk) >= distance) {
+			if ((length - Uk) >= distance) {
 				break;
 			}
 			i++;
@@ -273,7 +287,7 @@ public class FeatureExtraction {
 		}
 		return Point2DIndex - i;
 	}
-	
+
 	public static final void main(String[] args) {
 		Point2f b = new Point2f(18, 18);
 		Point2f center = new Point2f(19, 19);
@@ -282,19 +296,19 @@ public class FeatureExtraction {
 
 		System.out.println("Vec angle: " + Math.toDegrees(radians) + " radians: " + radians);
 	}
-	
-	private static List<Line2f> extractLine2Ds(List<Point2f> Point2fs, float[] deltaAngles) {	
+
+	private static List<Line2f> extractLine2Ds(List<Point2f> Point2fs, float[] deltaAngles) {
 		List<Line2f> Line2fs = new ArrayList<>();
-		for (int i = 0; i < deltaAngles.length - MIN_Line2D_SAMPLES; ) {
+		for (int i = 0; i < deltaAngles.length - MIN_Line2D_SAMPLES;) {
 			while (i < deltaAngles.length - 1 && Math.abs(deltaAngles[i]) > Line2D_ANGLE_THRESHOLD) {
 				i++;
-			}	
+			}
 			int j = i;
 			while (j < deltaAngles.length - 2 && (Math.abs(deltaAngles[j]) <= Line2D_ANGLE_THRESHOLD)) {
 				j++;
 			}
 			if (j - i - 1 >= MIN_Line2D_SAMPLES) {
-				Line2fs.add(new Line2f(Point2fs.get(i), Point2fs.get(j)));			
+				Line2fs.add(new Line2f(Point2fs.get(i), Point2fs.get(j)));
 			}
 			i = j;
 		}
