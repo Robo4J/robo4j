@@ -22,7 +22,6 @@ import java.util.Map;
 
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.reflect.ReflectionScan;
-import com.robo4j.socket.http.client.util.RoboClassLoader;
 
 /**
  * Registry for codecs.
