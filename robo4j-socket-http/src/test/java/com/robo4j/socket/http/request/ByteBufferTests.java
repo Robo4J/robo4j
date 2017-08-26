@@ -17,7 +17,9 @@
 
 package com.robo4j.socket.http.request;
 
+import com.robo4j.socket.http.HttpByteWrapper;
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.util.ByteBufferUtils;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,20 +32,23 @@ import java.nio.ByteBuffer;
  */
 public class ByteBufferTests {
 
-    @Test
-    public void testSimpleByteBufferFromRequest(){
+	@Test
+	public void testSimpleByteBufferFromRequest() {
 
-        String bodyMessage = "this is test message";
-        String client = "http://0.0.0.0:8080";
-        String clientUri = "/test";
-        final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, bodyMessage);
+		String bodyMessage = "this is test message";
+		String client = "http://0.0.0.0:8080";
+		String clientUri = "/test";
 
-        ByteBuffer inCommingBuffer = ByteBuffer.wrap(postMessage.getBytes());
+		String postHeader = RoboHttpUtils.createHeader(HttpMethod.POST, client, clientUri, bodyMessage);
+		String postHeaderAdjusted = postHeader.substring(0, postHeader.length()-1);
+		String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, bodyMessage);
 
-
-
+		ByteBuffer incomingBuffer = ByteBuffer.wrap(postMessage.getBytes());
+		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBuffer(incomingBuffer);
 
         Assert.assertNotNull(postMessage);
-    }
+		Assert.assertTrue(postHeaderAdjusted.equals(new String(wrapper.getHeader().array())));
+		Assert.assertTrue(bodyMessage.equals(new String(wrapper.getBody().array())));
+	}
 
 }

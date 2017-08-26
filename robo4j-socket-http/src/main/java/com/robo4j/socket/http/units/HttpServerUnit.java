@@ -52,6 +52,7 @@ import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.request.RoboRequestCallable;
 import com.robo4j.socket.http.request.RoboRequestFactory;
+import com.robo4j.socket.http.util.ByteBufferUtils;
 import com.robo4j.socket.http.util.JsonUtil;
 
 /**
@@ -220,7 +221,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			HttpUriRegister.getInstance().updateUnits(getContext());
 			final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
 
-			ByteBuffer buffer = ByteBuffer.allocate(1024);
+			ByteBuffer buffer = ByteBuffer.allocate(4*1024);
 
 			int numRead = channel.read(buffer);
 
@@ -231,7 +232,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 				return;
 			}
 
-			final RoboRequestCallable callable = new RoboRequestCallable(this, buffer, factory);
+			ByteBuffer validBuffer = ByteBufferUtils.copy(buffer, 0, numRead);
+			final RoboRequestCallable callable = new RoboRequestCallable(this, validBuffer, factory);
 			final Future<?> futureResult = executor.submit(callable);
 
 			try{
