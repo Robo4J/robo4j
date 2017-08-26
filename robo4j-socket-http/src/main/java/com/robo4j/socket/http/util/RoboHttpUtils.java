@@ -17,6 +17,7 @@
 package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.HttpHeaderNames;
+import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.request.RoboBasicMapEntry;
 import com.robo4j.socket.http.units.Constants;
 
@@ -33,8 +34,6 @@ import java.util.stream.Stream;
  */
 public final class RoboHttpUtils {
 
-	private static final String METHOD_GET = "GET";
-	private static final String METHOD_POST = "POST";
 	private static final String HTTP_VERSION = "HTTP/1.1";
 	private static final String ROBO4J_CLIENT = "Robo4J-HttpClient";
 	// private static final String SPACE = "\u0020";
@@ -84,14 +83,14 @@ public final class RoboHttpUtils {
 		//@formatter:on
 	}
 
-	public static String createPostRequest(String host, String uri, String message) {
+	public static String createRequest(HttpMethod method, String host, String uri, String message) {
 		//@formatter:off
-		final String header = createHeader(host, uri, message);
-		return createPostRequest(header, message);
+		final String header = createHeader(method, host, uri, message);
+		return createRequest(header, message);
 		//@formatter:on
 	}
 
-	public static String createPostRequest(String header, String message) {
+	public static String createRequest(String header, String message) {
 		//@formatter:off
 		return header
 				.concat(NEW_LINE)
@@ -99,17 +98,17 @@ public final class RoboHttpUtils {
 		//@formatter:on
 	}
 
-	public static String createHeader(String host, String uri, String message) {
-		return createHeaderFirstLine(uri).concat(createRequestHeader(host, message.length()));
+	public static String createHeader(HttpMethod method, String host, String uri, String message) {
+		return createHeaderFirstLine(method, uri).concat(createRequestHeader(host, message.length()));
 	}
 
-	public static String createHeaderFirstLine(String uri) {
-		return HttpFirstLineBuilder.Build(METHOD_POST).add(uri).add(HTTP_VERSION).build();
+	public static String createHeaderFirstLine(HttpMethod method, String uri) {
+		return HttpFirstLineBuilder.Build(method.getName()).add(uri).add(HTTP_VERSION).build();
 	}
 
 	public static String createGetRequest(String host, String message) {
 		//@formatter:off
-		return HttpFirstLineBuilder.Build(METHOD_GET).add(message).add(HTTP_VERSION)
+		return HttpFirstLineBuilder.Build(HttpMethod.GET.getName()).add(message).add(HTTP_VERSION)
 				.build().concat(createRequestHeader(host, 0));
 		//@formatter:on
 	}

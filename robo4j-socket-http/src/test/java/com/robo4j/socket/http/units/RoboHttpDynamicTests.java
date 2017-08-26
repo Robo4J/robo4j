@@ -19,11 +19,6 @@
 
 package com.robo4j.socket.http.units;
 
-import java.util.Collections;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
@@ -32,9 +27,14 @@ import com.robo4j.core.StringConsumer;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.util.SystemUtil;
-import com.robo4j.socket.http.util.RoboHttpUtils;
+import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import com.robo4j.socket.http.util.JsonUtil;
+import com.robo4j.socket.http.util.RoboHttpUtils;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.Collections;
 
 /**
  *
@@ -81,7 +81,7 @@ public class RoboHttpDynamicTests {
 		/* client system sending a messages to the main system */
 		for (int i = 0; i < MESSAGES_NUMBER; i++) {
 			httpClientReference
-					.sendMessage(RoboHttpUtils.createPostRequest(HOST_SYSTEM, "/".concat(TARGET_UNIT), JSON_STRING));
+					.sendMessage(RoboHttpUtils.createRequest(HttpMethod.POST, HOST_SYSTEM, "/".concat(TARGET_UNIT), JSON_STRING));
 		}
 		clientSystem.stop();
 		clientSystem.shutdown();

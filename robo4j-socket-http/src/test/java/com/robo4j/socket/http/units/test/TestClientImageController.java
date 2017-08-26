@@ -17,6 +17,18 @@
 
 package com.robo4j.socket.http.units.test;
 
+import com.robo4j.core.ConfigurationException;
+import com.robo4j.core.LifecycleState;
+import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboUnit;
+import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.codec.CameraMessage;
+import com.robo4j.socket.http.codec.CameraMessageCodec;
+import com.robo4j.socket.http.units.Constants;
+import com.robo4j.socket.http.util.RoboHttpUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -26,17 +38,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import com.robo4j.core.ConfigurationException;
-import com.robo4j.core.LifecycleState;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboUnit;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.util.RoboHttpUtils;
-import com.robo4j.socket.http.codec.CameraMessage;
-import com.robo4j.socket.http.codec.CameraMessageCodec;
-import com.robo4j.socket.http.units.Constants;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -135,7 +136,7 @@ public class TestClientImageController extends RoboUnit<Boolean> {
 		// "default", getSampleImage(cameraCommand));
 		final String message = codec.encode(cameraMessage);
 		if (cameraMessage.getImage().length() != 0) {
-			final String postMessage = RoboHttpUtils.createPostRequest(client, clientUri, message);
+			final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, message);
 			sendClientMessage(getContext(), postMessage);
 		}
 	}

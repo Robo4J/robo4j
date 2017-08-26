@@ -23,6 +23,7 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.StringProducer;
 import com.robo4j.core.StringToolkit;
 import com.robo4j.core.configuration.Configuration;
+import com.robo4j.socket.http.HttpMethod;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -110,7 +111,7 @@ public class HttpStringProducer extends StringProducer{
         if(uri == null){
             throw new IllegalStateException("uri not available");
         }
-        String postMessage = RoboHttpUtils.createPostRequest(host, uri, message);
+        String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, host, uri, message);
         final String request = method.equals("POST") ? postMessage : null;
         getContext().getReference(target).sendMessage(request);
     }

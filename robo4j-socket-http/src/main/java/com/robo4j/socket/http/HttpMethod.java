@@ -33,8 +33,6 @@ import java.util.stream.Stream;
 public enum HttpMethod implements Comparator<HttpMethod> {
 
 	// @formatter:off
-	// TODO: properly implement all possibilities
-
 	/**
 	 * The GET method means retrieve whatever information (in the form of an
 	 * entity) is identified by the Request-URI. If the Request-URI refers to a
@@ -42,32 +40,32 @@ public enum HttpMethod implements Comparator<HttpMethod> {
 	 * as the entity in the response and not the source text of the process,
 	 * unless that text happens to be the output of the process.
 	 */
-	GET("GET"),
+	GET		("GET"),
 
 	/**
 	 * The HEAD method is identical to GET except that the server MUST NOT
 	 * return a message-body in the response.
 	 */
-	HEAD("HEAD"),
+	HEAD	("HEAD"),
 
 	/**
 	 * The POST method is used to request that the origin server accept the
 	 * entity enclosed in the request as a new subordinate of the resource
 	 * identified by the Request-URI in the Request-Line.
 	 */
-	POST("POST"),
+	POST	("POST"),
 
 	/**
 	 * The PUT method requests that the enclosed entity be stored under the
 	 * supplied Request-URI
 	 */
-	PUT("PUT"),
+	PUT		("PUT"),
 
 	/**
 	 * The DELETE method requests that the origin server delete the resource
 	 * identified by the Request-URI.
 	 */
-	DELETE("DELETE"),
+	DELETE	("DELETE"),
 
 	/**
 	 * The TRACE method is used to invoke a remote, application-layer loop- back
@@ -75,7 +73,7 @@ public enum HttpMethod implements Comparator<HttpMethod> {
 	 * the message received back to the client as the entity-body of a 200 (OK)
 	 * response.
 	 */
-	TRACE("TRACE"),
+	TRACE	("TRACE"),
 
 	/**
 	 * The OPTIONS method represents a request for information about the
@@ -85,13 +83,13 @@ public enum HttpMethod implements Comparator<HttpMethod> {
 	 * capabilities of a server, without implying a resource action or
 	 * initiating a resource retrieval.
 	 */
-	OPTIONS("OPTIONS"),
+	OPTIONS	("OPTIONS"),
 
 	/**
 	 * This specification reserves the method name CONNECT for use with a proxy
 	 * that can dynamically switch to being a tunnel
 	 */
-	CONNECT("CONNECT");
+	CONNECT	("CONNECT");
 	// @formatter:on
 
 	private volatile static Map<String, HttpMethod> mapByName;
