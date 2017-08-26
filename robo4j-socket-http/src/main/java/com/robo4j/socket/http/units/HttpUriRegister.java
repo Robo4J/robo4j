@@ -72,9 +72,9 @@ public final class HttpUriRegister {
 	}
 
 	public void updateUnits(RoboContext context) {
-		pathMethods.entrySet().forEach(e -> {
-			final RoboReference<?> roboUnit = getRoboUnitById(context, e.getKey().substring(1));
-			e.getValue().setUnit(roboUnit);
+		pathMethods.forEach((key, value) -> {
+			final RoboReference<?> roboUnit = getRoboUnitById(context, key.substring(1));
+			value.setUnit(roboUnit);
 		});
 	}
 

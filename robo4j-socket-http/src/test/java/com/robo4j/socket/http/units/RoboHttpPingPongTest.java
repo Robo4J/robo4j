@@ -81,7 +81,7 @@ public class RoboHttpPingPongTest {
 		RoboReference<Object> pongConsumer = systemPong.getReference(REQUEST_CONSUMER);
 
 		// FIXME, TODO: 20.08.17 (miro,markus) please implement notification
-		Thread.sleep(1000);
+		Thread.sleep(100);
 		System.out.println("systemPing : Going Down!");
 		systemPing.stop();
 		systemPing.shutdown();
@@ -92,7 +92,6 @@ public class RoboHttpPingPongTest {
 				.create(Integer.class, StringConsumer.PROP_GET_NUMBER_OF_SENT_MESSAGES);
 		final int number = pongConsumer.getAttribute(messagesNumberDescriptor).get();
 		// NOTE: Not working
-
 		systemPong.stop();
 		Assert.assertEquals(number, MESSAGES);
 		System.out.println("PingPong is down!");

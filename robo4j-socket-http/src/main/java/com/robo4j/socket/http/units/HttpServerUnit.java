@@ -21,8 +21,7 @@ package com.robo4j.socket.http.units;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.nio.channels.SelectableChannel;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -76,6 +75,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private Integer port;
 	private List<String> target;
 	private ServerSocketChannel server;
+	private Map<SocketChannel, List<?>> channelObjectMap = new ConcurrentHashMap<>();
 
 	public HttpServerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -180,45 +180,71 @@ public class HttpServerUnit extends RoboUnit<Object> {
 					while (selectedIterator.hasNext()) {
 						final SelectionKey selectedKey = selectedIterator.next();
 
-						if (selectedKey.isAcceptable()) {
-							SocketChannel requestChannel = server.accept();
-							SelectableChannel selectableChannel = requestChannel.configureBlocking(true);
-
-							//@formatter:off
-							// TODO: (miro: 03.08.17): remove socket dependency in RoboRequestCallable
-							HttpUriRegister.getInstance().updateUnits(getContext());
-							final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
-							final Socket socket = requestChannel.socket();
-
-							final RoboRequestCallable callable = new RoboRequestCallable(this, socket,
-									factory);
-							final Future<?> futureResult = executor.submit(callable);
-							//@formatter:on
-
-							final Object result = futureResult.get();
-
-							for (RoboReference<Object> ref : targetRefs) {
-								if (result != null && ref.getMessageType() != null
-										&& ref.getMessageType().equals(result.getClass())) {
-									ref.sendMessage(result);
-								}
-							}
-
-							requestChannel.close();
-						} else {
-							SimpleLoggingUtil.error(getClass(), "something is not right: " + selectedKey);
-						}
+						// preventing similar keys coming
 						selectedIterator.remove();
+
+						if (!selectedKey.isValid()) {
+							continue;
+						}
+
+						if (selectedKey.isAcceptable()) {
+							accept(selector, selectedKey);
+						} else if (selectedKey.isReadable()) {
+							read(targetRefs, selectedKey);
+						}
 					}
-					selectedKeys.clear();
 				}
 
 			}
-		} catch (InterruptedException | ExecutionException | IOException e) {
+		} catch (IOException e) {
 			SimpleLoggingUtil.error(getClass(), "SERVER CLOSED", e);
 		}
 		SimpleLoggingUtil.debug(getClass(), "stopped port: " + port);
 		setState(LifecycleState.STOPPED);
+	}
+
+	private void accept(Selector selector, SelectionKey key) throws IOException {
+		ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
+		SocketChannel channel = serverChannel.accept();
+		channel.configureBlocking(false);
+		// channelObjectMap.put(channel, new ArrayList<>());
+		channel.register(selector, SelectionKey.OP_READ);
+
+	}
+
+	private void read(List<RoboReference<Object>> targetRefs, SelectionKey key) throws IOException {
+		// try {
+
+		SocketChannel channel = (SocketChannel) key.channel();
+		//@formatter:off
+			HttpUriRegister.getInstance().updateUnits(getContext());
+			final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
+
+			ByteBuffer buffer = ByteBuffer.allocate(1024);
+			int numRead = channel.read(buffer);
+
+			if(numRead == -1){
+//				channelObjectMap.remove(channel);
+				channel.close();
+				key.cancel();
+				return;
+			}
+
+			final RoboRequestCallable callable = new RoboRequestCallable(this, buffer, factory);
+			final Future<?> futureResult = executor.submit(callable);
+
+			try{
+				Object result = futureResult.get();
+				for (RoboReference<Object> ref : targetRefs) {
+				if (result != null && ref.getMessageType() != null
+						&& ref.getMessageType().equals(result.getClass())) {
+					ref.sendMessage(result);
+				}
+			}
+			} catch (InterruptedException | ExecutionException e){
+				System.out.println(getClass().getSimpleName() + " ERROR: " + e);
+			}
+
 	}
 
 	private boolean validatePackages(String packages) {

@@ -89,9 +89,7 @@ public final class RoboHttpUtils {
 	public static String createPostRequest(String host, String uri, String message) {
 		//@formatter:off
 		final String header = createHeader(host, uri, message);
-		return createPostRequest(header, message)
-				.concat(NEW_LINE)
-				.concat(message);
+		return createPostRequest(header, message);
 		//@formatter:on
 	}
 
