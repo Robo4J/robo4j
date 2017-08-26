@@ -27,12 +27,12 @@ import com.robo4j.socket.http.HttpMessage;
 import com.robo4j.socket.http.HttpMessageWrapper;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
-import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.units.HttpUriRegister;
 import com.robo4j.socket.http.util.HttpHeaderBuilder;
 import com.robo4j.socket.http.util.HttpMessageUtil;
 import com.robo4j.socket.http.util.HttpPathUtil;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.io.DataOutputStream;
 import java.net.URI;

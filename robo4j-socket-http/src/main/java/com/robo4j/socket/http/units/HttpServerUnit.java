@@ -221,6 +221,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
 
 			ByteBuffer buffer = ByteBuffer.allocate(1024);
+
 			int numRead = channel.read(buffer);
 
 			if(numRead == -1){
