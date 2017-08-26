@@ -51,15 +51,16 @@ public class ByteBufferUtils {
 		byte[] endWindow = { CHAR_NEW_LINE, CHAR_NEW_LINE };
 		int bWindowPosition = 0;
 		byte[] bWindow = new byte[SIZE_WINDOW];
+		int consideredWindowSize = SIZE_WINDOW - 1;
 
 		while (!isHeaderDone && position < endOfReading) {
 			byte b = buffer.get(position);
-			if (bWindowPosition < SIZE_WINDOW - 1) {
+			if (bWindowPosition < consideredWindowSize) {
 				bWindowPosition++;
 				bWindow[bWindowPosition] = b;
 				headerByteBuffer[position] = b;
 				position++;
-			} else if (bWindowPosition == SIZE_WINDOW - 1) {
+			} else if (bWindowPosition == consideredWindowSize) {
 				if (isBWindow(endWindow, bWindow)) {
 					isHeaderDone = true;
 				} else {
