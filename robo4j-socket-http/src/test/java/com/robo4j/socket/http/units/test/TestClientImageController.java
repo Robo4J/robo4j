@@ -33,11 +33,10 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.client.util.RoboClassLoader;
 import com.robo4j.socket.http.client.util.RoboHttpUtils;
-import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.codec.CameraMessageCodec;
+import com.robo4j.socket.http.units.Constants;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -58,9 +57,10 @@ public class TestClientImageController extends RoboUnit<Boolean> {
 	private final CameraMessageCodec codec = new CameraMessageCodec();
 
 	@SuppressWarnings("unchecked")
-	private static final Map<String, String> raspistillProperties = com.robo4j.core.units.httpunit.test.util.PropertyMapBuilder.Builder().put(KEY_WIDTH, "-w")
-			.put(KEY_HEIGHT, "-h").put(KEY_TIMEOUT, "-t").put(KEY_QUALITY, "-q").put(KEY_SHARPNESS, "-sh")
-			.put(KEY_BRIGHTNESS, "-br").put(KEY_CONTRAST, "-co").put(KEY_SATURATION, "-sa").create();
+	private static final Map<String, String> raspistillProperties = com.robo4j.core.units.httpunit.test.util.PropertyMapBuilder
+			.Builder().put(KEY_WIDTH, "-w").put(KEY_HEIGHT, "-h").put(KEY_TIMEOUT, "-t").put(KEY_QUALITY, "-q")
+			.put(KEY_SHARPNESS, "-sh").put(KEY_BRIGHTNESS, "-br").put(KEY_CONTRAST, "-co").put(KEY_SATURATION, "-sa")
+			.create();
 	private static final String DEFAULT_SETUP = "-n -e jpg -vf -hf -o -";
 	private static String cameraCommand;
 	private String targetOut;
@@ -71,13 +71,12 @@ public class TestClientImageController extends RoboUnit<Boolean> {
 		super(Boolean.class, context, id);
 	}
 
-
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		SimpleLoggingUtil.print(getClass(), "camera client init");
 		Map<String, String> parameters = new HashMap<>();
-		parameters.put(KEY_WIDTH, configuration.getString(KEY_WIDTH, "320"));		//64
-		parameters.put(KEY_HEIGHT, configuration.getString(KEY_HEIGHT, "240"));		//45
+		parameters.put(KEY_WIDTH, configuration.getString(KEY_WIDTH, "320")); // 64
+		parameters.put(KEY_HEIGHT, configuration.getString(KEY_HEIGHT, "240")); // 45
 
 		StringBuilder sb = new StringBuilder(RASPI_CAMERA).append(SPACE)
 				.append(parameters.entrySet().stream().map(e -> {
@@ -101,8 +100,8 @@ public class TestClientImageController extends RoboUnit<Boolean> {
 		try {
 			InetAddress inetAddress = InetAddress.getByName(tmpClient);
 			String clientPort = configuration.getString("clientPort", null);
-			client = clientPort == null ? inetAddress.getHostAddress() :
-					inetAddress.getHostAddress().concat(":").concat(clientPort);
+			client = clientPort == null ? inetAddress.getHostAddress()
+					: inetAddress.getHostAddress().concat(":").concat(clientPort);
 			clientUri = configuration.getString("clientUri", Constants.EMPTY_STRING);
 		} catch (UnknownHostException e) {
 			SimpleLoggingUtil.error(getClass(), "unknown ip address", e);
@@ -146,7 +145,7 @@ public class TestClientImageController extends RoboUnit<Boolean> {
 	}
 
 	private String getSampleImage(String command) {
-		final InputStream imageData = RoboClassLoader.getInstance().getResource(IMAGE_FILE);
+		final InputStream imageData = Thread.currentThread().getContextClassLoader().getResourceAsStream(IMAGE_FILE);
 		try {
 			byte[] imageArray = new byte[imageData.available()];
 			imageData.read(imageArray);
@@ -156,6 +155,5 @@ public class TestClientImageController extends RoboUnit<Boolean> {
 		}
 
 	}
-
 
 }

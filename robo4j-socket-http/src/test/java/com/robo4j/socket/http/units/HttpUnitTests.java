@@ -20,16 +20,15 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.Base64;
 
-import com.robo4j.socket.http.client.util.RoboClassLoader;
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.codec.SimpleCommand;
 import com.robo4j.socket.http.codec.SimpleCommandCodec;
 import com.robo4j.socket.http.units.test.TestCommandEnum;
 import com.robo4j.socket.http.units.test.codec.TestArrayDecoder;
 import com.robo4j.socket.http.units.test.codec.TestArrayEncoder;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  *
@@ -164,7 +163,7 @@ public class HttpUnitTests {
 	public void testHttpCameraMessageImage() throws Exception {
 
 		final InputStream imageData = new BufferedInputStream(
-				RoboClassLoader.getInstance().getResource("20161021_NoSignal_240.png"));
+				Thread.currentThread().getContextClassLoader().getResourceAsStream("20161021_NoSignal_240.png"));
 		byte[] imageArray = new byte[imageData.available()];
 		imageData.read(imageArray);
 

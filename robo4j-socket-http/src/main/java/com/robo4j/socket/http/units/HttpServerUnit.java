@@ -22,6 +22,7 @@ package com.robo4j.socket.http.units;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -180,7 +182,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 						if (selectedKey.isAcceptable()) {
 							SocketChannel requestChannel = server.accept();
-							requestChannel.configureBlocking(true);
+							SelectableChannel selectableChannel = requestChannel.configureBlocking(true);
 
 							//@formatter:off
 							// TODO: (miro: 03.08.17): remove socket dependency in RoboRequestCallable
