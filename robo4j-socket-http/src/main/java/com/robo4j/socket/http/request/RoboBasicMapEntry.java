@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.socket.http.client.request;
+package com.robo4j.socket.http.request;
 
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.util.HttpMessageUtil;

@@ -23,7 +23,6 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.StringProducer;
 import com.robo4j.core.StringToolkit;
 import com.robo4j.core.configuration.Configuration;
-import com.robo4j.socket.http.client.util.RoboHttpUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

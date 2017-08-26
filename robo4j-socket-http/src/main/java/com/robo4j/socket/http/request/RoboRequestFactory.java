@@ -17,7 +17,7 @@
  * along with robo4j .  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http.client.request;
+package com.robo4j.socket.http.request;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;

@@ -44,7 +44,7 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.client.util.RoboHttpUtils;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.codec.CameraMessageCodec;

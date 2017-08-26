@@ -30,7 +30,7 @@ import com.robo4j.core.StringConsumer;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.util.SystemUtil;
-import com.robo4j.socket.http.client.util.RoboHttpUtils;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
 
 import java.util.Collections;

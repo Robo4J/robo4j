@@ -15,18 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http.client.request;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
+package com.robo4j.socket.http.request;
 
 import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.RoboReference;
@@ -38,12 +27,20 @@ import com.robo4j.socket.http.HttpMessage;
 import com.robo4j.socket.http.HttpMessageWrapper;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
-import com.robo4j.socket.http.client.util.RoboHttpUtils;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.units.HttpUriRegister;
 import com.robo4j.socket.http.util.HttpHeaderBuilder;
 import com.robo4j.socket.http.util.HttpMessageUtil;
 import com.robo4j.socket.http.util.HttpPathUtil;
+
+import java.io.DataOutputStream;
+import java.net.URI;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -66,11 +63,8 @@ public class RoboRequestCallable implements Callable<Object> {
 		this.factory = factory;
 	}
 
-
 	@Override
 	public Object call() throws Exception {
-
-
 
 		final String testString = new String(buffer.array());
 		final String[] requestParts = testString.split("\n\n");
@@ -82,7 +76,7 @@ public class RoboRequestCallable implements Callable<Object> {
 		if (method != null) {
 			final Map<String, String> params = new HashMap<>();
 
-			for(int i=1; i<headerLines.length; i++){
+			for (int i = 1; i < headerLines.length; i++) {
 				final String[] array = headerLines[i]
 						.split(HttpMessageUtil.getHttpSeparator(HttpMessageUtil.HTTP_HEADER_SEP));
 
@@ -99,42 +93,40 @@ public class RoboRequestCallable implements Callable<Object> {
 			final List<String> paths = HttpPathUtil.uriStringToPathList(httpMessage.uri().getPath());
 			final RoboReference<?> desiredUnit = getRoboReferenceByPath(paths);
 
-            //@formatter:on
+			//@formatter:on
 			switch (method) {
-				case GET:
-						/* currently is supported only one path */
-					if (desiredUnit == null) {
-						final Object systemSummary = factory.processGet(unit, new HttpMessageWrapper<>(httpMessage));
-					} else {
-						AttributeDescriptor<?> attributeDescriptor = getAttributeByQuery(desiredUnit,
-								httpMessage.uri());
-						if (attributeDescriptor == null) {
-							final Object unitDescription = factory.processGet(desiredUnit,
-									paths.get(DEFAULT_PATH_POSITION_0), new HttpMessageWrapper<>(httpMessage));
-							if (unitDescription != null) {
-							}
-						} else {
-							final byte[] unitAttributeValue = (byte[]) factory.processGet(desiredUnit,
-									attributeDescriptor);
+			case GET:
+				/* currently is supported only one path */
+				if (desiredUnit == null) {
+					final Object systemSummary = factory.processGet(unit, new HttpMessageWrapper<>(httpMessage));
+				} else {
+					AttributeDescriptor<?> attributeDescriptor = getAttributeByQuery(desiredUnit, httpMessage.uri());
+					if (attributeDescriptor == null) {
+						final Object unitDescription = factory.processGet(desiredUnit,
+								paths.get(DEFAULT_PATH_POSITION_0), new HttpMessageWrapper<>(httpMessage));
+						if (unitDescription != null) {
 						}
-					}
-					return DEFAULT_RESPONSE;
-				case POST:
-					int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH));
-					final StringBuilder jsonSB = new StringBuilder();
-					final String postValue = requestParts[1].trim();
-					if (length == postValue.length()) {
-						jsonSB.append(postValue);
 					} else {
-						jsonSB.append(postValue);
-						jsonSB.append(requestParts[1]);
-						System.out.println("NOT SAME LENGTH: " + length + " message: " + postValue);
+						final byte[] unitAttributeValue = (byte[]) factory.processGet(desiredUnit, attributeDescriptor);
 					}
-					return factory.processPost(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0),
-							new HttpMessageWrapper<>(httpMessage, jsonSB.toString()));
-				default:
-					SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
-					return DEFAULT_RESPONSE;
+				}
+				return DEFAULT_RESPONSE;
+			case POST:
+				int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH));
+				final StringBuilder jsonSB = new StringBuilder();
+				final String postValue = requestParts[1].trim();
+				if (length == postValue.length()) {
+					jsonSB.append(postValue);
+				} else {
+					jsonSB.append(postValue);
+					jsonSB.append(requestParts[1]);
+					System.out.println("NOT SAME LENGTH: " + length + " message: " + postValue);
+				}
+				return factory.processPost(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0),
+						new HttpMessageWrapper<>(httpMessage, jsonSB.toString()));
+			default:
+				SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
+				return DEFAULT_RESPONSE;
 			}
 		}
 
@@ -172,7 +164,7 @@ public class RoboRequestCallable implements Callable<Object> {
 			return null;
 		} else {
 			final HttpUriRegister httpUriRegister = HttpUriRegister.getInstance();
-			String path = paths.get(DEFAULT_PATH_POSITION_0).replaceFirst("/","");
+			String path = paths.get(DEFAULT_PATH_POSITION_0).replaceFirst("/", "");
 			return httpUriRegister.getRoboUnitByPath(path);
 		}
 

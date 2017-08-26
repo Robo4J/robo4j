@@ -50,8 +50,8 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.client.request.RoboRequestCallable;
-import com.robo4j.socket.http.client.request.RoboRequestFactory;
+import com.robo4j.socket.http.request.RoboRequestCallable;
+import com.robo4j.socket.http.request.RoboRequestFactory;
 import com.robo4j.socket.http.util.JsonUtil;
 
 /**
