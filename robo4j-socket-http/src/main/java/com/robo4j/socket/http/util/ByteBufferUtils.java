@@ -17,7 +17,6 @@
 
 package com.robo4j.socket.http.util;
 
-import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpByteWrapper;
 
 import java.nio.ByteBuffer;
@@ -30,7 +29,9 @@ import java.util.Arrays;
 public class ByteBufferUtils {
 
 	private static final int SIZE_WINDOW = 2;
-	private static final byte CHAR_NEW_LINE = 0x0A;
+	public static final byte CHAR_NEW_LINE = 0x0A;
+	public static final byte CHAR_RETURN = 0x0D;
+	public static final byte[] END_WINDOW = { CHAR_NEW_LINE, CHAR_NEW_LINE };
 
 	public static ByteBuffer copy(ByteBuffer source, int start, int end) {
 		ByteBuffer result = ByteBuffer.allocate(end);
@@ -46,35 +47,43 @@ public class ByteBufferUtils {
 		int numberOverWindow = headerByteBuffer.length % SIZE_WINDOW;
 		int endOfReading = buffer.capacity() - numberOverWindow;
 
-		int position = buffer.position();
+		int position = 0;
+		int bPosition = 0;
+
 		boolean isHeaderDone = false;
-		byte[] endWindow = { CHAR_NEW_LINE, CHAR_NEW_LINE };
 		int bWindowPosition = 0;
 		byte[] bWindow = new byte[SIZE_WINDOW];
-		int consideredWindowSize = SIZE_WINDOW - 1;
 
 		while (!isHeaderDone && position < endOfReading) {
 			byte b = buffer.get(position);
-			if (bWindowPosition < consideredWindowSize) {
-				bWindowPosition++;
-				bWindow[bWindowPosition] = b;
-				headerByteBuffer[position] = b;
-				position++;
-			} else if (bWindowPosition == consideredWindowSize) {
-				if (isBWindow(endWindow, bWindow)) {
-					isHeaderDone = true;
-				} else {
-					bWindowPosition = 0;
+
+			if (bWindowPosition < (SIZE_WINDOW - 1)) {
+				if (b != CHAR_RETURN) {
 					bWindow[bWindowPosition] = b;
-					headerByteBuffer[position] = b;
-					position++;
+					bWindowPosition++;
 				}
+
+				headerByteBuffer[bPosition] = b;
+				bPosition++;
 			} else {
-				SimpleLoggingUtil.error(ByteBufferUtils.class, "wrong http content separation");
+				if (b != CHAR_RETURN) {
+					bWindow[bWindowPosition] = b;
+					bWindowPosition = 0;
+				}
+
+				headerByteBuffer[bPosition] = b;
+				bPosition++;
 			}
+
+			if (isBWindow(END_WINDOW, bWindow)) {
+				isHeaderDone = true;
+				bPosition--;
+			}
+
+			position++;
 		}
 
-		int validHeaderSize = position - SIZE_WINDOW;
+		int validHeaderSize = bPosition - SIZE_WINDOW;
 		int validBodySize = buffer.capacity() - position;
 		ByteBuffer headerBuffer = ByteBuffer.wrap(Arrays.copyOf(headerByteBuffer, validHeaderSize));
 
@@ -87,8 +96,19 @@ public class ByteBufferUtils {
 		return new HttpByteWrapper(headerBuffer, bodyBuffer);
 	}
 
-	// Private Methods
-	private static boolean isBWindow(byte[] stopWindow, byte[] window) {
+	public static byte[] validArray(byte[] array, int size) {
+		return validArray(array, 0, size);
+	}
+
+	public static byte[] validArray(byte[] array, int start, int size) {
+		byte[] result = new byte[size];
+		for (int i = start; i < size; i++) {
+			result[i] = array[i];
+		}
+		return result;
+	}
+
+	public static boolean isBWindow(byte[] stopWindow, byte[] window) {
 		return Arrays.equals(stopWindow, window);
 	}
 }

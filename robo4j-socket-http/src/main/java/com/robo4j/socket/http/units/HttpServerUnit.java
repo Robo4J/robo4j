@@ -235,6 +235,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			ByteBuffer validBuffer = ByteBufferUtils.copy(buffer, 0, numRead);
 			final RoboRequestCallable callable = new RoboRequestCallable(this, validBuffer, factory);
 			final Future<?> futureResult = executor.submit(callable);
+			SimpleLoggingUtil.debug(getClass(), " future: " + futureResult);
+
 
 			try{
 				Object result = futureResult.get();
@@ -248,6 +250,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 				System.out.println(getClass().getSimpleName() + " ERROR: " + e);
 			}
 
+			channel.close();
+			key.cancel();
 	}
 
 	private boolean validatePackages(String packages) {

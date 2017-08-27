@@ -21,6 +21,7 @@ import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.socket.http.HttpByteWrapper;
 import com.robo4j.socket.http.HttpHeaderNames;
 import com.robo4j.socket.http.HttpHeaderValues;
 import com.robo4j.socket.http.HttpMessage;
@@ -29,6 +30,7 @@ import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.units.HttpUriRegister;
+import com.robo4j.socket.http.util.ByteBufferUtils;
 import com.robo4j.socket.http.util.HttpHeaderBuilder;
 import com.robo4j.socket.http.util.HttpMessageUtil;
 import com.robo4j.socket.http.util.HttpPathUtil;
@@ -65,10 +67,10 @@ public class RoboRequestCallable implements Callable<Object> {
 
 	@Override
 	public Object call() throws Exception {
+		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBuffer(buffer);
 
-		final String testString = new String(buffer.array());
-		final String[] requestParts = testString.split("\n\n");
-		final String[] headerLines = requestParts[0].split("[\r\n]+");
+		// FIXME: 27.08.17 (miro) -> review
+		final String[] headerLines = new String(wrapper.getHeader().array()).split("[\r\n]+");
 		final String firstLine = RoboHttpUtils.correctLine(headerLines[0]);
 		final String[] tokens = firstLine.split(Constants.HTTP_EMPTY_SEP);
 		final HttpMethod method = HttpMethod.getByName(tokens[HttpMessageUtil.METHOD_KEY_POSITION]);
@@ -114,12 +116,11 @@ public class RoboRequestCallable implements Callable<Object> {
 			case POST:
 				int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH));
 				final StringBuilder jsonSB = new StringBuilder();
-				final String postValue = requestParts[1].trim();
+				final String postValue = new String(wrapper.getBody().array());
 				if (length == postValue.length()) {
 					jsonSB.append(postValue);
 				} else {
 					jsonSB.append(postValue);
-					jsonSB.append(requestParts[1]);
 					System.out.println("NOT SAME LENGTH: " + length + " message: " + postValue);
 				}
 				return factory.processPost(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0),

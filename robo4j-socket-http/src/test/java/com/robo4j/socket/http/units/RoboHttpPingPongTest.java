@@ -57,7 +57,15 @@ public class RoboHttpPingPongTest {
 	private static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
 
 
-	// FIXME: 20.08.17 miro -> review
+//	@Test
+	public void pongTest() throws Exception {
+		RoboContext systemPong = configurePongSystem();
+		systemPong.start();
+		System.out.println("Press Key...");
+		System.in.read();
+
+	}
+
 	@Test
 	public void pingPongTest() throws Exception {
 
