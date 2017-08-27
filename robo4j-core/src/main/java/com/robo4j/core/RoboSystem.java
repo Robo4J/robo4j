@@ -44,6 +44,8 @@ import com.robo4j.core.scheduler.Scheduler;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboSystem implements RoboContext {
+	private static final String NAME_BLOCKING_POOL = "Robo4J Blocking Pool";
+	private static final String NAME_WORKER_POOL = "Robo4J Worker Pool";
 	private static final String KEY_SCHEDULER_POOL_SIZE = "poolSizeScheduler";
 	private static final String KEY_WORKER_POOL_SIZE = "poolSizeWorker";
 	private static final String KEY_BLOCKING_POOL_SIZE = "poolSizeBlocking";
@@ -189,10 +191,9 @@ public class RoboSystem implements RoboContext {
 	public RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize) {
 		this.uid = uid;
 		workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
-				new RoboThreadFactory("Robo4J Worker Pool", true));
+				new RoboThreadFactory(new ThreadGroup(NAME_WORKER_POOL), NAME_WORKER_POOL, true));
 		blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, blockingQueue,
-				new RoboThreadFactory("Robo4J Blocking Pool", true));
-
+				new RoboThreadFactory(new ThreadGroup(NAME_BLOCKING_POOL), NAME_BLOCKING_POOL, true));
 		systemScheduler = new DefaultScheduler(this, schedulerPoolSize);
 	}
 

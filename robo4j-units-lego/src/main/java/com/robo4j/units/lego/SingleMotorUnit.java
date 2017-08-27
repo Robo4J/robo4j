@@ -17,18 +17,13 @@
 
 package com.robo4j.units.lego;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
-import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.hw.lego.ILegoMotor;
@@ -37,18 +32,13 @@ import com.robo4j.hw.lego.enums.MotorTypeEnum;
 import com.robo4j.hw.lego.provider.MotorProvider;
 import com.robo4j.hw.lego.wrapper.MotorWrapper;
 import com.robo4j.units.lego.platform.MotorRotationEnum;
-import com.robo4j.units.lego.utils.LegoUtils;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class SingleMotorUnit extends RoboUnit<MotorRotationEnum> implements RoboReference<MotorRotationEnum> {
-
 	protected volatile ILegoMotor motor;
-	private ExecutorService executor = new ThreadPoolExecutor(LegoUtils.SINGLE_THREAD_POOL_SIZE,
-			LegoUtils.SINGLE_THREAD_POOL_SIZE, LegoUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J Lego Single Motor", true));
 
 	public SingleMotorUnit(RoboContext context, String id) {
 		super(MotorRotationEnum.class, context, id);
@@ -70,15 +60,6 @@ public class SingleMotorUnit extends RoboUnit<MotorRotationEnum> implements Robo
 	public void shutdown() {
 		setState(LifecycleState.SHUTTING_DOWN);
 		motor.close();
-		try {
-			executor.awaitTermination(LegoUtils.TERMINATION_TIMEOUT, TimeUnit.SECONDS);
-			executor.shutdown();
-		} catch (InterruptedException e) {
-			SimpleLoggingUtil.error(getClass(), "termination failed");
-		}
-		if (executor.isShutdown()) {
-			SimpleLoggingUtil.debug(getClass(), "executor is down");
-		}
 		setState(LifecycleState.SHUTDOWN);
 	}
 
@@ -96,31 +77,28 @@ public class SingleMotorUnit extends RoboUnit<MotorRotationEnum> implements Robo
 		Character motorType = configuration.getCharacter("motorType", MotorTypeEnum.NXT.getType());
 
 		MotorProvider motorProvider = new MotorProvider();
-		motor = new MotorWrapper<>(motorProvider, AnalogPortEnum.getByType(motorPort),
-				MotorTypeEnum.getByType(motorType));
+		motor = new MotorWrapper<>(motorProvider, AnalogPortEnum.getByType(motorPort), MotorTypeEnum.getByType(motorType));
 
 		setState(LifecycleState.INITIALIZED);
 	}
 
 	// Private Methods
 	private void processPlatformMessage(MotorRotationEnum message) {
+		switch (message) {
+		case BACKWARD:
+		case FORWARD:
+		case STOP:
+			runEngine(motor, message);
+			break;
+		default:
+			SimpleLoggingUtil.error(getClass(), message + " not supported!");
+			throw new LegoUnitException("single motor command: " + message);
+		}
 
-        switch (message){
-            case BACKWARD:
-			case FORWARD:
-            case STOP:
-                runEngine(motor, message);
-                break;
-            default:
-                SimpleLoggingUtil.error(getClass(), message + " not supported!");
-                throw new LegoUnitException("single motor command: " + message);
-        }
-
-
-    }
+	}
 
 	private Future<Boolean> runEngine(ILegoMotor motor, MotorRotationEnum rotation) {
-		return executor.submit(() -> {
+		return getContext().getScheduler().submit(() -> {
 			switch (rotation) {
 			case FORWARD:
 				motor.forward();
