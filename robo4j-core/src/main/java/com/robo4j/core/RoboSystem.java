@@ -139,13 +139,13 @@ public class RoboSystem implements RoboContext {
 		private void deliverOnQueue(T message) {
 			switch (deliveryPolicy) {
 			case SYSTEM:
-				systemScheduler.execute(() -> unit.onMessage(message));
+				systemScheduler.execute(new Messenger<T>(unit, message));
 				break;
 			case WORK:
-				workExecutor.execute(() -> unit.onMessage(message));
+				workExecutor.execute(new Messenger<T>(unit, message));
 				break;
 			case BLOCKING:
-				blockingExecutor.execute(() -> unit.onMessage(message));
+				blockingExecutor.execute(new Messenger<T>(unit, message));
 				break;
 			}
 		}
@@ -168,6 +168,26 @@ public class RoboSystem implements RoboContext {
 		@Override
 		public Class<T> getMessageType() {
 			return unit.getMessageType();
+		}
+	}
+
+	// Protects the executors from problems in the units.
+	private static class Messenger<T> implements Runnable {
+		private final RoboUnit<T> unit;
+		private final T message;
+
+		public Messenger(RoboUnit<T> unit, T message) {
+			this.unit = unit;
+			this.message = message;
+		}
+
+		@Override
+		public void run() {
+			try {
+				unit.onMessage(message);
+			} catch (Throwable t) {
+				SimpleLoggingUtil.error(unit.getClass(), "Error processing message", t);
+			}
 		}
 	}
 
@@ -205,7 +225,7 @@ public class RoboSystem implements RoboContext {
 				systemConfig.getInteger(KEY_WORKER_POOL_SIZE, DEFAULT_WORKING_POOL_SIZE),
 				systemConfig.getInteger(KEY_BLOCKING_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE));
 	}
-	
+
 	/**
 	 * Constructor.
 	 */
