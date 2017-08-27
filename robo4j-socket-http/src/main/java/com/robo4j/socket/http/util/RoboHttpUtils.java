@@ -60,7 +60,7 @@ public final class RoboHttpUtils {
 
 	public static String createRequestHeader(String first, Map<String, String> headerMap) {
 		HttpHeaderBuilder result = HttpHeaderBuilder.Build();
-		headerMap.entrySet().forEach(e -> result.add(e.getKey(), e.getValue()));
+		headerMap.forEach(result::add);
 		return first.concat(result.build());
 
 	}

@@ -22,18 +22,19 @@ package com.robo4j.socket.http.units;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -49,6 +50,7 @@ import com.robo4j.socket.http.request.RoboRequestCallable;
 import com.robo4j.socket.http.request.RoboRequestFactory;
 import com.robo4j.socket.http.util.ByteBufferUtils;
 import com.robo4j.socket.http.util.JsonUtil;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 
 /**
  * Http NIO unit allows to configure format of the requests currently is only
@@ -66,7 +68,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private Integer port;
 	private List<String> target;
 	private ServerSocketChannel server;
-	private Map<SocketChannel, List<?>> channelObjectMap = new ConcurrentHashMap<>();
+	private final Map<SelectableChannel, SelectionKey> channelKeyMap = new HashMap<>();
 
 	public HttpServerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -145,11 +147,12 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			// I/O operations
 			final Selector selector = Selector.open();
 			server = ServerSocketChannel.open();
-			server.socket().bind(new InetSocketAddress(port));
 			server.configureBlocking(false);
+			server.socket().bind(new InetSocketAddress(port));
 
-			int selectorOpt = server.validOps();
-			server.register(selector, selectorOpt, null);
+//			channelKeyMap.put(server, listenKey);
+
+			server.register(selector, SelectionKey.OP_ACCEPT);
 			while (activeStates.contains(getState())) {
 				int channelReady = selector.select();
 
@@ -173,7 +176,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 						if (selectedKey.isAcceptable()) {
 							accept(selector, selectedKey);
 						} else if (selectedKey.isReadable()) {
-							read(targetRefs, selectedKey);
+							read(selector, targetRefs, selectedKey);
+						} else if (selectedKey.isWritable()){
+							write(selectedKey);
 						}
 					}
 				}
@@ -190,48 +195,61 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
 		SocketChannel channel = serverChannel.accept();
 		channel.configureBlocking(false);
-		// channelObjectMap.put(channel, new ArrayList<>());
-		channel.register(selector, SelectionKey.OP_READ);
+		channelKeyMap.put(channel, key);
+		channel.register(selector, SelectionKey.OP_READ );
 
 	}
 
-	private void read(List<RoboReference<Object>> targetRefs, SelectionKey key) throws IOException {
-		// try {
+	private void write(SelectionKey key) throws IOException{
+		SocketChannel channel = (SocketChannel) key.channel();
+		String message = "this is done!";
+
+		String header = RoboHttpUtils.setHeader("200", message.length());
+		String response = header.concat(message);
+
+		ByteBuffer buffer = ByteBuffer.wrap(response.getBytes());
+		if(key.isWritable()){
+			System.out.println("Possible To Write");
+		}
+		while(buffer.hasRemaining()){
+			channel.write(buffer);
+			System.out.println("written");
+		}
+		channelKeyMap.remove(channel);
+
+		channel.close();
+		key.cancel();
+	}
+
+	private void read(Selector selector, List<RoboReference<Object>> targetRefs, SelectionKey key) throws IOException {
 
 		SocketChannel channel = (SocketChannel) key.channel();
 		//@formatter:off
-			HttpUriRegister.getInstance().updateUnits(getContext());
-			final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
+		HttpUriRegister.getInstance().updateUnits(getContext());
+		final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
 
-			ByteBuffer buffer = ByteBuffer.allocate(4*1024);
+		ByteBuffer buffer = ByteBuffer.allocate(4*1024);
 
-			int numRead = channel.read(buffer);
+		int numRead = channel.read(buffer);
 
-			if(numRead == -1){
-//				channelObjectMap.remove(channel);
-				channel.close();
-				key.cancel();
-				return;
+		ByteBuffer validBuffer = ByteBufferUtils.copy(buffer, 0, numRead);
+		final RoboRequestCallable callable = new RoboRequestCallable(this, validBuffer, factory);
+		final Future<?> futureResult = getContext().getScheduler().submit(callable);
+
+		try{
+			Object result = futureResult.get();
+			for (RoboReference<Object> ref : targetRefs) {
+			if (result != null && ref.getMessageType() != null
+					&& ref.getMessageType().equals(result.getClass())) {
+				ref.sendMessage(result);
 			}
+		}
+		} catch (InterruptedException | ExecutionException e){
+			System.out.println(getClass().getSimpleName() + " ERROR: " + e);
+		}
 
-			ByteBuffer validBuffer = ByteBufferUtils.copy(buffer, 0, numRead);
-			final RoboRequestCallable callable = new RoboRequestCallable(this, validBuffer, factory);
-			final Future<?> futureResult = getContext().getScheduler().submit(callable);
-
-			try{
-				Object result = futureResult.get();
-				for (RoboReference<Object> ref : targetRefs) {
-				if (result != null && ref.getMessageType() != null
-						&& ref.getMessageType().equals(result.getClass())) {
-					ref.sendMessage(result);
-				}
-			}
-			} catch (InterruptedException | ExecutionException e){
-				System.out.println(getClass().getSimpleName() + " ERROR: " + e);
-			}
-
-			channel.close();
-			key.cancel();
+		channel.register(selector, SelectionKey.OP_WRITE);
+		System.out.println("DONE Reading");
 	}
 
 	private boolean validatePackages(String packages) {
