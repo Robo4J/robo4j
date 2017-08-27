@@ -188,7 +188,6 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 			}
 			break;
 		}
-		super.onMessage(message);
 	}
 
 	@SuppressWarnings("unchecked")
