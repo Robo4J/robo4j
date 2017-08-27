@@ -20,11 +20,7 @@
 package com.robo4j.units.lego;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -33,9 +29,7 @@ import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
-import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.hw.lego.ILegoMotor;
 import com.robo4j.hw.lego.ILegoSensor;
 import com.robo4j.hw.lego.enums.AnalogPortEnum;
@@ -49,7 +43,6 @@ import com.robo4j.hw.lego.wrapper.SensorWrapper;
 import com.robo4j.units.lego.sonic.LegoServoRotationEnum;
 import com.robo4j.units.lego.sonic.LegoSonicBrainMessage;
 import com.robo4j.units.lego.sonic.LegoSonicMessage;
-import com.robo4j.units.lego.utils.LegoUtils;
 
 /**
  *
@@ -61,10 +54,6 @@ import com.robo4j.units.lego.utils.LegoUtils;
  * @author Miro Wengner (@miragemiko)
  */
 public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboReference<LegoSonicMessage> {
-
-	private final ExecutorService executor = new ThreadPoolExecutor(LegoUtils.PLATFORM_THREAD_POOL_SIZE,
-			LegoUtils.PLATFORM_THREAD_POOL_SIZE, LegoUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J Lego BasicSonic", true));
 	private static final int POSITION_START = 0;
 	private static final int POSITION_STEP = 30;
 	private static final int POSITION_MAX = 30; // should be degrees
@@ -113,17 +102,8 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 	@Override
 	public void shutdown() {
 		setState(LifecycleState.SHUTTING_DOWN);
-		try {
-			executor.awaitTermination(LegoUtils.TERMINATION_TIMEOUT, TimeUnit.SECONDS);
-			executor.shutdown();
-		} catch (InterruptedException e) {
-			SimpleLoggingUtil.error(getClass(), "termination failed");
-		}
 		sensor.close();
 		servo.close();
-		if (executor.isShutdown()) {
-			SimpleLoggingUtil.debug(getClass(), "executor is down");
-		}
 		setState(LifecycleState.SHUTDOWN);
 	}
 
@@ -158,7 +138,7 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 	}
 
 	private Future<Boolean> center(ILegoSensor sensor, ILegoMotor motor){
-		return executor.submit(() -> {
+		return getContext().getScheduler().submit(() -> {
 			if(!motor.isMoving()){
 				sensor.activate(true);
 				String data = sensor.getData();
@@ -175,7 +155,7 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 
 	private Future<Boolean> scan(ILegoSensor sensor, ILegoMotor motor){
 		unitActive.set(true);
-		return executor.submit(() -> {
+		return getContext().getScheduler().submit(() -> {
 			while(unitActive.get()){
 				if(!motor.isMoving()){
 					sensor.activate(true);
@@ -205,7 +185,7 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 	}
 
 	private Future<Boolean> finish(ILegoSensor sensor, ILegoMotor motor){
-		return executor.submit(() -> {
+		return getContext().getScheduler().submit(() -> {
 			sensor.close();
 			motor.close();
 			unitActive.set(false);
@@ -214,7 +194,7 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 	}
 
 	private Future<Boolean> stop(ILegoSensor sensor, ILegoMotor motor){
-		return executor.submit(() -> {
+		return getContext().getScheduler().submit(() -> {
 			if (unitActive.get()) {
 				motor.stop();
 				unitActive.set(false);

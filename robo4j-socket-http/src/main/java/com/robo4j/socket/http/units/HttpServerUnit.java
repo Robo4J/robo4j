@@ -35,11 +35,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.robo4j.core.ConfigurationException;
@@ -47,7 +43,6 @@ import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
-import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.request.RoboRequestCallable;
@@ -64,14 +59,9 @@ import com.robo4j.socket.http.util.JsonUtil;
  */
 public class HttpServerUnit extends RoboUnit<Object> {
 	private static final String DELIMITER = ",";
-	private static final int DEFAULT_THREAD_POOL_SIZE = 2;
-	private static final int KEEP_ALIVE_TIME = 10;
 	private static final int _DEFAULT_PORT = 8042;
 	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
 	private static final HttpCodecRegistry CODEC_REGISTRY = new HttpCodecRegistry();
-	private final ExecutorService executor = new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE, DEFAULT_THREAD_POOL_SIZE,
-			KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
-			new RoboThreadFactory("Robo4J HttServerUnit", true));
 	private boolean available;
 	private Integer port;
 	private List<String> target;
@@ -117,7 +107,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		if (!available) {
 			available = true;
 			System.out.println(getClass().getSimpleName() + ": Server Started");
-			executor.execute(() -> server(targetRefs));
+			getContext().getScheduler().execute(() -> server(targetRefs));
 		} else {
 			SimpleLoggingUtil.error(getClass(), "HttpDynamicUnit start() -> error: " + targetRefs);
 		}
@@ -129,14 +119,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		setState(LifecycleState.STOPPING);
 		stopServer("stop");
 		setState(LifecycleState.STOPPED);
-	}
-
-	@Override
-	public void shutdown() {
-		setState(LifecycleState.SHUTTING_DOWN);
-		executor.shutdownNow();
-		stopServer("shutdown");
-		setState(LifecycleState.SHUTDOWN);
 	}
 
 	// Private Methods
@@ -234,9 +216,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 			ByteBuffer validBuffer = ByteBufferUtils.copy(buffer, 0, numRead);
 			final RoboRequestCallable callable = new RoboRequestCallable(this, validBuffer, factory);
-			final Future<?> futureResult = executor.submit(callable);
-			SimpleLoggingUtil.debug(getClass(), " future: " + futureResult);
-
+			final Future<?> futureResult = getContext().getScheduler().submit(callable);
 
 			try{
 				Object result = futureResult.get();

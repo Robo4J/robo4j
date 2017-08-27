@@ -26,9 +26,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboThreadFactory implements ThreadFactory {
+	/**
+	 * The thread group to use.
+	 */
+	private ThreadGroup threadGroup;
 
 	/**
-	 * Attribute to store the number of threads creates by the Factory
+	 * Attribute to store the number of threads created by the Factory
 	 */
 	private AtomicInteger counter;
 
@@ -45,7 +49,8 @@ public class RoboThreadFactory implements ThreadFactory {
 	/**
 	 * Constructor that initiates attributes
 	 */
-	public RoboThreadFactory(String prefix, boolean isDaemon) {
+	public RoboThreadFactory(ThreadGroup threadGroup, String prefix, boolean isDaemon) {
+		this.threadGroup = threadGroup;
 		this.threadBaseName = prefix;
 		this.isDaemon = isDaemon;
 		counter = new AtomicInteger(1);
@@ -53,7 +58,7 @@ public class RoboThreadFactory implements ThreadFactory {
 
 	@Override
 	public Thread newThread(Runnable r) {
-		Thread thread = new Thread(r, threadBaseName + "-" + counter.getAndIncrement());
+		Thread thread = new Thread(threadGroup, r, threadBaseName + "-" + counter.getAndIncrement());
 		thread.setDaemon(isDaemon);
 		return thread;
 	}

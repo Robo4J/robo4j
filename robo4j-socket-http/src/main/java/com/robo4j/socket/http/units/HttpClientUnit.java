@@ -22,19 +22,14 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
-import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
-import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.socket.http.util.JsonUtil;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 
 /**
  * Http NIO Client to communicate with external system/Robo4J units
@@ -43,10 +38,6 @@ import com.robo4j.socket.http.util.JsonUtil;
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpClientUnit extends RoboUnit<Object> {
-
-	private final ExecutorService executor = new ThreadPoolExecutor(RoboHttpUtils.DEFAULT_THREAD_POOL_SIZE,
-			RoboHttpUtils.DEFAULT_THREAD_POOL_SIZE, RoboHttpUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J HttpClientUnit", true));
 	private InetSocketAddress address;
 	private String responseUnit;
 	private Integer responseSize;
@@ -78,9 +69,9 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			SocketChannel client = SocketChannel.open(address);
 			client.configureBlocking(true);
 
-			ByteBuffer buffer = ByteBuffer.wrap(((String)message).getBytes());
+			ByteBuffer buffer = ByteBuffer.wrap(((String) message).getBytes());
 			client.write(buffer);
-			if(responseUnit != null && responseSize != null){
+			if (responseUnit != null && responseSize != null) {
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
 				client.read(readBuffer);
 				sendMessageToResponseUnit(readBuffer);
@@ -91,21 +82,8 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		}
 	}
 
-	@Override
-	public void start() {
-		setState(LifecycleState.STARTING);
-		setState(LifecycleState.STARTED);
-	}
-
-	@Override
-	public void shutdown() {
-		setState(LifecycleState.SHUTTING_DOWN);
-		executor.shutdownNow();
-		setState(LifecycleState.SHUTDOWN);
-	}
-
-	//Private Methods
-	private void sendMessageToResponseUnit(ByteBuffer byteBuffer){
+	// Private Methods
+	private void sendMessageToResponseUnit(ByteBuffer byteBuffer) {
 		getContext().getReference(responseUnit).sendMessage(byteBuffer.array());
 	}
 
