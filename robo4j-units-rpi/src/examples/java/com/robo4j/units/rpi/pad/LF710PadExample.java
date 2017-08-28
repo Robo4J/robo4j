@@ -17,14 +17,13 @@
 
 package com.robo4j.units.rpi.pad;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import com.robo4j.core.RoboBuilder;
 import com.robo4j.core.RoboBuilderException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.util.SystemUtil;
-import com.robo4j.http.client.util.RoboClassLoader;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Logitech F710 Pad Example
@@ -34,26 +33,25 @@ import java.io.InputStream;
  */
 public class LF710PadExample {
 
-    public static void main(String[] args) throws RoboBuilderException, IOException {
-        RoboBuilder builder = new RoboBuilder();
-        InputStream settings = RoboClassLoader.getInstance().getResource("logitechF710.xml");
-        if (settings == null) {
-            System.out.println("Could not find the settings for the LogitechF710Pad!");
-            System.exit(2);
-        }
-        builder.add(settings);
-        RoboContext ctx = builder.build();
+	public static void main(String[] args) throws RoboBuilderException, IOException {
+		RoboBuilder builder = new RoboBuilder();
+		InputStream settings = Thread.currentThread().getContextClassLoader().getResourceAsStream("logitechF710.xml");
+		if (settings == null) {
+			System.out.println("Could not find the settings for the LogitechF710Pad!");
+			System.exit(2);
+		}
+		builder.add(settings);
+		RoboContext ctx = builder.build();
 
+		System.out.println("State before start:");
+		System.out.println(SystemUtil.printStateReport(ctx));
+		ctx.start();
 
-        System.out.println("State before start:");
-        System.out.println(SystemUtil.printStateReport(ctx));
-        ctx.start();
+		System.out.println("State after start:");
+		System.out.println(SystemUtil.printStateReport(ctx));
 
-        System.out.println("State after start:");
-        System.out.println(SystemUtil.printStateReport(ctx));
-
-        System.out.println("Press enter to quit!");
-        System.in.read();
-        ctx.shutdown();
-    }
+		System.out.println("Press enter to quit!");
+		System.in.read();
+		ctx.shutdown();
+	}
 }

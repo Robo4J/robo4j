@@ -20,18 +20,13 @@
 package com.robo4j.units.lego;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
-import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.hw.lego.ILegoMotor;
@@ -50,14 +45,9 @@ import com.robo4j.units.lego.utils.LegoUtils;
  * @author Miro Wengner (@miragemiko)
  */
 public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements RoboReference<LegoPlatformMessage> {
-
 	/* test visible */
 	protected volatile ILegoMotor rightMotor;
 	protected volatile ILegoMotor leftMotor;
-	private ExecutorService executor = new ThreadPoolExecutor(LegoUtils.PLATFORM_THREAD_POOL_SIZE,
-			LegoUtils.PLATFORM_THREAD_POOL_SIZE, LegoUtils.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-			new LinkedBlockingQueue<>(), new RoboThreadFactory("Robo4J Lego Platform", true));
-
 	public SimpleTankUnit(RoboContext context, String id) {
 		super(LegoPlatformMessage.class, context, id);
 	}
@@ -79,15 +69,6 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 		setState(LifecycleState.SHUTTING_DOWN);
 		rightMotor.close();
 		leftMotor.close();
-		try {
-			executor.awaitTermination(LegoUtils.TERMINATION_TIMEOUT, TimeUnit.SECONDS);
-			executor.shutdown();
-		} catch (InterruptedException e) {
-			SimpleLoggingUtil.error(getClass(), "termination failed");
-		}
-		if (executor.isShutdown()) {
-			SimpleLoggingUtil.debug(getClass(), "executor is down");
-		}
 		setState(LifecycleState.SHUTDOWN);
 	}
 
@@ -163,7 +144,7 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	}
 
 	private Future<Boolean> runEngine(ILegoMotor motor, MotorRotationEnum rotation) {
-		return executor.submit(() -> {
+		return getContext().getScheduler().submit(() -> {
 			switch (rotation) {
 			case FORWARD:
 				motor.forward();
@@ -193,7 +174,7 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	}
 
 	private Future<Boolean> executeEngineStop(ILegoMotor motor) {
-		return executor.submit(() -> {
+		return getContext().getScheduler().submit(() -> {
 			motor.stop();
 			return motor.isMoving();
 		});

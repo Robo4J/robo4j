@@ -44,6 +44,8 @@ import com.robo4j.core.scheduler.Scheduler;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboSystem implements RoboContext {
+	private static final String NAME_BLOCKING_POOL = "Robo4J Blocking Pool";
+	private static final String NAME_WORKER_POOL = "Robo4J Worker Pool";
 	private static final String KEY_SCHEDULER_POOL_SIZE = "poolSizeScheduler";
 	private static final String KEY_WORKER_POOL_SIZE = "poolSizeWorker";
 	private static final String KEY_BLOCKING_POOL_SIZE = "poolSizeBlocking";
@@ -137,13 +139,13 @@ public class RoboSystem implements RoboContext {
 		private void deliverOnQueue(T message) {
 			switch (deliveryPolicy) {
 			case SYSTEM:
-				systemScheduler.execute(() -> unit.onMessage(message));
+				systemScheduler.execute(new Messenger<T>(unit, message));
 				break;
 			case WORK:
-				workExecutor.execute(() -> unit.onMessage(message));
+				workExecutor.execute(new Messenger<T>(unit, message));
 				break;
 			case BLOCKING:
-				blockingExecutor.execute(() -> unit.onMessage(message));
+				blockingExecutor.execute(new Messenger<T>(unit, message));
 				break;
 			}
 		}
@@ -160,12 +162,32 @@ public class RoboSystem implements RoboContext {
 
 		@Override
 		public Future<Map<AttributeDescriptor<?>, Object>> getAttributes() {
-			return systemScheduler.submit(() -> unit.onGetAttributes());
+			return systemScheduler.submit(unit::onGetAttributes);
 		}
 
 		@Override
 		public Class<T> getMessageType() {
 			return unit.getMessageType();
+		}
+	}
+
+	// Protects the executors from problems in the units.
+	private static class Messenger<T> implements Runnable {
+		private final RoboUnit<T> unit;
+		private final T message;
+
+		public Messenger(RoboUnit<T> unit, T message) {
+			this.unit = unit;
+			this.message = message;
+		}
+
+		@Override
+		public void run() {
+			try {
+				unit.onMessage(message);
+			} catch (Throwable t) {
+				SimpleLoggingUtil.error(unit.getClass(), "Error processing message", t);
+			}
 		}
 	}
 
@@ -189,10 +211,9 @@ public class RoboSystem implements RoboContext {
 	public RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize) {
 		this.uid = uid;
 		workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
-				new RoboThreadFactory("Robo4J Worker Pool", true));
+				new RoboThreadFactory(new ThreadGroup(NAME_WORKER_POOL), NAME_WORKER_POOL, true));
 		blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, blockingQueue,
-				new RoboThreadFactory("Robo4J Blocking Pool", true));
-
+				new RoboThreadFactory(new ThreadGroup(NAME_BLOCKING_POOL), NAME_BLOCKING_POOL, true));
 		systemScheduler = new DefaultScheduler(this, schedulerPoolSize);
 	}
 
@@ -204,7 +225,7 @@ public class RoboSystem implements RoboContext {
 				systemConfig.getInteger(KEY_WORKER_POOL_SIZE, DEFAULT_WORKING_POOL_SIZE),
 				systemConfig.getInteger(KEY_BLOCKING_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE));
 	}
-	
+
 	/**
 	 * Constructor.
 	 */

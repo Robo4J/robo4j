@@ -40,6 +40,26 @@ project("robo4j-core") {
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
     }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java']
+            }
+            resources {
+                srcDirs = ['src/main/resources']
+            }
+        }
+
+        test {
+            java {
+                srcDirs = ['src/test/java']
+            }
+            resources {
+                srcDirs = ['src/test/resources']
+            }
+        }
+    }
 }
 
 project("robo4j-db-sql") {
@@ -79,6 +99,26 @@ project("robo4j-db-sql") {
         url = 'jdbc:h2:~/data/robo4j1h2'
         user = 'sa'
     }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java']
+            }
+            resources {
+                srcDirs = ['src/main/resources']
+            }
+        }
+
+        test {
+            java {
+                srcDirs = ['src/test/java']
+            }
+            resources {
+                srcDirs = ['src/test/resources']
+            }
+        }
+    }
 }
 
 project("robo4j-hw-lego") {
@@ -115,10 +155,10 @@ project("robo4j-hw-lego") {
     sourceSets {
         main {
             java {
-                srcDirs = ['src/main/java', 'src/examples/java', 'src/test/java']
+                srcDirs = ['src/main/java', 'src/examples/java']
             }
             resources {
-                srcDirs = ['src/main/resources', 'src/examples/resources', 'src/test/resources']
+                srcDirs = ['src/main/resources', 'src/examples/resources']
             }
         }
 
@@ -180,7 +220,13 @@ project("robo4j-hw-rpi") {
         with jar
     }
 
-    //sources
+    dependencies {
+        compile(project(":robo4j-math"))
+        compile "com.pi4j:pi4j-core:${pi4jVersion}"
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+
     sourceSets {
         main {
             java {
@@ -199,13 +245,6 @@ project("robo4j-hw-rpi") {
                 srcDirs = ['src/test/resources']
             }
         }
-    }
-
-    dependencies {
-        compile(project(":robo4j-math"))
-        compile "com.pi4j:pi4j-core:${pi4jVersion}"
-        testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 }
 
@@ -231,33 +270,28 @@ project("robo4j-math") {
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
-}
 
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java']
+            }
+            resources {
+                srcDirs = ['src/main/resources']
+            }
+        }
 
-project("robo4j-http") {
-    description = "Robo4j Http"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
-
-    sourceCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
-    dependencies {
-        compile(project(":robo4j-core"))
-        testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+        test {
+            java {
+                srcDirs = ['src/test/java']
+            }
+            resources {
+                srcDirs = ['src/test/resources']
+            }
+        }
     }
 }
+
 
 project("robo4j-page") {
     description = "Robo4J Page"
@@ -281,7 +315,77 @@ project("robo4j-page") {
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
     }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java']
+            }
+            resources {
+                srcDirs = ['src/main/resources']
+            }
+        }
+
+        test {
+            java {
+                srcDirs = ['src/test/java']
+            }
+            resources {
+                srcDirs = ['src/test/resources']
+            }
+        }
+    }
 }
+
+project("robo4j-socket-http") {
+
+    description = "Robo4J socket http"
+
+    group 'com.robo4j'
+    version "${robo4jVersion}"
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+    apply plugin: "org.flywaydb.flyway"
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+        compile(project(":robo4j-core"))
+        testCompile project(':robo4j-core').sourceSets.test.output
+        testCompile "junit:junit:${junitVersion}@jar"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java']
+            }
+            resources {
+                srcDirs = ['src/main/resources']
+            }
+        }
+
+        test {
+            java {
+                srcDirs = ['src/test/java']
+            }
+            resources {
+                srcDirs = ['src/test/resources']
+            }
+        }
+    }
+
+}
+
 
 project("robo4j-units-lego") {
     description = "Robo4J Lego Abstractions"
@@ -322,7 +426,7 @@ project("robo4j-units-lego") {
 
     dependencies {
         compile(project(":robo4j-hw-lego"))
-        compile(project(":robo4j-http"))
+        compile(project(":robo4j-socket-http"))
         compile(project(":robo4j-core"))
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
@@ -391,7 +495,7 @@ project("robo4j-units-rpi") {
 
     dependencies {
         compile(project(":robo4j-hw-rpi"))
-        compile(project(":robo4j-http"))
+        compile(project(":robo4j-socket-http"))
         compile(project(":robo4j-core"))
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"

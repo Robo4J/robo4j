@@ -29,7 +29,7 @@ public class StringProducer extends RoboUnit<String> {
     private static final int DEFAULT = 0;
     private AtomicInteger counter;
     private String target;
- 
+
     /**
      * @param context
      * @param id
@@ -55,7 +55,8 @@ public class StringProducer extends RoboUnit<String> {
         } else {
             counter.incrementAndGet();
             String[] input = message.split("::");
-            switch (input[0]) {
+            String messageType = input[0];
+            switch (messageType) {
                 case "sendRandomMessage":
                     sendRandomMessage();
                     break;

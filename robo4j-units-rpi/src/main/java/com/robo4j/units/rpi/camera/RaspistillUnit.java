@@ -17,6 +17,29 @@
 
 package com.robo4j.units.rpi.camera;
 
+import com.robo4j.core.ConfigurationException;
+import com.robo4j.core.LifecycleState;
+import com.robo4j.core.RoboContext;
+import com.robo4j.core.RoboUnit;
+import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.hw.rpi.camera.CameraClientException;
+import com.robo4j.hw.rpi.camera.RaspistilDevice;
+import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.codec.CameraMessage;
+import com.robo4j.socket.http.codec.CameraMessageCodec;
+import com.robo4j.socket.http.units.Constants;
+import com.robo4j.socket.http.util.RoboHttpUtils;
+
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import static com.robo4j.units.rpi.camera.RaspistillUtils.DEFAULT;
 import static com.robo4j.units.rpi.camera.RaspistillUtils.FORMAT_IMAGE;
 import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_BRIGHTNESS;
@@ -28,28 +51,6 @@ import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_SHARPNESS;
 import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_TIMELAPSE;
 import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_TIMEOUT;
 import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_WIDTH;
-
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import com.robo4j.core.ConfigurationException;
-import com.robo4j.core.LifecycleState;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboUnit;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.http.client.util.RoboHttpUtils;
-import com.robo4j.http.units.Constants;
-import com.robo4j.http.units.httpunit.codec.CameraMessage;
-import com.robo4j.http.units.httpunit.codec.CameraMessageCodec;
-import com.robo4j.hw.rpi.camera.CameraClientException;
-import com.robo4j.hw.rpi.camera.RaspistilDevice;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -152,7 +153,7 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 		final CameraMessage cameraMessage = new CameraMessage(FORMAT_IMAGE, DEFAULT, executeCommand(cameraCommand));
 		final String message = codec.encode(cameraMessage);
 		if (cameraMessage.getImage().length() != Constants.DEFAULT_VALUE_0) {
-			final String postMessage = RoboHttpUtils.createPostRequest(client, clientUri, message);
+			final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, message);
 			sendClientMessage(getContext(), postMessage);
 		}
 	}

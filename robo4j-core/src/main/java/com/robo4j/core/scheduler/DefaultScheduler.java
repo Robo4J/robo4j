@@ -61,7 +61,8 @@ public class DefaultScheduler implements Scheduler {
 	 */
 	public DefaultScheduler(RoboContext context, int numberOfThreads) {
 		this.context = context;
-		this.executor = new ScheduledThreadPoolExecutor(numberOfThreads, new RoboThreadFactory("Robo4J Scheduler", true));
+		this.executor = new ScheduledThreadPoolExecutor(numberOfThreads,
+				new RoboThreadFactory(new ThreadGroup("Robo4J Scheduler"), "Robo4J Scheduler", true));
 	}
 
 	@Override
@@ -119,7 +120,6 @@ public class DefaultScheduler implements Scheduler {
 	@Override
 	public void execute(Runnable r) {
 		executor.execute(r);
-
 	}
 
 	@Override

@@ -24,5 +24,4 @@ ext {
     apacheCollectionsVersion = "4.1"
     apacheCollectionsExecVersion = "1.3"
     pi4jVersion = "1.1"
-
 }
