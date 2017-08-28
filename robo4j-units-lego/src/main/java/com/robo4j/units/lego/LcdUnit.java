@@ -58,12 +58,11 @@ public class LcdUnit extends RoboUnit<Object> {
 	 * @param configuration
 	 *            the {@link Configuration} provided.
 	 * @throws ConfigurationException
-     */
+	 */
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
 		lcd = new LcdWrapper<>();
-		System.out.println(getClass() + " initiated");
 		setState(LifecycleState.INITIALIZED);
 	}
 

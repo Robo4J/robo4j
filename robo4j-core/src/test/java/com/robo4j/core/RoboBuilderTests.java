@@ -40,7 +40,8 @@ public class RoboBuilderTests {
 		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 
 		/* descriptor is similar for both units */
-		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class, "getNumberOfSentMessages");
+		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class,
+				"getNumberOfSentMessages");
 
 		RoboReference<String> producer = system.getReference("producer");
 		Assert.assertNotNull(producer);
@@ -62,8 +63,10 @@ public class RoboBuilderTests {
 	}
 
 	@Test
-	public void testParsingFileWithSystemConfig() throws RoboBuilderException, InterruptedException, ExecutionException {
-		RoboBuilder builder = new RoboBuilder(Thread.currentThread().getContextClassLoader().getResourceAsStream("testsystem.xml"));
+	public void testParsingFileWithSystemConfig()
+			throws RoboBuilderException, InterruptedException, ExecutionException {
+		RoboBuilder builder = new RoboBuilder(
+				Thread.currentThread().getContextClassLoader().getResourceAsStream("testsystem.xml"));
 		// NOTE(Marcus/Aug 19, 2017): We have the system settings and the units
 		// in the same file.
 		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("testsystem.xml"));
@@ -74,7 +77,8 @@ public class RoboBuilderTests {
 		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 
 		/* descriptor is similar for both units */
-		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class, "getNumberOfSentMessages");
+		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class,
+				"getNumberOfSentMessages");
 
 		RoboReference<String> producer = system.getReference("producer");
 		Assert.assertNotNull(producer);
