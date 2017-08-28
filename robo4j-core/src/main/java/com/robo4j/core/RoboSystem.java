@@ -16,6 +16,12 @@
  */
 package com.robo4j.core;
 
+import com.robo4j.core.concurrency.RoboThreadFactory;
+import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.scheduler.DefaultScheduler;
+import com.robo4j.core.scheduler.Scheduler;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,12 +34,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
-
-import com.robo4j.core.concurrency.RoboThreadFactory;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.scheduler.DefaultScheduler;
-import com.robo4j.core.scheduler.Scheduler;
 
 /**
  * This is the default implementation for a local {@link RoboContext}. Contains
@@ -286,7 +286,9 @@ public class RoboSystem implements RoboContext {
 		stop();
 		try {
 			workExecutor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
+			blockingExecutor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
 			workExecutor.shutdown();
+			blockingExecutor.shutdown();
 			systemScheduler.shutdown();
 		} catch (InterruptedException e) {
 			SimpleLoggingUtil.error(getClass(), "Was interrupted when shutting down.", e);
