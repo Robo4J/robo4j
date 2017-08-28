@@ -17,8 +17,6 @@
 
 package com.robo4j.units.lego;
 
-import java.util.concurrent.Future;
-
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
@@ -32,6 +30,8 @@ import com.robo4j.hw.lego.enums.MotorTypeEnum;
 import com.robo4j.hw.lego.provider.MotorProvider;
 import com.robo4j.hw.lego.wrapper.MotorWrapper;
 import com.robo4j.units.lego.platform.MotorRotationEnum;
+
+import java.util.concurrent.Future;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -78,7 +78,6 @@ public class SingleMotorUnit extends RoboUnit<MotorRotationEnum> implements Robo
 
 		MotorProvider motorProvider = new MotorProvider();
 		motor = new MotorWrapper<>(motorProvider, AnalogPortEnum.getByType(motorPort), MotorTypeEnum.getByType(motorType));
-
 		setState(LifecycleState.INITIALIZED);
 	}
 

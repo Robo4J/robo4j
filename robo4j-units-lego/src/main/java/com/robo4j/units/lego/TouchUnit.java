@@ -17,8 +17,6 @@
 
 package com.robo4j.units.lego;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
@@ -30,6 +28,8 @@ import com.robo4j.hw.lego.enums.SensorTypeEnum;
 import com.robo4j.hw.lego.provider.SensorProvider;
 import com.robo4j.hw.lego.wrapper.SensorWrapper;
 import com.robo4j.units.lego.platform.MotorRotationEnum;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -71,8 +71,8 @@ public class TouchUnit extends RoboUnit<Boolean> {
 		sensorActive.set(true);
 		currentState = MotorRotationEnum.STOP;
 
-		setState(LifecycleState.INITIALIZED);
 		runTouchSensor();
+		setState(LifecycleState.INITIALIZED);
 	}
 
 	// private methods
@@ -80,13 +80,13 @@ public class TouchUnit extends RoboUnit<Boolean> {
 		getContext().getScheduler().execute(() -> {
 			while (sensorActive.get()) {
 				if (sensor.getData().equals(PRESSED) && currentState == MotorRotationEnum.STOP) {
-					getContext().getReference(target).sendMessage(MotorRotationEnum.FORWARD);
 					currentState = MotorRotationEnum.FORWARD;
+					getContext().getReference(target).sendMessage(currentState);
 				}
 
 				if (sensor.getData().equals(RELEASED) && currentState == MotorRotationEnum.FORWARD) {
-					getContext().getReference(target).sendMessage(MotorRotationEnum.STOP);
 					currentState = MotorRotationEnum.STOP;
+					getContext().getReference(target).sendMessage(currentState);
 				}
 			}
 		});

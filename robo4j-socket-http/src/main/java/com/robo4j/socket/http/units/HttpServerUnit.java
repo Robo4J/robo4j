@@ -69,6 +69,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private List<String> target;
 	private ServerSocketChannel server;
 	private final Map<SelectableChannel, SelectionKey> channelKeyMap = new HashMap<>();
+	private final Map<SelectionKey, Object> outBuffers = new HashMap<>();
 
 	public HttpServerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -97,7 +98,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		}
         //@formatter:on
 
-		System.out.println(getClass().getSimpleName() + " initiated");
 		setState(LifecycleState.INITIALIZED);
 	}
 
@@ -108,7 +108,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 				.filter(Objects::nonNull).collect(Collectors.toList());
 		if (!available) {
 			available = true;
-			System.out.println(getClass().getSimpleName() + ": Server Started");
 			getContext().getScheduler().execute(() -> server(targetRefs));
 		} else {
 			SimpleLoggingUtil.error(getClass(), "HttpDynamicUnit start() -> error: " + targetRefs);
@@ -150,7 +149,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			server.configureBlocking(false);
 			server.socket().bind(new InetSocketAddress(port));
 
-//			channelKeyMap.put(server, listenKey);
+			// channelKeyMap.put(server, listenKey);
 
 			server.register(selector, SelectionKey.OP_ACCEPT);
 			while (activeStates.contains(getState())) {
@@ -177,7 +176,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 							accept(selector, selectedKey);
 						} else if (selectedKey.isReadable()) {
 							read(selector, targetRefs, selectedKey);
-						} else if (selectedKey.isWritable()){
+						} else if (selectedKey.isWritable()) {
 							write(selectedKey);
 						}
 					}
@@ -196,24 +195,19 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		SocketChannel channel = serverChannel.accept();
 		channel.configureBlocking(false);
 		channelKeyMap.put(channel, key);
-		channel.register(selector, SelectionKey.OP_READ );
+		channel.register(selector, SelectionKey.OP_READ);
 
 	}
 
-	private void write(SelectionKey key) throws IOException{
+	private void write(SelectionKey key) throws IOException {
 		SocketChannel channel = (SocketChannel) key.channel();
-		String message = "this is done!";
 
-		String header = RoboHttpUtils.setHeader("200", message.length());
-		String response = header.concat(message);
+		String message = outBuffers.get(key).toString();
+		String response = RoboHttpUtils.HTTP_HEADER_OK.concat(RoboHttpUtils.NEW_LINE).concat(message);
 
 		ByteBuffer buffer = ByteBuffer.wrap(response.getBytes());
-		if(key.isWritable()){
-			System.out.println("Possible To Write");
-		}
-		while(buffer.hasRemaining()){
+		while (buffer.hasRemaining()) {
 			channel.write(buffer);
-			System.out.println("written");
 		}
 		channelKeyMap.remove(channel);
 
@@ -238,6 +232,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 		try{
 			Object result = futureResult.get();
+			// TODO: 27.08.17 miro discuss -> Serializable
+			outBuffers.put(key, result);
 			for (RoboReference<Object> ref : targetRefs) {
 			if (result != null && ref.getMessageType() != null
 					&& ref.getMessageType().equals(result.getClass())) {
@@ -245,11 +241,10 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			}
 		}
 		} catch (InterruptedException | ExecutionException e){
-			System.out.println(getClass().getSimpleName() + " ERROR: " + e);
+			SimpleLoggingUtil.error(getClass(), "read" + e);
 		}
 
 		channel.register(selector, SelectionKey.OP_WRITE);
-		System.out.println("DONE Reading");
 	}
 
 	private boolean validatePackages(String packages) {

@@ -16,10 +16,10 @@
  */
 package com.robo4j.core;
 
-import java.util.concurrent.ExecutionException;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * Test(s) for the builder.

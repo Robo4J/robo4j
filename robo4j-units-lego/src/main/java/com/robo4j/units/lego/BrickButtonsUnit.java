@@ -19,13 +19,6 @@
 
 package com.robo4j.units.lego;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
@@ -38,6 +31,13 @@ import com.robo4j.units.lego.brick.ButtonListener;
 import com.robo4j.units.lego.brick.PlateButtonEnum;
 import com.robo4j.units.lego.brick.PlateButtonI;
 import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 /**
  * Lego Mindstorm Brick button plate
@@ -88,13 +88,7 @@ public class BrickButtonsUnit extends RoboUnit<String> {
 	public void start() {
 		setState(LifecycleState.STARTING);
 		final RoboReference<LegoPlatformMessageTypeEnum> targetRef = getContext().getReference(target);
-
-		//@formatter:off
-        buttons.entrySet().forEach(e ->
-                    e.getValue().getType()
-							.addKeyListener(new ButtonListener(targetRef, e.getKey(), COLOR_GREEN))
-                );
-        //@formatter:on
+		buttons.forEach((key, value) -> value.getType().addKeyListener(new ButtonListener(targetRef, key, COLOR_GREEN)));
 		setState(LifecycleState.STARTED);
 	}
 

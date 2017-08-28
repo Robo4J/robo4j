@@ -19,9 +19,6 @@
 
 package com.robo4j.units.lego;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
@@ -37,6 +34,9 @@ import com.robo4j.hw.lego.wrapper.MotorWrapper;
 import com.robo4j.units.lego.platform.LegoPlatformMessage;
 import com.robo4j.units.lego.platform.MotorRotationEnum;
 import com.robo4j.units.lego.utils.LegoUtils;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * Lego Mindstorm tank platform consist from two engines
@@ -81,7 +81,6 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
-
 		String leftMotorPort = configuration.getString("leftMotorPort", AnalogPortEnum.B.getType());
 		Character leftMotorType = configuration.getCharacter("leftMotorType", MotorTypeEnum.NXT.getType());
 		String rightMotorPort = configuration.getString("rightMotorPort", AnalogPortEnum.C.getType());
@@ -148,14 +147,12 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 			switch (rotation) {
 			case FORWARD:
 				motor.forward();
-				SimpleLoggingUtil.debug(getClass(), "runEngine FORWARD rotation= " + motor.isMoving());
 				return motor.isMoving();
 			case STOP:
 				motor.stop();
 				return motor.isMoving();
 			case BACKWARD:
 				motor.backward();
-				SimpleLoggingUtil.debug(getClass(), "runEngine BACKWARD rotation= " + motor.isMoving());
 				return motor.isMoving();
 			default:
 				throw new LegoUnitException("no such rotation= " + rotation);
@@ -178,13 +175,5 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 			motor.stop();
 			return motor.isMoving();
 		});
-	}
-
-	public String getId() {
-		return super.getId();
-	}
-
-	public LifecycleState getState() {
-		return null;
 	}
 }
