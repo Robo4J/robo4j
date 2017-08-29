@@ -62,7 +62,7 @@ public class RoboBuilderTests {
 		system.shutdown();
 	}
 
-	@Test
+//	@Test
 	public void testSeparateSystemUnitsSystemConfig()
 			throws RoboBuilderException, InterruptedException, ExecutionException {
 		RoboBuilder builder = new RoboBuilder(
