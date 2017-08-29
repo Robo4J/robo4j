@@ -105,7 +105,7 @@ public class RoboBuilderTests {
 		RoboBuilder builder = new RoboBuilder(
 				Thread.currentThread().getContextClassLoader().getResourceAsStream("testsystem.xml"));
 		// NOTE(Marcus/Aug 19, 2017): We have the system settings and the units
-		// in the same file.
+		// in the same file, therefore we pass the same file to the unit configuration.
 		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("testsystem.xml"));
 		RoboContext system = builder.build();
 		Assert.assertEquals("mySystem", system.getId());
@@ -127,6 +127,8 @@ public class RoboBuilderTests {
 		RoboReference<String> consumer = system.getReference("consumer");
 		Assert.assertNotNull(consumer);
 
+		// We need to fix these tests so that we can get a callback.
+		Thread.sleep(1000);
 		synchronized (consumer.getAttribute(descriptor)) {
 			int receivedMessages = consumer.getAttribute(descriptor).get();
 			Assert.assertEquals(MESSAGES, receivedMessages);
