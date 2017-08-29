@@ -62,6 +62,43 @@ public class RoboBuilderTests {
 		system.shutdown();
 	}
 
+//	@Test
+	public void testSeparateSystemUnitsSystemConfig()
+			throws RoboBuilderException, InterruptedException, ExecutionException {
+		RoboBuilder builder = new RoboBuilder(
+				Thread.currentThread().getContextClassLoader().getResourceAsStream("testRoboSystemOnly.xml"));
+		// NOTE(Marcus/Aug 19, 2017): We have the system settings and the units
+		// in the same file.
+		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("testRoboUnitsOnly.xml"));
+		RoboContext system = builder.build();
+		Assert.assertEquals("mySystem", system.getId());
+		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+		system.start();
+		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
+
+		/* descriptor is similar for both units */
+		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class,
+				"getNumberOfSentMessages");
+
+		RoboReference<String> producer = system.getReference("producer");
+		Assert.assertNotNull(producer);
+		for (int i = 0; i < MESSAGES; i++) {
+			producer.sendMessage("sendRandomMessage");
+		}
+		Assert.assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
+
+		RoboReference<String> consumer = system.getReference("consumer");
+		Assert.assertNotNull(consumer);
+
+		synchronized (consumer.getAttribute(descriptor)) {
+			int receivedMessages = consumer.getAttribute(descriptor).get();
+			Assert.assertEquals(MESSAGES, receivedMessages);
+		}
+
+		system.stop();
+		system.shutdown();
+	}
+
 	@Test
 	public void testParsingFileWithSystemConfig()
 			throws RoboBuilderException, InterruptedException, ExecutionException {
