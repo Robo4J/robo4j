@@ -41,7 +41,6 @@ public class LcdUnit extends RoboUnit<Object> {
 
 	@Override
 	public void onMessage(Object message) {
-		System.out.println(getClass() + " message: " + message);
 		String lcdMessage = message.toString();
 		switch (lcdMessage) {
 		case CONSTANT_CLEAR:
