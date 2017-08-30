@@ -33,7 +33,9 @@ public interface AdafruitLcd {
 	int DEFAULT_ADDRESS = 0x20;
 
 	/**
-	 * Sets the text to display.
+	 * Sets the text to display. Use "\n" to begin a new line. Each line will be
+	 * padded to the full 16 columns to clear anything still in the VRAM
+	 * following the new line.
 	 * 
 	 * @param s
 	 *            the text to display.

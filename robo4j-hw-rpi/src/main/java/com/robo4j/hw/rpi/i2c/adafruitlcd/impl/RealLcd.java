@@ -29,19 +29,17 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
  * have deliberately kept this close to the original python script, including
  * most comments, even though it leads to less than beautiful code.
  * 
- * Here is an example on how to use this class:
- * <code>
+ * Here is an example on how to use this class: <code>
  * LCD lcd = new LCD();
  * lcd.setText("Hello World!\n2nd Hello World!");
  * </code>
  * 
- * Here is an example with buttons:
- * <code>
+ * Here is an example with buttons: <code>
  * final LCD lcd = new LCD();
  * lcd.setText("LCD Test!\nPress up/down...");
  * ButtonPressedObserver observer = new ButtonPressedObserver(lcd);
  * observer.addButtonListener(new ButtonListener() {
- * 		@Override
+ * 		&#64;Override
  *      public void onButtonPressed(Button button) {
  *      	lcd.clear();
  *      	lcd.setText(button.toString());
@@ -104,8 +102,8 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	// that order. Because this sequence is 'reversed,' a direct shift
 	// won't work. This table remaps 4-bit data values to MCP PORTB
 	// outputs, incorporating both the reverse and shift.
-	private static final int[] SHIFT_REVERSE = { 0x00, 0x10, 0x08, 0x18, 0x04,
-			0x14, 0x0C, 0x1C, 0x02, 0x12, 0x0A, 0x1A, 0x06, 0x16, 0x0E, 0x1E };
+	private static final int[] SHIFT_REVERSE = { 0x00, 0x10, 0x08, 0x18, 0x04, 0x14, 0x0C, 0x1C, 0x02, 0x12, 0x0A, 0x1A, 0x06, 0x16, 0x0E,
+			0x1E };
 
 	private static final int[] ROW_OFFSETS = new int[] { 0x00, 0x40, 0x14, 0x54 };
 
@@ -121,7 +119,7 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		// This seems to be the default for AdaFruit 1115.
 		this(AdafruitLcd.DEFAULT_BUS, AdafruitLcd.DEFAULT_ADDRESS);
 	}
-	
+
 	public RealLcd(int bus, int address) throws IOException, UnsupportedBusNumberException {
 		super(bus, address);
 		initialize();
@@ -227,10 +225,15 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 			while (true) {
 				i2cDevice.write((byte) hi); // Strobe high (enable)
 				int bits = i2cDevice.read(); // First nybble contains busy state
-				i2cDevice.write(MCP23017_GPIOB, new byte[] { (byte) lo,
-						(byte) hi, (byte) lo }, 0, 3); // Strobe low, high, low.
-														// Second nybble (A3) is
-														// ignored.
+				i2cDevice.write(MCP23017_GPIOB, new byte[] { (byte) lo, (byte) hi, (byte) lo }, 0, 3); // Strobe
+																										// low,
+																										// high,
+																										// low.
+																										// Second
+																										// nybble
+																										// (A3)
+																										// is
+																										// ignored.
 				if ((bits & 0x02) == 0)
 					break; // D7=0, not busy
 			}
@@ -244,22 +247,25 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		int hi = bitmask | SHIFT_REVERSE[value >> 4];
 		int lo = bitmask | SHIFT_REVERSE[value & 0x0F];
 
-		return new byte[] { (byte) (hi | 0x20), (byte) hi, (byte) (lo | 0x20),
-				(byte) lo };
+		return new byte[] { (byte) (hi | 0x20), (byte) hi, (byte) (lo | 0x20), (byte) lo };
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setText(java.lang.String)
 	 */
 	@Override
 	public synchronized void setText(String s) throws IOException {
-		String[] str = s.split("\n");
-		for (int i = 0; i < str.length; i++) {
-			setText(i, str[i]);
+		String[] rowStrings = s.split("\n");
+		for (int i = 0; i < rowStrings.length; i++) {
+			setText(i, pad(rowStrings[i]));
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setText(int, java.lang.String)
 	 */
 	@Override
@@ -290,7 +296,9 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		portB = bytes[bytesLen - 1];
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setCursorPosition(int, int)
 	 */
 	@Override
@@ -298,7 +306,9 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		write(LCD_SETDDRAMADDR | (column + ROW_OFFSETS[row]));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see se.hirt.pi.adafruitlcd.ILCD#stop()
 	 */
 	@Override
@@ -333,7 +343,9 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		write(0, registers, 0, registers.length);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see se.hirt.pi.adafruitlcd.ILCD#clear()
 	 */
 	@Override
@@ -341,7 +353,9 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		write(LCD_CLEARDISPLAY);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see se.hirt.pi.adafruitlcd.ILCD#home()
 	 */
 	@Override
@@ -349,7 +363,9 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		write(LCD_RETURNHOME);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setCursorEnabled(boolean)
 	 */
 	@Override
@@ -363,7 +379,9 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see se.hirt.pi.adafruitlcd.ILCD#isCursorEnabled()
 	 */
 	@Override
@@ -371,7 +389,9 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		return (displayControl & LCD_CURSORON) > 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setDisplayEnabled(boolean)
 	 */
 	@Override
@@ -385,7 +405,9 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see se.hirt.pi.adafruitlcd.ILCD#isDisplayEnabled()
 	 */
 	@Override
@@ -393,7 +415,9 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		return (displayControl & LCD_DISPLAYON) > 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setBlinkEnabled(boolean)
 	 */
 	@Override
@@ -407,7 +431,9 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see se.hirt.pi.adafruitlcd.ILCD#isBlinkEnabled()
 	 */
 	@Override
@@ -415,8 +441,11 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		return (displayControl & LCD_BLINKON) > 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see se.hirt.pi.adafruitlcd.ILCD#setBacklight(se.hirt.pi.adafruitlcd.LCD.Color)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see se.hirt.pi.adafruitlcd.ILCD#setBacklight(se.hirt.pi.adafruitlcd.LCD.
+	 * Color)
 	 */
 	@Override
 	public synchronized void setBacklight(Color color) throws IOException {
@@ -427,10 +456,14 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		i2cDevice.write(MCP23017_GPIOA, (byte) portA);
 		i2cDevice.write(MCP23017_GPIOB, (byte) portB);
 		this.color = color;
- 	}
+	}
 
-	/* (non-Javadoc)
-	 * @see se.hirt.pi.adafruitlcd.ILCD#scrollDisplay(se.hirt.pi.adafruitlcd.LCD.Direction)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * se.hirt.pi.adafruitlcd.ILCD#scrollDisplay(se.hirt.pi.adafruitlcd.LCD.
+	 * Direction)
 	 */
 	@Override
 	public synchronized void scrollDisplay(Direction direction) throws IOException {
@@ -443,8 +476,12 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see se.hirt.pi.adafruitlcd.ILCD#setTextFlowDirection(se.hirt.pi.adafruitlcd.LCD.Direction)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * se.hirt.pi.adafruitlcd.ILCD#setTextFlowDirection(se.hirt.pi.adafruitlcd.
+	 * LCD.Direction)
 	 */
 	@Override
 	public synchronized void setTextFlowDirection(Direction direction) throws IOException {
@@ -459,7 +496,9 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see se.hirt.pi.adafruitlcd.ILCD#setAutoScrollEnabled(boolean)
 	 */
 	@Override
@@ -475,7 +514,9 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see se.hirt.pi.adafruitlcd.ILCD#isAutoScrollEnabled()
 	 */
 	@Override
@@ -483,8 +524,11 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		return (displayControl & LCD_ENTRYSHIFTINCREMENT) > 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see se.hirt.pi.adafruitlcd.ILCD#isButtonPressed(se.hirt.pi.adafruitlcd.Button)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see se.hirt.pi.adafruitlcd.ILCD#isButtonPressed(se.hirt.pi.adafruitlcd.
+	 * Button)
 	 */
 	@Override
 	public synchronized boolean isButtonPressed(Button button) throws IOException {
@@ -495,7 +539,9 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 		return i2cDevice.read(bank);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see se.hirt.pi.adafruitlcd.ILCD#buttonsPressedBitmask()
 	 */
 	@Override
@@ -516,19 +562,31 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 
 	@Override
 	public void createChar(int location, byte[] pattern) throws IOException {
-		if(location < 0 || location > 7) {
+		if (location < 0 || location > 7) {
 			throw new IllegalArgumentException("Location should be between 0 and 7, value supplied is invalid: " + location);
 		}
-		if(pattern.length != 8) {
+		if (pattern.length != 8) {
 			throw new IllegalArgumentException("Pattern length should be 8, array supplied has invalid length: " + pattern.length);
 		}
-		
+
 		// Send ccgram update command
-        location &= 0x7; // Only position 0..7 are allowed
-        int command = LCD_SETCGRAMADDR | (location << 3);
-        write(command);
-        
-        // Send custom character definition
-        internalWrite(new String(pattern));
+		location &= 0x7; // Only position 0..7 are allowed
+		int command = LCD_SETCGRAMADDR | (location << 3);
+		write(command);
+
+		// Send custom character definition
+		internalWrite(new String(pattern));
+	}
+
+	private final static String pad(String inputString) {
+		// NOTE(Marcus/Aug 30, 2017): The VRAM IIRC is 40, but I'm
+		// just assuming that people will not use this with scroll (need to
+		// write less). Change if this makes someone unhappy. We could also just
+		// clear before writing, but then we get flicker if we, for example,
+		// want to write the same characters on a certain line.
+		for (int i = inputString.length(); i < 16; i++) {
+			inputString += " ";
+		}
+		return inputString;
 	}
 }
