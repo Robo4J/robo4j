@@ -170,6 +170,9 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 			try {
 				gyro.calibrate();
 				scanner.reset();
+				if (message.getTarget() != null) {
+					message.getTarget().sendMessage(new GyroEvent(new Tuple3f(0, 0, 0)));
+				}
 			} catch (IOException e) {
 				SimpleLoggingUtil.error(getClass(), "Failed to calibrate!", e);
 			}
