@@ -152,8 +152,11 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 	private void createImage() {
 		final CameraMessage cameraMessage = new CameraMessage(FORMAT_IMAGE, DEFAULT, executeCommand(cameraCommand));
 		final String message = codec.encode(cameraMessage);
+		System.out.println("ENDING JSON:" + message.substring(message.length()-10, message.length()));
 		if (cameraMessage.getImage().length() != Constants.DEFAULT_VALUE_0) {
+			System.out.println(getClass().getSimpleName() + " message image length: " + cameraMessage.getImage().length());
 			final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, message);
+			System.out.println("ENDING JSON:" + message.substring(message.length()-10, message.length()));
 			sendClientMessage(getContext(), postMessage);
 		}
 	}

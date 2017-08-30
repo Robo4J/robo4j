@@ -69,6 +69,7 @@ public class RoboRequestCallable implements Callable<Object> {
 	public Object call() throws Exception {
 		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBuffer(buffer);
 
+
 		// FIXME: 27.08.17 (miro) -> review
 		final String[] headerLines = new String(wrapper.getHeader().array()).split("[\r\n]+");
 		final String firstLine = RoboHttpUtils.correctLine(headerLines[0]);
@@ -119,9 +120,10 @@ public class RoboRequestCallable implements Callable<Object> {
 				final String postValue = new String(wrapper.getBody().array());
 				if (length == postValue.length()) {
 					jsonSB.append(postValue);
+					SimpleLoggingUtil.error(getClass(), "AWESOME SAME HEADER LENGTH: " + length + " convertedMessage: " + postValue.length());
 				} else {
 					jsonSB.append(postValue);
-					System.out.println("NOT SAME LENGTH: " + length + " message: " + postValue);
+					SimpleLoggingUtil.error(getClass(), "NOT SAME HEADER LENGTH: " + length + " convertedMessage: " + postValue.length());
 				}
 				return factory.processPost(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0),
 						new HttpMessageWrapper<>(httpMessage, jsonSB.toString()));

@@ -51,6 +51,7 @@ import com.robo4j.socket.http.request.RoboRequestFactory;
 import com.robo4j.socket.http.util.ByteBufferUtils;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
+import com.robo4j.socket.http.util.SocketUtil;
 
 /**
  * Http NIO unit allows to configure format of the requests currently is only
@@ -205,10 +206,11 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		String message = outBuffers.get(key).toString();
 		String response = RoboHttpUtils.HTTP_HEADER_OK.concat(RoboHttpUtils.NEW_LINE).concat(message);
 
-		ByteBuffer buffer = ByteBuffer.wrap(response.getBytes());
-		while (buffer.hasRemaining()) {
-			channel.write(buffer);
-		}
+		System.out.println("response: " + response);
+//		ByteBuffer buffer = ByteBuffer.wrap(response.getBytes());
+//		while (buffer.hasRemaining() && channel.isOpen()) {
+//			channel.write(buffer);
+//		}
 		channelKeyMap.remove(channel);
 
 		channel.close();
@@ -222,11 +224,17 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		HttpUriRegister.getInstance().updateUnits(getContext());
 		final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
 
-		ByteBuffer buffer = ByteBuffer.allocate(4*1024);
+		ByteBuffer buffer = ByteBuffer.allocate(700000);
+		int readBytes = SocketUtil.readBuffer(channel, buffer);
+		buffer.flip();
+		if(buffer.remaining() == 0){
+			buffer.clear();
+			return;
+		}
 
-		int numRead = channel.read(buffer);
+		System.out.println(getClass().getSimpleName() + " readBytes: " + readBytes);
 
-		ByteBuffer validBuffer = ByteBufferUtils.copy(buffer, 0, numRead);
+		ByteBuffer validBuffer = ByteBufferUtils.copy(buffer, 0, readBytes);
 		final RoboRequestCallable callable = new RoboRequestCallable(this, validBuffer, factory);
 		final Future<?> futureResult = getContext().getScheduler().submit(callable);
 

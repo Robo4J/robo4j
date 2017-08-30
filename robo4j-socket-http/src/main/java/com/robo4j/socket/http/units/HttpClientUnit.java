@@ -17,12 +17,6 @@
 
 package com.robo4j.socket.http.units;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
-import java.util.Map;
-
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
@@ -30,6 +24,12 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+import java.util.Map;
 
 /**
  * Http NIO Client to communicate with external system/Robo4J units
@@ -69,9 +69,9 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			SocketChannel client = SocketChannel.open(address);
 			client.configureBlocking(true);
 
-			ByteBuffer buffer = ByteBuffer.wrap(((String) message).getBytes());
+			ByteBuffer buffer = ByteBuffer.wrap(((String)message).getBytes());
 			client.write(buffer);
-			if (responseUnit != null && responseSize != null) {
+			if(responseUnit != null && responseSize != null){
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
 				client.read(readBuffer);
 				sendMessageToResponseUnit(readBuffer);
@@ -81,6 +81,32 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			throw new HttpException("onMessage", e);
 		}
 	}
+
+//	@Override
+//	public void onMessage(Object message) {
+//		try {
+//			SocketChannel client = SocketChannel.open(address);
+//			client.configureBlocking(true);
+//
+//			ByteBuffer buffer = ByteBuffer.wrap(((String) message).getBytes());
+////			buffer.flip();
+//
+//			int writtenBytes = SocketUtil.writeBuffer(client, buffer);
+//			buffer.clear();
+//
+//
+//			System.out.println("WRITTEN BYTES: " + writtenBytes);
+//			if (responseUnit != null && responseSize != null) {
+//				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
+//				client.read(readBuffer);
+//				System.out.println("READ: " + new String(readBuffer.array()));
+//				sendMessageToResponseUnit(readBuffer);
+//			}
+//			client.close();
+//		} catch (IOException e) {
+//			throw new HttpException("onMessage", e);
+//		}
+//	}
 
 	// Private Methods
 	private void sendMessageToResponseUnit(ByteBuffer byteBuffer) {
