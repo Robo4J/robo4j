@@ -155,7 +155,7 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 
 	@Override
 	public void shutdown() {
-		if (shutdownValue != 0) {
+		if (shutdownValue != null) {
 			try {
 				servo.setInput(shutdownValue.floatValue());
 			} catch (IOException e) {
