@@ -30,7 +30,7 @@ import com.robo4j.math.geometry.Line2f;
 public class FeatureSet {
 	private final List<Line2f> lines;
 	private final List<CurvaturePoint2f> corners;
-	
+
 	public FeatureSet(List<Line2f> lines, List<CurvaturePoint2f> corners) {
 		this.lines = lines;
 		this.corners = corners;
@@ -39,8 +39,13 @@ public class FeatureSet {
 	public List<Line2f> getLines() {
 		return lines;
 	}
-	
+
 	public final List<CurvaturePoint2f> getCorners() {
 		return corners;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("FeatureSet %d lines, %d corners", lines.size(), corners.size());
 	}
 }
