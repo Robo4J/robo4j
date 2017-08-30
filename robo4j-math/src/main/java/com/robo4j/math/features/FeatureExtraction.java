@@ -318,17 +318,4 @@ public class FeatureExtraction {
 	public static float getAngularResolution(List<Point2f> Point2fs) {
 		return Point2fs.get(1).getAngle() - Point2fs.get(0).getAngle();
 	}
-
-	public static float calculateNoGoRadius(Point2f p, float defaultNoGoRadius) {
-		if (p instanceof CurvaturePoint2f) {
-			CurvaturePoint2f cp = (CurvaturePoint2f) p;
-			if (cp.getCurvature() < 0) {
-				return defaultNoGoRadius;
-			} else {
-				return (float) (Math.sin(Math.PI - cp.getCurvature()) * defaultNoGoRadius * 1.5) + defaultNoGoRadius;
-			}
-		}
-		return defaultNoGoRadius;
-	}
-
 }
