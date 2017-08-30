@@ -232,8 +232,13 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 
 	@Override
 	public void onMessage(ScanRequest message) {
-		RoboReference<Float> servo = getReference(pan);
+		RoboReference<Float> servo = getPanServo();
 		scheduleScan(message, servo, message.getReceiver());
+	}
+
+	private RoboReference<Float> getPanServo() {
+		RoboReference<Float> servo = getReference(pan);
+		return servo;
 	}
 
 	private void scheduleScan(ScanRequest message, RoboReference<Float> servo, RoboReference<ScanResult2D> recipient) {

@@ -59,12 +59,18 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 	 * The key used to configure the expo to use.
 	 */
 	public static final String CONFIGURATION_KEY_EXPO = "expo";
+	/**
+	 * The setting to reset to on shutdown. If this is not set, nothing will
+	 * happen on shutdown.
+	 */
+	public static final String CONFIGURATION_KEY_SHUTDOWN_VALUE = "shutdownValue";
 
 	public static final AttributeDescriptor<Float> ATTRIBUTE_SERVO_INPUT = DefaultAttributeDescriptor.create(Float.class, "input");
 	public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections.singleton(ATTRIBUTE_SERVO_INPUT);
 
 	private PCA9685Servo servo;
 	private Integer channel;
+	private Float shutdownValue;
 
 	/**
 	 * Constructor.
@@ -109,6 +115,7 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 		servo.setInverted(configuration.getBoolean(CONFIGURATION_KEY_INVERTED, false));
 		servo.setDualRate(configuration.getFloat(CONFIGURATION_KEY_DUAL_RATE, 1.0f));
 		servo.setExpo(configuration.getFloat(CONFIGURATION_KEY_EXPO, 0.0f));
+		shutdownValue = configuration.getFloat(CONFIGURATION_KEY_SHUTDOWN_VALUE, null);
 	}
 
 	/**
@@ -144,5 +151,17 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 	@Override
 	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
 		return KNOWN_ATTRIBUTES;
+	}
+
+	@Override
+	public void shutdown() {
+		if (shutdownValue != 0) {
+			try {
+				servo.setInput(shutdownValue.floatValue());
+			} catch (IOException e) {
+				SimpleLoggingUtil.debug(PCA9685ServoUnit.class, "Failed to set the shutdown value!", e);
+			}
+		}
+		super.shutdown();
 	}
 }
