@@ -24,7 +24,8 @@ import com.robo4j.math.geometry.Point2f;
 /**
  * Simple raycasting algorithm.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 public class Raycast {
 
