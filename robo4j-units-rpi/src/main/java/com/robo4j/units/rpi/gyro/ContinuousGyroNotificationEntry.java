@@ -26,7 +26,7 @@ import com.robo4j.math.geometry.Tuple3f;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-class ContinuousGyroNotificationEntry extends AbstractNotificationEntry implements GyroNotificationEntry {
+class ContinuousGyroNotificationEntry extends AbstractNotificationEntry implements GyroNotificationEntry {	
 	private final Tuple3f deltaToNotify;
 	private final Tuple3f lastReported = new Tuple3f();
 
@@ -37,7 +37,7 @@ class ContinuousGyroNotificationEntry extends AbstractNotificationEntry implemen
 	 *            the recipient of the notifications.
 	 * 
 	 * @param deltaToNotify
-	 *            the delta angles required to send a change. For example (0, 0,
+	 *            the delta angles required to send a change. For example (DO_NOT_CARE, DO_NOT_CARE,
 	 *            1) will cause notifications whenever a one degree change has
 	 *            been detected around the Z-axis).
 	 */

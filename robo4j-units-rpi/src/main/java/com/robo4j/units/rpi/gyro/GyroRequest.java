@@ -26,6 +26,8 @@ import com.robo4j.math.geometry.Tuple3f;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GyroRequest {
+	public final static float DO_NOT_CARE = Float.MAX_VALUE;
+
 	public enum GyroAction {
 		/**
 		 * Performs a calibration. Note that the notification threshold can also
@@ -73,6 +75,9 @@ public class GyroRequest {
 	}
 
 	/**
+	 * This is the threshold used to decide when to notify. Use
+	 * {@link #DO_NOT_CARE} for axes that you do not care to be notified about.
+	 * 
 	 * @return the notification threshold for when to send a message to the
 	 *         target.
 	 */
