@@ -31,5 +31,6 @@ public interface ScanResult2D {
 	double getMinX();
 	double getMaxY();
 	double getMinY();
+	float getAngularResolution();
 	int getScanID();
 }

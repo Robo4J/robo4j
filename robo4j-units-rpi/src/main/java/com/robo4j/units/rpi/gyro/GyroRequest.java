@@ -31,8 +31,23 @@ public class GyroRequest {
 		 * Performs a calibration. Note that the notification threshold can also
 		 * be set, which result in the threshold being set right after
 		 * calibration has completed.
+		 * 
+		 * The target will be called once calibration is done with the the tuple
+		 * 0,0,0.
 		 */
-		CALIBRATE, ONCE, CONTINUOUS, STOP
+		CALIBRATE,
+		/**
+		 * Sends the gyro information once.
+		 */
+		ONCE,
+		/**
+		 * Continuously sends the gyro information.
+		 */
+		CONTINUOUS,
+		/**
+		 * Stops sending gyro information.
+		 */
+		STOP
 	}
 
 	private final RoboReference<GyroEvent> target;
@@ -71,4 +86,4 @@ public class GyroRequest {
 	public RoboReference<GyroEvent> getTarget() {
 		return target;
 	}
-	}
+}

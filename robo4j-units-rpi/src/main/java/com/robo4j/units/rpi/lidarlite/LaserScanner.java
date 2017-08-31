@@ -67,7 +67,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 
 	private final static class ScanJob implements Runnable {
 		private final AtomicInteger invokeCount = new AtomicInteger(0);
-		private final ScanResultImpl scanResult = new ScanResultImpl(100);
+		private final ScanResultImpl scanResult;
 		private final ScanRequest request;
 		private final RoboReference<ScanResult2D> recipient;
 		private final RoboReference<Float> servo;
@@ -108,6 +108,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			this.numberOfScans = calculateNumberOfScans() + 1;
 			this.delayMicros = calculateDelay(minimumAcquisitionTime, minimumServoMovementTime);
 			this.currentAngle = lowToHigh ? request.getStartAngle() : request.getStartAngle() + request.getRange();
+			this.scanResult = new ScanResultImpl(100, request.getStep());
 			scanEvent = new ScanEvent(scanResult.getScanID(), getScanInfo());
 			scanEvent.setScanLeftRight(lowToHigh);
 			JfrUtils.begin(scanEvent);
@@ -232,8 +233,13 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 
 	@Override
 	public void onMessage(ScanRequest message) {
-		RoboReference<Float> servo = getReference(pan);
+		RoboReference<Float> servo = getPanServo();
 		scheduleScan(message, servo, message.getReceiver());
+	}
+
+	private RoboReference<Float> getPanServo() {
+		RoboReference<Float> servo = getReference(pan);
+		return servo;
 	}
 
 	private void scheduleScan(ScanRequest message, RoboReference<Float> servo, RoboReference<ScanResult2D> recipient) {

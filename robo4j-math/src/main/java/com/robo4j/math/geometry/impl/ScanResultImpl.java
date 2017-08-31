@@ -49,13 +49,15 @@ public class ScanResultImpl implements ScanResult2D {
 	private Point2f closestPoint;
 
 	private final ScanPoint2DEvent scanPointEvent = new ScanPoint2DEvent();
+	private final float angularResolution;
 
-	public ScanResultImpl() {
-		this(70);
+	public ScanResultImpl(float angularResolution) {
+		this(70, angularResolution);
 	}
 
-	public ScanResultImpl(int size) {
+	public ScanResultImpl(int size, float angularResolution) {
 		scanID = SCANCOUNTER.incrementAndGet();
+		this.angularResolution = angularResolution;
 		points = new ArrayList<Point2f>(size);
 	}
 
@@ -153,5 +155,10 @@ public class ScanResultImpl implements ScanResult2D {
 	public String toString() {
 		return String.format("Closest: %s, Farthest: %s, # points: %d", String.valueOf(getNearestPoint()),
 				String.valueOf(getFarthestPoint()), getPoints().size());
+	}
+
+	@Override
+	public float getAngularResolution() {
+		return angularResolution;
 	}
 }
