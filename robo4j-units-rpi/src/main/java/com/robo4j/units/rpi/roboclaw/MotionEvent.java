@@ -16,6 +16,8 @@
  */
 package com.robo4j.units.rpi.roboclaw;
 
+import com.robo4j.hw.rpi.pwm.roboclaw.RoboClawRCTank;
+
 /**
  * Event for controlling the {@link RoboClawRCTankUnit}.
  * 
@@ -26,15 +28,35 @@ public class MotionEvent {
 	private final float speed;
 	private final float direction;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param speed
+	 *            the normalized speed.
+	 * @param direction
+	 *            direction in radians.
+	 * 
+	 * @See {@link RoboClawRCTank#setDirection(float)}
+	 */
 	public MotionEvent(float speed, float direction) {
 		this.speed = speed;
 		this.direction = direction;
 	}
 
+	/**
+	 * Returns the normalized speed.
+	 * 
+	 * @return the normalized speed.
+	 */
 	public float getSpeed() {
 		return speed;
 	}
 
+	/**
+	 * Returns the direction in radians.
+	 * 
+	 * @return the direction in radians.
+	 */
 	public float getDirection() {
 		return direction;
 	}
