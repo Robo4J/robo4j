@@ -65,8 +65,14 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private static final int _DEFAULT_PORT = 8042;
 	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
 	private static final HttpCodecRegistry CODEC_REGISTRY = new HttpCodecRegistry();
+	private static final int DEFAULT_STOPPER = 0;
+	public static final String PROPERTY_STOPPER = "stopper";
+	public static final String PROPERTY_PORT = "port";
+	public static final String PROPERTY_TARGET = "target";
 	private boolean available;
 	private Integer port;
+	// small message 0, bigger image message -1
+	private Integer stopper;
 	private List<String> target;
 	private ServerSocketChannel server;
 	private final Map<SelectableChannel, SelectionKey> channelKeyMap = new HashMap<>();
@@ -80,8 +86,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
 		/* target is always initiated as the list */
-		target = Arrays.asList(configuration.getString("target", Constants.EMPTY_STRING).split(DELIMITER));
-		port = configuration.getInteger("port", _DEFAULT_PORT);
+		target = Arrays.asList(configuration.getString(PROPERTY_TARGET, Constants.EMPTY_STRING).split(DELIMITER));
+		port = configuration.getInteger(PROPERTY_PORT, _DEFAULT_PORT);
+		stopper = configuration.getInteger(PROPERTY_STOPPER, DEFAULT_STOPPER);
 
 		String packages = configuration.getString("packages", null);
 		if (validatePackages(packages)) {
@@ -205,12 +212,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 		String message = outBuffers.get(key).toString();
 		String response = RoboHttpUtils.HTTP_HEADER_OK.concat(RoboHttpUtils.NEW_LINE).concat(message);
+		int writtenBytes = SocketUtil.writeBuffer(channel, ByteBuffer.wrap(response.getBytes()));
 
-		System.out.println("response: " + response);
-//		ByteBuffer buffer = ByteBuffer.wrap(response.getBytes());
-//		while (buffer.hasRemaining() && channel.isOpen()) {
-//			channel.write(buffer);
-//		}
 		channelKeyMap.remove(channel);
 
 		channel.close();
@@ -225,14 +228,12 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
 
 		ByteBuffer buffer = ByteBuffer.allocate(700000);
-		int readBytes = SocketUtil.readBuffer(channel, buffer);
+		int readBytes = SocketUtil.readBuffer(channel, buffer, stopper);
 		buffer.flip();
 		if(buffer.remaining() == 0){
 			buffer.clear();
 			return;
 		}
-
-		System.out.println(getClass().getSimpleName() + " readBytes: " + readBytes);
 
 		ByteBuffer validBuffer = ByteBufferUtils.copy(buffer, 0, readBytes);
 		final RoboRequestCallable callable = new RoboRequestCallable(this, validBuffer, factory);
