@@ -24,6 +24,7 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
+import com.robo4j.socket.http.util.SocketUtil;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -38,9 +39,12 @@ import java.util.Map;
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpClientUnit extends RoboUnit<Object> {
+	//short message 0, bigger message -1
+	private static final int DEFAULT_STOPPER = 0;
 	private InetSocketAddress address;
 	private String responseUnit;
 	private Integer responseSize;
+	private Integer stopper;
 
 	public HttpClientUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -53,6 +57,7 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		int confPort = configuration.getInteger("port", RoboHttpUtils._DEFAULT_PORT);
 		responseUnit = configuration.getString("responseUnit", null);
 		responseSize = configuration.getInteger("responseSize", null);
+		stopper = configuration.getInteger("stopper", DEFAULT_STOPPER);
 
 		Map<String, Object> targetUnitsMap = JsonUtil.getMapNyJson(configuration.getString("targetUnits", null));
 		if (confAddress == null || targetUnitsMap.isEmpty()) {
@@ -66,47 +71,24 @@ public class HttpClientUnit extends RoboUnit<Object> {
 	@Override
 	public void onMessage(Object message) {
 		try {
-			SocketChannel client = SocketChannel.open(address);
-			client.configureBlocking(true);
+			SocketChannel channel = SocketChannel.open(address);
+			channel.configureBlocking(true);
 
 			ByteBuffer buffer = ByteBuffer.wrap(((String)message).getBytes());
-			client.write(buffer);
+			int writtenBytes = SocketUtil.writeBuffer(channel, buffer);
+			System.out.println(getClass().getSimpleName() + " written bytes: " + writtenBytes);
 			if(responseUnit != null && responseSize != null){
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
-				client.read(readBuffer);
+				//important is set stopper properly
+				int readBytes = SocketUtil.readBuffer(channel, readBuffer, stopper);
+				System.out.println(getClass().getSimpleName() + " read response: " + readBytes);
 				sendMessageToResponseUnit(readBuffer);
 			}
-			client.close();
+			channel.close();
 		} catch (IOException e) {
 			throw new HttpException("onMessage", e);
 		}
 	}
-
-//	@Override
-//	public void onMessage(Object message) {
-//		try {
-//			SocketChannel client = SocketChannel.open(address);
-//			client.configureBlocking(true);
-//
-//			ByteBuffer buffer = ByteBuffer.wrap(((String) message).getBytes());
-////			buffer.flip();
-//
-//			int writtenBytes = SocketUtil.writeBuffer(client, buffer);
-//			buffer.clear();
-//
-//
-//			System.out.println("WRITTEN BYTES: " + writtenBytes);
-//			if (responseUnit != null && responseSize != null) {
-//				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
-//				client.read(readBuffer);
-//				System.out.println("READ: " + new String(readBuffer.array()));
-//				sendMessageToResponseUnit(readBuffer);
-//			}
-//			client.close();
-//		} catch (IOException e) {
-//			throw new HttpException("onMessage", e);
-//		}
-//	}
 
 	// Private Methods
 	private void sendMessageToResponseUnit(ByteBuffer byteBuffer) {

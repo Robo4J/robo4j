@@ -27,11 +27,10 @@ import java.nio.channels.SocketChannel;
  */
 public final class SocketUtil {
 
-    public static  int readBuffer(SocketChannel channel, ByteBuffer buffer) throws IOException {
+    public static  int readBuffer(SocketChannel channel, ByteBuffer buffer , int stopper) throws IOException {
         int numberRead = channel.read(buffer);
         int totalRead = numberRead;
-
-        while (numberRead != -1) {
+        while (numberRead != stopper) {
             numberRead = channel.read(buffer);
             if(numberRead > 0){
                 totalRead += numberRead;
