@@ -27,6 +27,15 @@ import java.nio.channels.SocketChannel;
  */
 public final class SocketUtil {
 
+    /**
+     * 
+     * @param channel
+     * @param buffer
+     * @param stopper - default is 0 for String message, -1 for big image message 
+     * @return
+     * @throws IOException
+     */
+    // FIXME: 01.09.17 (miro) -> remove stopper hacky solution
     public static  int readBuffer(SocketChannel channel, ByteBuffer buffer , int stopper) throws IOException {
         int numberRead = channel.read(buffer);
         int totalRead = numberRead;
