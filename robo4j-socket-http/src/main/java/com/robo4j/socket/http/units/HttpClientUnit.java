@@ -22,6 +22,7 @@ import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.socket.http.util.SocketUtil;
@@ -76,7 +77,6 @@ public class HttpClientUnit extends RoboUnit<Object> {
 
 			ByteBuffer buffer = ByteBuffer.wrap(((String)message).getBytes());
 			int writtenBytes = SocketUtil.writeBuffer(channel, buffer);
-			System.out.println(getClass().getSimpleName() + " written bytes: " + writtenBytes);
 			if(responseUnit != null && responseSize != null){
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
 				//important is set stopper properly
@@ -86,7 +86,7 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			}
 			channel.close();
 		} catch (IOException e) {
-			throw new HttpException("onMessage", e);
+			SimpleLoggingUtil.error(getClass(), "not available:"+ address +  ", no worry I continue sending images");
 		}
 	}
 

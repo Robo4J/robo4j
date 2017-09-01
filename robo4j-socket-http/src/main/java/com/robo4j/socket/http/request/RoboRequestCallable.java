@@ -120,9 +120,7 @@ public class RoboRequestCallable implements Callable<Object> {
 				final String postValue = new String(wrapper.getBody().array());
 				if (length == postValue.length()) {
 					jsonSB.append(postValue);
-					SimpleLoggingUtil.error(getClass(), "AWESOME SAME HEADER LENGTH: " + length + " convertedMessage: " + postValue.length());
 				} else {
-					jsonSB.append(postValue);
 					SimpleLoggingUtil.error(getClass(), "NOT SAME HEADER LENGTH: " + length + " convertedMessage: " + postValue.length());
 				}
 				return factory.processPost(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0),
