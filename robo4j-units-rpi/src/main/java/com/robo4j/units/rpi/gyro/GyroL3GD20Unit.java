@@ -91,7 +91,7 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 
 	private class GyroScanner implements Runnable {
 		private long lastReadingTime = System.currentTimeMillis();
-		private Tuple3f lastReading;
+		private Tuple3f lastReading = new Tuple3f(0f, 0f, 0f);
 
 		@Override
 		public void run() {
