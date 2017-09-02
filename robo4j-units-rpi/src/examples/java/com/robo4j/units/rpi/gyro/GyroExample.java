@@ -16,9 +16,6 @@
  */
 package com.robo4j.units.rpi.gyro;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import com.robo4j.core.RoboBuilder;
 import com.robo4j.core.RoboBuilderException;
 import com.robo4j.core.RoboContext;
@@ -26,6 +23,9 @@ import com.robo4j.core.RoboReference;
 import com.robo4j.core.util.SystemUtil;
 import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.units.rpi.gyro.GyroRequest.GyroAction;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Runs the gyro continuously.
@@ -59,7 +59,8 @@ public class GyroExample {
 
 		System.out.println("Let the gyro unit be absolutely still, then press enter to calibrate and start!");
 		System.in.read();
-		gyro.sendMessage(new GyroRequest(processor, GyroAction.CONTINUOUS, new Tuple3f(1.0f, 1.0f, 1.0f)));
+		gyro.sendMessage(new GyroRequest(processor, GyroAction.CONTINUOUS,
+				new Tuple3f(GyroRequest.DO_NOT_CARE, GyroRequest.DO_NOT_CARE, 1.0f)));
 		System.out.println("Will report angular changes indefinitely.\nPress enter to quit!");
 		System.in.read();
 	}

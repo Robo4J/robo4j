@@ -17,8 +17,9 @@
 
 package com.robo4j.units.rpi.camera;
 
+import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.ConfigurationException;
-import com.robo4j.core.LifecycleState;
+import com.robo4j.core.DefaultAttributeDescriptor;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
@@ -35,22 +36,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Base64;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.robo4j.units.rpi.camera.RaspistillUtils.DEFAULT;
-import static com.robo4j.units.rpi.camera.RaspistillUtils.FORMAT_IMAGE;
-import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_BRIGHTNESS;
-import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_CONTRAST;
-import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_EXPOSURE;
-import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_HEIGHT;
-import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_ROTATION;
-import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_SHARPNESS;
-import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_TIMELAPSE;
-import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_TIMEOUT;
-import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_WIDTH;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -58,15 +51,19 @@ import static com.robo4j.units.rpi.camera.RaspistillUtils.KEY_WIDTH;
  */
 public class RaspistillUnit extends RoboUnit<Boolean> {
 
+	private static final String ATTRIBUTE_COMMAND = "command";
+	private final static Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections.unmodifiableCollection(
+			Collections.singleton(DefaultAttributeDescriptor.create(String.class, ATTRIBUTE_COMMAND)));
+
 	private final CameraMessageCodec codec = new CameraMessageCodec();
 
-	private static final String DEFAULT_IMAGE_SETUP = "-n -e jpg --nopreview -o -";
 	private final RaspistilDevice device = new RaspistilDevice();
-	private String cameraCommand;
+	private String command;
 	private String targetOut;
 	private String storeTarget;
 	private String client;
 	private String clientUri;
+	private String imageEncoding;
 
 	public RaspistillUnit(RoboContext context, String id) {
 		super(Boolean.class, context, id);
@@ -74,38 +71,45 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		Map<String, String> parameters = new HashMap<>();
-		parameters.put(KEY_WIDTH, configuration.getString(KEY_WIDTH, "320"));
-		parameters.put(KEY_HEIGHT, configuration.getString(KEY_HEIGHT, "240"));
-		parameters.put(KEY_EXPOSURE, configuration.getString(KEY_EXPOSURE, "sport"));
-		parameters.put(KEY_BRIGHTNESS, configuration.getString(KEY_BRIGHTNESS, null));
-		parameters.put(KEY_SHARPNESS, configuration.getString(KEY_SHARPNESS, null));
-		parameters.put(KEY_CONTRAST, configuration.getString(KEY_CONTRAST, null));
-		parameters.put(KEY_TIMEOUT, configuration.getString(KEY_TIMEOUT, "1"));
-		parameters.put(KEY_TIMELAPSE, configuration.getString(KEY_TIMELAPSE, "100"));
-		parameters.put(KEY_ROTATION, configuration.getString(KEY_ROTATION, null));
+		imageEncoding = configuration.getString(RaspiCamProperties.ENCODING.getName(), "jpg");
+		// @fomatter:off
+		Map<RaspiCamProperties, String> parameters = new LinkedHashMap<>();
+		parameters.put(RaspiCamProperties.WIDTH, configuration.getString(RaspiCamProperties.WIDTH.getName(), "320"));
+		parameters.put(RaspiCamProperties.HEIGHT, configuration.getString(RaspiCamProperties.HEIGHT.getName(), "240"));
+		parameters.put(RaspiCamProperties.EXPORSURE,
+				configuration.getString(RaspiCamProperties.EXPORSURE.getName(), "sport"));
+		parameters.put(RaspiCamProperties.BRIGHTNESS,
+				configuration.getString(RaspiCamProperties.BRIGHTNESS.getName(), null));
+		parameters.put(RaspiCamProperties.SHARPNESS,
+				configuration.getString(RaspiCamProperties.SHARPNESS.getName(), null));
+		parameters.put(RaspiCamProperties.CONTRAST,
+				configuration.getString(RaspiCamProperties.CONTRAST.getName(), null));
+		parameters.put(RaspiCamProperties.TIMEOUT, configuration.getString(RaspiCamProperties.TIMEOUT.getName(), "1"));
+		parameters.put(RaspiCamProperties.TIMELAPSE,
+				configuration.getString(RaspiCamProperties.TIMELAPSE.getName(), "100"));
+		parameters.put(RaspiCamProperties.ROTATION,
+				configuration.getString(RaspiCamProperties.ROTATION.getName(), null));
+		parameters.put(RaspiCamProperties.ENCODING, imageEncoding);
+		parameters.put(RaspiCamProperties.NOPREVIEW, "");
+		parameters.put(RaspiCamProperties.OUTPUT, "-");
+		// formatter:on
 
 		//@formatter:off
-		cameraCommand = new StringBuilder()
+		command = new StringBuilder()
 			.append(RaspistillUtils.RASPISTILL_COMMAND)
 			.append(Constants.UTF8_SPACE)
 			.append(parameters.entrySet().stream()
-					.filter(p -> Objects.nonNull(p.getValue()))
+					.filter(e -> Objects.nonNull(e.getValue()))
 					.map(e -> {
 						StringBuilder c = new StringBuilder();
-						if (RaspistillUtils.isOption(e.getKey())) {
-							return c.append(RaspistillUtils.getOption(e.getKey()))
+							return c.append(e.getKey().getProperty())
 									.append(Constants.UTF8_SPACE)
 									.append(e.getValue()).toString();
-						}
-						return null;})
-					.filter(Objects::nonNull)
+					})
 					.collect(Collectors.joining(Constants.UTF8_SPACE)))
-							.append(Constants.UTF8_SPACE)
-			.append(DEFAULT_IMAGE_SETUP)
 			.toString();
 
-		SimpleLoggingUtil.print(getClass(), "cameraCommand:" + cameraCommand);
+		SimpleLoggingUtil.print(getClass(), "command:" + command);
 		//@formatter:on
 		targetOut = configuration.getString("targetOut", null);
 		String tmpClient = configuration.getString("client", null);
@@ -137,20 +141,22 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 	}
 
 	@Override
-	public void stop() {
-		setState(LifecycleState.STOPPING);
-		setState(LifecycleState.STOPPED);
+	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
+		return KNOWN_ATTRIBUTES;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public void shutdown() {
-		setState(LifecycleState.SHUTTING_DOWN);
-		setState(LifecycleState.SHUTDOWN);
+	public <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
+		if (ATTRIBUTE_COMMAND.equals(attribute.getAttributeName())) {
+			return (R) command;
+		}
+		return null;
 	}
 
 	// Private Methods
 	private void createImage() {
-		final CameraMessage cameraMessage = new CameraMessage(FORMAT_IMAGE, DEFAULT, executeCommand(cameraCommand));
+		final CameraMessage cameraMessage = new CameraMessage(imageEncoding, DEFAULT, executeCommand(command));
 		final String message = codec.encode(cameraMessage);
 		if (cameraMessage.getImage().length() != Constants.DEFAULT_VALUE_0) {
 			final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, message);
@@ -176,7 +182,7 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 		try {
 			return new String(Base64.getEncoder().encode(image), Constants.DEFAULT_ENCODING);
 		} catch (UnsupportedEncodingException e) {
-			throw new CameraClientException("IMAGE GENERATION", e);
+			throw new CameraClientException("image capture", e);
 		}
 
 	}
