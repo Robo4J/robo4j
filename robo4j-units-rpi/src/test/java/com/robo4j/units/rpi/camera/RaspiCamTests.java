@@ -17,12 +17,12 @@
 
 package com.robo4j.units.rpi.camera;
 
-import com.robo4j.core.DefaultAttributeDescriptor;
-import com.robo4j.core.RoboSystem;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.configuration.ConfigurationFactory;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.robo4j.core.DefaultAttributeDescriptor;
+import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.configuration.ConfigurationFactory;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -34,9 +34,8 @@ public class RaspiCamTests {
 
     @Test
     public void testCameraCommandBuilderEnd() throws  Exception{
-        final RoboSystem system = new RoboSystem();
 
-        RaspistillUnit imageController = new RaspistillUnit(system, "camera");
+        RaspistillUnit imageController = new RaspistillUnit(null, "camera");
         Configuration config = ConfigurationFactory.createEmptyConfiguration();
         config.setString("targetOut", "out");
         config.setString("client", "client");
