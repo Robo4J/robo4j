@@ -165,35 +165,44 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 
 	@Override
 	public void onMessage(GyroRequest message) {
+		RoboReference<GyroEvent> notificationTarget = message.getTarget();
 		switch (message.getAction()) {
 		case CALIBRATE:
 			try {
 				gyro.calibrate();
 				scanner.reset();
-				if (message.getTarget() != null) {
-					message.getTarget().sendMessage(new GyroEvent(new Tuple3f(0, 0, 0)));
+				if (notificationTarget != null) {
+					notificationTarget.sendMessage(new GyroEvent(new Tuple3f(0, 0, 0)));
 				}
 			} catch (IOException e) {
 				SimpleLoggingUtil.error(getClass(), "Failed to calibrate!", e);
 			}
 			break;
 		case STOP:
-			if (message.getTarget() == null) {
-				activeThresholds.clear();
-			} else {
-				activeThresholds.remove(message.getTarget());
-			}
-			if (activeThresholds.isEmpty()) {
-				readings.cancel(false);
-				readings = null;
-			}
+			stopForNotificationTarget(notificationTarget);
 			break;
 		case ONCE:
 		case CONTINUOUS:
 			if (message.getNotificationThreshold() != null) {
-				setUpNotification(message.getTarget(), message);
+				setUpNotification(message);
 			}
 			break;
+		}
+	}
+
+	private void stopForNotificationTarget(RoboReference<GyroEvent> notificationTarget) {
+		synchronized (this) {
+			if (notificationTarget == null) {
+				activeThresholds.clear();
+			} else {
+				activeThresholds.remove(notificationTarget);
+			}
+			if (activeThresholds.isEmpty()) {
+				if (readings != null) {
+					readings.cancel(false);
+					readings = null;
+				}
+			}
 		}
 	}
 
@@ -210,12 +219,12 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 		return super.onGetAttribute(descriptor);
 	}
 
-	private void setUpNotification(RoboReference<GyroEvent> target, GyroRequest request) {
+	private void setUpNotification(GyroRequest request) {
 		synchronized (this) {
 			if (request.getAction() == GyroAction.CONTINUOUS) {
-				activeThresholds.put(target, new ContinuousGyroNotificationEntry(target, request.getNotificationThreshold()));
+				activeThresholds.put(request.getTarget(), new ContinuousGyroNotificationEntry(request.getTarget(), request.getNotificationThreshold()));
 			} else {
-				activeThresholds.put(target, new FixedGyroNotificationEntry(target, request.getNotificationThreshold()));
+				activeThresholds.put(request.getTarget(), new FixedGyroNotificationEntry(request.getTarget(), request.getNotificationThreshold()));
 			}
 		}
 		if (readings == null) {
