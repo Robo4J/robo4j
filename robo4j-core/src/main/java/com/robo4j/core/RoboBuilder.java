@@ -366,6 +366,7 @@ public final class RoboBuilder {
 	 */
 	public RoboContext build() {
 		system.addUnits(units);
+		system.setState(LifecycleState.INITIALIZED);
 		return system;
 	}
 

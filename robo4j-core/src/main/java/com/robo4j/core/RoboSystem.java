@@ -56,7 +56,7 @@ public class RoboSystem implements RoboContext {
 	private static final int TERMINATION_TIMEOUT = 5;
 	private static final int KEEP_ALIVE_TIME = 10;
 
-	private volatile AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
+	private final AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
 	private final Map<String, RoboUnit<?>> units = new HashMap<>();
 	private final Map<RoboUnit<?>, RoboReference<?>> referenceCache = new WeakHashMap<>();
 
@@ -205,17 +205,6 @@ public class RoboSystem implements RoboContext {
 		this(uid, DEFAULT_SCHEDULER_POOL_SIZE, DEFAULT_WORKING_POOL_SIZE, DEFAULT_BLOCKING_POOL_SIZE);
 	}
 
-	/**
-	 * Constructor.
-	 */
-	public RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize) {
-		this.uid = uid;
-		workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
-				new RoboThreadFactory(new ThreadGroup(NAME_WORKER_POOL), NAME_WORKER_POOL, true));
-		blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, blockingQueue,
-				new RoboThreadFactory(new ThreadGroup(NAME_BLOCKING_POOL), NAME_BLOCKING_POOL, true));
-		systemScheduler = new DefaultScheduler(this, schedulerPoolSize);
-	}
 
 	/**
 	 * Constructor.
@@ -232,6 +221,7 @@ public class RoboSystem implements RoboContext {
 	public RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize, Set<RoboUnit<?>> unitSet) {
 		this(uid, schedulerPoolSize, workerPoolSize, blockingPoolSize);
 		addToMap(unitSet);
+		state.set(LifecycleState.INITIALIZED);
 	}
 
 	/**
@@ -240,6 +230,19 @@ public class RoboSystem implements RoboContext {
 	public RoboSystem(Configuration config) {
 		this(UUID.randomUUID().toString(), config);
 	}
+
+	/**
+	 * Constructor.
+	 */
+	public RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize) {
+		this.uid = uid;
+		workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
+				new RoboThreadFactory(new ThreadGroup(NAME_WORKER_POOL), NAME_WORKER_POOL, true));
+		blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, blockingQueue,
+				new RoboThreadFactory(new ThreadGroup(NAME_BLOCKING_POOL), NAME_BLOCKING_POOL, true));
+		systemScheduler = new DefaultScheduler(this, schedulerPoolSize);
+	}
+
 
 	/**
 	 * Adds the specified units to the system.
@@ -269,21 +272,36 @@ public class RoboSystem implements RoboContext {
 
 	@Override
 	public void start() {
-		state.set(LifecycleState.STARTING);
+		if (state.compareAndSet(LifecycleState.STOPPED, LifecycleState.STARTING)) {
+			// NOTE(Marcus/Sep 4, 2017): Do we want to support starting a stopped system? 
+			startUnits();
+		}
+		if (state.compareAndSet(LifecycleState.INITIALIZED, LifecycleState.STARTING)) {
+			startUnits();
+		}
+	}
+
+	private void startUnits() {
 		units.values().forEach(RoboUnit::start);
 		state.set(LifecycleState.STARTED);
 	}
 
 	@Override
 	public void stop() {
-		state.set(LifecycleState.STOPPING);
-		units.values().forEach(RoboUnit::stop);
+		if (state.compareAndSet(LifecycleState.STARTED, LifecycleState.STOPPING)) {
+			for (RoboUnit<?> unit : units.values()) {
+				getScheduler().schedule(() -> unit.stop(), 0, TimeUnit.NANOSECONDS);
+				// We may want to optionally wait until they are all actually
+				// stopped.
+			}
+		}
 		state.set(LifecycleState.STOPPED);
 	}
 
 	@Override
 	public void shutdown() {
 		stop();
+		state.set(LifecycleState.SHUTTING_DOWN);
 		try {
 			workExecutor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
 			blockingExecutor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
@@ -293,7 +311,6 @@ public class RoboSystem implements RoboContext {
 		} catch (InterruptedException e) {
 			SimpleLoggingUtil.error(getClass(), "Was interrupted when shutting down.", e);
 		}
-		state.set(LifecycleState.SHUTTING_DOWN);
 		units.values().forEach(RoboSystem::shutdownUnit);
 		state.set(LifecycleState.SHUTDOWN);
 	}
@@ -301,6 +318,10 @@ public class RoboSystem implements RoboContext {
 	@Override
 	public LifecycleState getState() {
 		return state.get();
+	}
+	
+	public void setState(LifecycleState state) {
+		this.state.set(state);
 	}
 
 	@Override
