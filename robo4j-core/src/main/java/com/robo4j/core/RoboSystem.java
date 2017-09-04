@@ -16,7 +16,14 @@
  */
 package com.robo4j.core;
 
+import com.robo4j.core.concurrency.RoboThreadFactory;
+import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.scheduler.DefaultScheduler;
+import com.robo4j.core.scheduler.Scheduler;
+
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -28,12 +35,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
-
-import com.robo4j.core.concurrency.RoboThreadFactory;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.scheduler.DefaultScheduler;
-import com.robo4j.core.scheduler.Scheduler;
 
 /**
  * This is the default implementation for a local {@link RoboContext}. Contains
@@ -54,6 +55,8 @@ public class RoboSystem implements RoboContext {
 	private static final int DEFAULT_WORKING_POOL_SIZE = 2;
 	private static final int DEFAULT_SCHEDULER_POOL_SIZE = 2;
 	private static final int KEEP_ALIVE_TIME = 10;
+	private static final EnumSet<LifecycleState> CRITERION_MESSAGE_ACCEPTANCE = EnumSet.of(LifecycleState.STARTED,
+			LifecycleState.STOPPED, LifecycleState.STOPPING);
 
 	private final AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
 	private final Map<String, RoboUnit<?>> units = new HashMap<>();
@@ -124,7 +127,7 @@ public class RoboSystem implements RoboContext {
 
 		@Override
 		public void sendMessage(T message) {
-			if (getState() == LifecycleState.STARTED || getState() == LifecycleState.STOPPED || getState() == LifecycleState.STOPPING) {
+			if (CRITERION_MESSAGE_ACCEPTANCE.contains(getState())) {
 				if (threadingPolicy != ThreadingPolicy.CRITICAL) {
 					deliverOnQueue(message);
 				} else {
@@ -216,7 +219,8 @@ public class RoboSystem implements RoboContext {
 	/**
 	 * Constructor.
 	 */
-	public RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize, Set<RoboUnit<?>> unitSet) {
+	public RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize,
+			Set<RoboUnit<?>> unitSet) {
 		this(uid, schedulerPoolSize, workerPoolSize, blockingPoolSize);
 		addToMap(unitSet);
 		state.set(LifecycleState.INITIALIZED);
@@ -234,10 +238,10 @@ public class RoboSystem implements RoboContext {
 	 */
 	public RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize) {
 		this.uid = uid;
-		workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
-				new RoboThreadFactory(new ThreadGroup(NAME_WORKER_POOL), NAME_WORKER_POOL, true));
-		blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, blockingQueue,
-				new RoboThreadFactory(new ThreadGroup(NAME_BLOCKING_POOL), NAME_BLOCKING_POOL, true));
+		workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
+				workQueue, new RoboThreadFactory(new ThreadGroup(NAME_WORKER_POOL), NAME_WORKER_POOL, true));
+		blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
+				blockingQueue, new RoboThreadFactory(new ThreadGroup(NAME_BLOCKING_POOL), NAME_BLOCKING_POOL, true));
 		systemScheduler = new DefaultScheduler(this, schedulerPoolSize);
 	}
 
