@@ -178,7 +178,11 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 			}
 			break;
 		case STOP:
-			activeThresholds.remove(message.getTarget());
+			if (message.getTarget() == null) {
+				activeThresholds.clear();
+			} else {
+				activeThresholds.remove(message.getTarget());
+			}
 			if (activeThresholds.isEmpty()) {
 				readings.cancel(false);
 				readings = null;
