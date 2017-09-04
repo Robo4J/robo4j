@@ -55,7 +55,7 @@ public class RoboSystem implements RoboContext {
 	private static final int DEFAULT_WORKING_POOL_SIZE = 2;
 	private static final int DEFAULT_SCHEDULER_POOL_SIZE = 2;
 	private static final int KEEP_ALIVE_TIME = 10;
-	private static final EnumSet<LifecycleState> CRITERION_MESSAGE_ACCEPTANCE = EnumSet.of(LifecycleState.STARTED,
+	private static final EnumSet<LifecycleState> MESSAGE_DELIVERY_CRITERIA = EnumSet.of(LifecycleState.STARTED,
 			LifecycleState.STOPPED, LifecycleState.STOPPING);
 
 	private final AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
@@ -127,7 +127,7 @@ public class RoboSystem implements RoboContext {
 
 		@Override
 		public void sendMessage(T message) {
-			if (CRITERION_MESSAGE_ACCEPTANCE.contains(getState())) {
+			if (MESSAGE_DELIVERY_CRITERIA.contains(getState())) {
 				if (threadingPolicy != ThreadingPolicy.CRITICAL) {
 					deliverOnQueue(message);
 				} else {
