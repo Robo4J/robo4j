@@ -124,7 +124,7 @@ public class RoboSystem implements RoboContext {
 
 		@Override
 		public void sendMessage(T message) {
-			if (getState() == LifecycleState.STARTED) {
+			if (getState() == LifecycleState.STARTED || getState() == LifecycleState.STOPPED || getState() == LifecycleState.STOPPING) {
 				if (threadingPolicy != ThreadingPolicy.CRITICAL) {
 					deliverOnQueue(message);
 				} else {
@@ -280,17 +280,21 @@ public class RoboSystem implements RoboContext {
 	}
 
 	private void startUnits() {
-		units.values().forEach(RoboUnit::start);
+		// NOTE(Marcus/Sep 4, 2017): May want to schedule the starts.
+		for (RoboUnit<?> unit : units.values()) {
+			unit.setState(LifecycleState.STARTING);
+			unit.start();
+			unit.setState(LifecycleState.STARTED);
+		}
 		state.set(LifecycleState.STARTED);
 	}
 
 	@Override
 	public void stop() {
+		// NOTE(Marcus/Sep 4, 2017): We may want schedule the stops in the
+		// future.
 		if (state.compareAndSet(LifecycleState.STARTED, LifecycleState.STOPPING)) {
-			for (RoboUnit<?> unit : units.values()) {
-				// Scheduling the stops on the system scheduler.
-				getScheduler().schedule(() -> unit.stop(), 0, TimeUnit.NANOSECONDS);
-			}
+			units.values().forEach(RoboUnit::stop);
 		}
 		state.set(LifecycleState.STOPPED);
 	}
@@ -299,7 +303,10 @@ public class RoboSystem implements RoboContext {
 	public void shutdown() {
 		stop();
 		state.set(LifecycleState.SHUTTING_DOWN);
-		// First shutdown all work...
+		units.values().forEach((unit) -> unit.setState(LifecycleState.SHUTTING_DOWN));
+
+		// First shutdown all executors. We don't care at this point, as any
+		// messages will no longer be delivered.
 		workExecutor.shutdown();
 		blockingExecutor.shutdown();
 
@@ -390,9 +397,9 @@ public class RoboSystem implements RoboContext {
 	}
 
 	private static void shutdownUnit(RoboUnit<?> unit) {
-		unit.setState(LifecycleState.SHUTTING_DOWN);
 		// NOTE(Marcus/Aug 11, 2017): Should really be scheduled and done in
 		// parallel.
 		unit.shutdown();
+		unit.setState(LifecycleState.SHUTDOWN);
 	}
 }

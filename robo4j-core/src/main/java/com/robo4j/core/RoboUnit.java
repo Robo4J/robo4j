@@ -95,33 +95,21 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	/**
 	 * Should be overridden in subclasses which need to do some initialization
 	 * on start.
-	 * 
-	 * <p>
-	 * Default implementation sets state to {@link LifecycleState#STARTED}.
 	 */
 	public void start() {
-		setState(LifecycleState.STARTED);
 	}
 
 	/**
 	 * Should be overridden in subclasses needing to do some work when stopping.
-	 * 
-	 * <p>
-	 * Default implementation sets state to {@link LifecycleState#STOPPED}.
 	 */
 	public void stop() {
-		setState(LifecycleState.STOPPED);
 	}
 
 	/**
 	 * Should be overridden in subclasses needing to do some work when shutting
 	 * down.
-	 * 
-	 * <p>
-	 * Default implementation sets state to {@link LifecycleState#SHUTDOWN}.
 	 */
 	public void shutdown() {
-		setState(LifecycleState.SHUTDOWN);
 	}
 
 	/**
