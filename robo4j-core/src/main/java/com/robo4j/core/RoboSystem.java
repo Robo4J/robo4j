@@ -16,12 +16,6 @@
  */
 package com.robo4j.core;
 
-import com.robo4j.core.concurrency.RoboThreadFactory;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.scheduler.DefaultScheduler;
-import com.robo4j.core.scheduler.Scheduler;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +28,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+
+import com.robo4j.core.concurrency.RoboThreadFactory;
+import com.robo4j.core.configuration.Configuration;
+import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.scheduler.DefaultScheduler;
+import com.robo4j.core.scheduler.Scheduler;
 
 /**
  * This is the default implementation for a local {@link RoboContext}. Contains
@@ -53,7 +53,6 @@ public class RoboSystem implements RoboContext {
 	private static final int DEFAULT_BLOCKING_POOL_SIZE = 4;
 	private static final int DEFAULT_WORKING_POOL_SIZE = 2;
 	private static final int DEFAULT_SCHEDULER_POOL_SIZE = 2;
-	private static final int TERMINATION_TIMEOUT = 5;
 	private static final int KEEP_ALIVE_TIME = 10;
 
 	private final AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
@@ -205,7 +204,6 @@ public class RoboSystem implements RoboContext {
 		this(uid, DEFAULT_SCHEDULER_POOL_SIZE, DEFAULT_WORKING_POOL_SIZE, DEFAULT_BLOCKING_POOL_SIZE);
 	}
 
-
 	/**
 	 * Constructor.
 	 */
@@ -243,7 +241,6 @@ public class RoboSystem implements RoboContext {
 		systemScheduler = new DefaultScheduler(this, schedulerPoolSize);
 	}
 
-
 	/**
 	 * Adds the specified units to the system.
 	 * 
@@ -273,7 +270,8 @@ public class RoboSystem implements RoboContext {
 	@Override
 	public void start() {
 		if (state.compareAndSet(LifecycleState.STOPPED, LifecycleState.STARTING)) {
-			// NOTE(Marcus/Sep 4, 2017): Do we want to support starting a stopped system? 
+			// NOTE(Marcus/Sep 4, 2017): Do we want to support starting a
+			// stopped system?
 			startUnits();
 		}
 		if (state.compareAndSet(LifecycleState.INITIALIZED, LifecycleState.STARTING)) {
@@ -290,9 +288,8 @@ public class RoboSystem implements RoboContext {
 	public void stop() {
 		if (state.compareAndSet(LifecycleState.STARTED, LifecycleState.STOPPING)) {
 			for (RoboUnit<?> unit : units.values()) {
+				// Scheduling the stops on the system scheduler.
 				getScheduler().schedule(() -> unit.stop(), 0, TimeUnit.NANOSECONDS);
-				// We may want to optionally wait until they are all actually
-				// stopped.
 			}
 		}
 		state.set(LifecycleState.STOPPED);
@@ -302,16 +299,27 @@ public class RoboSystem implements RoboContext {
 	public void shutdown() {
 		stop();
 		state.set(LifecycleState.SHUTTING_DOWN);
+		// First shutdown all work...
+		workExecutor.shutdown();
+		blockingExecutor.shutdown();
+
+		// Then schedule shutdowns on the scheduler threads...
+		for (RoboUnit<?> unit : units.values()) {
+			getScheduler().execute(new Runnable() {
+				@Override
+				public void run() {
+					RoboSystem.shutdownUnit(unit);
+				}
+			});
+		}
+
+		// Then shutdown the system scheduler. Will wait until the termination
+		// shutdown of the system scheduler (or the timeout).
 		try {
-			workExecutor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
-			blockingExecutor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
-			workExecutor.shutdown();
-			blockingExecutor.shutdown();
 			systemScheduler.shutdown();
 		} catch (InterruptedException e) {
-			SimpleLoggingUtil.error(getClass(), "Was interrupted when shutting down.", e);
+			SimpleLoggingUtil.error(getClass(), "System scheduler was interrupted when shutting down.", e);
 		}
-		units.values().forEach(RoboSystem::shutdownUnit);
 		state.set(LifecycleState.SHUTDOWN);
 	}
 
@@ -319,7 +327,7 @@ public class RoboSystem implements RoboContext {
 	public LifecycleState getState() {
 		return state.get();
 	}
-	
+
 	public void setState(LifecycleState state) {
 		this.state.set(state);
 	}
