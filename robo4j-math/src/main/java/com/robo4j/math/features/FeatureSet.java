@@ -20,6 +20,7 @@ import java.util.List;
 
 import com.robo4j.math.geometry.CurvaturePoint2f;
 import com.robo4j.math.geometry.Line2f;
+import com.robo4j.math.geometry.Point2f;
 
 /**
  * The features found when doing a feature extraction pass.
@@ -42,6 +43,22 @@ public class FeatureSet {
 
 	public final List<CurvaturePoint2f> getCorners() {
 		return corners;
+	}
+
+	/**
+	 * @return the corner closest to Origo, or null if there are no corners
+	 *         found.
+	 */
+	public Point2f getClosestCorner() {
+		CurvaturePoint2f result = null;
+		for (CurvaturePoint2f c : getCorners()) {
+			if (result == null) {
+				result = c;
+			} else if (c.getRange() < result.getRange()) {
+				result = c;
+			}
+		}
+		return result;
 	}
 
 	@Override

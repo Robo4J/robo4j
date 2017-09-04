@@ -27,6 +27,8 @@ public interface ScanResult2D {
 	List<Point2f> getPoints();
 	Point2f getNearestPoint();
 	Point2f getFarthestPoint();
+	Point2f getLeftmostPoint();
+	Point2f getRightmostPoint();
 	double getMaxX();
 	double getMinX();
 	double getMaxY();

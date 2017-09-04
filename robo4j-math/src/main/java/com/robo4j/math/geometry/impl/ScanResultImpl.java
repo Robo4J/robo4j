@@ -22,9 +22,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.robo4j.math.jfr.ScanPoint2DEvent;
 import com.robo4j.math.geometry.Point2f;
 import com.robo4j.math.geometry.ScanResult2D;
+import com.robo4j.math.jfr.ScanPoint2DEvent;
 
 /**
  * The implementation of a scan result. This particular implementation will emit
@@ -160,5 +160,17 @@ public class ScanResultImpl implements ScanResult2D {
 	@Override
 	public float getAngularResolution() {
 		return angularResolution;
+	}
+
+	@Override
+	public Point2f getLeftmostPoint() {
+		return points.get(0);
+	}
+
+	@Override
+	public Point2f getRightmostPoint() {
+		// NOTE(Marcus/Sep 5, 2017): Should be fine, as the add phase is
+		// separate from the read phase.
+		return points.get(points.size() - 1);
 	}
 }
