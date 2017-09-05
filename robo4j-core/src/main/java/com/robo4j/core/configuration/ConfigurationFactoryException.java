@@ -25,6 +25,14 @@ package com.robo4j.core.configuration;
 public class ConfigurationFactoryException extends Exception {
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param message
+	 *            the exception message.
+	 * @param cause
+	 *            the exception cause.
+	 */
 	public ConfigurationFactoryException(String message, Throwable cause) {
 		super(message, cause);
 	}

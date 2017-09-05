@@ -23,6 +23,11 @@ package com.robo4j.core.configuration;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ConfigurationFactory {
+	/**
+	 * Creates a new, empty, configuration.
+	 * 
+	 * @return an empty {@link Configuration}.
+	 */
 	public static Configuration createEmptyConfiguration() {
 		return new DefaultConfiguration();
 	}

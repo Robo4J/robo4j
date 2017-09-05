@@ -53,6 +53,9 @@ public class XmlConfigurationFactory {
 
 	private static final Deque<Configuration> configStack = new ArrayDeque<>();
 
+	/*
+	 * Internal XML Handler class for parsing the XML.
+	 */
 	private static class ConfigurationHandler extends DefaultHandler {
 		private Configuration currentConfig;
 		private String lastElement = "";
@@ -66,8 +69,7 @@ public class XmlConfigurationFactory {
 		}
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes)
-				throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 			if (qName.equals(ELEMENT_CONFIG)) {
 				String value = attributes.getValue(ATTRIBUTE_NAME);
 				if (!value.equals(ELEMENT_ROOT)) {
@@ -90,15 +92,14 @@ public class XmlConfigurationFactory {
 				break;
 			case ELEMENT_CONFIG:
 				if (!configStack.isEmpty()) { // Closing of the last config...
-					currentConfig = configStack.pop();					
+					currentConfig = configStack.pop();
 				}
 				break;
 			}
 			lastElement = "";
 		}
 
-		private static void writeValue(Configuration currentConfig, String currentValue, String currentType,
-				String currentName) {
+		private static void writeValue(Configuration currentConfig, String currentValue, String currentType, String currentName) {
 			switch (currentType) {
 			case TYPE_STRING:
 				currentConfig.setString(currentName, currentValue);
@@ -137,6 +138,15 @@ public class XmlConfigurationFactory {
 
 	}
 
+	/**
+	 * Reads a {@link Configuration} from a String.
+	 * 
+	 * @param xml
+	 *            the String containing the XML to read.
+	 * @return the {@link Configuration}.
+	 * @throws ConfigurationFactoryException
+	 *             if there was a problem reading the configuration.
+	 */
 	public static Configuration fromXml(String xml) throws ConfigurationFactoryException {
 		DefaultConfiguration config = new DefaultConfiguration();
 		SAXParser saxParser;
@@ -149,6 +159,13 @@ public class XmlConfigurationFactory {
 		return config;
 	}
 
+	/**
+	 * Serializes a {@link Configuration} to XML in a String object.
+	 * 
+	 * @param configuration
+	 *            the {@link Configuration} to serialize to XML.
+	 * @return the String containing the XML.
+	 */
 	public static String toXml(Configuration configuration) {
 		StringBuilder builder = new StringBuilder();
 		write(builder, configuration);
@@ -182,8 +199,8 @@ public class XmlConfigurationFactory {
 	}
 
 	private static void writeValue(StringBuilder builder, String valueName, Object value, int level) {
-		builder.append(String.format("%s<%s %s=\"%s\" %s=\"%s\">", getIndentation(level), ELEMENT_VALUE, ATTRIBUTE_NAME,
-				valueName, ATTRIBUTE_TYPE, getTypeDescriptor(value)));
+		builder.append(String.format("%s<%s %s=\"%s\" %s=\"%s\">", getIndentation(level), ELEMENT_VALUE, ATTRIBUTE_NAME, valueName,
+				ATTRIBUTE_TYPE, getTypeDescriptor(value)));
 		builder.append(String.valueOf(value));
 		builder.append(String.format("</%s>\n", ELEMENT_VALUE));
 	}
