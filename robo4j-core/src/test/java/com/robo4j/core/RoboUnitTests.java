@@ -40,8 +40,9 @@ public class RoboUnitTests {
 		producer.initialize(config);
 		StringConsumer consumer = new StringConsumer(system, "consumer");
 		system.addUnits(producer, consumer);
-		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+		system.setState(LifecycleState.INITIALIZED);
 		system.start();
+		Assert.assertEquals(system.getState(), LifecycleState.STARTED);
 		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 		for (int i = 0; i < 10; i++) {
 			producer.sendRandomMessage();
@@ -57,6 +58,7 @@ public class RoboUnitTests {
 		StringConsumer consumer = new StringConsumer(system, "consumer");
 		system.addUnits(consumer);
 		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+		system.setState(LifecycleState.INITIALIZED);
 		system.start();
 
 		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);

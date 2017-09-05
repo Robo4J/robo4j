@@ -35,7 +35,8 @@ public class RoboBuilderTests {
 		RoboBuilder builder = new RoboBuilder();
 		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("test.xml"));
 		RoboContext system = builder.build();
-		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+
+		Assert.assertEquals(system.getState(), LifecycleState.INITIALIZED);
 		system.start();
 		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 
@@ -109,7 +110,7 @@ public class RoboBuilderTests {
 		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("testsystem.xml"));
 		RoboContext system = builder.build();
 		Assert.assertEquals("mySystem", system.getId());
-		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+		Assert.assertEquals(system.getState(), LifecycleState.INITIALIZED);
 		system.start();
 		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 

@@ -149,6 +149,8 @@ public class RoboSystem implements RoboContext {
 			case BLOCKING:
 				blockingExecutor.execute(new Messenger<T>(unit, message));
 				break;
+			default:
+				SimpleLoggingUtil.error(getClass(), "not supported policy: " + deliveryPolicy);
 			}
 		}
 

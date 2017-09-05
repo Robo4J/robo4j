@@ -17,6 +17,7 @@
 
 package com.robo4j.socket.http.units;
 
+import com.robo4j.core.LifecycleState;
 import com.robo4j.socket.http.util.HttpStringProducer;
 import com.robo4j.socket.http.util.JsonUtil;
 import org.junit.Assert;
@@ -135,6 +136,7 @@ public class RoboHttpPingPongTest {
 		ctrl.initialize(config);
 
 		result.addUnits(httpServer, consumer, ctrl);
+		result.setState(LifecycleState.INITIALIZED);
 		return result;
 	}
 
@@ -158,6 +160,7 @@ public class RoboHttpPingPongTest {
 		producer.initialize(config);
 
 		result.addUnits(producer, httpClient);
+		result.setState(LifecycleState.INITIALIZED);
 		return result;
 	}
 }
