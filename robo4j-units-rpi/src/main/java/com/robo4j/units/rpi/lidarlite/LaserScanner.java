@@ -203,6 +203,35 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		}
 	}
 
+	private final static class ScanFixedAngleJob implements Runnable {
+		private final RoboReference<ScanResult2D> recipient;
+		private final LidarLiteDevice lidar;
+		private final float angle;
+		private volatile boolean firstRun = true;
+
+		public ScanFixedAngleJob(RoboReference<ScanResult2D> recipient, LidarLiteDevice lidar, float angle) {
+			this.recipient = recipient;
+			this.lidar = lidar;
+			this.angle = angle;
+		}
+
+		@Override
+		public void run() {
+			try {
+				if (firstRun) {
+					firstRun = false;
+					lidar.acquireRange();
+				} else {
+					ScanResultImpl scan = new ScanResultImpl(1, 0f);
+					scan.addPoint(lidar.readDistance(), angle);
+					recipient.sendMessage(scan);
+				}
+			} catch (IOException e) {
+				SimpleLoggingUtil.debug(getClass(), "Failed to read lidar", e);
+			}
+		}
+	}
+
 	public LaserScanner(RoboContext context, String id) {
 		super(ScanRequest.class, context, id);
 	}
@@ -234,7 +263,22 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	@Override
 	public void onMessage(ScanRequest message) {
 		RoboReference<Float> servo = getPanServo();
-		scheduleScan(message, servo, message.getReceiver());
+		if (message.getRange() == 0 || message.getStep() == 0) {
+			scheduleFixPanScan(message, servo);
+		} else {
+			scheduleScan(message, servo);
+		}
+	}
+
+	private void scheduleFixPanScan(ScanRequest message, RoboReference<Float> servo) {
+		servo.sendMessage(message.getStartAngle() / servoRange);
+		ScanFixedAngleJob fixedAngleJob = new ScanFixedAngleJob(message.getReceiver(), lidar, message.getStartAngle());
+		// FIXME(Marcus/Sep 5, 2017): We should try to calculate this - we are
+		// now assuming that it will take little time to move the servo to the
+		// "new" position, however, the fact is that the new position will
+		// usually be the old position.
+		getContext().getScheduler().schedule(fixedAngleJob, 31, TimeUnit.MILLISECONDS);
+		getContext().getScheduler().schedule(fixedAngleJob, (long) (31 + minimumAcquisitionTime), TimeUnit.MILLISECONDS);
 	}
 
 	private RoboReference<Float> getPanServo() {
@@ -242,7 +286,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		return servo;
 	}
 
-	private void scheduleScan(ScanRequest message, RoboReference<Float> servo, RoboReference<ScanResult2D> recipient) {
+	private void scheduleScan(ScanRequest message, RoboReference<Float> servo) {
 		float currentInput = getCurrentInput(servo);
 		float midPoint = message.getStartAngle() + message.getRange() / 2;
 		boolean lowToHigh = false;
@@ -251,7 +295,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		}
 		float minimumServoMovementTime = message.getRange() / angularSpeed;
 		ScanJob job = new ScanJob(lowToHigh, minimumServoMovementTime, minimumAcquisitionTime, trim, message, servo, servoRange, lidar,
-				recipient);
+				message.getReceiver());
 
 		schedule(job);
 	}

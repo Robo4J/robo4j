@@ -22,7 +22,6 @@ import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.math.geometry.ScanResult2D;
-import com.robo4j.units.rpi.lidarlite.ScanRequest.ScanAction;
 
 /**
  * Example controller for testing the laser scanner.
@@ -62,7 +61,7 @@ public class LaserScannerTestController extends RoboUnit<String> {
 	private void scan() {
 		RoboReference<ScanRequest> scanner = getContext().getReference("scanner");
 		RoboReference<ScanResult2D> processor = getContext().getReference("processor");
-		scanner.sendMessage(new ScanRequest(processor, ScanAction.ONCE, startAngle, range, step));
+		scanner.sendMessage(new ScanRequest(processor, startAngle, range, step));
 	}
 
 }

@@ -26,23 +26,7 @@ import com.robo4j.math.geometry.ScanResult2D;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ScanRequest {
-	public enum ScanAction {
-		/**
-		 * Stops scanning. Used in conjunction with CONTINUOUSLY.
-		 */
-		STOP,
-		/**
-		 * Just scans once.
-		 */
-		ONCE,
-		/**
-		 * Keeps sending scans continuously.
-		 */
-		CONTINUOUSLY
-	}
-
 	private final RoboReference<ScanResult2D> receiver;
-	private final ScanAction action;
 	private final float startAngle;
 	private final float range;
 	private final float step;
@@ -50,9 +34,6 @@ public class ScanRequest {
 
 	/**
 	 * Constructor.
-	 * 
-	 * @param action
-	 *            what action to take.
 	 * 
 	 * @param startAngle
 	 *            the angle relative to the centerline to start from. Note that
@@ -72,15 +53,12 @@ public class ScanRequest {
 	 *            how much of the full servo range should be scanned (in
 	 *            radians).
 	 */
-	public ScanRequest(RoboReference<ScanResult2D> receiver, ScanAction action, float startAngle, float range, float step) {
-		this(receiver, action, startAngle, range, step, Float.MAX_VALUE);
+	public ScanRequest(RoboReference<ScanResult2D> receiver, float startAngle, float range, float step) {
+		this(receiver, startAngle, range, step, Float.MAX_VALUE);
 	}
 
 	/**
 	 * Constructor.
-	 * 
-	 * @param action
-	 *            what action to take.
 	 * 
 	 * @param startAngle
 	 *            the angle relative to the centerline to start from. Note that
@@ -103,10 +81,9 @@ public class ScanRequest {
 	 *            will abort and send, the possibly incomplete, scan early if a
 	 *            range measurement is shorter than this value.
 	 */
-	public ScanRequest(RoboReference<ScanResult2D> receiver, ScanAction action, float startAngle, float range, float step,
+	public ScanRequest(RoboReference<ScanResult2D> receiver, float startAngle, float range, float step,
 			float abortRange) {
 		this.receiver = receiver;
-		this.action = action;
 		this.startAngle = startAngle;
 		this.range = range;
 		this.step = step;
@@ -132,13 +109,6 @@ public class ScanRequest {
 	 */
 	public float getStep() {
 		return step;
-	}
-
-	/**
-	 * @return the kind of {@link ScanAction} to perform.
-	 */
-	public ScanAction getAction() {
-		return action;
 	}
 
 	/**

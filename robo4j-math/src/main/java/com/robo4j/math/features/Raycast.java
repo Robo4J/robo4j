@@ -100,6 +100,23 @@ public class Raycast {
 		return minIntersectionRange;
 	}
 
+	public static Point2f raycastAtAngle(List<Point2f> points, float startAngle, float endAngle, float step, float noGoRadius, FeatureSet features) {		
+		float resultRange = Float.MIN_VALUE;
+		float resultAlpha = 0;
+		
+		for (float alpha = startAngle; alpha <= endAngle; alpha += step) {
+			float range = raycast(points, features.getCorners(), alpha, noGoRadius);
+			if (range == Float.MAX_VALUE) {
+				continue;
+			}
+			if (range > resultRange) {
+				resultRange = range;
+				resultAlpha = alpha;
+			}
+		}
+		return new Point2f(resultRange, resultAlpha);
+	}
+	
 	/**
 	 * Calculate the range at which a point is hit by the ray.
 	 */
