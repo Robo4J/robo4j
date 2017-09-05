@@ -21,12 +21,13 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 /**
- * Simple toolkit for logging
+ * Simple toolkit for logging.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class SimpleLoggingUtil {
+	// TODO(Marcus/Sep 6, 2017): Decide if we want to kill this...
 	private static final String SPACE = " ";
 	private static final String EMPTY = "";
 
@@ -38,9 +39,8 @@ public final class SimpleLoggingUtil {
 		Logger.getLogger(clazz.getName()).log(Level.FINE, message);
 	}
 
-	public static void debug(Class<?> clazz, String... message){
-		debug(clazz, clazz.getSimpleName() + " : " +
-				Stream.of(message).reduce(EMPTY,  (l, r) -> l.concat(SPACE).concat(r)));
+	public static void debug(Class<?> clazz, String... message) {
+		debug(clazz, clazz.getSimpleName() + " : " + Stream.of(message).reduce(EMPTY, (l, r) -> l.concat(SPACE).concat(r)));
 	}
 
 	public static void error(Class<?> clazz, String message) {
