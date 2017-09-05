@@ -17,11 +17,6 @@
 
 package com.robo4j.socket.http.units;
 
-import java.util.Collections;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.robo4j.core.DefaultAttributeDescriptor;
 import com.robo4j.core.RoboBuilder;
 import com.robo4j.core.RoboContext;
@@ -34,6 +29,10 @@ import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import com.robo4j.socket.http.util.HttpStringProducer;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.Collections;
 
 /**
  * Ping Pong test from outside/foreign unit is send signal. The signal has been
@@ -89,20 +88,20 @@ public class RoboHttpPingPongTest {
 		System.out.println("systemPing: send messages");
 		RoboReference<Object> systemPingProducer = systemPing.getReference(ID_HTTP_PRODUCER);
 		for (int i = 0; i < MESSAGES; i++) {
-			systemPingProducer.sendMessage((HttpStringProducer.SEND_POST_MESSAGE + "::").concat(RoboHttpDynamicTests.JSON_STRING));
+			systemPingProducer.sendMessage(
+					(HttpStringProducer.SEND_POST_MESSAGE + "::").concat(RoboHttpDynamicTests.JSON_STRING));
 		}
 
 		RoboReference<Object> pongConsumer = systemPong.getReference(REQUEST_CONSUMER);
 
-		// FIXME, TODO: 20.08.17 (miro,markus) please implement notification
 		Thread.sleep(100);
 		System.out.println("systemPing : Going Down!");
 		systemPing.stop();
 		systemPing.shutdown();
 
 		System.out.println("systemPong : Going Down!");
-		final DefaultAttributeDescriptor<Integer> messagesNumberDescriptor = DefaultAttributeDescriptor.create(Integer.class,
-				StringConsumer.PROP_GET_NUMBER_OF_SENT_MESSAGES);
+		final DefaultAttributeDescriptor<Integer> messagesNumberDescriptor = DefaultAttributeDescriptor
+				.create(Integer.class, StringConsumer.PROP_GET_NUMBER_OF_SENT_MESSAGES);
 		final int number = pongConsumer.getAttribute(messagesNumberDescriptor).get();
 		// NOTE: Not working
 		systemPong.stop();
@@ -122,13 +121,14 @@ public class RoboHttpPingPongTest {
 		config.setString("packages", PACKAGE_CODECS);
 		config.setInteger("stopper", STOPPER);
 		/* specific configuration */
-		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS, JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, "POST")));
+		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
+				JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, "POST")));
 		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
 		builder.add(StringConsumer.class, REQUEST_CONSUMER);
 
 		config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("target", REQUEST_CONSUMER);
-		builder.add(HttpCommandTestController.class, CONTROLLER_PING_PONG);
+		builder.add(HttpCommandTestController.class, config, CONTROLLER_PING_PONG);
 
 		return builder.build();
 	}
@@ -140,7 +140,8 @@ public class RoboHttpPingPongTest {
 		config.setString("address", HOST_SYSTEM);
 		config.setInteger("port", PORT);
 		/* specific configuration */
-		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS, JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, "POST")));
+		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
+				JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, "POST")));
 		builder.add(HttpClientUnit.class, config, ID_HTTP_CLIENT);
 
 		config = ConfigurationFactory.createEmptyConfiguration();
