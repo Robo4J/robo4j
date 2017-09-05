@@ -195,6 +195,9 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 
 	/**
 	 * Should be overridden in subclasses to define the behaviour of the unit.
+	 * This method should normally not be called directly, unless you have a
+	 * very good reason. It is used by the system to deliver messages to the
+	 * unit.
 	 * 
 	 * @param message
 	 *            the message received by this unit.

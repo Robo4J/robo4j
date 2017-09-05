@@ -22,8 +22,9 @@ import org.junit.Test;
 
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
+import com.robo4j.core.RoboBuilder;
+import com.robo4j.core.RoboBuilderException;
 import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboSystem;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 
@@ -32,21 +33,19 @@ import com.robo4j.core.configuration.ConfigurationFactory;
  * @author Miro Wengner (@miragemiko)
  */
 public class SchedulePeriodUnitTest {
-
+	private static final String ID = "scheduleUnit";
+	
     @Test
-    public void basicScheudlePeriodUnitTest() throws ConfigurationException{
+    public void basicScheudlePeriodUnitTest() throws ConfigurationException, RoboBuilderException{
+    	RoboBuilder builder = new RoboBuilder(); 
 
-        RoboContext system = new RoboSystem();
         Configuration config = ConfigurationFactory.createEmptyConfiguration();
-
-        SchedulePeriodUnit unit = new SchedulePeriodUnit(system, "schedulePeriodUnit");
         config.setString("unit", "test");
         config.setInteger("delay", 1);
         config.setInteger("period", 1);
         config.setString("timeUnit", "SECONDS");
-
-        unit.initialize(config);
-
-        Assert.assertTrue(unit.getState().equals(LifecycleState.INITIALIZED));
+        builder.add(SchedulePeriodUnit.class, config, ID);
+        RoboContext ctx = builder.build();
+        Assert.assertEquals(ctx.getReference(ID).getState(), LifecycleState.INITIALIZED);
     }
 }

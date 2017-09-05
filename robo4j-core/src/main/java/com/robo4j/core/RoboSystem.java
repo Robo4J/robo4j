@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RoboSystem implements RoboContext {
+class RoboSystem implements RoboContext {
 	private static final String NAME_BLOCKING_POOL = "Robo4J Blocking Pool";
 	private static final String NAME_WORKER_POOL = "Robo4J Worker Pool";
 	private static final String KEY_SCHEDULER_POOL_SIZE = "poolSizeScheduler";
@@ -198,21 +198,21 @@ public class RoboSystem implements RoboContext {
 	/**
 	 * Constructor.
 	 */
-	public RoboSystem() {
+	RoboSystem() {
 		this(UUID.randomUUID().toString());
 	}
 
 	/**
 	 * Constructor.
 	 */
-	public RoboSystem(String uid) {
+	RoboSystem(String uid) {
 		this(uid, DEFAULT_SCHEDULER_POOL_SIZE, DEFAULT_WORKING_POOL_SIZE, DEFAULT_BLOCKING_POOL_SIZE);
 	}
 
 	/**
 	 * Constructor.
 	 */
-	public RoboSystem(String uid, Configuration systemConfig) {
+	RoboSystem(String uid, Configuration systemConfig) {
 		this(uid, systemConfig.getInteger(KEY_SCHEDULER_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE),
 				systemConfig.getInteger(KEY_WORKER_POOL_SIZE, DEFAULT_WORKING_POOL_SIZE),
 				systemConfig.getInteger(KEY_BLOCKING_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE));
@@ -221,7 +221,7 @@ public class RoboSystem implements RoboContext {
 	/**
 	 * Constructor.
 	 */
-	public RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize,
+	RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize,
 			Set<RoboUnit<?>> unitSet) {
 		this(uid, schedulerPoolSize, workerPoolSize, blockingPoolSize);
 		addToMap(unitSet);
@@ -231,14 +231,14 @@ public class RoboSystem implements RoboContext {
 	/**
 	 * Constructor.
 	 */
-	public RoboSystem(Configuration config) {
+	RoboSystem(Configuration config) {
 		this(UUID.randomUUID().toString(), config);
 	}
 
 	/**
 	 * Constructor.
 	 */
-	public RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize) {
+	RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize) {
 		this.uid = uid;
 		workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
 				workQueue, new RoboThreadFactory(new ThreadGroup(NAME_WORKER_POOL), NAME_WORKER_POOL, true));
@@ -274,7 +274,7 @@ public class RoboSystem implements RoboContext {
 	}
 
 	@Override
-	public void start() {
+	public void start() {		
 		if (state.compareAndSet(LifecycleState.STOPPED, LifecycleState.STARTING)) {
 			// NOTE(Marcus/Sep 4, 2017): Do we want to support starting a
 			// stopped system?
@@ -283,6 +283,12 @@ public class RoboSystem implements RoboContext {
 		if (state.compareAndSet(LifecycleState.INITIALIZED, LifecycleState.STARTING)) {
 			startUnits();
 		}
+		
+		// This is only used from testing for now, it should never happen from the builder.
+		if (state.compareAndSet(LifecycleState.UNINITIALIZED, LifecycleState.STARTING)) {
+			startUnits();
+		}
+
 	}
 
 	private void startUnits() {

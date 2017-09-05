@@ -19,11 +19,12 @@ package com.robo4j.units.lego.example;
 
 import org.junit.Test;
 
-import com.robo4j.core.RoboSystem;
+import com.robo4j.core.RoboBuilder;
+import com.robo4j.core.RoboContext;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
-import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.socket.http.units.HttpServerUnit;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.units.lego.LcdTestUnit;
 import com.robo4j.units.lego.SimpleTankTestUnit;
 
@@ -35,57 +36,46 @@ import com.robo4j.units.lego.SimpleTankTestUnit;
  */
 public class TankExampleTests {
 
-    private static final String UNIT_CONTROLLER_NAME = "controller";
-    private static final int PORT = 8025;
+	private static final String ID_LCD = "lcd";
+	private static final String ID_PLATFORM = "platform";
+	private static final String ID_HTTP = "http";
+	private static final String ID_UNIT_CONTROLLER = "controller";
+	private static final int PORT = 8025;
 
-    @Test
-    public void legoTankExampleTest() throws Exception {
-        RoboSystem system = new RoboSystem();
-        Configuration config = ConfigurationFactory.createEmptyConfiguration();
+	@Test
+	public void legoTankExampleTest() throws Exception {
+		RoboBuilder builder = new RoboBuilder();
 
-        HttpServerUnit http = new HttpServerUnit(system, "http");
-        config.setString("target", UNIT_CONTROLLER_NAME);
-        config.setInteger("port", PORT);
-        config.setString("packages", "com.robo4j.units.lego.example.codec");
-        /* specific configuration */
-        Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
-        targetUnits.setString(UNIT_CONTROLLER_NAME, "GET");
-        http.initialize(config);
+		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
-        TankExampleController ctrl = new TankExampleController(system, UNIT_CONTROLLER_NAME);
-        config = ConfigurationFactory.createEmptyConfiguration();
-        config.setString("target", "platform");
-        ctrl.initialize(config);
+		config.setString("target", ID_UNIT_CONTROLLER);
+		config.setInteger("port", PORT);
+		config.setString("packages", "com.robo4j.units.lego.example.codec");
+		/* specific configuration */
+		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
+		targetUnits.setString(ID_UNIT_CONTROLLER, "GET");
+		builder.add(HttpServerUnit.class, config, ID_HTTP);
+
+		config = ConfigurationFactory.createEmptyConfiguration();
+		config.setString("target", ID_PLATFORM);
+		builder.add(TankExampleController.class, config, ID_UNIT_CONTROLLER);
 
 		/* platform is listening to the bus */
-        SimpleTankTestUnit platform = new SimpleTankTestUnit(system, "platform");
-        config = ConfigurationFactory.createEmptyConfiguration();
-        config.setString("leftMotorPort", "B");
-        config.setCharacter("leftMotorType", 'N');
-        config.setString("rightMotorPort", "C");
-        config.setCharacter("rightMotorType", 'N');
-        platform.initialize(config);
+		config = ConfigurationFactory.createEmptyConfiguration();
+		config.setString("leftMotorPort", "B");
+		config.setCharacter("leftMotorType", 'N');
+		config.setString("rightMotorPort", "C");
+		config.setCharacter("rightMotorType", 'N');
+		builder.add(SimpleTankTestUnit.class, config, ID_PLATFORM);
 
 		/* lcd is listening to the bus */
-        LcdTestUnit lcd = new LcdTestUnit(system, "lcd");
-        config = ConfigurationFactory.createEmptyConfiguration();
-        lcd.initialize(config);
+		builder.add(LcdTestUnit.class, ID_LCD);
 
-        // BasicSonicUnit sonic = new BasicSonicUnit(system, "sonic");
-        // config = ConfigurationFactory.createEmptyConfiguration();
-        // config.setString("target", "controller");
-        // sonic.initialize(config);
+		RoboContext context = builder.build();
 
-        // system.addUnits(http, ctrl, platform, lcd, sonic);
-        system.addUnits(http, ctrl, platform, lcd);
-        system.start();
+		context.start();
 
-
-
-        lcd.onMessage("Press Key to end...");
-//		System.in.read();
-        system.stop();
-        system.shutdown();
-
-    }
+		context.getReference(ID_LCD).sendMessage("Press Key to end...");
+		context.shutdown();
+	}
 }

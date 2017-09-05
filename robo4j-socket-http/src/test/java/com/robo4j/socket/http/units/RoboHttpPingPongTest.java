@@ -17,24 +17,23 @@
 
 package com.robo4j.socket.http.units;
 
-import com.robo4j.core.LifecycleState;
-import com.robo4j.socket.http.util.HttpStringProducer;
-import com.robo4j.socket.http.util.JsonUtil;
+import java.util.Collections;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.robo4j.core.DefaultAttributeDescriptor;
+import com.robo4j.core.RoboBuilder;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboSystem;
 import com.robo4j.core.StringConsumer;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.util.SystemUtil;
-import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
-
-import java.util.Collections;
+import com.robo4j.socket.http.util.HttpStringProducer;
+import com.robo4j.socket.http.util.JsonUtil;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 
 /**
  * Ping Pong test from outside/foreign unit is send signal. The signal has been
@@ -50,17 +49,19 @@ import java.util.Collections;
  */
 public class RoboHttpPingPongTest {
 
+	private static final String ID_HTTP_PRODUCER = "http_producer";
+	private static final String ID_HTTP_CLIENT = "http_client";
+	private static final String ID_HTTP_SERVER = "http_server";
 	private static final String CONTROLLER_PING_PONG = "controller";
 	private static final String HOST_SYSTEM = "0.0.0.0";
 	private static final int PORT = 8042;
 	private static final int MESSAGES = 3;
 	private static final String REQUEST_CONSUMER = "request_consumer";
 	private static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
-	//TODO FIXME (miro) -> research why
+	// TODO FIXME (miro) -> research why
 	private static final int STOPPER = -1;
 
-
-	//	@Test
+	// @Test
 	public void pongTest() throws Exception {
 		RoboContext systemPong = configurePongSystem();
 		systemPong.start();
@@ -86,7 +87,7 @@ public class RoboHttpPingPongTest {
 		System.out.println(SystemUtil.printStateReport(systemPing));
 
 		System.out.println("systemPing: send messages");
-		RoboReference<Object> systemPingProducer = systemPing.getReference("http_producer");
+		RoboReference<Object> systemPingProducer = systemPing.getReference(ID_HTTP_PRODUCER);
 		for (int i = 0; i < MESSAGES; i++) {
 			systemPingProducer.sendMessage((HttpStringProducer.SEND_POST_MESSAGE + "::").concat(RoboHttpDynamicTests.JSON_STRING));
 		}
@@ -99,10 +100,9 @@ public class RoboHttpPingPongTest {
 		systemPing.stop();
 		systemPing.shutdown();
 
-
 		System.out.println("systemPong : Going Down!");
-		final DefaultAttributeDescriptor<Integer> messagesNumberDescriptor = DefaultAttributeDescriptor
-				.create(Integer.class, StringConsumer.PROP_GET_NUMBER_OF_SENT_MESSAGES);
+		final DefaultAttributeDescriptor<Integer> messagesNumberDescriptor = DefaultAttributeDescriptor.create(Integer.class,
+				StringConsumer.PROP_GET_NUMBER_OF_SENT_MESSAGES);
 		final int number = pongConsumer.getAttribute(messagesNumberDescriptor).get();
 		// NOTE: Not working
 		systemPong.stop();
@@ -114,53 +114,41 @@ public class RoboHttpPingPongTest {
 
 	// Private Methods
 	private RoboContext configurePongSystem() throws Exception {
-		final RoboSystem result = new RoboSystem();
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
+		RoboBuilder builder = new RoboBuilder();
 
-		HttpServerUnit httpServer = new HttpServerUnit(result, "http_server");
+		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("target", CONTROLLER_PING_PONG);
 		config.setInteger("port", PORT);
 		config.setString("packages", PACKAGE_CODECS);
 		config.setInteger("stopper", STOPPER);
 		/* specific configuration */
 		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS, JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, "POST")));
-		httpServer.initialize(config);
+		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
+		builder.add(StringConsumer.class, REQUEST_CONSUMER);
 
-		StringConsumer consumer = new StringConsumer(result, REQUEST_CONSUMER);
-		config = ConfigurationFactory.createEmptyConfiguration();
-		consumer.initialize(config);
-
-		HttpCommandTestController ctrl = new HttpCommandTestController(result, CONTROLLER_PING_PONG);
 		config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("target", REQUEST_CONSUMER);
-		ctrl.initialize(config);
+		builder.add(HttpCommandTestController.class, CONTROLLER_PING_PONG);
 
-		result.addUnits(httpServer, consumer, ctrl);
-		result.setState(LifecycleState.INITIALIZED);
-		return result;
+		return builder.build();
 	}
 
 	private RoboContext configurePingSystem() throws Exception {
-		final RoboSystem result = new RoboSystem();
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
+		RoboBuilder builder = new RoboBuilder();
 
-		HttpClientUnit httpClient = new HttpClientUnit(result, "http_client");
+		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("address", HOST_SYSTEM);
 		config.setInteger("port", PORT);
 		/* specific configuration */
 		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS, JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, "POST")));
-		httpClient.initialize(config);
+		builder.add(HttpClientUnit.class, config, ID_HTTP_CLIENT);
 
-		HttpStringProducer producer = new HttpStringProducer(result, "http_producer");
 		config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString("target", "http_client");
+		config.setString("target", ID_HTTP_CLIENT);
 		config.setString("method", "POST");
 		config.setString("uri", "/controller");
 		config.setString("targetAddress", HOST_SYSTEM);
-		producer.initialize(config);
-
-		result.addUnits(producer, httpClient);
-		result.setState(LifecycleState.INITIALIZED);
-		return result;
+		builder.add(HttpStringProducer.class, config, ID_HTTP_PRODUCER);
+		return builder.build();
 	}
 }
