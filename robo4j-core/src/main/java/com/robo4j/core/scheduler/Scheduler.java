@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import com.robo4j.core.RoboReference;
 
 /**
- * Scheduler interface.
+ * Scheduler interface for a Robo4J scheduler.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

@@ -25,6 +25,10 @@ import com.robo4j.core.RoboReference;
 /**
  * Used by the scheduler.
  * 
+ * <p>
+ * Internal implementation class.
+ * </p>
+ * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
