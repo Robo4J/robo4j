@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-class RoboSystem implements RoboContext {
+final class RoboSystem implements RoboContext {
 	private static final String NAME_BLOCKING_POOL = "Robo4J Blocking Pool";
 	private static final String NAME_WORKER_POOL = "Robo4J Worker Pool";
 	private static final String KEY_SCHEDULER_POOL_SIZE = "poolSizeScheduler";
@@ -55,8 +55,8 @@ class RoboSystem implements RoboContext {
 	private static final int DEFAULT_WORKING_POOL_SIZE = 2;
 	private static final int DEFAULT_SCHEDULER_POOL_SIZE = 2;
 	private static final int KEEP_ALIVE_TIME = 10;
-	private static final EnumSet<LifecycleState> MESSAGE_DELIVERY_CRITERIA = EnumSet.of(LifecycleState.STARTED,
-			LifecycleState.STOPPED, LifecycleState.STOPPING);
+	private static final EnumSet<LifecycleState> MESSAGE_DELIVERY_CRITERIA = EnumSet.of(LifecycleState.STARTED, LifecycleState.STOPPED,
+			LifecycleState.STOPPING);
 
 	private final AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
 	private final Map<String, RoboUnit<?>> units = new HashMap<>();
@@ -221,16 +221,6 @@ class RoboSystem implements RoboContext {
 	/**
 	 * Constructor.
 	 */
-	RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize,
-			Set<RoboUnit<?>> unitSet) {
-		this(uid, schedulerPoolSize, workerPoolSize, blockingPoolSize);
-		addToMap(unitSet);
-		state.set(LifecycleState.INITIALIZED);
-	}
-
-	/**
-	 * Constructor.
-	 */
 	RoboSystem(Configuration config) {
 		this(UUID.randomUUID().toString(), config);
 	}
@@ -240,10 +230,10 @@ class RoboSystem implements RoboContext {
 	 */
 	RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize) {
 		this.uid = uid;
-		workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-				workQueue, new RoboThreadFactory(new ThreadGroup(NAME_WORKER_POOL), NAME_WORKER_POOL, true));
-		blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-				blockingQueue, new RoboThreadFactory(new ThreadGroup(NAME_BLOCKING_POOL), NAME_BLOCKING_POOL, true));
+		workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
+				new RoboThreadFactory(new ThreadGroup(NAME_WORKER_POOL), NAME_WORKER_POOL, true));
+		blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, blockingQueue,
+				new RoboThreadFactory(new ThreadGroup(NAME_BLOCKING_POOL), NAME_BLOCKING_POOL, true));
 		systemScheduler = new DefaultScheduler(this, schedulerPoolSize);
 	}
 
@@ -274,7 +264,7 @@ class RoboSystem implements RoboContext {
 	}
 
 	@Override
-	public void start() {		
+	public void start() {
 		if (state.compareAndSet(LifecycleState.STOPPED, LifecycleState.STARTING)) {
 			// NOTE(Marcus/Sep 4, 2017): Do we want to support starting a
 			// stopped system?
@@ -283,8 +273,9 @@ class RoboSystem implements RoboContext {
 		if (state.compareAndSet(LifecycleState.INITIALIZED, LifecycleState.STARTING)) {
 			startUnits();
 		}
-		
-		// This is only used from testing for now, it should never happen from the builder.
+
+		// This is only used from testing for now, it should never happen from
+		// the builder.
 		if (state.compareAndSet(LifecycleState.UNINITIALIZED, LifecycleState.STARTING)) {
 			startUnits();
 		}
