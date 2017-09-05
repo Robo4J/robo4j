@@ -16,10 +16,10 @@
  */
 package com.robo4j.core;
 
-import com.robo4j.core.concurrency.RoboThreadFactory;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.core.scheduler.DefaultScheduler;
+import com.robo4j.core.scheduler.RoboThreadFactory;
 import com.robo4j.core.scheduler.Scheduler;
 
 import java.util.Collection;

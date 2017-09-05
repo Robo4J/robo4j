@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
-import com.robo4j.core.concurrency.RoboThreadFactory;
 
 /**
  * This is the default scheduler used in Robo4J.
