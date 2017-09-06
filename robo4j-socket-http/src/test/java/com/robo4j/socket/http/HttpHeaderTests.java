@@ -17,7 +17,6 @@
 
 package com.robo4j.socket.http;
 
-import com.robo4j.socket.http.HttpHeaderNames;
 import org.junit.Assert;
 import org.junit.Test;
 
