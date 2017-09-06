@@ -141,7 +141,7 @@ public class RoboHttpPingPongTest {
 		config.setInteger("port", PORT);
 		/* specific configuration */
 		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
-				JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, HTTP_METHOD));
+				JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, HTTP_METHOD)));
 		builder.add(HttpClientUnit.class, config, ID_HTTP_CLIENT);
 
 		config = ConfigurationFactory.createEmptyConfiguration();
