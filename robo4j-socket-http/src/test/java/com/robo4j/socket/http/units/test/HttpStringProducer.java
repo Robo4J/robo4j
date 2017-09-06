@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http.util;
+package com.robo4j.socket.http.units.test;
 
 import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.ConfigurationException;
@@ -24,6 +24,7 @@ import com.robo4j.core.StringProducer;
 import com.robo4j.core.StringToolkit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

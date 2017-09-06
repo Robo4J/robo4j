@@ -26,7 +26,7 @@ import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.util.SystemUtil;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
-import com.robo4j.socket.http.util.HttpStringProducer;
+import com.robo4j.socket.http.units.test.HttpStringProducer;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import org.junit.Assert;
