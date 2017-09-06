@@ -57,8 +57,8 @@ public class RoboHttpPingPongTest {
 	private static final int MESSAGES = 3;
 	private static final String REQUEST_CONSUMER = "request_consumer";
 	private static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
-	// TODO FIXME (miro) -> research why
 	private static final int STOPPER = -1;
+	private static final String HTTP_METHOD = "POST";
 
 	// @Test
 	public void pongTest() throws Exception {
@@ -122,7 +122,7 @@ public class RoboHttpPingPongTest {
 		config.setInteger("stopper", STOPPER);
 		/* specific configuration */
 		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
-				JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, "POST")));
+				JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, HTTP_METHOD)));
 		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
 		builder.add(StringConsumer.class, REQUEST_CONSUMER);
 
@@ -141,7 +141,7 @@ public class RoboHttpPingPongTest {
 		config.setInteger("port", PORT);
 		/* specific configuration */
 		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
-				JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, "POST")));
+				JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, HTTP_METHOD));
 		builder.add(HttpClientUnit.class, config, ID_HTTP_CLIENT);
 
 		config = ConfigurationFactory.createEmptyConfiguration();
