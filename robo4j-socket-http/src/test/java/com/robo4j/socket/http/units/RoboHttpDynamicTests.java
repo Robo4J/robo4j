@@ -19,11 +19,8 @@
 
 package com.robo4j.socket.http.units;
 
-import java.util.Collections;
-
-import org.junit.Assert;
-import org.junit.Test;
-
+import com.robo4j.core.DefaultAttributeDescriptor;
+import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboBuilder;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
@@ -35,6 +32,11 @@ import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.Collections;
+import java.util.concurrent.Future;
 
 /**
  *
@@ -49,8 +51,10 @@ public class RoboHttpDynamicTests {
 	private static final int PORT = 8025;
 	private static final String ID_CLIENT_UNIT = "httpClient";
 	private static final String ID_TARGET_UNIT = "controller";
-	private static final int MESSAGES_NUMBER = 3;
+	private static final int MESSAGES_NUMBER = 6;
 	private static final String HOST_SYSTEM = "0.0.0.0";
+	private static final String REQUEST_CONSUMER = "request_consumer";
+	private static final String HTTP_METHOD = "POST";
 	static final String JSON_STRING = "{\"value\":\"move\"}";
 
 	/**
@@ -81,18 +85,28 @@ public class RoboHttpDynamicTests {
 
 		/* client system sending a messages to the main system */
 		for (int i = 0; i < MESSAGES_NUMBER; i++) {
-			httpClientReference
-					.sendMessage(RoboHttpUtils.createRequest(HttpMethod.POST, HOST_SYSTEM, "/".concat(ID_TARGET_UNIT), JSON_STRING));
+			httpClientReference.sendMessage(
+					RoboHttpUtils.createRequest(HttpMethod.POST, HOST_SYSTEM, "/".concat(ID_TARGET_UNIT), JSON_STRING));
 		}
+
+		Thread.sleep(100);
+
 		clientSystem.stop();
 		clientSystem.shutdown();
 
 		System.out.println("Going Down!");
+
+		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class,
+				StringConsumer.PROP_GET_NUMBER_OF_SENT_MESSAGES);
+		final Future<Integer> messagesFuture = mainSystem.getReference(REQUEST_CONSUMER).getAttribute(descriptor);
+		final int receivedMessages = messagesFuture.get();
+
 		mainSystem.stop();
 		mainSystem.shutdown();
+
 		System.out.println("System is Down!");
 		Assert.assertNotNull(mainSystem.getUnits());
-		Assert.assertEquals(mainSystem.getUnits().size(), MESSAGES_NUMBER);
+		Assert.assertEquals("wrong received messages", receivedMessages, MESSAGES_NUMBER);
 	}
 
 	// Private Methods
@@ -101,31 +115,31 @@ public class RoboHttpDynamicTests {
 		RoboBuilder builder = new RoboBuilder();
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-
 		config.setString("target", ID_TARGET_UNIT);
 		config.setInteger("port", PORT);
 		config.setString("packages", "com.robo4j.socket.http.units.test.codec");
-		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS, JsonUtil.getJsonByMap(Collections.singletonMap(ID_TARGET_UNIT, "POST")));
+		// FIXME: 06.09.17 (miro) -> fix stopper codecs
+		config.setInteger("stopper", -1);
+		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
+				JsonUtil.getJsonByMap(Collections.singletonMap(ID_TARGET_UNIT, HTTP_METHOD)));
 		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
 
 		config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString("target", "request_consumer");
+		config.setString("target", REQUEST_CONSUMER);
 		builder.add(HttpCommandTestController.class, config, ID_TARGET_UNIT);
 
-		builder.add(StringConsumer.class, "request_consumer");
+		builder.add(StringConsumer.class, REQUEST_CONSUMER);
 
-		/**
-		 * FIXME(Marcus/Sep 5, 2017): Add back verification...
-		 * Assert.assertNotNull(result.getUnits());
-		 * Assert.assertEquals(result.getUnits().size(), 0);
-		 * Assert.assertEquals(httpServer.getState(),
-		 * LifecycleState.INITIALIZED); Assert.assertEquals(result.getState(),
-		 * LifecycleState.UNINITIALIZED);
-		 */
-		RoboContext context = builder.build();
-		System.out.println(SystemUtil.printSocketEndPoint(context.getReference(ID_HTTP_SERVER), context.getReference(ID_TARGET_UNIT)));
-		context.start();
-		return context;
+		RoboContext result = builder.build();
+		Assert.assertNotNull(result.getUnits());
+		Assert.assertEquals(result.getUnits().size(), 3);
+		Assert.assertEquals(result.getReference(ID_HTTP_SERVER).getState(), LifecycleState.INITIALIZED);
+		Assert.assertEquals(result.getState(), LifecycleState.INITIALIZED);
+
+		result.start();
+		System.out.println(SystemUtil.printSocketEndPoint(result.getReference(ID_HTTP_SERVER),
+				result.getReference(ID_TARGET_UNIT)));
+		return result;
 	}
 
 	private RoboContext getClientRoboSystem() throws Exception {
@@ -136,13 +150,14 @@ public class RoboHttpDynamicTests {
 		config.setString("address", HOST_SYSTEM);
 		config.setInteger("port", PORT);
 		/* specific configuration */
-		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS, JsonUtil.getJsonByMap(Collections.singletonMap(ID_TARGET_UNIT, "POST")));
+		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
+				JsonUtil.getJsonByMap(Collections.singletonMap(ID_TARGET_UNIT, HTTP_METHOD)));
 		builder.add(HttpClientUnit.class, config, ID_CLIENT_UNIT);
 
-		RoboContext context = builder.build();
-		context.start();
+		RoboContext result = builder.build();
+		result.start();
 		System.out.println("Client State after start:");
-		System.out.println(SystemUtil.printStateReport(context));
-		return context;
+		System.out.println(SystemUtil.printStateReport(result));
+		return result;
 	}
 }
