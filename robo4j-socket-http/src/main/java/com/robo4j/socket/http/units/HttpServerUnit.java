@@ -102,7 +102,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			SimpleLoggingUtil.error(getClass(), "no targetUnits");
 		} else {
 			targetUnitsMap.forEach((key, value) ->
-				HttpUriRegister.getInstance().addNote(key, value.toString()));
+				HttpUriRegister.getInstance().addNode(key, value.toString()));
 		}
         //@formatter:on
 

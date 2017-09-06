@@ -17,16 +17,18 @@
 
 package com.robo4j.socket.http.units;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 /**
- * Register URIs by methods
+ * Register URIs by http method (GET,POST...) and URIs path
+ *
+ * @see HttpServerUnit
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -53,7 +55,13 @@ public final class HttpUriRegister {
 		return INSTANCE;
 	}
 
-	public void addNote(String path, String method) {
+	/**
+	 * register requested pathe with method
+	 *
+	 * @param path uri path
+	 * @param method used http method
+	 */
+	public void addNode(String path, String method) {
 		final String tmpPath = SOLIDUS.concat(path);
 		if (pathMethods.containsKey(tmpPath)) {
 			pathMethods.get(tmpPath).addMethod(method);
@@ -62,7 +70,13 @@ public final class HttpUriRegister {
 		}
 	}
 
-	public void addUnitToNote(String path, RoboReference<?> unit) {
+	/**
+	 * register RoboUnit to the Uri path
+	 *
+	 * @param path uri path
+	 * @param unit unit responsible for this uri
+	 */
+	public void addUnitToNode(String path, RoboReference<?> unit) {
 		final String tmpPath = SOLIDUS.concat(path);
 		if (pathMethods.containsKey(tmpPath)) {
 			pathMethods.get(tmpPath).setUnit(unit);

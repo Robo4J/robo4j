@@ -17,7 +17,16 @@
 
 package com.robo4j.socket.http.units;
 
+import com.robo4j.core.RoboBuilder;
+import com.robo4j.core.RoboContext;
+import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import org.junit.Test;
+
+import java.util.Arrays;
+
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 /**
  * target is defined by the unit methods are specified GET, POST options are
@@ -32,24 +41,22 @@ public class HttpUriRegisterTests {
 
 	@Test
 	public void registerSimpleTest() {
+
 		/* tested system configuration */
 
-		/**
-		 * Update module RoboBuilder builder = new RoboBuilder();
-		 * 
-		 * HttpUriRegister register = HttpUriRegister.getInstance();
-		 * 
-		 * register.addNote(TARGET_UNIT, METHODS[0]);
-		 * register.addNote(TARGET_UNIT, METHODS[1]);
-		 * 
-		 * HttpCommandTestController ctrl = new
-		 * HttpCommandTestController(system, TARGET_UNIT);
-		 * register.addUnitToNote(TARGET_UNIT, ctrl);
-		 * assertNotNull(register.getMethodsBytPath(TARGET_UNIT));
-		 * assertEquals(register.getMethodsBytPath(TARGET_UNIT).getUnit(),
-		 * ctrl);
-		 * assertTrue(register.getMethodsBytPath(TARGET_UNIT).getMethods().containsAll(Arrays.asList(METHODS)));
-		 */
+		RoboBuilder builder = new RoboBuilder();
+		RoboContext system = builder.build();
+
+		HttpUriRegister register = HttpUriRegister.getInstance();
+
+		register.addNode(TARGET_UNIT, METHODS[0]);
+		register.addNode(TARGET_UNIT, METHODS[1]);
+
+		HttpCommandTestController ctrl = new HttpCommandTestController(system, TARGET_UNIT);
+		register.addUnitToNode(TARGET_UNIT, ctrl);
+		assertNotNull(register.getMethodsBytPath(TARGET_UNIT));
+		assertEquals(register.getMethodsBytPath(TARGET_UNIT).getUnit(), ctrl);
+		assertTrue(register.getMethodsBytPath(TARGET_UNIT).getMethods().containsAll(Arrays.asList(METHODS)));
 	}
 
 }

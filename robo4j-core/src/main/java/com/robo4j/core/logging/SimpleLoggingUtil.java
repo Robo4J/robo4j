@@ -28,7 +28,7 @@ import java.util.stream.Stream;
  */
 public final class SimpleLoggingUtil {
 	// TODO(Marcus/Sep 6, 2017): Decide if we want to kill this...
-	private static final String SPACE = " ";
+	private static final String SPACE = "\u0020";
 	private static final String EMPTY = "";
 
 	public static void print(Class<?> clazz, String message) {
