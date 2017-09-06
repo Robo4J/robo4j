@@ -20,7 +20,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Tests for the configuration.
+ * Testing supported variables types potentially used for roboUnit configuration
  * 
  * @author Marcus Hirt
  * @author Miroslav Wengner (@miragemiko)

@@ -16,15 +16,14 @@
  */
 package com.robo4j.core.configuration;
 
-import java.io.IOException;
-
+import com.robo4j.core.util.IOUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.core.util.IOUtil;
+import java.io.IOException;
 
 /**
- * Tests for the configuration.
+ * XML Tests for the configuration.
  * 
  * @author Marcus Hirt
  * @author Miroslav Wengner (@miragemiko)
