@@ -88,7 +88,7 @@ public final class ReflectionScan {
 
         StreamUtils.enumerationAsStream(resources, false).map(url -> {
             try {
-                String jarFile = url.getFile().split(EXCLAMATION)[0].replace(FILE, CoreConstants.EMPTY_CHAR_SEQENCE);
+                String jarFile = url.getFile().split(EXCLAMATION)[0].replace(FILE, CoreConstants.EMPTY_CHAR_SEQUENCE);
                 if (new File(jarFile).isDirectory()) {
                     return null;
                 }
@@ -101,7 +101,7 @@ public final class ReflectionScan {
                 for (ZipEntry entry = e.getNextEntry(); entry != null; entry = e.getNextEntry()) {
                     if (!entry.isDirectory() && entry.getName().contains(slashifyPackage)
                             && entry.getName().endsWith(SUFFIX)) {
-                        String cName = entry.getName().replace(SLASH, DOT).replace(SUFFIX, CoreConstants.EMPTY_CHAR_SEQENCE);
+                        String cName = entry.getName().replace(SLASH, DOT).replace(SUFFIX, CoreConstants.EMPTY_CHAR_SEQUENCE);
                         classes.add(cName);
                     }
                 }
