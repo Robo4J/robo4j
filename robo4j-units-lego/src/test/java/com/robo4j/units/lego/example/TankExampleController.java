@@ -26,6 +26,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
+ * Test Tanks platform simulator
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
@@ -38,7 +40,7 @@ public class TankExampleController extends RoboUnit<LegoPlatformMessageTypeEnum>
 
 	private String target;
 
-	TankExampleController(RoboContext context, String id) {
+	public TankExampleController(RoboContext context, String id) {
 		super(LegoPlatformMessageTypeEnum.class, context, id);
 	}
 

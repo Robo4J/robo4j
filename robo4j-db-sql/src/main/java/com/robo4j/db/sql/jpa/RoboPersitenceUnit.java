@@ -17,12 +17,6 @@
 
 package com.robo4j.db.sql.jpa;
 
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
-
 import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.DefaultAttributeDescriptor;
@@ -32,9 +26,17 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.db.sql.SQLDataSourceUnit;
+import com.robo4j.db.sql.dto.ERoboRequest;
 import com.robo4j.db.sql.model.ERoboEntity;
 import com.robo4j.db.sql.model.ERoboUnit;
+import com.robo4j.db.sql.support.RoboRequestType;
 import com.robo4j.db.sql.util.DBSQLConstants;
+
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -67,7 +69,14 @@ public abstract class RoboPersitenceUnit<T> extends RoboUnit<T> {
 	}
 
 	protected void save(ERoboUnit unit) {
-		dataSourceUnit.onMessage(unit);
+		ERoboRequest request = getERequest(unit);
+		dataSourceUnit.onMessage(request);
+	}
+
+	private ERoboRequest getERequest(ERoboUnit unit){
+		ERoboRequest result = new ERoboRequest(RoboRequestType.SAVE);
+		result.addData(unit.getClass(), unit);
+		return result;
 	}
 
 	private void registerUnit(Configuration configuration) throws ConfigurationException {
@@ -100,7 +109,7 @@ public abstract class RoboPersitenceUnit<T> extends RoboUnit<T> {
 				return sb.toString();
 			}).collect(Collectors.joining(CONST_COMMA));
 			entity.setConfig(configString);
-			dataSourceUnit.onMessage(entity);
+			dataSourceUnit.onMessage(getERequest(entity));
 		} else {
 			SimpleLoggingUtil.debug(getClass(), "robo_unit exists: " + entity);
 		}

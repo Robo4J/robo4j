@@ -17,16 +17,6 @@
 
 package com.robo4j.db.sql;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.IntStream;
-
-import javax.transaction.Transactional;
-
-import org.junit.Test;
-import org.postgresql.util.PSQLException;
-
 import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.DefaultAttributeDescriptor;
 import com.robo4j.core.RoboBuilder;
@@ -37,6 +27,11 @@ import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.core.util.SystemUtil;
 import com.robo4j.db.sql.dto.ERoboPointDTO;
 import com.robo4j.db.sql.util.DBSQLConstants;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
 
 /**
  * DB SQL unit attached to other units to safe entities
@@ -49,8 +44,8 @@ public class SQLDBHttpServerUnitTests {
 	private static final String DB_PROVIDER = "h2";
 	private static final int DEFAULT_INDEX = 0;
 
-	@Test
-	@Transactional(rollbackOn = PSQLException.class)
+//	@Test
+//	@Transactional(rollbackOn = PSQLException.class)
 	public void createSystem() throws Exception {
 
 		final int maxPoints = 3;

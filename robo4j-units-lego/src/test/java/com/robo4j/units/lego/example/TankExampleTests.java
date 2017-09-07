@@ -17,6 +17,7 @@
 
 package com.robo4j.units.lego.example;
 
+import com.robo4j.socket.http.util.JsonUtil;
 import org.junit.Test;
 
 import com.robo4j.core.RoboBuilder;
@@ -27,6 +28,8 @@ import com.robo4j.socket.http.units.HttpServerUnit;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.units.lego.LcdTestUnit;
 import com.robo4j.units.lego.SimpleTankTestUnit;
+
+import java.util.Collections;
 
 /**
  * Simple Tanks examples tests
@@ -51,9 +54,9 @@ public class TankExampleTests {
 		config.setString("target", ID_UNIT_CONTROLLER);
 		config.setInteger("port", PORT);
 		config.setString("packages", "com.robo4j.units.lego.example.codec");
-		/* specific configuration */
-		Configuration targetUnits = config.createChildConfiguration(RoboHttpUtils.HTTP_TARGET_UNITS);
-		targetUnits.setString(ID_UNIT_CONTROLLER, "GET");
+		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
+				JsonUtil.getJsonByMap(Collections.singletonMap(ID_UNIT_CONTROLLER, "GET")));
+
 		builder.add(HttpServerUnit.class, config, ID_HTTP);
 
 		config = ConfigurationFactory.createEmptyConfiguration();
