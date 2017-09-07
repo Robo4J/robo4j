@@ -8,23 +8,24 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.db.sql.util;
+package com.robo4j.core.util;
 
 /**
- * CoreConstants used by DB-SQL module
+ * commonly used constants
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class DBSQLConstants {
+public class CoreConstants {
 
-    public static String KEY_PERSISTENCE_UNIT = "persistenceUnit";
-
+    public static final String STRING_EMPTY = "";
+    public static final String STRING_SPACE = "\u0020";
+    public static final CharSequence EMPTY_CHAR_SEQENCE = "";
 }

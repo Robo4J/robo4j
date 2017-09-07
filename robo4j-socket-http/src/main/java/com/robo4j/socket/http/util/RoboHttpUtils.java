@@ -16,6 +16,7 @@
  */
 package com.robo4j.socket.http.util;
 
+import com.robo4j.core.util.CoreConstants;
 import com.robo4j.socket.http.HttpHeaderNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.request.RoboBasicMapEntry;
@@ -36,20 +37,15 @@ public final class RoboHttpUtils {
 
 	private static final String HTTP_VERSION = "HTTP/1.1";
 	private static final String ROBO4J_CLIENT = "Robo4J-HttpClient";
-	// private static final String SPACE = "\u0020";
-	// private static final String NEXT_LINE = "\r\n";
 	public static final String NEW_LINE = "\n";
 	public static final String HTTP_HEADER_OK = HttpFirstLineBuilder.Build(HTTP_VERSION).add("200").add("OK").build();
-	public static final int DEFAULT_THREAD_POOL_SIZE = 2;
 	public static final int _DEFAULT_PORT = 8042;
-	public static final String _EMPTY_STRING = "";
 	public static final String HTTP_TARGET_UNITS = "targetUnits";
-	public static final int KEEP_ALIVE_TIME = 10;
 
 	public static String setHeader(String responseCode, int length) throws IOException {
 		//@formatter:off
 		return HttpHeaderBuilder.Build()
-				.add(Constants.EMPTY_STRING, responseCode)
+				.add(CoreConstants.STRING_EMPTY, responseCode)
 				.add(HttpHeaderNames.DATE, LocalDateTime.now().toString())
 				.add(HttpHeaderNames.SERVER, ROBO4J_CLIENT)
 				.add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(length))
@@ -114,7 +110,7 @@ public final class RoboHttpUtils {
 	}
 
 	public static String correctLine(String line) {
-		return line == null ? Constants.EMPTY_STRING : line;
+		return line == null ? CoreConstants.STRING_EMPTY : line;
 	}
 
 	public static Map<String, String> parseURIQueryToMap(final String uriQuery, final String delimiter) {

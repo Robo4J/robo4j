@@ -16,16 +16,16 @@
  */
 package com.robo4j.units.rpi.pwm;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.Scanner;
-
 import com.robo4j.core.RoboBuilder;
 import com.robo4j.core.RoboBuilderException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.util.SystemUtil;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.Scanner;
 
 /**
  * Small calibration utility to help fine tune a servo.
@@ -56,7 +56,7 @@ public class CalibrationUtility {
 		System.out.println("State after start:");
 		System.out.println(SystemUtil.printStateReport(ctx));
 
-		String lastCommand = "";
+		String lastCommand;
 		Scanner scanner = new Scanner(System.in);
 		System.out.println(
 				"Type the servo to control and how much to move the servo, between -1 and 1. For example:\npan -1.0\nType q and enter to quit!\n");

@@ -17,6 +17,10 @@
 
 package com.robo4j.core.reflect;
 
+import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.util.CoreConstants;
+import com.robo4j.core.util.StreamUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,9 +36,6 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.util.StreamUtils;
-
 /**
  * Util class for reflection scan.
  *
@@ -42,8 +43,6 @@ import com.robo4j.core.util.StreamUtils;
  * @author Miro Wengner (@miragemiko)
  */
 public final class ReflectionScan {
-	private static final CharSequence EMPTY_STRING = "";
-
     private static final String FILE = "file:";
     private static final String SUFFIX = ".class";
     private static final String EXCLAMATION = "\u0021";		//Exclamation mark !
@@ -89,7 +88,7 @@ public final class ReflectionScan {
 
         StreamUtils.enumerationAsStream(resources, false).map(url -> {
             try {
-                String jarFile = url.getFile().split(EXCLAMATION)[0].replace(FILE, EMPTY_STRING);
+                String jarFile = url.getFile().split(EXCLAMATION)[0].replace(FILE, CoreConstants.EMPTY_CHAR_SEQENCE);
                 if (new File(jarFile).isDirectory()) {
                     return null;
                 }
@@ -102,7 +101,7 @@ public final class ReflectionScan {
                 for (ZipEntry entry = e.getNextEntry(); entry != null; entry = e.getNextEntry()) {
                     if (!entry.isDirectory() && entry.getName().contains(slashifyPackage)
                             && entry.getName().endsWith(SUFFIX)) {
-                        String cName = entry.getName().replace(SLASH, DOT).replace(SUFFIX, EMPTY_STRING);
+                        String cName = entry.getName().replace(SLASH, DOT).replace(SUFFIX, CoreConstants.EMPTY_CHAR_SEQENCE);
                         classes.add(cName);
                     }
                 }

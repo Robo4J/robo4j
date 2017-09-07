@@ -17,13 +17,13 @@
 
 package com.robo4j.socket.http.codec;
 
-import java.util.Map;
-
-import com.robo4j.socket.http.units.Constants;
+import com.robo4j.core.util.CoreConstants;
 import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpEncoder;
 import com.robo4j.socket.http.units.HttpProducer;
 import com.robo4j.socket.http.util.JsonUtil;
+
+import java.util.Map;
 
 /**
  * default simple codec for simple commands Simple codec is currently used for
@@ -42,7 +42,7 @@ public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncod
 	@Override
 	public String encode(SimpleCommand stuff) {
 		final StringBuilder sb = new StringBuilder("{\"value\":\"").append(stuff.getValue());
-		if (stuff.getType().equals(Constants.EMPTY_STRING)) {
+		if (stuff.getType().equals(CoreConstants.STRING_EMPTY)) {
 			sb.append("\"}");
 		} else {
 			sb.append("\",\"type\":\"").append(stuff.getType()).append("\"}");
@@ -70,6 +70,6 @@ public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncod
 
 	// Private Methods
 	private String objectToString(Object object) {
-		return object != null ? object.toString().trim() : Constants.EMPTY_STRING;
+		return object != null ? object.toString().trim() : CoreConstants.STRING_EMPTY;
 	}
 }

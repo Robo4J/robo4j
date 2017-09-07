@@ -24,6 +24,7 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.util.CoreConstants;
 import com.robo4j.hw.rpi.camera.CameraClientException;
 import com.robo4j.hw.rpi.camera.RaspistilDevice;
 import com.robo4j.socket.http.HttpMethod;
@@ -125,7 +126,7 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 			String clientPort = configuration.getString("clientPort", null);
 			client = clientPort == null ? inetAddress.getHostAddress()
 					: inetAddress.getHostAddress().concat(":").concat(clientPort);
-			clientUri = configuration.getString("clientUri", Constants.EMPTY_STRING);
+			clientUri = configuration.getString("clientUri", CoreConstants.STRING_EMPTY);
 		} catch (UnknownHostException e) {
 			SimpleLoggingUtil.error(getClass(), "unknown ip address", e);
 			throw ConfigurationException.createMissingConfigNameException("unknown ip address");

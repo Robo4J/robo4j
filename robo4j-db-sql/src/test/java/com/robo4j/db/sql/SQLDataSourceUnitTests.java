@@ -64,7 +64,7 @@ public class SQLDataSourceUnitTests {
 
 	@Before
 	public void setUp(){
-		system = prepareSystemWithSQLUnit(DEFAULT_SORTED, DEFAULT_LIMIT);
+		system = prepareSystemWithSQLUnits(DEFAULT_SORTED, DEFAULT_LIMIT);
 	}
 
 	@After
@@ -77,7 +77,7 @@ public class SQLDataSourceUnitTests {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testAllRoboReferencesInDatabase() throws Exception {
+	public void getAllStoredERoboUnits() throws Exception {
 
 		final RoboReference<ERoboRequest> sqlDataSourceUnit = system.getReference(DB_SQL_UNIT);
 
@@ -127,7 +127,7 @@ public class SQLDataSourceUnitTests {
 		//@formatter:on
 	}
 
-	private RoboContext prepareSystemWithSQLUnit(String sorted, int limit) {
+	private RoboContext prepareSystemWithSQLUnits(String sorted, int limit) {
 		try {
 
 			RoboBuilder builder = new RoboBuilder();
@@ -153,9 +153,11 @@ public class SQLDataSourceUnitTests {
 			System.out.println("systemPong: State after start:");
 			System.out.println(SystemUtil.printStateReport(system));
 
+
 			ERoboUnit ERoboUnit1 = new ERoboUnit();
 			ERoboUnit1.setUid("system1");
 			ERoboUnit1.setConfig(DB_SQL_UNIT.concat(",").concat("httpClient"));
+
 
 			ERoboUnit ERoboUnit2 = new ERoboUnit();
 			ERoboUnit2.setUid("system2");

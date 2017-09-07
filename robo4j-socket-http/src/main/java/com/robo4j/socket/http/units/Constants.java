@@ -25,7 +25,6 @@ package com.robo4j.socket.http.units;
 public final class Constants {
 
 	public static final String DEFAULT_ENCODING = "UTF-8";
-	public static final String EMPTY_STRING = "";
 	public static final int DEFAULT_VALUE_0 = 0;
 	public static final int DEFAULT_VALUE_1 = 1;
 	public static final String HTTP_QUERY_SEP = "\u0026"; // AMPERSAND &
