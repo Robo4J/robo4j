@@ -17,10 +17,9 @@
 
 package com.robo4j.db.sql.repository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
+import com.robo4j.db.sql.model.ERoboUnit;
+import com.robo4j.db.sql.support.DataSourceContext;
+import com.robo4j.db.sql.support.SortType;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -30,10 +29,9 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-
-import com.robo4j.db.sql.model.ERoboUnit;
-import com.robo4j.db.sql.support.DataSourceContext;
-import com.robo4j.db.sql.support.SortType;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -49,7 +47,6 @@ public class DefaultRepository implements RoboRepository {
 	private static final CharSequence EMPTY_STRING = "";
 	
 	private final DataSourceContext dataSourceContext;
-	private final ReentrantLock lock = new ReentrantLock();
 
 	public DefaultRepository(DataSourceContext dataSourceContext) {
 		this.dataSourceContext = dataSourceContext;
@@ -109,8 +106,6 @@ public class DefaultRepository implements RoboRepository {
 
 	@Override
 	public <T> T save(T entity) {
-		lock.lock();
-		try {
 			EntityManager em = dataSourceContext.getEntityManager(entity.getClass());
 			em.getTransaction().begin();
 			if(em.contains(entity)){
@@ -120,9 +115,6 @@ public class DefaultRepository implements RoboRepository {
 			}
 			em.getTransaction().commit();
 			return entity;
-		} finally {
-			lock.unlock();
-		}
 	}
 
 	// Private Methods

@@ -26,7 +26,7 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.db.sql.SQLDataSourceUnit;
-import com.robo4j.db.sql.dto.ERoboRequest;
+import com.robo4j.db.sql.dto.ERoboDbContract;
 import com.robo4j.db.sql.model.ERoboEntity;
 import com.robo4j.db.sql.model.ERoboUnit;
 import com.robo4j.db.sql.support.RoboRequestType;
@@ -69,12 +69,12 @@ public abstract class RoboPersitenceUnit<T> extends RoboUnit<T> {
 	}
 
 	protected void save(ERoboUnit unit) {
-		ERoboRequest request = getERequest(unit);
+		ERoboDbContract request = getERequest(unit);
 		dataSourceUnit.onMessage(request);
 	}
 
-	private ERoboRequest getERequest(ERoboUnit unit){
-		ERoboRequest result = new ERoboRequest(RoboRequestType.SAVE);
+	private ERoboDbContract getERequest(ERoboUnit unit){
+		ERoboDbContract result = new ERoboDbContract(RoboRequestType.SAVE);
 		result.addData(unit.getClass(), unit);
 		return result;
 	}

@@ -27,9 +27,7 @@ import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.db.sql.dto.ERoboRequest;
-import com.robo4j.db.sql.dto.ERoboResponse;
-import com.robo4j.db.sql.model.ERoboEntity;
+import com.robo4j.db.sql.dto.ERoboDbContract;
 import com.robo4j.db.sql.model.ERoboPoint;
 import com.robo4j.db.sql.model.ERoboUnit;
 import com.robo4j.db.sql.repository.DefaultRepository;
@@ -54,7 +52,7 @@ import java.util.stream.Collectors;
  */
 @BlockingTrait
 @SuppressWarnings(value = {"rawtypes"})
-public class SQLDataSourceUnit extends RoboUnit<ERoboRequest> {
+public class SQLDataSourceUnit extends RoboUnit<ERoboDbContract> {
 	private static final String UTF8_COMMA = "\u002C";
 	private static final String ATTRIBUTE_ROBO_SQL_UNIT = "robo_sql_unit";
 	private static final String ATTRIBUTE_ROBO_ALL_NAME = "all";
@@ -89,7 +87,7 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboRequest> {
 	private String receiverUnitName;
 
 	public SQLDataSourceUnit(RoboContext context, String id) {
-		super(ERoboRequest.class, context, id);
+		super(ERoboDbContract.class, context, id);
 	}
 
 	@Override
@@ -129,7 +127,7 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboRequest> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void onMessage(ERoboRequest message) {
+	public void onMessage(ERoboDbContract message) {
 		switch (message.getType()){
 			case SAVE:
 				message.getData().forEach((key, value) -> {
@@ -144,17 +142,22 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboRequest> {
 				break;
 			case READ:
 				if(receiverUnitName != null){
-					RoboReference<ERoboResponse> receiverUnit = getContext().getReference(receiverUnitName);
+					final ERoboDbContract response = new ERoboDbContract(message.getType());
+					final RoboReference<ERoboDbContract> receiverUnit = getContext().getReference(receiverUnitName);
 					message.getData().forEach((key, value) -> {
-
-						List list = registeredClasses.stream().map(rc -> repository.findAllByClass(rc, SortType.ASC))
-								.flatMap(List::stream)
-								.collect(Collectors.toList());
-
-						ERoboResponse response = new ERoboResponse(ERoboEntity.class, list);
-
-						receiverUnit.sendMessage(response);
+						if(registeredClasses.contains(key)){
+							Map<String, Object> searchParametersMap = (Map<String, Object>) value;
+							if(!searchParametersMap.isEmpty()){
+								List<?> tmpList = repository.findByFields(key, searchParametersMap, limit, sorted);
+								response.addData(key, tmpList);
+							} else {
+								List<?> tmpList = repository.findAllByClass(key, sorted);
+								response.addData(key, tmpList);
+							}
+						}
 					});
+
+					receiverUnit.sendMessage(response);
 				}
 				break;
 			default:
