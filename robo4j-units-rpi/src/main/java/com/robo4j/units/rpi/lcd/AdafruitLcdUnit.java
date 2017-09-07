@@ -16,12 +16,6 @@
  */
 package com.robo4j.units.rpi.lcd;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.concurrent.atomic.AtomicReference;
-
 import com.robo4j.core.AttributeDescriptor;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.DefaultAttributeDescriptor;
@@ -30,6 +24,7 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.core.util.CoreConstants;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.LcdFactory;
@@ -37,6 +32,12 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd.Direction;
 import com.robo4j.units.rpi.I2CEndPoint;
 import com.robo4j.units.rpi.I2CRegistry;
 import com.robo4j.units.rpi.I2CRoboUnit;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A {@link RoboUnit} for the Adafruit 16x2 character LCD shield.
@@ -53,7 +54,7 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 					DefaultAttributeDescriptor.create(Color.class, ATTRIBUTE_NAME_COLOR)));
 
 	private AdafruitLcd lcd;
-	private AtomicReference<String> stringMessage = new AtomicReference<>("");
+	private AtomicReference<String> stringMessage = new AtomicReference<>(CoreConstants.STRING_EMPTY);
 
 	public AdafruitLcdUnit(RoboContext context, String id) {
 		super(LcdMessage.class, context, id);

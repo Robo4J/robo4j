@@ -16,6 +16,8 @@
  */
 package com.robo4j.core.logging;
 
+import com.robo4j.core.util.CoreConstants;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -28,9 +30,6 @@ import java.util.stream.Stream;
  */
 public final class SimpleLoggingUtil {
 	// TODO(Marcus/Sep 6, 2017): Decide if we want to kill this...
-	private static final String SPACE = "\u0020";
-	private static final String EMPTY = "";
-
 	public static void print(Class<?> clazz, String message) {
 		Logger.getLogger(clazz.getName()).log(Level.INFO, message);
 	}
@@ -40,7 +39,8 @@ public final class SimpleLoggingUtil {
 	}
 
 	public static void debug(Class<?> clazz, String... message) {
-		debug(clazz, clazz.getSimpleName() + " : " + Stream.of(message).reduce(EMPTY, (l, r) -> l.concat(SPACE).concat(r)));
+		debug(clazz, clazz.getSimpleName() + " : " + Stream.of(message).reduce(CoreConstants.STRING_EMPTY,
+				(l, r) -> l.concat(CoreConstants.STRING_SPACE).concat(r)));
 	}
 
 	public static void error(Class<?> clazz, String message) {

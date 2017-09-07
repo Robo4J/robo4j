@@ -17,13 +17,14 @@
 
 package com.robo4j.socket.http.util;
 
+import com.robo4j.core.util.CoreConstants;
+import com.robo4j.socket.http.units.Constants;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.robo4j.socket.http.units.Constants;
 
 /**
  *
@@ -64,7 +65,7 @@ public final class JsonUtil {
 			return result;
 		}
 
-		final String[] parts = json.replaceAll("^\\{\\s*\"|\"\\s*\\}$", Constants.EMPTY_STRING)
+		final String[] parts = json.replaceAll("^\\{\\s*\"|\"\\s*\\}$", CoreConstants.STRING_EMPTY)
 				.split("\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?");
 
 		for (int i = 0; i < parts.length - 1; i += 2) {
