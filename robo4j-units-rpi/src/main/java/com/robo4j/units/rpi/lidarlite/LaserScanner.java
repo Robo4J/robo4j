@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
@@ -27,6 +28,7 @@ import com.robo4j.core.RoboReference;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.hw.rpi.i2c.lidar.LidarLiteDevice;
+import com.robo4j.math.geometry.Point2f;
 import com.robo4j.math.geometry.ScanResult2D;
 import com.robo4j.math.geometry.impl.ScanResultImpl;
 import com.robo4j.math.jfr.JfrUtils;
@@ -58,12 +60,20 @@ import com.robo4j.units.rpi.pwm.PCA9685ServoUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class LaserScanner extends I2CRoboUnit<ScanRequest> {
+	private final static Predicate<Point2f> POINT_FILTER = new PointFilter();
 	private String pan;
 	private LidarLiteDevice lidar;
 	private float servoRange;
 	private float angularSpeed;
 	private float minimumAcquisitionTime;
 	private float trim;
+	
+	private static class PointFilter implements Predicate<Point2f> {
+		@Override
+		public boolean test(Point2f t) {
+			return t.getRange() >= 0.08;
+		}		
+	}
 
 	private final static class ScanJob implements Runnable {
 		private final AtomicInteger invokeCount = new AtomicInteger(0);
@@ -108,7 +118,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			this.numberOfScans = calculateNumberOfScans() + 1;
 			this.delayMicros = calculateDelay(minimumAcquisitionTime, minimumServoMovementTime);
 			this.currentAngle = lowToHigh ? request.getStartAngle() : request.getStartAngle() + request.getRange();
-			this.scanResult = new ScanResultImpl(100, request.getStep());
+			this.scanResult = new ScanResultImpl(100, request.getStep(), POINT_FILTER);
 			scanEvent = new ScanEvent(scanResult.getScanID(), getScanInfo());
 			scanEvent.setScanLeftRight(lowToHigh);
 			JfrUtils.begin(scanEvent);
@@ -222,7 +232,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 					firstRun = false;
 					lidar.acquireRange();
 				} else {
-					ScanResultImpl scan = new ScanResultImpl(1, 0f);
+					ScanResultImpl scan = new ScanResultImpl(1, 0f, POINT_FILTER);
 					scan.addPoint(lidar.readDistance(), angle);
 					recipient.sendMessage(scan);
 				}

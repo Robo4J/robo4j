@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 import com.robo4j.math.geometry.Point2f;
 import com.robo4j.math.geometry.ScanResult2D;
@@ -50,12 +51,14 @@ public class ScanResultImpl implements ScanResult2D {
 
 	private final ScanPoint2DEvent scanPointEvent = new ScanPoint2DEvent();
 	private final float angularResolution;
+	private final Predicate<Point2f> pointFilter;
 
-	public ScanResultImpl(float angularResolution) {
-		this(70, angularResolution);
+	public ScanResultImpl(float angularResolution, Predicate<Point2f> pointFilter) {
+		this(70, angularResolution, pointFilter);
 	}
 
-	public ScanResultImpl(int size, float angularResolution) {
+	public ScanResultImpl(int size, float angularResolution, Predicate<Point2f> pointFilter) {
+		this.pointFilter = pointFilter;
 		scanID = SCANCOUNTER.incrementAndGet();
 		this.angularResolution = angularResolution;
 		points = new ArrayList<Point2f>(size);
@@ -82,8 +85,8 @@ public class ScanResultImpl implements ScanResult2D {
 	}
 
 	public void addPoint(Point2f p) {
-		if (p.getRange() < 0.05) {
-			return;
+		if (!pointFilter.test(p)) {
+			return; 
 		}
 		points.add(p);
 		emitEvent(p);
