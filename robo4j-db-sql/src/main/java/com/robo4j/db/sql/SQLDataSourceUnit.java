@@ -28,8 +28,6 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.db.sql.dto.ERoboDbContract;
-import com.robo4j.db.sql.model.ERoboPoint;
-import com.robo4j.db.sql.model.ERoboUnit;
 import com.robo4j.db.sql.repository.DefaultRepository;
 import com.robo4j.db.sql.repository.RoboRepository;
 import com.robo4j.db.sql.support.DataSourceContext;
@@ -37,36 +35,25 @@ import com.robo4j.db.sql.support.DataSourceType;
 import com.robo4j.db.sql.support.PersistenceContextBuilder;
 import com.robo4j.db.sql.support.SortType;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
-
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 @BlockingTrait
-@SuppressWarnings(value = {"rawtypes"})
+@SuppressWarnings(value = { "rawtypes" })
 public class SQLDataSourceUnit extends RoboUnit<ERoboDbContract> {
 	private static final String UTF8_COMMA = "\u002C";
-	private static final String ATTRIBUTE_ROBO_SQL_UNIT = "robo_sql_unit";
 	private static final String ATTRIBUTE_ROBO_ALL_NAME = "all";
-	private static final String ATTRIBUTE_ROBO_UNIT_ALL_ASC_NAME = "units_all_asc";
-	private static final String ATTRIBUTE_ROBO_UNIT_ALL_DESC_NAME = "units_all_desc";
-	private static final String ATTRIBUTE_ROBO_UNIT_ASC_NAME = "units_asc";
-	private static final String ATTRIBUTE_ROBO_UNIT_DESC_NAME = "units_desc";
-	private static final String ATTRIBUTE_ROBO_UNIT_POINTS_NAME = "unit_points";
-	private static final String ATTRIBUTE_BY_MAP = "by_map";
-	private static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Arrays.asList(
-			DefaultAttributeDescriptor.create(SQLDataSourceUnit.class, ATTRIBUTE_ROBO_SQL_UNIT),
-			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_ALL_NAME),
-			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_ALL_ASC_NAME),
-			DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_UNIT_POINTS_NAME));
+	private static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
+			.singletonList(DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_ALL_NAME));
 	private Map<String, Object> targetUnitSearchMap = new HashMap<>();
 
 	private static final String PERSISTENCE_UNIT = "sourceType";
@@ -120,7 +107,7 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboDbContract> {
 		}
 
 		String hibernateConnectionUrl = configuration.getString(HIBERNATE_CONNECTION_URL, null);
-		if(hibernateConnectionUrl != null){
+		if (hibernateConnectionUrl != null) {
 			persistenceMap.put(HIBERNATE_CONNECTION_URL, hibernateConnectionUrl);
 		}
 	}
@@ -128,39 +115,39 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboDbContract> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void onMessage(ERoboDbContract message) {
-		switch (message.getType()){
-			case SAVE:
+		switch (message.getType()) {
+		case SAVE:
+			message.getData().forEach((key, value) -> {
+				if (value instanceof List) {
+					List values = (List) value;
+					values.forEach(this::storeEntity);
+				} else {
+					storeEntity(value);
+				}
+			});
+			break;
+		case READ:
+			if (receiverUnitName != null) {
+				final ERoboDbContract response = new ERoboDbContract(message.getType());
+				final RoboReference<ERoboDbContract> receiverUnit = getContext().getReference(receiverUnitName);
 				message.getData().forEach((key, value) -> {
-					if(value instanceof List){
-						List values = (List)value;
-						values.forEach(this::storeEntity);
-					} else {
-						storeEntity(value);
+					if (registeredClasses.contains(key)) {
+						Map<String, Object> searchParametersMap = (Map<String, Object>) value;
+						if (!searchParametersMap.isEmpty()) {
+							List<?> tmpList = repository.findByFields(key, searchParametersMap, limit, sorted);
+							response.addData(key, tmpList);
+						} else {
+							List<?> tmpList = repository.findAllByClass(key, sorted);
+							response.addData(key, tmpList);
+						}
 					}
 				});
-				break;
-			case READ:
-				if(receiverUnitName != null){
-					final ERoboDbContract response = new ERoboDbContract(message.getType());
-					final RoboReference<ERoboDbContract> receiverUnit = getContext().getReference(receiverUnitName);
-					message.getData().forEach((key, value) -> {
-						if(registeredClasses.contains(key)){
-							Map<String, Object> searchParametersMap = (Map<String, Object>) value;
-							if(!searchParametersMap.isEmpty()){
-								List<?> tmpList = repository.findByFields(key, searchParametersMap, limit, sorted);
-								response.addData(key, tmpList);
-							} else {
-								List<?> tmpList = repository.findAllByClass(key, sorted);
-								response.addData(key, tmpList);
-							}
-						}
-					});
 
-					receiverUnit.sendMessage(response);
-				}
-				break;
-			default:
-				SimpleLoggingUtil.error(getClass(), "not implemented: " + message);
+				receiverUnit.sendMessage(response);
+			}
+			break;
+		default:
+			SimpleLoggingUtil.error(getClass(), "not implemented: " + message);
 		}
 	}
 
@@ -189,47 +176,11 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboDbContract> {
 		if (descriptor.getAttributeName().equals(ATTRIBUTE_ROBO_ALL_NAME)
 				&& descriptor.getAttributeType() == List.class) {
 			//@formatter:off
-			return (R) registeredClasses.stream().map(rc -> repository.findAllByClass(rc, SortType.ASC))
+			return (R) registeredClasses.stream().map(rc -> repository.findAllByClass(rc, sorted))
 					.flatMap(List::stream)
 					.collect(Collectors.toList());
 			//@formatter:on
 		}
-
-		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_UNIT_ALL_ASC_NAME)
-				&& descriptor.getAttributeType() == List.class) {
-			return (R) repository.findAllByClass(ERoboUnit.class, SortType.ASC);
-		}
-
-		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_UNIT_ASC_NAME)
-				&& descriptor.getAttributeType() == List.class) {
-			return (R) repository.findByClassWithLimit(ERoboUnit.class, limit, SortType.ASC);
-		}
-
-		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_UNIT_ALL_DESC_NAME)
-				&& descriptor.getAttributeType() == List.class) {
-			return (R) repository.findAllByClass(ERoboUnit.class, SortType.DESC);
-		}
-
-		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_UNIT_DESC_NAME)
-				&& descriptor.getAttributeType() == List.class) {
-			return (R) repository.findByClassWithLimit(ERoboUnit.class, limit, SortType.DESC);
-		}
-
-		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_UNIT_POINTS_NAME)
-				&& descriptor.getAttributeType() == List.class) {
-			return (R) repository.findByFields(ERoboPoint.class, targetUnitSearchMap, limit, sorted);
-		}
-
-		if (descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_ROBO_SQL_UNIT)
-				&& descriptor.getAttributeType() == SQLDataSourceUnit.class) {
-			return (R) this;
-		}
-
-		if(descriptor.getAttributeName().equalsIgnoreCase(ATTRIBUTE_BY_MAP)
-				&& descriptor.getAttributeType() == Map.class){
-
-		}
-
 		return super.onGetAttribute(descriptor);
 	}
 
@@ -243,8 +194,8 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboDbContract> {
 		return (R) repository.findByFields(c, map, limit, sorted);
 	}
 
-	//Private Methods
-	private void storeEntity(Object entity){
+	// Private Methods
+	private void storeEntity(Object entity) {
 		Object id = repository.save(entity);
 		if (id == null) {
 			SimpleLoggingUtil.error(getClass(), "entity not stored: " + entity);
