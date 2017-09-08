@@ -53,7 +53,7 @@ import java.util.stream.IntStream;
  */
 public class SQLDataSourceUnitTests {
 
-	private static final int WAIT_TIME = 400;
+	private static final int WAIT_TIME = 500;
 	private static final int DEFAULT_LIMIT = 2;
 	private static final String DEFAULT_SORTED = "asc";
 	private static final String UNIT_SYSTEM_1_NAME = "system1";
