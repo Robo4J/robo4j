@@ -31,6 +31,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +46,7 @@ public class DefaultRepository implements RoboRepository {
 	private static final String PREFIX_LIKE = "like";
 	private static final String SIGN_PERCENTAGE = "%";
 	private static final CharSequence EMPTY_STRING = "";
+	private final ReentrantLock lock = new ReentrantLock();
 	
 	private final DataSourceContext dataSourceContext;
 
@@ -106,15 +108,20 @@ public class DefaultRepository implements RoboRepository {
 
 	@Override
 	public <T> T save(T entity) {
+		lock.lock();
+		try {
 			EntityManager em = dataSourceContext.getEntityManager(entity.getClass());
 			em.getTransaction().begin();
-			if(em.contains(entity)){
+			if (em.contains(entity)) {
 				em.merge(entity);
 			} else {
 				em.persist(entity);
 			}
 			em.getTransaction().commit();
 			return entity;
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	// Private Methods

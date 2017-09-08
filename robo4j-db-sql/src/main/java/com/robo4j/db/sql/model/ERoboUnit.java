@@ -122,7 +122,7 @@ public class ERoboUnit implements ERoboEntity<Long> {
 		this.parent = parent;
 	}
 
-	@OneToMany(mappedBy = "parent", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	public List<ERoboUnit> getParts() {
 		return parts;
 	}

@@ -28,6 +28,8 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.db.sql.dto.ERoboDbContract;
+import com.robo4j.db.sql.model.ERoboPoint;
+import com.robo4j.db.sql.model.ERoboUnit;
 import com.robo4j.db.sql.repository.DefaultRepository;
 import com.robo4j.db.sql.repository.RoboRepository;
 import com.robo4j.db.sql.support.DataSourceContext;
@@ -196,7 +198,15 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboDbContract> {
 
 	// Private Methods
 	private void storeEntity(Object entity) {
-		Object id = repository.save(entity);
+		Object id;
+		if (entity instanceof ERoboPoint) {
+			ERoboPoint eRoboPoint = (ERoboPoint) entity;
+			ERoboUnit eRoboUnit = eRoboPoint.getUnit();
+			eRoboUnit.addPoint(eRoboPoint);
+			id = repository.save(eRoboUnit);
+		} else {
+			id = repository.save(entity);
+		}
 		if (id == null) {
 			SimpleLoggingUtil.error(getClass(), "entity not stored: " + entity);
 		}

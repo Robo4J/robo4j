@@ -19,7 +19,6 @@ package com.robo4j.db.sql;
 
 import com.robo4j.core.DefaultAttributeDescriptor;
 import com.robo4j.core.RoboBuilder;
-import com.robo4j.core.RoboBuilderException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
 import com.robo4j.core.configuration.Configuration;
@@ -53,7 +52,7 @@ import java.util.stream.IntStream;
  */
 public class SQLDataSourceUnitTests {
 
-	private static final int WAIT_TIME = 500;
+	private static final int WAIT_TIME = 400;
 	private static final int DEFAULT_LIMIT = 2;
 	private static final String DEFAULT_SORTED = "asc";
 	private static final String UNIT_SYSTEM_1_NAME = "system1";
@@ -73,6 +72,7 @@ public class SQLDataSourceUnitTests {
 		system.shutdown();
 		System.out.println("SQL System: State after shutdown:");
 		System.out.println(SystemUtil.printStateReport(system));
+		Thread.sleep(WAIT_TIME);
 	}
 
 	@Test
@@ -103,7 +103,7 @@ public class SQLDataSourceUnitTests {
 	public void retrieveSpecificUnitsFromDB() throws Exception {
 		final RoboReference<ERoboDbContract> sqlDataSourceUnit = system.getReference(DB_SQL_UNIT);
 		Map<String, Object> map = new HashMap<>();
-		map.put("likeUid", "system1");
+		map.put("uid", UNIT_SYSTEM_1_NAME);
 
 		final ERoboDbContract readRequest = new ERoboDbContract(RoboRequestType.READ);
 		readRequest.addData(ERoboUnit.class, map);
@@ -127,7 +127,7 @@ public class SQLDataSourceUnitTests {
 	}
 
 	@Test
-	public void storePointsForERoboUnits() throws Exception {
+	public void storePointsAtOnceForERoboUnits() throws Exception {
 		final RoboReference<ERoboDbContract> sqlDataSourceUnit = system.getReference(DB_SQL_UNIT);
 		Map<String, Object> map = new HashMap<>();
 		map.put("uid", UNIT_SYSTEM_1_NAME);
@@ -146,7 +146,7 @@ public class SQLDataSourceUnitTests {
 		List<ERoboUnit> responseUnitList = (List<ERoboUnit>) responseMap.get(ERoboUnit.class);
 
 		ERoboUnit systemUnit1 = responseUnitList.get(0);
-		systemUnit1.addPoints(getRoboPoint(null, DEFAULT_LIMIT));
+		systemUnit1.addPoints(getRoboPoints(null, DEFAULT_LIMIT));
 
 		final ERoboDbContract saveRequest = new ERoboDbContract(RoboRequestType.SAVE);
 		saveRequest.addData(ERoboUnit.class, systemUnit1);
@@ -161,6 +161,7 @@ public class SQLDataSourceUnitTests {
 		ERoboUnit system1WithPoint = responseUnitList.get(0);
 
 		System.out.println("After Points Storage: " + system1WithPoint);
+		Thread.sleep(2000);
 		Assert.assertTrue(response.getType().equals(RoboRequestType.READ));
 		Assert.assertNotNull(responseMap.get(ERoboUnit.class));
 		Assert.assertNotNull(responseUnitList);
@@ -169,17 +170,66 @@ public class SQLDataSourceUnitTests {
 		Assert.assertTrue(system1WithPoint.getPoints().size() == DEFAULT_LIMIT);
 	}
 
+	@Test
+	public void storePointsForUnitAsMessage() throws Exception {
+		final RoboReference<ERoboDbContract> sqlDataSourceUnit = system.getReference(DB_SQL_UNIT);
+		Map<String, Object> map = new HashMap<>();
+		map.put("uid", UNIT_SYSTEM_1_NAME);
+
+		final ERoboDbContract readRequest = new ERoboDbContract(RoboRequestType.READ);
+		readRequest.addData(ERoboUnit.class, map);
+		sqlDataSourceUnit.sendMessage(readRequest);
+
+		Thread.sleep(WAIT_TIME);
+		final RoboReference<SQLSimpleReceiverUnit> receiverUnit = system.getReference(DB_SIMPLE_RECEIVER);
+		Future<ERoboDbContract> responseFuture = receiverUnit.getAttribute(
+				DefaultAttributeDescriptor.create(ERoboDbContract.class, SQLSimpleReceiverUnit.ATTRIBUTE_SQL_RESPONSE));
+		ERoboDbContract response = responseFuture.get();
+
+		Map<Class<?>, Object> responseMap = response.getData();
+		List<ERoboUnit> responseUnitList = (List<ERoboUnit>) responseMap.get(ERoboUnit.class);
+
+		ERoboUnit systemUnit1 = responseUnitList.get(0);
+
+		int points = 10;
+		for (int i = 0; i < points; i++) {
+			final ERoboDbContract saveRequest = new ERoboDbContract(RoboRequestType.SAVE);
+			saveRequest.addData(ERoboPoint.class, getRoboPoint(systemUnit1, i));
+			sqlDataSourceUnit.sendMessage(saveRequest);
+		}
+		Thread.sleep(WAIT_TIME);
+		responseFuture = receiverUnit.getAttribute(
+				DefaultAttributeDescriptor.create(ERoboDbContract.class, SQLSimpleReceiverUnit.ATTRIBUTE_SQL_RESPONSE));
+		response = responseFuture.get();
+		responseMap = response.getData();
+		responseUnitList = (List<ERoboUnit>) responseMap.get(ERoboUnit.class);
+		ERoboUnit system1WithPoint = responseUnitList.get(0);
+
+		System.out.println("After Points Storage: " + system1WithPoint);
+		Thread.sleep(WAIT_TIME);
+		Assert.assertTrue(response.getType().equals(RoboRequestType.READ));
+		Assert.assertNotNull(responseMap.get(ERoboUnit.class));
+		Assert.assertNotNull(responseUnitList);
+		Assert.assertTrue(responseUnitList.size() == 1);
+		Assert.assertTrue(system1WithPoint.getUid().equals(UNIT_SYSTEM_1_NAME));
+		Assert.assertTrue(system1WithPoint.getPoints().size() == points);
+	}
+
 	// Private Methods
 
-	private List<ERoboPoint> getRoboPoint(ERoboUnit unit, int number) {
+	private ERoboPoint getRoboPoint(ERoboUnit unit, int number) {
+		ERoboPoint result = new ERoboPoint();
+		result.setUnit(unit);
+		result.setValues("value: " + number);
+		result.setValueType("magicType: " + number);
+		return result;
+	}
+
+	private List<ERoboPoint> getRoboPoints(ERoboUnit unit, int number) {
 		//@formatter:off
-		return IntStream.range(0, number).mapToObj(i -> {
-							ERoboPoint point = new ERoboPoint();
-							point.setUnit(unit);
-							point.setValues("value: " + i);
-							point.setValueType("magicType: " + i);
-							return point;})
-						.collect(Collectors.toList());
+		return IntStream.range(0, number)
+				.mapToObj(i -> getRoboPoint(unit, i))
+				.collect(Collectors.toList());
 		//@formatter:on
 	}
 
@@ -216,7 +266,7 @@ public class SQLDataSourceUnitTests {
 			ERoboUnit ERoboUnit2 = new ERoboUnit();
 			ERoboUnit2.setUid(UNIT_SYSTEM_2_NAME);
 			ERoboUnit2.setConfig("httpServer");
-
+			Thread.sleep(WAIT_TIME);
 			// store message
 			final RoboReference<ERoboDbContract> dbSqlReference = system.getReference(DB_SQL_UNIT);
 			final ERoboDbContract storeRequest = new ERoboDbContract(RoboRequestType.SAVE);
@@ -224,7 +274,7 @@ public class SQLDataSourceUnitTests {
 			dbSqlReference.sendMessage(storeRequest);
 
 			return system;
-		} catch (RoboBuilderException e) {
+		} catch (Exception e) {
 			SimpleLoggingUtil.error(getClass(), "problem", e);
 			throw new RuntimeException("problem");
 		}
