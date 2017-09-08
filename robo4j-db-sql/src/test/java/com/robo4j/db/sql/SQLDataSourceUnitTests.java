@@ -189,10 +189,7 @@ public class SQLDataSourceUnitTests {
 			RoboBuilder builder = new RoboBuilder();
 			Configuration config = ConfigurationFactory.createEmptyConfiguration();
 
-//			config.setString("sourceType", "h2");
-			config.setString("sourceType", "postgresql");
-			config.setString("hibernate.hbm2ddl.auto","create");
-			config.setString("hibernate.connection.url", "jdbc:postgresql://192.168.178.42:5433/robo4j1");
+			config.setString("sourceType", "h2");
 			config.setString("packages", "com.robo4j.db.sql.model");
 			config.setInteger("limit", limit);
 			config.setString("sorted", sorted);
