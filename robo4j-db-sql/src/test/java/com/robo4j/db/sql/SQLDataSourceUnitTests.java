@@ -77,6 +77,7 @@ public class SQLDataSourceUnitTests {
 	}
 
 	@Test
+	@Ignore
 	public void retrieveAllERoboUnitsFromDB() throws Exception {
 		final RoboReference<ERoboDbContract> sqlDataSourceUnit = system.getReference(DB_SQL_UNIT);
 
