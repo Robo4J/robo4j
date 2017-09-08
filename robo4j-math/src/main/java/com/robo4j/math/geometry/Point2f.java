@@ -86,7 +86,7 @@ public class Point2f {
 	}
 	
 	public String toString() {
-		return String.format("x:%2.1f, y:%2.1f, range:%2.1f, angle:%2.1f", x, y, range, angle);
+		return String.format("x:%2.1f, y:%2.1f, range:%2.1f, angle:%2.1f", x, y, range, Math.toDegrees(angle));
 	}
 
 	public float distance(Point2f p) {
