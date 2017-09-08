@@ -137,7 +137,6 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboDbContract> {
 					} else {
 						storeEntity(value);
 					}
-
 				});
 				break;
 			case READ:
