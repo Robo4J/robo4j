@@ -33,6 +33,7 @@ import com.robo4j.db.sql.support.RoboRequestType;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -100,6 +101,7 @@ public class SQLDataSourceUnitTests {
 	}
 
 	@Test
+	@Ignore
 	public void retrieveSpecificUnitsFromDB() throws Exception {
 		final RoboReference<ERoboDbContract> sqlDataSourceUnit = system.getReference(DB_SQL_UNIT);
 		Map<String, Object> map = new HashMap<>();
@@ -127,6 +129,7 @@ public class SQLDataSourceUnitTests {
 	}
 
 	@Test
+	@Ignore
 	public void storePointsAtOnceForERoboUnits() throws Exception {
 		final RoboReference<ERoboDbContract> sqlDataSourceUnit = system.getReference(DB_SQL_UNIT);
 		Map<String, Object> map = new HashMap<>();
@@ -171,6 +174,7 @@ public class SQLDataSourceUnitTests {
 	}
 
 	@Test
+	@Ignore
 	public void storePointsForUnitAsMessage() throws Exception {
 		final RoboReference<ERoboDbContract> sqlDataSourceUnit = system.getReference(DB_SQL_UNIT);
 		Map<String, Object> map = new HashMap<>();
