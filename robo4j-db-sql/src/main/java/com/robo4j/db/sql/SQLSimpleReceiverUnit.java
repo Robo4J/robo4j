@@ -17,9 +17,14 @@
 
 package com.robo4j.db.sql;
 
+import com.robo4j.core.AttributeDescriptor;
+import com.robo4j.core.DefaultAttributeDescriptor;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
-import com.robo4j.db.sql.dto.ERoboResponse;
+import com.robo4j.db.sql.dto.ERoboDbContract;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Simple receiver for ERobo Entities
@@ -27,14 +32,36 @@ import com.robo4j.db.sql.dto.ERoboResponse;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class SQLSimpleReceiverUnit extends RoboUnit<ERoboResponse> {
+public class SQLSimpleReceiverUnit extends RoboUnit<ERoboDbContract> {
 
-    public SQLSimpleReceiverUnit(RoboContext context, String id) {
-        super(ERoboResponse.class, context, id);
-    }
+	public static final String ATTRIBUTE_SQL_RESPONSE = "response";
+	private static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
+			.singleton(DefaultAttributeDescriptor.create(SQLDataSourceUnit.class, ATTRIBUTE_SQL_RESPONSE));
 
-    @Override
-    public void onMessage(ERoboResponse message) {
-        System.out.println(getClass().getSimpleName() + " response message: " + message);
-    }
+	public SQLSimpleReceiverUnit(RoboContext context, String id) {
+		super(ERoboDbContract.class, context, id);
+	}
+
+	private volatile ERoboDbContract response;
+
+	@Override
+	public void onMessage(ERoboDbContract message) {
+		System.out.println(getClass().getSimpleName() + " response message: " + message);
+		response = message;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
+		if (descriptor.getAttributeName().equals(ATTRIBUTE_SQL_RESPONSE)
+				&& descriptor.getAttributeType() == ERoboDbContract.class) {
+			return (R) response;
+		}
+		return super.onGetAttribute(descriptor);
+	}
+
+	@Override
+	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
+		return KNOWN_ATTRIBUTES;
+	}
 }

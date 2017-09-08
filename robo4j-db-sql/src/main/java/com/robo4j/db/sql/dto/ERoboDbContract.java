@@ -23,15 +23,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ *
+ * ERoboDbContract is intent for CRUD differentiated by RoboRequestType {@link RoboRequestType}
+ *
+ * 1. Create -> value is intend to be an Class which implements {@link com.robo4j.db.sql.model.ERoboEntity}
+ * 2. Read -> value is intend to be and Map with requested specific parameters for filtering the result
+ * 3. Update -> similar to 1.
+ * 4. Deleted -> similar to 1.
+ *
+ * ERoboDbContract represent also response from desired CRUD operation
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class ERoboRequest {
+public class ERoboDbContract {
 
     private final RoboRequestType type;
     private final Map<Class<?>, Object> data = new HashMap<>();
 
-    public ERoboRequest(RoboRequestType type) {
+    public ERoboDbContract(RoboRequestType type) {
         this.type = type;
     }
 
@@ -49,7 +59,7 @@ public class ERoboRequest {
 
     @Override
     public String toString() {
-        return "ERoboRequest{" +
+        return "ERoboDbContract{" +
                 "type=" + type +
                 ", data=" + data +
                 '}';
