@@ -51,6 +51,9 @@ public final class JsonUtil {
 				sb2.append(e.getValue());
 			} else if (checkString(clazz)) {
 				sb2.append(Constants.UTF8_QUOTATION_MARK).append(e.getValue()).append(Constants.UTF8_QUOTATION_MARK);
+			} else if (e.getValue() instanceof Enum<?>){
+				Enum<?> en = (Enum<?>)e.getValue();
+				sb2.append(Constants.UTF8_QUOTATION_MARK).append(en.name()).append(Constants.UTF8_QUOTATION_MARK);
 			} else if (e.getValue() instanceof Map) {
 				sb2.append(getJsonByMap((Map<String, Object>) e.getValue()));
 			}

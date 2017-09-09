@@ -49,6 +49,7 @@ public class RoboHttpDynamicTests {
 
 	private static final String ID_HTTP_SERVER = "http";
 	private static final int PORT = 8025;
+	private static final int SLEEP_DELAY = 400;						//necessary delay due to multi-threading we should fix it
 	private static final String ID_CLIENT_UNIT = "httpClient";
 	private static final String ID_TARGET_UNIT = "controller";
 	private static final int MESSAGES_NUMBER = 6;
@@ -89,7 +90,7 @@ public class RoboHttpDynamicTests {
 					RoboHttpUtils.createRequest(HttpMethod.POST, HOST_SYSTEM, "/".concat(ID_TARGET_UNIT), JSON_STRING));
 		}
 
-		Thread.sleep(100);
+		Thread.sleep(SLEEP_DELAY);
 
 		clientSystem.stop();
 		clientSystem.shutdown();
@@ -101,6 +102,7 @@ public class RoboHttpDynamicTests {
 		final Future<Integer> messagesFuture = mainSystem.getReference(REQUEST_CONSUMER).getAttribute(descriptor);
 		final int receivedMessages = messagesFuture.get();
 
+		Thread.sleep(SLEEP_DELAY);
 		mainSystem.stop();
 		mainSystem.shutdown();
 

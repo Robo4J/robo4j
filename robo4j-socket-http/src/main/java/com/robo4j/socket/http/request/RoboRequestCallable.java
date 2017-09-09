@@ -23,7 +23,6 @@ import com.robo4j.core.RoboUnit;
 import com.robo4j.core.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpByteWrapper;
 import com.robo4j.socket.http.HttpHeaderNames;
-import com.robo4j.socket.http.HttpHeaderValues;
 import com.robo4j.socket.http.HttpMessage;
 import com.robo4j.socket.http.HttpMessageWrapper;
 import com.robo4j.socket.http.HttpMethod;
@@ -31,12 +30,10 @@ import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.units.HttpUriRegister;
 import com.robo4j.socket.http.util.ByteBufferUtils;
-import com.robo4j.socket.http.util.HttpHeaderBuilder;
 import com.robo4j.socket.http.util.HttpMessageUtil;
 import com.robo4j.socket.http.util.HttpPathUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 
-import java.io.DataOutputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -99,16 +96,18 @@ public class RoboRequestCallable implements Callable<Object> {
 			case GET:
 				/* currently is supported only one path */
 				if (desiredUnit == null) {
-					final Object systemSummary = factory.processGet(unit, new HttpMessageWrapper<>(httpMessage));
+					return factory.processGet(unit, new HttpMessageWrapper<>(httpMessage));
 				} else {
 					AttributeDescriptor<?> attributeDescriptor = getAttributeByQuery(desiredUnit, httpMessage.uri());
 					if (attributeDescriptor == null) {
 						final Object unitDescription = factory.processGet(desiredUnit,
 								paths.get(DEFAULT_PATH_POSITION_0), new HttpMessageWrapper<>(httpMessage));
 						if (unitDescription != null) {
+							return unitDescription;
 						}
 					} else {
-						final byte[] unitAttributeValue = (byte[]) factory.processGet(desiredUnit, attributeDescriptor);
+						//TODO (miro 09/09/2017 : think about how to return attributes
+						return factory.processGet(desiredUnit, attributeDescriptor);
 					}
 				}
 				return DEFAULT_RESPONSE;
@@ -169,26 +168,5 @@ public class RoboRequestCallable implements Callable<Object> {
 
 	}
 
-	private void processWriter(final DataOutputStream out, String message) throws Exception {
-		out.writeBytes(RoboHttpUtils.HTTP_HEADER_OK);
-		out.writeBytes(HttpHeaderBuilder.Build().add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(message.length()))
-				.build());
-		out.writeBytes(RoboHttpUtils.NEW_LINE);
-		out.writeBytes(message);
-		out.flush();
-	}
 
-	private boolean processByteWriter(final DataOutputStream out, byte[] message) throws Exception {
-		out.writeBytes(RoboHttpUtils.HTTP_HEADER_OK);
-		out.writeBytes(
-				HttpHeaderBuilder.Build().add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_IMAGE_JPG)
-						.add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(message.length))
-						// .add(HttpHeaderNames.CONTENT_DISPOSITION,
-						// HttpHeaderValues.APPLICATION_IMAGE_CONTENT)
-						.build());
-		out.writeBytes(Constants.HTTP_NEW_LINE);
-		out.write(message);
-		out.flush();
-		return true;
-	}
 }
