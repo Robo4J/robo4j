@@ -41,11 +41,9 @@ import java.util.Map;
  */
 public class HttpClientUnit extends RoboUnit<Object> {
 	//short message 0, bigger message -1
-	private static final int DEFAULT_STOPPER = 0;
 	private InetSocketAddress address;
 	private String responseUnit;
 	private Integer responseSize;
-	private Integer stopper;
 
 	public HttpClientUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -58,7 +56,6 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		int confPort = configuration.getInteger("port", RoboHttpUtils._DEFAULT_PORT);
 		responseUnit = configuration.getString("responseUnit", null);
 		responseSize = configuration.getInteger("responseSize", null);
-		stopper = configuration.getInteger("stopper", DEFAULT_STOPPER);
 
 		Map<String, Object> targetUnitsMap = JsonUtil.getMapNyJson(configuration.getString("targetUnits", null));
 		if (confAddress == null || targetUnitsMap.isEmpty()) {
@@ -80,7 +77,7 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			if(responseUnit != null && responseSize != null){
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
 				//important is set stopper properly
-				int readBytes = SocketUtil.readBuffer(channel, readBuffer, stopper);
+				int readBytes = SocketUtil.readBuffer(channel, readBuffer);
 				System.out.println(getClass().getSimpleName() + " read response: " + readBytes);
 				sendMessageToResponseUnit(readBuffer);
 			}

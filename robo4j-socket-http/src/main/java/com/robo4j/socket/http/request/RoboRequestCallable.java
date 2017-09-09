@@ -69,8 +69,6 @@ public class RoboRequestCallable implements Callable<Object> {
 	public Object call() throws Exception {
 		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBuffer(buffer);
 
-
-		// FIXME: 27.08.17 (miro) -> review
 		final String[] headerLines = new String(wrapper.getHeader().array()).split("[\r\n]+");
 		final String firstLine = RoboHttpUtils.correctLine(headerLines[0]);
 		final String[] tokens = firstLine.split(Constants.HTTP_EMPTY_SEP);

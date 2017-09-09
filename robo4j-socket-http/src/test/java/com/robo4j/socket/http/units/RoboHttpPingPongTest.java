@@ -57,10 +57,9 @@ public class RoboHttpPingPongTest {
 	private static final int MESSAGES = 3;
 	private static final String REQUEST_CONSUMER = "request_consumer";
 	private static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
-	private static final int STOPPER = -1;
 	private static final String HTTP_METHOD = "POST";
 
-	// @Test
+//	@Test
 	public void pongTest() throws Exception {
 		RoboContext systemPong = configurePongSystem();
 		systemPong.start();
@@ -94,7 +93,7 @@ public class RoboHttpPingPongTest {
 
 		RoboReference<Object> pongConsumer = systemPong.getReference(REQUEST_CONSUMER);
 
-		Thread.sleep(100);
+		Thread.sleep(500);
 		System.out.println("systemPing : Going Down!");
 		systemPing.stop();
 		systemPing.shutdown();
@@ -119,7 +118,6 @@ public class RoboHttpPingPongTest {
 		config.setString("target", CONTROLLER_PING_PONG);
 		config.setInteger("port", PORT);
 		config.setString("packages", PACKAGE_CODECS);
-		config.setInteger("stopper", STOPPER);
 		/* specific configuration */
 		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
 				JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, HTTP_METHOD)));
