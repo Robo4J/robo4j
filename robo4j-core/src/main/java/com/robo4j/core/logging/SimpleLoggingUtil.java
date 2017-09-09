@@ -16,7 +16,7 @@
  */
 package com.robo4j.core.logging;
 
-import com.robo4j.core.util.CoreConstants;
+import com.robo4j.core.util.StringConstants;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,8 +39,8 @@ public final class SimpleLoggingUtil {
 	}
 
 	public static void debug(Class<?> clazz, String... message) {
-		debug(clazz, clazz.getSimpleName() + " : " + Stream.of(message).reduce(CoreConstants.STRING_EMPTY,
-				(l, r) -> l.concat(CoreConstants.STRING_SPACE).concat(r)));
+		debug(clazz, clazz.getSimpleName() + " : " + Stream.of(message).reduce(StringConstants.EMPTY,
+				(l, r) -> l.concat(StringConstants.SPACE).concat(r)));
 	}
 
 	public static void error(Class<?> clazz, String message) {

@@ -17,7 +17,7 @@
 
 package com.robo4j.socket.http.codec;
 
-import com.robo4j.core.util.CoreConstants;
+import com.robo4j.core.util.StringConstants;
 import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpEncoder;
 import com.robo4j.socket.http.units.HttpProducer;
@@ -42,7 +42,7 @@ public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncod
 	@Override
 	public String encode(SimpleCommand stuff) {
 		final StringBuilder sb = new StringBuilder("{\"value\":\"").append(stuff.getValue());
-		if (stuff.getType().equals(CoreConstants.STRING_EMPTY)) {
+		if (stuff.getType().equals(StringConstants.EMPTY)) {
 			sb.append("\"}");
 		} else {
 			sb.append("\",\"type\":\"").append(stuff.getType()).append("\"}");
@@ -70,6 +70,6 @@ public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncod
 
 	// Private Methods
 	private String objectToString(Object object) {
-		return object != null ? object.toString().trim() : CoreConstants.STRING_EMPTY;
+		return object != null ? object.toString().trim() : StringConstants.EMPTY;
 	}
 }

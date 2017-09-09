@@ -16,7 +16,7 @@
  */
 package com.robo4j.core.configuration;
 
-import com.robo4j.core.util.CoreConstants;
+import com.robo4j.core.util.StringConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -58,9 +58,9 @@ public class XmlConfigurationFactory {
 	 */
 	private static class ConfigurationHandler extends DefaultHandler {
 		private Configuration currentConfig;
-		private String lastElement = CoreConstants.STRING_EMPTY;
+		private String lastElement = StringConstants.EMPTY;
 
-		private String currentValue = CoreConstants.STRING_EMPTY;
+		private String currentValue = StringConstants.EMPTY;
 		private String currentType;
 		private String currentName;
 
@@ -88,7 +88,7 @@ public class XmlConfigurationFactory {
 			switch (qName) {
 			case ELEMENT_VALUE:
 				writeValue(currentConfig, currentValue.trim(), currentType, currentName);
-				currentValue = CoreConstants.STRING_EMPTY;
+				currentValue = StringConstants.EMPTY;
 				break;
 			case ELEMENT_CONFIG:
 				if (!configStack.isEmpty()) { // Closing of the last config...
@@ -96,7 +96,7 @@ public class XmlConfigurationFactory {
 				}
 				break;
 			}
-			lastElement = CoreConstants.STRING_EMPTY;
+			lastElement = StringConstants.EMPTY;
 		}
 
 		private static void writeValue(Configuration currentConfig, String currentValue, String currentType, String currentName) {
@@ -191,7 +191,7 @@ public class XmlConfigurationFactory {
 	}
 
 	private static String getIndentation(int level) {
-		String result = CoreConstants.STRING_EMPTY;
+		String result = StringConstants.EMPTY;
 		for (int i = 0; i < level; i++) {
 			result += "   ";
 		}

@@ -16,7 +16,7 @@
  */
 package com.robo4j.socket.http.util;
 
-import com.robo4j.core.util.CoreConstants;
+import com.robo4j.core.util.StringConstants;
 import com.robo4j.socket.http.HttpHeaderNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.request.RoboBasicMapEntry;
@@ -45,7 +45,7 @@ public final class RoboHttpUtils {
 	public static String setHeader(String responseCode, int length) throws IOException {
 		//@formatter:off
 		return HttpHeaderBuilder.Build()
-				.add(CoreConstants.STRING_EMPTY, responseCode)
+				.add(StringConstants.EMPTY, responseCode)
 				.add(HttpHeaderNames.DATE, LocalDateTime.now().toString())
 				.add(HttpHeaderNames.SERVER, ROBO4J_CLIENT)
 				.add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(length))
@@ -110,7 +110,7 @@ public final class RoboHttpUtils {
 	}
 
 	public static String correctLine(String line) {
-		return line == null ? CoreConstants.STRING_EMPTY : line;
+		return line == null ? StringConstants.EMPTY : line;
 	}
 
 	public static Map<String, String> parseURIQueryToMap(final String uriQuery, final String delimiter) {
