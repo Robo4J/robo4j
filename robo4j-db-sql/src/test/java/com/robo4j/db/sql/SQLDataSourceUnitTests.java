@@ -69,7 +69,6 @@ public class SQLDataSourceUnitTests {
 
 	@After
 	public void clean() throws Exception {
-		Thread.sleep(WAIT_TIME);
 		system.shutdown();
 		System.out.println("SQL System: State after shutdown:");
 		System.out.println(SystemUtil.printStateReport(system));

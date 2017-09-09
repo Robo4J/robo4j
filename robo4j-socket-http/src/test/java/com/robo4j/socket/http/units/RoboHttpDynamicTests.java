@@ -118,8 +118,6 @@ public class RoboHttpDynamicTests {
 		config.setString("target", ID_TARGET_UNIT);
 		config.setInteger("port", PORT);
 		config.setString("packages", "com.robo4j.socket.http.units.test.codec");
-		// FIXME: 06.09.17 (miro) -> fix stopper codecs
-		config.setInteger("stopper", -1);
 		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
 				JsonUtil.getJsonByMap(Collections.singletonMap(ID_TARGET_UNIT, HTTP_METHOD)));
 		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
