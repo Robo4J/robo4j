@@ -46,7 +46,7 @@ import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.util.CoreConstants;
+import com.robo4j.core.util.StringConstants;
 import com.robo4j.socket.http.request.RoboRequestCallable;
 import com.robo4j.socket.http.request.RoboRequestFactory;
 import com.robo4j.socket.http.util.ByteBufferUtils;
@@ -86,7 +86,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
 		/* target is always initiated as the list */
-		target = Arrays.asList(configuration.getString(PROPERTY_TARGET, CoreConstants.STRING_EMPTY).split(DELIMITER));
+		target = Arrays.asList(configuration.getString(PROPERTY_TARGET, StringConstants.EMPTY).split(DELIMITER));
 		port = configuration.getInteger(PROPERTY_PORT, _DEFAULT_PORT);
 		bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
 

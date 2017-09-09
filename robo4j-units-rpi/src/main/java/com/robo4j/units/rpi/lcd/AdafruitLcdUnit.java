@@ -24,7 +24,7 @@ import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.util.CoreConstants;
+import com.robo4j.core.util.StringConstants;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.LcdFactory;
@@ -54,7 +54,7 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 					DefaultAttributeDescriptor.create(Color.class, ATTRIBUTE_NAME_COLOR)));
 
 	private AdafruitLcd lcd;
-	private AtomicReference<String> stringMessage = new AtomicReference<>(CoreConstants.STRING_EMPTY);
+	private AtomicReference<String> stringMessage = new AtomicReference<>(StringConstants.EMPTY);
 
 	public AdafruitLcdUnit(RoboContext context, String id) {
 		super(LcdMessage.class, context, id);

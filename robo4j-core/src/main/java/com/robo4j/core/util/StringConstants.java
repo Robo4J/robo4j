@@ -23,8 +23,7 @@ package com.robo4j.core.util;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class CoreConstants {
-    public static final String STRING_EMPTY = "";
-    public static final String STRING_SPACE = "\u0020";
-    public static final CharSequence EMPTY_CHAR_SEQUENCE = "";
+public final class StringConstants {
+    public static final String EMPTY = "";
+    public static final String SPACE = "\u0020";
 }

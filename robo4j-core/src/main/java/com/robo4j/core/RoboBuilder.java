@@ -29,7 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import com.robo4j.core.util.CoreConstants;
+import com.robo4j.core.util.StringConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -56,10 +56,10 @@ public final class RoboBuilder {
 	 */
 	private class RoboXMLHandler extends DefaultHandler {
 		private static final String ELEMENT_ROBO_UNIT = "roboUnit";
-		private String currentId = CoreConstants.STRING_EMPTY;
-		private String currentClassName = CoreConstants.STRING_EMPTY;
-		private String currentConfiguration = CoreConstants.STRING_EMPTY;
-		private String lastElement = CoreConstants.STRING_EMPTY;
+		private String currentId = StringConstants.EMPTY;
+		private String currentClassName = StringConstants.EMPTY;
+		private String currentConfiguration = StringConstants.EMPTY;
+		private String lastElement = StringConstants.EMPTY;
 		private boolean configState = false;
 		private boolean inSystemElement = false;
 		
@@ -74,7 +74,7 @@ public final class RoboBuilder {
 				break;
 			case XmlConfigurationFactory.ELEMENT_CONFIG:
 				if (!configState && !inSystemElement) {
-					currentConfiguration = CoreConstants.STRING_EMPTY;
+					currentConfiguration = StringConstants.EMPTY;
 					configState = true;
 					break;
 				}
@@ -98,7 +98,7 @@ public final class RoboBuilder {
 						@SuppressWarnings("unchecked")
 						Class<RoboUnit<?>> roboUnitClass = (Class<RoboUnit<?>>) Thread.currentThread().getContextClassLoader()
 								.loadClass(currentClassName.trim());
-						Configuration config = currentConfiguration.trim().equals(CoreConstants.STRING_EMPTY) ? null
+						Configuration config = currentConfiguration.trim().equals(StringConstants.EMPTY) ? null
 								: XmlConfigurationFactory.fromXml(currentConfiguration);
 						internalAddUnit(instantiateAndInitialize(roboUnitClass, currentId.trim(), config));
 					} catch (Exception e) {
@@ -141,10 +141,10 @@ public final class RoboBuilder {
 		}
 
 		private void clearCurrentVariables() {
-			currentId = CoreConstants.STRING_EMPTY;
-			currentClassName = CoreConstants.STRING_EMPTY;
+			currentId = StringConstants.EMPTY;
+			currentClassName = StringConstants.EMPTY;
 			currentConfiguration = null;
-			currentConfiguration = CoreConstants.STRING_EMPTY;
+			currentConfiguration = StringConstants.EMPTY;
 		}
 
 		private boolean verifyUnit() {
@@ -168,9 +168,9 @@ public final class RoboBuilder {
 	 */
 	private class SystemXMLHandler extends DefaultHandler {
 		private static final String ELEMENT_SYSTEM = "roboSystem";
-		private String currentId = CoreConstants.STRING_EMPTY;
-		private String currentConfiguration = CoreConstants.STRING_EMPTY;
-		private String lastElement = CoreConstants.STRING_EMPTY;
+		private String currentId = StringConstants.EMPTY;
+		private String currentConfiguration = StringConstants.EMPTY;
+		private String lastElement = StringConstants.EMPTY;
 		private boolean configState = false;
 		private RoboSystem system;
 
@@ -182,7 +182,7 @@ public final class RoboBuilder {
 				break;
 			case XmlConfigurationFactory.ELEMENT_CONFIG:
 				if (!configState) {
-					currentConfiguration = CoreConstants.STRING_EMPTY;
+					currentConfiguration = StringConstants.EMPTY;
 					configState = true;
 					break;
 				}
