@@ -69,10 +69,13 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private static final HttpCodecRegistry CODEC_REGISTRY = new HttpCodecRegistry();
 	public static final String PROPERTY_PORT = "port";
 	public static final String PROPERTY_TARGET = "target";
+	public static final String PROPERTY_STOPPER = "stopper";
 	public static final String PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
 	private boolean available;
 	private Integer port;
 	private Integer bufferCapacity;
+	//used for encoded messages
+	private Integer stopper;
 	private List<String> target;
 	private ServerSocketChannel server;
 	private final Map<SelectableChannel, SelectionKey> channelKeyMap = new HashMap<>();
@@ -89,6 +92,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		target = Arrays.asList(configuration.getString(PROPERTY_TARGET, CoreConstants.STRING_EMPTY).split(DELIMITER));
 		port = configuration.getInteger(PROPERTY_PORT, _DEFAULT_PORT);
 		bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
+		stopper = configuration.getInteger(PROPERTY_STOPPER, null);
 
 		String packages = configuration.getString("packages", null);
 		if (validatePackages(packages)) {
@@ -228,7 +232,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
 
 		ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
-		int readBytes = SocketUtil.readBuffer(channel, buffer);
+		int readBytes = stopper == null ? SocketUtil.readBuffer(channel, buffer) : SocketUtil.readBuffer(channel, buffer, stopper);
 		buffer.flip();
 		if(buffer.remaining() == 0){
 			buffer.clear();

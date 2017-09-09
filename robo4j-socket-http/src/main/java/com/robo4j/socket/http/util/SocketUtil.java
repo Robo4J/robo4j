@@ -28,7 +28,8 @@ import java.nio.channels.SocketChannel;
 public final class SocketUtil {
 
     /**
-     * 
+     * Used for normal message
+     *
      * @param channel
      * @param buffer
      * @return
@@ -44,6 +45,27 @@ public final class SocketUtil {
                 totalRead += numberRead;
             } else if(numberRead == -1){
                 numberRead = 0;
+            }
+        }
+        return totalRead;
+    }
+
+    /**
+     * used for messages contains Base64 messages
+     *
+     * @param channel
+     * @param buffer
+     * @param stopper
+     * @return
+     * @throws IOException
+     */
+    public static int readBuffer(SocketChannel channel, ByteBuffer buffer, int stopper) throws IOException {
+        int numberRead = channel.read(buffer);
+        int totalRead = numberRead;
+        while (numberRead != stopper) {
+            numberRead = channel.read(buffer);
+            if(numberRead > 0){
+                totalRead += numberRead;
             }
         }
         return totalRead;
