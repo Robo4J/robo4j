@@ -17,8 +17,6 @@
 
 package com.robo4j.units.rpi.pad;
 
-import java.nio.file.Paths;
-
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
@@ -26,10 +24,12 @@ import com.robo4j.core.RoboReference;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.hw.rpi.pad.LF710ButtonObserver;
-import com.robo4j.hw.rpi.pad.LF710Pad;
 import com.robo4j.hw.rpi.pad.LF710Message;
+import com.robo4j.hw.rpi.pad.LF710Pad;
 import com.robo4j.hw.rpi.pad.PadInputResponseListener;
 import com.robo4j.hw.rpi.pad.RoboControlPad;
+
+import java.nio.file.Paths;
 
 /**
  * Logitech F710 Gamepad unit
@@ -91,12 +91,6 @@ public class LF710PadUnit extends RoboUnit<Object>{
         observer = null;
         listener = null;
         setState(LifecycleState.STOPPED);
-    }
-
-    @Override
-    public void shutdown() {
-        setState(LifecycleState.SHUTTING_DOWN);
-        setState(LifecycleState.SHUTDOWN);
     }
 
 }
