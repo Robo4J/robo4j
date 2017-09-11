@@ -233,7 +233,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 					lidar.acquireRange();
 				} else {
 					ScanResultImpl scan = new ScanResultImpl(1, 0f, POINT_FILTER);
-					scan.addPoint(lidar.readDistance(), angle);
+					scan.addPoint(lidar.readDistance(), (float) Math.toRadians(angle));
 					recipient.sendMessage(scan);
 				}
 			} catch (IOException e) {
