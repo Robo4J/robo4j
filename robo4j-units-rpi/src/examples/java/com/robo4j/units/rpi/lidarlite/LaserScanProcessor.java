@@ -46,6 +46,5 @@ public class LaserScanProcessor extends RoboUnit<ScanResult2D> {
 		// System.out.println(result.toString());
 		RoboReference<String> controller = getContext().getReference("controller");
 		getContext().getScheduler().schedule(controller, "scan", 5, 100, TimeUnit.SECONDS, 1);
-		controller.sendMessage("scan");
 	}
 }
