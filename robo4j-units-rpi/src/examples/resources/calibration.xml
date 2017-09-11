@@ -17,8 +17,7 @@
 			<!-- 0x40 hex -->	
 			<value name="address" type="int">0x40</value>
 			<value name="channel" type="int">1</value>
-			<value name="trim" type="float">-50</value>
-			<value name="panServoRange" type="float">45</value>
+			<value name="trim" type="float">-40</value>
 			<value name="inverted" type="boolean">true</value>
 		</config>
 	</roboUnit>
