@@ -86,7 +86,7 @@ public class ScanResultImpl implements ScanResult2D {
 
 	public void addPoint(Point2f p) {
 		if (!pointFilter.test(p)) {
-			return; 
+			return;
 		}
 		points.add(p);
 		emitEvent(p);
@@ -126,6 +126,14 @@ public class ScanResultImpl implements ScanResult2D {
 		return points;
 	}
 
+	/**
+	 * Adds a point to the scan.
+	 * 
+	 * @param range
+	 *            range in meters.
+	 * @param angle
+	 *            angle in radians.
+	 */
 	public void addPoint(float range, float angle) {
 		addPoint(new Point2f(range, angle));
 	}
