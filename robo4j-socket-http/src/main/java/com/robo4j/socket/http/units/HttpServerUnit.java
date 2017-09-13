@@ -245,6 +245,10 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 		try{
 			Object result = futureResult.get();
+			if(result == null){
+				System.out.println(getClass() + " EMPTY RESULT");
+				result = StringConstants.EMPTY;
+			}
 			// TODO: 27.08.17 miro discuss -> Serializable
 			outBuffers.put(key, result);
 			for (RoboReference<Object> ref : targetRefs) {

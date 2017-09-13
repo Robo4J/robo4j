@@ -16,9 +16,6 @@
  */
 package com.robo4j.units.rpi.lidarlite;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import com.robo4j.core.RoboBuilder;
 import com.robo4j.core.RoboBuilderException;
 import com.robo4j.core.RoboContext;
@@ -26,6 +23,11 @@ import com.robo4j.core.RoboReference;
 import com.robo4j.core.configuration.Configuration;
 import com.robo4j.core.configuration.ConfigurationFactory;
 import com.robo4j.units.rpi.pwm.ServoUnitExample;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Runs the laser scanner, printing the max range and min range found on stdout.
@@ -40,16 +42,21 @@ public class LaserScannerExample {
 		float startAngle = -45.0f;
 		float range = 90.0f;
 		float step = 1.0f;
+		InputStream settings;
 
-		if (args.length > 0) {
-			startAngle = Float.parseFloat(args[0]);
-			if (args.length > 1) {
+		switch (args.length){
+			case 1:
+				settings = Files.newInputStream(Paths.get(args[0]));
+				break;
+			case 3:
+				startAngle = Float.parseFloat(args[0]);
 				range = Float.parseFloat(args[1]);
-				if (args.length > 2) {
-					step = Float.parseFloat(args[2]);
-				}
-			}
+				step = Float.parseFloat(args[2]);
+			default:
+				settings = ServoUnitExample.class.getClassLoader().getResourceAsStream("lidarexample.xml");
 		}
+
+
 		Configuration controllerConfiguration = ConfigurationFactory.createEmptyConfiguration();
 		controllerConfiguration.setFloat(LaserScannerTestController.CONFIG_KEY_START_ANGLE, startAngle);
 		controllerConfiguration.setFloat(LaserScannerTestController.CONFIG_KEY_RANGE, range);
@@ -58,7 +65,6 @@ public class LaserScannerExample {
 		System.out.println(String.format("Running scans with startAngle=%2.1f, range=%2.1f and step=%2.1f", startAngle, range, step));
 		
 		RoboBuilder builder = new RoboBuilder();
-		InputStream settings = ServoUnitExample.class.getClassLoader().getResourceAsStream("lidarexample.xml");
 		if (settings == null) {
 			System.out.println("Could not find the settings for the LaserScannerExample!");
 			System.exit(2);
