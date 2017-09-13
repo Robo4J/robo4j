@@ -20,7 +20,14 @@ import java.io.IOException;
 
 import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
 
+/**
+ * Simple hello world-style example.
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
 public class HelloLcd {
+	
 	public static void main(String[] args) throws IOException, UnsupportedBusNumberException {
 		 AdafruitLcd lcd = LcdFactory.createLCD();
 		 lcd.setBacklight(Color.TEAL);
