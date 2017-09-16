@@ -35,7 +35,7 @@ import java.util.Scanner;
  */
 public class CalibrationUtility {
 	public static void main(String[] args) throws RoboBuilderException, FileNotFoundException {
-		InputStream settings = ServoUnitExample.class.getClassLoader().getResourceAsStream("servoexample.xml");
+		InputStream settings = ServoUnitExample.class.getClassLoader().getResourceAsStream("calibration.xml");
 		if (args.length != 1) {
 			System.out.println("No file specified, using default calibration.xml");
 		} else {

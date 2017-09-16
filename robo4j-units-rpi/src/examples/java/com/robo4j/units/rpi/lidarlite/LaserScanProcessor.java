@@ -16,6 +16,8 @@
  */
 package com.robo4j.units.rpi.lidarlite;
 
+import java.util.concurrent.TimeUnit;
+
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboReference;
@@ -43,6 +45,6 @@ public class LaserScanProcessor extends RoboUnit<ScanResult2D> {
 	public void onMessage(ScanResult2D result) {
 		// System.out.println(result.toString());
 		RoboReference<String> controller = getContext().getReference("controller");
-		controller.sendMessage("scan");
+		getContext().getScheduler().schedule(controller, "scan", 5, 100, TimeUnit.SECONDS, 1);
 	}
 }

@@ -72,6 +72,8 @@ public class LaserScannerExample {
 		builder.add(settings).add(LaserScannerTestController.class, controllerConfiguration, "controller").add(LaserScanProcessor.class,
 				"processor");
 		RoboContext ctx = builder.build();
+		RoboReference<Float> tiltServo = ctx.getReference("laserscanner.tilt");
+		tiltServo.sendMessage(Float.valueOf(0));
 		RoboReference<String> reference = ctx.getReference("controller");
 		ctx.start();
 		System.out.println("Starting scanning for ever\nPress enter to quit");

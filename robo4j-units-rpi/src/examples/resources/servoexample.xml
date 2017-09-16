@@ -7,7 +7,7 @@
 			<!-- 0x40 hex -->	
 			<value name="address" type="int">0x40</value>
 			<value name="channel" type="int">0</value>
-			<value name="trim" type="float">16</value>
+			<value name="trim" type="float">7</value>
 		</config>
 	</roboUnit>
 	<roboUnit id="tilt">
