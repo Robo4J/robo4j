@@ -252,8 +252,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			// TODO: 27.08.17 miro discuss -> Serializable
 			outBuffers.put(key, result);
 			for (RoboReference<Object> ref : targetRefs) {
-			if (result != null && ref.getMessageType() != null
-					&& ref.getMessageType().equals(result.getClass())) {
+			if (ref.getMessageType().equals(result.getClass())) {
 				ref.sendMessage(result);
 			}
 		}

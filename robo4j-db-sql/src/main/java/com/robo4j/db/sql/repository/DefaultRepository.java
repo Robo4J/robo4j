@@ -110,6 +110,7 @@ public class DefaultRepository implements RoboRepository {
 	public <T> T save(T entity) {
 		lock.lock();
 		try {
+			//TODO remove entityManager, features -> JDBC patching
 			EntityManager em = dataSourceContext.getEntityManager(entity.getClass());
 			em.getTransaction().begin();
 			if (em.contains(entity)) {

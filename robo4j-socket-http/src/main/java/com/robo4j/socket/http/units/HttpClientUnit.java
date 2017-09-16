@@ -40,7 +40,6 @@ import java.util.Map;
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpClientUnit extends RoboUnit<Object> {
-	//short message 0, bigger message -1
 	private InetSocketAddress address;
 	private String responseUnit;
 	private Integer responseSize;
@@ -70,20 +69,19 @@ public class HttpClientUnit extends RoboUnit<Object> {
 	public void onMessage(Object message) {
 		try {
 			SocketChannel channel = SocketChannel.open(address);
-			channel.configureBlocking(true);
-
-			ByteBuffer buffer = ByteBuffer.wrap(((String)message).getBytes());
+			channel.configureBlocking(false);
+			ByteBuffer buffer = ByteBuffer.wrap(((String) message).getBytes());
 			int writtenBytes = SocketUtil.writeBuffer(channel, buffer);
-			if(responseUnit != null && responseSize != null){
+			if (responseUnit != null && responseSize != null) {
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
-				//important is set stopper properly
+				// important is set stopper properly
 				int readBytes = SocketUtil.readBuffer(channel, readBuffer);
 				System.out.println(getClass().getSimpleName() + " read response: " + readBytes);
 				sendMessageToResponseUnit(readBuffer);
 			}
 			channel.close();
 		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "not available:"+ address +  ", no worry I continue sending images");
+			SimpleLoggingUtil.error(getClass(), "not available:" + address + ", no worry I continue sending images");
 		}
 	}
 
