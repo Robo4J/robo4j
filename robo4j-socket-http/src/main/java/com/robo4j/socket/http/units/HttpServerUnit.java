@@ -39,6 +39,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import com.robo4j.core.BlockingTrait;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
@@ -61,6 +62,7 @@ import com.robo4j.socket.http.util.SocketUtil;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@BlockingTrait
 public class HttpServerUnit extends RoboUnit<Object> {
 	private static final String DELIMITER = ",";
 	private static final int _DEFAULT_PORT = 8042;
