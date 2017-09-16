@@ -18,8 +18,10 @@
 package com.robo4j.units.rpi.camera;
 
 import com.robo4j.core.AttributeDescriptor;
+import com.robo4j.core.BlockingTrait;
 import com.robo4j.core.ConfigurationException;
 import com.robo4j.core.DefaultAttributeDescriptor;
+import com.robo4j.core.LifecycleState;
 import com.robo4j.core.RoboContext;
 import com.robo4j.core.RoboUnit;
 import com.robo4j.core.configuration.Configuration;
@@ -39,9 +41,11 @@ import java.net.UnknownHostException;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.robo4j.units.rpi.camera.RaspistillUtils.DEFAULT;
@@ -50,6 +54,8 @@ import static com.robo4j.units.rpi.camera.RaspistillUtils.DEFAULT;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+
+@BlockingTrait
 public class RaspistillUnit extends RoboUnit<Boolean> {
 
 	private static final String ATTRIBUTE_COMMAND = "command";
@@ -59,6 +65,7 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 	private final CameraMessageCodec codec = new CameraMessageCodec();
 
 	private final RaspistilDevice device = new RaspistilDevice();
+	private AtomicBoolean progress = new AtomicBoolean(false);
 	private String command;
 	private String targetOut;
 	private String storeTarget;
@@ -142,6 +149,18 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 	}
 
 	@Override
+	public void start() {
+		EnumSet<LifecycleState> acceptedStates = EnumSet.of(LifecycleState.STARTING, LifecycleState.STARTED);
+		getContext().getScheduler().execute(() -> {
+			while(acceptedStates.contains(getState())){
+				if(progress.compareAndSet(false, true)){
+					createImage();
+				}
+			}
+		});
+	}
+
+	@Override
 	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
 		return KNOWN_ATTRIBUTES;
 	}
@@ -164,6 +183,7 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 			final String message = codec.encode(cameraMessage);
 			final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, message);
 			sendClientMessage(getContext(), postMessage);
+			progress.set(false);
 		}
 	}
 
