@@ -17,23 +17,23 @@
 
 <robo4j>
     <roboUnit id="httpServer">
-        <class>com.robo4j.core.httpunit.HttpServerUnit</class>
-        <config name="com.robo4j.core.root">
+        <class>com.robo4j.httpunit.HttpServerUnit</class>
+        <config name="com.robo4j.root">
             <value name="port" type="int">8027</value>
             <value name="target" type="String">imageController</value>
-            <value name="packages" type="String">com.robo4j.core.httpunit.codec</value>
+            <value name="packages" type="String">com.robo4j.httpunit.codec</value>
             <value name="targetUnits" type="String">{"imageController":"POST"}</value>
         </config>
     </roboUnit>
     <roboUnit id="imageController">
-        <class>com.robo4j.core.httpunit.test.TestServerImageController</class>
-        <config name="com.robo4j.core.root">
+        <class>com.robo4j.httpunit.test.TestServerImageController</class>
+        <config name="com.robo4j.root">
             <value name="target" type="String">dbSqlUnit</value>
         </config>
     </roboUnit>
     <roboUnit id="dbSqlUnit">
         <class>com.robo4j.db.sql.SQLDataSourceUnit</class>
-        <config name="com.robo4j.core.root">
+        <config name="com.robo4j.root">
             <value name="sourceType" type="String">h2</value>
             <value name="packages" type="String">com.robo4j.db.sql.model</value>
             <value name="limit" type="Integer">2</value>
@@ -44,7 +44,7 @@
     </roboUnit>
     <roboUnit id="dbRegisterController">
         <class>com.robo4j.db.sql.unit.SQLRegisterController</class>
-    <config name="com.robo4j.core.root">
+    <config name="com.robo4j.root">
         <value name="dataSourceName" type="String">dbSqlUnit</value>
     </config>
 </roboUnit>

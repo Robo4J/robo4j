@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core.units.httpunit.test.util;
+package com.robo4j.units.httpunit.test.util;
 
 import java.util.Collections;
 import java.util.HashMap;

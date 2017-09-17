@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core.units.httpunit.test.model;
+package com.robo4j.units.httpunit.test.model;
 
 import java.util.List;
 
