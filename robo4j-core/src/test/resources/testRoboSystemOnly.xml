@@ -16,7 +16,7 @@
   -->
 <robo4j>
     <roboSystem id="mySystem">
-        <config name="com.robo4j.core.root">
+        <config name="com.robo4j.root">
             <value name="poolSizeScheduler" type="int">6</value>
             <value name="poolSizeWorker" type="int">3</value>
             <value name="poolSizeBlocking" type="int">10</value>

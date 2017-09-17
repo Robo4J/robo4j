@@ -1,7 +1,7 @@
 <!-- Erroneous Robo4J Unit Definition file for JUnit Tests -->
 <robo4j>
 	<roboUnit id="producer">
-		<class>com.robo4j.core.StringProducer</class>
+		<class>com.robo4j.StringProducer</class>
 		<properties>
 			<property>
 				<key>target</key>
@@ -11,7 +11,7 @@
 	</roboUnit>
 
 	<roboUnit id="producer">
-		<class>com.robo4j.core.StringConsumer</class>
+		<class>com.robo4j.StringConsumer</class>
 		<properties>
 		</properties>
 	</roboUnit>

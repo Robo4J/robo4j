@@ -16,13 +16,13 @@
   -->
 <robo4j>
     <roboUnit id="producer">
-        <class>com.robo4j.core.StringProducer</class>
-        <config name="com.robo4j.core.root">
+        <class>com.robo4j.StringProducer</class>
+        <config name="com.robo4j.root">
             <value name="target" type="String">consumer</value>
         </config>
     </roboUnit>
 
     <roboUnit id="consumer">
-    <class>com.robo4j.core.StringConsumer</class>
+    <class>com.robo4j.StringConsumer</class>
     </roboUnit>
 </robo4j>

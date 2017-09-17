@@ -50,7 +50,7 @@ public class XmlConfigurationFactory {
 	private static final String TYPE_FLOAT = "float";
 	private static final String TYPE_INT = "int";
 	private static final String TYPE_STRING = "String";
-	private static final String ELEMENT_ROOT = "com.robo4j.core.root";
+	private static final String ELEMENT_ROOT = "com.robo4j.root";
 	private static final String ELEMENT_VALUE = "value";
 
 	private static final Deque<Configuration> configStack = new ArrayDeque<>();

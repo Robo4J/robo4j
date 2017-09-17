@@ -1,7 +1,7 @@
 <!-- Robo4J Unit Definition file for JUnit Tests -->
 <robo4j>
 	<roboSystem id="mySystem">
-		<config name="com.robo4j.core.root">
+		<config name="com.robo4j.root">
 			<value name="poolSizeScheduler" type="int">11</value>
 			<value name="poolSizeWorker" type="int">5</value>
 			<value name="poolSizeBlocking" type="int">13</value>
@@ -9,13 +9,13 @@
 	</roboSystem>
 	
 	<roboUnit id="producer">
-		<class>com.robo4j.core.StringProducer</class>
-		<config name="com.robo4j.core.root">
+		<class>com.robo4j.StringProducer</class>
+		<config name="com.robo4j.root">
 			<value name="target" type="String">consumer</value>
 		</config>
 	</roboUnit>
 
 	<roboUnit id="consumer">
-		<class>com.robo4j.core.StringConsumer</class>
+		<class>com.robo4j.StringConsumer</class>
 	</roboUnit>
 </robo4j>

@@ -1,5 +1,5 @@
 <!-- Example - Update parameters to suit your set up, especially offsets and multipliers! -->
-<config name="com.robo4j.core.root">
+<config name="com.robo4j.root">
 	<value name="bus" type="int">1</value>
 	<value name="address" type="int">0x19</value>
 	<value name="rate" type="String">HZ_10</value>
