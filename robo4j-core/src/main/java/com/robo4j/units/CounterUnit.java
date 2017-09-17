@@ -14,19 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.units;
+package com.robo4j.units;
 
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.robo4j.core.AttributeDescriptor;
-import com.robo4j.core.ConfigurationException;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboUnit;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.ConfigurationException;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.RoboUnit;
+import com.robo4j.configuration.Configuration;
+import com.robo4j.logging.SimpleLoggingUtil;
 
 /**
  * A simple unit which will count upwards from zero. Useful, for example, as a

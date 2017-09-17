@@ -26,19 +26,19 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import com.robo4j.core.AttributeDescriptor;
-import com.robo4j.core.ConfigurationException;
-import com.robo4j.core.DefaultAttributeDescriptor;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboUnit;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.ConfigurationException;
+import com.robo4j.DefaultAttributeDescriptor;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.RoboUnit;
+import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.serial.gps.GPS;
 import com.robo4j.hw.rpi.serial.gps.GPSEvent;
 import com.robo4j.hw.rpi.serial.gps.GPSListener;
 import com.robo4j.hw.rpi.serial.gps.PositionEvent;
 import com.robo4j.hw.rpi.serial.gps.VelocityEvent;
+import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.math.geometry.Tuple3f;
 
 /**

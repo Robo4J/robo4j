@@ -17,10 +17,10 @@
 
 package com.robo4j.db.sql;
 
-import com.robo4j.core.AttributeDescriptor;
-import com.robo4j.core.DefaultAttributeDescriptor;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboUnit;
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.DefaultAttributeDescriptor;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboUnit;
 import com.robo4j.db.sql.dto.ERoboDbContract;
 
 import java.util.Collection;

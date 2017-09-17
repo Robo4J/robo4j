@@ -26,10 +26,10 @@ import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.spi.PersistenceUnitInfo;
 
-import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.reflect.ReflectionScan;
 import com.robo4j.db.sql.RoboDbException;
 import com.robo4j.db.sql.support.DataSourceType;
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.reflect.ReflectionScan;
 
 /**
  *

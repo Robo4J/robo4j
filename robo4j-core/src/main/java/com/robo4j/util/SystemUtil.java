@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.util;
+package com.robo4j.util;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
 
 /**
  * Some useful little utilities.

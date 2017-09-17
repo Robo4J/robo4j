@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
+package com.robo4j;
 
 import java.util.Collection;
 
-import com.robo4j.core.scheduler.Scheduler;
+import com.robo4j.scheduler.Scheduler;
 
 /**
  * The execution context available for a unit. Contains a simple lookup service,

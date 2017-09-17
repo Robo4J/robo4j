@@ -17,16 +17,15 @@
 
 package com.robo4j.db.sql;
 
-import com.robo4j.core.AttributeDescriptor;
-import com.robo4j.core.BlockingTrait;
-import com.robo4j.core.ConfigurationException;
-import com.robo4j.core.DefaultAttributeDescriptor;
-import com.robo4j.core.LifecycleState;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboUnit;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.BlockingTrait;
+import com.robo4j.ConfigurationException;
+import com.robo4j.DefaultAttributeDescriptor;
+import com.robo4j.LifecycleState;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.RoboUnit;
+import com.robo4j.configuration.Configuration;
 import com.robo4j.db.sql.dto.ERoboDbContract;
 import com.robo4j.db.sql.model.ERoboPoint;
 import com.robo4j.db.sql.model.ERoboUnit;
@@ -36,6 +35,7 @@ import com.robo4j.db.sql.support.DataSourceContext;
 import com.robo4j.db.sql.support.DataSourceType;
 import com.robo4j.db.sql.support.PersistenceContextBuilder;
 import com.robo4j.db.sql.support.SortType;
+import com.robo4j.logging.SimpleLoggingUtil;
 
 import java.util.Collection;
 import java.util.Collections;

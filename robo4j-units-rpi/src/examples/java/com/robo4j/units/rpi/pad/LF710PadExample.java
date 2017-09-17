@@ -20,10 +20,10 @@ package com.robo4j.units.rpi.pad;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.robo4j.core.RoboBuilder;
-import com.robo4j.core.RoboBuilderException;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.util.SystemUtil;
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboBuilderException;
+import com.robo4j.RoboContext;
+import com.robo4j.util.SystemUtil;
 
 /**
  * Logitech F710 Pad Example

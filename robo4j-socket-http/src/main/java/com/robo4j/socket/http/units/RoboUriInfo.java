@@ -17,10 +17,10 @@
 
 package com.robo4j.socket.http.units;
 
-import com.robo4j.core.RoboReference;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.robo4j.RoboReference;
 
 /**
  * Related information to the URI

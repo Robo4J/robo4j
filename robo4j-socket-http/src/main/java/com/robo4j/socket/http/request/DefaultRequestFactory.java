@@ -16,9 +16,9 @@
  */
 package com.robo4j.socket.http.request;
 
-import com.robo4j.core.AttributeDescriptor;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboUnit;
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.RoboReference;
+import com.robo4j.RoboUnit;
 import com.robo4j.socket.http.HttpMessageWrapper;
 
 /**

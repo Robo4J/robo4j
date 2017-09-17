@@ -14,13 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
+package com.robo4j;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.configuration.ConfigurationFactory;
+import com.robo4j.LifecycleState;
+import com.robo4j.RoboReference;
+import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationFactory;
 
 /**
  * Test(s) for the RoboUnits.

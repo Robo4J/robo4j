@@ -17,13 +17,13 @@
 
 package com.robo4j.socket.http.units;
 
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.logging.SimpleLoggingUtil;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.logging.SimpleLoggingUtil;
 
 /**
  * Register URIs by http method (GET,POST...) and URIs path

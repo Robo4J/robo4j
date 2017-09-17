@@ -20,10 +20,10 @@ package com.robo4j.units.lego.example;
 import com.robo4j.socket.http.util.JsonUtil;
 import org.junit.Test;
 
-import com.robo4j.core.RoboBuilder;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.configuration.ConfigurationFactory;
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboContext;
+import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.socket.http.units.HttpServerUnit;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.units.lego.LcdTestUnit;

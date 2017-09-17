@@ -17,7 +17,7 @@
 
 package com.robo4j.socket.http.codec;
 
-import com.robo4j.core.util.StringConstants;
+import com.robo4j.util.StringConstants;
 
 /**
  * used for simple http communication

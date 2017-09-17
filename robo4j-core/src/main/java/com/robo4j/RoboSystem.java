@@ -14,13 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
-
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.scheduler.DefaultScheduler;
-import com.robo4j.core.scheduler.RoboThreadFactory;
-import com.robo4j.core.scheduler.Scheduler;
+package com.robo4j;
 
 import java.util.Collection;
 import java.util.EnumSet;
@@ -35,6 +29,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+
+import com.robo4j.configuration.Configuration;
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.scheduler.DefaultScheduler;
+import com.robo4j.scheduler.RoboThreadFactory;
+import com.robo4j.scheduler.Scheduler;
 
 /**
  * This is the default implementation for a local {@link RoboContext}. Contains

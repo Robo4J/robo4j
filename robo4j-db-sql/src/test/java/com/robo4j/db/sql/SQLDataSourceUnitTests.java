@@ -17,19 +17,20 @@
 
 package com.robo4j.db.sql;
 
-import com.robo4j.core.DefaultAttributeDescriptor;
-import com.robo4j.core.RoboBuilder;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.configuration.ConfigurationFactory;
-import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.util.SystemUtil;
+import com.robo4j.DefaultAttributeDescriptor;
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.db.sql.dto.ERoboDbContract;
 import com.robo4j.db.sql.model.ERoboEntity;
 import com.robo4j.db.sql.model.ERoboPoint;
 import com.robo4j.db.sql.model.ERoboUnit;
 import com.robo4j.db.sql.support.RoboRequestType;
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.util.SystemUtil;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.reflect.ReflectionScan;
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.reflect.ReflectionScan;
 
 /**
  * Registry for codecs.

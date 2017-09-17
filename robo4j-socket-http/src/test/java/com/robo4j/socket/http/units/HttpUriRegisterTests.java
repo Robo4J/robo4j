@@ -17,8 +17,8 @@
 
 package com.robo4j.socket.http.units;
 
-import com.robo4j.core.RoboBuilder;
-import com.robo4j.core.RoboContext;
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboContext;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import org.junit.Test;
 

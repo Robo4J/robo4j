@@ -17,8 +17,8 @@
 
 package com.robo4j.units.lego.example;
 
-import com.robo4j.core.*;
-import com.robo4j.core.configuration.Configuration;
+import com.robo4j.*;
+import com.robo4j.configuration.Configuration;
 import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
 import com.robo4j.units.lego.platform.LegoPlatformMessage;
 

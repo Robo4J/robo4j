@@ -18,13 +18,13 @@ package com.robo4j.units.rpi.gps;
 
 import java.io.IOException;
 
-import com.robo4j.core.RoboBuilder;
-import com.robo4j.core.RoboBuilderException;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.util.SystemUtil;
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboBuilderException;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
 import com.robo4j.hw.rpi.serial.gps.GPSEvent;
 import com.robo4j.units.rpi.gps.GPSRequest.Operation;
+import com.robo4j.util.SystemUtil;
 
 /**
  * Runs the gyro continuously.

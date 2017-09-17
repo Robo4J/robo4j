@@ -14,10 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
+package com.robo4j;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.robo4j.DefaultAttributeDescriptor;
+import com.robo4j.LifecycleState;
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboBuilderException;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
 
 import java.util.concurrent.ExecutionException;
 

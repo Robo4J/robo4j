@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core.util;
+package com.robo4j.util;
 
 /**
  * Commonly used constants.

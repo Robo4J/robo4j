@@ -24,10 +24,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import com.robo4j.core.AttributeDescriptor;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.RoboUnit;
-import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.RoboReference;
+import com.robo4j.RoboUnit;
+import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMessageWrapper;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.units.Constants;

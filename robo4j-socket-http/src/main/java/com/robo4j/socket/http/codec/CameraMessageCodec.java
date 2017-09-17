@@ -17,10 +17,10 @@
 
 package com.robo4j.socket.http.codec;
 
-import com.robo4j.core.util.StringConstants;
 import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpEncoder;
 import com.robo4j.socket.http.units.HttpProducer;
+import com.robo4j.util.StringConstants;
 
 import java.util.HashMap;
 import java.util.Map;

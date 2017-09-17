@@ -1,4 +1,4 @@
-package com.robo4j.core.reflect;
+package com.robo4j.reflect;
 
 public class ReflectionScanException extends RuntimeException {
 	private static final long serialVersionUID = 1L;

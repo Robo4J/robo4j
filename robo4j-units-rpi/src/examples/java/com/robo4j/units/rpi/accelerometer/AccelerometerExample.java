@@ -19,11 +19,11 @@ package com.robo4j.units.rpi.accelerometer;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.robo4j.core.RoboBuilder;
-import com.robo4j.core.RoboBuilderException;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.util.SystemUtil;
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboBuilderException;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.util.SystemUtil;
 
 /**
  * Runs the accelerometer continuously and always prints what it reads.

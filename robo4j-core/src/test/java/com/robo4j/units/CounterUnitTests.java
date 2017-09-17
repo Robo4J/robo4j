@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.units;
+package com.robo4j.units;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -22,16 +22,18 @@ import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.core.AttributeDescriptor;
-import com.robo4j.core.DefaultAttributeDescriptor;
-import com.robo4j.core.IntegerConsumer;
-import com.robo4j.core.LifecycleState;
-import com.robo4j.core.RoboBuilder;
-import com.robo4j.core.RoboBuilderException;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.configuration.ConfigurationFactory;
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.DefaultAttributeDescriptor;
+import com.robo4j.IntegerConsumer;
+import com.robo4j.LifecycleState;
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboBuilderException;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.units.CounterCommand;
+import com.robo4j.units.CounterUnit;
 
 /**
  * Test for the CounterUnit.

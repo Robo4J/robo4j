@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.logging;
-
-import com.robo4j.core.util.StringConstants;
+package com.robo4j.logging;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
+
+import com.robo4j.util.StringConstants;
 
 /**
  * Simple toolkit for logging.

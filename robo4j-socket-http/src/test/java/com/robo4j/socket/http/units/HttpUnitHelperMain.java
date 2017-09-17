@@ -17,13 +17,13 @@
 
 package com.robo4j.socket.http.units;
 
-import com.robo4j.core.RoboBuilder;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.util.SystemUtil;
-
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
+
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.util.SystemUtil;
 
 /**
  * Helper test utility

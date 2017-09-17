@@ -19,19 +19,20 @@
 
 package com.robo4j.socket.http.units;
 
-import com.robo4j.core.DefaultAttributeDescriptor;
-import com.robo4j.core.LifecycleState;
-import com.robo4j.core.RoboBuilder;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.RoboReference;
-import com.robo4j.core.StringConsumer;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.configuration.ConfigurationFactory;
-import com.robo4j.core.util.SystemUtil;
+import com.robo4j.DefaultAttributeDescriptor;
+import com.robo4j.LifecycleState;
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.StringConsumer;
+import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
+import com.robo4j.util.SystemUtil;
+
 import org.junit.Assert;
 import org.junit.Test;
 

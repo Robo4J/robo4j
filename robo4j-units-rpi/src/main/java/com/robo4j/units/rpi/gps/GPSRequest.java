@@ -16,7 +16,7 @@
  */
 package com.robo4j.units.rpi.gps;
 
-import com.robo4j.core.RoboReference;
+import com.robo4j.RoboReference;
 import com.robo4j.hw.rpi.serial.gps.GPSEvent;
 
 /**

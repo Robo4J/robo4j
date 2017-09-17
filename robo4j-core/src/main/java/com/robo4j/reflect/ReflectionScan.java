@@ -15,11 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.core.reflect;
-
-import com.robo4j.core.logging.SimpleLoggingUtil;
-import com.robo4j.core.util.StringConstants;
-import com.robo4j.core.util.StreamUtils;
+package com.robo4j.reflect;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,6 +31,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.util.StreamUtils;
+import com.robo4j.util.StringConstants;
 
 /**
  * Util class for reflection scan.

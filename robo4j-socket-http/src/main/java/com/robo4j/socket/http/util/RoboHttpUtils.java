@@ -16,11 +16,11 @@
  */
 package com.robo4j.socket.http.util;
 
-import com.robo4j.core.util.StringConstants;
 import com.robo4j.socket.http.HttpHeaderNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.request.RoboBasicMapEntry;
 import com.robo4j.socket.http.units.Constants;
+import com.robo4j.util.StringConstants;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

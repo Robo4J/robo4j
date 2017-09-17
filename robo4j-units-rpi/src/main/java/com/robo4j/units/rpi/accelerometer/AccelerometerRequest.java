@@ -18,7 +18,7 @@ package com.robo4j.units.rpi.accelerometer;
 
 import java.util.function.Predicate;
 
-import com.robo4j.core.RoboReference;
+import com.robo4j.RoboReference;
 import com.robo4j.math.geometry.Tuple3f;
 
 /**

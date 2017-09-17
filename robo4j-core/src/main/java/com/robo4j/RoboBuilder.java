@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
+package com.robo4j;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,16 +29,16 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import com.robo4j.core.util.StringConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.configuration.ConfigurationFactory;
-import com.robo4j.core.configuration.ConfigurationFactoryException;
-import com.robo4j.core.configuration.XmlConfigurationFactory;
-import com.robo4j.core.logging.SimpleLoggingUtil;
+import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.configuration.ConfigurationFactoryException;
+import com.robo4j.configuration.XmlConfigurationFactory;
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.util.StringConstants;
 
 /**
  * Builds a RoboSystem from various different sources.

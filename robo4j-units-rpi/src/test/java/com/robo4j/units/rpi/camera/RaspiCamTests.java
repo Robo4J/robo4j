@@ -17,10 +17,11 @@
 
 package com.robo4j.units.rpi.camera;
 
-import com.robo4j.core.DefaultAttributeDescriptor;
-import com.robo4j.core.configuration.Configuration;
-import com.robo4j.core.configuration.ConfigurationFactory;
 import org.junit.Assert;
+
+import com.robo4j.DefaultAttributeDescriptor;
+import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationFactory;
 
 /**
  * @author Marcus Hirt (@hirt)

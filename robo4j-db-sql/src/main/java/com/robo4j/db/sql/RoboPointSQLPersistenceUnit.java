@@ -17,9 +17,9 @@
 
 package com.robo4j.db.sql;
 
-import com.robo4j.core.ConfigurationException;
-import com.robo4j.core.RoboContext;
-import com.robo4j.core.configuration.Configuration;
+import com.robo4j.ConfigurationException;
+import com.robo4j.RoboContext;
+import com.robo4j.configuration.Configuration;
 import com.robo4j.db.sql.dto.ERoboPointDTO;
 import com.robo4j.db.sql.jpa.RoboPersitenceUnit;
 import com.robo4j.db.sql.model.ERoboPoint;

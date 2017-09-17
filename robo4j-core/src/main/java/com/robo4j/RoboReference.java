@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
+package com.robo4j;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.Future;
 
-import com.robo4j.core.configuration.Configuration;
+import com.robo4j.configuration.Configuration;
 
 /**
  * Reference to a RoboUnit.

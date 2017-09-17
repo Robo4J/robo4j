@@ -19,7 +19,7 @@
 
 package com.robo4j.units.lego.platform;
 
-import com.robo4j.core.RoboReference;
+import com.robo4j.RoboReference;
 import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
 
 /**

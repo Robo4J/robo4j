@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core;
+package com.robo4j;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -24,8 +24,11 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.core.scheduler.FinalInvocationListener;
-import com.robo4j.core.scheduler.Scheduler;
+import com.robo4j.LifecycleState;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.scheduler.FinalInvocationListener;
+import com.robo4j.scheduler.Scheduler;
 
 /**
  * Testing scheduling messages.

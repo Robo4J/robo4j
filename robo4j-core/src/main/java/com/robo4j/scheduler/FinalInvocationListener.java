@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.core.scheduler;
+package com.robo4j.scheduler;
 
-import com.robo4j.core.RoboContext;
+import com.robo4j.RoboContext;
 
 /**
  * Optional listener to be executed on the final invocation of series of
