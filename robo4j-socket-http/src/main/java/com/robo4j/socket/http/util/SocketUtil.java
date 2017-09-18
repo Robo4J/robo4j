@@ -38,14 +38,16 @@ public final class SocketUtil {
     public static  int readBuffer(SocketChannel channel, ByteBuffer buffer) throws IOException {
         buffer.rewind();
         int numberRead = channel.read(buffer);
+        int position = 0;
         int totalRead = numberRead;
-        while (numberRead != 0) {
+        while (numberRead != 0 && position <= totalRead) {
             numberRead = channel.read(buffer);
             if(numberRead > 0){
                 totalRead += numberRead;
             } else if(numberRead == -1){
                 numberRead = 0;
             }
+            position++;
         }
         return totalRead;
     }
@@ -61,12 +63,14 @@ public final class SocketUtil {
      */
     public static int readBuffer(SocketChannel channel, ByteBuffer buffer, int stopper) throws IOException {
         int numberRead = channel.read(buffer);
+        int position = 0;
         int totalRead = numberRead;
-        while (numberRead != stopper) {
+        while (numberRead != stopper && position <= totalRead) {
             numberRead = channel.read(buffer);
             if(numberRead > 0){
                 totalRead += numberRead;
             }
+            position++;
         }
         return totalRead;
     }

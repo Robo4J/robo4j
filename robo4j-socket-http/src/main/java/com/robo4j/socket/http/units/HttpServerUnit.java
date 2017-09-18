@@ -217,6 +217,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		String message = outBuffers.get(key).toString();
+		//TODO: extent the header creation
 		String response = RoboHttpUtils.HTTP_HEADER_OK.concat(RoboHttpUtils.NEW_LINE).concat(message);
 		int writtenBytes = SocketUtil.writeBuffer(channel, ByteBuffer.wrap(response.getBytes()));
 
@@ -251,7 +252,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 				System.out.println(getClass() + " EMPTY RESULT");
 				result = StringConstants.EMPTY;
 			}
-			// TODO: 27.08.17 miro discuss -> Serializable
 			outBuffers.put(key, result);
 			for (RoboReference<Object> ref : targetRefs) {
 			if (ref.getMessageType().equals(result.getClass())) {
