@@ -35,7 +35,7 @@ import java.util.stream.Stream;
  */
 public final class RoboHttpUtils {
 
-	private static final String HTTP_VERSION = "HTTP/1.1";
+	public static final String HTTP_VERSION = "HTTP/1.1";
 	private static final String ROBO4J_CLIENT = "Robo4J-HttpClient";
 	public static final String NEW_LINE = "\n";
 	public static final String HTTP_HEADER_OK = HttpFirstLineBuilder.Build(HTTP_VERSION).add("200").add("OK").build();
@@ -54,11 +54,15 @@ public final class RoboHttpUtils {
 		//@formatter:on
 	}
 
-	public static String createRequestHeader(String first, Map<String, String> headerMap) {
+	public static String createHeaderWithFirstLineAndMap(String first, Map<String, String> headerMap) {
 		HttpHeaderBuilder result = HttpHeaderBuilder.Build();
 		headerMap.forEach(result::add);
 		return first.concat(result.build());
 
+	}
+
+	public static String createResponseWithHeaderAndMessage(String header, String message){
+		return header.concat(NEW_LINE).concat(message);
 	}
 
 	public static String createRequestHeader(String host, int length) {

@@ -19,6 +19,26 @@
 
 package com.robo4j.socket.http.units;
 
+import com.robo4j.BlockingTrait;
+import com.robo4j.ConfigurationException;
+import com.robo4j.LifecycleState;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.RoboUnit;
+import com.robo4j.configuration.Configuration;
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.socket.http.enums.StatusCode;
+import com.robo4j.socket.http.request.RoboRequestCallable;
+import com.robo4j.socket.http.request.RoboRequestFactory;
+import com.robo4j.socket.http.request.RoboResponseProcess;
+import com.robo4j.socket.http.util.ByteBufferUtils;
+import com.robo4j.socket.http.util.HttpHeaderBuilder;
+import com.robo4j.socket.http.util.JsonUtil;
+import com.robo4j.socket.http.util.RoboHttpUtils;
+import com.robo4j.socket.http.util.RoboResponseHeader;
+import com.robo4j.socket.http.util.SocketUtil;
+import com.robo4j.util.StringConstants;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -38,22 +58,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-
-import com.robo4j.BlockingTrait;
-import com.robo4j.ConfigurationException;
-import com.robo4j.LifecycleState;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboReference;
-import com.robo4j.RoboUnit;
-import com.robo4j.configuration.Configuration;
-import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.request.RoboRequestCallable;
-import com.robo4j.socket.http.request.RoboRequestFactory;
-import com.robo4j.socket.http.util.ByteBufferUtils;
-import com.robo4j.socket.http.util.JsonUtil;
-import com.robo4j.socket.http.util.RoboHttpUtils;
-import com.robo4j.socket.http.util.SocketUtil;
-import com.robo4j.util.StringConstants;
 
 /**
  * Http NIO unit allows to configure format of the requests currently is only
@@ -81,7 +85,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private List<String> target;
 	private ServerSocketChannel server;
 	private final Map<SelectableChannel, SelectionKey> channelKeyMap = new HashMap<>();
-	private final Map<SelectionKey, Object> outBuffers = new HashMap<>();
+	private final Map<SelectionKey, RoboResponseProcess> outBuffers = new HashMap<>();
 
 	public HttpServerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -108,7 +112,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			SimpleLoggingUtil.error(getClass(), "no targetUnits");
 		} else {
 			targetUnitsMap.forEach((key, value) ->
-				HttpUriRegister.getInstance().addNode(key, value.toString()));
+				HttpUriRegister.getInstance().addUnitPathNode(key, value.toString()));
 		}
         //@formatter:on
 
@@ -189,9 +193,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 						if (selectedKey.isAcceptable()) {
 							accept(selector, selectedKey);
 						} else if (selectedKey.isReadable()) {
-							read(selector, targetRefs, selectedKey);
+							read(selector, selectedKey);
 						} else if (selectedKey.isWritable()) {
-							write(selectedKey);
+							write(targetRefs, selectedKey);
 						}
 					}
 				}
@@ -213,13 +217,37 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 	}
 
-	private void write(SelectionKey key) throws IOException {
+	private void write(List<RoboReference<Object>> targetRefs, SelectionKey key) throws IOException {
 		SocketChannel channel = (SocketChannel) key.channel();
 
-		String message = outBuffers.get(key).toString();
-		//TODO: extent the header creation
-		String response = RoboHttpUtils.HTTP_HEADER_OK.concat(RoboHttpUtils.NEW_LINE).concat(message);
-		int writtenBytes = SocketUtil.writeBuffer(channel, ByteBuffer.wrap(response.getBytes()));
+		RoboResponseProcess responseProcess = outBuffers.get(key);
+
+		if(responseProcess.getMethod() != null){
+			switch (responseProcess.getMethod()){
+				case GET:
+					String getHeader = RoboResponseHeader.headerByCode(StatusCode.OK)
+							.concat(HttpHeaderBuilder.Build().add("uid", getContext().getId()).build());
+					String getResponse = RoboHttpUtils.createResponseWithHeaderAndMessage(getHeader, responseProcess.getResult().toString());
+					SocketUtil.writeBuffer(channel, ByteBuffer.wrap(getResponse.getBytes()));
+					break;
+				case POST:
+					String postHeader = RoboResponseHeader.headerByCode(StatusCode.ACCEPTED);
+					SocketUtil.writeBuffer(channel, ByteBuffer.wrap(postHeader.getBytes()));
+					for (RoboReference<Object> ref : targetRefs) {
+						if (ref.getMessageType().equals(responseProcess.getResult().getClass())) {
+							ref.sendMessage(responseProcess.getResult());
+						}
+					}
+					break;
+				default:
+					String notImplementedHeader = RoboResponseHeader.headerByCode(StatusCode.NOT_IMPLEMENTED);
+					SocketUtil.writeBuffer(channel, ByteBuffer.wrap(notImplementedHeader.getBytes()));
+
+			}
+		} else {
+			String badHeader = RoboResponseHeader.headerByCode(StatusCode.BAD_REQUEST);
+			SocketUtil.writeBuffer(channel, ByteBuffer.wrap(badHeader.getBytes()));
+		}
 
 		channelKeyMap.remove(channel);
 
@@ -227,7 +255,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		key.cancel();
 	}
 
-	private void read(Selector selector, List<RoboReference<Object>> targetRefs, SelectionKey key) throws IOException {
+	private void read(Selector selector, SelectionKey key) throws IOException {
 
 		SocketChannel channel = (SocketChannel) key.channel();
 		//@formatter:off
@@ -244,20 +272,11 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 		ByteBuffer validBuffer = ByteBufferUtils.copy(buffer, 0, readBytes);
 		final RoboRequestCallable callable = new RoboRequestCallable(this, validBuffer, factory);
-		final Future<?> futureResult = getContext().getScheduler().submit(callable);
+		final Future<RoboResponseProcess> futureResult = getContext().getScheduler().submit(callable);
 
 		try{
-			Object result = futureResult.get();
-			if(result == null){
-				System.out.println(getClass() + " EMPTY RESULT");
-				result = StringConstants.EMPTY;
-			}
+			RoboResponseProcess result = futureResult.get();
 			outBuffers.put(key, result);
-			for (RoboReference<Object> ref : targetRefs) {
-			if (ref.getMessageType().equals(result.getClass())) {
-				ref.sendMessage(result);
-			}
-		}
 		} catch (InterruptedException | ExecutionException e){
 			SimpleLoggingUtil.error(getClass(), "read" + e);
 		}

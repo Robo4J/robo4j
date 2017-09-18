@@ -21,6 +21,8 @@ import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.socket.http.HttpMessageWrapper;
 
+import java.util.List;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -31,7 +33,7 @@ public interface DefaultRequestFactory<ResponseType> {
 
 	ResponseType processGet(RoboReference<?> desiredReference, AttributeDescriptor<?> attributeDescriptor);
 
-	ResponseType processGet(RoboReference<?> desiredReference, String path, HttpMessageWrapper<?> wrapper);
+	ResponseType processGet(RoboReference<?> desiredReference, List<String> paths, HttpMessageWrapper<?> wrapper);
 
-	ResponseType processPost(RoboReference<?> desiredUnit, String path, HttpMessageWrapper<?> wrapper);
+	ResponseType processPost(RoboReference<?> desiredUnit, List<String> paths, HttpMessageWrapper<?> wrapper);
 }

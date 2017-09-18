@@ -17,13 +17,16 @@
 
 package com.robo4j.socket.http.units;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.socket.http.enums.SystemPath;
+import com.robo4j.socket.http.util.HttpPathUtil;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Register URIs by http method (GET,POST...) and URIs path
@@ -35,7 +38,10 @@ import com.robo4j.logging.SimpleLoggingUtil;
  */
 public final class HttpUriRegister {
 
+	private static final int DEFAULT_VALUE_0 = 0;
+	private static final int DEFAULT_VALUE_1 = 1;
 	private static final String SOLIDUS = "/";
+	private static final String PATH_UNITS = "units";
 
 	private static volatile HttpUriRegister INSTANCE;
 	/* avalibale paths */
@@ -61,8 +67,8 @@ public final class HttpUriRegister {
 	 * @param path uri path
 	 * @param method used http method
 	 */
-	public void addNode(String path, String method) {
-		final String tmpPath = SOLIDUS.concat(path);
+	public void addUnitPathNode(String path, String method) {
+		final String tmpPath = SOLIDUS.concat(PATH_UNITS).concat(SOLIDUS).concat(path);
 		if (pathMethods.containsKey(tmpPath)) {
 			pathMethods.get(tmpPath).addMethod(method);
 		} else {
@@ -77,7 +83,7 @@ public final class HttpUriRegister {
 	 * @param unit unit responsible for this uri
 	 */
 	public void addUnitToNode(String path, RoboReference<?> unit) {
-		final String tmpPath = SOLIDUS.concat(path);
+		final String tmpPath = SOLIDUS.concat(PATH_UNITS).concat(SOLIDUS).concat(path);
 		if (pathMethods.containsKey(tmpPath)) {
 			pathMethods.get(tmpPath).setUnit(unit);
 		} else {
@@ -87,8 +93,17 @@ public final class HttpUriRegister {
 
 	public void updateUnits(RoboContext context) {
 		pathMethods.forEach((key, value) -> {
-			final RoboReference<?> roboUnit = getRoboUnitById(context, key.substring(1));
-			value.setUnit(roboUnit);
+			final List<String> paths = HttpPathUtil.uriStringToPathList(key);
+			SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_VALUE_0));
+			if(systemPath != null){
+				// FIXME: 18.09.17 (miro) -> improve
+				switch (systemPath){
+					case UNITS:
+						final RoboReference<?> roboUnit = getRoboUnitById(context, paths.get(DEFAULT_VALUE_1));
+						value.setUnit(roboUnit);
+						break;
+				}
+			}
 		});
 	}
 
@@ -97,7 +112,7 @@ public final class HttpUriRegister {
 	}
 
 	public RoboReference<?> getRoboUnitByPath(String path) {
-		final RoboUriInfo uri = pathMethods.get(SOLIDUS.concat(path));
+		final RoboUriInfo uri = pathMethods.get(SOLIDUS.concat(SystemPath.UNITS.getPath()).concat(SOLIDUS).concat(path));
 		return uri != null ? uri.getUnit() : null;
 	}
 

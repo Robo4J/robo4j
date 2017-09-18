@@ -27,6 +27,7 @@ import com.robo4j.socket.http.HttpMessage;
 import com.robo4j.socket.http.HttpMessageWrapper;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.units.HttpUriRegister;
 import com.robo4j.socket.http.util.ByteBufferUtils;
@@ -45,11 +46,11 @@ import java.util.concurrent.Callable;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RoboRequestCallable implements Callable<Object> {
+public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 
 	/* currently is supported only one PATH */
 	private static final int DEFAULT_PATH_POSITION_0 = 0;
-	private static final String DEFAULT_RESPONSE = "done";
+	private static final int DEFAULT_PATH_POSITION_1 = 1;
 
 	private final RoboUnit<?> unit;
 	private final ByteBuffer buffer;
@@ -63,7 +64,7 @@ public class RoboRequestCallable implements Callable<Object> {
 	}
 
 	@Override
-	public Object call() throws Exception {
+	public RoboResponseProcess call() throws Exception {
 		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBuffer(buffer);
 
 		final String[] headerLines = new String(wrapper.getHeader().array()).split("[\r\n]+");
@@ -71,7 +72,9 @@ public class RoboRequestCallable implements Callable<Object> {
 		final String[] tokens = firstLine.split(Constants.HTTP_EMPTY_SEP);
 		final HttpMethod method = HttpMethod.getByName(tokens[HttpMessageUtil.METHOD_KEY_POSITION]);
 
+		RoboResponseProcess result = new RoboResponseProcess();
 		if (method != null) {
+			result.setMethod(method);
 			final Map<String, String> params = new HashMap<>();
 
 			for (int i = 1; i < headerLines.length; i++) {
@@ -96,21 +99,21 @@ public class RoboRequestCallable implements Callable<Object> {
 			case GET:
 				/* currently is supported only one path */
 				if (desiredUnit == null) {
-					return factory.processGet(unit, new HttpMessageWrapper<>(httpMessage));
+					result.setResult(factory.processGet(unit, new HttpMessageWrapper<>(httpMessage)));
 				} else {
 					AttributeDescriptor<?> attributeDescriptor = getAttributeByQuery(desiredUnit, httpMessage.uri());
 					if (attributeDescriptor == null) {
 						final Object unitDescription = factory.processGet(desiredUnit,
-								paths.get(DEFAULT_PATH_POSITION_0), new HttpMessageWrapper<>(httpMessage));
+								paths, new HttpMessageWrapper<>(httpMessage));
 						if (unitDescription != null) {
-							return unitDescription;
+							result.setResult(unitDescription);
 						}
 					} else {
 						//TODO (miro 09/09/2017 : think about how to return attributes
-						return factory.processGet(desiredUnit, attributeDescriptor);
+						result.setResult(factory.processGet(desiredUnit, attributeDescriptor));
 					}
 				}
-				return DEFAULT_RESPONSE;
+				return result;
 			case POST:
 				int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH));
 				final StringBuilder jsonSB = new StringBuilder();
@@ -120,15 +123,21 @@ public class RoboRequestCallable implements Callable<Object> {
 				} else {
 					SimpleLoggingUtil.error(getClass(), "NOT SAME HEADER LENGTH: " + length + " convertedMessage: " + postValue.length());
 				}
-				return factory.processPost(desiredUnit, paths.get(DEFAULT_PATH_POSITION_0),
-						new HttpMessageWrapper<>(httpMessage, jsonSB.toString()));
+
+				SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
+				switch (systemPath){
+					case UNITS:
+						result.setResult(factory.processPost(desiredUnit, paths,
+								new HttpMessageWrapper<>(httpMessage, jsonSB.toString())));
+
+				}
+				return result;
 			default:
 				SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
-				return DEFAULT_RESPONSE;
 			}
 		}
 
-		return DEFAULT_RESPONSE;
+		return result;
 	}
 
 	// Private Methods
@@ -162,11 +171,16 @@ public class RoboRequestCallable implements Callable<Object> {
 			return null;
 		} else {
 			final HttpUriRegister httpUriRegister = HttpUriRegister.getInstance();
-			String path = paths.get(DEFAULT_PATH_POSITION_0).replaceFirst("/", "");
-			return httpUriRegister.getRoboUnitByPath(path);
+			SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
+			if (systemPath != null) {
+				switch (systemPath) {
+				case UNITS:
+					return httpUriRegister.getRoboUnitByPath(paths.get(DEFAULT_PATH_POSITION_1));
+				}
+			}
+			return null;
 		}
 
 	}
-
 
 }

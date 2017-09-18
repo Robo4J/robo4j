@@ -17,10 +17,12 @@
 
 package com.robo4j.socket.http.util;
 
+import com.robo4j.socket.http.dto.ResponseUnitDTO;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.util.StringConstants;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -77,6 +79,14 @@ public final class JsonUtil {
 		return result;
 
 	}
+
+	public static String getArrayByListResponseUnitDTO(List<ResponseUnitDTO> units){
+		return "[".concat(units.stream().map(u -> "{id:" + "\"" + u.getId() + "\","
+				+ u.getState().getClass().getCanonicalName() + ":\"" + u.getState().getLocalizedName().toUpperCase() + "\"}"  )
+				.collect(Collectors.joining(","))).concat("]");
+	}
+
+
 
 	// Private Methods
 	private static boolean checkPrimitiveOrWrapper(Class<?> clazz) {

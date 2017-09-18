@@ -8,47 +8,51 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.robo4j.socket.http.enums;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Marcus Hirt (@hirt)
- * @author Miroslav Wengner (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  */
-public enum StatusCode {
+public enum SystemPath {
 
     //@formatting:off
-    OK                  (200, "OK"),
-    ACCEPTED            (202, "Accepted"),
-    NOT_IMPLEMENTED     (501, "Not Implemented"),
-    BAD_REQUEST         (400, "Bad Request")
+    UNITS                  ("units"),
     ;
 
     //@formatting:on
 
-    private volatile static Map<Integer, StatusCode> codeToStatusMapping;
-    private int code;
-    private String reasonPhrase;
+    private volatile static Map<String, SystemPath> toPathMap;
+    private String path;
 
-    StatusCode(int code, String reasonPhrase) {
-        this.code = code;
-        this.reasonPhrase = reasonPhrase;
+    SystemPath(String path) {
+        this.path = path;
     }
 
-    public int getCode() {
-        return code;
+    public String getPath() {
+        return path;
     }
 
-    public String getReasonPhrase() {
-        return reasonPhrase;
+    public static SystemPath getByPath(String name){
+        if(toPathMap == null){
+            toPathMap = initMapping();
+        }
+        return  toPathMap.get(name);
     }
 
+    private static Map<String, SystemPath> initMapping() {
+        return Arrays.stream(values()).collect(Collectors.toMap(SystemPath::getPath, e -> e));
+    }
 
 }
