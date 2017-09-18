@@ -85,7 +85,11 @@ public class RaycastTest {
 
 		FeatureSet features = FeatureExtraction.getFeatures(scan.getPoints(), 1.0f);
 		Assert.assertNotNull(features);
+		// FIXME: Remove the next two lines when the test is properly fixed.
+		Assert.assertNotEquals(DELTA, 0);
+		Assert.assertNotNull(ORIGO);
 		Point2f promisingPoint = Raycast.raycastMostPromisingPoint(scan.getPoints(), 0.4f, 0.3f, features);
+		Assert.assertNotNull(promisingPoint);
 		// Assert.assertNotEquals(ORIGO.getX(), promisingPoint.getX(), DELTA);
 		// Assert.assertNotEquals(ORIGO.getY(), promisingPoint.getY(), DELTA);
 	}

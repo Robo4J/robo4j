@@ -18,7 +18,7 @@
 <robo4j>
     <roboUnit id="lf710pad">
         <class>com.robo4j.units.rpi.pad.LF710PadUnit</class>
-        <config name="com.robo4j.core.root">
+        <config name="com.robo4j.root">
             <value name="input" type="String">/dev/input/js0</value>
             <value name="target" type="String">lcd</value>
         </config>

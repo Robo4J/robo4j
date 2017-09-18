@@ -2,7 +2,7 @@
 <robo4j>
 	<roboUnit id="gyro">
 		<class>com.robo4j.units.rpi.gyro.GyroL3GD20Unit</class>
-		<config name="com.robo4j.core.root">
+		<config name="com.robo4j.root">
 			<value name="bus" type="int">1</value>
 			<value name="address" type="int">0x6b</value>
 			<value name="sensitivity" type="String">DPS_245</value>

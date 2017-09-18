@@ -59,7 +59,7 @@ public class TestClientImageController extends RoboUnit<Boolean> {
 	private final CameraMessageCodec codec = new CameraMessageCodec();
 
 	@SuppressWarnings("unchecked")
-	private static final Map<String, String> raspistillProperties = com.robo4j.core.units.httpunit.test.util.PropertyMapBuilder
+	private static final Map<String, String> raspistillProperties = com.robo4j.units.httpunit.test.util.PropertyMapBuilder
 			.Builder().put(KEY_WIDTH, "-w").put(KEY_HEIGHT, "-h").put(KEY_TIMEOUT, "-t").put(KEY_QUALITY, "-q")
 			.put(KEY_SHARPNESS, "-sh").put(KEY_BRIGHTNESS, "-br").put(KEY_CONTRAST, "-co").put(KEY_SATURATION, "-sa")
 			.create();

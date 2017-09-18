@@ -21,8 +21,8 @@
 
 <robo4j>
     <roboUnit id="http">
-        <class>com.robo4j.core.unit.HttpServerUnit</class>
-        <config name="com.robo4j.core.root">
+        <class>com.robo4j.unit.HttpServerUnit</class>
+        <config name="com.robo4j.root">
             <value name="port" type="int">8025</value>
             <value name="target" type="String">request_consumer</value>
             <targetUnits>
@@ -31,6 +31,6 @@
         </config>
     </roboUnit>
     <roboUnit id="request_consumer">
-        <class>com.robo4j.core.StringConsumer</class>
+        <class>com.robo4j.StringConsumer</class>
     </roboUnit>
 </robo4j>
