@@ -27,8 +27,9 @@ public enum StatusCode {
     //@formatting:off
     OK                  (200, "OK"),
     ACCEPTED            (202, "Accepted"),
-    NOT_IMPLEMENTED     (501, "Not Implemented"),
-    BAD_REQUEST         (400, "Bad Request")
+    BAD_REQUEST         (400, "Bad Request"),
+    NOT_FOUND           (404, "Not Found"),
+    NOT_IMPLEMENTED     (501, "Not Implemented")
     ;
 
     //@formatting:on

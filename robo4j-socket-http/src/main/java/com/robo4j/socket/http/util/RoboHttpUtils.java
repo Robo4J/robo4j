@@ -18,6 +18,7 @@ package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.HttpHeaderNames;
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.request.RoboBasicMapEntry;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.util.StringConstants;
@@ -62,6 +63,12 @@ public final class RoboHttpUtils {
 
 	public static String createResponseWithHeaderAndMessage(String header, String message){
 		return header.concat(NEW_LINE).concat(message);
+	}
+
+	public static String createResponseByCode(StatusCode code){
+		return  RoboHttpUtils.createResponseWithHeaderAndMessage(
+				RoboResponseHeader.headerByCode(code),
+				StringConstants.EMPTY);
 	}
 
 	public static String createRequestHeader(String host, int length) {

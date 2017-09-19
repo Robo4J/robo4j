@@ -98,9 +98,7 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 			switch (method) {
 			case GET:
 				/* currently is supported only one path */
-				if (desiredUnit == null) {
-					result.setResult(factory.processGet(unit, new HttpMessageWrapper<>(httpMessage)));
-				} else {
+				if (desiredUnit != null) {
 					AttributeDescriptor<?> attributeDescriptor = getAttributeByQuery(desiredUnit, httpMessage.uri());
 					if (attributeDescriptor == null) {
 						final Object unitDescription = factory.processGet(desiredUnit,
@@ -112,6 +110,8 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 						//TODO (miro 09/09/2017 : think about how to return attributes
 						result.setResult(factory.processGet(desiredUnit, attributeDescriptor));
 					}
+				} else if(paths.size() == 0){
+					result.setResult(factory.processGet(unit, new HttpMessageWrapper<>(httpMessage)));
 				}
 				return result;
 			case POST:
@@ -124,14 +124,16 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 					SimpleLoggingUtil.error(getClass(), "NOT SAME HEADER LENGTH: " + length + " convertedMessage: " + postValue.length());
 				}
 
-				SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
-				switch (systemPath){
-					case UNITS:
-						result.setResult(factory.processPost(desiredUnit, paths,
-								new HttpMessageWrapper<>(httpMessage, jsonSB.toString())));
+				if(paths.size() == 2){
+					SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
+					switch (systemPath){
+						case UNITS:
+							result.setResult(factory.processPost(desiredUnit, paths,
+									new HttpMessageWrapper<>(httpMessage, jsonSB.toString())));
 
+					}
+					return result;
 				}
-				return result;
 			default:
 				SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
 			}
@@ -172,7 +174,7 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 		} else {
 			final HttpUriRegister httpUriRegister = HttpUriRegister.getInstance();
 			SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
-			if (systemPath != null) {
+			if (systemPath != null && paths.size() == 2) {
 				switch (systemPath) {
 				case UNITS:
 					return httpUriRegister.getRoboUnitByPath(paths.get(DEFAULT_PATH_POSITION_1));
