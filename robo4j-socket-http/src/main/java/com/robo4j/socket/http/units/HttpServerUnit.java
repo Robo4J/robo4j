@@ -236,18 +236,26 @@ public class HttpServerUnit extends RoboUnit<Object> {
                     break;
                 case POST:
                     if (responseProcess.getResult() != null) {
-                        String postResponse = RoboHttpUtils.createResponseByCode(StatusCode.ACCEPTED);
-                        for (RoboReference<Object> ref : targetRefs) {
+                        if(responseProcess.getResult() instanceof StatusCode){
+                            String postResponse = RoboHttpUtils.createResponseByCode(StatusCode.NOT_FOUND);
                             SocketUtil.writeBuffer(channel, ByteBuffer.wrap(postResponse.getBytes()));
-                            if (responseProcess.getResult() != null && ref.getMessageType().equals(responseProcess.getResult().getClass())) {
-                                ref.sendMessage(responseProcess.getResult());
+                        } else {
+                            String postResponse = RoboHttpUtils.createResponseByCode(StatusCode.ACCEPTED);
+                            SocketUtil.writeBuffer(channel, ByteBuffer.wrap(postResponse.getBytes()));
+                            for (RoboReference<Object> ref : targetRefs) {
+                                if (responseProcess.getResult() != null && ref.getMessageType().equals(responseProcess.getResult().getClass())) {
+                                    ref.sendMessage(responseProcess.getResult());
+                                }
                             }
+
                         }
-                        break;
+
+
+                    } else {
+                        String notImplementedResponse = RoboHttpUtils.createResponseByCode(StatusCode.NOT_IMPLEMENTED);
+                        SocketUtil.writeBuffer(channel, ByteBuffer.wrap(notImplementedResponse.getBytes()));
                     }
-                default:
-                    String notImplementedResponse = RoboHttpUtils.createResponseByCode(StatusCode.NOT_IMPLEMENTED);
-                    SocketUtil.writeBuffer(channel, ByteBuffer.wrap(notImplementedResponse.getBytes()));
+
 
             }
         } else {

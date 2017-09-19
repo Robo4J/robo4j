@@ -27,6 +27,7 @@ import com.robo4j.socket.http.HttpMessage;
 import com.robo4j.socket.http.HttpMessageWrapper;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.units.HttpUriRegister;
@@ -124,16 +125,20 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 					SimpleLoggingUtil.error(getClass(), "NOT SAME HEADER LENGTH: " + length + " convertedMessage: " + postValue.length());
 				}
 
-				if(paths.size() == 2){
-					SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
-					switch (systemPath){
-						case UNITS:
-							result.setResult(factory.processPost(desiredUnit, paths,
-									new HttpMessageWrapper<>(httpMessage, jsonSB.toString())));
+				SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
+				switch (systemPath){
+					case UNITS:
+						if(paths.size() == 2) {
+							Object respObj  = factory.processPost(desiredUnit, paths,
+									new HttpMessageWrapper<>(httpMessage, jsonSB.toString()));
+							result.setResult(respObj== null ? StatusCode.NOT_FOUND : respObj);
+						} else {
+							result.setResult(StatusCode.NOT_FOUND);
+						}
 
-					}
-					return result;
 				}
+				return result;
+
 			default:
 				SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
 			}
