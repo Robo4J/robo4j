@@ -86,6 +86,10 @@ public final class JsonUtil {
 				.collect(Collectors.joining(","))).concat("]");
 	}
 
+	public static String getArraysByMethodList(List<String> list){
+		return "[".concat(list.stream().map(m -> "{type:" + "\"" + m + "\"}").collect(Collectors.joining(","))).concat("]");
+	}
+
 
 
 	// Private Methods

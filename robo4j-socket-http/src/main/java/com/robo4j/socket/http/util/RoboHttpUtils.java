@@ -38,7 +38,6 @@ public final class RoboHttpUtils {
 	public static final String HTTP_VERSION = "HTTP/1.1";
 	private static final String ROBO4J_CLIENT = "Robo4J-HttpClient";
 	public static final String NEW_LINE = "\n";
-	public static final String HTTP_HEADER_OK = HttpFirstLineBuilder.Build(HTTP_VERSION).add("200").add("OK").build();
 	public static final int _DEFAULT_PORT = 8042;
 	public static final String HTTP_TARGET_UNITS = "targetUnits";
 

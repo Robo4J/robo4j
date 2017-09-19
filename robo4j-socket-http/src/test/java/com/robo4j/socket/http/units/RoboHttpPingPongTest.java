@@ -26,14 +26,16 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import com.robo4j.socket.http.units.test.HttpStringProducer;
+import com.robo4j.socket.http.util.HttpPathUtil;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.SystemUtil;
-
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Ping Pong test from outside/foreign unit is send signal. The signal has been
@@ -134,6 +136,7 @@ public class RoboHttpPingPongTest {
 
 	private RoboContext configurePingSystem() throws Exception {
 		RoboBuilder builder = new RoboBuilder();
+		List<String> paths = Arrays.asList("units", CONTROLLER_PING_PONG);
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("address", HOST_SYSTEM);
@@ -146,7 +149,7 @@ public class RoboHttpPingPongTest {
 		config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("target", ID_HTTP_CLIENT);
 		config.setString("method", "POST");
-		config.setString("uri", "/controller");
+		config.setString("uri", HttpPathUtil.pathsToUri(paths));
 		config.setString("targetAddress", HOST_SYSTEM);
 		builder.add(HttpStringProducer.class, config, ID_HTTP_PRODUCER);
 		return builder.build();

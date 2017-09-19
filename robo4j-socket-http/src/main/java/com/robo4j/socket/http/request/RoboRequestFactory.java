@@ -19,6 +19,7 @@
 
 package com.robo4j.socket.http.request;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -92,12 +93,13 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 			if (register.isUnitAvailable(HttpPathUtil.pathsToUri(paths))) {
 				final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredReference.getMessageType());
 				if (decoder != null) {
-					StringBuilder sb = new StringBuilder().append("Unit Description").append(Constants.HTTP_NEW_LINE)
-							.append("codec is available:").append(Constants.HTTP_NEW_LINE)
-							.append("to send command use POST request").append(Constants.HTTP_NEW_LINE)
-							.append("example: { \"value\":\"<possible_value>\"}\n\n").append(Constants.HTTP_NEW_LINE)
-							.append(Constants.HTTP_NEW_LINE).append("available type: ")
-							.append(desiredReference.getMessageType().toGenericString());
+					List<String> methods = Arrays.asList("GET", "POST");
+					final StringBuilder sb = new StringBuilder("{").append("id").append(":")
+							.append("\"").append(desiredReference.getId()).append("\"").append(",")
+							.append("codec").append(":").append("\"")
+							.append(desiredReference.getMessageType().getName()).append("\"").append(",")
+							.append("method").append(":").append(JsonUtil.getArraysByMethodList(methods))
+							.append("}");
 					return sb.toString();
 				} else {
 					SimpleLoggingUtil.error(getClass(), "no decoder available");
