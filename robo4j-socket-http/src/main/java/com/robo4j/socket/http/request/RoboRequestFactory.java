@@ -19,12 +19,6 @@
 
 package com.robo4j.socket.http.request;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
-
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
@@ -38,7 +32,18 @@ import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpUriRegister;
 import com.robo4j.socket.http.util.HttpPathUtil;
 import com.robo4j.socket.http.util.JsonUtil;
-import jdk.nashorn.api.scripting.ScriptUtils;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
+
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COLON;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COMMA;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_LEFT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_RIGHT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_QUOTATION_MARK;
 
 /**
  * Dynamically configurable request factory
@@ -58,7 +63,6 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	@Override
 	public Object processGet(RoboUnit<?> desiredUnit, HttpMessageWrapper<?> wrapper) {
 		if (HttpVersion.containsValue(wrapper.message().version()) && !desiredUnit.getContext().getUnits().isEmpty()) {
-			//TODO response
 
 			final List<ResponseUnitDTO> unitList = desiredUnit.getContext().getUnits().stream()
 					.map(u -> new ResponseUnitDTO(u.getId(), u.getState()))
@@ -94,12 +98,15 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 				final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredReference.getMessageType());
 				if (decoder != null) {
 					List<String> methods = Arrays.asList("GET", "POST");
-					final StringBuilder sb = new StringBuilder("{").append("id").append(":")
-							.append("\"").append(desiredReference.getId()).append("\"").append(",")
-							.append("codec").append(":").append("\"")
-							.append(desiredReference.getMessageType().getName()).append("\"").append(",")
-							.append("method").append(":").append(JsonUtil.getArraysByMethodList(methods))
-							.append("}");
+					final StringBuilder sb = new StringBuilder(CHAR_CURLY_BRACKET_LEFT)
+							.append(CHAR_QUOTATION_MARK)
+							.append("id").append(CHAR_QUOTATION_MARK).append(CHAR_COLON)
+							.append(CHAR_QUOTATION_MARK).append(desiredReference.getId()).append(CHAR_QUOTATION_MARK).append(CHAR_COMMA)
+							.append(CHAR_QUOTATION_MARK).append("codec").append(CHAR_QUOTATION_MARK).append(CHAR_COLON)
+							.append(CHAR_QUOTATION_MARK).append(desiredReference.getMessageType().getName()).append(CHAR_QUOTATION_MARK).append(",")
+							.append(CHAR_QUOTATION_MARK).append("method").append(CHAR_QUOTATION_MARK).append(CHAR_COLON)
+							.append(JsonUtil.getArraysByMethodList(methods))
+							.append(CHAR_CURLY_BRACKET_RIGHT);
 					return sb.toString();
 				} else {
 					SimpleLoggingUtil.error(getClass(), "no decoder available");

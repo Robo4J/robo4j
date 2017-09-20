@@ -8,32 +8,43 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http.util;
+package com.robo4j.socket.http.units.test;
 
-import com.robo4j.socket.http.enums.StatusCode;
-import com.robo4j.util.StringConstants;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Support for HTTP/1.1
- *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class RoboResponseHeader {
+@SuppressWarnings("rawtypes")
+public class PropertyMapBuilder<Key, Value> {
 
-    public static String headerByCode(StatusCode code){
-        return HttpFirstLineBuilder.Build(RoboHttpUtils.HTTP_VERSION).add(code.getCode()).add(code.getReasonPhrase()).build();
-    }
+	private Map<Key, Value> map;
 
-    public static String headerByCodeWithUid(StatusCode code, String uid){
-        return HttpFirstLineBuilder.Build(RoboHttpUtils.HTTP_VERSION).add(code.getCode()).add(code.getReasonPhrase())
-                .add("uid").add(uid).build();
-    }
+	private PropertyMapBuilder() {
+		this.map = new HashMap<>();
+	}
+
+	public static <Key, Value> PropertyMapBuilder Builder() {
+		return new PropertyMapBuilder<Key, Value>();
+	}
+
+	public PropertyMapBuilder put(Key key, Value value) {
+		map.put(key, value);
+		return this;
+	}
+
+	public Map<Key, Value> create() {
+		return Collections.unmodifiableMap(map);
+	}
+
 }

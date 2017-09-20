@@ -28,6 +28,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COLON;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COMMA;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_LEFT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_RIGHT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_QUOTATION_MARK;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_SQUARE_BRACKET_LEFT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_SQUARE_BRACKET_RIGHT;
+
 /**
  *
  * Simple Json util
@@ -81,14 +89,19 @@ public final class JsonUtil {
 	}
 
 	public static String getArrayByListResponseUnitDTO(List<ResponseUnitDTO> units){
-		return "[".concat(units.stream().map(u -> "{id:" + "\"" + u.getId() + "\","
-				+ u.getState().getClass().getCanonicalName() + ":\"" + u.getState().getLocalizedName().toUpperCase() + "\"}"  )
+		return "[".concat(units.stream().map(u -> "{\"id:\"" + "\"" + u.getId() + "\",\""
+				+ u.getState().getClass().getCanonicalName() + "\":\"" + u.getState().getLocalizedName().toUpperCase() + "\"}"  )
 				.collect(Collectors.joining(","))).concat("]");
 	}
 
 	public static String getArraysByMethodList(List<String> list){
-		return "[".concat(list.stream().map(m -> "{type:" + "\"" + m + "\"}").collect(Collectors.joining(","))).concat("]");
+		return new StringBuilder(CHAR_SQUARE_BRACKET_LEFT).append(list.stream().map(m -> new StringBuilder(CHAR_CURLY_BRACKET_LEFT)
+						.append(CHAR_QUOTATION_MARK).append("type").append(CHAR_QUOTATION_MARK)
+						.append(CHAR_COLON).append(CHAR_QUOTATION_MARK).append(m).append(CHAR_QUOTATION_MARK)
+						.append(CHAR_CURLY_BRACKET_RIGHT).toString()).collect(Collectors.joining(CHAR_COMMA)))
+				.append(CHAR_SQUARE_BRACKET_RIGHT).toString();
 	}
+
 
 
 

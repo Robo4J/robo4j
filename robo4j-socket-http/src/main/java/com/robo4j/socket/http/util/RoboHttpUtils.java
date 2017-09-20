@@ -39,6 +39,13 @@ public final class RoboHttpUtils {
 	public static final String HTTP_VERSION = "HTTP/1.1";
 	private static final String ROBO4J_CLIENT = "Robo4J-HttpClient";
 	public static final String NEW_LINE = "\n";
+	public static final CharSequence CHAR_QUOTATION_MARK = "\"";
+	public static final CharSequence CHAR_COLON = ":";
+	public static final CharSequence CHAR_CURLY_BRACKET_LEFT = "{";
+	public static final CharSequence CHAR_CURLY_BRACKET_RIGHT = "}";
+	public static final CharSequence CHAR_SQUARE_BRACKET_LEFT = "[";
+	public static final CharSequence CHAR_SQUARE_BRACKET_RIGHT = "]";
+	public static final CharSequence CHAR_COMMA = ",";
 	public static final int _DEFAULT_PORT = 8042;
 	public static final String HTTP_TARGET_UNITS = "targetUnits";
 

@@ -32,7 +32,6 @@ import com.robo4j.socket.http.request.RoboRequestCallable;
 import com.robo4j.socket.http.request.RoboRequestFactory;
 import com.robo4j.socket.http.request.RoboResponseProcess;
 import com.robo4j.socket.http.util.ByteBufferUtils;
-import com.robo4j.socket.http.util.HttpHeaderBuilder;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.socket.http.util.RoboResponseHeader;
@@ -94,7 +93,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
         setState(LifecycleState.UNINITIALIZED);
-		/* target is always initiated as the list */
+        /* target is always initiated as the list */
         target = Arrays.asList(configuration.getString(PROPERTY_TARGET, StringConstants.EMPTY).split(DELIMITER));
         port = configuration.getInteger(PROPERTY_PORT, _DEFAULT_PORT);
         bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
@@ -158,7 +157,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
      */
     private void server(final List<RoboReference<Object>> targetRefs) {
         try {
-			/* selector is multiplexor to SelectableChannel */
+            /* selector is multiplexor to SelectableChannel */
             // Selects a set of keys whose corresponding channels are ready for
             // I/O operations
             final Selector selector = Selector.open();
@@ -173,7 +172,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
                 int channelReady = selector.select();
 
                 if (channelReady == 0) {
-					/*
+                    /*
 					 * token representing the registration of a SelectableChannel with a Selector
 					 */
                     Set<SelectionKey> selectedKeys = selector.selectedKeys();
@@ -226,9 +225,12 @@ public class HttpServerUnit extends RoboUnit<Object> {
                 case GET:
                     String getResponse;
                     if (responseProcess.getResult() != null) {
-                        String getHeader = RoboResponseHeader.headerByCode(StatusCode.OK)
-                                .concat(HttpHeaderBuilder.Build().add("uid", getContext().getId()).build());
-                        getResponse = RoboHttpUtils.createResponseWithHeaderAndMessage(getHeader, responseProcess.getResult().toString());
+                        if (responseProcess.getResult() instanceof StatusCode) {
+                            getResponse = RoboHttpUtils.createResponseByCode((StatusCode) responseProcess.getResult());
+                        } else {
+                            String getHeader = RoboResponseHeader.headerByCodeWithUid(StatusCode.OK, getContext().getId());
+                            getResponse = RoboHttpUtils.createResponseWithHeaderAndMessage(getHeader, responseProcess.getResult().toString());
+                        }
                     } else {
                         getResponse = RoboHttpUtils.createResponseByCode(StatusCode.NOT_IMPLEMENTED);
                     }
@@ -236,8 +238,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
                     break;
                 case POST:
                     if (responseProcess.getResult() != null) {
-                        if(responseProcess.getResult() instanceof StatusCode){
-                            String postResponse = RoboHttpUtils.createResponseByCode(StatusCode.NOT_FOUND);
+                        if (responseProcess.getResult() instanceof StatusCode) {
+                            String postResponse = RoboHttpUtils.createResponseByCode((StatusCode) responseProcess.getResult());
                             SocketUtil.writeBuffer(channel, ByteBuffer.wrap(postResponse.getBytes()));
                         } else {
                             String postResponse = RoboHttpUtils.createResponseByCode(StatusCode.ACCEPTED);
