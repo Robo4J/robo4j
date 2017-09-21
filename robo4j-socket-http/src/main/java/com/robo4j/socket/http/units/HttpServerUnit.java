@@ -249,10 +249,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
                                     ref.sendMessage(responseProcess.getResult());
                                 }
                             }
-
                         }
-
-
                     } else {
                         String notImplementedResponse = RoboHttpUtils.createResponseByCode(StatusCode.NOT_IMPLEMENTED);
                         SocketUtil.writeBuffer(channel, ByteBuffer.wrap(notImplementedResponse.getBytes()));

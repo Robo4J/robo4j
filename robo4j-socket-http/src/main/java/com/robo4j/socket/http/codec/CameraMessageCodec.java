@@ -31,6 +31,7 @@ import java.util.Map;
  */
 @HttpProducer
 public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncoder<CameraMessage> {
+	private static final String ROBO4J_MEDIA_TYPE = "application/vnd.robo4j.media";
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_VALUE = "value";
 	private static final String KEY_IMAGE = "image";

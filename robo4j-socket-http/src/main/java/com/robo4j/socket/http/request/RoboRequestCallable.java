@@ -108,11 +108,17 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 							result.setResult(unitDescription);
 						}
 					} else {
-						//TODO (miro 09/09/2017 : think about how to return attributes
 						result.setResult(factory.processGet(desiredUnit, attributeDescriptor));
 					}
 				} else if(paths.size() == 0){
 					result.setResult(factory.processGet(unit, new HttpMessageWrapper<>(httpMessage)));
+				} else {
+					SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
+					switch (systemPath) {
+						case UNITS:
+							result.setResult(StatusCode.NOT_FOUND);
+							break;
+					}
 				}
 				return result;
 			case POST:
@@ -125,18 +131,23 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 					SimpleLoggingUtil.error(getClass(), "NOT SAME HEADER LENGTH: " + length + " convertedMessage: " + postValue.length());
 				}
 
-				SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
-				switch (systemPath){
-					case UNITS:
-						if(paths.size() == 2) {
-							Object respObj  = factory.processPost(desiredUnit, paths,
-									new HttpMessageWrapper<>(httpMessage, jsonSB.toString()));
-							result.setResult(respObj== null ? StatusCode.NOT_FOUND : respObj);
-						} else {
-							result.setResult(StatusCode.NOT_FOUND);
-						}
+				if(paths.size() != 0){
+					SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
+					switch (systemPath){
+						case UNITS:
+							if(paths.size() == 2) {
+								Object respObj  = factory.processPost(desiredUnit, paths,
+										new HttpMessageWrapper<>(httpMessage, jsonSB.toString()));
+								result.setResult(respObj== null ? StatusCode.NOT_FOUND : respObj);
+							} else {
+								result.setResult(StatusCode.NOT_FOUND);
+							}
 
+					}
+				} else {
+					result.setResult(StatusCode.NOT_IMPLEMENTED);
 				}
+
 				return result;
 
 			default:
@@ -149,11 +160,8 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 
 	// Private Methods
 	/**
-	 *
-	 * @param unit
-	 *            desired unit {@see RoboReference}
-	 * @param query
-	 *            URI query attributes
+	 * @param unit  desired unit {@see RoboReference}
+	 * @param query URI query attributes
 	 * @return specific Attribute
 	 */
 	private AttributeDescriptor<?> getAttributeByQuery(RoboReference<?> unit, URI query) {

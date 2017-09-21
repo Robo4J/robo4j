@@ -17,10 +17,12 @@
 
 package com.robo4j.socket.http.util;
 
+import com.robo4j.LifecycleState;
 import com.robo4j.socket.http.dto.ResponseUnitDTO;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.util.StringConstants;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,10 +90,32 @@ public final class JsonUtil {
 
 	}
 
+	public static List<ResponseUnitDTO> getListByUnitJsonArray(String json){
+		List<ResponseUnitDTO> result = new ArrayList<>();
+		String array = json.replace(CHAR_SQUARE_BRACKET_LEFT,StringConstants.EMPTY)
+				.replace(CHAR_SQUARE_BRACKET_RIGHT, StringConstants.EMPTY);
+		final String[] parts = array.replaceAll("\\{\\s*\"|\"\\s*\\}", StringConstants.EMPTY)
+				.split("\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?");
+		for(int i=0; i < parts.length; i=i+4){
+			result.add(new ResponseUnitDTO(parts[i+1], LifecycleState.valueOf(parts[i+3])));
+		}
+		return result;
+
+	}
+
+
 	public static String getArrayByListResponseUnitDTO(List<ResponseUnitDTO> units){
-		return "[".concat(units.stream().map(u -> "{\"id:\"" + "\"" + u.getId() + "\",\""
-				+ u.getState().getClass().getCanonicalName() + "\":\"" + u.getState().getLocalizedName().toUpperCase() + "\"}"  )
-				.collect(Collectors.joining(","))).concat("]");
+
+		return new StringBuilder(CHAR_SQUARE_BRACKET_LEFT)
+						.append(units.stream().map(u -> new StringBuilder(CHAR_CURLY_BRACKET_LEFT)
+								.append(CHAR_QUOTATION_MARK).append("id").append(CHAR_QUOTATION_MARK).append(CHAR_COLON)
+								.append(CHAR_QUOTATION_MARK).append(u.getId()).append(CHAR_QUOTATION_MARK).append(CHAR_COMMA)
+								.append(CHAR_QUOTATION_MARK).append(u.getState().getClass().getCanonicalName()).append(CHAR_QUOTATION_MARK)
+								.append(CHAR_COLON).append(CHAR_QUOTATION_MARK).append(u.getState().getLocalizedName().toUpperCase()).append(CHAR_QUOTATION_MARK)
+								.append(CHAR_CURLY_BRACKET_RIGHT).toString())
+
+								.collect(Collectors.joining(CHAR_COMMA)))
+						.append(CHAR_SQUARE_BRACKET_RIGHT).toString();
 	}
 
 	public static String getArraysByMethodList(List<String> list){

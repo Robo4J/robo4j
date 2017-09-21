@@ -72,18 +72,21 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		try {
 			SocketChannel channel = SocketChannel.open(address);
 			channel.configureBlocking(blocking);
-			ByteBuffer buffer = ByteBuffer.wrap(((String) message).getBytes());
+
+			String writeMessage = message.toString();
+			ByteBuffer buffer = ByteBuffer.wrap(writeMessage.getBytes());
 			int writtenBytes = SocketUtil.writeBuffer(channel, buffer);
+
 			if (responseUnit != null && responseSize != null) {
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
 				// important is set stopper properly
 				int readBytes = SocketUtil.readBuffer(channel, readBuffer);
-				System.out.println(getClass().getSimpleName() + " read response: " + readBytes);
 				sendMessageToResponseUnit(readBuffer);
 			}
 			channel.close();
 		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "not available:" + address + ", no worry I continue sending images");
+			System.out.println(getClass() + " e:" + e);
+			SimpleLoggingUtil.error(getClass(), "not available:" + address + ", no worry I continue sending");
 		}
 	}
 

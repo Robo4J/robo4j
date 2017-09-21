@@ -63,7 +63,7 @@ public class RoboHttpPingPongTest {
     private static final String HTTP_METHOD = "POST";
 
 
-//    @Test
+    @Test
     public void pongTest() throws Exception {
         RoboContext systemPong = configurePongSystem();
         systemPong.start();

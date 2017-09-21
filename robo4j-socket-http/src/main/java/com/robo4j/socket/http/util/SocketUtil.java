@@ -40,7 +40,7 @@ public final class SocketUtil {
         int numberRead = channel.read(buffer);
         int position = 0;
         int totalRead = numberRead;
-        while (numberRead != 0 && position <= totalRead) {
+        while (numberRead != 0 && position <= buffer.capacity()) {
             numberRead = channel.read(buffer);
             if(numberRead > 0){
                 totalRead += numberRead;
@@ -65,7 +65,7 @@ public final class SocketUtil {
         int numberRead = channel.read(buffer);
         int position = 0;
         int totalRead = numberRead;
-        while (numberRead != stopper && position <= totalRead) {
+        while (numberRead != stopper && position <= buffer.capacity()) {
             numberRead = channel.read(buffer);
             if(numberRead > 0){
                 totalRead += numberRead;

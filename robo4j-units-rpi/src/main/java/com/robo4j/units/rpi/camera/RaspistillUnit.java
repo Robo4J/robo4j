@@ -117,7 +117,6 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 					.collect(Collectors.joining(Constants.UTF8_SPACE)))
 			.toString();
 
-		SimpleLoggingUtil.print(getClass(), "command:" + command);
 		//@formatter:on
 		targetOut = configuration.getString("targetOut", null);
 		String tmpClient = configuration.getString("client", null);
