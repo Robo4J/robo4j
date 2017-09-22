@@ -19,19 +19,11 @@
 
 package com.robo4j.socket.http.request;
 
-import com.robo4j.AttributeDescriptor;
-import com.robo4j.RoboReference;
-import com.robo4j.RoboUnit;
-import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.HttpMessageWrapper;
-import com.robo4j.socket.http.HttpVersion;
-import com.robo4j.socket.http.dto.ResponseUnitDTO;
-import com.robo4j.socket.http.units.Constants;
-import com.robo4j.socket.http.units.HttpCodecRegistry;
-import com.robo4j.socket.http.units.HttpDecoder;
-import com.robo4j.socket.http.units.HttpUriRegister;
-import com.robo4j.socket.http.util.HttpPathUtil;
-import com.robo4j.socket.http.util.JsonUtil;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COLON;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COMMA;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_LEFT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_RIGHT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_QUOTATION_MARK;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,11 +31,18 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COLON;
-import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COMMA;
-import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_LEFT;
-import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_RIGHT;
-import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_QUOTATION_MARK;
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.RoboReference;
+import com.robo4j.RoboUnit;
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.socket.http.HttpMessageWrapper;
+import com.robo4j.socket.http.dto.ResponseUnitDTO;
+import com.robo4j.socket.http.units.Constants;
+import com.robo4j.socket.http.units.HttpCodecRegistry;
+import com.robo4j.socket.http.units.HttpDecoder;
+import com.robo4j.socket.http.units.HttpUriRegister;
+import com.robo4j.socket.http.util.HttpPathUtil;
+import com.robo4j.socket.http.util.JsonUtil;
 
 /**
  * Dynamically configurable request factory
@@ -62,11 +61,10 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 
 	@Override
 	public Object processGet(RoboUnit<?> desiredUnit, HttpMessageWrapper<?> wrapper) {
-		if (HttpVersion.containsValue(wrapper.message().version()) && !desiredUnit.getContext().getUnits().isEmpty()) {
+		if (!desiredUnit.getContext().getUnits().isEmpty()) {
 
 			final List<ResponseUnitDTO> unitList = desiredUnit.getContext().getUnits().stream()
-					.map(u -> new ResponseUnitDTO(u.getId(), u.getState()))
-					.collect(Collectors.toList());
+					.map(u -> new ResponseUnitDTO(u.getId(), u.getState())).collect(Collectors.toList());
 
 			return JsonUtil.getArrayByListResponseUnitDTO(unitList);
 		} else {
@@ -89,32 +87,25 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	}
 
 	@Override
-	public Object processGet(final RoboReference<?> desiredReference, final List<String> paths,
-			final HttpMessageWrapper<?> wrapper) {
-		if (HttpVersion.containsValue(wrapper.message().version())) {
-			/* currently is supported only */
-			final HttpUriRegister register = HttpUriRegister.getInstance();
-			if (register.isUnitAvailable(HttpPathUtil.pathsToUri(paths))) {
-				final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredReference.getMessageType());
-				if (decoder != null) {
-					List<String> methods = Arrays.asList("GET", "POST");
-					final StringBuilder sb = new StringBuilder(CHAR_CURLY_BRACKET_LEFT)
-							.append(CHAR_QUOTATION_MARK)
-							.append("id").append(CHAR_QUOTATION_MARK).append(CHAR_COLON)
-							.append(CHAR_QUOTATION_MARK).append(desiredReference.getId()).append(CHAR_QUOTATION_MARK).append(CHAR_COMMA)
-							.append(CHAR_QUOTATION_MARK).append("codec").append(CHAR_QUOTATION_MARK).append(CHAR_COLON)
-							.append(CHAR_QUOTATION_MARK).append(desiredReference.getMessageType().getName()).append(CHAR_QUOTATION_MARK).append(",")
-							.append(CHAR_QUOTATION_MARK).append("method").append(CHAR_QUOTATION_MARK).append(CHAR_COLON)
-							.append(JsonUtil.getArraysByMethodList(methods))
-							.append(CHAR_CURLY_BRACKET_RIGHT);
-					return sb.toString();
-				} else {
-					SimpleLoggingUtil.error(getClass(), "no decoder available");
-					return "no decoder available";
-				}
+	public Object processGet(final RoboReference<?> desiredReference, final List<String> paths, final HttpMessageWrapper<?> wrapper) {
+		/* currently is supported only */
+		final HttpUriRegister register = HttpUriRegister.getInstance();
+		if (register.isUnitAvailable(HttpPathUtil.pathsToUri(paths))) {
+			final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredReference.getMessageType());
+			if (decoder != null) {
+				List<String> methods = Arrays.asList("GET", "POST");
+				final StringBuilder sb = new StringBuilder(CHAR_CURLY_BRACKET_LEFT).append(CHAR_QUOTATION_MARK).append("id")
+						.append(CHAR_QUOTATION_MARK).append(CHAR_COLON).append(CHAR_QUOTATION_MARK).append(desiredReference.getId())
+						.append(CHAR_QUOTATION_MARK).append(CHAR_COMMA).append(CHAR_QUOTATION_MARK).append("codec")
+						.append(CHAR_QUOTATION_MARK).append(CHAR_COLON).append(CHAR_QUOTATION_MARK)
+						.append(desiredReference.getMessageType().getName()).append(CHAR_QUOTATION_MARK).append(",")
+						.append(CHAR_QUOTATION_MARK).append("method").append(CHAR_QUOTATION_MARK).append(CHAR_COLON)
+						.append(JsonUtil.getArraysByMethodList(methods)).append(CHAR_CURLY_BRACKET_RIGHT);
+				return sb.toString();
+			} else {
+				SimpleLoggingUtil.error(getClass(), "no decoder available");
+				return "no decoder available";
 			}
-		} else {
-			SimpleLoggingUtil.error(getClass(), "processGet is corrupted: " + wrapper);
 		}
 		return null;
 	}
@@ -130,21 +121,16 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	 * @return
 	 */
 	@Override
-	public Object processPost(final RoboReference<?> desiredUnit, final List<String> paths,
-			final HttpMessageWrapper<?> wrapper) {
-		if (HttpVersion.containsValue(wrapper.message().version())) {
-			final HttpUriRegister register = HttpUriRegister.getInstance();
-			if (register.isUnitAvailable(HttpPathUtil.pathsToUri(paths))) {
-				final String json = (String) wrapper.body();
-				final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredUnit.getMessageType());
-				if (decoder != null) {
-					return decoder.decode(json);
-				} else {
-					SimpleLoggingUtil.error(getClass(), "no decoder available");
-				}
+	public Object processPost(final RoboReference<?> desiredUnit, final List<String> paths, final HttpMessageWrapper<?> wrapper) {
+		final HttpUriRegister register = HttpUriRegister.getInstance();
+		if (register.isUnitAvailable(HttpPathUtil.pathsToUri(paths))) {
+			final String json = (String) wrapper.body();
+			final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredUnit.getMessageType());
+			if (decoder != null) {
+				return decoder.decode(json);
+			} else {
+				SimpleLoggingUtil.error(getClass(), "no decoder available");
 			}
-		} else {
-			SimpleLoggingUtil.error(getClass(), "processPost is corrupted: " + wrapper);
 		}
 		return null;
 	}
