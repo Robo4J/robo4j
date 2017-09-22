@@ -26,28 +26,24 @@ import java.nio.ByteBuffer;
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpByteWrapper {
+	private final ByteBuffer header;
+	private final ByteBuffer body;
 
-    private ByteBuffer header;
-    private ByteBuffer body;
+	public HttpByteWrapper(ByteBuffer header, ByteBuffer body) {
+		this.header = header;
+		this.body = body;
+	}
 
-    public HttpByteWrapper(ByteBuffer header, ByteBuffer body) {
-        this.header = header;
-        this.body = body;
-    }
+	public ByteBuffer getHeader() {
+		return header;
+	}
 
-    public ByteBuffer getHeader() {
-        return header;
-    }
+	public ByteBuffer getBody() {
+		return body;
+	}
 
-    public ByteBuffer getBody() {
-        return body;
-    }
-
-    @Override
-    public String toString() {
-        return "HttpByteWrapper{" +
-                "header=" + header +
-                ", body=" + body +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "HttpByteWrapper{" + "header=" + header + ", body=" + body + '}';
+	}
 }
