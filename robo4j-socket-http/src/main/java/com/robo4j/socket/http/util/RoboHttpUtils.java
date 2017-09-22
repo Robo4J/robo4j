@@ -16,7 +16,7 @@
  */
 package com.robo4j.socket.http.util;
 
-import com.robo4j.socket.http.HttpHeaderNames;
+import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.request.RoboBasicMapEntry;
@@ -53,10 +53,10 @@ public final class RoboHttpUtils {
 		//@formatter:off
 		return HttpHeaderBuilder.Build()
 				.add(StringConstants.EMPTY, responseCode)
-				.add(HttpHeaderNames.DATE, LocalDateTime.now().toString())
-				.add(HttpHeaderNames.SERVER, ROBO4J_CLIENT)
-				.add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(length))
-				.add(HttpHeaderNames.CONTENT_TYPE, "text/html;".concat(Constants.UTF8_SPACE).concat("charset=utf-8"))
+				.add(HttpHeaderFieldNames.DATE, LocalDateTime.now().toString())
+				.add(HttpHeaderFieldNames.SERVER, ROBO4J_CLIENT)
+				.add(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(length))
+				.add(HttpHeaderFieldNames.CONTENT_TYPE, "text/html;".concat(Constants.UTF8_SPACE).concat("charset=utf-8"))
 				.build();
 		//@formatter:on
 	}
@@ -81,16 +81,16 @@ public final class RoboHttpUtils {
 	public static String createRequestHeader(String host, int length) {
 		//@formatter:off
 		HttpHeaderBuilder builder = HttpHeaderBuilder.Build()
-			.add(HttpHeaderNames.HOST, host)
-			.add(HttpHeaderNames.CONNECTION, "keep-alive")
-			.add(HttpHeaderNames.CACHE_CONTROL, "no-cache")
-			.add(HttpHeaderNames.USER_AGENT, ROBO4J_CLIENT)
-			.add(HttpHeaderNames.ACCEPT, "*/*")
-			.add(HttpHeaderNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
-			.add(HttpHeaderNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8")
-			.add(HttpHeaderNames.CONTENT_TYPE, "text/html;".concat(Constants.UTF8_SPACE).concat("charset=utf-8"));
+			.add(HttpHeaderFieldNames.HOST, host)
+			.add(HttpHeaderFieldNames.CONNECTION, "keep-alive")
+			.add(HttpHeaderFieldNames.CACHE_CONTROL, "no-cache")
+			.add(HttpHeaderFieldNames.USER_AGENT, ROBO4J_CLIENT)
+			.add(HttpHeaderFieldNames.ACCEPT, "*/*")
+			.add(HttpHeaderFieldNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
+			.add(HttpHeaderFieldNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8")
+			.add(HttpHeaderFieldNames.CONTENT_TYPE, "text/html;".concat(Constants.UTF8_SPACE).concat("charset=utf-8"));
 		if(length != 0){
-			builder.add(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(length));
+			builder.add(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(length));
 		}
 		return builder.build();
 		//@formatter:on

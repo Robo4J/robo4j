@@ -38,18 +38,18 @@ public class HttpHeaderTests {
 	@Test
 	public void simpleHttpHeader() {
 		// formatter:off
-		final String header = HttpHeaderBuilder.Build().add(HttpHeaderNames.HOST, "127.0.0.1")
-				.add(HttpHeaderNames.CONNECTION, CONST_CACHE_CONTROL).add(HttpHeaderNames.CACHE_CONTROL, "no-cache")
-				.add(HttpHeaderNames.USER_AGENT, CONST_USER_AGENT).add(HttpHeaderNames.ACCEPT, "*/*")
-				.add(HttpHeaderNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
-				.add(HttpHeaderNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8").build();
+		final String header = HttpHeaderBuilder.Build().add(HttpHeaderFieldNames.HOST, "127.0.0.1")
+				.add(HttpHeaderFieldNames.CONNECTION, CONST_CACHE_CONTROL).add(HttpHeaderFieldNames.CACHE_CONTROL, "no-cache")
+				.add(HttpHeaderFieldNames.USER_AGENT, CONST_USER_AGENT).add(HttpHeaderFieldNames.ACCEPT, "*/*")
+				.add(HttpHeaderFieldNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
+				.add(HttpHeaderFieldNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8").build();
 		// formatter:on
 		Assert.assertNotNull(header);
 		Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE).length, 7);
 		Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[1],
-				HttpHeaderBuilder.Build().add(HttpHeaderNames.CONNECTION, CONST_CACHE_CONTROL).build().trim());
+				HttpHeaderBuilder.Build().add(HttpHeaderFieldNames.CONNECTION, CONST_CACHE_CONTROL).build().trim());
 		Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[3],
-				HttpHeaderBuilder.Build().add(HttpHeaderNames.USER_AGENT, CONST_USER_AGENT).build().trim());
+				HttpHeaderBuilder.Build().add(HttpHeaderFieldNames.USER_AGENT, CONST_USER_AGENT).build().trim());
 	}
 
 }

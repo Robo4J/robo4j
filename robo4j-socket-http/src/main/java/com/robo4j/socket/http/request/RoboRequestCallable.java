@@ -22,7 +22,7 @@ import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpByteWrapper;
-import com.robo4j.socket.http.HttpHeaderNames;
+import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMessage;
 import com.robo4j.socket.http.HttpMessageWrapper;
 import com.robo4j.socket.http.HttpMethod;
@@ -122,7 +122,7 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 				}
 				return result;
 			case POST:
-				int length = Integer.valueOf(params.get(HttpHeaderNames.CONTENT_LENGTH));
+				int length = Integer.valueOf(params.get(HttpHeaderFieldNames.CONTENT_LENGTH));
 				final StringBuilder jsonSB = new StringBuilder();
 				final String postValue = new String(wrapper.getBody().array());
 				if (length == postValue.length()) {

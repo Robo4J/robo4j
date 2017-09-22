@@ -18,14 +18,12 @@
 package com.robo4j.socket.http;
 
 /**
- * Util class for header names
- *
- * all names are lower case, currently supported header values
+ * Util class for header field names. All names are lower case.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class HttpHeaderNames {
+public final class HttpHeaderFieldNames {
 
 	public static final String ACCEPT = "accept";
 

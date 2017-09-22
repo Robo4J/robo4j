@@ -20,7 +20,7 @@ package com.robo4j.socket.http;
 import java.nio.ByteBuffer;
 
 /**
- * Wrapper to Http Message
+ * Wrapper to Http Message.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
