@@ -17,14 +17,26 @@
 
 package com.robo4j.socket.http.util;
 
+import com.robo4j.LifecycleState;
+import com.robo4j.socket.http.dto.ResponseUnitDTO;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.util.StringConstants;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COLON;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COMMA;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_LEFT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_RIGHT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_QUOTATION_MARK;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_SQUARE_BRACKET_LEFT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_SQUARE_BRACKET_RIGHT;
 
 /**
  *
@@ -77,6 +89,45 @@ public final class JsonUtil {
 		return result;
 
 	}
+
+	public static List<ResponseUnitDTO> getListByUnitJsonArray(String json){
+		List<ResponseUnitDTO> result = new ArrayList<>();
+		String array = json.replace(CHAR_SQUARE_BRACKET_LEFT,StringConstants.EMPTY)
+				.replace(CHAR_SQUARE_BRACKET_RIGHT, StringConstants.EMPTY);
+		final String[] parts = array.replaceAll("\\{\\s*\"|\"\\s*\\}", StringConstants.EMPTY)
+				.split("\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?");
+		for(int i=0; i < parts.length; i=i+4){
+			result.add(new ResponseUnitDTO(parts[i+1], LifecycleState.valueOf(parts[i+3])));
+		}
+		return result;
+
+	}
+
+
+	public static String getArrayByListResponseUnitDTO(List<ResponseUnitDTO> units){
+
+		return new StringBuilder(CHAR_SQUARE_BRACKET_LEFT)
+						.append(units.stream().map(u -> new StringBuilder(CHAR_CURLY_BRACKET_LEFT)
+								.append(CHAR_QUOTATION_MARK).append("id").append(CHAR_QUOTATION_MARK).append(CHAR_COLON)
+								.append(CHAR_QUOTATION_MARK).append(u.getId()).append(CHAR_QUOTATION_MARK).append(CHAR_COMMA)
+								.append(CHAR_QUOTATION_MARK).append(u.getState().getClass().getCanonicalName()).append(CHAR_QUOTATION_MARK)
+								.append(CHAR_COLON).append(CHAR_QUOTATION_MARK).append(u.getState().getLocalizedName().toUpperCase()).append(CHAR_QUOTATION_MARK)
+								.append(CHAR_CURLY_BRACKET_RIGHT).toString())
+
+								.collect(Collectors.joining(CHAR_COMMA)))
+						.append(CHAR_SQUARE_BRACKET_RIGHT).toString();
+	}
+
+	public static String getArraysByMethodList(List<String> list){
+		return new StringBuilder(CHAR_SQUARE_BRACKET_LEFT).append(list.stream().map(m -> new StringBuilder(CHAR_CURLY_BRACKET_LEFT)
+						.append(CHAR_QUOTATION_MARK).append("type").append(CHAR_QUOTATION_MARK)
+						.append(CHAR_COLON).append(CHAR_QUOTATION_MARK).append(m).append(CHAR_QUOTATION_MARK)
+						.append(CHAR_CURLY_BRACKET_RIGHT).toString()).collect(Collectors.joining(CHAR_COMMA)))
+				.append(CHAR_SQUARE_BRACKET_RIGHT).toString();
+	}
+
+
+
 
 	// Private Methods
 	private static boolean checkPrimitiveOrWrapper(Class<?> clazz) {

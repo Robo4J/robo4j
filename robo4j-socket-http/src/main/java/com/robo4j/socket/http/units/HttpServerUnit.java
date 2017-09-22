@@ -19,6 +19,25 @@
 
 package com.robo4j.socket.http.units;
 
+import com.robo4j.BlockingTrait;
+import com.robo4j.ConfigurationException;
+import com.robo4j.LifecycleState;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.RoboUnit;
+import com.robo4j.configuration.Configuration;
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.socket.http.enums.StatusCode;
+import com.robo4j.socket.http.request.RoboRequestCallable;
+import com.robo4j.socket.http.request.RoboRequestFactory;
+import com.robo4j.socket.http.request.RoboResponseProcess;
+import com.robo4j.socket.http.util.ByteBufferUtils;
+import com.robo4j.socket.http.util.JsonUtil;
+import com.robo4j.socket.http.util.RoboHttpUtils;
+import com.robo4j.socket.http.util.RoboResponseHeader;
+import com.robo4j.socket.http.util.SocketUtil;
+import com.robo4j.util.StringConstants;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -39,22 +58,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import com.robo4j.BlockingTrait;
-import com.robo4j.ConfigurationException;
-import com.robo4j.LifecycleState;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboReference;
-import com.robo4j.RoboUnit;
-import com.robo4j.configuration.Configuration;
-import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.request.RoboRequestCallable;
-import com.robo4j.socket.http.request.RoboRequestFactory;
-import com.robo4j.socket.http.util.ByteBufferUtils;
-import com.robo4j.socket.http.util.JsonUtil;
-import com.robo4j.socket.http.util.RoboHttpUtils;
-import com.robo4j.socket.http.util.SocketUtil;
-import com.robo4j.util.StringConstants;
-
 /**
  * Http NIO unit allows to configure format of the requests currently is only
  * GET method available
@@ -64,172 +67,212 @@ import com.robo4j.util.StringConstants;
  */
 @BlockingTrait
 public class HttpServerUnit extends RoboUnit<Object> {
-	private static final String DELIMITER = ",";
-	private static final int _DEFAULT_PORT = 8042;
-	private static final int DEFAULT_BUFFER_CAPACITY = 700000;
-	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
-	private static final HttpCodecRegistry CODEC_REGISTRY = new HttpCodecRegistry();
-	public static final String PROPERTY_PORT = "port";
-	public static final String PROPERTY_TARGET = "target";
-	public static final String PROPERTY_STOPPER = "stopper";
-	public static final String PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
-	private boolean available;
-	private Integer port;
-	private Integer bufferCapacity;
-	//used for encoded messages
-	private Integer stopper;
-	private List<String> target;
-	private ServerSocketChannel server;
-	private final Map<SelectableChannel, SelectionKey> channelKeyMap = new HashMap<>();
-	private final Map<SelectionKey, Object> outBuffers = new HashMap<>();
+    private static final String DELIMITER = ",";
+    private static final int _DEFAULT_PORT = 8042;
+    private static final int DEFAULT_BUFFER_CAPACITY = 700000;
+    private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
+    private static final HttpCodecRegistry CODEC_REGISTRY = new HttpCodecRegistry();
+    public static final String PROPERTY_PORT = "port";
+    public static final String PROPERTY_TARGET = "target";
+    public static final String PROPERTY_STOPPER = "stopper";
+    public static final String PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
+    private boolean available;
+    private Integer port;
+    private Integer bufferCapacity;
+    //used for encoded messages
+    private Integer stopper;
+    private List<String> target;
+    private ServerSocketChannel server;
+    private final Map<SelectableChannel, SelectionKey> channelKeyMap = new HashMap<>();
+    private final Map<SelectionKey, RoboResponseProcess> outBuffers = new HashMap<>();
 
-	public HttpServerUnit(RoboContext context, String id) {
-		super(Object.class, context, id);
-	}
+    public HttpServerUnit(RoboContext context, String id) {
+        super(Object.class, context, id);
+    }
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		setState(LifecycleState.UNINITIALIZED);
-		/* target is always initiated as the list */
-		target = Arrays.asList(configuration.getString(PROPERTY_TARGET, StringConstants.EMPTY).split(DELIMITER));
-		port = configuration.getInteger(PROPERTY_PORT, _DEFAULT_PORT);
-		bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
-		stopper = configuration.getInteger(PROPERTY_STOPPER, null);
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        setState(LifecycleState.UNINITIALIZED);
+        /* target is always initiated as the list */
+        target = Arrays.asList(configuration.getString(PROPERTY_TARGET, StringConstants.EMPTY).split(DELIMITER));
+        port = configuration.getInteger(PROPERTY_PORT, _DEFAULT_PORT);
+        bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
+        stopper = configuration.getInteger(PROPERTY_STOPPER, null);
 
-		String packages = configuration.getString("packages", null);
-		if (validatePackages(packages)) {
-			CODEC_REGISTRY.scan(Thread.currentThread().getContextClassLoader(), packages.split(","));
-		}
+        String packages = configuration.getString("packages", null);
+        if (validatePackages(packages)) {
+            CODEC_REGISTRY.scan(Thread.currentThread().getContextClassLoader(), packages.split(","));
+        }
 
-		//@formatter:off
+        //@formatter:off
 		Map<String, Object> targetUnitsMap = JsonUtil.getMapNyJson(configuration.getString("targetUnits", null));
 
 		if(targetUnitsMap.isEmpty()){
 			SimpleLoggingUtil.error(getClass(), "no targetUnits");
 		} else {
 			targetUnitsMap.forEach((key, value) ->
-				HttpUriRegister.getInstance().addNode(key, value.toString()));
+				HttpUriRegister.getInstance().addUnitPathNode(key, value.toString()));
 		}
         //@formatter:on
 
-		setState(LifecycleState.INITIALIZED);
-	}
+        setState(LifecycleState.INITIALIZED);
+    }
 
-	@Override
-	public void start() {
-		setState(LifecycleState.STARTING);
-		final List<RoboReference<Object>> targetRefs = target.stream().map(e -> getContext().getReference(e))
-				.filter(Objects::nonNull).collect(Collectors.toList());
-		if (!available) {
-			available = true;
-			getContext().getScheduler().execute(() -> server(targetRefs));
-		} else {
-			SimpleLoggingUtil.error(getClass(), "HttpDynamicUnit start() -> error: " + targetRefs);
-		}
-		setState(LifecycleState.STARTED);
-	}
+    @Override
+    public void start() {
+        setState(LifecycleState.STARTING);
+        final List<RoboReference<Object>> targetRefs = target.stream().map(e -> getContext().getReference(e))
+                .filter(Objects::nonNull).collect(Collectors.toList());
+        if (!available) {
+            available = true;
+            getContext().getScheduler().execute(() -> server(targetRefs));
+        } else {
+            SimpleLoggingUtil.error(getClass(), "HttpDynamicUnit start() -> error: " + targetRefs);
+        }
+        setState(LifecycleState.STARTED);
+    }
 
-	@Override
-	public void stop() {
-		setState(LifecycleState.STOPPING);
-		stopServer("stop");
-		setState(LifecycleState.STOPPED);
-	}
+    @Override
+    public void stop() {
+        setState(LifecycleState.STOPPING);
+        stopServer("stop");
+        setState(LifecycleState.STOPPED);
+    }
 
-	// Private Methods
-	public void stopServer(String method) {
-		try {
-			if (server != null && server.isOpen()) {
-				server.close();
-			}
-		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "method:" + method + ",server problem: ", e);
-		}
-	}
+    // Private Methods
+    public void stopServer(String method) {
+        try {
+            if (server != null && server.isOpen()) {
+                server.close();
+            }
+        } catch (IOException e) {
+            SimpleLoggingUtil.error(getClass(), "method:" + method + ",server problem: ", e);
+        }
+    }
 
-	/**
-	 * Start non-blocking socket server on http protocol
-	 *
-	 * @param targetRef
-	 *            - reference to the target queue
-	 */
-	private void server(final List<RoboReference<Object>> targetRefs) {
-		try {
-			/* selector is multiplexor to SelectableChannel */
-			// Selects a set of keys whose corresponding channels are ready for
-			// I/O operations
-			final Selector selector = Selector.open();
-			server = ServerSocketChannel.open();
-			server.configureBlocking(false);
-			server.socket().bind(new InetSocketAddress(port));
+    /**
+     * Start non-blocking socket server on http protocol
+     *
+     * @param targetRef - reference to the target queue
+     */
+    private void server(final List<RoboReference<Object>> targetRefs) {
+        try {
+            /* selector is multiplexor to SelectableChannel */
+            // Selects a set of keys whose corresponding channels are ready for
+            // I/O operations
+            final Selector selector = Selector.open();
+            server = ServerSocketChannel.open();
+            server.configureBlocking(false);
+            server.socket().bind(new InetSocketAddress(port));
 
-			// channelKeyMap.put(server, listenKey);
+            // channelKeyMap.put(server, listenKey);
 
-			server.register(selector, SelectionKey.OP_ACCEPT);
-			while (activeStates.contains(getState())) {
-				int channelReady = selector.select();
+            server.register(selector, SelectionKey.OP_ACCEPT);
+            while (activeStates.contains(getState())) {
+                int channelReady = selector.select();
 
-				if (channelReady == 0) {
-					/*
+                if (channelReady == 0) {
+                    /*
 					 * token representing the registration of a SelectableChannel with a Selector
 					 */
-					Set<SelectionKey> selectedKeys = selector.selectedKeys();
-					Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
+                    Set<SelectionKey> selectedKeys = selector.selectedKeys();
+                    Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
 
-					while (selectedIterator.hasNext()) {
-						final SelectionKey selectedKey = selectedIterator.next();
+                    while (selectedIterator.hasNext()) {
+                        final SelectionKey selectedKey = selectedIterator.next();
 
-						// preventing similar keys coming
-						selectedIterator.remove();
+                        // preventing similar keys coming
+                        selectedIterator.remove();
 
-						if (!selectedKey.isValid()) {
-							continue;
-						}
+                        if (!selectedKey.isValid()) {
+                            continue;
+                        }
 
-						if (selectedKey.isAcceptable()) {
-							accept(selector, selectedKey);
-						} else if (selectedKey.isReadable()) {
-							read(selector, targetRefs, selectedKey);
-						} else if (selectedKey.isWritable()) {
-							write(selectedKey);
-						}
-					}
-				}
+                        if (selectedKey.isAcceptable()) {
+                            accept(selector, selectedKey);
+                        } else if (selectedKey.isReadable()) {
+                            read(selector, selectedKey);
+                        } else if (selectedKey.isWritable()) {
+                            write(targetRefs, selectedKey);
+                        }
+                    }
+                }
 
-			}
-		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "SERVER CLOSED", e);
-		}
-		SimpleLoggingUtil.debug(getClass(), "stopped port: " + port);
-		setState(LifecycleState.STOPPED);
-	}
+            }
+        } catch (IOException e) {
+            SimpleLoggingUtil.error(getClass(), "SERVER CLOSED", e);
+        }
+        SimpleLoggingUtil.debug(getClass(), "stopped port: " + port);
+        setState(LifecycleState.STOPPED);
+    }
 
-	private void accept(Selector selector, SelectionKey key) throws IOException {
-		ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
-		SocketChannel channel = serverChannel.accept();
-		channel.configureBlocking(false);
-		channelKeyMap.put(channel, key);
-		channel.register(selector, SelectionKey.OP_READ);
+    private void accept(Selector selector, SelectionKey key) throws IOException {
+        ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
+        SocketChannel channel = serverChannel.accept();
+        channel.configureBlocking(false);
+        channelKeyMap.put(channel, key);
+        channel.register(selector, SelectionKey.OP_READ);
 
-	}
+    }
 
-	private void write(SelectionKey key) throws IOException {
-		SocketChannel channel = (SocketChannel) key.channel();
+    private void write(List<RoboReference<Object>> targetRefs, SelectionKey key) throws IOException {
+        SocketChannel channel = (SocketChannel) key.channel();
 
-		String message = outBuffers.get(key).toString();
-		String response = RoboHttpUtils.HTTP_HEADER_OK.concat(RoboHttpUtils.NEW_LINE).concat(message);
-		int writtenBytes = SocketUtil.writeBuffer(channel, ByteBuffer.wrap(response.getBytes()));
+        RoboResponseProcess responseProcess = outBuffers.get(key);
 
-		channelKeyMap.remove(channel);
+        if (responseProcess.getMethod() != null) {
+            switch (responseProcess.getMethod()) {
+                case GET:
+                    String getResponse;
+                    if (responseProcess.getResult() != null) {
+                        if (responseProcess.getResult() instanceof StatusCode) {
+                            getResponse = RoboHttpUtils.createResponseByCode((StatusCode) responseProcess.getResult());
+                        } else {
+                            String getHeader = RoboResponseHeader.headerByCodeWithUid(StatusCode.OK, getContext().getId());
+                            getResponse = RoboHttpUtils.createResponseWithHeaderAndMessage(getHeader, responseProcess.getResult().toString());
+                        }
+                    } else {
+                        getResponse = RoboHttpUtils.createResponseByCode(StatusCode.NOT_IMPLEMENTED);
+                    }
+                    SocketUtil.writeBuffer(channel, ByteBuffer.wrap(getResponse.getBytes()));
+                    break;
+                case POST:
+                    if (responseProcess.getResult() != null) {
+                        if (responseProcess.getResult() instanceof StatusCode) {
+                            String postResponse = RoboHttpUtils.createResponseByCode((StatusCode) responseProcess.getResult());
+                            SocketUtil.writeBuffer(channel, ByteBuffer.wrap(postResponse.getBytes()));
+                        } else {
+                            String postResponse = RoboHttpUtils.createResponseByCode(StatusCode.ACCEPTED);
+                            SocketUtil.writeBuffer(channel, ByteBuffer.wrap(postResponse.getBytes()));
+                            for (RoboReference<Object> ref : targetRefs) {
+                                if (responseProcess.getResult() != null && ref.getMessageType().equals(responseProcess.getResult().getClass())) {
+                                    ref.sendMessage(responseProcess.getResult());
+                                }
+                            }
+                        }
+                    } else {
+                        String notImplementedResponse = RoboHttpUtils.createResponseByCode(StatusCode.NOT_IMPLEMENTED);
+                        SocketUtil.writeBuffer(channel, ByteBuffer.wrap(notImplementedResponse.getBytes()));
+                    }
 
-		channel.close();
-		key.cancel();
-	}
 
-	private void read(Selector selector, List<RoboReference<Object>> targetRefs, SelectionKey key) throws IOException {
+            }
+        } else {
+            String badResponse = RoboResponseHeader.headerByCode(StatusCode.BAD_REQUEST);
+            SocketUtil.writeBuffer(channel, ByteBuffer.wrap(badResponse.getBytes()));
+        }
 
-		SocketChannel channel = (SocketChannel) key.channel();
-		//@formatter:off
+        channelKeyMap.remove(channel);
+
+        channel.close();
+        key.cancel();
+    }
+
+
+    private void read(Selector selector, SelectionKey key) throws IOException {
+
+        SocketChannel channel = (SocketChannel) key.channel();
+        //@formatter:off
 		HttpUriRegister.getInstance().updateUnits(getContext());
 		final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
 
@@ -243,21 +286,11 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 		ByteBuffer validBuffer = ByteBufferUtils.copy(buffer, 0, readBytes);
 		final RoboRequestCallable callable = new RoboRequestCallable(this, validBuffer, factory);
-		final Future<?> futureResult = getContext().getScheduler().submit(callable);
+		final Future<RoboResponseProcess> futureResult = getContext().getScheduler().submit(callable);
 
 		try{
-			Object result = futureResult.get();
-			if(result == null){
-				System.out.println(getClass() + " EMPTY RESULT");
-				result = StringConstants.EMPTY;
-			}
-			// TODO: 27.08.17 miro discuss -> Serializable
+			RoboResponseProcess result = futureResult.get();
 			outBuffers.put(key, result);
-			for (RoboReference<Object> ref : targetRefs) {
-			if (ref.getMessageType().equals(result.getClass())) {
-				ref.sendMessage(result);
-			}
-		}
 		} catch (InterruptedException | ExecutionException e){
 			SimpleLoggingUtil.error(getClass(), "read" + e);
 		}

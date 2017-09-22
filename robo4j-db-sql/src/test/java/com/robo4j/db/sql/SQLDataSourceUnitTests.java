@@ -52,6 +52,7 @@ import java.util.stream.IntStream;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@SuppressWarnings("unchecked")
 public class SQLDataSourceUnitTests {
 
 	private static final int WAIT_TIME = 400;

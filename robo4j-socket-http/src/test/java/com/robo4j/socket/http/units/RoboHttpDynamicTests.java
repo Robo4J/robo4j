@@ -29,14 +29,16 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
+import com.robo4j.socket.http.util.HttpPathUtil;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.SystemUtil;
-
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Future;
 
 /**
@@ -86,9 +88,10 @@ public class RoboHttpDynamicTests {
 		System.out.println(SystemUtil.printStateReport(mainSystem));
 
 		/* client system sending a messages to the main system */
+		List<String> paths = Arrays.asList("units", ID_TARGET_UNIT);
 		for (int i = 0; i < MESSAGES_NUMBER; i++) {
 			httpClientReference.sendMessage(
-					RoboHttpUtils.createRequest(HttpMethod.POST, HOST_SYSTEM, "/".concat(ID_TARGET_UNIT), JSON_STRING));
+					RoboHttpUtils.createRequest(HttpMethod.POST, HOST_SYSTEM, HttpPathUtil.pathsToUri(paths), JSON_STRING));
 		}
 
 		Thread.sleep(SLEEP_DELAY);

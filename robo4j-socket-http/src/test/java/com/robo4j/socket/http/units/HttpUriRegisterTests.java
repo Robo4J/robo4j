@@ -39,7 +39,8 @@ import static org.junit.Assert.assertEquals;
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpUriRegisterTests {
-	private static final String TARGET_UNIT = "controller";
+	private static final String PATH_UNITS = "units/";
+	private static final String TARGET_UNIT_CONTROLLER = "controller";
 	private static final String[] METHODS = { "GET", "POST" };
 
 	@Test
@@ -51,14 +52,15 @@ public class HttpUriRegisterTests {
 
 		HttpUriRegister register = HttpUriRegister.getInstance();
 
-		register.addNode(TARGET_UNIT, METHODS[0]);
-		register.addNode(TARGET_UNIT, METHODS[1]);
+		register.addUnitPathNode(TARGET_UNIT_CONTROLLER, METHODS[0]);
+		register.addUnitPathNode(TARGET_UNIT_CONTROLLER, METHODS[1]);
 
-		HttpCommandTestController ctrl = new HttpCommandTestController(system, TARGET_UNIT);
-		register.addUnitToNode(TARGET_UNIT, ctrl);
-		assertNotNull(register.getMethodsBytPath(TARGET_UNIT));
-		assertEquals(register.getMethodsBytPath(TARGET_UNIT).getUnit(), ctrl);
-		assertTrue(register.getMethodsBytPath(TARGET_UNIT).getMethods().containsAll(Arrays.asList(METHODS)));
+		HttpCommandTestController ctrl = new HttpCommandTestController(system, TARGET_UNIT_CONTROLLER);
+		String path = PATH_UNITS.concat(TARGET_UNIT_CONTROLLER);
+		register.addUnitToNode(TARGET_UNIT_CONTROLLER, ctrl);
+		assertNotNull(register.getMethodsBytPath(path));
+		assertEquals(register.getMethodsBytPath(path).getUnit(), ctrl);
+		assertTrue(register.getMethodsBytPath(path).getMethods().containsAll(Arrays.asList(METHODS)));
 	}
 
 }

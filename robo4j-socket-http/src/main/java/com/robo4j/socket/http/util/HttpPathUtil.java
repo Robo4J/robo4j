@@ -41,4 +41,8 @@ public final class HttpPathUtil {
                 .filter(e -> !e.isEmpty())
                 .collect(Collectors.toList());
     }
+
+    public static String pathsToUri(List<String> paths){
+        return paths.stream().collect(Collectors.joining(HttpMessageUtil.getHttpSeparator(SEPARATOR_PATH)));
+    }
 }

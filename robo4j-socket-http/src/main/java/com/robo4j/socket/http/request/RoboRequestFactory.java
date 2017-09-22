@@ -19,22 +19,31 @@
 
 package com.robo4j.socket.http.request;
 
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
-
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMessageWrapper;
 import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.socket.http.dto.ResponseUnitDTO;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.units.HttpCodecRegistry;
 import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpUriRegister;
+import com.robo4j.socket.http.util.HttpPathUtil;
 import com.robo4j.socket.http.util.JsonUtil;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
+
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COLON;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COMMA;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_LEFT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_RIGHT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_QUOTATION_MARK;
 
 /**
  * Dynamically configurable request factory
@@ -43,6 +52,7 @@ import com.robo4j.socket.http.util.JsonUtil;
  * @author Miro Wengner (@miragemiko)
  */
 // TODO discuss how to use URIs
+// FIXME: 18.09.17 (miro) simplify
 public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	private final HttpCodecRegistry codecRegistry;
 
@@ -53,9 +63,12 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	@Override
 	public Object processGet(RoboUnit<?> desiredUnit, HttpMessageWrapper<?> wrapper) {
 		if (HttpVersion.containsValue(wrapper.message().version()) && !desiredUnit.getContext().getUnits().isEmpty()) {
-			final Map<String, Object> unitsMap = desiredUnit.getContext().getUnits().stream()
-					.collect(Collectors.toMap(RoboReference::getId, RoboReference::getState));
-			return JsonUtil.getJsonByMap(unitsMap);
+
+			final List<ResponseUnitDTO> unitList = desiredUnit.getContext().getUnits().stream()
+					.map(u -> new ResponseUnitDTO(u.getId(), u.getState()))
+					.collect(Collectors.toList());
+
+			return JsonUtil.getArrayByListResponseUnitDTO(unitList);
 		} else {
 			SimpleLoggingUtil.error(getClass(), "internal error: no units available");
 		}
@@ -76,20 +89,24 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	}
 
 	@Override
-	public Object processGet(final RoboReference<?> desiredReference, final String path,
+	public Object processGet(final RoboReference<?> desiredReference, final List<String> paths,
 			final HttpMessageWrapper<?> wrapper) {
 		if (HttpVersion.containsValue(wrapper.message().version())) {
 			/* currently is supported only */
 			final HttpUriRegister register = HttpUriRegister.getInstance();
-			if (register.isUnitAvailable(path)) {
+			if (register.isUnitAvailable(HttpPathUtil.pathsToUri(paths))) {
 				final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredReference.getMessageType());
 				if (decoder != null) {
-					StringBuilder sb = new StringBuilder().append("Unit Description").append(Constants.HTTP_NEW_LINE)
-							.append("codec is available:").append(Constants.HTTP_NEW_LINE)
-							.append("to send command use POST request").append(Constants.HTTP_NEW_LINE)
-							.append("example: { \"value\":\"<possible_value>\"}\n\n").append(Constants.HTTP_NEW_LINE)
-							.append(Constants.HTTP_NEW_LINE).append("available type: ")
-							.append(desiredReference.getMessageType().toGenericString());
+					List<String> methods = Arrays.asList("GET", "POST");
+					final StringBuilder sb = new StringBuilder(CHAR_CURLY_BRACKET_LEFT)
+							.append(CHAR_QUOTATION_MARK)
+							.append("id").append(CHAR_QUOTATION_MARK).append(CHAR_COLON)
+							.append(CHAR_QUOTATION_MARK).append(desiredReference.getId()).append(CHAR_QUOTATION_MARK).append(CHAR_COMMA)
+							.append(CHAR_QUOTATION_MARK).append("codec").append(CHAR_QUOTATION_MARK).append(CHAR_COLON)
+							.append(CHAR_QUOTATION_MARK).append(desiredReference.getMessageType().getName()).append(CHAR_QUOTATION_MARK).append(",")
+							.append(CHAR_QUOTATION_MARK).append("method").append(CHAR_QUOTATION_MARK).append(CHAR_COLON)
+							.append(JsonUtil.getArraysByMethodList(methods))
+							.append(CHAR_CURLY_BRACKET_RIGHT);
 					return sb.toString();
 				} else {
 					SimpleLoggingUtil.error(getClass(), "no decoder available");
@@ -113,11 +130,11 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	 * @return
 	 */
 	@Override
-	public Object processPost(final RoboReference<?> desiredUnit, final String path,
+	public Object processPost(final RoboReference<?> desiredUnit, final List<String> paths,
 			final HttpMessageWrapper<?> wrapper) {
 		if (HttpVersion.containsValue(wrapper.message().version())) {
 			final HttpUriRegister register = HttpUriRegister.getInstance();
-			if (register.isUnitAvailable(path)) {
+			if (register.isUnitAvailable(HttpPathUtil.pathsToUri(paths))) {
 				final String json = (String) wrapper.body();
 				final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredUnit.getMessageType());
 				if (decoder != null) {

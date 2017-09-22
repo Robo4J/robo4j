@@ -18,6 +18,7 @@ package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.HttpHeaderNames;
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.request.RoboBasicMapEntry;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.util.StringConstants;
@@ -35,10 +36,16 @@ import java.util.stream.Stream;
  */
 public final class RoboHttpUtils {
 
-	private static final String HTTP_VERSION = "HTTP/1.1";
+	public static final String HTTP_VERSION = "HTTP/1.1";
 	private static final String ROBO4J_CLIENT = "Robo4J-HttpClient";
 	public static final String NEW_LINE = "\n";
-	public static final String HTTP_HEADER_OK = HttpFirstLineBuilder.Build(HTTP_VERSION).add("200").add("OK").build();
+	public static final CharSequence CHAR_QUOTATION_MARK = "\"";
+	public static final CharSequence CHAR_COLON = ":";
+	public static final CharSequence CHAR_CURLY_BRACKET_LEFT = "{";
+	public static final CharSequence CHAR_CURLY_BRACKET_RIGHT = "}";
+	public static final CharSequence CHAR_SQUARE_BRACKET_LEFT = "[";
+	public static final CharSequence CHAR_SQUARE_BRACKET_RIGHT = "]";
+	public static final CharSequence CHAR_COMMA = ",";
 	public static final int _DEFAULT_PORT = 8042;
 	public static final String HTTP_TARGET_UNITS = "targetUnits";
 
@@ -54,11 +61,21 @@ public final class RoboHttpUtils {
 		//@formatter:on
 	}
 
-	public static String createRequestHeader(String first, Map<String, String> headerMap) {
+	public static String createHeaderWithFirstLineAndMap(String first, Map<String, String> headerMap) {
 		HttpHeaderBuilder result = HttpHeaderBuilder.Build();
 		headerMap.forEach(result::add);
 		return first.concat(result.build());
 
+	}
+
+	public static String createResponseWithHeaderAndMessage(String header, String message){
+		return header.concat(NEW_LINE).concat(message);
+	}
+
+	public static String createResponseByCode(StatusCode code){
+		return  RoboHttpUtils.createResponseWithHeaderAndMessage(
+				RoboResponseHeader.headerByCode(code),
+				StringConstants.EMPTY);
 	}
 
 	public static String createRequestHeader(String host, int length) {
