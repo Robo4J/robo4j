@@ -114,11 +114,14 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 					result.setResult(factory.processGet(unit, new HttpMessageWrapper<>(httpMessage)));
 				} else {
 					SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
-					switch (systemPath) {
-						case UNITS:
-							result.setResult(StatusCode.NOT_FOUND);
-							break;
+					if(systemPath != null){
+						switch (systemPath) {
+							case UNITS:
+								result.setResult(StatusCode.NOT_FOUND);
+								break;
+						}
 					}
+
 				}
 				return result;
 			case POST:

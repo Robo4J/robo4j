@@ -17,6 +17,7 @@
 
 package com.robo4j.socket.http.util;
 
+import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.enums.StatusCode;
 
 /**
@@ -32,7 +33,11 @@ public final class RoboResponseHeader {
     }
 
     public static String headerByCodeWithUid(StatusCode code, String uid){
-        return HttpFirstLineBuilder.Build(RoboHttpUtils.HTTP_VERSION).add(code.getCode()).add(code.getReasonPhrase())
-                .add("uid").add(uid).build();
+        return HttpFirstLineBuilder.Build(RoboHttpUtils.HTTP_VERSION)
+                .add(code.getCode()).build()
+                .concat( HttpHeaderBuilder.Build()
+                        .add(HttpHeaderFieldNames.ROBO_UNIT_UID, uid)
+                        .build());
     }
+
 }

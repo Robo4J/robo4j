@@ -55,4 +55,6 @@ public final class HttpHeaderFieldNames {
 
 	public static final String SERVER = "server";
 
+	public static final String ROBO_UNIT_UID = "uid";
+
 }
