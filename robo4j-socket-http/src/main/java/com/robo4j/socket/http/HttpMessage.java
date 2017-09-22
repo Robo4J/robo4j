@@ -22,8 +22,7 @@ import java.util.Comparator;
 import java.util.Map;
 
 /**
- * Http request message is immutable
- *
+ * An Http request message.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

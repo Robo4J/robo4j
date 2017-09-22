@@ -18,17 +18,14 @@
 package com.robo4j.socket.http;
 
 /**
- * Simple Message Wrapper to the incoming request GET/POST
- *
- * Simple HttpMessage is immutable
+ * Simple message wrapper to the incoming request GET/POST.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpMessageWrapper<T> {
-
-	private HttpMessage message;
-	private T body;
+	private final HttpMessage message;
+	private final T body;
 
 	public HttpMessageWrapper(final HttpMessage message) {
 		this.message = message;
