@@ -30,27 +30,25 @@ import java.util.Map;
  * @author Miro Wengner (@miragemiko)
  */
 @HttpProducer
-public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncoder<CameraMessage> {
-	public static final String ROBO4J_MEDIA_TYPE = "application/vnd.robo4j.media";
-	
+public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncoder<CameraMessage> {	
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_VALUE = "value";
 	private static final String KEY_IMAGE = "image";
 
 	@Override
-	public String encode(CameraMessage stuff) {
+	public String encode(CameraMessage message) {
 		//@formatter:off
         final StringBuilder sb = new StringBuilder("{\"")
 				.append(KEY_TYPE).append("\":\"")
-                .append(stuff.getType())
+                .append(message.getType())
                 .append("\",\"")
 				.append(KEY_VALUE)
 				.append("\":\"")
-                .append(stuff.getValue())
+                .append(message.getValue())
                 .append("\",\"")
 				.append(KEY_IMAGE)
 				.append("\":\"")
-                .append(stuff.getImage())
+                .append(message.getImage())
                 .append("\"}");
         //@formatter:off
         return sb.toString();

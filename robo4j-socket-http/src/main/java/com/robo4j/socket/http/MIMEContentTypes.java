@@ -18,19 +18,15 @@
 package com.robo4j.socket.http;
 
 /**
- *
- * Standard Http header values
+ * Standard Http MIME content types.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class HttpHeaderValues {
-
-	// TODO: add all
+public class MIMEContentTypes {
 	public static final String APPLICATION_JSON = "application/json";
 	public static final String APPLICATION_IMAGE_JPG = "image/jpg";
-	public static final String APPLICATION_IMAGE_CONTENT = "attachment; filename=image.jgp";
 	public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 	public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
-
+	public static final String APPLICATION_ROBO4J = "application/vnd.robo4j.media";
 }
