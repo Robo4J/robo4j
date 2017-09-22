@@ -17,48 +17,21 @@
 
 package com.robo4j.socket.http;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
 /**
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public enum HttpVersion {
-
 	// @formatter:off
-	HTTP_1_0("HTTP/1.0"),
-	HTTP_1_1("HTTP/1.1")
-	;
+	HTTP_1_0(Constants.VALUE_HTTP_1_0),
+	HTTP_1_1(Constants.VALUE_HTTP_1_1);
 	// @formatter:on
 
-	private volatile static Map<String, HttpVersion> valueToHttpVersion;
 	private String value;
 
 	HttpVersion(String value) {
 		this.value = value;
-	}
-
-	// Utils Method
-	public static HttpVersion getByValue(String value) {
-		if (Objects.isNull(valueToHttpVersion)) {
-			iniMapping();
-		}
-		return valueToHttpVersion.get(value);
-	}
-
-	public static boolean containsValue(HttpVersion version) {
-		return valueToHttpVersion.containsValue(version);
-	}
-
-	// Private Methods
-	private static void iniMapping() {
-		valueToHttpVersion = new HashMap<>();
-		for (HttpVersion version : values()) {
-			valueToHttpVersion.put(version.getValue(), version);
-		}
 	}
 
 	public String getValue() {
@@ -68,5 +41,21 @@ public enum HttpVersion {
 	@Override
 	public String toString() {
 		return "HttpVersion{" + "value='" + value + '\'' + '}';
+	}
+
+	public static HttpVersion getByValue(String string) {
+		switch (string) {
+		case Constants.VALUE_HTTP_1_0:
+			return HTTP_1_0;
+		case Constants.VALUE_HTTP_1_1:
+			return HTTP_1_1;
+		default:
+			return null;
+		}
+	}
+	
+	private static class Constants {
+		private final static String VALUE_HTTP_1_0 = "HTTP/1.0";
+		private final static String VALUE_HTTP_1_1 = "HTTP/1.1";
 	}
 }
