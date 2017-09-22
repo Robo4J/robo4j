@@ -254,8 +254,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
                         String notImplementedResponse = RoboHttpUtils.createResponseByCode(StatusCode.NOT_IMPLEMENTED);
                         SocketUtil.writeBuffer(channel, ByteBuffer.wrap(notImplementedResponse.getBytes()));
                     }
-
-
+			default:
+				break;
             }
         } else {
             String badResponse = RoboResponseHeader.headerByCode(StatusCode.BAD_REQUEST);

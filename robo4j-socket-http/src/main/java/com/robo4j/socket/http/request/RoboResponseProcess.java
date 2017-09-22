@@ -28,8 +28,6 @@ public class RoboResponseProcess {
     private Object result;
 
     public RoboResponseProcess() {
-        this.method = method;
-        this.result = result;
     }
 
     public void setMethod(HttpMethod method) {

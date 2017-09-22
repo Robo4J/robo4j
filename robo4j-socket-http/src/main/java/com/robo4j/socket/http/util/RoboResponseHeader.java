@@ -18,7 +18,6 @@
 package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.enums.StatusCode;
-import com.robo4j.util.StringConstants;
 
 /**
  * Support for HTTP/1.1

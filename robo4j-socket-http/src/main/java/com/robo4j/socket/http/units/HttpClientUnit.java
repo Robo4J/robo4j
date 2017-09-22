@@ -75,12 +75,12 @@ public class HttpClientUnit extends RoboUnit<Object> {
 
 			String writeMessage = message.toString();
 			ByteBuffer buffer = ByteBuffer.wrap(writeMessage.getBytes());
-			int writtenBytes = SocketUtil.writeBuffer(channel, buffer);
+			SocketUtil.writeBuffer(channel, buffer);
 
 			if (responseUnit != null && responseSize != null) {
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
 				// important is set stopper properly
-				int readBytes = SocketUtil.readBuffer(channel, readBuffer);
+				SocketUtil.readBuffer(channel, readBuffer);
 				sendMessageToResponseUnit(readBuffer);
 			}
 			channel.close();

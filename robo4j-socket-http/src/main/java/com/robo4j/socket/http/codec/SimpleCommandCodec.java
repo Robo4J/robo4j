@@ -36,7 +36,6 @@ import java.util.Map;
  */
 @HttpProducer
 public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncoder<SimpleCommand> {
-	private static final String ROBO4J_MEDIA_TYPE = "application/vnd.robo4j.units";
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_VALUE = "value";
 

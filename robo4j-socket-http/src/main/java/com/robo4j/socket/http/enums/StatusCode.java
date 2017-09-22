@@ -16,8 +16,6 @@
  */
 package com.robo4j.socket.http.enums;
 
-import java.util.Map;
-
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -29,12 +27,9 @@ public enum StatusCode {
     ACCEPTED            (202, "Accepted"),
     BAD_REQUEST         (400, "Bad Request"),
     NOT_FOUND           (404, "Not Found"),
-    NOT_IMPLEMENTED     (501, "Not Implemented")
-    ;
-
+    NOT_IMPLEMENTED     (501, "Not Implemented");
     //@formatting:on
 
-    private volatile static Map<Integer, StatusCode> codeToStatusMapping;
     private int code;
     private String reasonPhrase;
 
