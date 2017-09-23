@@ -15,45 +15,38 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http.enums;
+package com.robo4j.socket.http.dto;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.robo4j.RoboReference;
+import com.robo4j.socket.http.enums.SystemPath;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum SystemPath {
+public class RoboPathReferenceDTO {
 
-    //@formatting:off
-    NONE                   ("none"),
-    UNITS                  ("units"),
-    ;
+    private final SystemPath path;
+    private final RoboReference<?> roboReference;
 
-    //@formatting:on
-
-    private volatile static Map<String, SystemPath> toPathMap;
-    private String path;
-
-    SystemPath(String path) {
+    public RoboPathReferenceDTO(SystemPath path, RoboReference<?> roboReference) {
         this.path = path;
+        this.roboReference = roboReference;
     }
 
-    public String getPath() {
+    public SystemPath getPath() {
         return path;
     }
 
-    public static SystemPath getByPath(String name){
-        if(toPathMap == null){
-            toPathMap = initMapping();
-        }
-        return  toPathMap.get(name);
+    public RoboReference<?> getRoboReference() {
+        return roboReference;
     }
 
-    private static Map<String, SystemPath> initMapping() {
-        return Arrays.stream(values()).collect(Collectors.toMap(SystemPath::getPath, e -> e));
+    @Override
+    public String toString() {
+        return "RoboPathReferenceDTO{" +
+                "path=" + path +
+                ", roboReference=" + roboReference +
+                '}';
     }
-
 }

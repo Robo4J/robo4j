@@ -27,6 +27,7 @@ import com.robo4j.socket.http.HttpMessage;
 import com.robo4j.socket.http.HttpMessageWrapper;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.socket.http.dto.RoboPathReferenceDTO;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.socket.http.units.Constants;
@@ -49,9 +50,12 @@ import java.util.concurrent.Callable;
  */
 public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 
+	public static final int PATH_SECOND_LEVEL = 2;
 	/* currently is supported only one PATH */
 	private static final int DEFAULT_PATH_POSITION_0 = 0;
 	private static final int DEFAULT_PATH_POSITION_1 = 1;
+	public static final int PATH_DEFAULT_LEVEL = 0;
+	public static final int PATH_FIRST_LEVEL = 1;
 
 	private final RoboUnit<?> unit;
 	private final ByteBuffer buffer;
@@ -93,69 +97,97 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 					HttpVersion.getByValue(tokens[HttpMessageUtil.VERSION_POSITION]), params);
 
 			final List<String> paths = HttpPathUtil.uriStringToPathList(httpMessage.uri().getPath());
-			final RoboReference<?> desiredUnit = getRoboReferenceByPath(paths);
 
 			//@formatter:on
 			switch (method) {
-			case GET:
-				/* currently is supported only one path */
-				if (desiredUnit != null) {
-					AttributeDescriptor<?> attributeDescriptor = getAttributeByQuery(desiredUnit, httpMessage.uri());
-					if (attributeDescriptor == null) {
-						final Object unitDescription = factory.processGet(desiredUnit,
-								paths, new HttpMessageWrapper<>(httpMessage));
-						if (unitDescription != null) {
-							result.setResult(unitDescription);
-						}
-					} else {
-						result.setResult(factory.processGet(desiredUnit, attributeDescriptor));
-					}
-				} else if(paths.size() == 0){
-					result.setResult(factory.processGet(unit, new HttpMessageWrapper<>(httpMessage)));
-				} else {
-					SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
-					if(systemPath != null){
-						switch (systemPath) {
+				case GET:
+					switch (paths.size()) {
+						case PATH_DEFAULT_LEVEL:
+							result.setCode(StatusCode.OK);
+							result.setResult(factory.processGet(unit));
+							break;
+						case PATH_FIRST_LEVEL:
+							result.setCode(StatusCode.NOT_IMPLEMENTED);
+							break;
+						case PATH_SECOND_LEVEL:
+							final RoboPathReferenceDTO pathReference = getRoboReferenceByPath(paths);
+							switch (pathReference.getPath()) {
+							case NONE:
+								result.setCode(StatusCode.NOT_FOUND);
+								break;
 							case UNITS:
-								result.setResult(StatusCode.NOT_FOUND);
+								if (pathReference.getRoboReference() == null) {
+									result.setCode(StatusCode.NOT_FOUND);
+								} else {
+									AttributeDescriptor<?> attributeDescriptor = getAttributeByQuery(
+											pathReference.getRoboReference(), httpMessage.uri());
+									if (attributeDescriptor != null) {
+										result.setCode(StatusCode.OK);
+										result.setResult(
+												factory.processGet(pathReference.getRoboReference(), attributeDescriptor));
+									} else {
+										final Object unitDescription = factory
+												.processGetByRegisteredPaths(pathReference.getRoboReference(), paths);
+										result.setCode(StatusCode.OK);
+										result.setResult(unitDescription);
+									}
+
+								}
+							}
+							break;
+						default:
+					}
+					return result;
+				case POST:
+					int length = Integer.valueOf(params.get(HttpHeaderFieldNames.CONTENT_LENGTH));
+					final StringBuilder jsonSB = new StringBuilder();
+					final String postValue = new String(wrapper.getBody().array());
+
+					//check header size
+					if (length == postValue.length()) {
+						jsonSB.append(postValue);
+
+						switch (paths.size()){
+							case PATH_DEFAULT_LEVEL:
+							case PATH_FIRST_LEVEL:
+								result.setCode(StatusCode.NOT_IMPLEMENTED);
+								break;
+							case PATH_SECOND_LEVEL:
+								final RoboPathReferenceDTO pathReference = getRoboReferenceByPath(paths);
+								switch (pathReference.getPath()){
+									case UNITS:
+										if(pathReference.getRoboReference() != null){
+											Object respObj = factory.processPost(pathReference.getRoboReference(), paths,
+													new HttpMessageWrapper<>(httpMessage, jsonSB.toString()));
+											if(respObj != null ){
+												result.setCode(StatusCode.ACCEPTED);
+												result.setResult(respObj);
+											} else {
+												result.setCode(StatusCode.NOT_FOUND);
+											}
+										}
+										break;
+									case NONE:
+									default:
+										result.setCode(StatusCode.NOT_FOUND);
+								}
 								break;
 						}
+
+					} else {
+						SimpleLoggingUtil.error(getClass(),
+								"NOT SAME HEADER LENGTH: " + length + " convertedMessage: " + postValue.length());
+						result.setCode(StatusCode.NOT_ACCEPTABLE);
 					}
 
-				}
-				return result;
-			case POST:
-				int length = Integer.valueOf(params.get(HttpHeaderFieldNames.CONTENT_LENGTH));
-				final StringBuilder jsonSB = new StringBuilder();
-				final String postValue = new String(wrapper.getBody().array());
-				if (length == postValue.length()) {
-					jsonSB.append(postValue);
-				} else {
-					SimpleLoggingUtil.error(getClass(), "NOT SAME HEADER LENGTH: " + length + " convertedMessage: " + postValue.length());
-				}
+					return result;
 
-				if(paths.size() != 0){
-					SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
-					switch (systemPath){
-						case UNITS:
-							if(paths.size() == 2) {
-								Object respObj  = factory.processPost(desiredUnit, paths,
-										new HttpMessageWrapper<>(httpMessage, jsonSB.toString()));
-								result.setResult(respObj== null ? StatusCode.NOT_FOUND : respObj);
-							} else {
-								result.setResult(StatusCode.NOT_FOUND);
-							}
-
-					}
-				} else {
-					result.setResult(StatusCode.NOT_IMPLEMENTED);
-				}
-
-				return result;
-
-			default:
-				SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
+				default:
+					result.setCode(StatusCode.BAD_REQUEST);
+					SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
 			}
+		} else {
+			result.setCode(StatusCode.BAD_REQUEST);
 		}
 
 		return result;
@@ -163,8 +195,10 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 
 	// Private Methods
 	/**
-	 * @param unit  desired unit {@see RoboReference}
-	 * @param query URI query attributes
+	 * @param unit
+	 *            desired unit {@see RoboReference}
+	 * @param query
+	 *            URI query attributes
 	 * @return specific Attribute
 	 */
 	private AttributeDescriptor<?> getAttributeByQuery(RoboReference<?> unit, URI query) {
@@ -184,19 +218,21 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 	 *            registered paths by the configuration
 	 * @return reference to desired RoboUnit
 	 */
-	private RoboReference<?> getRoboReferenceByPath(final List<String> paths) {
+	private RoboPathReferenceDTO getRoboReferenceByPath(final List<String> paths) {
 		if (paths.isEmpty()) {
-			return null;
+			return new RoboPathReferenceDTO(SystemPath.NONE, null);
 		} else {
-			final HttpUriRegister httpUriRegister = HttpUriRegister.getInstance();
-			SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
-			if (systemPath != null && paths.size() == 2) {
+			final SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
+			if (systemPath != null && paths.size() == PATH_SECOND_LEVEL) {
 				switch (systemPath) {
 				case UNITS:
-					return httpUriRegister.getRoboUnitByPath(paths.get(DEFAULT_PATH_POSITION_1));
+					final HttpUriRegister httpUriRegister = HttpUriRegister.getInstance();
+					final RoboReference<?> reference = httpUriRegister
+							.getRoboUnitByPath(paths.get(DEFAULT_PATH_POSITION_1));
+					return new RoboPathReferenceDTO(systemPath, reference);
 				}
 			}
-			return null;
+			return new RoboPathReferenceDTO(SystemPath.NONE, null);
 		}
 
 	}

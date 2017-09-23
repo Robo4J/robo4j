@@ -18,13 +18,18 @@
 package com.robo4j.socket.http.request;
 
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.enums.StatusCode;
 
 /**
+ *  wrapper for http request result
+ *  @see RoboRequestCallable
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class RoboResponseProcess {
     private HttpMethod method;
+    private StatusCode code;
     private Object result;
 
     public RoboResponseProcess() {
@@ -44,5 +49,22 @@ public class RoboResponseProcess {
 
     public void setResult(Object result) {
         this.result = result;
+    }
+
+    public void setCode(StatusCode code){
+        this.code = code;
+    }
+
+    public StatusCode getCode() {
+        return code;
+    }
+
+    @Override
+    public String toString() {
+        return "RoboResponseProcess{" +
+                "method=" + method +
+                ", code=" + code +
+                ", result=" + result +
+                '}';
     }
 }

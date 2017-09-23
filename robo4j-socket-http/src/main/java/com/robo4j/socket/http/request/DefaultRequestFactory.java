@@ -29,11 +29,11 @@ import java.util.List;
  */
 public interface DefaultRequestFactory<ResponseType> {
 
-	ResponseType processGet(RoboUnit<?> desiredUnit, HttpMessageWrapper<?> wrapper);
+	ResponseType processGet(RoboUnit<?> desiredUnit);
 
 	ResponseType processGet(RoboReference<?> desiredReference, AttributeDescriptor<?> attributeDescriptor);
 
-	ResponseType processGet(RoboReference<?> desiredReference, List<String> paths, HttpMessageWrapper<?> wrapper);
+	ResponseType processGetByRegisteredPaths(RoboReference<?> desiredReference, List<String> paths);
 
 	ResponseType processPost(RoboReference<?> desiredUnit, List<String> paths, HttpMessageWrapper<?> wrapper);
 }

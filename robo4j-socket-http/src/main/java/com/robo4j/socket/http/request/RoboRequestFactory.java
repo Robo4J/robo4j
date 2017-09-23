@@ -53,6 +53,7 @@ import com.robo4j.socket.http.util.JsonUtil;
 // TODO discuss how to use URIs
 // FIXME: 18.09.17 (miro) simplify
 public class RoboRequestFactory implements DefaultRequestFactory<Object> {
+	public static final String NO_DECODER_AVAILABLE = "no decoder available";
 	private final HttpCodecRegistry codecRegistry;
 
 	public RoboRequestFactory(final HttpCodecRegistry codecRegistry) {
@@ -60,7 +61,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	}
 
 	@Override
-	public Object processGet(RoboUnit<?> desiredUnit, HttpMessageWrapper<?> wrapper) {
+	public Object processGet(RoboUnit<?> desiredUnit) {
 		if (!desiredUnit.getContext().getUnits().isEmpty()) {
 
 			final List<ResponseUnitDTO> unitList = desiredUnit.getContext().getUnits().stream()
@@ -70,7 +71,6 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 		} else {
 			SimpleLoggingUtil.error(getClass(), "internal error: no units available");
 		}
-
 		return null;
 	}
 
@@ -87,7 +87,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	}
 
 	@Override
-	public Object processGet(final RoboReference<?> desiredReference, final List<String> paths, final HttpMessageWrapper<?> wrapper) {
+	public Object processGetByRegisteredPaths(final RoboReference<?> desiredReference, final List<String> paths) {
 		/* currently is supported only */
 		final HttpUriRegister register = HttpUriRegister.getInstance();
 		if (register.isUnitAvailable(HttpPathUtil.pathsToUri(paths))) {
@@ -104,10 +104,10 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 				return sb.toString();
 			} else {
 				SimpleLoggingUtil.error(getClass(), "no decoder available");
-				return "no decoder available";
+				return NO_DECODER_AVAILABLE;
 			}
 		}
-		return null;
+		return NO_DECODER_AVAILABLE;
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 			if (decoder != null) {
 				return decoder.decode(json);
 			} else {
-				SimpleLoggingUtil.error(getClass(), "no decoder available");
+				SimpleLoggingUtil.error(getClass(), NO_DECODER_AVAILABLE);
 			}
 		}
 		return null;

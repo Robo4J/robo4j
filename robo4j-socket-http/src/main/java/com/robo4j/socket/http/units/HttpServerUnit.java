@@ -224,38 +224,29 @@ public class HttpServerUnit extends RoboUnit<Object> {
             switch (responseProcess.getMethod()) {
                 case GET:
                     String getResponse;
-                    if (responseProcess.getResult() != null) {
-                        if (responseProcess.getResult() instanceof StatusCode) {
-                            getResponse = RoboHttpUtils.createResponseByCode((StatusCode) responseProcess.getResult());
-                        } else {
-                            String getHeader = RoboResponseHeader.headerByCodeWithUid(StatusCode.OK, getContext().getId());
-                            getResponse = RoboHttpUtils.createResponseWithHeaderAndMessage(getHeader, responseProcess.getResult().toString());
-                        }
+                    if (responseProcess.getResult() != null && responseProcess.getCode().equals(StatusCode.OK)) {
+                        String getHeader = RoboResponseHeader.headerByCodeWithUid(responseProcess.getCode(), getContext().getId());
+                        getResponse = RoboHttpUtils.createResponseWithHeaderAndMessage(getHeader, responseProcess.getResult().toString());
                     } else {
-                        getResponse = RoboHttpUtils.createResponseByCode(StatusCode.NOT_IMPLEMENTED);
+                        getResponse = RoboHttpUtils.createResponseByCode(responseProcess.getCode());
                     }
                     SocketUtil.writeBuffer(channel, ByteBuffer.wrap(getResponse.getBytes()));
                     break;
                 case POST:
-                    if (responseProcess.getResult() != null) {
-                        if (responseProcess.getResult() instanceof StatusCode) {
-                            String postResponse = RoboHttpUtils.createResponseByCode((StatusCode) responseProcess.getResult());
-                            SocketUtil.writeBuffer(channel, ByteBuffer.wrap(postResponse.getBytes()));
-                        } else {
-                            String postResponse = RoboHttpUtils.createResponseByCode(StatusCode.ACCEPTED);
-                            SocketUtil.writeBuffer(channel, ByteBuffer.wrap(postResponse.getBytes()));
-                            for (RoboReference<Object> ref : targetRefs) {
-                                if (responseProcess.getResult() != null && ref.getMessageType().equals(responseProcess.getResult().getClass())) {
-                                    ref.sendMessage(responseProcess.getResult());
-                                }
+                    if (responseProcess.getResult() != null && responseProcess.getCode().equals(StatusCode.ACCEPTED)) {
+                        String postResponse = RoboHttpUtils.createResponseByCode(responseProcess.getCode());
+                        SocketUtil.writeBuffer(channel, ByteBuffer.wrap(postResponse.getBytes()));
+                        for (RoboReference<Object> ref : targetRefs) {
+                            if (responseProcess.getResult() != null && ref.getMessageType().equals(responseProcess.getResult().getClass())) {
+                                ref.sendMessage(responseProcess.getResult());
                             }
                         }
                     } else {
-                        String notImplementedResponse = RoboHttpUtils.createResponseByCode(StatusCode.NOT_IMPLEMENTED);
+                        String notImplementedResponse = RoboHttpUtils.createResponseByCode(responseProcess.getCode());
                         SocketUtil.writeBuffer(channel, ByteBuffer.wrap(notImplementedResponse.getBytes()));
                     }
-			default:
-				break;
+                default:
+				    break;
             }
         } else {
             String badResponse = RoboResponseHeader.headerByCode(StatusCode.BAD_REQUEST);
