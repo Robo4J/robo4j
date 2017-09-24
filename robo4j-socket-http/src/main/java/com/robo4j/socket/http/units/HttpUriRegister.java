@@ -102,6 +102,8 @@ public final class HttpUriRegister {
 						final RoboReference<?> roboUnit = getRoboUnitById(context, paths.get(DEFAULT_VALUE_1));
 						value.setUnit(roboUnit);
 						break;
+				default:
+					throw new IllegalArgumentException("Unsupported path " + systemPath);
 				}
 			}
 		});
