@@ -36,7 +36,7 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonListener;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonPressedObserver;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
-import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd.Direction;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl.Direction;
 
 /**
  * Swing mockup for the LCD.
@@ -44,7 +44,7 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd.Direction;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class MockupLcd implements AdafruitLcd {
+public class AdafruitLcdMockup implements AdafruitLcd {
 	private static final int DDRAM_SIZE = 40;
 	private volatile int cursorColumn;
 	private volatile int cursorRow;
@@ -60,12 +60,12 @@ public class MockupLcd implements AdafruitLcd {
 	private String text;
 	private int currentScroll;
 
-	public MockupLcd() {
+	public AdafruitLcdMockup() {
 		// This seems to be the default for AdaFruit 1115.
 		this(I2CBus.BUS_1, 0x20);
 	}
 
-	public MockupLcd(int bus, int address) {
+	public AdafruitLcdMockup(int bus, int address) {
 		this.bus = bus;
 		this.address = address;
 		initialize();
@@ -215,7 +215,7 @@ public class MockupLcd implements AdafruitLcd {
 	}
 
 	public static void main(String[] args) {
-		final MockupLcd lcd = new MockupLcd();
+		final AdafruitLcdMockup lcd = new AdafruitLcdMockup();
 		lcd.clear();
 		lcd.setText("Hello World!\nDone!");
 		ButtonPressedObserver observer = new ButtonPressedObserver(lcd);
@@ -245,12 +245,12 @@ public class MockupLcd implements AdafruitLcd {
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				MockupLcd.this.maskVal = MockupLcd.this.maskVal & ~buttonMaskVal;
+				AdafruitLcdMockup.this.maskVal = AdafruitLcdMockup.this.maskVal & ~buttonMaskVal;
 			}
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				MockupLcd.this.maskVal = MockupLcd.this.maskVal | buttonMaskVal;
+				AdafruitLcdMockup.this.maskVal = AdafruitLcdMockup.this.maskVal | buttonMaskVal;
 				try {
 					Thread.sleep(30);
 				} catch (InterruptedException e1) {

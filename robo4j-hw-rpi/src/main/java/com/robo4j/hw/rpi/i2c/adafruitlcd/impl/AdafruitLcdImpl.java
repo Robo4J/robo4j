@@ -52,7 +52,7 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
+public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 	public enum Direction {
 		LEFT, RIGHT;
 	}
@@ -115,12 +115,12 @@ public class RealLcd extends AbstractI2CDevice implements AdafruitLcd {
 	private int displayControl = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF;
 	private Color color = Color.WHITE;
 
-	public RealLcd() throws IOException, UnsupportedBusNumberException {
+	public AdafruitLcdImpl() throws IOException, UnsupportedBusNumberException {
 		// This seems to be the default for AdaFruit 1115.
 		this(AdafruitLcd.DEFAULT_BUS, AdafruitLcd.DEFAULT_ADDRESS);
 	}
 
-	public RealLcd(int bus, int address) throws IOException, UnsupportedBusNumberException {
+	public AdafruitLcdImpl(int bus, int address) throws IOException, UnsupportedBusNumberException {
 		super(bus, address);
 		initialize();
 	}

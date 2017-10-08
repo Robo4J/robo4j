@@ -19,7 +19,7 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
 import java.io.IOException;
 
 import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
-import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd.Direction;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl.Direction;
 
 /**
  * Scrolls the view area back and forth a few times. Check out the documentation

@@ -24,7 +24,7 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
  */
 import java.io.IOException;
 
-import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.RealLcd.Direction;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl.Direction;
 
 public interface AdafruitLcd {
 	// Not using the Pi4J bus specification here, since we may not be able to
