@@ -27,62 +27,45 @@ import java.nio.channels.SocketChannel;
  */
 public final class SocketUtil {
 
-    /**
-     * Used for normal message
-     *
-     * @param channel
-     * @param buffer
-     * @return
-     * @throws IOException
-     */
-    public static  int readBuffer(SocketChannel channel, ByteBuffer buffer) throws IOException {
-        buffer.rewind();
-        int numberRead = channel.read(buffer);
-        int position = 0;
-        int totalRead = numberRead;
-        while (numberRead != 0 && position <= buffer.capacity()) {
-            numberRead = channel.read(buffer);
-            if(numberRead > 0){
-                totalRead += numberRead;
-            } else if(numberRead == -1){
-                numberRead = 0;
-            }
-            position++;
-        }
-        return totalRead;
-    }
+	/**
+	 * reading buffer
+	 *
+	 * @param channel
+	 * @param buffer
+	 * @return
+	 * @throws IOException
+	 */
+	public static int readBuffer(SocketChannel channel, ByteBuffer buffer) throws IOException {
+		buffer.rewind();
+		int numberRead = channel.read(buffer);
+		int position = 0;
+		int totalRead = numberRead;
+		while (numberRead >= 0 && position <= buffer.capacity()) {
+			numberRead = channel.read(buffer);
+			if (numberRead > 0) {
+				totalRead += numberRead;
+			}
+			position++;
+		}
+		return totalRead;
+	}
 
-    /**
-     * used for messages contains Base64 messages
-     *
-     * @param channel
-     * @param buffer
-     * @param stopper
-     * @return
-     * @throws IOException
-     */
-    public static int readBuffer(SocketChannel channel, ByteBuffer buffer, int stopper) throws IOException {
-        int numberRead = channel.read(buffer);
-        int position = 0;
-        int totalRead = numberRead;
-        while (numberRead != stopper && position <= buffer.capacity()) {
-            numberRead = channel.read(buffer);
-            if(numberRead > 0){
-                totalRead += numberRead;
-            }
-            position++;
-        }
-        return totalRead;
-    }
+	/**
+	 * writing to channel buffer
+	 * 
+	 * @param channel
+	 * @param buffer
+	 * @return
+	 * @throws IOException
+	 */
+	public static int writeBuffer(SocketChannel channel, ByteBuffer buffer) throws IOException {
+		int numberWriten = channel.write(buffer);
+		int totalWritten = numberWriten;
 
-    public static int writeBuffer(SocketChannel channel, ByteBuffer buffer) throws IOException {
-        int numberWriten = channel.write(buffer);
-        int totalWritten = numberWriten;
-
-        while(numberWriten > 0 && buffer.hasRemaining()){
-            numberWriten = channel.write(buffer);
-            totalWritten += numberWriten;
-        }
-        return totalWritten;
-    }
+		while (numberWriten > 0 && buffer.hasRemaining()) {
+			numberWriten = channel.write(buffer);
+			totalWritten += numberWriten;
+		}
+		return totalWritten;
+	}
 }

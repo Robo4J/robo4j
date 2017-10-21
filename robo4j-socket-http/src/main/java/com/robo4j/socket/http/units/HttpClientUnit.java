@@ -58,7 +58,7 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		int confPort = configuration.getInteger("port", RoboHttpUtils._DEFAULT_PORT);
 		responseUnit = configuration.getString("responseUnit", null);
 		responseSize = configuration.getInteger("responseSize", null);
-		blocking = configuration.getBoolean("mode", false);
+		blocking = configuration.getBoolean("blocking", false);
 
 		Map<String, Object> targetUnitsMap = JsonUtil.getMapNyJson(configuration.getString("targetUnits", null));
 		if (confAddress == null || targetUnitsMap.isEmpty()) {
