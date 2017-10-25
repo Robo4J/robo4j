@@ -14,14 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.i2c.pwm;
+package com.robo4j.hw.rpi.pwm;
 
 import java.io.IOException;
 
 import com.pi4j.io.gpio.RaspiPin;
+import com.robo4j.hw.rpi.i2c.pwm.PWMServo;
 
 /**
- * This example assumes a servo connected to the GPIO_01 hardware PWM.
+ * This example assumes a servo connected to the GPIO_01 hardware PWM pin.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
