@@ -189,8 +189,6 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 				final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, message);
 				sendHttpClientMessage(getContext(), postMessage);
 			} else {
-				System.out.println(getClass().getSimpleName() + " CAMERA MESSAGE : " + targetOut);
-				System.out.println(getClass().getSimpleName() + " targetOut : " + getContext().getReference(targetOut).getMessageType());
 				getContext().getReference(targetOut).sendMessage(cameraMessage);
 			}
 			progress.set(false);
