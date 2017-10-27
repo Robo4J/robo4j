@@ -26,7 +26,6 @@ import java.nio.channels.SocketChannel;
  * @author Miro Wengner (@miragemiko)
  */
 public final class SocketUtil {
-
 	/**
 	 * reading buffer
 	 *
@@ -59,10 +58,10 @@ public final class SocketUtil {
 	 * @throws IOException
 	 */
 	public static int writeBuffer(SocketChannel channel, ByteBuffer buffer) throws IOException {
-		int numberWriten = channel.write(buffer);
+		int numberWriten = 0;
 		int totalWritten = numberWriten;
 
-		while (numberWriten > 0 && buffer.hasRemaining()) {
+		while (numberWriten >= 0 && buffer.hasRemaining()) {
 			numberWriten = channel.write(buffer);
 			totalWritten += numberWriten;
 		}

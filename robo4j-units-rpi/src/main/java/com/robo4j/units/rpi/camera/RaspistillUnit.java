@@ -121,23 +121,15 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 		targetOut = configuration.getString("targetOut", null);
 		String tmpClient = configuration.getString("client", null);
 
-		if (tmpClient == null || targetOut == null) {
+		if (targetOut == null) {
 			throw ConfigurationException.createMissingConfigNameException("targetOut, client");
 		}
 
 		storeTarget = configuration.getString("storeTarget", null);
 
-		try {
-			InetAddress inetAddress = InetAddress.getByName(tmpClient);
-			String clientPort = configuration.getString("clientPort", null);
-			client = clientPort == null ? inetAddress.getHostAddress()
-					: inetAddress.getHostAddress().concat(":").concat(clientPort);
-			clientUri = configuration.getString("clientUri", StringConstants.EMPTY);
-		} catch (UnknownHostException e) {
-			SimpleLoggingUtil.error(getClass(), "unknown ip address", e);
-			throw ConfigurationException.createMissingConfigNameException("unknown ip address");
+		if (tmpClient != null) {
+			initClient(tmpClient, configuration);
 		}
-
 	}
 
 	@Override
@@ -151,8 +143,8 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 	public void start() {
 		EnumSet<LifecycleState> acceptedStates = EnumSet.of(LifecycleState.STARTING, LifecycleState.STARTED);
 		getContext().getScheduler().execute(() -> {
-			while(acceptedStates.contains(getState())){
-				if(progress.compareAndSet(false, true)){
+			while (acceptedStates.contains(getState())) {
+				if (progress.compareAndSet(false, true)) {
 					createImage();
 				}
 			}
@@ -174,19 +166,38 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 	}
 
 	// Private Methods
-	private void createImage() {
+	private void initClient(String tmpClient, Configuration configuration) throws ConfigurationException {
+		try {
+			InetAddress inetAddress = InetAddress.getByName(tmpClient);
+			String clientPort = configuration.getString("clientPort", null);
+			client = clientPort == null ? inetAddress.getHostAddress()
+					: inetAddress.getHostAddress().concat(":").concat(clientPort);
+			clientUri = configuration.getString("clientUri", StringConstants.EMPTY);
+		} catch (UnknownHostException e) {
+			SimpleLoggingUtil.error(getClass(), "unknown ip address", e);
+			throw ConfigurationException.createMissingConfigNameException("unknown ip address");
+		}
+	}
 
+	private void createImage() {
 		final String encodeString = executeCommand(command);
-		if(encodeString.length() != Constants.DEFAULT_VALUE_0){
+		if (encodeString.length() != Constants.DEFAULT_VALUE_0) {
 			final CameraMessage cameraMessage = new CameraMessage(imageEncoding, DEFAULT, encodeString);
-			final String message = codec.encode(cameraMessage);
-			final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, message);
-			sendClientMessage(getContext(), postMessage);
+
+			if(client != null){
+				final String message = codec.encode(cameraMessage);
+				final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, message);
+				sendHttpClientMessage(getContext(), postMessage);
+			} else {
+				System.out.println(getClass().getSimpleName() + " CAMERA MESSAGE : " + targetOut);
+				System.out.println(getClass().getSimpleName() + " targetOut : " + getContext().getReference(targetOut).getMessageType());
+				getContext().getReference(targetOut).sendMessage(cameraMessage);
+			}
 			progress.set(false);
 		}
 	}
 
-	private void sendClientMessage(RoboContext ctx, String message) {
+	private void sendHttpClientMessage(RoboContext ctx, String message) {
 		ctx.getReference(targetOut).sendMessage(message);
 	}
 
