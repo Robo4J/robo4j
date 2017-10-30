@@ -15,4 +15,5 @@ ext {
     junitVersion = "4.12"
     hamcrestAllVersion = "1.3"
     pi4jVersion = "1.1"
+    mockitoVerison = "1.10.19"
 }
