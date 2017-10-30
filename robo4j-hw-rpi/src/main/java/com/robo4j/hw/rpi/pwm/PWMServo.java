@@ -19,8 +19,8 @@ package com.robo4j.hw.rpi.pwm;
 import java.io.IOException;
 
 import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinPwmOutput;
 import com.pi4j.io.gpio.Pin;
+import com.pi4j.wiringpi.Gpio;
 import com.robo4j.hw.rpi.Servo;
 
 /**
@@ -63,7 +63,7 @@ public class PWMServo implements Servo {
 	private final static float ACTUAL_FREQUENCY = BASE_FREQUENCY / (float) (RANGE * CLOCK_DIVISOR);
 	private final static float ACTUAL_PERIOD = 1 / ACTUAL_FREQUENCY;
 
-	private final GpioPinPwmOutput pwmOutput;
+	private final Pin pin;
 	private boolean inverted;
 
 	private float input;
@@ -75,12 +75,16 @@ public class PWMServo implements Servo {
 	 *            the GpioPin to use for PWM.
 	 */
 	public PWMServo(Pin pin, boolean inverted) {
+		this.pin = pin;
 		this.inverted = inverted;
-		pwmOutput = GpioFactory.getInstance().provisionPwmOutputPin(pin);
+		if (GpioFactory.getDefaultProvider().getName().equals(pin.getProvider())) {
+			throw new UnsupportedOperationException("Pin provider is set up to be " + GpioFactory.getDefaultProvider().getName() + ". You cannot use " + pin.getProvider());
+		}
 		// Servo -> mark:space
-		com.pi4j.wiringpi.Gpio.pwmSetMode(com.pi4j.wiringpi.Gpio.PWM_MODE_MS);
-		com.pi4j.wiringpi.Gpio.pwmSetClock(CLOCK_DIVISOR);
-		com.pi4j.wiringpi.Gpio.pwmSetRange(RANGE);
+		Gpio.pwmSetMode(Gpio.PWM_MODE_MS);
+		Gpio.pwmSetClock(CLOCK_DIVISOR);
+		Gpio.pwmSetRange(RANGE);
+		Gpio.pinMode(pin.getAddress(), Gpio.PWM_OUTPUT);
 	}
 
 	@Override
@@ -114,6 +118,6 @@ public class PWMServo implements Servo {
 		float correctedInput = isInverted() ? -1 * input : input;
 		float targetOnTime = 0.0015f + (correctedInput * 0.001f) / 2;
 		int pwm = Math.round((RANGE_F * (targetOnTime / ACTUAL_PERIOD)));
-		pwmOutput.setPwm(pwm);
+		Gpio.pwmWrite(pin.getAddress(), pwm);
 	}
 }

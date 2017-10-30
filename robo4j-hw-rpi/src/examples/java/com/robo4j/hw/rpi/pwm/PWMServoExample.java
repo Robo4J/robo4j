@@ -34,7 +34,7 @@ public class PWMServoExample {
 		if (args.length != 1) {
 			System.out.println("Usage: PWMExample <input>");
 			System.exit(2);
-		}
+		} 
 		Float input = Float.parseFloat(args[0]);
 		PWMServo servo = new PWMServo(RaspiPin.GPIO_01, false);
 		System.out.println("Setting input to " + input);
