@@ -21,6 +21,7 @@ package com.robo4j.socket.http.units;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
@@ -215,6 +216,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 	private void accept(Selector selector, SelectionKey key) throws IOException {
 		ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
+		serverChannel.socket().setReceiveBufferSize(DEFAULT_BUFFER_CAPACITY);
 		SocketChannel channel = serverChannel.accept();
 		channel.configureBlocking(false);
 		channelKeyMap.put(channel, key);
@@ -283,6 +285,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		if(buffer.remaining() == 0){
 			SimpleLoggingUtil.error(getClass(), "buffer has a problem");
 		}
+		buffer.compact();
 
 		ByteBuffer validBuffer = ByteBufferUtils.copy(buffer, 0, readBytes);
 		final RoboRequestCallable callable = new RoboRequestCallable(this, validBuffer, factory);
@@ -294,6 +297,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		} catch (InterruptedException | ExecutionException e){
 			SimpleLoggingUtil.error(getClass(), "read" + e);
 		}
+
 
 		channel.register(selector, SelectionKey.OP_WRITE);
 	}

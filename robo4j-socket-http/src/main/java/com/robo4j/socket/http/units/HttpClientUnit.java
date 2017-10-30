@@ -74,10 +74,15 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		try {
 			SocketChannel channel = SocketChannel.open(address);
 			channel.configureBlocking(blocking);
+			channel.socket().setKeepAlive(true);
 
-			String writeMessage = message.toString();
-			ByteBuffer buffer = ByteBuffer.wrap(writeMessage.getBytes());
-			SocketUtil.writeBuffer(channel, buffer);
+			String processMessage = message.toString();
+
+			ByteBuffer buffer = ByteBuffer.wrap(processMessage.getBytes());
+			buffer.rewind();
+
+			int writtenBytes = SocketUtil.writeBuffer(channel, buffer);
+			buffer.clear();
 
 			if (responseUnit != null && responseSize != null) {
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
@@ -87,7 +92,6 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			}
 			channel.close();
 		} catch (IOException e) {
-			System.out.println(getClass() + " e:" + e);
 			SimpleLoggingUtil.error(getClass(), "not available:" + address + ", no worry I continue sending");
 		}
 	}

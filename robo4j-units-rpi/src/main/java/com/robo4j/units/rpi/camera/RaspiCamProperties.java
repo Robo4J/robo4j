@@ -69,7 +69,7 @@ public enum RaspiCamProperties {
     ;
     //@formatter:on
 
-	private static volatile Map<String, RaspiCamProperties> nameToProperty;
+	private static Map<String, RaspiCamProperties> nameToProperty;
 	private String name;
 	private String property;
 
