@@ -19,7 +19,6 @@ package com.robo4j.hw.rpi.pwm;
 import java.io.IOException;
 
 import com.pi4j.io.gpio.RaspiPin;
-import com.robo4j.hw.rpi.i2c.pwm.PWMServo;
 
 /**
  * This example assumes a servo connected to the GPIO_01 hardware PWM pin.
