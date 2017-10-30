@@ -112,7 +112,7 @@ public class PWMServo implements Servo {
 	public void setInput(float input) throws IOException {
 		this.input = input;
 		float correctedInput = isInverted() ? -1 * input : input;
-		float targetOnTime = 0.0015f + (correctedInput + 0.001f) / 2;
+		float targetOnTime = 0.0015f + (correctedInput * 0.001f) / 2;
 		int pwm = Math.round((RANGE_F * (targetOnTime / ACTUAL_PERIOD)));
 		pwmOutput.setPwm(pwm);
 	}
