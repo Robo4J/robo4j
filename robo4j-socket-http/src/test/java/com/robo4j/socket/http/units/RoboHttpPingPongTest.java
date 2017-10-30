@@ -31,6 +31,7 @@ import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -63,7 +64,8 @@ public class RoboHttpPingPongTest {
     private static final String HTTP_METHOD = "POST";
 
 
-//    @Test
+    @Ignore
+    @Test
     public void pongTest() throws Exception {
         RoboContext systemPong = configurePongSystem();
         systemPong.start();
