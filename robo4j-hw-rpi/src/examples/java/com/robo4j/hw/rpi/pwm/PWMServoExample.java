@@ -23,6 +23,8 @@ import com.robo4j.hw.rpi.i2c.pwm.PWMServo;
 
 /**
  * This example assumes a servo connected to the GPIO_01 hardware PWM pin.
+ * Remember to activate dtoverlay=pwm-with-clk in your /boot/config.txt file
+ * to use hardware PWM in the Raspberry Pi. Also remember to disable the audio.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

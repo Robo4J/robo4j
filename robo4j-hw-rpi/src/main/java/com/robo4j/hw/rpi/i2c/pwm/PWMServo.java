@@ -38,6 +38,10 @@ import com.robo4j.hw.rpi.Servo;
  * <li>GPIO_26</li>
  * </ul>
  * </p>
+ * <p>
+ * Remember to activate dtoverlay=pwm in your /boot/config.txt file to
+ * use hardware PWM in the Raspberry Pi. Also remember to disable the audio.
+ * </p>
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -53,8 +57,9 @@ public class PWMServo implements Servo {
 
 	// Clock divisor to use
 	private final static int CLOCK_DIVISOR = BASE_FREQUENCY / (RANGE * PWM_FREQUENCY);
-	
-	// Select divisor and range to make the actual frequency as close to the PWM_FREQUENCY as possible
+
+	// Select divisor and range to make the actual frequency as close to the
+	// PWM_FREQUENCY as possible
 	private final static float ACTUAL_FREQUENCY = BASE_FREQUENCY / (float) (RANGE * CLOCK_DIVISOR);
 	private final static float ACTUAL_PERIOD = 1 / ACTUAL_FREQUENCY;
 
@@ -107,7 +112,7 @@ public class PWMServo implements Servo {
 	public void setInput(float input) throws IOException {
 		this.input = input;
 		float correctedInput = isInverted() ? -1 * input : input;
-		float targetOnTime = 1.5f + (correctedInput + 1.0f) / 2;
+		float targetOnTime = 0.0015f + (correctedInput + 0.001f) / 2;
 		int pwm = Math.round((RANGE_F * (targetOnTime / ACTUAL_PERIOD)));
 		pwmOutput.setPwm(pwm);
 	}
