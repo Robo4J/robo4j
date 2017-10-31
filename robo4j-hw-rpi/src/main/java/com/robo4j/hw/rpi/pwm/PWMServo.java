@@ -38,10 +38,6 @@ import com.robo4j.hw.rpi.Servo;
  * <li>GPIO_26</li>
  * </ul>
  * </p>
- * <p>
- * Remember to activate dtoverlay=pwm in your /boot/config.txt file to
- * use hardware PWM in the Raspberry Pi. Also remember to disable the audio.
- * </p>
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -49,7 +45,7 @@ import com.robo4j.hw.rpi.Servo;
 public class PWMServo implements Servo {
 	// Raspberry Pi base frequency
 	private final static int BASE_FREQUENCY = 19_200_000;
-	private final static int RANGE = 4000;
+	private final static int RANGE = 1000;
 	private final static float RANGE_F = RANGE;
 
 	// Servo Frequency in Hz
