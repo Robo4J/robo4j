@@ -17,13 +17,6 @@
 
 package com.robo4j.socket.http.request;
 
-import java.net.URI;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
@@ -43,6 +36,13 @@ import com.robo4j.socket.http.util.ByteBufferUtils;
 import com.robo4j.socket.http.util.HttpMessageUtil;
 import com.robo4j.socket.http.util.HttpPathUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
+
+import java.net.URI;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -77,6 +77,7 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 		final String[] tokens = firstLine.split(Constants.HTTP_EMPTY_SEP);
 		final HttpMethod method = HttpMethod.getByName(tokens[HttpMessageUtil.METHOD_KEY_POSITION]);
 
+		//TODO: (miro) -> separate header and body different processes
 		RoboResponseProcess result = new RoboResponseProcess();
 		if (method != null) {
 			result.setMethod(method);
@@ -103,7 +104,7 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 				switch (paths.size()) {
 				case PATH_DEFAULT_LEVEL:
 					result.setCode(StatusCode.OK);
-					result.setResult(factory.processGet(unit));
+					result.setResult(factory.processGet(unit) );
 					break;
 				case PATH_FIRST_LEVEL:
 					result.setCode(StatusCode.NOT_IMPLEMENTED);
@@ -122,8 +123,7 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 									pathReference.getRoboReference(), httpMessage.uri());
 							if (attributeDescriptor != null) {
 								result.setCode(StatusCode.OK);
-								result.setResult(
-										factory.processGet(pathReference.getRoboReference(), attributeDescriptor));
+								result.setResult(factory.processGet(pathReference.getRoboReference(), attributeDescriptor));
 							} else {
 								final Object unitDescription = factory
 										.processGetByRegisteredPaths(pathReference.getRoboReference(), paths);

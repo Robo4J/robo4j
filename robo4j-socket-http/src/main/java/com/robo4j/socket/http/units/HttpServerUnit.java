@@ -229,6 +229,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 		RoboResponseProcess responseProcess = outBuffers.get(key);
 
+		ByteBuffer buffer;
 		if (responseProcess.getMethod() != null) {
 			switch (responseProcess.getMethod()) {
 			case GET:
@@ -241,34 +242,55 @@ public class HttpServerUnit extends RoboUnit<Object> {
 				} else {
 					getResponse = RoboHttpUtils.createResponseByCode(responseProcess.getCode());
 				}
-				SocketUtil.writeBuffer(channel, ByteBuffer.wrap(getResponse.getBytes()));
+				buffer = getByteBufferByMessage(getResponse);
+				SocketUtil.writeBuffer(channel, buffer);
+				buffer.clear();
 				break;
 			case POST:
 				if (responseProcess.getResult() != null && responseProcess.getCode().equals(StatusCode.ACCEPTED)) {
 					String postResponse = RoboHttpUtils.createResponseByCode(responseProcess.getCode());
-					SocketUtil.writeBuffer(channel, ByteBuffer.wrap(postResponse.getBytes()));
+
+					buffer = getByteBufferByMessage(postResponse);
+					SocketUtil.writeBuffer(channel, buffer);
 					for (RoboReference<Object> ref : targetRefs) {
 						if (responseProcess.getResult() != null
 								&& ref.getMessageType().equals(responseProcess.getResult().getClass())) {
 							ref.sendMessage(responseProcess.getResult());
 						}
 					}
+					buffer.clear();
 				} else {
 					String notImplementedResponse = RoboHttpUtils.createResponseByCode(responseProcess.getCode());
-					SocketUtil.writeBuffer(channel, ByteBuffer.wrap(notImplementedResponse.getBytes()));
+					buffer = getByteBufferByMessage(notImplementedResponse);
+					SocketUtil.writeBuffer(channel, buffer);
+					buffer.clear();
 				}
 			default:
 				break;
 			}
 		} else {
 			String badResponse = RoboResponseHeader.headerByCode(StatusCode.BAD_REQUEST);
-			SocketUtil.writeBuffer(channel, ByteBuffer.wrap(badResponse.getBytes()));
+			buffer = getByteBufferByMessage(badResponse);
+			SocketUtil.writeBuffer(channel, buffer);
+			buffer.clear();
 		}
 
 		channelKeyMap.remove(channel);
 
-		channel.close();
+
+		if(channel.finishConnect() || channel.isConnectionPending()){
+			channel.close();
+			System.out.println(getClass().getSimpleName() + " finished");
+		}
+
 		key.cancel();
+	}
+
+	private ByteBuffer getByteBufferByMessage(String message){
+		ByteBuffer result = ByteBuffer.allocate(message.length());
+		result.put(message.getBytes());
+		result.flip();
+		return result;
 	}
 
 	private void read(Selector selector, SelectionKey key) throws IOException {
@@ -285,10 +307,15 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		if(buffer.remaining() == 0){
 			SimpleLoggingUtil.error(getClass(), "buffer has a problem");
 		}
-		buffer.compact();
 
 		ByteBuffer validBuffer = ByteBufferUtils.copy(buffer, 0, readBytes);
+		validBuffer.flip();
+		//TODO: (miro) separate header and body
 		final RoboRequestCallable callable = new RoboRequestCallable(this, validBuffer, factory);
+
+		validBuffer.clear();
+		buffer.clear();
+
 		final Future<RoboResponseProcess> futureResult = getContext().getScheduler().submit(callable);
 
 		try{

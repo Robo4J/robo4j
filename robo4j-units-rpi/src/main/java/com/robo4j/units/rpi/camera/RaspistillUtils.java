@@ -26,7 +26,6 @@ package com.robo4j.units.rpi.camera;
  */
 final class RaspistillUtils {
 
-	static final String DEFAULT = "default";
 	static final String RASPISTILL_COMMAND = "raspistill";
 
 

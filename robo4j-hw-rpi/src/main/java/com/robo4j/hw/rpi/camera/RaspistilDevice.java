@@ -51,7 +51,8 @@ public class RaspistilDevice {
 				baos.write(imageCh);
 			}
 			imageArray.close();
-			return baos.toByteArray().clone();
+			baos.flush();
+			return baos.toByteArray();
 		} catch (IOException e) {
 			throw new CameraClientException("IMAGE GENERATION", e);
 		}

@@ -20,6 +20,7 @@ package com.robo4j.units.rpi.camera;
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.BlockingTrait;
 import com.robo4j.ConfigurationException;
+import com.robo4j.CriticalSectionTrait;
 import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
@@ -46,9 +47,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-import static com.robo4j.units.rpi.camera.RaspistillUtils.DEFAULT;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -56,6 +56,7 @@ import static com.robo4j.units.rpi.camera.RaspistillUtils.DEFAULT;
  */
 
 @BlockingTrait
+@CriticalSectionTrait
 public class RaspistillUnit extends RoboUnit<Boolean> {
 
 	private static final String ATTRIBUTE_COMMAND = "command";
@@ -65,6 +66,7 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 	private final CameraMessageCodec codec = new CameraMessageCodec();
 
 	private final RaspistilDevice device = new RaspistilDevice();
+	private final AtomicInteger imageValue = new AtomicInteger(0);
 	private AtomicBoolean progress = new AtomicBoolean(false);
 	private String command;
 	private String targetOut;
@@ -182,11 +184,12 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 	private void createImage() {
 		final String encodeString = executeCommand(command);
 		if (encodeString.length() != Constants.DEFAULT_VALUE_0) {
-			final CameraMessage cameraMessage = new CameraMessage(imageEncoding, DEFAULT, encodeString);
+			final CameraMessage cameraMessage = new CameraMessage(imageEncoding, String.valueOf(imageValue.incrementAndGet()), encodeString);
 
 			if(client != null){
 				final String message = codec.encode(cameraMessage);
 				final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, message);
+				System.out.println(getClass() + " image to sent: " + cameraMessage.getValue());
 				sendHttpClientMessage(getContext(), postMessage);
 			} else {
 				getContext().getReference(targetOut).sendMessage(cameraMessage);

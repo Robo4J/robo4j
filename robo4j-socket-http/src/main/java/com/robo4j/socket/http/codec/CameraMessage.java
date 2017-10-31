@@ -52,10 +52,9 @@ public class CameraMessage {
 
     @Override
     public String toString() {
-        return "CameraMessage{" +
-                "type='" + type + '\'' +
-                ", value='" + value + '\'' +
-                ", image=" + image +
-                '}';
+        return "{" +
+                "\"type\":\"" + type + "\"" +
+                ",\"value\":\"" + value + "\"" +
+                ",\"image\":\"" + image + "\"}";
     }
 }

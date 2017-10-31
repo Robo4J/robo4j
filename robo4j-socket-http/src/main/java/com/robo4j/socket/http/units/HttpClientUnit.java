@@ -17,6 +17,7 @@
 
 package com.robo4j.socket.http.units;
 
+import com.robo4j.BlockingTrait;
 import com.robo4j.ConfigurationException;
 import com.robo4j.CriticalSectionTrait;
 import com.robo4j.LifecycleState;
@@ -32,7 +33,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Http NIO Client to communicate with external system/Robo4J units
@@ -41,7 +44,10 @@ import java.util.Map;
  * @author Miro Wengner (@miragemiko)
  */
 @CriticalSectionTrait
+@BlockingTrait
 public class HttpClientUnit extends RoboUnit<Object> {
+	private static final int DEFAULT_BUFFER_CAPACITY = 700000;
+	private static final String CHARSET_NAME_UTF_8 = "UTF-8";
 	private InetSocketAddress address;
 	private String responseUnit;
 	private Integer responseSize;
@@ -74,15 +80,17 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		try {
 			SocketChannel channel = SocketChannel.open(address);
 			channel.configureBlocking(blocking);
+			channel.socket().setSendBufferSize(DEFAULT_BUFFER_CAPACITY);
 			channel.socket().setKeepAlive(true);
 
 			String processMessage = message.toString();
 
-			ByteBuffer buffer = ByteBuffer.wrap(processMessage.getBytes());
-			buffer.rewind();
+			byte[] bytes = processMessage.getBytes();
+			ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
+			buffer.put(bytes);
+			buffer.flip();
 
 			int writtenBytes = SocketUtil.writeBuffer(channel, buffer);
-			buffer.clear();
 
 			if (responseUnit != null && responseSize != null) {
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
@@ -90,9 +98,13 @@ public class HttpClientUnit extends RoboUnit<Object> {
 				SocketUtil.readBuffer(channel, readBuffer);
 				sendMessageToResponseUnit(readBuffer);
 			}
+
+			buffer.clear();
 			channel.close();
 		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "not available:" + address + ", no worry I continue sending");
+			SimpleLoggingUtil.error(getClass(), "not available:" + address + ", no worry I continue sending: " + e);
+			SimpleLoggingUtil.error(getClass(), "not available:" + address + ",  stack: " +
+					Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.toList()));
 		}
 	}
 
