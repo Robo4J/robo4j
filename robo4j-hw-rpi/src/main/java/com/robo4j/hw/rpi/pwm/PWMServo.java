@@ -77,7 +77,7 @@ public class PWMServo implements Servo {
 		GpioController gpio = GpioFactory.getInstance();
 		pwmPin = gpio.provisionPwmOutputPin(pin);
 
-		if (GpioFactory.getDefaultProvider().getName().equals(pin.getProvider())) {
+		if (!GpioFactory.getDefaultProvider().getName().equals(pin.getProvider())) {
 			throw new UnsupportedOperationException("Pin provider is set up to be " + GpioFactory.getDefaultProvider().getName() + ". You cannot use " + pin.getProvider());
 		}
 		// Servo -> mark:space
