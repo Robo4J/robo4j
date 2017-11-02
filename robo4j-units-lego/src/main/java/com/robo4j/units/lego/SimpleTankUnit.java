@@ -32,7 +32,7 @@ import com.robo4j.hw.lego.provider.MotorProvider;
 import com.robo4j.hw.lego.wrapper.MotorWrapper;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.lego.platform.LegoPlatformMessage;
-import com.robo4j.units.lego.platform.MotorRotationEnum;
+import com.robo4j.units.lego.enums.MotorRotationEnum;
 import com.robo4j.units.lego.utils.LegoUtils;
 
 import java.util.concurrent.ExecutionException;

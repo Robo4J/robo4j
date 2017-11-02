@@ -139,11 +139,6 @@ project("robo4j-hw-lego") {
         mavenLocal()
     }
 
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
     uploadArchives {
         repositories {
             mavenDeployer {
@@ -195,9 +190,6 @@ project("robo4j-hw-rpi") {
     sourceCompatibility = 1.8
 
     repositories {
-        flatDir {
-            dirs 'libs'
-        }
         mavenCentral()
         mavenLocal()
     }
@@ -224,9 +216,8 @@ project("robo4j-hw-rpi") {
     }
 
     dependencies {
+        compile fileTree(dir: 'libs', include: 'pi4j-core-1.2-20170907.193313-36.jar')
         compile(project(":robo4j-math"))
-//        compile "com.pi4j:pi4j-core:${pi4jVersion}"
-        compile files('libs/pi4j-core-1.2-SNAPSHOT.jar')
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }

@@ -21,7 +21,6 @@ package com.robo4j.socket.http.units;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
@@ -71,13 +70,12 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private static final String DELIMITER = ",";
 	private static final int _DEFAULT_PORT = 8042;
 	private static final int DEFAULT_BUFFER_CAPACITY = 700000;
-	public static final Boolean DEFAULT_PROPERTY_KEEP_ALIVE = true;
 	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
 	private static final HttpCodecRegistry CODEC_REGISTRY = new HttpCodecRegistry();
 	public static final String PROPERTY_PORT = "port";
 	public static final String PROPERTY_TARGET = "target";
 	public static final String PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
-	public static final String PROPERTY_KEEP_ALIVE = "keepAlive";
+	private static final String PROPERTY_KEEP_ALIVE = "keepAlive";
 	private boolean available;
 	private Integer port;
 	private Integer bufferCapacity;
@@ -99,8 +97,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		target = Arrays.asList(configuration.getString(PROPERTY_TARGET, StringConstants.EMPTY).split(DELIMITER));
 		port = configuration.getInteger(PROPERTY_PORT, _DEFAULT_PORT);
 		bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
-		keepAlive = configuration.getBoolean(PROPERTY_KEEP_ALIVE, DEFAULT_PROPERTY_KEEP_ALIVE);
-
+		keepAlive = configuration.getBoolean(PROPERTY_KEEP_ALIVE, false);
 
 		String packages = configuration.getString("packages", null);
 		if (validatePackages(packages)) {
@@ -188,21 +185,21 @@ public class HttpServerUnit extends RoboUnit<Object> {
 						// preventing similar keys coming
 						selectedIterator.remove();
 
-						switch (selectedKey.readyOps()){
-                            case SelectionKey.OP_ACCEPT:
-                                accept(selector, selectedKey);
-                                break;
-                            case SelectionKey.OP_READ:
-                                read(selector, selectedKey);
-                                break;
-                            case SelectionKey.OP_WRITE:
-                                write(targetRefs, selectedKey);
-                                break;
-                            case SelectionKey.OP_CONNECT:
-                                break;
-                            default:
-                                SimpleLoggingUtil.error(getClass(), "not supported channel operation : " + selectedKey);
-                        }
+						switch (selectedKey.readyOps()) {
+						case SelectionKey.OP_ACCEPT:
+							accept(selector, selectedKey);
+							break;
+						case SelectionKey.OP_READ:
+							read(selector, selectedKey);
+							break;
+						case SelectionKey.OP_WRITE:
+							write(targetRefs, selectedKey);
+							break;
+						case SelectionKey.OP_CONNECT:
+							break;
+						default:
+							SimpleLoggingUtil.error(getClass(), "not supported channel operation : " + selectedKey);
+						}
 					}
 				}
 
@@ -277,16 +274,11 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 		channelKeyMap.remove(channel);
 
-
-		if(channel.finishConnect() || channel.isConnectionPending()){
-			channel.close();
-			System.out.println(getClass().getSimpleName() + " finished");
-		}
-
+		channel.close();
 		key.cancel();
 	}
 
-	private ByteBuffer getByteBufferByMessage(String message){
+	private ByteBuffer getByteBufferByMessage(String message) {
 		ByteBuffer result = ByteBuffer.allocate(message.length());
 		result.put(message.getBytes());
 		result.flip();
@@ -296,7 +288,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private void read(Selector selector, SelectionKey key) throws IOException {
 
 		SocketChannel channel = (SocketChannel) key.channel();
-		channel.socket().setKeepAlive(true);
+		channel.socket().setKeepAlive(keepAlive);
 		//@formatter:off
 		HttpUriRegister.getInstance().updateUnits(getContext());
 		final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
@@ -305,7 +297,10 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		int readBytes = SocketUtil.readBuffer(channel, buffer);
 		buffer.flip();
 		if(buffer.remaining() == 0){
-			SimpleLoggingUtil.error(getClass(), "buffer has a problem");
+			SimpleLoggingUtil.error(getClass(), "buffer has a problem position: " + buffer.position()
+					+ " readBytes: " + readBytes + " limit: " + buffer.limit());
+			buffer.clear();
+			return;
 		}
 
 		ByteBuffer validBuffer = ByteBufferUtils.copy(buffer, 0, readBytes);

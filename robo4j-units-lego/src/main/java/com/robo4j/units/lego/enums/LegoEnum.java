@@ -8,40 +8,22 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http.units.test;
-
-import com.robo4j.socket.http.units.test.enums.TestCommandEnum;
+package com.robo4j.units.lego.enums;
 
 /**
- * Unit Test Message
- * immutable
+ * Every Lego related enum should implement this interface
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class UnitTestMessage {
-
-    private TestCommandEnum command;
-
-    UnitTestMessage(TestCommandEnum command) {
-        this.command = command;
-    }
-
-    public TestCommandEnum getCommand() {
-        return command;
-    }
-
-    @Override
-    public String toString() {
-        return "UnitTestMessage{" +
-                "command=" + command +
-                '}';
-    }
+public interface LegoEnum {
+    int getType();
+    String getName();
 }

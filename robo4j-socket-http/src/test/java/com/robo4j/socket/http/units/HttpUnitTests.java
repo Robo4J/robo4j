@@ -16,19 +16,18 @@
  */
 package com.robo4j.socket.http.units;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.util.Base64;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.codec.SimpleCommand;
 import com.robo4j.socket.http.codec.SimpleCommandCodec;
-import com.robo4j.socket.http.units.test.TestCommandEnum;
 import com.robo4j.socket.http.units.test.codec.TestArrayDecoder;
 import com.robo4j.socket.http.units.test.codec.TestArrayEncoder;
+import com.robo4j.socket.http.units.test.enums.TestCommandEnum;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.util.Base64;
 
 /**
  *
