@@ -22,6 +22,7 @@ import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinPwmOutput;
 import com.pi4j.io.gpio.Pin;
+import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.wiringpi.Gpio;
 import com.robo4j.hw.rpi.Servo;
 
@@ -71,6 +72,8 @@ public class PWMServo implements Servo {
 	 * 
 	 * @param pin
 	 *            the GpioPin to use for PWM.
+	 * @param inverted
+	 *            if the servo input should be inverted.
 	 */
 	public PWMServo(Pin pin, boolean inverted) {
 		this.inverted = inverted;
@@ -78,12 +81,25 @@ public class PWMServo implements Servo {
 		pwmPin = gpio.provisionPwmOutputPin(pin);
 
 		if (!GpioFactory.getDefaultProvider().getName().equals(pin.getProvider())) {
-			throw new UnsupportedOperationException("Pin provider is set up to be " + GpioFactory.getDefaultProvider().getName() + ". You cannot use " + pin.getProvider());
+			throw new UnsupportedOperationException(
+					"Pin provider is set up to be " + GpioFactory.getDefaultProvider().getName() + ". You cannot use " + pin.getProvider());
 		}
 		// Servo -> mark:space
 		Gpio.pwmSetMode(Gpio.PWM_MODE_MS);
 		Gpio.pwmSetClock(CLOCK_DIVISOR);
 		Gpio.pwmSetRange(RANGE);
+	}
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param pinAddress
+	 *            the RaspiPin pin address.
+	 * @param inverted
+	 *            if the servo input should be inverted.
+	 */
+	public PWMServo(int pinAddress, boolean inverted) {
+		this(RaspiPin.getPinByAddress(pinAddress), inverted);
 	}
 
 	@Override
