@@ -29,7 +29,7 @@ import com.robo4j.hw.lego.enums.MotorTypeEnum;
 import com.robo4j.hw.lego.provider.MotorProvider;
 import com.robo4j.hw.lego.wrapper.MotorWrapper;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.units.lego.platform.MotorRotationEnum;
+import com.robo4j.units.lego.enums.MotorRotationEnum;
 
 import java.util.concurrent.Future;
 

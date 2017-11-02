@@ -8,14 +8,14 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http.units.test;
+package com.robo4j.socket.http.units.test.enums;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,28 +25,31 @@ import java.util.stream.Stream;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum TestCommandEnum {
+public enum AdvancedTestCommandEnum implements TestEnum {
 
-    //@formatter:off
-    MOVE        (1, "move"),
-    BACK        (2, "back");
+	//@formatter:off
+    STOP        (0, "stop"),
+    RIGHT       (1, "right"),
+    LEFT        (2, "left"),
+    FORWARD     (3, "forward"),
+    BACKWARD    (4, "backward")
     ;
+
     //@formatter:on
+	private static volatile Map<Integer, AdvancedTestCommandEnum> nameToEnum;
+	private int id;
+	private String name;
 
-    private static volatile Map<Integer, TestCommandEnum> nameToEnum;
-    private int id;
-    private String name;
+	AdvancedTestCommandEnum(int id, String name) {
+		this.id = id;
+		this.name = name;
+	}
 
-    TestCommandEnum(int id, String name) {
-        this.id = id;
-        this.name = name;
+    private static Map<Integer, AdvancedTestCommandEnum> initMapping() {
+        return Stream.of(values()).collect(Collectors.toMap(AdvancedTestCommandEnum::getId, e -> e));
     }
 
-    private static Map<Integer, TestCommandEnum> initMapping() {
-        return Stream.of(values()).collect(Collectors.toMap(TestCommandEnum::getId, e -> e));
-    }
-
-    public static TestCommandEnum getByName(String name){
+    public static AdvancedTestCommandEnum getByName(String name){
         if(nameToEnum == null){
             nameToEnum = initMapping();
         }
@@ -59,18 +62,19 @@ public enum TestCommandEnum {
         //@formatter:on
     }
 
+    @Override
     public int getId() {
         return id;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
-
     @Override
     public String toString() {
-        return "TestCommandEnum{" +
+        return "AdvancedTestCommandEnum{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';

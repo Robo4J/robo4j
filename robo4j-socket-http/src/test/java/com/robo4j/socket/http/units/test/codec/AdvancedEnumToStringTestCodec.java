@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -17,40 +17,43 @@
 
 package com.robo4j.socket.http.units.test.codec;
 
+import com.robo4j.socket.http.codec.SimpleCommand;
+import com.robo4j.socket.http.codec.SimpleCommandCodec;
 import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpEncoder;
 import com.robo4j.socket.http.units.HttpProducer;
-import com.robo4j.socket.http.codec.SimpleCommand;
-import com.robo4j.socket.http.codec.SimpleCommandCodec;
-import com.robo4j.socket.http.units.test.enums.TestCommandEnum;
+import com.robo4j.socket.http.units.test.enums.AdvancedTestCommandEnum;
 
 /**
  * @author Marcus Hirt (@hirt)
- * @author Miroslav Wengner (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  */
 @HttpProducer
-public class CommandEnumToStringTestCodec implements HttpDecoder<TestCommandEnum>, HttpEncoder<TestCommandEnum> {
+public class AdvancedEnumToStringTestCodec
+		implements HttpDecoder<AdvancedTestCommandEnum>, HttpEncoder<AdvancedTestCommandEnum> {
+
 
     private final SimpleCommandCodec codec = new SimpleCommandCodec();
     @Override
-    public String encode(TestCommandEnum stuff) {
+    public String encode(AdvancedTestCommandEnum stuff) {
         final SimpleCommand simpleCommand = new SimpleCommand(stuff.getName());
         return codec.encode(simpleCommand);
     }
 
     @Override
-    public TestCommandEnum decode(String json) {
+    public AdvancedTestCommandEnum decode(String json) {
         final SimpleCommand simpleCommand = codec.decode(json);
-        return TestCommandEnum.getByName(simpleCommand.getValue());
+        return AdvancedTestCommandEnum.getByName(simpleCommand.getValue());
     }
 
     @Override
-    public Class<TestCommandEnum> getEncodedClass() {
-        return TestCommandEnum.class;
+    public Class<AdvancedTestCommandEnum> getEncodedClass() {
+        return AdvancedTestCommandEnum.class;
     }
 
     @Override
-    public Class<TestCommandEnum> getDecodedClass() {
-        return TestCommandEnum.class;
+    public Class<AdvancedTestCommandEnum> getDecodedClass() {
+        return AdvancedTestCommandEnum.class;
     }
+
 }

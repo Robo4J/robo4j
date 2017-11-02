@@ -30,7 +30,7 @@ import java.util.stream.Stream;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum LegoPlatformMessageTypeEnum {
+public enum LegoPlatformMessageTypeEnum implements LegoEnum {
 
 	//@formatter:off
     STOP        (0, "stop"),
@@ -39,12 +39,10 @@ public enum LegoPlatformMessageTypeEnum {
     LEFT        (3, "left"),
     RIGHT       (4, "right")
     ;
-
-
     //@formatter:on
 
 	private static volatile Map<Integer, LegoPlatformMessageTypeEnum> internMapByType;
-	private Integer type;
+	private int type;
 	private String name;
 
 	LegoPlatformMessageTypeEnum(int type, String name) {
@@ -69,10 +67,12 @@ public enum LegoPlatformMessageTypeEnum {
     }
     //@formatter:on
 
-	public Integer getType() {
+	@Override
+	public int getType() {
 		return type;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}

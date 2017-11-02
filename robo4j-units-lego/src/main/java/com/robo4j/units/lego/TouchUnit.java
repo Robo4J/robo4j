@@ -27,7 +27,7 @@ import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
 import com.robo4j.hw.lego.provider.SensorProvider;
 import com.robo4j.hw.lego.wrapper.SensorWrapper;
-import com.robo4j.units.lego.platform.MotorRotationEnum;
+import com.robo4j.units.lego.enums.MotorRotationEnum;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

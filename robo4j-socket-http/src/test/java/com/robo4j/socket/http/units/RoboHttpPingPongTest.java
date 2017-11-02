@@ -61,7 +61,7 @@ public class RoboHttpPingPongTest {
     private static final int MESSAGES = 3;
     private static final String REQUEST_CONSUMER = "request_consumer";
     private static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
-    private static final String HTTP_METHOD = "POST";
+    private static final String HTTP_POST_METHOD = "POST";
 
 
     @Ignore
@@ -126,7 +126,7 @@ public class RoboHttpPingPongTest {
         config.setString("packages", PACKAGE_CODECS);
         /* specific configuration */
         config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
-                JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, HTTP_METHOD)));
+                JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, HTTP_POST_METHOD)));
         builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
         builder.add(StringConsumer.class, REQUEST_CONSUMER);
 
@@ -146,7 +146,7 @@ public class RoboHttpPingPongTest {
         config.setInteger("port", PORT);
 		/* specific configuration */
         config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
-                JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, HTTP_METHOD)));
+                JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, HTTP_POST_METHOD)));
         builder.add(HttpClientUnit.class, config, ID_HTTP_CLIENT);
 
         config = ConfigurationFactory.createEmptyConfiguration();

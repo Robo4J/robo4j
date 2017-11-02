@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -18,44 +18,44 @@
 package com.robo4j.units.lego.enums;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * Enum is used to distinguished the movement direction motor direction of
+ * rotation
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum LegoSonicMessageTypeEnum implements LegoEnum {
+public enum MotorRotationEnum implements LegoEnum {
 
 	//@formatter:off
-    FINISH      (0, "finish"),
-    SCAN        (1, "scan"),
-    CENTER      (2, "center"),
-    STOP        (3, "stop"),
-    ;
+	FORWARD			(0, 1, "forward"),
+	STOP			(1, 0, "stop"),
+	BACKWARD		(2, 2, "backward"),;
+	// @formatter:on
 
-
-    //@formatter:on
-
-	private static volatile Map<Integer, LegoSonicMessageTypeEnum> internMapByType;
+	private static volatile Map<Integer, MotorRotationEnum> internMapByType;
 	private int type;
+	private int code;
 	private String name;
 
-	LegoSonicMessageTypeEnum(int type, String name) {
+	MotorRotationEnum(int type, int code, String name) {
 		this.type = type;
+		this.code = code;
 		this.name = name;
 	}
 
 	//@formatter:off
-    private static Map<Integer, LegoSonicMessageTypeEnum> initMapping() {
+    private static Map<Integer, MotorRotationEnum> initMapping() {
         return Stream.of(values())
-                .collect(Collectors.toMap(LegoSonicMessageTypeEnum::getType, e -> e));
+                .collect(Collectors.toMap(MotorRotationEnum::getType, e -> e));
     }
-    public static LegoSonicMessageTypeEnum getInternalByName(String name) {
-        if (internMapByType == null) {
+
+    public static MotorRotationEnum getByName(String name) {
+        if (internMapByType == null)
             internMapByType = initMapping();
-        }
         return internMapByType.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .filter(e -> e.getName().equals(name))
@@ -69,25 +69,17 @@ public enum LegoSonicMessageTypeEnum implements LegoEnum {
 		return type;
 	}
 
+	public int getCode() {
+		return code;
+	}
+
 	@Override
 	public String getName() {
 		return name;
 	}
 
-	public Set<String> commandNames() {
-		//@formatter:off
-        return Stream.of(values())
-                .map(LegoSonicMessageTypeEnum::getName)
-                .collect(Collectors.toSet());
-        //@formatter:on
-	}
-
-	public LegoSonicMessageTypeEnum getByName(String name) {
-		return getInternalByName(name);
-	}
-
 	@Override
 	public String toString() {
-		return "LegoSonicMessageTypeEnum{" + "type=" + type + ", name='" + name + '\'' + '}';
+		return "MotorRotationEnum{" + "type=" + type + ", code=" + code + ", name='" + name + '\'' + '}';
 	}
 }

@@ -66,6 +66,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 
 			final List<ResponseUnitDTO> unitList = desiredUnit.getContext().getUnits().stream()
 					.map(u -> new ResponseUnitDTO(u.getId(), u.getState())).collect(Collectors.toList());
+			System.out.println(getClass() + " getList: " + unitList);
 
 			return JsonUtil.getArrayByListResponseUnitDTO(unitList);
 		} else {

@@ -17,9 +17,7 @@
 
 package com.robo4j.socket.http.units;
 
-import com.robo4j.BlockingTrait;
 import com.robo4j.ConfigurationException;
-import com.robo4j.CriticalSectionTrait;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
@@ -43,14 +41,13 @@ import java.util.stream.Collectors;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-@CriticalSectionTrait
-@BlockingTrait
 public class HttpClientUnit extends RoboUnit<Object> {
-	private static final int DEFAULT_BUFFER_CAPACITY = 700000;
-	private static final String CHARSET_NAME_UTF_8 = "UTF-8";
+	private static final String PROPERTY_KEEP_ALIVE = "keepAlive";
 	private InetSocketAddress address;
 	private String responseUnit;
 	private Integer responseSize;
+	private Integer bufferCapacity;
+	private boolean keepAlive;
 	private boolean blocking;
 
 	public HttpClientUnit(RoboContext context, String id) {
@@ -64,7 +61,9 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		int confPort = configuration.getInteger("port", RoboHttpUtils._DEFAULT_PORT);
 		responseUnit = configuration.getString("responseUnit", null);
 		responseSize = configuration.getInteger("responseSize", null);
+		bufferCapacity = configuration.getInteger("bufferCapacity", null);
 		blocking = configuration.getBoolean("blocking", false);
+		keepAlive = configuration.getBoolean(PROPERTY_KEEP_ALIVE, false);
 
 		Map<String, Object> targetUnitsMap = JsonUtil.getMapNyJson(configuration.getString("targetUnits", null));
 		if (confAddress == null || targetUnitsMap.isEmpty()) {
@@ -80,8 +79,10 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		try {
 			SocketChannel channel = SocketChannel.open(address);
 			channel.configureBlocking(blocking);
-			channel.socket().setSendBufferSize(DEFAULT_BUFFER_CAPACITY);
-			channel.socket().setKeepAlive(true);
+			if(responseSize != null){
+				channel.socket().setSendBufferSize(bufferCapacity);
+			}
+			channel.socket().setKeepAlive(keepAlive);
 
 			String processMessage = message.toString();
 

@@ -59,7 +59,7 @@ public class RoboHttpDynamicTests {
 	private static final String HOST_SYSTEM = "0.0.0.0";
 	private static final String REQUEST_CONSUMER = "request_consumer";
 	private static final String HTTP_METHOD = "POST";
-	static final String JSON_STRING = "{\"value\":\"move\"}";
+	static final String JSON_STRING = "{\"value\":\"stop\"}";
 
 	/**
 	 * Motivation Client system is sending messages to the main system over HTTP
@@ -90,8 +90,8 @@ public class RoboHttpDynamicTests {
 		/* client system sending a messages to the main system */
 		List<String> paths = Arrays.asList("units", ID_TARGET_UNIT);
 		for (int i = 0; i < MESSAGES_NUMBER; i++) {
-			httpClientReference.sendMessage(
-					RoboHttpUtils.createRequest(HttpMethod.POST, HOST_SYSTEM, HttpPathUtil.pathsToUri(paths), JSON_STRING));
+			String messageToSend = RoboHttpUtils.createRequest(HttpMethod.POST, HOST_SYSTEM, HttpPathUtil.pathsToUri(paths), JSON_STRING);
+			httpClientReference.sendMessage(messageToSend);
 		}
 
 		Thread.sleep(SLEEP_DELAY);

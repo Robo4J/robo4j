@@ -21,6 +21,7 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
+import com.robo4j.socket.http.units.test.enums.TestCommandEnum;
 
 /**
  *
