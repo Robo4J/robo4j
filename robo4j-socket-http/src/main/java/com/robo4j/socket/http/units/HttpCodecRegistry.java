@@ -38,6 +38,7 @@ public class HttpCodecRegistry {
 	}
 
 	public HttpCodecRegistry(String... packages) {
+		this();
 		scan(Thread.currentThread().getContextClassLoader(), packages);
 	}
 
@@ -45,7 +46,7 @@ public class HttpCodecRegistry {
 		ReflectionScan scan = new ReflectionScan(loader);
 		processClasses(loader, scan.scanForEntities(packages));
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	public <T> HttpEncoder<T> getEncoder(Class<T> type) {
 		return (HttpEncoder<T>) encoders.get(type);
