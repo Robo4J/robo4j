@@ -33,11 +33,12 @@ public class HttpCodecRegistry {
 	private Map<Class<?>, HttpEncoder<?>> encoders = new HashMap<>();
 	private Map<Class<?>, HttpDecoder<?>> decoders = new HashMap<>();
 
-
 	public HttpCodecRegistry() {
+		registerDefaults();
 	}
 
 	public HttpCodecRegistry(String... packages) {
+		this();
 		scan(Thread.currentThread().getContextClassLoader(), packages);
 	}
 
@@ -45,7 +46,20 @@ public class HttpCodecRegistry {
 		ReflectionScan scan = new ReflectionScan(loader);
 		processClasses(loader, scan.scanForEntities(packages));
 	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> HttpEncoder<T> getEncoder(Class<T> type) {
+		return (HttpEncoder<T>) encoders.get(type);
+	}
 
+	@SuppressWarnings("unchecked")
+	public <T> HttpDecoder<T> getDecoder(Class<T> type) {
+		return (HttpDecoder<T>) decoders.get(type);
+	}
+	
+	private void registerDefaults() {
+		scan(HttpCodecRegistry.class.getClassLoader(), "com.robo4j.socket.http.codec");
+	}
 
 	private void processClasses(ClassLoader loader, List<String> allClasses) {
 
@@ -73,16 +87,5 @@ public class HttpCodecRegistry {
 			HttpDecoder<?> decoder = (HttpDecoder<?>) instance;
 			decoders.put(decoder.getDecodedClass(), decoder);
 		}
-	}
-
-
-	@SuppressWarnings("unchecked")
-	public <T> HttpEncoder<T> getEncoder(Class<T> type) {
-		return (HttpEncoder<T>) encoders.get(type);
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> HttpDecoder<T> getDecoder(Class<T> type) {
-		return (HttpDecoder<T>) decoders.get(type);
-	}
+	}	
 }
