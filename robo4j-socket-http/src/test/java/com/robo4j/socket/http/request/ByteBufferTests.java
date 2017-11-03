@@ -19,6 +19,7 @@ package com.robo4j.socket.http.request;
 
 import com.robo4j.socket.http.HttpByteWrapper;
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.units.BufferWrapper;
 import com.robo4j.socket.http.util.ByteBufferUtils;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import org.junit.Assert;
@@ -54,7 +55,8 @@ public class ByteBufferTests {
 	@Test
 	public void testPostmanMessage(){
 		ByteBuffer incomingBuffer = ByteBuffer.wrap(TEST_POSTMAN_STRING.getBytes());
-		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBuffer(incomingBuffer);
+		BufferWrapper bufferWrapper = new BufferWrapper(incomingBuffer, TEST_POSTMAN_STRING.length());
+		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBuffer(bufferWrapper);
 
 		String resultValue = new String(wrapper.getHeader().array());
 		String resultBody = new String(wrapper.getBody().array());
@@ -76,7 +78,8 @@ public class ByteBufferTests {
 		String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, bodyMessage);
 
 		ByteBuffer incomingBuffer = ByteBuffer.wrap(postMessage.getBytes());
-		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBuffer(incomingBuffer);
+		BufferWrapper bufferWrapper = new BufferWrapper(incomingBuffer, postMessage.length());
+		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBuffer(bufferWrapper);
 
 		String resultHeader = new String(wrapper.getHeader().array());
 		String resultBody = new String(wrapper.getBody().array());

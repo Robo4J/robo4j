@@ -18,6 +18,7 @@
 package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.HttpByteWrapper;
+import com.robo4j.socket.http.units.BufferWrapper;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -41,11 +42,11 @@ public class ByteBufferUtils {
 		return result;
 	}
 
-	public static HttpByteWrapper getHttpByteWrapperByByteBuffer(ByteBuffer buffer) {
-		byte[] headerByteBuffer = new byte[buffer.capacity()];
+	public static HttpByteWrapper getHttpByteWrapperByByteBuffer(BufferWrapper bufferWrapper) {
+		byte[] headerByteBuffer = new byte[bufferWrapper.getReadBytes()];
 
 		int numberOverWindow = headerByteBuffer.length % SIZE_WINDOW;
-		int endOfReading = buffer.capacity() - numberOverWindow;
+		int endOfReading =bufferWrapper.getReadBytes() - numberOverWindow;
 
 		int position = 0;
 		int bPosition = 0;
@@ -55,7 +56,7 @@ public class ByteBufferUtils {
 		byte[] bWindow = new byte[SIZE_WINDOW];
 
 		while (!isHeaderDone && position < endOfReading) {
-			byte b = buffer.get(position);
+			byte b = bufferWrapper.getBuffer().get(position);
 
 			if (bWindowPosition < (SIZE_WINDOW - 1)) {
 				if (b != CHAR_RETURN) {
@@ -84,12 +85,12 @@ public class ByteBufferUtils {
 		}
 
 		int validHeaderSize = bPosition - SIZE_WINDOW;
-		int validBodySize = buffer.capacity() - position;
+		int validBodySize = bufferWrapper.getReadBytes() - position;
 		ByteBuffer headerBuffer = ByteBuffer.wrap(Arrays.copyOf(headerByteBuffer, validHeaderSize));
 
 		byte[] bodyBytes = new byte[validBodySize];
-		for (int i = position; i < buffer.capacity(); i++) {
-			bodyBytes[i - position] = buffer.get(i);
+		for (int i = position; i < bufferWrapper.getReadBytes(); i++) {
+			bodyBytes[i - position] = bufferWrapper.getBuffer().get(i);
 		}
 		ByteBuffer bodyBuffer = ByteBuffer.wrap(bodyBytes);
 

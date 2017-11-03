@@ -30,6 +30,7 @@ import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.dto.RoboPathReferenceDTO;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.enums.SystemPath;
+import com.robo4j.socket.http.units.BufferWrapper;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.units.HttpUriRegister;
 import com.robo4j.socket.http.util.ByteBufferUtils;
@@ -38,7 +39,6 @@ import com.robo4j.socket.http.util.HttpPathUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.net.URI;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,19 +58,19 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 	public static final int PATH_FIRST_LEVEL = 1;
 
 	private final RoboUnit<?> unit;
-	private final ByteBuffer buffer;
+	private final BufferWrapper bufferWrapper;
 	private final DefaultRequestFactory<?> factory;
 
-	public RoboRequestCallable(RoboUnit<?> unit, ByteBuffer buffer, DefaultRequestFactory<Object> factory) {
-		assert buffer != null;
+	public RoboRequestCallable(RoboUnit<?> unit, BufferWrapper bufferWrapper, DefaultRequestFactory<Object> factory) {
+		assert bufferWrapper != null;
 		this.unit = unit;
-		this.buffer = buffer;
+		this.bufferWrapper = bufferWrapper;
 		this.factory = factory;
 	}
 
 	@Override
 	public RoboResponseProcess call() throws Exception {
-		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBuffer(buffer);
+		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBuffer(bufferWrapper);
 
 		final String[] headerLines = new String(wrapper.getHeader().array()).split("[\r\n]+");
 		final String firstLine = RoboHttpUtils.correctLine(headerLines[0]);
