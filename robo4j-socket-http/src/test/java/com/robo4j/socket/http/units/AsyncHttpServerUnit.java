@@ -169,7 +169,6 @@ public class AsyncHttpServerUnit extends RoboUnit<Object> {
 
     private static final String DELIMITER = ",";
     private static final int _DEFAULT_PORT = 8042;
-    private static final int DEFAULT_BUFFER_CAPACITY = 700000;
     private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
     private static final HttpCodecRegistry CODEC_REGISTRY = new HttpCodecRegistry();
     public static final String PROPERTY_PORT = "port";
@@ -177,7 +176,6 @@ public class AsyncHttpServerUnit extends RoboUnit<Object> {
     public static final String PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
     private boolean available;
     private Integer port;
-    private Integer bufferCapacity;
     //used for encoded messages
     private List<String> target;
     private AsynchronousServerSocketChannel server;
@@ -197,7 +195,6 @@ public class AsyncHttpServerUnit extends RoboUnit<Object> {
         /* target is always initiated as the list */
         target = Arrays.asList(configuration.getString(PROPERTY_TARGET, StringConstants.EMPTY).split(DELIMITER));
         port = configuration.getInteger(PROPERTY_PORT, _DEFAULT_PORT);
-        bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
 
         String packages = configuration.getString("packages", null);
         if (validatePackages(packages)) {
@@ -259,7 +256,7 @@ public class AsyncHttpServerUnit extends RoboUnit<Object> {
                         }
                         clientChannel = result;
                         if ((clientChannel != null) && (clientChannel.isOpen())){
-                            AsyncServerHandler handler = new AsyncServerHandler(clientChannel);
+                            new AsyncServerHandler(clientChannel);
                         }
 
                     }

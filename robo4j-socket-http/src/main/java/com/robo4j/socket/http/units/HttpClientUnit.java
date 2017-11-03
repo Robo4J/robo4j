@@ -91,7 +91,7 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			buffer.put(bytes);
 			buffer.flip();
 
-			int writtenBytes = SocketUtil.writeBuffer(channel, buffer);
+			SocketUtil.writeBuffer(channel, buffer);
 
 			if (responseUnit != null && responseSize != null) {
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
