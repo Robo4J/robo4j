@@ -58,7 +58,7 @@ public class HttpCodecRegistry {
 	}
 	
 	private void registerDefaults() {
-		scan(HttpCodecRegistry.class.getClassLoader(), "com.robo4j.scoket.http.codec");
+		scan(HttpCodecRegistry.class.getClassLoader(), "com.robo4j.socket.http.codec");
 	}
 
 	private void processClasses(ClassLoader loader, List<String> allClasses) {
