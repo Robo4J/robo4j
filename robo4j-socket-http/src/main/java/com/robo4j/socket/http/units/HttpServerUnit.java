@@ -282,7 +282,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 	private void read(Selector selector, SelectionKey key) throws IOException {
 
-		long start = System.currentTimeMillis();
 		SocketChannel channel = (SocketChannel) key.channel();
 		channel.socket().setKeepAlive(keepAlive);
 
