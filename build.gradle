@@ -1,22 +1,129 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+    }
+}
+
 plugins {
     id "org.flywaydb.flyway" version "4.2.0"
 }
 
-group 'com.robo4j'
-
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
-
-
+apply plugin: 'maven'
+apply plugin: 'com.bmuschko.nexus'
 apply from: 'libraries.gradle'
 
+group = 'com.robo4j'
+archivesBaseName = 'robo4j'
+description = 'Robo4J is the message passing framework for Robotics/IoT'
+
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
     mavenLocal()
+    jcenter()
 }
+
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+//
+//            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+//                authentication(userName: ossrhUsername, password: ossrhPassword)
+//            }
+//            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+//                authentication(userName: ossrhUsername, password: ossrhPassword)
+//            }
+//
+//            pom.project {
+//                name project.name
+//                description project.description
+//                packaging 'jar'
+//                url 'https://github.com/Robo4J/robo4j'
+//                scm {
+//                    connection 'scm:git:https://github.com/Robo4J/robo4j.git'
+//                    developerConnection 'scm:https://github.com/Robo4J/robo4j.git'
+//                    url 'https://github.com/Robo4J/robo4j.git'
+//                }
+//                licenses {
+//                    license {
+//                        name 'GNU General Public License'
+//                        url 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+//                        distribution 'repo'
+//                    }
+//                }
+//                developers {
+//                    developer {
+//                        id = 'Wengner'
+//                        name = 'Miroslav Wengner'
+//                        email = 'miro@robo4j.io'
+//                    }
+//                    developer {
+//                        id = 'hirt'
+//                        name = 'Marcus Hirt'
+//                        email = 'marcus@robo4j.io'
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
+
+modifyPom {
+    project {
+        name 'Robo4J framework'
+        description "${description}"
+        url 'https://github.com/Robo4J/robo4j'
+        inceptionYear '2014'
+
+        scm {
+            url 'https://github.com/Robo4J/robo4j'
+            connection 'scm:https://github.com/Robo4J/robo4j.git'
+            developerConnection 'scm:https://github.com/Robo4J/robo4j.git'
+        }
+
+        licenses {
+            license {
+                name 'GNU General Public License'
+                url 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+                distribution 'repo'
+            }
+        }
+
+        developers {
+            developer {
+                id 'Wengner'
+                name 'Miroslav Wengner'
+                email 'miro@robo4j.io'
+            }
+            developer {
+                id 'Hirt'
+                name 'Marcus Hirt'
+                email 'marcus@robo4j.io'
+            }
+        }
+    }
+}
+
+extraArchive {
+    sources = false
+    tests = true
+    javadoc = false
+}
+
+//nexus {
+//    sign = true
+//    repositoryUrl = 'https://github.com/Robo4J/robo4j/'
+//    snapshotRepositoryUrl = 'https://github.com/Robo4J/robo4j/'
+//}
 
 project("robo4j-core") {
     description = "Robo4J Core"
@@ -139,18 +246,18 @@ project("robo4j-hw-lego") {
         mavenLocal()
     }
 
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "${mavenRepository}")
-            }
-        }
-    }
+//    uploadArchives {
+//        repositories {
+//            mavenDeployer {
+//                repository(url: "${mavenRepository}")
+//            }
+//        }
+//    }
 
     sourceSets {
         main {
             java {
-                srcDirs = ['src/main/java', 'src/examples/java']
+                srcDirs = ['src/main/java', 'src/examples/java', 'libs']
             }
             resources {
                 srcDirs = ['src/main/resources', 'src/examples/resources']
@@ -194,13 +301,13 @@ project("robo4j-hw-rpi") {
         mavenLocal()
     }
 
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "${mavenRepository}")
-            }
-        }
-    }
+//    uploadArchives {
+//        repositories {
+//            mavenDeployer {
+//                repository(url: "${mavenRepository}")
+//            }
+//        }
+//    }
 
     //create a single Jar with all dependencies
     task fatJar(type: Jar) {
@@ -401,13 +508,13 @@ project("robo4j-units-lego") {
         mavenLocal()
     }
 
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "${mavenRepository}")
-            }
-        }
-    }
+//    uploadArchives {
+//        repositories {
+//            mavenDeployer {
+//                repository(url: "${mavenRepository}")
+//            }
+//        }
+//    }
 
     //create a single Jar with all dependencies
     task fatJar(type: Jar) {
@@ -447,13 +554,13 @@ project("robo4j-units-rpi") {
         mavenLocal()
     }
 
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "${mavenRepository}")
-            }
-        }
-    }
+//    uploadArchives {
+//        repositories {
+//            mavenDeployer {
+//                repository(url: "${mavenRepository}")
+//            }
+//        }
+//    }
 
     //create a single Jar with all dependencies
     task fatJar(type: Jar) {
