@@ -15,34 +15,19 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http.units;
+package com.robo4j.util;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class BufferWrapper {
+public class StreamException extends RuntimeException {
 
-	private Integer size;
-	private String message;
+    public StreamException(String message) {
+        super(message);
+    }
 
-	public BufferWrapper(Integer size, String message) {
-		this.message = message;
-	}
-
-	public Integer getSize() {
-		return size;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	@Override
-	public String toString() {
-		return "BufferWrapper{" +
-				"size=" + size +
-				", message='" + message + '\'' +
-				'}';
-	}
+    public StreamException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

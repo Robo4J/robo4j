@@ -50,10 +50,11 @@ import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.request.RoboRequestCallable;
 import com.robo4j.socket.http.request.RoboRequestFactory;
 import com.robo4j.socket.http.request.RoboResponseProcess;
+import com.robo4j.socket.http.util.ChannelBufferUtils;
+import com.robo4j.socket.http.util.ChannelUtil;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.socket.http.util.RoboResponseHeader;
-import com.robo4j.socket.http.util.SocketUtil;
 import com.robo4j.util.StringConstants;
 
 /**
@@ -74,7 +75,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	public static final String PROPERTY_TARGET = "target";
 	public static final String PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
 	private static final String PROPERTY_KEEP_ALIVE = "keepAlive";
-	public static final int INIT_BUFFER_CAPACITY = 48;
 	private boolean available;
 	private Integer port;
 	private Integer bufferCapacity;
@@ -236,7 +236,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 					getResponse = RoboHttpUtils.createResponseByCode(responseProcess.getCode());
 				}
 				buffer = getByteBufferByMessage(getResponse);
-				SocketUtil.writeBuffer(channel, buffer);
+				ChannelUtil.writeBuffer(channel, buffer);
 				buffer.clear();
 				break;
 			case POST:
@@ -244,7 +244,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 					String postResponse = RoboHttpUtils.createResponseByCode(responseProcess.getCode());
 
 					buffer = getByteBufferByMessage(postResponse);
-					SocketUtil.writeBuffer(channel, buffer);
+					ChannelUtil.writeBuffer(channel, buffer);
 					for (RoboReference<Object> ref : targetRefs) {
 						if (responseProcess.getResult() != null
 								&& ref.getMessageType().equals(responseProcess.getResult().getClass())) {
@@ -255,7 +255,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 				} else {
 					String notImplementedResponse = RoboHttpUtils.createResponseByCode(responseProcess.getCode());
 					buffer = getByteBufferByMessage(notImplementedResponse);
-					SocketUtil.writeBuffer(channel, buffer);
+					ChannelUtil.writeBuffer(channel, buffer);
 					buffer.clear();
 				}
 			default:
@@ -264,7 +264,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		} else {
 			String badResponse = RoboResponseHeader.headerByCode(StatusCode.BAD_REQUEST);
 			buffer = getByteBufferByMessage(badResponse);
-			SocketUtil.writeBuffer(channel, buffer);
+			ChannelUtil.writeBuffer(channel, buffer);
 			buffer.clear();
 		}
 
@@ -281,17 +281,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		return result;
 	}
 
-
-	private void addToStringBuilder(StringBuilder sb, ByteBuffer buffer, int end){
-
-		byte[] array = new byte[end];
-		for(int i=0; i < end; i++){
-			array[i] = buffer.get(i);
-		}
-		sb.append(new String(array));
-
-	}
-
 	private void read(Selector selector, SelectionKey key) throws IOException {
 
 		SocketChannel channel = (SocketChannel) key.channel();
@@ -300,35 +289,10 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		HttpUriRegister.getInstance().updateUnits(getContext());
 		final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
 
-		ByteBuffer buffer = ByteBuffer.allocate(INIT_BUFFER_CAPACITY);
-		StringBuilder stringBuilder = new StringBuilder();
-		int readBytes = SocketUtil.readBuffer(channel, buffer);
-
-		addToStringBuilder(stringBuilder, buffer, readBytes);
-
-		int totalReadBytes = readBytes;
-		while (!buffer.hasRemaining() && (readBytes % INIT_BUFFER_CAPACITY) == 0) {
-			int tmpSize = buffer.array().length;
-			buffer = ByteBuffer.allocate(tmpSize + INIT_BUFFER_CAPACITY);
-			totalReadBytes+=readBytes;
-			readBytes = SocketUtil.readBuffer(channel, buffer);
-			addToStringBuilder(stringBuilder, buffer, readBytes);
-
-		}
-		System.out.println(getClass().getSimpleName() + " totalReadBytes: " + totalReadBytes + " stringBuffer= " + stringBuilder.toString());
-
-		if (buffer.remaining() == 0) {
-			SimpleLoggingUtil.error(getClass(), "buffer has a problem position: " + buffer.position() + " readBytes: "
-					+ readBytes + " limit: " + buffer.limit());
-			return;
-		}
-		buffer.clear();
-
-		BufferWrapper bufferWrapper = new BufferWrapper(stringBuilder.toString());
+		final BufferWrapper bufferWrapper = ChannelBufferUtils.getBufferWrapperByChannel(channel);
 
 		// TODO: (miro) separate header and body
 		final RoboRequestCallable callable = new RoboRequestCallable(this, bufferWrapper, factory);
-
 
 		final Future<RoboResponseProcess> futureResult = getContext().getScheduler().submit(callable);
 

@@ -20,7 +20,7 @@ package com.robo4j.socket.http.request;
 import com.robo4j.socket.http.HttpByteWrapper;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.units.BufferWrapper;
-import com.robo4j.socket.http.util.ByteBufferUtils;
+import com.robo4j.socket.http.util.ChannelBufferUtils;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -56,8 +56,8 @@ public class ByteBufferTests {
 
 	@Test
 	public void testPostmanMessage(){
-		BufferWrapper bufferWrapper = new BufferWrapper(TEST_POSTMAN_STRING);
-		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBufferString(bufferWrapper);
+		BufferWrapper bufferWrapper = new BufferWrapper(TEST_POSTMAN_STRING.length(), TEST_POSTMAN_STRING);
+		HttpByteWrapper wrapper = ChannelBufferUtils.getHttpByteWrapperByByteBufferString(bufferWrapper);
 
 		String[] headerResult = wrapper.getHeader();
 		String resultBody = wrapper.getBody();
@@ -80,9 +80,8 @@ public class ByteBufferTests {
 		String correctedPostHeader = postHeader.trim();
 		String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, bodyMessage);
 
-		ByteBuffer incomingBuffer = ByteBuffer.wrap(postMessage.getBytes());
-		BufferWrapper bufferWrapper = new BufferWrapper(postMessage);
-		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBufferString(bufferWrapper);
+		BufferWrapper bufferWrapper = new BufferWrapper(postMessage.length(), postMessage);
+		HttpByteWrapper wrapper = ChannelBufferUtils.getHttpByteWrapperByByteBufferString(bufferWrapper);
 
 		String[] resultHeader = wrapper.getHeader();
 		String resultBody = wrapper.getBody();
@@ -97,7 +96,7 @@ public class ByteBufferTests {
 	@Test
 	public void testMovingWindow() {
 		String correctString = "\n\n";
-		Assert.assertTrue(ByteBufferUtils.isBWindow(ByteBufferUtils.END_WINDOW,
+		Assert.assertTrue(ChannelBufferUtils.isBWindow(ChannelBufferUtils.END_WINDOW,
 				ByteBuffer.wrap(correctString.getBytes()).array()));
 	}
 
@@ -111,7 +110,7 @@ public class ByteBufferTests {
 
 		while (position < size) {
 			byte b = TEST_BYTE_BUFFER.get(position);
-			if (b == ByteBufferUtils.CHAR_RETURN) {
+			if (b == ChannelBufferUtils.CHAR_RETURN) {
 			} else {
 				tmpBytes[bPosition] = b;
 				bPosition++;
@@ -119,8 +118,8 @@ public class ByteBufferTests {
 			position++;
 		}
 
-		byte[] resBytes = ByteBufferUtils.validArray(tmpBytes, bPosition);
+		byte[] resBytes = ChannelBufferUtils.validArray(tmpBytes, bPosition);
 		ByteBuffer resultBuffer = ByteBuffer.wrap(resBytes);
-		Assert.assertTrue(TEST_BYTE_BUFFER.capacity() == resultBuffer.capacity() + ByteBufferUtils.END_WINDOW.length);
+		Assert.assertTrue(TEST_BYTE_BUFFER.capacity() == resultBuffer.capacity() + ChannelBufferUtils.END_WINDOW.length);
 	}
 }

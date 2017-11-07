@@ -25,7 +25,7 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
-import com.robo4j.socket.http.util.SocketUtil;
+import com.robo4j.socket.http.util.ChannelUtil;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -91,12 +91,12 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			buffer.put(bytes);
 			buffer.flip();
 
-			SocketUtil.writeBuffer(channel, buffer);
+			ChannelUtil.writeBuffer(channel, buffer);
 
 			if (responseUnit != null && responseSize != null) {
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
 				// important is set stopper properly
-				SocketUtil.readBuffer(channel, readBuffer);
+				ChannelUtil.readBuffer(channel, readBuffer);
 				sendMessageToResponseUnit(readBuffer);
 			}
 

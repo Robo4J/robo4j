@@ -33,7 +33,7 @@ import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.socket.http.units.BufferWrapper;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.units.HttpUriRegister;
-import com.robo4j.socket.http.util.ByteBufferUtils;
+import com.robo4j.socket.http.util.ChannelBufferUtils;
 import com.robo4j.socket.http.util.HttpMessageUtil;
 import com.robo4j.socket.http.util.HttpPathUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
@@ -72,9 +72,7 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 
 	@Override
 	public RoboResponseProcess call() throws Exception {
-		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBufferString(bufferWrapper);
-
-
+		HttpByteWrapper wrapper = ChannelBufferUtils.getHttpByteWrapperByByteBufferString(bufferWrapper);
 
 		final String[] headerLines = wrapper.getHeader();
 		final String firstLine = RoboHttpUtils.correctLine(headerLines[0]);

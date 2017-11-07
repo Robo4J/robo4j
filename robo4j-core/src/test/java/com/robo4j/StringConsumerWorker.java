@@ -16,16 +16,11 @@
  */
 package com.robo4j;
 
+import com.robo4j.configuration.Configuration;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import com.robo4j.AttributeDescriptor;
-import com.robo4j.ConfigurationException;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboUnit;
-import com.robo4j.WorkTrait;
-import com.robo4j.configuration.Configuration;
 
 /**
  * This one should schedule everything on the Worker pool.
@@ -51,7 +46,7 @@ public class StringConsumerWorker extends RoboUnit<String> {
 	public synchronized List<String> getReceivedMessages() {
 		return receivedMessages;
 	}
-	
+
 	@Override
 	public synchronized void onMessage(String message) {
 		counter.incrementAndGet();
@@ -60,14 +55,15 @@ public class StringConsumerWorker extends RoboUnit<String> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		
+
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
-			return (R) (Integer)counter.get();
+		if (attribute.getAttributeName().equals("getNumberOfSentMessages")
+				&& attribute.getAttributeType() == Integer.class) {
+			return (R) (Integer) counter.get();
 		}
 		if (attribute.getAttributeName().equals("getReceivedMessages")
 				&& attribute.getAttributeType() == ArrayList.class) {

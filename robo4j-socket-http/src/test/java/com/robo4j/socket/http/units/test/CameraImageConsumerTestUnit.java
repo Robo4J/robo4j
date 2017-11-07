@@ -17,23 +17,32 @@
 
 package com.robo4j.socket.http.units.test;
 
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.codec.CameraMessage;
 
 import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class CameraImageProcessorTestUnit extends RoboUnit<CameraMessage> {
+public class CameraImageConsumerTestUnit extends RoboUnit<CameraMessage> {
+
+    public static final String ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME = "numberOfReceivedImages";
+    public static final Collection<AttributeDescriptor<?>> ATTRIBUTES_COLLECTION = Collections
+            .unmodifiableCollection(Collections
+                    .singletonList(DefaultAttributeDescriptor.create(Integer.class, ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME)));
 
     private final AtomicInteger counter = new AtomicInteger(0);
 
-    public CameraImageProcessorTestUnit(RoboContext context, String id) {
+    public CameraImageConsumerTestUnit(RoboContext context, String id) {
         super(CameraMessage.class, context, id);
         System.out.println(getClass() + "init");
     }
@@ -47,5 +56,16 @@ public class CameraImageProcessorTestUnit extends RoboUnit<CameraMessage> {
             SimpleLoggingUtil.error(getClass(), "no imageView: " + counter.getAndIncrement());
         }
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
+        if (descriptor.getAttributeType() == Integer.class
+                && descriptor.getAttributeName().equals(ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME)) {
+            return (R) Integer.valueOf(counter.get());
+        }
+        return super.onGetAttribute(descriptor);
+    }
+
 
 }

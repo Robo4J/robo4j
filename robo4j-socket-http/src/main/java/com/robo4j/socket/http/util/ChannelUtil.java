@@ -19,13 +19,13 @@ package com.robo4j.socket.http.util;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.ByteChannel;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class SocketUtil {
+public final class ChannelUtil {
 	/**
 	 * reading buffer
 	 *
@@ -34,7 +34,7 @@ public final class SocketUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public static int readBuffer(SocketChannel channel, ByteBuffer buffer) throws IOException {
+	public static int readBuffer(ByteChannel channel, ByteBuffer buffer) throws IOException {
 		buffer.rewind();
 		int numberRead = channel.read(buffer);
 		int position = 0;
@@ -57,7 +57,7 @@ public final class SocketUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public static int writeBuffer(SocketChannel channel, ByteBuffer buffer) throws IOException {
+	public static int writeBuffer(ByteChannel channel, ByteBuffer buffer) throws IOException {
 		int numberWriten = 0;
 		int totalWritten = numberWriten;
 

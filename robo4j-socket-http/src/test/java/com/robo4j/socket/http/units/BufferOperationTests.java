@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http.util;
+package com.robo4j.socket.http.units;
 
 import org.junit.Test;
 
@@ -26,8 +26,6 @@ import java.util.Arrays;
  * @author Miro Wengner (@miragemiko)
  */
 public class BufferOperationTests {
-
-    private static final String ENCODED_IMAGE_SAMPLE_TXT = "encodedImageSample.txt";
 
     private static final String REQUEST_MESSAGE = "POST units/controller HTTP/1.1\n" +
 			"host: 0.0.0.0\n" +
@@ -50,8 +48,6 @@ public class BufferOperationTests {
 		System.out.println("Header first: " + header[0]);
 		System.out.println("Header full: " + Arrays.asList(header));
 		System.out.println("Body: " + headerAndBody[1]);
-
-
 	}
 
 
