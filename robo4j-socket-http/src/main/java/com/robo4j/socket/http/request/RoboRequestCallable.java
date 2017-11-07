@@ -68,11 +68,15 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 		this.factory = factory;
 	}
 
+
+
 	@Override
 	public RoboResponseProcess call() throws Exception {
-		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBuffer(bufferWrapper);
+		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBufferString(bufferWrapper);
 
-		final String[] headerLines = new String(wrapper.getHeader().array()).split("[\r\n]+");
+
+
+		final String[] headerLines = wrapper.getHeader();
 		final String firstLine = RoboHttpUtils.correctLine(headerLines[0]);
 		final String[] tokens = firstLine.split(Constants.HTTP_EMPTY_SEP);
 		final HttpMethod method = HttpMethod.getByName(tokens[HttpMessageUtil.METHOD_KEY_POSITION]);
@@ -139,7 +143,7 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 			case POST:
 				int length = Integer.valueOf(params.get(HttpHeaderFieldNames.CONTENT_LENGTH));
 				final StringBuilder jsonSB = new StringBuilder();
-				final String postValue = new String(wrapper.getBody().array());
+				final String postValue = wrapper.getBody();
 
 				// check header size
 				if (length == postValue.length()) {

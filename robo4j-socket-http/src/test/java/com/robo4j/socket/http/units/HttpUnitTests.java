@@ -22,6 +22,7 @@ import com.robo4j.socket.http.codec.SimpleCommandCodec;
 import com.robo4j.socket.http.units.test.codec.TestArrayDecoder;
 import com.robo4j.socket.http.units.test.codec.TestArrayEncoder;
 import com.robo4j.socket.http.units.test.enums.TestCommandEnum;
+import com.robo4j.socket.http.util.HttpUnitHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -193,7 +194,7 @@ public class HttpUnitTests {
 	@Test
 	public void testHttpCameraRealMessageImage() throws Exception {
 
-		String encodedImage = HttpUnitHelperMain.getExampleCamera();
+		String encodedImage = HttpUnitHelper.getExampleCamera();
 
 		final String jsonCammeraMessageCorrupted = "{ \"type\"  :  \"jpg\" ,  \"value\"   :  \"description\"  ,\"image\":\""
 				+ encodedImage + "\"}";

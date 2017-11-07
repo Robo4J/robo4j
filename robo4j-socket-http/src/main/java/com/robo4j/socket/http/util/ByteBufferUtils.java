@@ -42,60 +42,68 @@ public class ByteBufferUtils {
 		return result;
 	}
 
-	public static HttpByteWrapper getHttpByteWrapperByByteBuffer(BufferWrapper bufferWrapper) {
-		byte[] headerByteBuffer = new byte[bufferWrapper.getReadBytes()];
-
-		int numberOverWindow = headerByteBuffer.length % SIZE_WINDOW;
-		int endOfReading =bufferWrapper.getReadBytes() - numberOverWindow;
-
-		int position = 0;
-		int bPosition = 0;
-
-		boolean isHeaderDone = false;
-		int bWindowPosition = 0;
-		byte[] bWindow = new byte[SIZE_WINDOW];
-
-		while (!isHeaderDone && position < endOfReading) {
-			byte b = bufferWrapper.getBuffer().get(position);
-
-			if (bWindowPosition < (SIZE_WINDOW - 1)) {
-				if (b != CHAR_RETURN) {
-					bWindow[bWindowPosition] = b;
-					bWindowPosition++;
-				}
-
-				headerByteBuffer[bPosition] = b;
-				bPosition++;
-			} else {
-				if (b != CHAR_RETURN) {
-					bWindow[bWindowPosition] = b;
-					bWindowPosition = 0;
-				}
-
-				headerByteBuffer[bPosition] = b;
-				bPosition++;
-			}
-
-			if (isBWindow(END_WINDOW, bWindow)) {
-				isHeaderDone = true;
-				bPosition--;
-			}
-
-			position++;
-		}
-
-		int validHeaderSize = bPosition - SIZE_WINDOW;
-		int validBodySize = bufferWrapper.getReadBytes() - position;
-		ByteBuffer headerBuffer = ByteBuffer.wrap(Arrays.copyOf(headerByteBuffer, validHeaderSize));
-
-		byte[] bodyBytes = new byte[validBodySize];
-		for (int i = position; i < bufferWrapper.getReadBytes(); i++) {
-			bodyBytes[i - position] = bufferWrapper.getBuffer().get(i);
-		}
-		ByteBuffer bodyBuffer = ByteBuffer.wrap(bodyBytes);
-
-		return new HttpByteWrapper(headerBuffer, bodyBuffer);
+	public static HttpByteWrapper getHttpByteWrapperByByteBufferString(BufferWrapper bufferWrapper){
+		String[] headerAndBody = bufferWrapper.getMessage().split("\n\n");
+		String[] header = headerAndBody[0].split("[\r\n]+");
+		return new HttpByteWrapper(header, headerAndBody[1]);
 	}
+
+//	public static HttpByteWrapper getHttpByteWrapperByByteBuffer(BufferWrapper bufferWrapper) {
+//		final String message = bufferWrapper.getMessage();
+//		final int readBytes = bufferWrapper.getMessage().length();
+//		byte[] headerByteBuffer = new byte[message.length()];
+//
+//		int numberOverWindow = readBytes % SIZE_WINDOW;
+//		int endOfReading = readBytes - numberOverWindow;
+//
+//		int position = 0;
+//		int bPosition = 0;
+//
+//		boolean isHeaderDone = false;
+//		int bWindowPosition = 0;
+//		byte[] bWindow = new byte[SIZE_WINDOW];
+//
+//		while (!isHeaderDone && position < endOfReading) {
+//			byte b = bufferWrapper.getBuffer().get(position);
+//
+//			if (bWindowPosition < (SIZE_WINDOW - 1)) {
+//				if (b != CHAR_RETURN) {
+//					bWindow[bWindowPosition] = b;
+//					bWindowPosition++;
+//				}
+//
+//				headerByteBuffer[bPosition] = b;
+//				bPosition++;
+//			} else {
+//				if (b != CHAR_RETURN) {
+//					bWindow[bWindowPosition] = b;
+//					bWindowPosition = 0;
+//				}
+//
+//				headerByteBuffer[bPosition] = b;
+//				bPosition++;
+//			}
+//
+//			if (isBWindow(END_WINDOW, bWindow)) {
+//				isHeaderDone = true;
+//				bPosition--;
+//			}
+//
+//			position++;
+//		}
+//
+//		int validHeaderSize = bPosition - SIZE_WINDOW;
+//		int validBodySize = bufferWrapper.getReadBytes() - position;
+//		ByteBuffer headerBuffer = ByteBuffer.wrap(Arrays.copyOf(headerByteBuffer, validHeaderSize));
+//
+//		byte[] bodyBytes = new byte[validBodySize];
+//		for (int i = position; i < bufferWrapper.getReadBytes(); i++) {
+//			bodyBytes[i - position] = bufferWrapper.getBuffer().get(i);
+//		}
+//		ByteBuffer bodyBuffer = ByteBuffer.wrap(bodyBytes);
+//
+//		return new HttpByteWrapper(headerBuffer, bodyBuffer);
+//	}
 
 	public static byte[] validArray(byte[] array, int size) {
 		return validArray(array, 0, size);

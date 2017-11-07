@@ -26,6 +26,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -39,14 +41,14 @@ public class ByteBufferTests {
 			"Connection: keep-alive\r\n" +
 			"Content-Length: 23\r\n" +
 			"Postman-Token: 60b492c5-e7a9-6037-3021-42f8885542a9\r\n" +
-			"Cache-Control: no-cache\n" +
+			"Cache-Control: no-cache\r\n" +
 			"Origin: chrome-extension://fhbjgbiflinjbdggehcddcbncdddomop\r\n" +
 			"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36\r\n" +
 			"Content-Type: text/plain;charset=UTF-8\r\n" +
 			"Accept: */*\r\n" +
 			"Accept-Encoding: gzip, deflate, br\r\n" +
 			"Accept-Language: en-US,en;q=0.8\r\n" +
-			"\r\n" +
+			"\n" +
 			"{ \n" +
 			"  \"value\" : \"move\"\n" +
 			"}";
@@ -54,14 +56,15 @@ public class ByteBufferTests {
 
 	@Test
 	public void testPostmanMessage(){
-		ByteBuffer incomingBuffer = ByteBuffer.wrap(TEST_POSTMAN_STRING.getBytes());
-		BufferWrapper bufferWrapper = new BufferWrapper(incomingBuffer, TEST_POSTMAN_STRING.length());
-		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBuffer(bufferWrapper);
+		BufferWrapper bufferWrapper = new BufferWrapper(TEST_POSTMAN_STRING);
+		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBufferString(bufferWrapper);
 
-		String resultValue = new String(wrapper.getHeader().array());
-		String resultBody = new String(wrapper.getBody().array());
+		String[] headerResult = wrapper.getHeader();
+		String resultBody = wrapper.getBody();
 
-		System.out.println("VALUE: " + resultValue);
+		Assert.assertNotNull(headerResult);
+		Assert.assertNotNull(resultBody);
+		System.out.println("VALUE: " + Arrays.asList(headerResult));
 		System.out.println("BODY: " + resultBody);
 
 	}
@@ -78,15 +81,16 @@ public class ByteBufferTests {
 		String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, bodyMessage);
 
 		ByteBuffer incomingBuffer = ByteBuffer.wrap(postMessage.getBytes());
-		BufferWrapper bufferWrapper = new BufferWrapper(incomingBuffer, postMessage.length());
-		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBuffer(bufferWrapper);
+		BufferWrapper bufferWrapper = new BufferWrapper(postMessage);
+		HttpByteWrapper wrapper = ByteBufferUtils.getHttpByteWrapperByByteBufferString(bufferWrapper);
 
-		String resultHeader = new String(wrapper.getHeader().array());
-		String resultBody = new String(wrapper.getBody().array());
+		String[] resultHeader = wrapper.getHeader();
+		String resultBody = wrapper.getBody();
 
+		String httpHeaderString = Arrays.stream(resultHeader).collect(Collectors.joining("\r\n"));
 		Assert.assertNotNull(postMessage);
-		Assert.assertTrue(correctedPostHeader.length() == resultHeader.length());
-		Assert.assertTrue(correctedPostHeader.equals(new String(wrapper.getHeader().array())));
+		Assert.assertTrue(correctedPostHeader.length() == httpHeaderString.length());
+		Assert.assertTrue(correctedPostHeader.equals(httpHeaderString));
 		Assert.assertTrue(bodyMessage.equals(resultBody));
 	}
 

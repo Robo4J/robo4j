@@ -15,26 +15,25 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http.units;
+package com.robo4j.socket.http.util;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class BufferWrapper {
+public class FileUtil {
 
-	private String message;
-
-	public BufferWrapper(String message) {
-		this.message = message;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	@Override
-	public String toString() {
-		return "BufferWrapper{" + "message=" + message + '}';
-	}
+//    public static int readBuffer(AsynchronousFileChannel channel, ByteBuffer buffer) throws IOException {
+//        int numberRead = channel.read(buffer);
+//        int position = 0;
+//        int totalRead = numberRead;
+//        while (numberRead >= 0 && position <= buffer.capacity()) {
+//            numberRead = channel.read(buffer);
+//            if (numberRead > 0) {
+//                totalRead += numberRead;
+//            }
+//            position++;
+//        }
+//        return totalRead;
+//    }
 }

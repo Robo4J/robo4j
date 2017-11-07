@@ -90,7 +90,7 @@ public class AsyncHttpServerUnit extends RoboUnit<Object> {
 
                     ByteBuffer readBuffer = (ByteBuffer) actionInfo.get(CONSTANT_INFO_BUFFER);
                     readBuffer.flip();
-                    BufferWrapper bufferWrapper = new BufferWrapper(readBuffer, 0);
+                    BufferWrapper bufferWrapper = new BufferWrapper(CONSTANT_INFO_BUFFER);
 
                     final RoboRequestCallable callable = new RoboRequestCallable(serverUnit, bufferWrapper, factory);
                     final Future<RoboResponseProcess> futureResult = getContext().getScheduler().submit(callable);
