@@ -27,6 +27,7 @@ public class BufferWrapper {
 	private String message;
 
 	public BufferWrapper(Integer size, String message) {
+		this.size = size;
 		this.message = message;
 	}
 

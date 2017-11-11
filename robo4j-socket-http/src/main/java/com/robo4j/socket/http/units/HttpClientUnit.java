@@ -23,9 +23,9 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.socket.http.util.ChannelUtil;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
-import com.robo4j.socket.http.util.ChannelUtil;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+
 public class HttpClientUnit extends RoboUnit<Object> {
 	private static final String PROPERTY_KEEP_ALIVE = "keepAlive";
 	private InetSocketAddress address;
@@ -79,7 +80,7 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		try {
 			SocketChannel channel = SocketChannel.open(address);
 			channel.configureBlocking(blocking);
-			if(responseSize != null){
+			if(bufferCapacity != null){
 				channel.socket().setSendBufferSize(bufferCapacity);
 			}
 			channel.socket().setKeepAlive(keepAlive);
@@ -91,7 +92,8 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			buffer.put(bytes);
 			buffer.flip();
 
-			ChannelUtil.writeBuffer(channel, buffer);
+			int writtenBytes = ChannelUtil.writeBuffer(channel, buffer);
+			System.out.println(getClass().getSimpleName() + " onMessage, writtenBytes: " + writtenBytes + " bytes: " + bytes.length);
 
 			if (responseUnit != null && responseSize != null) {
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
@@ -101,7 +103,12 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			}
 
 			buffer.clear();
-			channel.close();
+			if(channel.isConnectionPending()){
+				channel.close();
+
+			} else {
+				System.out.println(getClass().getSimpleName() + " Still reading");
+			}
 		} catch (IOException e) {
 			SimpleLoggingUtil.error(getClass(), "not available:" + address + ", no worry I continue sending: " + e);
 			SimpleLoggingUtil.error(getClass(), "not available:" + address + ",  stack: " +

@@ -92,7 +92,7 @@ public enum HttpMethod implements Comparator<HttpMethod> {
 	CONNECT	("CONNECT");
 	// @formatter:on
 
-	private volatile static Map<String, HttpMethod> mapByName;
+	private static Map<String, HttpMethod> mapByName;
 	private final String name;
 
 	HttpMethod(String name) {

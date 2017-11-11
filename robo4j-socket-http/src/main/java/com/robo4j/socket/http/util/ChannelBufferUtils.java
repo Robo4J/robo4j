@@ -17,14 +17,16 @@
 
 package com.robo4j.socket.http.util;
 
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpByteWrapper;
+import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.units.BufferWrapper;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -32,10 +34,15 @@ import java.util.Arrays;
  */
 public class ChannelBufferUtils {
 
-	public static final int INIT_BUFFER_CAPACITY = 48;
+	public static final int INIT_BUFFER_CAPACITY = 4 * 4096;
 	public static final byte CHAR_NEW_LINE = 0x0A;
 	public static final byte CHAR_RETURN = 0x0D;
 	public static final byte[] END_WINDOW = { CHAR_NEW_LINE, CHAR_NEW_LINE };
+	private static final  ByteBuffer buffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
+	public static final String MESSAGE_HEADER_BODY_DELIMITER = "\n\n";
+	public static final String MESSAGE_HEADER_DELIMITER = "\r\n";
+
+
 
 	public static ByteBuffer copy(ByteBuffer source, int start, int end) {
 		ByteBuffer result = ByteBuffer.allocate(end);
@@ -48,32 +55,35 @@ public class ChannelBufferUtils {
 	public static HttpByteWrapper getHttpByteWrapperByByteBufferString(BufferWrapper bufferWrapper) {
 		final String[] headerAndBody = bufferWrapper.getMessage().split("\n\n");
 		final String[] header = headerAndBody[0].split("[\r\n]+");
-		return new HttpByteWrapper(header, headerAndBody[1]);
+
+		return new HttpByteWrapper(header, headerAndBody.length == 2 ? headerAndBody[1] : null);
 	}
 
 	public static BufferWrapper getBufferWrapperByChannel(ByteChannel channel) throws IOException {
-
-		ByteBuffer buffer = ByteBuffer.allocate(INIT_BUFFER_CAPACITY);
 		StringBuilder stringBuilder = new StringBuilder();
-		int readBytes = ChannelUtil.readBuffer(channel, buffer);
+		buffer.clear();
+		int readBytes = channel.read(buffer);
+		buffer.flip();
 		addToStringBuilder(stringBuilder, buffer, readBytes);
+		Integer messageSize =  getTotalMessageSizeWithBody(readBytes, stringBuilder);
 
+		System.out.println("Extracted Message size: " + messageSize);
+
+		int iteration = 1;
 		int totalReadBytes = readBytes;
-		while (!buffer.hasRemaining() && (readBytes % INIT_BUFFER_CAPACITY) == 0) {
-			int tmpSize = buffer.array().length;
-			buffer = ByteBuffer.allocate(tmpSize + INIT_BUFFER_CAPACITY);
-			totalReadBytes += readBytes;
-			readBytes = ChannelUtil.readBuffer(channel, buffer);
-			addToStringBuilder(stringBuilder, buffer, readBytes);
 
-		}
+		if(messageSize != null){
+			while (totalReadBytes < messageSize) {
 
-		System.out.println(ChannelBufferUtils.class.getSimpleName() + " totalReadBytes: " + totalReadBytes
-				+ " stringBuffer= " + stringBuilder.toString());
+				readBytes = channel.read(buffer);
+				buffer.flip();
+				addToStringBuilder(stringBuilder, buffer, readBytes);
+				iteration++;
 
-		if (buffer.remaining() == 0) {
-			SimpleLoggingUtil.error(ChannelBufferUtils.class, "buffer has a problem position: " + buffer.position()
-					+ " readBytes: " + readBytes + " limit: " + buffer.limit());
+				totalReadBytes+= readBytes;
+				buffer.clear();
+			}
+			System.out.println("ChannelBufferUtils getBufferWrapperByChannel iteration: " + iteration + " totalReadBytes: " + totalReadBytes);
 		}
 		buffer.clear();
 
@@ -97,13 +107,37 @@ public class ChannelBufferUtils {
 		return Arrays.equals(stopWindow, window);
 	}
 
-	private static void addToStringBuilder(StringBuilder sb, ByteBuffer buffer, int end) {
 
-		byte[] array = new byte[end];
-		for (int i = 0; i < end; i++) {
+	private static Integer getTotalMessageSizeWithBody(int fistReadBytes, StringBuilder sb){
+		final String[] headerAndBody = sb.toString().split(MESSAGE_HEADER_BODY_DELIMITER);
+		final String[] header = headerAndBody[0].split("[\r\n]+");
+		final String[] paramArray = Arrays.copyOfRange(header,1, header.length);
+
+
+		final Map<String, String> headerParams = new HashMap<>();
+
+		for (int i = 1; i < paramArray.length; i++) {
+			final String[] array = paramArray[i]
+					.split(HttpMessageUtil.getHttpSeparator(HttpMessageUtil.HTTP_HEADER_SEP));
+
+			String key = array[HttpMessageUtil.METHOD_KEY_POSITION].toLowerCase();
+			String value = array[HttpMessageUtil.URI_VALUE_POSITION].trim();
+			headerParams.put(key, value);
+		}
+
+		System.out.println("Extracted Header: " + headerParams);
+		String valueBodySize = headerParams.get(HttpHeaderFieldNames.CONTENT_LENGTH);
+
+		return valueBodySize != null ? headerAndBody[0].length() + MESSAGE_HEADER_BODY_DELIMITER.length() + Integer.valueOf(valueBodySize)  : null;
+	}
+
+	private static void addToStringBuilder(StringBuilder sb, ByteBuffer buffer, int size) {
+		byte[] array = new byte[size];
+		for (int i = 0; i < size; i++) {
 			array[i] = buffer.get(i);
 		}
-		sb.append(new String(array));
+		String message = new String(array);
+		sb.append(message);
 
 	}
 }

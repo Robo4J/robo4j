@@ -35,7 +35,6 @@ public final class ChannelUtil {
 	 * @throws IOException
 	 */
 	public static int readBuffer(ByteChannel channel, ByteBuffer buffer) throws IOException {
-		buffer.rewind();
 		int numberRead = channel.read(buffer);
 		int position = 0;
 		int totalRead = numberRead;
@@ -66,5 +65,17 @@ public final class ChannelUtil {
 			totalWritten += numberWriten;
 		}
 		return totalWritten;
+	}
+
+	/**
+	 * report time in moment M from start time
+	 *
+	 * @param message
+	 *            message
+	 * @param start
+	 *            start time
+	 */
+	public static void printMeasuredTime(Class<?> clazz, String message, long start) {
+		System.out.println(clazz.getSimpleName() + " "  +  message + " duration: " + (System.currentTimeMillis() - start));
 	}
 }

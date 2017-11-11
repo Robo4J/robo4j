@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 import com.robo4j.BlockingTrait;
 import com.robo4j.ConfigurationException;
+import com.robo4j.CriticalSectionTrait;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
@@ -64,7 +65,6 @@ import com.robo4j.util.StringConstants;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-@BlockingTrait
 public class HttpServerUnit extends RoboUnit<Object> {
 	private static final String DELIMITER = ",";
 	private static final int _DEFAULT_PORT = 8042;
@@ -156,19 +156,15 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	 */
 	private void server(final List<RoboReference<Object>> targetRefs) {
 		try {
-			/* selector is multiplexor to SelectableChannel */
-			// Selects a set of keys whose corresponding channels are ready for
-			// I/O operations
+
+			final Selector selector = Selector.open();
+
 			server = ServerSocketChannel.open();
 			server.configureBlocking(false);
 			server.bind(new InetSocketAddress(port));
 
-			// channelKeyMap.put(server, listenKey);
 
-			int ops = server.validOps();
-
-			final Selector selector = Selector.open();
-			server.register(selector, SelectionKey.OP_ACCEPT);
+			SelectionKey key = server.register(selector, SelectionKey.OP_ACCEPT);
 
 			while (activeStates.contains(getState())) {
 
@@ -189,11 +185,21 @@ public class HttpServerUnit extends RoboUnit<Object> {
 					selectedIterator.remove();
 
 					if (selectedKey.isAcceptable()) {
+						long starTime = System.currentTimeMillis();
 						accept(selector, selectedKey);
+						ChannelUtil.printMeasuredTime(getClass(), "accept", starTime);
+					} else if(selectedKey.isConnectable()){
+						long starTime = System.currentTimeMillis();
+						((SocketChannel)key.channel()).finishConnect();
+						ChannelUtil.printMeasuredTime(getClass(), "connectable", starTime);
 					} else if (selectedKey.isReadable()) {
+						long starTime = System.currentTimeMillis();
 						read(selector, selectedKey);
+						ChannelUtil.printMeasuredTime(getClass(), "read", starTime);
 					} else if (selectedKey.isWritable()) {
+						long starTime = System.currentTimeMillis();
 						write(targetRefs, selectedKey);
+						ChannelUtil.printMeasuredTime(getClass(), "write", starTime);
 					}
 				}
 			}
@@ -204,9 +210,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		setState(LifecycleState.STOPPED);
 	}
 
-	private long getMesuredTime(long start) {
-		return System.currentTimeMillis() - start;
-	}
+
 
 	private void accept(Selector selector, SelectionKey key) throws IOException {
 		ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
@@ -216,6 +220,40 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		channel.register(selector, SelectionKey.OP_READ);
 
 	}
+
+	private void read(Selector selector, SelectionKey key) throws IOException {
+
+		SocketChannel channel = (SocketChannel) key.channel();
+//		channel.socket().setKeepAlive(keepAlive);
+
+		System.out.println("before read capacity: " + bufferCapacity);
+		long startTime = System.currentTimeMillis();
+		final BufferWrapper bufferWrapper = ChannelBufferUtils.getBufferWrapperByChannel(channel);
+		ChannelUtil.printMeasuredTime(getClass(), " bufferWrapper: ", startTime);
+
+		startTime = System.currentTimeMillis();
+		HttpUriRegister.getInstance().updateUnits(getContext());
+		final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
+		ChannelUtil.printMeasuredTime(getClass(), " registryUpdate: ", startTime);
+
+
+		// TODO: (miro) separate header and body
+		startTime = System.currentTimeMillis();
+		final RoboRequestCallable callable = new RoboRequestCallable(this, bufferWrapper, factory);
+		ChannelUtil.printMeasuredTime(getClass(), " callable message process: ", startTime);
+
+		final Future<RoboResponseProcess> futureResult = getContext().getScheduler().submit(callable);
+
+		try {
+			RoboResponseProcess result = futureResult.get();
+			outBuffers.put(key, result);
+		} catch (InterruptedException | ExecutionException e) {
+			SimpleLoggingUtil.error(getClass(), "read" + e);
+		}
+
+		channel.register(selector, SelectionKey.OP_WRITE);
+	}
+
 
 	private void write(List<RoboReference<Object>> targetRefs, SelectionKey key) throws IOException {
 		SocketChannel channel = (SocketChannel) key.channel();
@@ -279,31 +317,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		result.put(message.getBytes());
 		result.flip();
 		return result;
-	}
-
-	private void read(Selector selector, SelectionKey key) throws IOException {
-
-		SocketChannel channel = (SocketChannel) key.channel();
-		channel.socket().setKeepAlive(keepAlive);
-
-		HttpUriRegister.getInstance().updateUnits(getContext());
-		final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
-
-		final BufferWrapper bufferWrapper = ChannelBufferUtils.getBufferWrapperByChannel(channel);
-
-		// TODO: (miro) separate header and body
-		final RoboRequestCallable callable = new RoboRequestCallable(this, bufferWrapper, factory);
-
-		final Future<RoboResponseProcess> futureResult = getContext().getScheduler().submit(callable);
-
-		try {
-			RoboResponseProcess result = futureResult.get();
-			outBuffers.put(key, result);
-		} catch (InterruptedException | ExecutionException e) {
-			SimpleLoggingUtil.error(getClass(), "read" + e);
-		}
-
-		channel.register(selector, SelectionKey.OP_WRITE);
 	}
 
 	private boolean validatePackages(String packages) {

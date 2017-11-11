@@ -24,7 +24,6 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.socket.http.units.test.CameraImageConsumerTestUnit;
 import com.robo4j.socket.http.units.test.CameraImageProducerTestUnit;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.InputStream;
@@ -34,37 +33,43 @@ import java.io.InputStream;
  * @author Miro Wengner (@miragemiko)
  */
 public class CameraImageProducerConsumerTests {
-    AttributeDescriptor<Integer> ATTRIBUTE_NUMBER_OF_IMAGES= new DefaultAttributeDescriptor<>(Integer.class, CameraImageProducerTestUnit.ATTRIBUTE_NUMBER_OF_IMAGES_NAME);
-    AttributeDescriptor<Integer> ATTRIBUTE_COUNTER = new DefaultAttributeDescriptor<>(Integer.class, CameraImageConsumerTestUnit.ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME);
+	AttributeDescriptor<Integer> ATTRIBUTE_NUMBER_OF_IMAGES = new DefaultAttributeDescriptor<>(Integer.class,
+			CameraImageProducerTestUnit.ATTRIBUTE_NUMBER_OF_IMAGES_NAME);
+	AttributeDescriptor<Integer> ATTRIBUTE_COUNTER = new DefaultAttributeDescriptor<>(Integer.class,
+			CameraImageConsumerTestUnit.ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME);
 
-    @Ignore
-    @Test
-    public void simpleTest() throws  Exception{
+	@Test
+	public void simpleTest() throws Exception {
 
-        RoboBuilder builderProducer = new RoboBuilder(Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemTest.xml"));
-        InputStream clientConfigInputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("robo_camera_producer_test.xml");
-        builderProducer.add(clientConfigInputStream);
-        RoboContext producerSystem = builderProducer.build();
+		RoboBuilder builderProducer = new RoboBuilder(
+				Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemTest.xml"));
+		InputStream clientConfigInputStream = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream("robo_camera_producer_test.xml");
+		builderProducer.add(clientConfigInputStream);
+		RoboContext producerSystem = builderProducer.build();
 
-        RoboBuilder builderConsumer = new RoboBuilder(Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemTest.xml"));
-        InputStream serverConfigInputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("robo_camara_consumer_test.xml");
-        builderConsumer.add(serverConfigInputStream);
-        RoboContext consumerSystem = builderConsumer.build();
+		RoboBuilder builderConsumer = new RoboBuilder(
+				Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemTest.xml"));
+		InputStream serverConfigInputStream = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream("robo_camara_consumer_test.xml");
+		builderConsumer.add(serverConfigInputStream);
+		RoboContext consumerSystem = builderConsumer.build();
 
-        consumerSystem.start();
-        producerSystem.start();
+		consumerSystem.start();
+		producerSystem.start();
 
-        RoboReference<CameraImageProducerConsumerTests> imageProducer = producerSystem.getReference("imageController");
-        RoboReference<CameraImageConsumerTestUnit> imageConsumer = consumerSystem.getReference("imageProcessor");
+		RoboReference<CameraImageProducerConsumerTests> imageProducer = producerSystem.getReference("imageController");
+		RoboReference<CameraImageConsumerTestUnit> imageConsumer = consumerSystem.getReference("imageProcessor");
 
-        Integer numberOfSentImages = imageProducer.getAttribute(ATTRIBUTE_NUMBER_OF_IMAGES).get() - 1;
-        while(!imageConsumer.getAttribute(ATTRIBUTE_COUNTER).get().equals(numberOfSentImages) ){
-        }
-        System.out.println("sendImages: " + (numberOfSentImages + 1));
-        producerSystem.shutdown();
-        consumerSystem.shutdown();
 
-        System.out.println("Press any key to End...");
+		Integer numberOfImages = imageProducer.getAttribute(ATTRIBUTE_NUMBER_OF_IMAGES).get();
+		while (imageConsumer.getAttribute(ATTRIBUTE_COUNTER).get() < numberOfImages) {
+		}
+		System.out.println("sendImages: " + numberOfImages);
+		producerSystem.shutdown();
+		consumerSystem.shutdown();
 
-    }
+		System.out.println("Press any key to End...");
+
+	}
 }

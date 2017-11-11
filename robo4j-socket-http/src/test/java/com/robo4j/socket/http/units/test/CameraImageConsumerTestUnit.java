@@ -51,7 +51,7 @@ public class CameraImageConsumerTestUnit extends RoboUnit<CameraMessage> {
     public void onMessage(CameraMessage message) {
         if(message.getImage() != null){
             final byte[] bytes = Base64.getDecoder().decode(message.getImage());
-            System.out.println(getClass().getSimpleName() + " Delivered image: " + counter.getAndIncrement() + " size: " + bytes.length + " imageSize: " + message.getImage().length());
+            System.out.println(getClass().getSimpleName() + " Delivered image: " + counter.incrementAndGet() + " size: " + bytes.length + " imageSize: " + message.getImage().length());
         } else {
             SimpleLoggingUtil.error(getClass(), "no imageView: " + counter.getAndIncrement());
         }
