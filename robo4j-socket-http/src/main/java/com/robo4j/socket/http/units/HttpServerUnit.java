@@ -38,9 +38,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import com.robo4j.BlockingTrait;
 import com.robo4j.ConfigurationException;
-import com.robo4j.CriticalSectionTrait;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
@@ -66,8 +64,6 @@ import com.robo4j.util.StringConstants;
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpServerUnit extends RoboUnit<Object> {
-	private static final String DELIMITER = ",";
-	private static final int _DEFAULT_PORT = 8042;
 	private static final int DEFAULT_BUFFER_CAPACITY = 32 * 1024;
 	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
 	private static final HttpCodecRegistry CODEC_REGISTRY = new HttpCodecRegistry();
@@ -92,8 +88,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
 		/* target is always initiated as the list */
-		target = Arrays.asList(configuration.getString(PROPERTY_TARGET, StringConstants.EMPTY).split(DELIMITER));
-		port = configuration.getInteger(PROPERTY_PORT, _DEFAULT_PORT);
+		target = Arrays.asList(configuration.getString(PROPERTY_TARGET, StringConstants.EMPTY)
+				.split(RoboHttpUtils.CHAR_COMMA.toString()));
+		port = configuration.getInteger(PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
 		bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
 		keepAlive = configuration.getBoolean(PROPERTY_KEEP_ALIVE, false);
 
@@ -163,7 +160,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			server.configureBlocking(false);
 			server.bind(new InetSocketAddress(port));
 
-
 			SelectionKey key = server.register(selector, SelectionKey.OP_ACCEPT);
 
 			while (activeStates.contains(getState())) {
@@ -188,9 +184,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 						long starTime = System.currentTimeMillis();
 						accept(selector, selectedKey);
 						ChannelUtil.printMeasuredTime(getClass(), "accept", starTime);
-					} else if(selectedKey.isConnectable()){
+					} else if (selectedKey.isConnectable()) {
 						long starTime = System.currentTimeMillis();
-						((SocketChannel)key.channel()).finishConnect();
+						((SocketChannel) key.channel()).finishConnect();
 						ChannelUtil.printMeasuredTime(getClass(), "connectable", starTime);
 					} else if (selectedKey.isReadable()) {
 						long starTime = System.currentTimeMillis();
@@ -210,8 +206,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		setState(LifecycleState.STOPPED);
 	}
 
-
-
 	private void accept(Selector selector, SelectionKey key) throws IOException {
 		ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
 		SocketChannel channel = serverChannel.accept();
@@ -224,7 +218,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private void read(Selector selector, SelectionKey key) throws IOException {
 
 		SocketChannel channel = (SocketChannel) key.channel();
-//		channel.socket().setKeepAlive(keepAlive);
+		// channel.socket().setKeepAlive(keepAlive);
 
 		System.out.println("before read capacity: " + bufferCapacity);
 		long startTime = System.currentTimeMillis();
@@ -235,7 +229,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		HttpUriRegister.getInstance().updateUnits(getContext());
 		final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
 		ChannelUtil.printMeasuredTime(getClass(), " registryUpdate: ", startTime);
-
 
 		// TODO: (miro) separate header and body
 		startTime = System.currentTimeMillis();
@@ -253,7 +246,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 		channel.register(selector, SelectionKey.OP_WRITE);
 	}
-
 
 	private void write(List<RoboReference<Object>> targetRefs, SelectionKey key) throws IOException {
 		SocketChannel channel = (SocketChannel) key.channel();

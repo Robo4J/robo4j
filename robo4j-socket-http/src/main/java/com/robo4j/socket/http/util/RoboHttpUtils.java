@@ -18,6 +18,7 @@ package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.ProtocolType;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.request.RoboBasicMapEntry;
 import com.robo4j.socket.http.units.Constants;
@@ -46,7 +47,7 @@ public final class RoboHttpUtils {
 	public static final CharSequence CHAR_SQUARE_BRACKET_LEFT = "[";
 	public static final CharSequence CHAR_SQUARE_BRACKET_RIGHT = "]";
 	public static final CharSequence CHAR_COMMA = ",";
-	public static final int _DEFAULT_PORT = 8042;
+	public static final int DEFAULT_PORT = 8042;
 	public static final String HTTP_TARGET_UNITS = "targetUnits";
 
 	public static String setHeader(String responseCode, int length) throws IOException {
@@ -97,10 +98,13 @@ public final class RoboHttpUtils {
 	}
 
 	public static String createRequest(HttpMethod method, String host, String uri, String message) {
-		//@formatter:off
-		final String header = createHeader(method, host, uri, message);
+		final String header = createHeader(method, host, uri, message.length());
 		return createRequest(header, message);
-		//@formatter:on
+	}
+
+	public static String createRequest(HttpMethod method, ProtocolType protocol, String host, String uri, String message){
+		final String header = createHeader(method, protocol, host, uri, message.length());
+		return createRequest(header, message);
 	}
 
 	public static String createRequest(String header, String message) {
@@ -111,12 +115,24 @@ public final class RoboHttpUtils {
 		//@formatter:on
 	}
 
-	public static String createHeader(HttpMethod method, String host, String uri, String message) {
-		return createHeaderFirstLine(method, uri).concat(createRequestHeader(host, message.length()));
+	public static String createHeader(HttpMethod method, ProtocolType protocol, String host, String path, int length ){
+		return createHeaderFirstLine(method, protocol, host, path)
+				.concat(createRequestHeader(host, length));
+	}
+
+	public static String createHeader(HttpMethod method, String host, String uri, int length) {
+		return createHeaderFirstLine(method, uri)
+				.concat(createRequestHeader(host, length));
 	}
 
 	public static String createHeaderFirstLine(HttpMethod method, String uri) {
 		return HttpFirstLineBuilder.Build(method.getName()).add(uri).add(HTTP_VERSION).build();
+	}
+
+	public static String createHeaderFirstLine(HttpMethod method, ProtocolType protocol, String host, String path){
+		return HttpFirstLineBuilder.Build(method.getName())
+				.addProtocolAndHostAndPath(protocol, host, path)
+				.add(HTTP_VERSION).build();
 	}
 
 	public static String createGetRequest(String host, String message) {

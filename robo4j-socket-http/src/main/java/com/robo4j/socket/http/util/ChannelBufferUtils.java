@@ -28,6 +28,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.robo4j.socket.http.util.HttpMessageUtil.HTTP_HEADER_BODY_DELIMITER;
+import static com.robo4j.socket.http.util.HttpMessageUtil.HTTP_HEADER_SEP;
+import static com.robo4j.socket.http.util.HttpMessageUtil.NEXT_LINE;
+import static com.robo4j.socket.http.util.HttpMessageUtil.POSITION_BODY;
+import static com.robo4j.socket.http.util.HttpMessageUtil.POSITION_HEADER;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -38,11 +44,7 @@ public class ChannelBufferUtils {
 	public static final byte CHAR_NEW_LINE = 0x0A;
 	public static final byte CHAR_RETURN = 0x0D;
 	public static final byte[] END_WINDOW = { CHAR_NEW_LINE, CHAR_NEW_LINE };
-	private static final  ByteBuffer buffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
-	public static final String MESSAGE_HEADER_BODY_DELIMITER = "\n\n";
-	public static final String MESSAGE_HEADER_DELIMITER = "\r\n";
-
-
+	private static final ByteBuffer buffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
 
 	public static ByteBuffer copy(ByteBuffer source, int start, int end) {
 		ByteBuffer result = ByteBuffer.allocate(end);
@@ -53,37 +55,31 @@ public class ChannelBufferUtils {
 	}
 
 	public static HttpByteWrapper getHttpByteWrapperByByteBufferString(BufferWrapper bufferWrapper) {
-		final String[] headerAndBody = bufferWrapper.getMessage().split("\n\n");
-		final String[] header = headerAndBody[0].split("[\r\n]+");
+		final String[] headerAndBody = bufferWrapper.getMessage().split(HTTP_HEADER_BODY_DELIMITER);
+		final String[] header = headerAndBody[POSITION_HEADER].split("[" + NEXT_LINE + "]+");
 
-		return new HttpByteWrapper(header, headerAndBody.length == 2 ? headerAndBody[1] : null);
+		return new HttpByteWrapper(header, headerAndBody.length == 2 ? headerAndBody[POSITION_BODY] : null);
 	}
 
 	public static BufferWrapper getBufferWrapperByChannel(ByteChannel channel) throws IOException {
 		StringBuilder stringBuilder = new StringBuilder();
-		buffer.clear();
 		int readBytes = channel.read(buffer);
 		buffer.flip();
 		addToStringBuilder(stringBuilder, buffer, readBytes);
-		Integer messageSize =  getTotalMessageSizeWithBody(readBytes, stringBuilder);
+		Integer messageSize = getTotalMessageSizeWithBody(stringBuilder);
 
-		System.out.println("Extracted Message size: " + messageSize);
-
-		int iteration = 1;
 		int totalReadBytes = readBytes;
 
-		if(messageSize != null){
+		if (messageSize != null) {
 			while (totalReadBytes < messageSize) {
-
 				readBytes = channel.read(buffer);
 				buffer.flip();
 				addToStringBuilder(stringBuilder, buffer, readBytes);
-				iteration++;
 
-				totalReadBytes+= readBytes;
+				totalReadBytes += readBytes;
 				buffer.clear();
 			}
-			System.out.println("ChannelBufferUtils getBufferWrapperByChannel iteration: " + iteration + " totalReadBytes: " + totalReadBytes);
+
 		}
 		buffer.clear();
 
@@ -107,28 +103,27 @@ public class ChannelBufferUtils {
 		return Arrays.equals(stopWindow, window);
 	}
 
-
-	private static Integer getTotalMessageSizeWithBody(int fistReadBytes, StringBuilder sb){
-		final String[] headerAndBody = sb.toString().split(MESSAGE_HEADER_BODY_DELIMITER);
-		final String[] header = headerAndBody[0].split("[\r\n]+");
-		final String[] paramArray = Arrays.copyOfRange(header,1, header.length);
-
+	private static Integer getTotalMessageSizeWithBody(StringBuilder sb) {
+		final String[] headerAndBody = sb.toString().split(HTTP_HEADER_BODY_DELIMITER);
+		final String[] header = headerAndBody[0].split("[" + NEXT_LINE + "]+");
+		final String[] paramArray = Arrays.copyOfRange(header, 1, header.length);
 
 		final Map<String, String> headerParams = new HashMap<>();
 
 		for (int i = 1; i < paramArray.length; i++) {
 			final String[] array = paramArray[i]
-					.split(HttpMessageUtil.getHttpSeparator(HttpMessageUtil.HTTP_HEADER_SEP));
+					.split(HttpMessageUtil.getHttpSeparator(HTTP_HEADER_SEP));
 
 			String key = array[HttpMessageUtil.METHOD_KEY_POSITION].toLowerCase();
 			String value = array[HttpMessageUtil.URI_VALUE_POSITION].trim();
 			headerParams.put(key, value);
 		}
 
-		System.out.println("Extracted Header: " + headerParams);
 		String valueBodySize = headerParams.get(HttpHeaderFieldNames.CONTENT_LENGTH);
 
-		return valueBodySize != null ? headerAndBody[0].length() + MESSAGE_HEADER_BODY_DELIMITER.length() + Integer.valueOf(valueBodySize)  : null;
+		return valueBodySize != null
+				? headerAndBody[POSITION_HEADER].length() + HTTP_HEADER_BODY_DELIMITER.length() + Integer.valueOf(valueBodySize)
+				: null;
 	}
 
 	private static void addToStringBuilder(StringBuilder sb, ByteBuffer buffer, int size) {

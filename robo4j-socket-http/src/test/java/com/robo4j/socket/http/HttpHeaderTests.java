@@ -17,6 +17,7 @@
 
 package com.robo4j.socket.http;
 
+import com.robo4j.socket.http.util.RoboHttpUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,15 +36,18 @@ public class HttpHeaderTests {
 	private static final String CONST_CACHE_CONTROL = "keep-alive";
 	private static final String CONST_USER_AGENT = "Robo4J-client";
 
+	// formatter:off
+	private static final HttpHeaderBuilder TEST_HEADER_BUILDER = HttpHeaderBuilder.Build()
+			.add(HttpHeaderFieldNames.HOST, "127.0.0.1").add(HttpHeaderFieldNames.CONNECTION, CONST_CACHE_CONTROL)
+			.add(HttpHeaderFieldNames.CACHE_CONTROL, "no-cache").add(HttpHeaderFieldNames.USER_AGENT, CONST_USER_AGENT)
+			.add(HttpHeaderFieldNames.ACCEPT, "*/*")
+			.add(HttpHeaderFieldNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
+			.add(HttpHeaderFieldNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8");
+	// formatter:on
+
 	@Test
 	public void simpleHttpHeader() {
-		// formatter:off
-		final String header = HttpHeaderBuilder.Build().add(HttpHeaderFieldNames.HOST, "127.0.0.1")
-				.add(HttpHeaderFieldNames.CONNECTION, CONST_CACHE_CONTROL).add(HttpHeaderFieldNames.CACHE_CONTROL, "no-cache")
-				.add(HttpHeaderFieldNames.USER_AGENT, CONST_USER_AGENT).add(HttpHeaderFieldNames.ACCEPT, "*/*")
-				.add(HttpHeaderFieldNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
-				.add(HttpHeaderFieldNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8").build();
-		// formatter:on
+		final String header = TEST_HEADER_BUILDER.build();
 		Assert.assertNotNull(header);
 		Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE).length, 7);
 		Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[1],
@@ -52,4 +56,15 @@ public class HttpHeaderTests {
 				HttpHeaderBuilder.Build().add(HttpHeaderFieldNames.USER_AGENT, CONST_USER_AGENT).build().trim());
 	}
 
+	@Test
+	public void characterParser() {
+		Assert.assertTrue("[".equals(HttpMessageUtil.getHttpSeparator(13)));
+		Assert.assertTrue("]".equals(HttpMessageUtil.getHttpSeparator(14)));
+	}
+
+	@Test
+	public void extractHeaderParameter() {
+		String postRequest = RoboHttpUtils.createRequest(HttpMethod.POST, ProtocolType.HTTP, "127.0.0.1", "controller", "message");
+		System.out.println("HEADER: " + postRequest);
+	}
 }

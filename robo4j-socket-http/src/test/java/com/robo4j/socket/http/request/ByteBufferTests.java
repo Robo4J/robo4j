@@ -76,7 +76,7 @@ public class ByteBufferTests {
 		String client = "http://0.0.0.0:8080";
 		String clientUri = "/test";
 
-		String postHeader = RoboHttpUtils.createHeader(HttpMethod.POST, client, clientUri, bodyMessage);
+		String postHeader = RoboHttpUtils.createHeader(HttpMethod.POST, client, clientUri, bodyMessage.length());
 		String correctedPostHeader = postHeader.trim();
 		String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, bodyMessage);
 

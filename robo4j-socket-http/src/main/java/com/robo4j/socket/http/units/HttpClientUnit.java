@@ -59,7 +59,7 @@ public class HttpClientUnit extends RoboUnit<Object> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
 		String confAddress = configuration.getString("address", null);
-		int confPort = configuration.getInteger("port", RoboHttpUtils._DEFAULT_PORT);
+		int confPort = configuration.getInteger("port", RoboHttpUtils.DEFAULT_PORT);
 		responseUnit = configuration.getString("responseUnit", null);
 		responseSize = configuration.getInteger("responseSize", null);
 		bufferCapacity = configuration.getInteger("bufferCapacity", null);

@@ -26,6 +26,7 @@ package com.robo4j.socket.http.util;
 public final class HttpMessageUtil {
 
 	public static final String SPACE = "\u0020";
+	public static final String HTTP_HEADER_BODY_DELIMITER = "\n\n";
 	public static final String NEXT_LINE = "\r\n";
 	public static final String COLON = ":";
 
@@ -34,6 +35,7 @@ public final class HttpMessageUtil {
 	 */
 	private static final String HTTP_SEPARATORS = " ,;=()<>@:\\\"/[]?{}\t";
 
+	public static final int POSITION_HEADER = 0, POSITION_BODY = 1;
 	public static final int METHOD_KEY_POSITION = 0, URI_VALUE_POSITION = 1, VERSION_POSITION = 2, HTTP_HEADER_SEP = 9;
 
 	public static String getHttpSeparator(int position) {
