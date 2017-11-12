@@ -29,7 +29,7 @@ import java.nio.channels.SocketChannel;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class AcceptSelectorHandler implements SelectorHendler {
+public class AcceptSelectorHandler implements SelectorHandler {
 
 	private final SelectionKey key;
 	private final int bufferCapacity;

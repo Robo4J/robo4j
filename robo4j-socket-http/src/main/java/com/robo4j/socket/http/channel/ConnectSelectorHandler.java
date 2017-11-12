@@ -28,7 +28,7 @@ import java.nio.channels.SocketChannel;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class ConnectSelectorHandler implements SelectorHendler {
+public class ConnectSelectorHandler implements SelectorHandler {
 
     private final SelectionKey key;
 

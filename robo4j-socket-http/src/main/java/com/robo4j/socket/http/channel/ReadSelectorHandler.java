@@ -38,7 +38,7 @@ import java.util.concurrent.Future;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class ReadSelectorHandler implements SelectorHendler {
+public class ReadSelectorHandler implements SelectorHandler {
 
 	private final RoboUnit<?> roboUnit;
 	private final HttpCodecRegistry codecRegistry;

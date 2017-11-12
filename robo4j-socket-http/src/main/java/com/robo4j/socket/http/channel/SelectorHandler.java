@@ -23,7 +23,7 @@ import java.nio.channels.SelectionKey;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public interface SelectorHendler {
+public interface SelectorHandler {
 
 	SelectionKey handle();
 }

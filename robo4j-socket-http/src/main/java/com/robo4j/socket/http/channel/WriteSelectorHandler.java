@@ -38,7 +38,7 @@ import java.util.Map;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class WriteSelectorHandler implements SelectorHendler {
+public class WriteSelectorHandler implements SelectorHandler {
 
 	private final RoboUnit<?> roboUnit;
 	private final List<RoboReference<Object>> targetRefs;

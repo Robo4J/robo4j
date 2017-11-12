@@ -93,6 +93,7 @@ public class InboundSocketHandler implements SocketHandler {
 			socketChannel.bind(new InetSocketAddress(properties.getIntSafe("port")));
 
 			SelectionKey key = socketChannel.register(selector, SelectionKey.OP_ACCEPT);
+            final HttpCodecRegistry codecRegistry = properties.getPropertyByClassSafe(PROPERTY_CODEC_REGISTRY);
 
 			while (active) {
 
@@ -113,19 +114,13 @@ public class InboundSocketHandler implements SocketHandler {
 					selectedIterator.remove();
 
 					if (selectedKey.isAcceptable()) {
-                        AcceptSelectorHandler handler = new AcceptSelectorHandler(selectedKey, properties.getIntSafe(PROPERTY_BUFFER_CAPACITY));
-                        handler.handle();
+                        handleSelectorHandler(new AcceptSelectorHandler(selectedKey, properties.getIntSafe(PROPERTY_BUFFER_CAPACITY)));
 					} else if (selectedKey.isConnectable()) {
-                        ConnectSelectorHandler handler = new ConnectSelectorHandler(selectedKey);
-                        handler.handle();
+                        handleSelectorHandler(new ConnectSelectorHandler(selectedKey));
 					} else if (selectedKey.isReadable()) {
-						final HttpCodecRegistry codecRegistry = properties
-								.getPropertyByClassSafe(PROPERTY_CODEC_REGISTRY);
-                        ReadSelectorHandler handler =  new ReadSelectorHandler(roboUnit, codecRegistry, outBuffers, selectedKey);
-                        handler.handle();
+                        handleSelectorHandler(new ReadSelectorHandler(roboUnit, codecRegistry, outBuffers, selectedKey));
 					} else if (selectedKey.isWritable()) {
-                        WriteSelectorHandler handler = new WriteSelectorHandler(roboUnit, targetRefs, outBuffers, selectedKey);
-                        handler.handle();
+                        handleSelectorHandler(new WriteSelectorHandler(roboUnit, targetRefs, outBuffers, selectedKey));
 					}
 				}
 			}
@@ -134,4 +129,9 @@ public class InboundSocketHandler implements SocketHandler {
 		}
 		SimpleLoggingUtil.debug(getClass(), "stopped port: " + properties.getIntSafe("port"));
 	}
+
+	private void handleSelectorHandler(SelectorHandler handler){
+	    handler.handle();
+    }
+
 }
