@@ -17,17 +17,16 @@
 
 package com.robo4j.socket.http.request;
 
-import com.robo4j.socket.http.HttpByteWrapper;
+import com.robo4j.socket.http.HttpMessageDescriptor;
 import com.robo4j.socket.http.HttpMethod;
-import com.robo4j.socket.http.units.BufferWrapper;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -36,6 +35,10 @@ import java.util.stream.Collectors;
 public class ByteBufferTests {
 
 	private static final String TEST_STRING = "Accept-Language: en-US,en;q=0.8\r\n\r\n{";
+	private static final String TEST_POSTMAN_MESSAGE = "\r\n" +
+			"{ \n" +
+			"  \"value\" : \"move\"\n" +
+			"}";
 	private static final String TEST_POSTMAN_STRING = "POST /controller HTTP/1.1\r\n" +
 			"Host: localhost:8042\r\n" +
 			"Connection: keep-alive\r\n" +
@@ -48,24 +51,19 @@ public class ByteBufferTests {
 			"Accept: */*\r\n" +
 			"Accept-Encoding: gzip, deflate, br\r\n" +
 			"Accept-Language: en-US,en;q=0.8\r\n" +
-			"\n" +
-			"{ \n" +
-			"  \"value\" : \"move\"\n" +
-			"}";
+			TEST_POSTMAN_MESSAGE;
 	private static final ByteBuffer TEST_BYTE_BUFFER = ByteBuffer.wrap(TEST_STRING.getBytes());
 
 	@Test
 	public void testPostmanMessage(){
-		BufferWrapper bufferWrapper = new BufferWrapper(TEST_POSTMAN_STRING.length(), TEST_POSTMAN_STRING);
-		HttpByteWrapper wrapper = ChannelBufferUtils.getHttpByteWrapperByByteBufferString(bufferWrapper);
+		HttpMessageDescriptor messageDescriptor = ChannelBufferUtils.extractDescriptorByStringMessage(TEST_POSTMAN_STRING);
+		messageDescriptor.setMessage(TEST_POSTMAN_MESSAGE);
 
-		String[] headerResult = wrapper.getHeader();
-		String resultBody = wrapper.getBody();
-
-		Assert.assertNotNull(headerResult);
-		Assert.assertNotNull(resultBody);
-		System.out.println("VALUE: " + Arrays.asList(headerResult));
-		System.out.println("BODY: " + resultBody);
+		Assert.assertNotNull(messageDescriptor.getHeader());
+		Assert.assertTrue(!messageDescriptor.getHeader().isEmpty());
+		Assert.assertNotNull(messageDescriptor.getMessage());
+		System.out.println("HEADER: " + messageDescriptor.getHeader());
+		System.out.println("BODY: " + messageDescriptor.getMessage());
 
 	}
 
@@ -74,23 +72,18 @@ public class ByteBufferTests {
 
 		String bodyMessage = "this is test message";
 		String client = "http://0.0.0.0:8080";
-		String clientUri = "/test";
+		String clientPath = "/test";
 
-		String postHeader = RoboHttpUtils.createHeader(HttpMethod.POST, client, clientUri, bodyMessage.length());
-		String correctedPostHeader = postHeader.trim();
-		String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, bodyMessage);
+		String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientPath, bodyMessage);
 
-		BufferWrapper bufferWrapper = new BufferWrapper(postMessage.length(), postMessage);
-		HttpByteWrapper wrapper = ChannelBufferUtils.getHttpByteWrapperByByteBufferString(bufferWrapper);
+		HttpMessageDescriptor messageDescriptor = ChannelBufferUtils.extractDescriptorByStringMessage(postMessage);
+		messageDescriptor.setMessage(bodyMessage);
 
-		String[] resultHeader = wrapper.getHeader();
-		String resultBody = wrapper.getBody();
 
-		String httpHeaderString = Arrays.stream(resultHeader).collect(Collectors.joining("\r\n"));
 		Assert.assertNotNull(postMessage);
-		Assert.assertTrue(correctedPostHeader.length() == httpHeaderString.length());
-		Assert.assertTrue(correctedPostHeader.equals(httpHeaderString));
-		Assert.assertTrue(bodyMessage.equals(resultBody));
+		Assert.assertTrue(postMessage.length() == messageDescriptor.getLength());
+		Assert.assertTrue(clientPath.equals(messageDescriptor.getPath()));
+		Assert.assertTrue(bodyMessage.equals(messageDescriptor.getMessage()));
 	}
 
 	@Test
@@ -121,5 +114,24 @@ public class ByteBufferTests {
 		byte[] resBytes = ChannelBufferUtils.validArray(tmpBytes, bPosition);
 		ByteBuffer resultBuffer = ByteBuffer.wrap(resBytes);
 		Assert.assertTrue(TEST_BYTE_BUFFER.capacity() == resultBuffer.capacity() + ChannelBufferUtils.END_WINDOW.length);
+	}
+
+	@Test
+	public void test(){
+		Pattern pattern = Pattern.compile("^(.*)[\\r\\n{2}]|[\\n\\n](.*)$");
+
+		String one = "some\r\n\r\nother";
+		String two = "some\n\nother";
+
+		Matcher matcher1 = pattern.matcher(one);
+		Matcher matcher2 = pattern.matcher(two);
+
+//		Assert.assertTrue(matcher1.find());
+//		Assert.assertTrue(matcher2.find());
+//		Assert.assertTrue(matcher2.groupCount() == matcher1.groupCount());
+//		Assert.assertTrue(matcher2.groupCount() == matcher1.groupCount());
+		System.out.println("ONE: " + matcher1.find() + " group: " + matcher1.groupCount() + " 1: " + matcher1.group(1) + " 2: " + matcher1.group(0));
+		System.out.println("TWO: " + matcher2.find() + " group: " + matcher2.groupCount());
+
 	}
 }

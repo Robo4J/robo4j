@@ -21,27 +21,19 @@ import com.robo4j.AttributeDescriptor;
 import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.HttpByteWrapper;
-import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMessage;
+import com.robo4j.socket.http.HttpMessageDescriptor;
 import com.robo4j.socket.http.HttpMessageWrapper;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.dto.RoboPathReferenceDTO;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.enums.SystemPath;
-import com.robo4j.socket.http.units.BufferWrapper;
-import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.units.HttpUriRegister;
-import com.robo4j.socket.http.util.ChannelBufferUtils;
-import com.robo4j.socket.http.util.HttpMessageUtil;
 import com.robo4j.socket.http.util.HttpPathUtil;
-import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -58,13 +50,13 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 	public static final int PATH_FIRST_LEVEL = 1;
 
 	private final RoboUnit<?> unit;
-	private final BufferWrapper bufferWrapper;
+	private final HttpMessageDescriptor messageDescriptor;
 	private final DefaultRequestFactory<?> factory;
 
-	public RoboRequestCallable(RoboUnit<?> unit, BufferWrapper bufferWrapper, DefaultRequestFactory<Object> factory) {
-		assert bufferWrapper != null;
+	public RoboRequestCallable(RoboUnit<?> unit, HttpMessageDescriptor messageDescriptor, DefaultRequestFactory<Object> factory) {
+		assert messageDescriptor != null;
 		this.unit = unit;
-		this.bufferWrapper = bufferWrapper;
+		this.messageDescriptor = messageDescriptor;
 		this.factory = factory;
 	}
 
@@ -72,32 +64,20 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 
 	@Override
 	public RoboResponseProcess call() throws Exception {
-		HttpByteWrapper wrapper = ChannelBufferUtils.getHttpByteWrapperByByteBufferString(bufferWrapper);
 
-		final String[] headerLines = wrapper.getHeader();
-		final String firstLine = RoboHttpUtils.correctLine(headerLines[0]);
-		final String[] tokens = firstLine.split(Constants.HTTP_EMPTY_SEP);
-		final HttpMethod method = HttpMethod.getByName(tokens[HttpMessageUtil.METHOD_KEY_POSITION]);
 
 		//TODO: (miro) -> separate header and body different processes
-		RoboResponseProcess result = new RoboResponseProcess();
+		final RoboResponseProcess result = new RoboResponseProcess();
+		final HttpMethod method = messageDescriptor.getMethod();
 		if (method != null) {
 			result.setMethod(method);
-			final Map<String, String> params = new HashMap<>();
 
-			for (int i = 1; i < headerLines.length; i++) {
-				final String[] array = headerLines[i]
-						.split(HttpMessageUtil.getHttpSeparator(HttpMessageUtil.HTTP_HEADER_SEP));
-
-				String key = array[HttpMessageUtil.METHOD_KEY_POSITION].toLowerCase();
-				String value = array[HttpMessageUtil.URI_VALUE_POSITION].trim();
-				params.put(key, value);
-			}
 
 			/* parsed http specifics, header */
 			final HttpMessage httpMessage = new HttpMessage(method,
-					URI.create(tokens[HttpMessageUtil.URI_VALUE_POSITION]),
-					HttpVersion.getByValue(tokens[HttpMessageUtil.VERSION_POSITION]), params);
+					URI.create(messageDescriptor.getPath()),
+					HttpVersion.getByValue(messageDescriptor.getVersion()),
+					messageDescriptor.getHeader());
 
 			final List<String> paths = HttpPathUtil.uriStringToPathList(httpMessage.uri().getPath());
 
@@ -139,45 +119,32 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 				}
 				return result;
 			case POST:
-				int length = Integer.valueOf(params.get(HttpHeaderFieldNames.CONTENT_LENGTH));
-				final StringBuilder jsonSB = new StringBuilder();
-				final String postValue = wrapper.getBody();
-
-				// check header size
-				if (length == postValue.length()) {
-					jsonSB.append(postValue);
-
-					switch (paths.size()) {
-					case PATH_DEFAULT_LEVEL:
-					case PATH_FIRST_LEVEL:
-						result.setCode(StatusCode.NOT_IMPLEMENTED);
-						break;
-					case PATH_SECOND_LEVEL:
-						final RoboPathReferenceDTO pathReference = getRoboReferenceByPath(paths);
-						switch (pathReference.getPath()) {
-						case UNITS:
-							if (pathReference.getRoboReference() != null) {
-								Object respObj = factory.processPost(pathReference.getRoboReference(), paths,
-										new HttpMessageWrapper<>(httpMessage, jsonSB.toString()));
-								if (respObj != null) {
-									result.setCode(StatusCode.ACCEPTED);
-									result.setResult(respObj);
-								} else {
-									result.setCode(StatusCode.NOT_FOUND);
-								}
+				final String postValue = messageDescriptor.getMessage();
+				switch (paths.size()) {
+				case PATH_DEFAULT_LEVEL:
+				case PATH_FIRST_LEVEL:
+					result.setCode(StatusCode.NOT_IMPLEMENTED);
+					break;
+				case PATH_SECOND_LEVEL:
+					final RoboPathReferenceDTO pathReference = getRoboReferenceByPath(paths);
+					switch (pathReference.getPath()) {
+					case UNITS:
+						if (pathReference.getRoboReference() != null) {
+							Object respObj = factory.processPost(pathReference.getRoboReference(), paths,
+									new HttpMessageWrapper<>(httpMessage, postValue));
+							if (respObj != null) {
+								result.setCode(StatusCode.ACCEPTED);
+								result.setResult(respObj);
+							} else {
+								result.setCode(StatusCode.NOT_FOUND);
 							}
-							break;
-						case NONE:
-						default:
-							result.setCode(StatusCode.NOT_FOUND);
 						}
 						break;
+					case NONE:
+					default:
+						result.setCode(StatusCode.NOT_FOUND);
 					}
-
-				} else {
-					SimpleLoggingUtil.error(getClass(),
-							"NOT SAME HEADER LENGTH: " + length + " convertedMessage: " + postValue.length());
-					result.setCode(StatusCode.NOT_ACCEPTABLE);
+					break;
 				}
 
 				return result;

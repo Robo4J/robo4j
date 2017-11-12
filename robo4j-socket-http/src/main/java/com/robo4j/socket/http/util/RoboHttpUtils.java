@@ -39,7 +39,8 @@ public final class RoboHttpUtils {
 
 	public static final String HTTP_VERSION = "HTTP/1.1";
 	private static final String ROBO4J_CLIENT = "Robo4J-HttpClient";
-	public static final String NEW_LINE = "\n";
+	public static final String NEW_LINE_MAC = "\r";
+	public static final String NEW_LINE_UNIX = "\n";
 	public static final CharSequence CHAR_QUOTATION_MARK = "\"";
 	public static final CharSequence CHAR_COLON = ":";
 	public static final CharSequence CHAR_CURLY_BRACKET_LEFT = "{";
@@ -70,7 +71,7 @@ public final class RoboHttpUtils {
 	}
 
 	public static String createResponseWithHeaderAndMessage(String header, String message){
-		return header.concat(NEW_LINE).concat(message);
+		return header.concat(NEW_LINE_UNIX).concat(message);
 	}
 
 	public static String createResponseByCode(StatusCode code){
@@ -110,13 +111,14 @@ public final class RoboHttpUtils {
 	public static String createRequest(String header, String message) {
 		//@formatter:off
 		return header
-				.concat(NEW_LINE)
+                .concat(NEW_LINE_MAC)
+				.concat(NEW_LINE_UNIX)
 				.concat(message);
 		//@formatter:on
 	}
 
 	public static String createHeader(HttpMethod method, ProtocolType protocol, String host, String path, int length ){
-		return createHeaderFirstLine(method, protocol, host, path)
+		return createHeaderFirstLine(method, path)
 				.concat(createRequestHeader(host, length));
 	}
 
@@ -125,19 +127,20 @@ public final class RoboHttpUtils {
 				.concat(createRequestHeader(host, length));
 	}
 
-	public static String createHeaderFirstLine(HttpMethod method, String uri) {
-		return HttpFirstLineBuilder.Build(method.getName()).add(uri).add(HTTP_VERSION).build();
+	public static String createHeaderFirstLine(HttpMethod method, String path) {
+		return HttpFirstLineBuilder.Build(method.getName()).add(path).add(HTTP_VERSION).build();
 	}
 
-	public static String createHeaderFirstLine(HttpMethod method, ProtocolType protocol, String host, String path){
-		return HttpFirstLineBuilder.Build(method.getName())
-				.addProtocolAndHostAndPath(protocol, host, path)
-				.add(HTTP_VERSION).build();
+
+	public static String createGetRequest(ProtocolType protocol, String host, String path){
+		return createHeaderFirstLine(HttpMethod.GET,  path)
+				.concat(createRequestHeader(host, 0));
+
 	}
 
-	public static String createGetRequest(String host, String message) {
+	public static String createGetRequest(String host, String path) {
 		//@formatter:off
-		return HttpFirstLineBuilder.Build(HttpMethod.GET.getName()).add(message).add(HTTP_VERSION)
+		return HttpFirstLineBuilder.Build(HttpMethod.GET.getName()).add(path).add(HTTP_VERSION)
 				.build().concat(createRequestHeader(host, 0));
 		//@formatter:on
 	}

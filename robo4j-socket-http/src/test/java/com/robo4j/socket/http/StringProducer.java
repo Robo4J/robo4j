@@ -100,8 +100,8 @@ public class StringProducer extends RoboUnit<String> {
         getContext().getReference(target).sendMessage(message);
     }
 
-    public void sendGetSimpleMessage(String host, String message) {
-        final String request = method.equals("GET") ? RoboHttpUtils.createGetRequest(host, message) : null;
+    public void sendGetSimpleMessage(String host, String path) {
+        final String request = RoboHttpUtils.createGetRequest(ProtocolType.HTTP, host, path);
         getContext().getReference(target).sendMessage(request);
     }
 
@@ -109,7 +109,7 @@ public class StringProducer extends RoboUnit<String> {
         if(uri == null){
             throw new IllegalStateException("uri not available");
         }
-        final String request = method.equals("POST") ? RoboHttpUtils.createRequest(HttpMethod.POST, host, uri, message) : null;
+        final String request = RoboHttpUtils.createRequest(HttpMethod.POST, host, uri, message);
         getContext().getReference(target).sendMessage(request);
     }
 

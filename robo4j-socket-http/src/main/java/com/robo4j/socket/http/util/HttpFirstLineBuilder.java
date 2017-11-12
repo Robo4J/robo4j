@@ -17,8 +17,6 @@
 
 package com.robo4j.socket.http.util;
 
-import com.robo4j.socket.http.ProtocolType;
-
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -30,24 +28,8 @@ public final class HttpFirstLineBuilder {
 		sb = new StringBuilder(value);
 	}
 
-	public static HttpFirstLineBuilder Build(String startValue) {
-		return new HttpFirstLineBuilder(startValue);
-	}
-
-	public HttpFirstLineBuilder addProtocolAndHostAndPath(ProtocolType protocol, String host, String path){
-		sb.append(HttpMessageUtil.SPACE)
-				.append(protocol.getName())
-				.append(HttpMessageUtil.getHttpSeparator(12))
-				.append(HttpMessageUtil.getHttpSeparator(12))
-				.append(host);
-				if(protocol.equals(ProtocolType.HTTPS)){
-					sb.append(HttpMessageUtil.getHttpSeparator(9))
-							.append(protocol.getPort());
-				}
-				sb.append(HttpMessageUtil.getHttpSeparator(12))
-				.append(path);
-		return this;
-
+	public static HttpFirstLineBuilder Build(String value) {
+		return new HttpFirstLineBuilder(value);
 	}
 
 	public HttpFirstLineBuilder add(Object value) {

@@ -17,9 +17,10 @@
 
 package com.robo4j.socket.http.util;
 
-import com.robo4j.socket.http.HttpByteWrapper;
 import com.robo4j.socket.http.HttpHeaderFieldNames;
-import com.robo4j.socket.http.units.BufferWrapper;
+import com.robo4j.socket.http.HttpMessageDescriptor;
+import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.units.Constants;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -54,36 +55,31 @@ public class ChannelBufferUtils {
 		return result;
 	}
 
-	public static HttpByteWrapper getHttpByteWrapperByByteBufferString(BufferWrapper bufferWrapper) {
-		final String[] headerAndBody = bufferWrapper.getMessage().split(HTTP_HEADER_BODY_DELIMITER);
-		final String[] header = headerAndBody[POSITION_HEADER].split("[" + NEXT_LINE + "]+");
-
-		return new HttpByteWrapper(header, headerAndBody.length == 2 ? headerAndBody[POSITION_BODY] : null);
-	}
-
-	public static BufferWrapper getBufferWrapperByChannel(ByteChannel channel) throws IOException {
-		StringBuilder stringBuilder = new StringBuilder();
+	public static HttpMessageDescriptor getHttpMessageDescriptorByChannel(ByteChannel channel) throws IOException {
+		StringBuilder sb = new StringBuilder();
 		int readBytes = channel.read(buffer);
 		buffer.flip();
-		addToStringBuilder(stringBuilder, buffer, readBytes);
-		Integer messageSize = getTotalMessageSizeWithBody(stringBuilder);
+		addToStringBuilder(sb, buffer, readBytes);
+		final HttpMessageDescriptor result = extractDescriptorByStringBuilder(sb);
 
 		int totalReadBytes = readBytes;
 
-		if (messageSize != null) {
-			while (totalReadBytes < messageSize) {
+		if (result.getLength() != null) {
+			while (readBytes % INIT_BUFFER_CAPACITY == 0 && totalReadBytes < result.getLength()) {
 				readBytes = channel.read(buffer);
 				buffer.flip();
-				addToStringBuilder(stringBuilder, buffer, readBytes);
+				addToStringBuilder(sb, buffer, readBytes);
 
 				totalReadBytes += readBytes;
 				buffer.clear();
 			}
-
+			if (result.getMessage() == null) {
+				result.setMessage(sb.toString());
+			}
 		}
 		buffer.clear();
 
-		return new BufferWrapper(totalReadBytes, stringBuilder.toString());
+		return result;
 
 	}
 
@@ -103,27 +99,44 @@ public class ChannelBufferUtils {
 		return Arrays.equals(stopWindow, window);
 	}
 
-	private static Integer getTotalMessageSizeWithBody(StringBuilder sb) {
-		final String[] headerAndBody = sb.toString().split(HTTP_HEADER_BODY_DELIMITER);
-		final String[] header = headerAndBody[0].split("[" + NEXT_LINE + "]+");
+	public static HttpMessageDescriptor extractDescriptorByStringBuilder(StringBuilder sb) {
+		return extractDescriptorByStringMessage(sb.toString());
+	}
+
+	public static HttpMessageDescriptor extractDescriptorByStringMessage(String message) {
+		final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
+		final String[] header = headerAndBody[POSITION_HEADER].split("[" + NEXT_LINE + "]+");
+		final String firstLine = RoboHttpUtils.correctLine(header[0]);
+		final String[] tokens = firstLine.split(Constants.HTTP_EMPTY_SEP);
 		final String[] paramArray = Arrays.copyOfRange(header, 1, header.length);
 
+		final HttpMethod method = HttpMethod.getByName(tokens[HttpMessageUtil.METHOD_KEY_POSITION]);
+		final String path = tokens[HttpMessageUtil.URI_VALUE_POSITION];
+		final String version = tokens[HttpMessageUtil.VERSION_POSITION];
 		final Map<String, String> headerParams = new HashMap<>();
 
 		for (int i = 1; i < paramArray.length; i++) {
-			final String[] array = paramArray[i]
-					.split(HttpMessageUtil.getHttpSeparator(HTTP_HEADER_SEP));
+			final String[] array = paramArray[i].split(HttpMessageUtil.getHttpSeparator(HTTP_HEADER_SEP));
 
 			String key = array[HttpMessageUtil.METHOD_KEY_POSITION].toLowerCase();
 			String value = array[HttpMessageUtil.URI_VALUE_POSITION].trim();
 			headerParams.put(key, value);
 		}
 
-		String valueBodySize = headerParams.get(HttpHeaderFieldNames.CONTENT_LENGTH);
+		HttpMessageDescriptor result = new HttpMessageDescriptor(headerParams, method, version, path);
+		if (headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)) {
+			result.setLength(calculateMessageSize(headerAndBody[POSITION_HEADER].length(), headerParams));
+		}
+		if (headerAndBody.length > 1) {
+			result.setMessage(headerAndBody[POSITION_BODY]);
+		}
 
-		return valueBodySize != null
-				? headerAndBody[POSITION_HEADER].length() + HTTP_HEADER_BODY_DELIMITER.length() + Integer.valueOf(valueBodySize)
-				: null;
+		return result;
+	}
+
+	private static Integer calculateMessageSize(int headerValue, Map<String, String> headerParams) {
+		return headerValue + HTTP_HEADER_BODY_DELIMITER.length()
+				+ Integer.valueOf(headerParams.get(HttpHeaderFieldNames.CONTENT_LENGTH));
 	}
 
 	private static void addToStringBuilder(StringBuilder sb, ByteBuffer buffer, int size) {

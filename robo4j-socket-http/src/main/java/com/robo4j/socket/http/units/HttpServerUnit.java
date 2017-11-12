@@ -45,6 +45,7 @@ import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.socket.http.HttpMessageDescriptor;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.request.RoboRequestCallable;
 import com.robo4j.socket.http.request.RoboRequestFactory;
@@ -222,7 +223,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 		System.out.println("before read capacity: " + bufferCapacity);
 		long startTime = System.currentTimeMillis();
-		final BufferWrapper bufferWrapper = ChannelBufferUtils.getBufferWrapperByChannel(channel);
+		final HttpMessageDescriptor messageDescriptor = ChannelBufferUtils.getHttpMessageDescriptorByChannel(channel);
 		ChannelUtil.printMeasuredTime(getClass(), " bufferWrapper: ", startTime);
 
 		startTime = System.currentTimeMillis();
@@ -232,7 +233,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 		// TODO: (miro) separate header and body
 		startTime = System.currentTimeMillis();
-		final RoboRequestCallable callable = new RoboRequestCallable(this, bufferWrapper, factory);
+		final RoboRequestCallable callable = new RoboRequestCallable(this, messageDescriptor, factory);
 		ChannelUtil.printMeasuredTime(getClass(), " callable message process: ", startTime);
 
 		final Future<RoboResponseProcess> futureResult = getContext().getScheduler().submit(callable);
