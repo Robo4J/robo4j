@@ -17,7 +17,9 @@
 
 package com.robo4j.socket.http.units;
 
+import com.robo4j.BlockingTrait;
 import com.robo4j.ConfigurationException;
+import com.robo4j.CriticalSectionTrait;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
@@ -31,9 +33,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Http NIO Client to communicate with external system/Robo4J units
@@ -41,7 +41,8 @@ import java.util.stream.Collectors;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-
+@BlockingTrait
+@CriticalSectionTrait
 public class HttpClientUnit extends RoboUnit<Object> {
 	private static final String PROPERTY_KEEP_ALIVE = "keepAlive";
 	private InetSocketAddress address;
@@ -80,7 +81,7 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		try {
 			SocketChannel channel = SocketChannel.open(address);
 			channel.configureBlocking(blocking);
-			if(bufferCapacity != null){
+			if (bufferCapacity != null) {
 				channel.socket().setSendBufferSize(bufferCapacity);
 			}
 			channel.socket().setKeepAlive(keepAlive);
@@ -93,7 +94,8 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			buffer.flip();
 
 			int writtenBytes = ChannelUtil.writeBuffer(channel, buffer);
-			System.out.println(getClass().getSimpleName() + " onMessage, writtenBytes: " + writtenBytes + " bytes: " + bytes.length);
+			System.out.println(getClass().getSimpleName() + " onMessage, writtenBytes: " + writtenBytes + " bytes: "
+					+ bytes.length);
 
 			if (responseUnit != null && responseSize != null) {
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
@@ -103,16 +105,12 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			}
 
 			buffer.clear();
-			if(channel.isConnectionPending()){
-				channel.close();
+			channel.close();
 
-			} else {
-				System.out.println(getClass().getSimpleName() + " Still reading");
-			}
 		} catch (IOException e) {
 			SimpleLoggingUtil.error(getClass(), "not available:" + address + ", no worry I continue sending: " + e);
-			SimpleLoggingUtil.error(getClass(), "not available:" + address + ",  stack: " +
-					Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.toList()));
+//			SimpleLoggingUtil.error(getClass(), "not available:" + address + ",  stack: "
+//					+ Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.toList()));
 		}
 	}
 

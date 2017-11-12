@@ -19,7 +19,9 @@
 
 package com.robo4j.socket.http.units;
 
+import com.robo4j.BlockingTrait;
 import com.robo4j.ConfigurationException;
+import com.robo4j.CriticalSectionTrait;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
@@ -51,6 +53,8 @@ import java.util.stream.Collectors;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@BlockingTrait
+@CriticalSectionTrait
 public class HttpServerUnit extends RoboUnit<Object> {
 	private static final int DEFAULT_BUFFER_CAPACITY = 32 * 1024;
 	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
