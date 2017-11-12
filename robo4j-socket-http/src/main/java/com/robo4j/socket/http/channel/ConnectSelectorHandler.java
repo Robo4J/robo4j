@@ -15,25 +15,34 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http.util;
+package com.robo4j.socket.http.channel;
+
+import com.robo4j.logging.SimpleLoggingUtil;
+
+import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
 
 /**
+ * Handle OP_CONNECT
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class FileUtil {
+public class ConnectSelectorHandler implements SelectorHendler {
 
-//    public static int readBuffer(AsynchronousFileChannel channel, ByteBuffer buffer) throws IOException {
-//        int numberRead = channel.read(buffer);
-//        int position = 0;
-//        int totalRead = numberRead;
-//        while (numberRead >= 0 && position <= buffer.capacity()) {
-//            numberRead = channel.read(buffer);
-//            if (numberRead > 0) {
-//                totalRead += numberRead;
-//            }
-//            position++;
-//        }
-//        return totalRead;
-//    }
+    private final SelectionKey key;
+
+    public ConnectSelectorHandler(SelectionKey key) {
+        this.key = key;
+    }
+
+    @Override
+    public SelectionKey handle() {
+        try{
+            ((SocketChannel) key.channel()).finishConnect();
+        } catch (Exception e){
+            SimpleLoggingUtil.error(getClass(), "handle connect", e);
+        }
+        return key;
+    }
 }

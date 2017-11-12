@@ -28,12 +28,12 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -46,6 +46,7 @@ import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMessageDescriptor;
+import com.robo4j.socket.http.PropertiesProvider;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.request.RoboRequestCallable;
 import com.robo4j.socket.http.request.RoboRequestFactory;
@@ -67,11 +68,12 @@ import com.robo4j.util.StringConstants;
 public class HttpServerUnit extends RoboUnit<Object> {
 	private static final int DEFAULT_BUFFER_CAPACITY = 32 * 1024;
 	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
-	private static final HttpCodecRegistry CODEC_REGISTRY = new HttpCodecRegistry();
 	public static final String PROPERTY_PORT = "port";
 	public static final String PROPERTY_TARGET = "target";
 	public static final String PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
+	public static final String PROPERTY_CODEC_REGISTRY = "codecRegistry";
 	private static final String PROPERTY_KEEP_ALIVE = "keepAlive";
+	private final HttpCodecRegistry codecRegistry = new HttpCodecRegistry();
 	private boolean available;
 	private Integer port;
 	private Integer bufferCapacity;
@@ -79,7 +81,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	// used for encoded messages
 	private List<String> target;
 	private ServerSocketChannel server;
-	private final Map<SelectionKey, RoboResponseProcess> outBuffers = new HashMap<>();
+	private final Map<SelectionKey, RoboResponseProcess> outBuffers = new ConcurrentHashMap<>();
+	private final PropertiesProvider propertiesProvider = new PropertiesProvider();
 
 	public HttpServerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -97,7 +100,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 		String packages = configuration.getString("packages", null);
 		if (validatePackages(packages)) {
-			CODEC_REGISTRY.scan(Thread.currentThread().getContextClassLoader(), packages.split(","));
+			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(","));
 		}
 
 		//@formatter:off
@@ -111,6 +114,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		}
         //@formatter:on
 
+		propertiesProvider.put(PROPERTY_BUFFER_CAPACITY, bufferCapacity);
+		propertiesProvider.put(PROPERTY_PORT, port);
+		propertiesProvider.put(PROPERTY_CODEC_REGISTRY, codecRegistry);
 		setState(LifecycleState.INITIALIZED);
 	}
 
@@ -183,7 +189,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 					if (selectedKey.isAcceptable()) {
 						long starTime = System.currentTimeMillis();
-						accept(selector, selectedKey);
+						accept(selectedKey);
 						ChannelUtil.printMeasuredTime(getClass(), "accept", starTime);
 					} else if (selectedKey.isConnectable()) {
 						long starTime = System.currentTimeMillis();
@@ -191,7 +197,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 						ChannelUtil.printMeasuredTime(getClass(), "connectable", starTime);
 					} else if (selectedKey.isReadable()) {
 						long starTime = System.currentTimeMillis();
-						read(selector, selectedKey);
+						read(selectedKey);
 						ChannelUtil.printMeasuredTime(getClass(), "read", starTime);
 					} else if (selectedKey.isWritable()) {
 						long starTime = System.currentTimeMillis();
@@ -207,16 +213,16 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		setState(LifecycleState.STOPPED);
 	}
 
-	private void accept(Selector selector, SelectionKey key) throws IOException {
+	private void accept(SelectionKey key) throws IOException {
 		ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
 		SocketChannel channel = serverChannel.accept();
 		serverChannel.socket().setReceiveBufferSize(bufferCapacity);
 		channel.configureBlocking(false);
-		channel.register(selector, SelectionKey.OP_READ);
+		channel.register(key.selector(), SelectionKey.OP_READ);
 
 	}
 
-	private void read(Selector selector, SelectionKey key) throws IOException {
+	private void read(SelectionKey key) throws IOException {
 
 		SocketChannel channel = (SocketChannel) key.channel();
 		// channel.socket().setKeepAlive(keepAlive);
@@ -228,7 +234,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 		startTime = System.currentTimeMillis();
 		HttpUriRegister.getInstance().updateUnits(getContext());
-		final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
+		final RoboRequestFactory factory = new RoboRequestFactory(codecRegistry);
 		ChannelUtil.printMeasuredTime(getClass(), " registryUpdate: ", startTime);
 
 		// TODO: (miro) separate header and body
@@ -245,7 +251,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			SimpleLoggingUtil.error(getClass(), "read" + e);
 		}
 
-		channel.register(selector, SelectionKey.OP_WRITE);
+		channel.register(key.selector(), SelectionKey.OP_WRITE);
 	}
 
 	private void write(List<RoboReference<Object>> targetRefs, SelectionKey key) throws IOException {
@@ -266,7 +272,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 				} else {
 					getResponse = RoboHttpUtils.createResponseByCode(responseProcess.getCode());
 				}
-				buffer = getByteBufferByMessage(getResponse);
+				buffer = ChannelBufferUtils.getByteBufferByString(getResponse);
 				ChannelUtil.writeBuffer(channel, buffer);
 				buffer.clear();
 				break;
@@ -274,7 +280,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 				if (responseProcess.getResult() != null && responseProcess.getCode().equals(StatusCode.ACCEPTED)) {
 					String postResponse = RoboHttpUtils.createResponseByCode(responseProcess.getCode());
 
-					buffer = getByteBufferByMessage(postResponse);
+					buffer = ChannelBufferUtils.getByteBufferByString(postResponse);
 					ChannelUtil.writeBuffer(channel, buffer);
 					for (RoboReference<Object> ref : targetRefs) {
 						if (responseProcess.getResult() != null
@@ -285,7 +291,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 					buffer.clear();
 				} else {
 					String notImplementedResponse = RoboHttpUtils.createResponseByCode(responseProcess.getCode());
-					buffer = getByteBufferByMessage(notImplementedResponse);
+					buffer = ChannelBufferUtils.getByteBufferByString(notImplementedResponse);
 					ChannelUtil.writeBuffer(channel, buffer);
 					buffer.clear();
 				}
@@ -294,7 +300,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			}
 		} else {
 			String badResponse = RoboResponseHeader.headerByCode(StatusCode.BAD_REQUEST);
-			buffer = getByteBufferByMessage(badResponse);
+			buffer = ChannelBufferUtils.getByteBufferByString(badResponse);
 			ChannelUtil.writeBuffer(channel, buffer);
 			buffer.clear();
 		}
@@ -303,13 +309,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 		channel.close();
 		key.cancel();
-	}
-
-	private ByteBuffer getByteBufferByMessage(String message) {
-		ByteBuffer result = ByteBuffer.allocate(message.length());
-		result.put(message.getBytes());
-		result.flip();
-		return result;
 	}
 
 	private boolean validatePackages(String packages) {

@@ -55,6 +55,13 @@ public class ChannelBufferUtils {
 		return result;
 	}
 
+	public static ByteBuffer getByteBufferByString(String message) {
+		ByteBuffer result = ByteBuffer.allocate(message.length());
+		result.put(message.getBytes());
+		result.flip();
+		return result;
+	}
+
 	public static HttpMessageDescriptor getHttpMessageDescriptorByChannel(ByteChannel channel) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		int readBytes = channel.read(buffer);

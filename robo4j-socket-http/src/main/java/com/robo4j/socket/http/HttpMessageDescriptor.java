@@ -41,16 +41,6 @@ public class HttpMessageDescriptor {
 		this.message = null;
 	}
 
-	public HttpMessageDescriptor(Map<String, String> header, HttpMethod method, String version, String path,
-			Integer length) {
-		this.header = header;
-		this.method = method;
-		this.version = version;
-		this.path = path;
-		this.length = length;
-		this.message = null;
-	}
-
 	public Map<String, String> getHeader() {
 		return header;
 	}
