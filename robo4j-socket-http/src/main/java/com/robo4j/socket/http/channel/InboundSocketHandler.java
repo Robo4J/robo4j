@@ -113,19 +113,19 @@ public class InboundSocketHandler implements SocketHandler {
 					selectedIterator.remove();
 
 					if (selectedKey.isAcceptable()) {
-						roboUnit.getContext().getScheduler().execute(
-						        () -> new AcceptSelectorHandler(selectedKey, properties.getIntSafe(PROPERTY_BUFFER_CAPACITY)));
+                        AcceptSelectorHandler handler = new AcceptSelectorHandler(selectedKey, properties.getIntSafe(PROPERTY_BUFFER_CAPACITY));
+                        handler.handle();
 					} else if (selectedKey.isConnectable()) {
-						roboUnit.getContext().getScheduler().execute(() -> new AcceptSelectorHandler(selectedKey,
-								properties.getIntSafe(PROPERTY_BUFFER_CAPACITY)));
+                        ConnectSelectorHandler handler = new ConnectSelectorHandler(selectedKey);
+                        handler.handle();
 					} else if (selectedKey.isReadable()) {
 						final HttpCodecRegistry codecRegistry = properties
 								.getPropertyByClassSafe(PROPERTY_CODEC_REGISTRY);
-						roboUnit.getContext().getScheduler().submit(
-								() -> new ReadSelectorHandler(roboUnit, codecRegistry, outBuffers, selectedKey));
+                        ReadSelectorHandler handler =  new ReadSelectorHandler(roboUnit, codecRegistry, outBuffers, selectedKey);
+                        handler.handle();
 					} else if (selectedKey.isWritable()) {
-						roboUnit.getContext().getScheduler()
-								.submit(() -> new WriteSelectorHandler(roboUnit, targetRefs, outBuffers, selectedKey));
+                        WriteSelectorHandler handler = new WriteSelectorHandler(roboUnit, targetRefs, outBuffers, selectedKey);
+                        handler.handle();
 					}
 				}
 			}
