@@ -57,7 +57,7 @@ public class ByteBufferTests {
 	@Test
 	public void testPostmanMessage(){
 		HttpMessageDescriptor messageDescriptor = ChannelBufferUtils.extractDescriptorByStringMessage(TEST_POSTMAN_STRING);
-		messageDescriptor.setMessage(TEST_POSTMAN_MESSAGE);
+		messageDescriptor.addMessage(TEST_POSTMAN_MESSAGE);
 
 		Assert.assertNotNull(messageDescriptor.getHeader());
 		Assert.assertTrue(!messageDescriptor.getHeader().isEmpty());
@@ -77,8 +77,6 @@ public class ByteBufferTests {
 		String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientPath, bodyMessage);
 
 		HttpMessageDescriptor messageDescriptor = ChannelBufferUtils.extractDescriptorByStringMessage(postMessage);
-		messageDescriptor.setMessage(bodyMessage);
-
 
 		Assert.assertNotNull(postMessage);
 		Assert.assertTrue(postMessage.length() == messageDescriptor.getLength());

@@ -19,31 +19,24 @@
 
 package com.robo4j.socket.http.units;
 
-import com.robo4j.BlockingTrait;
 import com.robo4j.ConfigurationException;
-import com.robo4j.CriticalSectionTrait;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.socket.http.HttpHeaderConstant;
 import com.robo4j.socket.http.PropertiesProvider;
 import com.robo4j.socket.http.channel.InboundSocketHandler;
-import com.robo4j.socket.http.request.RoboResponseProcess;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.StringConstants;
 
-import java.nio.channels.SelectionKey;
-import java.nio.channels.ServerSocketChannel;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -53,24 +46,17 @@ import java.util.stream.Collectors;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-@BlockingTrait
-@CriticalSectionTrait
 public class HttpServerUnit extends RoboUnit<Object> {
 	private static final int DEFAULT_BUFFER_CAPACITY = 32 * 1024;
-	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
 	public static final String PROPERTY_PORT = "port";
 	public static final String PROPERTY_TARGET = "target";
 	public static final String PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
 	public static final String PROPERTY_CODEC_REGISTRY = "codecRegistry";
-	private static final String PROPERTY_KEEP_ALIVE = "keepAlive";
 	private final HttpCodecRegistry codecRegistry = new HttpCodecRegistry();
-	private boolean available;
 	private Integer port;
 	private Integer bufferCapacity;
 	// used for encoded messages
 	private List<String> target;
-	private ServerSocketChannel server;
-	private final Map<SelectionKey, RoboResponseProcess> outBuffers = new ConcurrentHashMap<>();
 	private final PropertiesProvider propertiesProvider = new PropertiesProvider();
 	private InboundSocketHandler inboundSocketHandler;
 
@@ -86,7 +72,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 				.split(RoboHttpUtils.CHAR_COMMA.toString()));
 		port = configuration.getInteger(PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
 		bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
-		boolean keepAlive = configuration.getBoolean(PROPERTY_KEEP_ALIVE, false);
+		boolean keepAlive = configuration.getBoolean(HttpHeaderConstant.KEEP_ALIVE, false);
 
 		String packages = configuration.getString("packages", null);
 		if (validatePackages(packages)) {
@@ -105,7 +91,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
         //@formatter:on
 		propertiesProvider.put(PROPERTY_BUFFER_CAPACITY, bufferCapacity);
 		propertiesProvider.put(PROPERTY_PORT, port);
-		propertiesProvider.put(PROPERTY_KEEP_ALIVE, keepAlive);
+		propertiesProvider.put(HttpHeaderConstant.KEEP_ALIVE, keepAlive);
 		propertiesProvider.put(PROPERTY_CODEC_REGISTRY, codecRegistry);
 		setState(LifecycleState.INITIALIZED);
 	}

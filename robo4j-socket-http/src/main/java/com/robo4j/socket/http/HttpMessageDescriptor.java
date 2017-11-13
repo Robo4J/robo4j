@@ -69,8 +69,8 @@ public class HttpMessageDescriptor {
 		return message;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public void addMessage(String message) {
+		this.message = this.message == null ? message : this.message.concat(message);
 	}
 
 	@Override

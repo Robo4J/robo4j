@@ -17,14 +17,13 @@
 
 package com.robo4j.socket.http.units;
 
-import com.robo4j.BlockingTrait;
 import com.robo4j.ConfigurationException;
-import com.robo4j.CriticalSectionTrait;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.socket.http.HttpHeaderConstant;
 import com.robo4j.socket.http.util.ChannelUtil;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
@@ -41,10 +40,7 @@ import java.util.Map;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-@BlockingTrait
-@CriticalSectionTrait
 public class HttpClientUnit extends RoboUnit<Object> {
-	private static final String PROPERTY_KEEP_ALIVE = "keepAlive";
 	private InetSocketAddress address;
 	private String responseUnit;
 	private Integer responseSize;
@@ -65,7 +61,7 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		responseSize = configuration.getInteger("responseSize", null);
 		bufferCapacity = configuration.getInteger("bufferCapacity", null);
 		blocking = configuration.getBoolean("blocking", false);
-		keepAlive = configuration.getBoolean(PROPERTY_KEEP_ALIVE, false);
+		keepAlive = configuration.getBoolean(HttpHeaderConstant.KEEP_ALIVE, false);
 
 		Map<String, Object> targetUnitsMap = JsonUtil.getMapNyJson(configuration.getString("targetUnits", null));
 		if (confAddress == null || targetUnitsMap.isEmpty()) {
@@ -93,13 +89,9 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			buffer.put(bytes);
 			buffer.flip();
 
-			int writtenBytes = ChannelUtil.writeBuffer(channel, buffer);
-			System.out.println(getClass().getSimpleName() + " onMessage, writtenBytes: " + writtenBytes + " bytes: "
-					+ bytes.length);
-
+			ChannelUtil.writeBuffer(channel, buffer);
 			if (responseUnit != null && responseSize != null) {
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
-				// important is set stopper properly
 				ChannelUtil.readBuffer(channel, readBuffer);
 				sendMessageToResponseUnit(readBuffer);
 			}
@@ -109,8 +101,6 @@ public class HttpClientUnit extends RoboUnit<Object> {
 
 		} catch (IOException e) {
 			SimpleLoggingUtil.error(getClass(), "not available:" + address + ", no worry I continue sending: " + e);
-//			SimpleLoggingUtil.error(getClass(), "not available:" + address + ",  stack: "
-//					+ Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.toList()));
 		}
 	}
 

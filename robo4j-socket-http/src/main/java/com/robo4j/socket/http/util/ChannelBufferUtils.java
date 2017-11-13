@@ -63,25 +63,26 @@ public class ChannelBufferUtils {
 	}
 
 	public static HttpMessageDescriptor getHttpMessageDescriptorByChannel(ByteChannel channel) throws IOException {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sbBasic = new StringBuilder();
 		int readBytes = channel.read(buffer);
 		buffer.flip();
-		addToStringBuilder(sb, buffer, readBytes);
-		final HttpMessageDescriptor result = extractDescriptorByStringBuilder(sb);
+		addToStringBuilder(sbBasic, buffer, readBytes);
+		final HttpMessageDescriptor result = extractDescriptorByStringMessage(sbBasic.toString());
+		final StringBuilder sbAdditional = new StringBuilder();
 
 		int totalReadBytes = readBytes;
 
 		if (result.getLength() != null) {
-			while (readBytes % INIT_BUFFER_CAPACITY == 0 && totalReadBytes < result.getLength()) {
+			while (totalReadBytes < result.getLength()) {
 				readBytes = channel.read(buffer);
 				buffer.flip();
-				addToStringBuilder(sb, buffer, readBytes);
+				addToStringBuilder(sbAdditional, buffer, readBytes);
 
 				totalReadBytes += readBytes;
 				buffer.clear();
 			}
-			if (result.getMessage() == null) {
-				result.setMessage(sb.toString());
+			if (sbAdditional.length() > 0) {
+				result.addMessage(sbAdditional.toString());
 			}
 		}
 		buffer.clear();
@@ -106,9 +107,6 @@ public class ChannelBufferUtils {
 		return Arrays.equals(stopWindow, window);
 	}
 
-	public static HttpMessageDescriptor extractDescriptorByStringBuilder(StringBuilder sb) {
-		return extractDescriptorByStringMessage(sb.toString());
-	}
 
 	public static HttpMessageDescriptor extractDescriptorByStringMessage(String message) {
 		final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
@@ -135,7 +133,7 @@ public class ChannelBufferUtils {
 			result.setLength(calculateMessageSize(headerAndBody[POSITION_HEADER].length(), headerParams));
 		}
 		if (headerAndBody.length > 1) {
-			result.setMessage(headerAndBody[POSITION_BODY]);
+			result.addMessage(headerAndBody[POSITION_BODY]);
 		}
 
 		return result;

@@ -26,7 +26,6 @@ import com.robo4j.socket.http.request.RoboResponseProcess;
 import com.robo4j.socket.http.units.HttpCodecRegistry;
 import com.robo4j.socket.http.units.HttpUriRegister;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
-import com.robo4j.socket.http.util.ChannelUtil;
 
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -58,23 +57,17 @@ public class ReadSelectorHandler implements SelectorHandler {
 		try {
 			SocketChannel channel = (SocketChannel) key.channel();
 			// channel.socket().setKeepAlive(keepAlive);
-			long startTime = System.currentTimeMillis();
 			final HttpMessageDescriptor messageDescriptor = ChannelBufferUtils
 					.getHttpMessageDescriptorByChannel(channel);
-			ChannelUtil.printMeasuredTime(getClass(), " bufferWrapper: ", startTime);
 
-			startTime = System.currentTimeMillis();
 			HttpUriRegister.getInstance().updateUnits(roboUnit.getContext());
 			final RoboRequestFactory factory = new RoboRequestFactory(codecRegistry);
-			ChannelUtil.printMeasuredTime(getClass(), " registryUpdate: ", startTime);
 
-			startTime = System.currentTimeMillis();
 			final RoboRequestCallable callable = new RoboRequestCallable(roboUnit, messageDescriptor, factory);
 
 			final Future<RoboResponseProcess> futureResult = roboUnit.getContext().getScheduler().submit(callable);
 			try {
 				RoboResponseProcess result = futureResult.get();
-				ChannelUtil.printMeasuredTime(getClass(), " callable message process: ", startTime);
 				outBuffers.put(key, result);
 			} catch (InterruptedException | ExecutionException e) {
 				SimpleLoggingUtil.error(getClass(), "read" + e);
