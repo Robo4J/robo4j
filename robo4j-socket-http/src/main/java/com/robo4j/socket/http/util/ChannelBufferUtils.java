@@ -67,8 +67,8 @@ public class ChannelBufferUtils {
 		int readBytes = channel.read(buffer);
 		buffer.flip();
 		addToStringBuilder(sbBasic, buffer, readBytes);
-		final HttpMessageDescriptor result = extractDescriptorByStringMessage(sbBasic.toString());
 		final StringBuilder sbAdditional = new StringBuilder();
+		final HttpMessageDescriptor result = extractDescriptorByStringMessage(sbBasic.toString());
 
 		int totalReadBytes = readBytes;
 

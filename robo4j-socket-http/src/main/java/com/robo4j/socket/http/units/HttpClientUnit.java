@@ -23,7 +23,6 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.HttpHeaderConstant;
 import com.robo4j.socket.http.util.ChannelUtil;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
@@ -45,7 +44,6 @@ public class HttpClientUnit extends RoboUnit<Object> {
 	private String responseUnit;
 	private Integer responseSize;
 	private Integer bufferCapacity;
-	private boolean keepAlive;
 	private boolean blocking;
 
 	public HttpClientUnit(RoboContext context, String id) {
@@ -61,7 +59,6 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		responseSize = configuration.getInteger("responseSize", null);
 		bufferCapacity = configuration.getInteger("bufferCapacity", null);
 		blocking = configuration.getBoolean("blocking", false);
-		keepAlive = configuration.getBoolean(HttpHeaderConstant.KEEP_ALIVE, false);
 
 		Map<String, Object> targetUnitsMap = JsonUtil.getMapNyJson(configuration.getString("targetUnits", null));
 		if (confAddress == null || targetUnitsMap.isEmpty()) {
@@ -80,7 +77,6 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			if (bufferCapacity != null) {
 				channel.socket().setSendBufferSize(bufferCapacity);
 			}
-			channel.socket().setKeepAlive(keepAlive);
 
 			String processMessage = message.toString();
 

@@ -26,7 +26,6 @@ import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.HttpHeaderConstant;
 import com.robo4j.socket.http.PropertiesProvider;
 import com.robo4j.socket.http.channel.InboundSocketHandler;
 import com.robo4j.socket.http.util.JsonUtil;
@@ -72,7 +71,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 				.split(RoboHttpUtils.CHAR_COMMA.toString()));
 		port = configuration.getInteger(PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
 		bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
-		boolean keepAlive = configuration.getBoolean(HttpHeaderConstant.KEEP_ALIVE, false);
 
 		String packages = configuration.getString("packages", null);
 		if (validatePackages(packages)) {
@@ -91,7 +89,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
         //@formatter:on
 		propertiesProvider.put(PROPERTY_BUFFER_CAPACITY, bufferCapacity);
 		propertiesProvider.put(PROPERTY_PORT, port);
-		propertiesProvider.put(HttpHeaderConstant.KEEP_ALIVE, keepAlive);
 		propertiesProvider.put(PROPERTY_CODEC_REGISTRY, codecRegistry);
 		setState(LifecycleState.INITIALIZED);
 	}
@@ -103,6 +100,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 				.filter(Objects::nonNull).collect(Collectors.toList());
 
 		inboundSocketHandler = new InboundSocketHandler(this, targetRefs, propertiesProvider);
+		HttpUriRegister.getInstance().updateUnits(getContext());
 		inboundSocketHandler.start();
 		setState(LifecycleState.STARTED);
 	}

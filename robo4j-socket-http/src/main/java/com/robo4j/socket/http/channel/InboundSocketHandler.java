@@ -92,20 +92,18 @@ public class InboundSocketHandler implements SocketHandler {
 			socketChannel.configureBlocking(false);
 			socketChannel.bind(new InetSocketAddress(properties.getIntSafe("port")));
 
-			SelectionKey key = socketChannel.register(selector, SelectionKey.OP_ACCEPT);
+			final SelectionKey key = socketChannel.register(selector, SelectionKey.OP_ACCEPT);
             final HttpCodecRegistry codecRegistry = properties.getPropertyByClassSafe(PROPERTY_CODEC_REGISTRY);
+            final int bufferCapacity = properties.getIntSafe(PROPERTY_BUFFER_CAPACITY);
 
 			while (active) {
 
-				int channelReady = selector.select();
+				int channelReady = key.selector().select();
 				if (channelReady == 0) {
 					continue;
 				}
 
-				/*
-				 * token representing the registration of a SelectableChannel with a Selector
-				 */
-				Set<SelectionKey> selectedKeys = selector.selectedKeys();
+				Set<SelectionKey> selectedKeys =  key.selector().selectedKeys();
 				Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
 
 				while (selectedIterator.hasNext()) {
@@ -114,7 +112,7 @@ public class InboundSocketHandler implements SocketHandler {
 					selectedIterator.remove();
 
 					if (selectedKey.isAcceptable()) {
-                        handleSelectorHandler(new AcceptSelectorHandler(selectedKey, properties.getIntSafe(PROPERTY_BUFFER_CAPACITY)));
+						handleSelectorHandler(new AcceptSelectorHandler(selectedKey, bufferCapacity));
 					} else if (selectedKey.isConnectable()) {
                         handleSelectorHandler(new ConnectSelectorHandler(selectedKey));
 					} else if (selectedKey.isReadable()) {
@@ -133,5 +131,6 @@ public class InboundSocketHandler implements SocketHandler {
 	private void handleSelectorHandler(SelectorHandler handler){
 	    handler.handle();
     }
+
 
 }

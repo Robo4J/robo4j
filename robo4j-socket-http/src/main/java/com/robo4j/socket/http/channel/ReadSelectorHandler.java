@@ -24,13 +24,11 @@ import com.robo4j.socket.http.request.RoboRequestCallable;
 import com.robo4j.socket.http.request.RoboRequestFactory;
 import com.robo4j.socket.http.request.RoboResponseProcess;
 import com.robo4j.socket.http.units.HttpCodecRegistry;
-import com.robo4j.socket.http.units.HttpUriRegister;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
 
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
@@ -56,26 +54,20 @@ public class ReadSelectorHandler implements SelectorHandler {
 	public SelectionKey handle() {
 		try {
 			SocketChannel channel = (SocketChannel) key.channel();
-			// channel.socket().setKeepAlive(keepAlive);
 			final HttpMessageDescriptor messageDescriptor = ChannelBufferUtils
 					.getHttpMessageDescriptorByChannel(channel);
 
-			HttpUriRegister.getInstance().updateUnits(roboUnit.getContext());
 			final RoboRequestFactory factory = new RoboRequestFactory(codecRegistry);
 
 			final RoboRequestCallable callable = new RoboRequestCallable(roboUnit, messageDescriptor, factory);
 
 			final Future<RoboResponseProcess> futureResult = roboUnit.getContext().getScheduler().submit(callable);
-			try {
-				RoboResponseProcess result = futureResult.get();
-				outBuffers.put(key, result);
-			} catch (InterruptedException | ExecutionException e) {
-				SimpleLoggingUtil.error(getClass(), "read" + e);
-			}
+			final RoboResponseProcess result = futureResult.get();
+			outBuffers.put(key, result);
 
 			channel.register(key.selector(), SelectionKey.OP_WRITE);
 		} catch (Exception e) {
-			SimpleLoggingUtil.error(getClass(), "handle connect", e);
+			SimpleLoggingUtil.error(getClass(), "handle read", e);
 		}
 		return key;
 	}

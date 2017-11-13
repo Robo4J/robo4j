@@ -105,7 +105,7 @@ public class WriteSelectorHandler implements SelectorHandler {
 		try {
 			channel.close();
 		} catch (Exception e) {
-			throw new HttpException("channel close", e);
+			throw new HttpException("handle write channel close", e);
 		}
 		key.cancel();
 		return key;
