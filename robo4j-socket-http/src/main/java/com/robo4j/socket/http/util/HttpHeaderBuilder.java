@@ -19,6 +19,7 @@ package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.util.StringConstants;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -29,46 +30,44 @@ import java.util.stream.Collectors;
  * @author Miro Wengner (@miragemiko)
  */
 public final class HttpHeaderBuilder {
-    private static final String STRING_EMPTY = "";
-    private final Map<String, String> map = new LinkedHashMap<>();
-    private HttpFirstLineBuilder firstLineBuilder;
+	private static final String STRING_EMPTY = "";
+	private final Map<String, String> map = new LinkedHashMap<>();
+	private HttpFirstLineBuilder firstLineBuilder;
 
-    private HttpHeaderBuilder(){
+	private HttpHeaderBuilder() {
 
-    }
+	}
 
-    public static HttpHeaderBuilder Build(){
-        return new HttpHeaderBuilder();
-    }
+	public static HttpHeaderBuilder Build() {
+		return new HttpHeaderBuilder();
+	}
 
-    public HttpHeaderBuilder add(String key, String value){
-        map.put(key, value);
-        return this;
-    }
+	public HttpHeaderBuilder add(String key, String value) {
+		map.put(key, value);
+		return this;
+	}
 
-    public HttpHeaderBuilder addFirstLine(String value){
-        if(firstLineBuilder == null){
-            firstLineBuilder = HttpFirstLineBuilder.Build(value) ;
-        }
-        firstLineBuilder.add(value);
-        return this;
-    }
+	public HttpHeaderBuilder addFirstLine(Object value) {
+		if (firstLineBuilder == null) {
+			firstLineBuilder = HttpFirstLineBuilder.Build(value);
+		} else {
+			firstLineBuilder.add(value);
+		}
+		return this;
+	}
 
+	public String build() {
+		final String start = firstLineBuilder.isEmpty() ? StringConstants.EMPTY
+				: firstLineBuilder.build().concat(HttpMessageUtil.NEXT_LINE);
+		return start.concat(map
+				.entrySet().stream().map(e -> e.getKey().concat(HttpMessageUtil.COLON).concat(HttpMessageUtil.SPACE)
+						.concat(e.getValue()).concat(HttpMessageUtil.NEXT_LINE))
+				.collect(Collectors.joining(STRING_EMPTY)));
+	}
 
-
-
-    public String build(){
-        return map.entrySet().stream()
-                .map(e -> e.getKey().concat(HttpMessageUtil.COLON)
-                        .concat(HttpMessageUtil.SPACE)
-                        .concat(e.getValue())
-                        .concat(HttpMessageUtil.NEXT_LINE))
-                .collect(Collectors.joining(STRING_EMPTY));
-    }
-
-    public String build(HttpMethod method, HttpVersion version){
-        addFirstLine(version.getValue());
-        //@formatter:off
+	public String build(HttpMethod method, HttpVersion version) {
+		addFirstLine(version.getValue());
+		//@formatter:off
         return method.getName()
                 .concat(HttpMessageUtil.SPACE)
                 .concat(firstLineBuilder.build())
@@ -80,8 +79,6 @@ public final class HttpHeaderBuilder {
                                 .concat(HttpMessageUtil.NEXT_LINE))
                         .collect(Collectors.joining(STRING_EMPTY)));
         //@formatter:on
-    }
-
-
+	}
 
 }

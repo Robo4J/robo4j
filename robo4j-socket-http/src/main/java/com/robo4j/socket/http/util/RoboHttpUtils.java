@@ -48,7 +48,10 @@ public final class RoboHttpUtils {
 
 
     public static String createResponseWithHeaderAndMessage(String header, String message) {
-        return header.concat(NEW_LINE_UNIX).concat(message);
+        return header
+                .concat(NEW_LINE_MAC)
+                .concat(NEW_LINE_UNIX)
+                .concat(message);
     }
 
     public static String createResponseByCode(StatusCode code) {
@@ -84,10 +87,7 @@ public final class RoboHttpUtils {
 
     public static String createRequest(HttpMethod method, String host, String path, String message) {
         final String header = createRequestHeader(method, host, path, message.length());
-        return header
-                .concat(NEW_LINE_MAC)
-                .concat(NEW_LINE_UNIX)
-                .concat(message);
+        return createResponseWithHeaderAndMessage(header,message);
     }
 
     public static String correctLine(String line) {

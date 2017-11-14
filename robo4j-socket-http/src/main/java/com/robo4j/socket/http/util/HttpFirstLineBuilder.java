@@ -24,17 +24,21 @@ package com.robo4j.socket.http.util;
 public final class HttpFirstLineBuilder {
 	private volatile StringBuilder sb;
 
-	private HttpFirstLineBuilder(String value) {
-		sb = new StringBuilder(value);
+	private HttpFirstLineBuilder(Object value) {
+		sb = new StringBuilder(String.valueOf(value));
 	}
 
-	public static HttpFirstLineBuilder Build(String value) {
+	public static HttpFirstLineBuilder Build(Object value) {
 		return new HttpFirstLineBuilder(value);
 	}
 
 	public HttpFirstLineBuilder add(Object value) {
 		sb.append(HttpMessageUtil.SPACE).append(value);
 		return this;
+	}
+
+	public boolean isEmpty(){
+		return sb.length() == 0;
 	}
 
 	public String build() {

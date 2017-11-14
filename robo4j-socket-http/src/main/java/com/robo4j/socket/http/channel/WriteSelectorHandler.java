@@ -19,11 +19,14 @@ package com.robo4j.socket.http.channel;
 
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
+import com.robo4j.socket.http.HttpHeaderFieldNames;
+import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.request.RoboResponseProcess;
 import com.robo4j.socket.http.units.HttpException;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
 import com.robo4j.socket.http.util.ChannelUtil;
+import com.robo4j.socket.http.util.HttpHeaderBuilder;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.socket.http.util.RoboResponseHeader;
 
@@ -65,8 +68,12 @@ public class WriteSelectorHandler implements SelectorHandler {
 			case GET:
 				String getResponse;
 				if (responseProcess.getResult() != null && responseProcess.getCode().equals(StatusCode.OK)) {
-					String getHeader = RoboResponseHeader.headerByCodeWithUid(responseProcess.getCode(),
-							context.getId());
+					String getHeader =  HttpHeaderBuilder.Build()
+							.addFirstLine(HttpVersion.HTTP_1_1.getValue())
+							.addFirstLine(responseProcess.getCode().getCode())
+							.addFirstLine(responseProcess.getCode().getReasonPhrase())
+							.add(HttpHeaderFieldNames.ROBO_UNIT_UID, context.getId())
+							.build();
 					getResponse = RoboHttpUtils.createResponseWithHeaderAndMessage(getHeader,
 							responseProcess.getResult().toString());
 				} else {

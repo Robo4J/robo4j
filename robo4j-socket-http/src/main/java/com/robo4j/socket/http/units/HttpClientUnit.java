@@ -24,14 +24,12 @@ import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.util.ChannelUtil;
-import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.Map;
 
 /**
  * Http NIO Client to communicate with external system/Robo4J units
@@ -60,10 +58,6 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		bufferCapacity = configuration.getInteger("bufferCapacity", null);
 		blocking = configuration.getBoolean("blocking", false);
 
-		Map<String, Object> targetUnitsMap = JsonUtil.getMapNyJson(configuration.getString("targetUnits", null));
-		if (confAddress == null || targetUnitsMap.isEmpty()) {
-			throw ConfigurationException.createMissingConfigNameException("address, path, commands...");
-		}
 		address = new InetSocketAddress(confAddress, confPort);
 
 		setState(LifecycleState.INITIALIZED);

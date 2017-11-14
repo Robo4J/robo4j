@@ -17,6 +17,7 @@
 
 package com.robo4j.socket.http;
 
+import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.util.HttpHeaderBuilder;
 import com.robo4j.socket.http.util.HttpMessageUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
@@ -58,6 +59,17 @@ public class HttpHeaderTests {
     public void characterParser() {
         Assert.assertTrue("[".equals(HttpMessageUtil.getHttpSeparator(13)));
         Assert.assertTrue("]".equals(HttpMessageUtil.getHttpSeparator(14)));
+    }
+
+    @Test
+    public void test(){
+        String getHeader =  HttpHeaderBuilder.Build()
+                .addFirstLine(HttpVersion.HTTP_1_1.getValue())
+                .addFirstLine(StatusCode.OK.getCode())
+                .addFirstLine(StatusCode.OK.getReasonPhrase())
+                .add(HttpHeaderFieldNames.ROBO_UNIT_UID, "1234")
+                .build();
+        System.out.println("SOME: " + getHeader);
     }
 
     @Test
