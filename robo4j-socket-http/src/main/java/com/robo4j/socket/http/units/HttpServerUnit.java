@@ -99,7 +99,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		final List<RoboReference<Object>> targetRefs = target.stream().map(e -> getContext().getReference(e))
 				.filter(Objects::nonNull).collect(Collectors.toList());
 
-		inboundSocketHandler = new InboundSocketHandler(this, targetRefs, propertiesProvider);
+		inboundSocketHandler = new InboundSocketHandler(getContext(), targetRefs, propertiesProvider);
 		HttpUriRegister.getInstance().updateUnits(getContext());
 		inboundSocketHandler.start();
 		setState(LifecycleState.STARTED);

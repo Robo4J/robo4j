@@ -41,6 +41,11 @@ public class HttpMessage implements Comparable<HttpMessage> {
 		this.header = header;
 	}
 
+	public HttpMessage(HttpMessageDescriptor messageDescriptor) {
+		this(messageDescriptor.getMethod(), URI.create(messageDescriptor.getPath()),
+				HttpVersion.getByValue(messageDescriptor.getVersion()), messageDescriptor.getHeader());
+	}
+
 	public HttpMethod method() {
 		return method;
 	}

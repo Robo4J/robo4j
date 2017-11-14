@@ -40,7 +40,6 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -52,9 +51,8 @@ public class CameraImageProducerTestUnit extends RoboUnit<Boolean> {
 
 	public static final String ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME = "numberOfSentImages";
 	public static final String ATTRIBUTE_NUMBER_OF_IMAGES_NAME = "numberOfImages";
-	public static final Collection<AttributeDescriptor<?>> ATTRIBUTE_DESCRIPTORS = Collections
-			.unmodifiableCollection(Arrays.asList(
-					DefaultAttributeDescriptor.create(Integer.class, ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME),
+	public static final Collection<AttributeDescriptor<?>> ATTRIBUTE_DESCRIPTORS = Collections.unmodifiableCollection(
+			Arrays.asList(DefaultAttributeDescriptor.create(Integer.class, ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME),
 					DefaultAttributeDescriptor.create(Integer.class, ATTRIBUTE_NUMBER_OF_IMAGES_NAME)));
 
 	private final CameraMessageCodec codec = new CameraMessageCodec();
@@ -64,7 +62,6 @@ public class CameraImageProducerTestUnit extends RoboUnit<Boolean> {
 	private String targetOut;
 	private String client;
 	private String clientUri;
-	private Integer timeout;
 	private Integer numberOfImages;
 
 	public CameraImageProducerTestUnit(RoboContext context, String id) {
@@ -74,7 +71,6 @@ public class CameraImageProducerTestUnit extends RoboUnit<Boolean> {
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		targetOut = configuration.getString("targetOut", null);
-		timeout = configuration.getInteger("timeout", null);
 		numberOfImages = configuration.getInteger("numberOfImages", 0);
 		String tmpClient = configuration.getString("client", null);
 
@@ -111,10 +107,10 @@ public class CameraImageProducerTestUnit extends RoboUnit<Boolean> {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
-		if (descriptor.getAttributeType() == Integer.class){
-			if(descriptor.getAttributeName().equals(ATTRIBUTE_NUMBER_OF_IMAGES_NAME)){
+		if (descriptor.getAttributeType() == Integer.class) {
+			if (descriptor.getAttributeName().equals(ATTRIBUTE_NUMBER_OF_IMAGES_NAME)) {
 				return (R) numberOfImages;
-			}else if(descriptor.getAttributeName().equals(ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME)){
+			} else if (descriptor.getAttributeName().equals(ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME)) {
 				return (R) Integer.valueOf(counter.get());
 			}
 		}
@@ -131,15 +127,6 @@ public class CameraImageProducerTestUnit extends RoboUnit<Boolean> {
 			final CameraMessage cameraMessage = new CameraMessage("jpg", String.valueOf(counter.incrementAndGet()),
 					encodeString);
 
-			if (timeout != null) {
-				try {
-					TimeUnit.MILLISECONDS.sleep(timeout);
-					System.out.println(
-							getClass().getSimpleName() + " sleeping: " + timeout + "ms image: " + counter.get());
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
 			final String message = codec.encode(cameraMessage);
 			final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, message);
 			System.out.println(getClass() + " image to sent number: " + cameraMessage.getValue() + " Size: "

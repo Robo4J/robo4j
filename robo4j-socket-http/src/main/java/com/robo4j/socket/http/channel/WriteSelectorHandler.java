@@ -17,8 +17,8 @@
 
 package com.robo4j.socket.http.channel;
 
+import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.RoboUnit;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.request.RoboResponseProcess;
 import com.robo4j.socket.http.units.HttpException;
@@ -40,13 +40,14 @@ import java.util.Map;
  */
 public class WriteSelectorHandler implements SelectorHandler {
 
-	private final RoboUnit<?> roboUnit;
+	private final RoboContext context;
 	private final List<RoboReference<Object>> targetRefs;
 	private final Map<SelectionKey, RoboResponseProcess> outBuffers;
 	private final SelectionKey key;
 
-	public WriteSelectorHandler(RoboUnit<?> roboUnit, List<RoboReference<Object>> targetRefs, Map<SelectionKey, RoboResponseProcess> outBuffers, SelectionKey key) {
-		this.roboUnit = roboUnit;
+	public WriteSelectorHandler(RoboContext context, List<RoboReference<Object>> targetRefs,
+			Map<SelectionKey, RoboResponseProcess> outBuffers, SelectionKey key) {
+		this.context = context;
 		this.targetRefs = targetRefs;
 		this.outBuffers = outBuffers;
 		this.key = key;
@@ -65,7 +66,7 @@ public class WriteSelectorHandler implements SelectorHandler {
 				String getResponse;
 				if (responseProcess.getResult() != null && responseProcess.getCode().equals(StatusCode.OK)) {
 					String getHeader = RoboResponseHeader.headerByCodeWithUid(responseProcess.getCode(),
-							roboUnit.getContext().getId());
+							context.getId());
 					getResponse = RoboHttpUtils.createResponseWithHeaderAndMessage(getHeader,
 							responseProcess.getResult().toString());
 				} else {

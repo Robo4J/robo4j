@@ -35,37 +35,37 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class CameraImageConsumerTestUnit extends RoboUnit<CameraMessage> {
 
-    public static final String ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME = "numberOfReceivedImages";
-    public static final Collection<AttributeDescriptor<?>> ATTRIBUTES_COLLECTION = Collections
-            .unmodifiableCollection(Collections
-                    .singletonList(DefaultAttributeDescriptor.create(Integer.class, ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME)));
+	public static final String ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME = "numberOfReceivedImages";
+	public static final Collection<AttributeDescriptor<?>> ATTRIBUTES_COLLECTION = Collections
+			.unmodifiableCollection(Collections.singletonList(
+					DefaultAttributeDescriptor.create(Integer.class, ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME)));
 
-    private final AtomicInteger counter = new AtomicInteger(0);
+	private final AtomicInteger counter = new AtomicInteger(0);
 
-    public CameraImageConsumerTestUnit(RoboContext context, String id) {
-        super(CameraMessage.class, context, id);
-        System.out.println(getClass() + "init");
-    }
+	public CameraImageConsumerTestUnit(RoboContext context, String id) {
+		super(CameraMessage.class, context, id);
+		System.out.println(getClass() + "init");
+	}
 
-    @Override
-    public void onMessage(CameraMessage message) {
-        if(message.getImage() != null){
-            final byte[] bytes = Base64.getDecoder().decode(message.getImage());
-            System.out.println(getClass().getSimpleName() + " Delivered image: " + counter.incrementAndGet() + " size: " + bytes.length + " imageSize: " + message.getImage().length());
-        } else {
-            SimpleLoggingUtil.error(getClass(), "no imageView: " + counter.getAndIncrement());
-        }
-    }
+	@Override
+	public void onMessage(CameraMessage message) {
+		if (message.getImage() != null) {
+			final byte[] bytes = Base64.getDecoder().decode(message.getImage());
+			System.out.println(getClass().getSimpleName() + " Delivered image: " + counter.incrementAndGet() + " size: "
+					+ bytes.length + " imageSize: " + message.getImage().length());
+		} else {
+			SimpleLoggingUtil.error(getClass(), "no imageView: " + counter.getAndIncrement());
+		}
+	}
 
-    @SuppressWarnings("unchecked")
-    @Override
-    protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
-        if (descriptor.getAttributeType() == Integer.class
-                && descriptor.getAttributeName().equals(ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME)) {
-            return (R) Integer.valueOf(counter.get());
-        }
-        return super.onGetAttribute(descriptor);
-    }
-
+	@SuppressWarnings("unchecked")
+	@Override
+	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
+		if (descriptor.getAttributeType() == Integer.class
+				&& descriptor.getAttributeName().equals(ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME)) {
+			return (R) Integer.valueOf(counter.get());
+		}
+		return super.onGetAttribute(descriptor);
+	}
 
 }

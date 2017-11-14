@@ -18,14 +18,12 @@
 package com.robo4j.socket.http.request;
 
 import com.robo4j.AttributeDescriptor;
+import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.RoboUnit;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMessage;
 import com.robo4j.socket.http.HttpMessageDescriptor;
 import com.robo4j.socket.http.HttpMessageWrapper;
-import com.robo4j.socket.http.HttpMethod;
-import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.dto.RoboPathReferenceDTO;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.enums.SystemPath;
@@ -49,13 +47,13 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 	public static final int PATH_DEFAULT_LEVEL = 0;
 	public static final int PATH_FIRST_LEVEL = 1;
 
-	private final RoboUnit<?> unit;
+	private final RoboContext context;
 	private final HttpMessageDescriptor messageDescriptor;
 	private final DefaultRequestFactory<?> factory;
 
-	public RoboRequestCallable(RoboUnit<?> unit, HttpMessageDescriptor messageDescriptor, DefaultRequestFactory<Object> factory) {
+	public RoboRequestCallable(RoboContext context, HttpMessageDescriptor messageDescriptor, DefaultRequestFactory<Object> factory) {
 		assert messageDescriptor != null;
-		this.unit = unit;
+		this.context = context;
 		this.messageDescriptor = messageDescriptor;
 		this.factory = factory;
 	}
@@ -65,28 +63,23 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 	@Override
 	public RoboResponseProcess call() throws Exception {
 
-
-		//TODO: (miro) -> separate header and body different processes
 		final RoboResponseProcess result = new RoboResponseProcess();
-		final HttpMethod method = messageDescriptor.getMethod();
-		if (method != null) {
-			result.setMethod(method);
+
+		if (messageDescriptor.getMethod() != null) {
+			result.setMethod(messageDescriptor.getMethod());
 
 
 			/* parsed http specifics, header */
-			final HttpMessage httpMessage = new HttpMessage(method,
-					URI.create(messageDescriptor.getPath()),
-					HttpVersion.getByValue(messageDescriptor.getVersion()),
-					messageDescriptor.getHeader());
+			final HttpMessage httpMessage = new HttpMessage(messageDescriptor);
 
-			final List<String> paths = HttpPathUtil.uriStringToPathList(httpMessage.uri().getPath());
+			final List<String> paths = HttpPathUtil.uriStringToPathList(messageDescriptor.getPath());
 
-			switch (method) {
+			switch (messageDescriptor.getMethod()) {
 			case GET:
 				switch (paths.size()) {
 				case PATH_DEFAULT_LEVEL:
 					result.setCode(StatusCode.OK);
-					result.setResult(factory.processGet(unit) );
+					result.setResult(factory.processGet(context) );
 					break;
 				case PATH_FIRST_LEVEL:
 					result.setCode(StatusCode.NOT_IMPLEMENTED);
@@ -151,7 +144,7 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 
 			default:
 				result.setCode(StatusCode.BAD_REQUEST);
-				SimpleLoggingUtil.debug(getClass(), "not implemented method: " + method);
+				SimpleLoggingUtil.debug(getClass(), "not implemented method: " + messageDescriptor.getMethod());
 			}
 		} else {
 			result.setCode(StatusCode.BAD_REQUEST);

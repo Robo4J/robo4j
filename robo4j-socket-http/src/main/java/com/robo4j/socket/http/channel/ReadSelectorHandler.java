@@ -17,7 +17,7 @@
 
 package com.robo4j.socket.http.channel;
 
-import com.robo4j.RoboUnit;
+import com.robo4j.RoboContext;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMessageDescriptor;
 import com.robo4j.socket.http.request.RoboRequestCallable;
@@ -37,14 +37,14 @@ import java.util.concurrent.Future;
  */
 public class ReadSelectorHandler implements SelectorHandler {
 
-	private final RoboUnit<?> roboUnit;
+	private final RoboContext context;
 	private final HttpCodecRegistry codecRegistry;
 	private final Map<SelectionKey, RoboResponseProcess> outBuffers;
 	private final SelectionKey key;
 
-	public ReadSelectorHandler(RoboUnit<?> roboUnit, HttpCodecRegistry codecRegistry,
+	public ReadSelectorHandler(RoboContext context, HttpCodecRegistry codecRegistry,
 			Map<SelectionKey, RoboResponseProcess> outBuffers, SelectionKey key) {
-		this.roboUnit = roboUnit;
+		this.context = context;
 		this.codecRegistry = codecRegistry;
 		this.outBuffers = outBuffers;
 		this.key = key;
@@ -59,15 +59,15 @@ public class ReadSelectorHandler implements SelectorHandler {
 
 			final RoboRequestFactory factory = new RoboRequestFactory(codecRegistry);
 
-			final RoboRequestCallable callable = new RoboRequestCallable(roboUnit, messageDescriptor, factory);
+			final RoboRequestCallable callable = new RoboRequestCallable(context, messageDescriptor, factory);
 
-			final Future<RoboResponseProcess> futureResult = roboUnit.getContext().getScheduler().submit(callable);
+			final Future<RoboResponseProcess> futureResult = context.getScheduler().submit(callable);
 			final RoboResponseProcess result = futureResult.get();
 			outBuffers.put(key, result);
 
 			channel.register(key.selector(), SelectionKey.OP_WRITE);
 		} catch (Exception e) {
-			SimpleLoggingUtil.error(getClass(), "handle read", e);
+			SimpleLoggingUtil.error(getClass(), "handle read", e.getCause());
 		}
 		return key;
 	}

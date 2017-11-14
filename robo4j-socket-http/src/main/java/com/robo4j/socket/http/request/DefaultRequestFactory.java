@@ -17,8 +17,8 @@
 package com.robo4j.socket.http.request;
 
 import com.robo4j.AttributeDescriptor;
+import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.RoboUnit;
 import com.robo4j.socket.http.HttpMessageWrapper;
 
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.List;
  */
 public interface DefaultRequestFactory<ResponseType> {
 
-	ResponseType processGet(RoboUnit<?> desiredUnit);
+	ResponseType processGet(RoboContext context);
 
 	ResponseType processGet(RoboReference<?> desiredReference, AttributeDescriptor<?> attributeDescriptor);
 

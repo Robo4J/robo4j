@@ -17,9 +17,8 @@
 
 package com.robo4j.socket.http.channel;
 
-import com.robo4j.LifecycleState;
+import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.RoboUnit;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.PropertiesProvider;
 import com.robo4j.socket.http.request.RoboResponseProcess;
@@ -30,7 +29,6 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
-import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.robo4j.socket.http.units.HttpServerUnit.PROPERTY_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.units.HttpServerUnit.PROPERTY_CODEC_REGISTRY;
+import static com.robo4j.socket.http.units.HttpServerUnit.PROPERTY_PORT;
 
 /**
  * Inbound context co
@@ -48,17 +47,16 @@ import static com.robo4j.socket.http.units.HttpServerUnit.PROPERTY_CODEC_REGISTR
  */
 public class InboundSocketHandler implements SocketHandler {
 
-	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
-	private final RoboUnit<?> roboUnit;
+	private final RoboContext context;
 	private final List<RoboReference<Object>> targetRefs;
 	private final Map<SelectionKey, RoboResponseProcess> outBuffers = new ConcurrentHashMap<>();
 	private ServerSocketChannel socketChannel;
 	private PropertiesProvider properties;
 	private boolean active;
 
-	public InboundSocketHandler(RoboUnit<?> roboUnit, List<RoboReference<Object>> targetRefs,
+	public InboundSocketHandler(RoboContext context, List<RoboReference<Object>> targetRefs,
 			PropertiesProvider properties) {
-		this.roboUnit = roboUnit;
+		this.context = context;
 		this.targetRefs = targetRefs;
 		this.properties = properties;
 	}
@@ -67,7 +65,7 @@ public class InboundSocketHandler implements SocketHandler {
 	public void start() {
 		if (!active) {
 			active = true;
-			roboUnit.getContext().getScheduler().execute(() -> initSocketChannel(targetRefs, properties));
+			context.getScheduler().execute(() -> initSocketChannel(targetRefs, properties));
 		}
 	}
 
@@ -93,8 +91,8 @@ public class InboundSocketHandler implements SocketHandler {
 			socketChannel.bind(new InetSocketAddress(properties.getIntSafe("port")));
 
 			final SelectionKey key = socketChannel.register(selector, SelectionKey.OP_ACCEPT);
-            final HttpCodecRegistry codecRegistry = properties.getPropertyByClassSafe(PROPERTY_CODEC_REGISTRY);
-            final int bufferCapacity = properties.getIntSafe(PROPERTY_BUFFER_CAPACITY);
+			final HttpCodecRegistry codecRegistry = properties.getPropertyByClassSafe(PROPERTY_CODEC_REGISTRY);
+			final int bufferCapacity = properties.getIntSafe(PROPERTY_BUFFER_CAPACITY);
 
 			while (active) {
 
@@ -103,7 +101,7 @@ public class InboundSocketHandler implements SocketHandler {
 					continue;
 				}
 
-				Set<SelectionKey> selectedKeys =  key.selector().selectedKeys();
+				Set<SelectionKey> selectedKeys = key.selector().selectedKeys();
 				Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
 
 				while (selectedIterator.hasNext()) {
@@ -114,23 +112,22 @@ public class InboundSocketHandler implements SocketHandler {
 					if (selectedKey.isAcceptable()) {
 						handleSelectorHandler(new AcceptSelectorHandler(selectedKey, bufferCapacity));
 					} else if (selectedKey.isConnectable()) {
-                        handleSelectorHandler(new ConnectSelectorHandler(selectedKey));
+						handleSelectorHandler(new ConnectSelectorHandler(selectedKey));
 					} else if (selectedKey.isReadable()) {
-                        handleSelectorHandler(new ReadSelectorHandler(roboUnit, codecRegistry, outBuffers, selectedKey));
+						handleSelectorHandler(new ReadSelectorHandler(context, codecRegistry, outBuffers, selectedKey));
 					} else if (selectedKey.isWritable()) {
-                        handleSelectorHandler(new WriteSelectorHandler(roboUnit, targetRefs, outBuffers, selectedKey));
+						handleSelectorHandler(new WriteSelectorHandler(context, targetRefs, outBuffers, selectedKey));
 					}
 				}
 			}
 		} catch (IOException e) {
 			SimpleLoggingUtil.error(getClass(), "SERVER CLOSED", e);
 		}
-		SimpleLoggingUtil.debug(getClass(), "stopped port: " + properties.getIntSafe("port"));
+		SimpleLoggingUtil.debug(getClass(), "stopped port: " + properties.getIntSafe(PROPERTY_PORT));
 	}
 
-	private void handleSelectorHandler(SelectorHandler handler){
-	    handler.handle();
-    }
-
+	private void handleSelectorHandler(SelectorHandler handler) {
+		handler.handle();
+	}
 
 }
