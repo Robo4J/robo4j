@@ -52,19 +52,15 @@ public class ReadSelectorHandler implements SelectorHandler {
 
 	@Override
 	public SelectionKey handle() {
+		SocketChannel channel = (SocketChannel) key.channel();
 		try {
-			SocketChannel channel = (SocketChannel) key.channel();
 			final HttpMessageDescriptor messageDescriptor = ChannelBufferUtils
 					.getHttpMessageDescriptorByChannel(channel);
-
 			final RoboRequestFactory factory = new RoboRequestFactory(codecRegistry);
-
 			final RoboRequestCallable callable = new RoboRequestCallable(context, messageDescriptor, factory);
-
 			final Future<RoboResponseProcess> futureResult = context.getScheduler().submit(callable);
 			final RoboResponseProcess result = futureResult.get();
 			outBuffers.put(key, result);
-
 			channel.register(key.selector(), SelectionKey.OP_WRITE);
 		} catch (Exception e) {
 			SimpleLoggingUtil.error(getClass(), "handle read", e.getCause());
