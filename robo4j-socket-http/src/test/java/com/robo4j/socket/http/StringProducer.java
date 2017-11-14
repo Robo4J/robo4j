@@ -22,7 +22,9 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.StringToolkit;
 import com.robo4j.configuration.Configuration;
+import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.util.RoboHttpUtils;
+import com.robo4j.util.StringConstants;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -101,7 +103,7 @@ public class StringProducer extends RoboUnit<String> {
     }
 
     public void sendGetSimpleMessage(String host, String path) {
-        final String request = RoboHttpUtils.createGetRequest(ProtocolType.HTTP, host, path);
+        final String request = RoboHttpUtils.createRequest(HttpMethod.GET, host, path, StringConstants.EMPTY);
         getContext().getReference(target).sendMessage(request);
     }
 

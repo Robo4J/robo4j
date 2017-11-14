@@ -17,15 +17,14 @@
 package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.HttpHeaderFieldNames;
+import com.robo4j.socket.http.HttpHeaderFieldValues;
 import com.robo4j.socket.http.HttpMethod;
-import com.robo4j.socket.http.ProtocolType;
+import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.request.RoboBasicMapEntry;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.util.StringConstants;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,24 +52,6 @@ public final class RoboHttpUtils {
     public static final int DEFAULT_PORT = 8042;
     public static final String HTTP_TARGET_UNITS = "targetUnits";
 
-    public static String setHeader(String responseCode, int length) throws IOException {
-        //@formatter:off
-		return HttpHeaderBuilder.Build()
-				.add(StringConstants.EMPTY, responseCode)
-				.add(HttpHeaderFieldNames.DATE, LocalDateTime.now().toString())
-				.add(HttpHeaderFieldNames.SERVER, ROBO4J_CLIENT)
-				.add(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(length))
-				.add(HttpHeaderFieldNames.CONTENT_TYPE, "text/html;".concat(Constants.UTF8_SPACE).concat("charset=utf-8"))
-				.build();
-		//@formatter:on
-    }
-
-    public static String createHeaderWithFirstLineAndMap(String first, Map<String, String> headerMap) {
-        HttpHeaderBuilder result = HttpHeaderBuilder.Build();
-        headerMap.forEach(result::add);
-        return first.concat(result.build());
-
-    }
 
     public static String createResponseWithHeaderAndMessage(String header, String message) {
         return header.concat(NEW_LINE_UNIX).concat(message);
@@ -82,31 +63,33 @@ public final class RoboHttpUtils {
                 StringConstants.EMPTY);
     }
 
-    public static String createRequestHeader(String host, int length) {
+    /**
+     * creat Default request Header
+     *
+     * @param host
+     * @param length
+     * @return
+     */
+    public static String createRequestHeader(HttpMethod method, String host, String path, int length) {
         //@formatter:off
-		HttpHeaderBuilder builder = HttpHeaderBuilder.Build()
-			.add(HttpHeaderFieldNames.HOST, host)
-			.add(HttpHeaderFieldNames.CONNECTION, CONNECTION_KEEP_ALIVE)
-			.add(HttpHeaderFieldNames.CACHE_CONTROL, "no-cache")
-			.add(HttpHeaderFieldNames.USER_AGENT, ROBO4J_CLIENT)
-			.add(HttpHeaderFieldNames.ACCEPT, "*/*")
-			.add(HttpHeaderFieldNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
-			.add(HttpHeaderFieldNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8")
-			.add(HttpHeaderFieldNames.CONTENT_TYPE, "text/html;".concat(Constants.UTF8_SPACE).concat("charset=utf-8"));
-		if(length != 0){
+
+		HttpHeaderBuilder builder =  HttpHeaderBuilder.Build()
+                .addFirstLine(path)
+                .add(HttpHeaderFieldNames.HOST, host).add(HttpHeaderFieldNames.CONNECTION, CONNECTION_KEEP_ALIVE)
+                .add(HttpHeaderFieldNames.CACHE_CONTROL, HttpHeaderFieldValues.NO_CACHE).add(HttpHeaderFieldNames.USER_AGENT, ROBO4J_CLIENT)
+                .add(HttpHeaderFieldNames.ACCEPT, "*/*")
+                .add(HttpHeaderFieldNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
+                .add(HttpHeaderFieldNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8")
+		        .add(HttpHeaderFieldNames.CONTENT_TYPE, "text/html;".concat(Constants.UTF8_SPACE).concat("charset=utf-8"));
+        if(length != 0){
 			builder.add(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(length));
 		}
-		return builder.build();
+        return builder.build(method, HttpVersion.HTTP_1_1);
 		//@formatter:on
     }
 
-    public static String createRequest(HttpMethod method, String host, String uri, String message) {
-        final String header = createHeader(method, host, uri, message.length());
-        return createRequest(header, message);
-    }
-
-    public static String createRequest(HttpMethod method, ProtocolType protocol, String host, String uri, String message) {
-        final String header = createHeader(method, protocol, host, uri, message.length());
+    public static String createRequest(HttpMethod method, String host, String path, String message) {
+        final String header = createHeader(method, host, path, message.length());
         return createRequest(header, message);
     }
 
@@ -119,32 +102,12 @@ public final class RoboHttpUtils {
 		//@formatter:on
     }
 
-    public static String createHeader(HttpMethod method, ProtocolType protocol, String host, String path, int length) {
-        return createHeaderFirstLine(method, path)
-                .concat(createRequestHeader(host, length));
-    }
-
-    public static String createHeader(HttpMethod method, String host, String uri, int length) {
-        return createHeaderFirstLine(method, uri)
-                .concat(createRequestHeader(host, length));
-    }
-
-    public static String createHeaderFirstLine(HttpMethod method, String path) {
-        return HttpFirstLineBuilder.Build(method.getName()).add(path).add(HTTP_VERSION).build();
-    }
-
-
-    public static String createGetRequest(ProtocolType protocol, String host, String path) {
-        return createHeaderFirstLine(HttpMethod.GET, path)
-                .concat(createRequestHeader(host, 0));
-
+    public static String createHeader(HttpMethod method, String host, String path, int length) {
+        return createRequestHeader(method, host, path, length);
     }
 
     public static String createGetRequest(String host, String path) {
-        //@formatter:off
-		return HttpFirstLineBuilder.Build(HttpMethod.GET.getName()).add(path).add(HTTP_VERSION)
-				.build().concat(createRequestHeader(host, 0));
-		//@formatter:on
+        return createRequestHeader(HttpMethod.GET, host, path, 0);
     }
 
     public static String correctLine(String line) {

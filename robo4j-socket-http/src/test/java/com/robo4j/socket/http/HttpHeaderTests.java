@@ -64,7 +64,7 @@ public class HttpHeaderTests {
 
     @Test
     public void extractHeaderParameter() {
-        String postRequest = RoboHttpUtils.createRequest(HttpMethod.POST, ProtocolType.HTTP, "127.0.0.1", "controller", "message");
+        String postRequest = RoboHttpUtils.createRequest(HttpMethod.POST, "127.0.0.1", "controller", "message");
         System.out.println("HEADER: " + postRequest);
     }
 }

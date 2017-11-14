@@ -24,8 +24,8 @@ import com.robo4j.StringProducer;
 import com.robo4j.StringToolkit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.socket.http.HttpMethod;
-import com.robo4j.socket.http.ProtocolType;
 import com.robo4j.socket.http.util.RoboHttpUtils;
+import com.robo4j.util.StringConstants;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class HttpStringProducer extends StringProducer{
+public class HttpStringProducer extends StringProducer {
 
     /* default sent messages */
     private static final int DEFAULT = 0;
@@ -78,7 +78,7 @@ public class HttpStringProducer extends StringProducer{
             String inMessage = input[1].trim();
             switch (inMessageType) {
                 case SEND_GET_MESSAGE:
-                    sendGetSimpleMessage(targetAddress, inMessage);
+                    sendGetSimpleMessage(targetAddress);
                     break;
                 case SEND_POST_MESSAGE:
                     sendPostSimpleMessage(targetAddress, uri, inMessage);
@@ -104,16 +104,16 @@ public class HttpStringProducer extends StringProducer{
         getContext().getReference(target).sendMessage(message);
     }
 
-    private void sendGetSimpleMessage(String host, String message) {
-        final String request =  RoboHttpUtils.createGetRequest(host, message);
+    private void sendGetSimpleMessage(String host) {
+        final String request = RoboHttpUtils.createRequest(HttpMethod.GET, host, StringConstants.EMPTY, StringConstants.EMPTY);
         getContext().getReference(target).sendMessage(request);
     }
 
     private void sendPostSimpleMessage(String host, String uri, String message) {
-        if(uri == null){
+        if (uri == null) {
             throw new IllegalStateException("uri not available");
         }
-        final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, ProtocolType.HTTP, host, uri, message);
+        final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, host, uri, message);
         getContext().getReference(target).sendMessage(postMessage);
     }
 }

@@ -63,7 +63,7 @@ public class ReadSelectorHandler implements SelectorHandler {
 			outBuffers.put(key, result);
 			channel.register(key.selector(), SelectionKey.OP_WRITE);
 		} catch (Exception e) {
-			SimpleLoggingUtil.error(getClass(), "handle read", e.getCause());
+			SimpleLoggingUtil.error(getClass(), "handle read", e);
 		}
 		return key;
 	}
