@@ -18,6 +18,7 @@
 package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.HttpHeaderFieldNames;
+import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.enums.StatusCode;
 
 /**
@@ -28,14 +29,18 @@ import com.robo4j.socket.http.enums.StatusCode;
  */
 public final class RoboResponseHeader {
 
-    public static String headerByCode(StatusCode code){
-        return HttpFirstLineBuilder.Build(RoboHttpUtils.HTTP_VERSION).add(code.getCode()).add(code.getReasonPhrase()).build();
+    public static String headerByCode(StatusCode code) {
+        return HttpFirstLineBuilder.Build(HttpVersion.HTTP_1_1.getValue())
+                .add(code.getCode())
+                .add(code.getReasonPhrase())
+                .build();
     }
 
-    public static String headerByCodeWithUid(StatusCode code, String uid){
-        return HttpFirstLineBuilder.Build(RoboHttpUtils.HTTP_VERSION)
-                .add(code.getCode()).build()
-                .concat( HttpHeaderBuilder.Build()
+    public static String headerByCodeWithUid(StatusCode code, String uid) {
+        return HttpFirstLineBuilder.Build(HttpVersion.HTTP_1_1.getValue())
+                .add(code.getCode())
+                .build()
+                .concat(HttpHeaderBuilder.Build()
                         .add(HttpHeaderFieldNames.ROBO_UNIT_UID, uid)
                         .build());
     }

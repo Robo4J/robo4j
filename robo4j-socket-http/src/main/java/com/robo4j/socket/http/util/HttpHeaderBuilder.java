@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public final class HttpHeaderBuilder {
     private static final String STRING_EMPTY = "";
     private final Map<String, String> map = new LinkedHashMap<>();
-    private final StringBuilder sb = new StringBuilder();
+    private HttpFirstLineBuilder firstLineBuilder;
 
     private HttpHeaderBuilder(){
 
@@ -47,9 +47,14 @@ public final class HttpHeaderBuilder {
     }
 
     public HttpHeaderBuilder addFirstLine(String value){
-        sb.append(HttpMessageUtil.SPACE).append(value);
+        if(firstLineBuilder == null){
+            firstLineBuilder = HttpFirstLineBuilder.Build(value) ;
+        }
+        firstLineBuilder.add(value);
         return this;
     }
+
+
 
 
     public String build(){
@@ -65,7 +70,8 @@ public final class HttpHeaderBuilder {
         addFirstLine(version.getValue());
         //@formatter:off
         return method.getName()
-                .concat(sb.toString())
+                .concat(HttpMessageUtil.SPACE)
+                .concat(firstLineBuilder.build())
                 .concat(HttpMessageUtil.NEXT_LINE)
                 .concat(map.entrySet().stream()
                         .map(e -> e.getKey().concat(HttpMessageUtil.COLON)

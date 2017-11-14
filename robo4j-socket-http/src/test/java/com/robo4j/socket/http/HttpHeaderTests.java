@@ -50,10 +50,8 @@ public class HttpHeaderTests {
 
         Assert.assertNotNull(header);
         Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE).length, 8);
-        Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[2],
-                HttpHeaderBuilder.Build().add(HttpHeaderFieldNames.CONNECTION, CONNECTION_KEEP_ALIVE).build().trim());
-        Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[4],
-                HttpHeaderBuilder.Build().add(HttpHeaderFieldNames.USER_AGENT, CONST_USER_AGENT).build().trim());
+        Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[2], craeteHeaderField(HttpHeaderFieldNames.CONNECTION, CONNECTION_KEEP_ALIVE));
+        Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[4], craeteHeaderField(HttpHeaderFieldNames.USER_AGENT, CONST_USER_AGENT));
     }
 
     @Test
@@ -66,5 +64,9 @@ public class HttpHeaderTests {
     public void extractHeaderParameter() {
         String postRequest = RoboHttpUtils.createRequest(HttpMethod.POST, "127.0.0.1", "controller", "message");
         System.out.println("HEADER: " + postRequest);
+    }
+
+    private String craeteHeaderField(String key, String value){
+        return key + ": " + value;
     }
 }

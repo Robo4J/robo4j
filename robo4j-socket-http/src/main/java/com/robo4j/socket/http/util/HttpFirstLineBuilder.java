@@ -38,6 +38,6 @@ public final class HttpFirstLineBuilder {
 	}
 
 	public String build() {
-		return sb.append(HttpMessageUtil.NEXT_LINE).toString();
+		return sb.toString();
 	}
 }

@@ -21,13 +21,8 @@ import com.robo4j.socket.http.HttpHeaderFieldValues;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.enums.StatusCode;
-import com.robo4j.socket.http.request.RoboBasicMapEntry;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.util.StringConstants;
-
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.robo4j.socket.http.HttpHeaderFieldValues.CONNECTION_KEEP_ALIVE;
 
@@ -38,7 +33,6 @@ import static com.robo4j.socket.http.HttpHeaderFieldValues.CONNECTION_KEEP_ALIVE
  */
 public final class RoboHttpUtils {
 
-    public static final String HTTP_VERSION = "HTTP/1.1";
     private static final String ROBO4J_CLIENT = "Robo4J-HttpClient";
     public static final String NEW_LINE_MAC = "\r";
     public static final String NEW_LINE_UNIX = "\n";
@@ -89,38 +83,15 @@ public final class RoboHttpUtils {
     }
 
     public static String createRequest(HttpMethod method, String host, String path, String message) {
-        final String header = createHeader(method, host, path, message.length());
-        return createRequest(header, message);
-    }
-
-    public static String createRequest(String header, String message) {
-        //@formatter:off
-		return header
+        final String header = createRequestHeader(method, host, path, message.length());
+        return header
                 .concat(NEW_LINE_MAC)
-				.concat(NEW_LINE_UNIX)
-				.concat(message);
-		//@formatter:on
-    }
-
-    public static String createHeader(HttpMethod method, String host, String path, int length) {
-        return createRequestHeader(method, host, path, length);
-    }
-
-    public static String createGetRequest(String host, String path) {
-        return createRequestHeader(HttpMethod.GET, host, path, 0);
+                .concat(NEW_LINE_UNIX)
+                .concat(message);
     }
 
     public static String correctLine(String line) {
         return line == null ? StringConstants.EMPTY : line;
-    }
-
-    public static Map<String, String> parseURIQueryToMap(final String uriQuery, final String delimiter) {
-        //@formatter:off
-		return Stream.of(uriQuery.split(delimiter))
-				.filter(e -> !e.isEmpty())
-				.map(RoboBasicMapEntry::new)
-				.collect(Collectors.toMap(RoboBasicMapEntry::getKey, RoboBasicMapEntry::getValue));
-		//@formatter:on
     }
 
 }
