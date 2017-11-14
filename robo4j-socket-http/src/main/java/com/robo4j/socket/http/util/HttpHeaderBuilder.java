@@ -17,6 +17,9 @@
 
 package com.robo4j.socket.http.util;
 
+import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.HttpVersion;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,10 +30,11 @@ import java.util.stream.Collectors;
  */
 public final class HttpHeaderBuilder {
     private static final String STRING_EMPTY = "";
-    private final Map<String, String> map;
+    private final Map<String, String> map = new LinkedHashMap<>();
+    private final StringBuilder sb = new StringBuilder();
 
     private HttpHeaderBuilder(){
-        map = new LinkedHashMap<>();
+
     }
 
     public static HttpHeaderBuilder Build(){
@@ -39,6 +43,11 @@ public final class HttpHeaderBuilder {
 
     public HttpHeaderBuilder add(String key, String value){
         map.put(key, value);
+        return this;
+    }
+
+    public HttpHeaderBuilder addFirstLine(String value){
+        sb.append(HttpMessageUtil.SPACE).append(value);
         return this;
     }
 
@@ -51,4 +60,22 @@ public final class HttpHeaderBuilder {
                         .concat(HttpMessageUtil.NEXT_LINE))
                 .collect(Collectors.joining(STRING_EMPTY));
     }
+
+    public String build(HttpMethod method, HttpVersion version){
+        addFirstLine(version.getValue());
+        //@formatter:off
+        return method.getName()
+                .concat(sb.toString())
+                .concat(HttpMessageUtil.NEXT_LINE)
+                .concat(map.entrySet().stream()
+                        .map(e -> e.getKey().concat(HttpMessageUtil.COLON)
+                                .concat(HttpMessageUtil.SPACE)
+                                .concat(e.getValue())
+                                .concat(HttpMessageUtil.NEXT_LINE))
+                        .collect(Collectors.joining(STRING_EMPTY)));
+        //@formatter:on
+    }
+
+
+
 }

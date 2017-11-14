@@ -21,6 +21,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static com.robo4j.socket.http.HttpHeaderFieldValues.CONNECTION_KEEP_ALIVE;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -28,28 +30,27 @@ import java.util.Arrays;
 public class BufferOperationTests {
 
     private static final String REQUEST_MESSAGE = "POST units/controller HTTP/1.1\n" +
-			"host: 0.0.0.0\n" +
-			"connection: keep-alive\n" +
-			"cache-control: no-cache\n" +
-			"user-agent: Robo4J-HttpClient\n" +
-			"accept: */*\n" +
-			"accept-encoding: gzip, deflate, sdch, br\n" +
-			"accept-language: en-US,en;q=0.8\n" +
-			"content-type: text/html; charset=utf-8\n" +
-			"content-length: 16\n" +
-			"\n" +
-			"{\"value\":\"stop\"}";
+            "host: 0.0.0.0\n" +
+            "connection:" + CONNECTION_KEEP_ALIVE + "\n" +
+            "cache-control: no-cache\n" +
+            "user-agent: Robo4J-HttpClient\n" +
+            "accept: */*\n" +
+            "accept-encoding: gzip, deflate, sdch, br\n" +
+            "accept-language: en-US,en;q=0.8\n" +
+            "content-type: text/html; charset=utf-8\n" +
+            "content-length: 16\n" +
+            "\n" +
+            "{\"value\":\"stop\"}";
 
     @Test
     public void testExtractedStringMessage() {
-    	String[] headerAndBody = REQUEST_MESSAGE.split("\n\n");
-    	String[] header = headerAndBody[0].split("[\r\n]+");
+        String[] headerAndBody = REQUEST_MESSAGE.split("\n\n");
+        String[] header = headerAndBody[0].split("[\r\n]+");
 
-		System.out.println("Header first: " + header[0]);
-		System.out.println("Header full: " + Arrays.asList(header));
-		System.out.println("Body: " + headerAndBody[1]);
-	}
-
+        System.out.println("Header first: " + header[0]);
+        System.out.println("Header full: " + Arrays.asList(header));
+        System.out.println("Body: " + headerAndBody[1]);
+    }
 
 
 }

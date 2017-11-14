@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.robo4j.socket.http.HttpHeaderFieldValues.CONNECTION_KEEP_ALIVE;
+
 /**
  * Basic Http constants and utils methods
  *
@@ -37,22 +39,22 @@ import java.util.stream.Stream;
  */
 public final class RoboHttpUtils {
 
-	public static final String HTTP_VERSION = "HTTP/1.1";
-	private static final String ROBO4J_CLIENT = "Robo4J-HttpClient";
-	public static final String NEW_LINE_MAC = "\r";
-	public static final String NEW_LINE_UNIX = "\n";
-	public static final CharSequence CHAR_QUOTATION_MARK = "\"";
-	public static final CharSequence CHAR_COLON = ":";
-	public static final CharSequence CHAR_CURLY_BRACKET_LEFT = "{";
-	public static final CharSequence CHAR_CURLY_BRACKET_RIGHT = "}";
-	public static final CharSequence CHAR_SQUARE_BRACKET_LEFT = "[";
-	public static final CharSequence CHAR_SQUARE_BRACKET_RIGHT = "]";
-	public static final CharSequence CHAR_COMMA = ",";
-	public static final int DEFAULT_PORT = 8042;
-	public static final String HTTP_TARGET_UNITS = "targetUnits";
+    public static final String HTTP_VERSION = "HTTP/1.1";
+    private static final String ROBO4J_CLIENT = "Robo4J-HttpClient";
+    public static final String NEW_LINE_MAC = "\r";
+    public static final String NEW_LINE_UNIX = "\n";
+    public static final CharSequence CHAR_QUOTATION_MARK = "\"";
+    public static final CharSequence CHAR_COLON = ":";
+    public static final CharSequence CHAR_CURLY_BRACKET_LEFT = "{";
+    public static final CharSequence CHAR_CURLY_BRACKET_RIGHT = "}";
+    public static final CharSequence CHAR_SQUARE_BRACKET_LEFT = "[";
+    public static final CharSequence CHAR_SQUARE_BRACKET_RIGHT = "]";
+    public static final CharSequence CHAR_COMMA = ",";
+    public static final int DEFAULT_PORT = 8042;
+    public static final String HTTP_TARGET_UNITS = "targetUnits";
 
-	public static String setHeader(String responseCode, int length) throws IOException {
-		//@formatter:off
+    public static String setHeader(String responseCode, int length) throws IOException {
+        //@formatter:off
 		return HttpHeaderBuilder.Build()
 				.add(StringConstants.EMPTY, responseCode)
 				.add(HttpHeaderFieldNames.DATE, LocalDateTime.now().toString())
@@ -61,30 +63,30 @@ public final class RoboHttpUtils {
 				.add(HttpHeaderFieldNames.CONTENT_TYPE, "text/html;".concat(Constants.UTF8_SPACE).concat("charset=utf-8"))
 				.build();
 		//@formatter:on
-	}
+    }
 
-	public static String createHeaderWithFirstLineAndMap(String first, Map<String, String> headerMap) {
-		HttpHeaderBuilder result = HttpHeaderBuilder.Build();
-		headerMap.forEach(result::add);
-		return first.concat(result.build());
+    public static String createHeaderWithFirstLineAndMap(String first, Map<String, String> headerMap) {
+        HttpHeaderBuilder result = HttpHeaderBuilder.Build();
+        headerMap.forEach(result::add);
+        return first.concat(result.build());
 
-	}
+    }
 
-	public static String createResponseWithHeaderAndMessage(String header, String message){
-		return header.concat(NEW_LINE_UNIX).concat(message);
-	}
+    public static String createResponseWithHeaderAndMessage(String header, String message) {
+        return header.concat(NEW_LINE_UNIX).concat(message);
+    }
 
-	public static String createResponseByCode(StatusCode code){
-		return  RoboHttpUtils.createResponseWithHeaderAndMessage(
-				RoboResponseHeader.headerByCode(code),
-				StringConstants.EMPTY);
-	}
+    public static String createResponseByCode(StatusCode code) {
+        return RoboHttpUtils.createResponseWithHeaderAndMessage(
+                RoboResponseHeader.headerByCode(code),
+                StringConstants.EMPTY);
+    }
 
-	public static String createRequestHeader(String host, int length) {
-		//@formatter:off
+    public static String createRequestHeader(String host, int length) {
+        //@formatter:off
 		HttpHeaderBuilder builder = HttpHeaderBuilder.Build()
 			.add(HttpHeaderFieldNames.HOST, host)
-			.add(HttpHeaderFieldNames.CONNECTION, "keep-alive")
+			.add(HttpHeaderFieldNames.CONNECTION, CONNECTION_KEEP_ALIVE)
 			.add(HttpHeaderFieldNames.CACHE_CONTROL, "no-cache")
 			.add(HttpHeaderFieldNames.USER_AGENT, ROBO4J_CLIENT)
 			.add(HttpHeaderFieldNames.ACCEPT, "*/*")
@@ -96,66 +98,66 @@ public final class RoboHttpUtils {
 		}
 		return builder.build();
 		//@formatter:on
-	}
+    }
 
-	public static String createRequest(HttpMethod method, String host, String uri, String message) {
-		final String header = createHeader(method, host, uri, message.length());
-		return createRequest(header, message);
-	}
+    public static String createRequest(HttpMethod method, String host, String uri, String message) {
+        final String header = createHeader(method, host, uri, message.length());
+        return createRequest(header, message);
+    }
 
-	public static String createRequest(HttpMethod method, ProtocolType protocol, String host, String uri, String message){
-		final String header = createHeader(method, protocol, host, uri, message.length());
-		return createRequest(header, message);
-	}
+    public static String createRequest(HttpMethod method, ProtocolType protocol, String host, String uri, String message) {
+        final String header = createHeader(method, protocol, host, uri, message.length());
+        return createRequest(header, message);
+    }
 
-	public static String createRequest(String header, String message) {
-		//@formatter:off
+    public static String createRequest(String header, String message) {
+        //@formatter:off
 		return header
                 .concat(NEW_LINE_MAC)
 				.concat(NEW_LINE_UNIX)
 				.concat(message);
 		//@formatter:on
-	}
+    }
 
-	public static String createHeader(HttpMethod method, ProtocolType protocol, String host, String path, int length ){
-		return createHeaderFirstLine(method, path)
-				.concat(createRequestHeader(host, length));
-	}
+    public static String createHeader(HttpMethod method, ProtocolType protocol, String host, String path, int length) {
+        return createHeaderFirstLine(method, path)
+                .concat(createRequestHeader(host, length));
+    }
 
-	public static String createHeader(HttpMethod method, String host, String uri, int length) {
-		return createHeaderFirstLine(method, uri)
-				.concat(createRequestHeader(host, length));
-	}
+    public static String createHeader(HttpMethod method, String host, String uri, int length) {
+        return createHeaderFirstLine(method, uri)
+                .concat(createRequestHeader(host, length));
+    }
 
-	public static String createHeaderFirstLine(HttpMethod method, String path) {
-		return HttpFirstLineBuilder.Build(method.getName()).add(path).add(HTTP_VERSION).build();
-	}
+    public static String createHeaderFirstLine(HttpMethod method, String path) {
+        return HttpFirstLineBuilder.Build(method.getName()).add(path).add(HTTP_VERSION).build();
+    }
 
 
-	public static String createGetRequest(ProtocolType protocol, String host, String path){
-		return createHeaderFirstLine(HttpMethod.GET,  path)
-				.concat(createRequestHeader(host, 0));
+    public static String createGetRequest(ProtocolType protocol, String host, String path) {
+        return createHeaderFirstLine(HttpMethod.GET, path)
+                .concat(createRequestHeader(host, 0));
 
-	}
+    }
 
-	public static String createGetRequest(String host, String path) {
-		//@formatter:off
+    public static String createGetRequest(String host, String path) {
+        //@formatter:off
 		return HttpFirstLineBuilder.Build(HttpMethod.GET.getName()).add(path).add(HTTP_VERSION)
 				.build().concat(createRequestHeader(host, 0));
 		//@formatter:on
-	}
+    }
 
-	public static String correctLine(String line) {
-		return line == null ? StringConstants.EMPTY : line;
-	}
+    public static String correctLine(String line) {
+        return line == null ? StringConstants.EMPTY : line;
+    }
 
-	public static Map<String, String> parseURIQueryToMap(final String uriQuery, final String delimiter) {
-		//@formatter:off
+    public static Map<String, String> parseURIQueryToMap(final String uriQuery, final String delimiter) {
+        //@formatter:off
 		return Stream.of(uriQuery.split(delimiter))
 				.filter(e -> !e.isEmpty())
 				.map(RoboBasicMapEntry::new)
 				.collect(Collectors.toMap(RoboBasicMapEntry::getKey, RoboBasicMapEntry::getValue));
 		//@formatter:on
-	}
+    }
 
 }

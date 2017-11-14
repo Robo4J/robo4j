@@ -17,15 +17,15 @@
 
 package com.robo4j.socket.http;
 
+import com.robo4j.socket.http.util.HttpHeaderBuilder;
+import com.robo4j.socket.http.util.HttpMessageUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.socket.http.util.HttpHeaderBuilder;
-import com.robo4j.socket.http.util.HttpMessageUtil;
+import static com.robo4j.socket.http.HttpHeaderFieldValues.CONNECTION_KEEP_ALIVE;
 
 /**
- *
  * Simple Http Header Oriented tests
  *
  * @author Marcus Hirt (@hirt)
@@ -33,38 +33,38 @@ import com.robo4j.socket.http.util.HttpMessageUtil;
  */
 public class HttpHeaderTests {
 
-	private static final String CONST_CACHE_CONTROL = "keep-alive";
-	private static final String CONST_USER_AGENT = "Robo4J-client";
+    private static final String CONST_USER_AGENT = "Robo4J-client";
 
-	// formatter:off
-	private static final HttpHeaderBuilder TEST_HEADER_BUILDER = HttpHeaderBuilder.Build()
-			.add(HttpHeaderFieldNames.HOST, "127.0.0.1").add(HttpHeaderFieldNames.CONNECTION, CONST_CACHE_CONTROL)
-			.add(HttpHeaderFieldNames.CACHE_CONTROL, "no-cache").add(HttpHeaderFieldNames.USER_AGENT, CONST_USER_AGENT)
-			.add(HttpHeaderFieldNames.ACCEPT, "*/*")
-			.add(HttpHeaderFieldNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
-			.add(HttpHeaderFieldNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8");
-	// formatter:on
+    private static final String HEADER_HOST = "127.0.0.1";
 
-	@Test
-	public void simpleHttpHeader() {
-		final String header = TEST_HEADER_BUILDER.build();
-		Assert.assertNotNull(header);
-		Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE).length, 7);
-		Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[1],
-				HttpHeaderBuilder.Build().add(HttpHeaderFieldNames.CONNECTION, CONST_CACHE_CONTROL).build().trim());
-		Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[3],
-				HttpHeaderBuilder.Build().add(HttpHeaderFieldNames.USER_AGENT, CONST_USER_AGENT).build().trim());
-	}
+    @Test
+    public void createHeaderTest() {
+        String header = HttpHeaderBuilder.Build()
+                .addFirstLine("units/controller")
+                .add(HttpHeaderFieldNames.HOST, HEADER_HOST).add(HttpHeaderFieldNames.CONNECTION, CONNECTION_KEEP_ALIVE)
+                .add(HttpHeaderFieldNames.CACHE_CONTROL, HttpHeaderFieldValues.NO_CACHE).add(HttpHeaderFieldNames.USER_AGENT, CONST_USER_AGENT)
+                .add(HttpHeaderFieldNames.ACCEPT, "*/*")
+                .add(HttpHeaderFieldNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
+                .add(HttpHeaderFieldNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8")
+                .build(HttpMethod.GET, HttpVersion.HTTP_1_1);
 
-	@Test
-	public void characterParser() {
-		Assert.assertTrue("[".equals(HttpMessageUtil.getHttpSeparator(13)));
-		Assert.assertTrue("]".equals(HttpMessageUtil.getHttpSeparator(14)));
-	}
+        Assert.assertNotNull(header);
+        Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE).length, 8);
+        Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[2],
+                HttpHeaderBuilder.Build().add(HttpHeaderFieldNames.CONNECTION, CONNECTION_KEEP_ALIVE).build().trim());
+        Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[4],
+                HttpHeaderBuilder.Build().add(HttpHeaderFieldNames.USER_AGENT, CONST_USER_AGENT).build().trim());
+    }
 
-	@Test
-	public void extractHeaderParameter() {
-		String postRequest = RoboHttpUtils.createRequest(HttpMethod.POST, ProtocolType.HTTP, "127.0.0.1", "controller", "message");
-		System.out.println("HEADER: " + postRequest);
-	}
+    @Test
+    public void characterParser() {
+        Assert.assertTrue("[".equals(HttpMessageUtil.getHttpSeparator(13)));
+        Assert.assertTrue("]".equals(HttpMessageUtil.getHttpSeparator(14)));
+    }
+
+    @Test
+    public void extractHeaderParameter() {
+        String postRequest = RoboHttpUtils.createRequest(HttpMethod.POST, ProtocolType.HTTP, "127.0.0.1", "controller", "message");
+        System.out.println("HEADER: " + postRequest);
+    }
 }
