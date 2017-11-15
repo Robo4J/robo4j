@@ -41,6 +41,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
+
 /**
  *
  * Dynamic HttpUnit request/method configuration
@@ -52,7 +54,7 @@ public class RoboHttpDynamicTests {
 
 	private static final String ID_HTTP_SERVER = "http";
 	private static final int PORT = 8025;
-	private static final int SLEEP_DELAY = 400;						//necessary delay due to multi-threading we should fix it
+	private static final int SLEEP_DELAY = 400; // necessary delay due to multi-threading we should fix it
 	private static final String ID_CLIENT_UNIT = "httpClient";
 	private static final String ID_TARGET_UNIT = "controller";
 	private static final int MESSAGES_NUMBER = 6;
@@ -90,7 +92,8 @@ public class RoboHttpDynamicTests {
 		/* client system sending a messages to the main system */
 		List<String> paths = Arrays.asList("units", ID_TARGET_UNIT);
 		for (int i = 0; i < MESSAGES_NUMBER; i++) {
-			String messageToSend = RoboHttpUtils.createRequest(HttpMethod.POST, HOST_SYSTEM, HttpPathUtil.pathsToUri(paths), JSON_STRING);
+			String messageToSend = RoboHttpUtils.createRequest(HttpMethod.POST, HOST_SYSTEM,
+					HttpPathUtil.pathsToUri(paths), JSON_STRING);
 			httpClientReference.sendMessage(messageToSend);
 		}
 
@@ -122,7 +125,7 @@ public class RoboHttpDynamicTests {
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("target", ID_TARGET_UNIT);
-		config.setInteger("port", PORT);
+		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		config.setString("packages", "com.robo4j.socket.http.units.test.codec");
 		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
 				JsonUtil.getJsonByMap(Collections.singletonMap(ID_TARGET_UNIT, HTTP_METHOD)));
@@ -152,7 +155,7 @@ public class RoboHttpDynamicTests {
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("address", HOST_SYSTEM);
-		config.setInteger("port", PORT);
+		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		/* specific configuration */
 		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
 				JsonUtil.getJsonByMap(Collections.singletonMap(ID_TARGET_UNIT, HTTP_METHOD)));

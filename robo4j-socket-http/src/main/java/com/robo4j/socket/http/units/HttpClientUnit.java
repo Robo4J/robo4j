@@ -31,6 +31,9 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
+
 /**
  * Http NIO Client to communicate with external system/Robo4J units
  *
@@ -42,7 +45,6 @@ public class HttpClientUnit extends RoboUnit<Object> {
 	private String responseUnit;
 	private Integer responseSize;
 	private Integer bufferCapacity;
-	private boolean blocking;
 
 	public HttpClientUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -52,11 +54,10 @@ public class HttpClientUnit extends RoboUnit<Object> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
 		String confAddress = configuration.getString("address", null);
-		int confPort = configuration.getInteger("port", RoboHttpUtils.DEFAULT_PORT);
+		int confPort = configuration.getInteger(HTTP_PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
 		responseUnit = configuration.getString("responseUnit", null);
 		responseSize = configuration.getInteger("responseSize", null);
-		bufferCapacity = configuration.getInteger("bufferCapacity", null);
-		blocking = configuration.getBoolean("blocking", false);
+		bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, null);
 
 		address = new InetSocketAddress(confAddress, confPort);
 
@@ -67,7 +68,6 @@ public class HttpClientUnit extends RoboUnit<Object> {
 	public void onMessage(Object message) {
 		try {
 			SocketChannel channel = SocketChannel.open(address);
-			channel.configureBlocking(blocking);
 			if (bufferCapacity != null) {
 				channel.socket().setSendBufferSize(bufferCapacity);
 			}

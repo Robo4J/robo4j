@@ -22,7 +22,6 @@ import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.util.StringConstants;
 
-import static com.robo4j.socket.http.HttpHeaderFieldValues.CONNECTION_KEEP_ALIVE;
 import static com.robo4j.socket.http.provider.DefaultValuesProvider.basicHeaderMap;
 
 /**
@@ -43,6 +42,9 @@ public final class RoboHttpUtils {
 	public static final CharSequence CHAR_COMMA = ",";
 	public static final int DEFAULT_PORT = 8042;
 	public static final String HTTP_TARGET_UNITS = "targetUnits";
+	public static final String HTTP_PROPERTY_PORT = "port";
+	public static final String HTTP_PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
+
 
 	public static String createResponseWithHeaderAndMessage(String header, String message) {
 		return header.concat(NEW_LINE_MAC).concat(NEW_LINE_UNIX).concat(message);

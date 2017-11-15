@@ -35,9 +35,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.robo4j.socket.http.units.HttpServerUnit.PROPERTY_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.units.HttpServerUnit.PROPERTY_CODEC_REGISTRY;
-import static com.robo4j.socket.http.units.HttpServerUnit.PROPERTY_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 
 /**
  * Inbound context co
@@ -88,11 +88,11 @@ public class InboundSocketHandler implements SocketHandler {
 
 			socketChannel = ServerSocketChannel.open();
 			socketChannel.configureBlocking(false);
-			socketChannel.bind(new InetSocketAddress(properties.getIntSafe("port")));
+			socketChannel.bind(new InetSocketAddress(properties.getIntSafe(HTTP_PROPERTY_PORT)));
 
 			final SelectionKey key = socketChannel.register(selector, SelectionKey.OP_ACCEPT);
 			final HttpCodecRegistry codecRegistry = properties.getPropertyByClassSafe(PROPERTY_CODEC_REGISTRY);
-			final int bufferCapacity = properties.getIntSafe(PROPERTY_BUFFER_CAPACITY);
+			final int bufferCapacity = properties.getIntSafe(HTTP_PROPERTY_BUFFER_CAPACITY);
 
 			while (active) {
 
@@ -123,7 +123,7 @@ public class InboundSocketHandler implements SocketHandler {
 		} catch (IOException e) {
 			SimpleLoggingUtil.error(getClass(), "SERVER CLOSED", e);
 		}
-		SimpleLoggingUtil.debug(getClass(), "stopped port: " + properties.getIntSafe(PROPERTY_PORT));
+		SimpleLoggingUtil.debug(getClass(), "stopped port: " + properties.getIntSafe(HTTP_PROPERTY_PORT));
 	}
 
 	private void handleSelectorHandler(SelectorHandler handler) {

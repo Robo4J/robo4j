@@ -38,6 +38,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
+
 /**
  * Ping Pong test from outside/foreign unit is send signal. The signal has been
  * received by HttpServer unit. HttpServer unit propagates the signal to the
@@ -121,7 +123,7 @@ public class RoboHttpPingPongTest {
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("target", CONTROLLER_PING_PONG);
-		config.setInteger("port", PORT);
+		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		config.setString("packages", PACKAGE_CODECS);
 		/* specific configuration */
 		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
@@ -142,7 +144,7 @@ public class RoboHttpPingPongTest {
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("address", HOST_SYSTEM);
-		config.setInteger("port", PORT);
+		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		/* specific configuration */
 		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
 				JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, HTTP_POST_METHOD)));

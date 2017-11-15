@@ -38,6 +38,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
+
 /**
  * Http NIO unit allows to configure format of the requests currently is only
  * GET method available
@@ -47,13 +50,10 @@ import java.util.stream.Collectors;
  */
 public class HttpServerUnit extends RoboUnit<Object> {
 	private static final int DEFAULT_BUFFER_CAPACITY = 32 * 1024;
-	public static final String PROPERTY_PORT = "port";
 	public static final String PROPERTY_TARGET = "target";
-	public static final String PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
 	public static final String PROPERTY_CODEC_REGISTRY = "codecRegistry";
+	public static final String CODEC_PACKAGES_CODE = "packages";
 	private final HttpCodecRegistry codecRegistry = new HttpCodecRegistry();
-	private Integer port;
-	private Integer bufferCapacity;
 	// used for encoded messages
 	private List<String> target;
 	private final PropertiesProvider propertiesProvider = new PropertiesProvider();
@@ -69,10 +69,10 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		/* target is always initiated as the list */
 		target = Arrays.asList(configuration.getString(PROPERTY_TARGET, StringConstants.EMPTY)
 				.split(RoboHttpUtils.CHAR_COMMA.toString()));
-		port = configuration.getInteger(PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
-		bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
+		int port = configuration.getInteger(HTTP_PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
+		int bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
 
-		String packages = configuration.getString("packages", null);
+		String packages = configuration.getString(CODEC_PACKAGES_CODE, null);
 		if (validatePackages(packages)) {
 			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(","));
 		}
@@ -87,8 +87,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 				HttpUriRegister.getInstance().addUnitPathNode(key, value.toString()));
 		}
         //@formatter:on
-		propertiesProvider.put(PROPERTY_BUFFER_CAPACITY, bufferCapacity);
-		propertiesProvider.put(PROPERTY_PORT, port);
+		propertiesProvider.put(HTTP_PROPERTY_BUFFER_CAPACITY, bufferCapacity);
+		propertiesProvider.put(HTTP_PROPERTY_PORT, port);
 		propertiesProvider.put(PROPERTY_CODEC_REGISTRY, codecRegistry);
 		setState(LifecycleState.INITIALIZED);
 	}
@@ -96,8 +96,12 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	@Override
 	public void start() {
 		setState(LifecycleState.STARTING);
-		final List<RoboReference<Object>> targetRefs = target.stream().map(e -> getContext().getReference(e))
-				.filter(Objects::nonNull).collect(Collectors.toList());
+		//@formatter:off
+		final List<RoboReference<Object>> targetRefs = target.stream()
+				.map(e -> getContext().getReference(e))
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
+		//@formatter:on
 
 		inboundSocketHandler = new InboundSocketHandler(getContext(), targetRefs, propertiesProvider);
 		HttpUriRegister.getInstance().updateUnits(getContext());
