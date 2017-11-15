@@ -52,8 +52,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	public static final String PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
 	public static final String PROPERTY_CODEC_REGISTRY = "codecRegistry";
 	private final HttpCodecRegistry codecRegistry = new HttpCodecRegistry();
-	private Integer port;
-	private Integer bufferCapacity;
 	// used for encoded messages
 	private List<String> target;
 	private final PropertiesProvider propertiesProvider = new PropertiesProvider();
@@ -69,8 +67,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		/* target is always initiated as the list */
 		target = Arrays.asList(configuration.getString(PROPERTY_TARGET, StringConstants.EMPTY)
 				.split(RoboHttpUtils.CHAR_COMMA.toString()));
-		port = configuration.getInteger(PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
-		bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
+		int port = configuration.getInteger(PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
+		int bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
 
 		String packages = configuration.getString("packages", null);
 		if (validatePackages(packages)) {
@@ -118,8 +116,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		}
 		for (int i = 0; i < packages.length(); i++) {
 			char c = packages.charAt(i);
-			// if (!Character.isJavaIdentifierPart(c) || c != ',' ||
-			// !Character.isWhitespace(c)) {
 			if (Character.isWhitespace(c)) {
 				return false;
 			}

@@ -68,10 +68,7 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 		if (messageDescriptor.getMethod() != null) {
 			result.setMethod(messageDescriptor.getMethod());
 
-
-			/* parsed http specifics, header */
 			final HttpMessage httpMessage = new HttpMessage(messageDescriptor);
-
 			final List<String> paths = HttpPathUtil.uriStringToPathList(messageDescriptor.getPath());
 
 			switch (messageDescriptor.getMethod()) {

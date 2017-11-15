@@ -26,56 +26,54 @@ import java.nio.channels.ByteChannel;
  * @author Miro Wengner (@miragemiko)
  */
 public final class ChannelUtil {
-	/**
-	 * reading buffer
-	 *
-	 * @param channel
-	 * @param buffer
-	 * @return
-	 * @throws IOException
-	 */
-	public static int readBuffer(ByteChannel channel, ByteBuffer buffer) throws IOException {
-		int numberRead = channel.read(buffer);
-		int position = 0;
-		int totalRead = numberRead;
-		while (numberRead >= 0 && position <= buffer.capacity()) {
-			numberRead = channel.read(buffer);
-			if (numberRead > 0) {
-				totalRead += numberRead;
-			}
-			position++;
-		}
-		return totalRead;
-	}
+    /**
+     * reading buffer
+     *
+     * @param channel
+     * @param buffer
+     * @return
+     * @throws IOException
+     */
+    public static int readBuffer(ByteChannel channel, ByteBuffer buffer) throws IOException {
+        int numberRead = channel.read(buffer);
+        int position = 0;
+        int totalRead = numberRead;
+        while (numberRead >= 0 && position <= buffer.capacity()) {
+            numberRead = channel.read(buffer);
+            if (numberRead > 0) {
+                totalRead += numberRead;
+            }
+            position++;
+        }
+        return totalRead;
+    }
 
-	/**
-	 * writing to channel buffer
-	 * 
-	 * @param channel
-	 * @param buffer
-	 * @return
-	 * @throws IOException
-	 */
-	public static int writeBuffer(ByteChannel channel, ByteBuffer buffer) throws IOException {
-		int numberWriten = 0;
-		int totalWritten = numberWriten;
+    /**
+     * writing to channel buffer
+     *
+     * @param channel
+     * @param buffer
+     * @return
+     * @throws IOException
+     */
+    public static int writeBuffer(ByteChannel channel, ByteBuffer buffer) throws IOException {
+        int numberWriten = 0;
+        int totalWritten = numberWriten;
 
-		while (numberWriten >= 0 && buffer.hasRemaining()) {
-			numberWriten = channel.write(buffer);
-			totalWritten += numberWriten;
-		}
-		return totalWritten;
-	}
+        while (numberWriten >= 0 && buffer.hasRemaining()) {
+            numberWriten = channel.write(buffer);
+            totalWritten += numberWriten;
+        }
+        return totalWritten;
+    }
 
-	/**
-	 * report time in moment M from start time
-	 *
-	 * @param message
-	 *            message
-	 * @param start
-	 *            start time
-	 */
-	public static void printMeasuredTime(Class<?> clazz, String message, long start) {
-		System.out.println(clazz.getSimpleName() + " "  +  message + " duration: " + (System.currentTimeMillis() - start));
-	}
+    /**
+     * report time in moment M from start time
+     *
+     * @param message message
+     * @param start   start time
+     */
+    public static void printMeasuredTime(Class<?> clazz, String message, long start) {
+        System.out.println(String.format("%s message: %s duration: %d%n", clazz.getSimpleName(), message, System.currentTimeMillis() - start));
+    }
 }

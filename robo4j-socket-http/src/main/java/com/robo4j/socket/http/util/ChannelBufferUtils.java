@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +47,7 @@ public class ChannelBufferUtils {
 	public static final byte CHAR_RETURN = 0x0D;
 	public static final byte[] END_WINDOW = { CHAR_NEW_LINE, CHAR_NEW_LINE };
 	private static final ByteBuffer buffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
+	private static final int BUFFER_MARK_END = -1;
 
 	public static ByteBuffer copy(ByteBuffer source, int start, int end) {
 		ByteBuffer result = ByteBuffer.allocate(end);
@@ -65,29 +67,34 @@ public class ChannelBufferUtils {
 	public static HttpMessageDescriptor getHttpMessageDescriptorByChannel(ByteChannel channel) throws IOException {
 		final StringBuilder sbBasic = new StringBuilder();
 		int readBytes = channel.read(buffer);
-		buffer.flip();
-		addToStringBuilder(sbBasic, buffer, readBytes);
-		final StringBuilder sbAdditional = new StringBuilder();
-		final HttpMessageDescriptor result = extractDescriptorByStringMessage(sbBasic.toString());
+		if(readBytes != BUFFER_MARK_END){
 
-		int totalReadBytes = readBytes;
+			buffer.flip();
+			addToStringBuilder(sbBasic, buffer, readBytes);
+			final StringBuilder sbAdditional = new StringBuilder();
+			final HttpMessageDescriptor result = extractDescriptorByStringMessage(sbBasic.toString());
 
-		if (result.getLength() != null) {
-			while (totalReadBytes < result.getLength()) {
-				readBytes = channel.read(buffer);
-				buffer.flip();
-				addToStringBuilder(sbAdditional, buffer, readBytes);
+			int totalReadBytes = readBytes;
 
-				totalReadBytes += readBytes;
-				buffer.clear();
+			if (result.getLength() != null) {
+				while (totalReadBytes < result.getLength()) {
+					readBytes = channel.read(buffer);
+					buffer.flip();
+					addToStringBuilder(sbAdditional, buffer, readBytes);
+
+					totalReadBytes += readBytes;
+					buffer.clear();
+				}
+				if (sbAdditional.length() > 0) {
+					result.addMessage(sbAdditional.toString());
+				}
 			}
-			if (sbAdditional.length() > 0) {
-				result.addMessage(sbAdditional.toString());
-			}
+			buffer.clear();
+			return result;
+		} else {
+			return new HttpMessageDescriptor(new HashMap<>(), null, null, null);
 		}
-		buffer.clear();
 
-		return result;
 
 	}
 
@@ -149,8 +156,7 @@ public class ChannelBufferUtils {
 		for (int i = 0; i < size; i++) {
 			array[i] = buffer.get(i);
 		}
-		String message = new String(array);
+		final String message = new String(array);
 		sb.append(message);
-
 	}
 }
