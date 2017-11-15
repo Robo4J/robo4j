@@ -109,7 +109,6 @@ public class RoboHttpPingPongTest {
 		final DefaultAttributeDescriptor<Integer> messagesNumberDescriptor = DefaultAttributeDescriptor
 				.create(Integer.class, StringConsumer.PROP_GET_NUMBER_OF_SENT_MESSAGES);
 		final int number = pongConsumer.getAttribute(messagesNumberDescriptor).get();
-		// NOTE: Not working
 		systemPong.stop();
 		Assert.assertEquals(number, MESSAGES);
 		System.out.println("PingPong is down!");

@@ -43,7 +43,7 @@ public class TankExampleTests {
 	private static final String ID_PLATFORM = "platform";
 	private static final String ID_HTTP = "http";
 	private static final String ID_UNIT_CONTROLLER = "controller";
-	private static final int PORT = 8025;
+	private static final int PORT = 8021;
 
 	@Test
 	public void legoTankExampleTest() throws Exception {

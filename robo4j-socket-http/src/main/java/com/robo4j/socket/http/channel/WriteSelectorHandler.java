@@ -23,7 +23,7 @@ import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.request.RoboResponseProcess;
-import com.robo4j.socket.http.units.HttpException;
+import com.robo4j.socket.http.units.SocketException;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
 import com.robo4j.socket.http.util.ChannelUtil;
 import com.robo4j.socket.http.util.HttpHeaderBuilder;
@@ -103,7 +103,7 @@ public class WriteSelectorHandler implements SelectorHandler {
 			try {
 				ChannelUtil.writeBuffer(channel, buffer);
 			} catch (Exception e) {
-				throw new HttpException("post write", e);
+				throw new SocketException("post write", e);
 			}
 			buffer.clear();
 		}
@@ -113,7 +113,7 @@ public class WriteSelectorHandler implements SelectorHandler {
 		try {
 			channel.close();
 		} catch (Exception e) {
-			throw new HttpException("handle write channel close", e);
+			throw new SocketException("handle write channel close", e);
 		}
 		key.cancel();
 		return key;
@@ -129,7 +129,7 @@ public class WriteSelectorHandler implements SelectorHandler {
 		try {
 			ChannelUtil.writeBuffer(channel, buffer);
 		} catch (Exception e) {
-			throw new HttpException(message, e);
+			throw new SocketException(message, e);
 		} finally {
 			buffer.clear();
 		}

@@ -122,8 +122,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		}
 		for (int i = 0; i < packages.length(); i++) {
 			char c = packages.charAt(i);
-			// if (!Character.isJavaIdentifierPart(c) || c != ',' ||
-			// !Character.isWhitespace(c)) {
 			if (Character.isWhitespace(c)) {
 				return false;
 			}

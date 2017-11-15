@@ -24,10 +24,10 @@ package com.robo4j.socket.http.units;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class HttpException extends RuntimeException{
+public class SocketException extends RuntimeException{
 	private static final long serialVersionUID = 1L;
 
-	public HttpException(String message, Throwable cause) {
+	public SocketException(String message, Throwable cause) {
         super(message, cause);
     }
 }

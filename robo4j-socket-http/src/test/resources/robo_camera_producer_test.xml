@@ -31,7 +31,7 @@
             <value name="client" type="String">0.0.0.0</value>
             <value name="clientPort" type="String">8030</value>
             <value name="clientUri" type="String">/units/imageProcessor</value>
-            <value name="numberOfImages" type="int">50</value>
+            <value name="numberOfImages" type="int">40</value>
         </config>
     </roboUnit>
 </robo4j>

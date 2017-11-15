@@ -23,11 +23,10 @@ import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.PropertiesProvider;
 import com.robo4j.socket.http.request.RoboResponseProcess;
 import com.robo4j.socket.http.units.HttpCodecRegistry;
+import com.robo4j.socket.http.util.ChannelUtil;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.util.Iterator;
 import java.util.List;
@@ -37,7 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.robo4j.socket.http.units.HttpServerUnit.PROPERTY_CODEC_REGISTRY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 
 /**
  * Inbound context co
@@ -82,48 +80,37 @@ public class InboundSocketHandler implements SocketHandler {
 	}
 
 	private void initSocketChannel(List<RoboReference<Object>> targetRefs, PropertiesProvider properties) {
-		try {
+		socketChannel = ChannelUtil.initServerSocketChannel(properties);
+		final SelectionKey key = ChannelUtil.registerSelectionKey(socketChannel);
 
-			final Selector selector = Selector.open();
+		final HttpCodecRegistry codecRegistry = properties.getPropertyByClassSafe(PROPERTY_CODEC_REGISTRY);
+		final int bufferCapacity = properties.getIntSafe(HTTP_PROPERTY_BUFFER_CAPACITY);
 
-			socketChannel = ServerSocketChannel.open();
-			socketChannel.configureBlocking(false);
-			socketChannel.bind(new InetSocketAddress(properties.getIntSafe(HTTP_PROPERTY_PORT)));
+		while (active) {
+			int channelReady = ChannelUtil.getReadyChannelBySelectionKey(key);
+			if (channelReady == 0) {
+				continue;
+			}
 
-			final SelectionKey key = socketChannel.register(selector, SelectionKey.OP_ACCEPT);
-			final HttpCodecRegistry codecRegistry = properties.getPropertyByClassSafe(PROPERTY_CODEC_REGISTRY);
-			final int bufferCapacity = properties.getIntSafe(HTTP_PROPERTY_BUFFER_CAPACITY);
+			Set<SelectionKey> selectedKeys = key.selector().selectedKeys();
+			Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
 
-			while (active) {
+			while (selectedIterator.hasNext()) {
+				final SelectionKey selectedKey = selectedIterator.next();
 
-				int channelReady = key.selector().select();
-				if (channelReady == 0) {
-					continue;
-				}
+				selectedIterator.remove();
 
-				Set<SelectionKey> selectedKeys = key.selector().selectedKeys();
-				Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
-
-				while (selectedIterator.hasNext()) {
-					final SelectionKey selectedKey = selectedIterator.next();
-
-					selectedIterator.remove();
-
-					if (selectedKey.isAcceptable()) {
-						handleSelectorHandler(new AcceptSelectorHandler(selectedKey, bufferCapacity));
-					} else if (selectedKey.isConnectable()) {
-						handleSelectorHandler(new ConnectSelectorHandler(selectedKey));
-					} else if (selectedKey.isReadable()) {
-						handleSelectorHandler(new ReadSelectorHandler(context, codecRegistry, outBuffers, selectedKey));
-					} else if (selectedKey.isWritable()) {
-						handleSelectorHandler(new WriteSelectorHandler(context, targetRefs, outBuffers, selectedKey));
-					}
+				if (selectedKey.isAcceptable()) {
+					handleSelectorHandler(new AcceptSelectorHandler(selectedKey, bufferCapacity));
+				} else if (selectedKey.isConnectable()) {
+					handleSelectorHandler(new ConnectSelectorHandler(selectedKey));
+				} else if (selectedKey.isReadable()) {
+					handleSelectorHandler(new ReadSelectorHandler(context, codecRegistry, outBuffers, selectedKey));
+				} else if (selectedKey.isWritable()) {
+					handleSelectorHandler(new WriteSelectorHandler(context, targetRefs, outBuffers, selectedKey));
 				}
 			}
-		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "SERVER CLOSED", e);
 		}
-		SimpleLoggingUtil.debug(getClass(), "stopped port: " + properties.getIntSafe(HTTP_PROPERTY_PORT));
 	}
 
 	private void handleSelectorHandler(SelectorHandler handler) {
