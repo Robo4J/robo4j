@@ -47,6 +47,11 @@ public final class HttpHeaderBuilder {
 		return this;
 	}
 
+	public HttpHeaderBuilder addAll(Map<String, String> map){
+		this.map.putAll(map);
+		return this;
+	}
+
 	public HttpHeaderBuilder addFirstLine(Object value) {
 		if (firstLineBuilder == null) {
 			firstLineBuilder = HttpFirstLineBuilder.Build(value);

@@ -18,6 +18,7 @@
 package com.robo4j.socket.http;
 
 import com.robo4j.socket.http.enums.StatusCode;
+import com.robo4j.socket.http.provider.DefaultValuesProvider;
 import com.robo4j.socket.http.util.HttpHeaderBuilder;
 import com.robo4j.socket.http.util.HttpMessageUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
@@ -25,6 +26,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static com.robo4j.socket.http.HttpHeaderFieldValues.CONNECTION_KEEP_ALIVE;
+import static com.robo4j.socket.http.provider.DefaultValuesProvider.ROBO4J_CLIENT;
+import static com.robo4j.socket.http.util.HttpMessageUtil.NEXT_LINE;
 
 /**
  * Simple Http Header Oriented tests
@@ -34,51 +37,47 @@ import static com.robo4j.socket.http.HttpHeaderFieldValues.CONNECTION_KEEP_ALIVE
  */
 public class HttpHeaderTests {
 
-    private static final String CONST_USER_AGENT = "Robo4J-client";
+	@Test
+	public void createHeaderTest() {
+		String header = HttpHeaderBuilder.Build().addFirstLine("units/controller")
+				.addAll(DefaultValuesProvider.basicHeaderMap).build(HttpMethod.GET, HttpVersion.HTTP_1_1);
 
-    private static final String HEADER_HOST = "127.0.0.1";
+		Assert.assertNotNull(header);
+		Assert.assertEquals(header.split(NEXT_LINE).length, 8);
+		Assert.assertEquals(header.split(NEXT_LINE)[2],
+				createHeaderField(HttpHeaderFieldNames.USER_AGENT, ROBO4J_CLIENT));
+		Assert.assertEquals(header.split(NEXT_LINE)[3],
+				createHeaderField(HttpHeaderFieldNames.CONNECTION, CONNECTION_KEEP_ALIVE));
+	}
 
-    @Test
-    public void createHeaderTest() {
-        String header = HttpHeaderBuilder.Build()
-                .addFirstLine("units/controller")
-                .add(HttpHeaderFieldNames.HOST, HEADER_HOST).add(HttpHeaderFieldNames.CONNECTION, CONNECTION_KEEP_ALIVE)
-                .add(HttpHeaderFieldNames.CACHE_CONTROL, HttpHeaderFieldValues.NO_CACHE).add(HttpHeaderFieldNames.USER_AGENT, CONST_USER_AGENT)
-                .add(HttpHeaderFieldNames.ACCEPT, "*/*")
-                .add(HttpHeaderFieldNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
-                .add(HttpHeaderFieldNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8")
-                .build(HttpMethod.GET, HttpVersion.HTTP_1_1);
+	@Test
+	public void characterParser() {
+		Assert.assertTrue("[".equals(HttpMessageUtil.getHttpSeparator(13)));
+		Assert.assertTrue("]".equals(HttpMessageUtil.getHttpSeparator(14)));
+	}
 
-        Assert.assertNotNull(header);
-        Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE).length, 8);
-        Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[2], craeteHeaderField(HttpHeaderFieldNames.CONNECTION, CONNECTION_KEEP_ALIVE));
-        Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[4], craeteHeaderField(HttpHeaderFieldNames.USER_AGENT, CONST_USER_AGENT));
-    }
-
-    @Test
-    public void characterParser() {
-        Assert.assertTrue("[".equals(HttpMessageUtil.getHttpSeparator(13)));
-        Assert.assertTrue("]".equals(HttpMessageUtil.getHttpSeparator(14)));
-    }
-
-    @Test
-    public void test(){
+	@Test
+	public void test() {
+		String uid = "1234";
+		String expectedResult = "HTTP/1.1 200 OK" + NEXT_LINE + "uid: " + uid + NEXT_LINE;
+		//@formatter:off
         String getHeader =  HttpHeaderBuilder.Build()
                 .addFirstLine(HttpVersion.HTTP_1_1.getValue())
                 .addFirstLine(StatusCode.OK.getCode())
                 .addFirstLine(StatusCode.OK.getReasonPhrase())
-                .add(HttpHeaderFieldNames.ROBO_UNIT_UID, "1234")
+                .add(HttpHeaderFieldNames.ROBO_UNIT_UID, uid)
                 .build();
-        System.out.println("SOME: " + getHeader);
-    }
+        //@formatter:on
+		Assert.assertTrue(getHeader.equals(expectedResult));
+	}
 
-    @Test
-    public void extractHeaderParameter() {
-        String postRequest = RoboHttpUtils.createRequest(HttpMethod.POST, "127.0.0.1", "controller", "message");
-        System.out.println("HEADER: " + postRequest);
-    }
+	@Test
+	public void extractHeaderParameter() {
+		String postRequest = RoboHttpUtils.createRequest(HttpMethod.POST, "127.0.0.1", "controller", "message");
+		System.out.println("HEADER: " + postRequest);
+	}
 
-    private String craeteHeaderField(String key, String value){
-        return key + ": " + value;
-    }
+	private String createHeaderField(String key, String value) {
+		return key + ": " + value;
+	}
 }

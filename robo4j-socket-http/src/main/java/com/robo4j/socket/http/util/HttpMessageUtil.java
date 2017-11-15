@@ -26,8 +26,8 @@ package com.robo4j.socket.http.util;
 public final class HttpMessageUtil {
 
 	public static final String SPACE = "\u0020";
-	public static final String HTTP_HEADER_BODY_DELIMITER = "\r\n\r\n";
 	public static final String NEXT_LINE = "\r\n";
+	public static final String HTTP_HEADER_BODY_DELIMITER = NEXT_LINE.concat(NEXT_LINE);
 	public static final String COLON = ":";
 
 	/**

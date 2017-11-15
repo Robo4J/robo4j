@@ -8,17 +8,17 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.camera;
+package com.robo4j.util;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -30,12 +30,8 @@ public class PropertyMapBuilder<Key, Value> {
 
 	private Map<Key, Value> map;
 
-	private PropertyMapBuilder() {
-		this.map = new HashMap<>();
-	}
-
-	public static <Key, Value> PropertyMapBuilder Builder() {
-		return new PropertyMapBuilder<Key, Value>();
+	public PropertyMapBuilder() {
+		this.map = new LinkedHashMap<>();
 	}
 
 	public PropertyMapBuilder put(Key key, Value value) {
@@ -44,7 +40,7 @@ public class PropertyMapBuilder<Key, Value> {
 	}
 
 	public Map<Key, Value> create() {
-		return Collections.unmodifiableMap(map);
+		return (Map<Key,Value>)Collections.unmodifiableMap(map);
 	}
 
 }
