@@ -83,7 +83,7 @@ public class InboundSocketHandler implements SocketHandler {
 		socketChannel = ChannelUtil.initServerSocketChannel(properties);
 		final SelectionKey key = ChannelUtil.registerSelectionKey(socketChannel);
 
-		final HttpCodecRegistry codecRegistry = properties.getPropertyByClassSafe(PROPERTY_CODEC_REGISTRY);
+		final HttpCodecRegistry codecRegistry = properties.getPropertySafe(PROPERTY_CODEC_REGISTRY);
 		final int bufferCapacity = properties.getIntSafe(HTTP_PROPERTY_BUFFER_CAPACITY);
 
 		while (active) {

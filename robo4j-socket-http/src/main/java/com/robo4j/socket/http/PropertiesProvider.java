@@ -66,17 +66,18 @@ public final class PropertiesProvider {
 	}
 
 	/**
-     * Desired specific property defined by Structure
-     * 
-     * @param clazz
-     * @param key
-     * @param <T>
-     * @return
-     */
+	 * Desired specific property defined by object
+	 * 
+	 * @param key
+	 *            property name
+	 * @param <T>
+	 *            object type
+	 * @return object
+	 */
 	@SuppressWarnings("unchecked")
-	public <T> T getPropertyByClassSafe(String key){
-        return (T) map.get(key);
-    }
+	public <T> T getPropertySafe(String key) {
+		return (T) map.get(key);
+	}
 
 	@Override
 	public String toString() {
