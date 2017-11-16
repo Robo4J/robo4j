@@ -17,7 +17,12 @@
 
 package com.robo4j.socket.http.util;
 
+import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.dto.PathMethodDTO;
+
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -44,5 +49,21 @@ public final class HttpPathUtil {
 
     public static String pathsToUri(List<String> paths){
         return paths.stream().collect(Collectors.joining(HttpMessageUtil.getHttpSeparator(SEPARATOR_PATH)));
+    }
+
+
+    /**
+     * Parsing string of JSON format to Set of PathMethodTargets
+     *
+     * @param value representing unit and accepted method
+     * @return return map key
+     */
+    public static Set<PathMethodDTO> getPathMethodTargetByString(String value) {
+        return JsonUtil.getMapNyJson(value)
+                .entrySet().stream()
+                .filter(e -> Objects.nonNull(e.getKey()) && Objects.nonNull(e.getKey()))
+                .filter(e -> Objects.nonNull(HttpMethod.getByName(e.getValue().toString())))
+                .map(e -> new PathMethodDTO(e.getKey(), HttpMethod.getByName(e.getValue().toString())))
+                .collect(Collectors.toSet());
     }
 }

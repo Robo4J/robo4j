@@ -62,7 +62,7 @@ public class TestClientImageController extends RoboUnit<Boolean> {
 	private static final Map<String, String> raspistillProperties = PropertyMapBuilder
 			.Builder().put(KEY_WIDTH, "-w").put(KEY_HEIGHT, "-h").put(KEY_TIMEOUT, "-t").put(KEY_QUALITY, "-q")
 			.put(KEY_SHARPNESS, "-sh").put(KEY_BRIGHTNESS, "-br").put(KEY_CONTRAST, "-co").put(KEY_SATURATION, "-sa")
-			.create();
+			.build();
 	private static final String DEFAULT_SETUP = "-n -e jpg -vf -hf -o -";
 	private static String cameraCommand;
 	private String targetOut;

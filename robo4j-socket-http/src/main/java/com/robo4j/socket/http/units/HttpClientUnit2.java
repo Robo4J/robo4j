@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -22,13 +22,19 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.socket.http.HttpMessageDescriptor;
+import com.robo4j.socket.http.SocketException;
+import com.robo4j.socket.http.dto.PathMethodDTO;
 import com.robo4j.socket.http.util.ChannelUtil;
+import com.robo4j.socket.http.util.HttpPathUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
+import com.robo4j.util.StringConstants;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Set;
 
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
@@ -39,14 +45,16 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class HttpClientUnit extends RoboUnit<Object> {
+public class HttpClientUnit2 extends RoboUnit<HttpMessageDescriptor> {
+
 	private InetSocketAddress address;
 	private String responseUnit;
 	private Integer responseSize;
 	private Integer bufferCapacity;
+	private Set<PathMethodDTO> targetUnitByMethodMap;
 
-	public HttpClientUnit(RoboContext context, String id) {
-		super(Object.class, context, id);
+	public HttpClientUnit2(RoboContext context, String id) {
+		super(HttpMessageDescriptor.class, context, id);
 	}
 
 	@Override
@@ -56,43 +64,64 @@ public class HttpClientUnit extends RoboUnit<Object> {
 		responseUnit = configuration.getString("responseUnit", null);
 		responseSize = configuration.getInteger("responseSize", null);
 		bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, null);
+		targetUnitByMethodMap = HttpPathUtil
+				.getPathMethodTargetByString(configuration.getString("targetUnits", StringConstants.EMPTY));
 
 		address = new InetSocketAddress(confAddress, confPort);
 	}
 
 	@Override
-	public void onMessage(Object message) {
+	public void onMessage(HttpMessageDescriptor message) {
 		try {
 			SocketChannel channel = SocketChannel.open(address);
 			if (bufferCapacity != null) {
 				channel.socket().setSendBufferSize(bufferCapacity);
 			}
 
-			String processMessage = message.toString();
+			final PathMethodDTO pathMethod = new PathMethodDTO(message.getPath(), message.getMethod());
+			if(targetUnitByMethodMap.contains(pathMethod)){
+                final ByteBuffer buffer = processMessageToClient(message);
+                switch (message.getMethod()) {
+                    case GET:
+                    case HEAD:
+                        break;
+                    case PUT:
+                    case POST:
+                    case PATCH:
+                        ByteBuffer readBuffer = ByteBuffer.allocate(message.getMessage().length());
+                        ChannelUtil.readBuffer(channel, readBuffer);
+                        sendMessageToResponseUnit(readBuffer);
+                        break;
+                    case TRACE:
+                        break;
+                    case OPTIONS:
+                        break;
+                    case DELETE:
+                        break;
+                    default:
+                        throw new SocketException(String.format("not implemented method: %s", message));
+                }
+                buffer.clear();
+            }
 
-			byte[] bytes = processMessage.getBytes();
-			ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
-			buffer.put(bytes);
-			buffer.flip();
-
-			ChannelUtil.writeBuffer(channel, buffer);
-			if (responseUnit != null && responseSize != null) {
-				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
-				ChannelUtil.readBuffer(channel, readBuffer);
-				sendMessageToResponseUnit(readBuffer);
-			}
-
-			buffer.clear();
 			channel.close();
 
 		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), String.format("not available: %s, no worry I continue sending. Error: %s",address ,e));
+			SimpleLoggingUtil.error(getClass(),
+					String.format("not available: %s, no worry I continue sending. Error: %s", address, e));
 		}
+	}
+
+	private ByteBuffer processMessageToClient(HttpMessageDescriptor message) {
+		byte[] requestBytes = message.getMessage().getBytes();
+		ByteBuffer buffer = ByteBuffer.allocate(requestBytes.length);
+		buffer.put(requestBytes);
+		buffer.flip();
+		return buffer;
 	}
 
 	// Private Methods
 	private void sendMessageToResponseUnit(ByteBuffer byteBuffer) {
 		getContext().getReference(responseUnit).sendMessage(byteBuffer.array());
 	}
-
 }

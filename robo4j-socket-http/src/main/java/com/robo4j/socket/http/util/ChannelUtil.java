@@ -19,7 +19,7 @@ package com.robo4j.socket.http.util;
 
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.PropertiesProvider;
-import com.robo4j.socket.http.units.SocketException;
+import com.robo4j.socket.http.SocketException;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

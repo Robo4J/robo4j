@@ -22,6 +22,7 @@ import com.robo4j.socket.http.util.HttpMessageUtil;
 /**
  * @author Miro Wengner (@miragemiko)
  */
+@Deprecated
 public class RoboBasicMapEntry {
 
     private String key;

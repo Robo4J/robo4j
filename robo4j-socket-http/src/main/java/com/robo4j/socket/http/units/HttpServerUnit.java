@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.robo4j.socket.http.util.ChannelBufferUtils.INIT_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 
@@ -49,7 +50,6 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpServerUnit extends RoboUnit<Object> {
-	private static final int DEFAULT_BUFFER_CAPACITY = 32 * 1024;
 	public static final String PROPERTY_TARGET = "target";
 	public static final String PROPERTY_CODEC_REGISTRY = "codecRegistry";
 	public static final String CODEC_PACKAGES_CODE = "packages";
@@ -65,19 +65,17 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		setState(LifecycleState.UNINITIALIZED);
 		/* target is always initiated as the list */
 		target = Arrays.asList(configuration.getString(PROPERTY_TARGET, StringConstants.EMPTY)
 				.split(RoboHttpUtils.CHAR_COMMA.toString()));
 		int port = configuration.getInteger(HTTP_PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
-		int bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
+		int bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, INIT_BUFFER_CAPACITY);
 
 		String packages = configuration.getString(CODEC_PACKAGES_CODE, null);
 		if (validatePackages(packages)) {
 			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(","));
 		}
 
-		//@formatter:off
 		Map<String, Object> targetUnitsMap = JsonUtil.getMapNyJson(configuration.getString("targetUnits", null));
 
 		if(targetUnitsMap.isEmpty()){
@@ -86,11 +84,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			targetUnitsMap.forEach((key, value) ->
 				HttpUriRegister.getInstance().addUnitPathNode(key, value.toString()));
 		}
-        //@formatter:on
 		propertiesProvider.put(HTTP_PROPERTY_BUFFER_CAPACITY, bufferCapacity);
 		propertiesProvider.put(HTTP_PROPERTY_PORT, port);
 		propertiesProvider.put(PROPERTY_CODEC_REGISTRY, codecRegistry);
-		setState(LifecycleState.INITIALIZED);
 	}
 
 	@Override

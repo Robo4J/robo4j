@@ -23,7 +23,7 @@ import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.request.RoboResponseProcess;
-import com.robo4j.socket.http.units.SocketException;
+import com.robo4j.socket.http.SocketException;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
 import com.robo4j.socket.http.util.ChannelUtil;
 import com.robo4j.socket.http.util.HttpHeaderBuilder;

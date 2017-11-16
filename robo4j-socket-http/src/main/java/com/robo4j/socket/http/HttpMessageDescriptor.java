@@ -20,6 +20,9 @@ package com.robo4j.socket.http;
 import java.util.Map;
 
 /**
+ * Generic message used by Server and Client units.
+ *
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */

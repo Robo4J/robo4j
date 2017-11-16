@@ -43,7 +43,7 @@ public class PropertyMapBuilder<Key, Value> {
 		return this;
 	}
 
-	public Map<Key, Value> create() {
+	public Map<Key, Value> build() {
 		return Collections.unmodifiableMap(map);
 	}
 
