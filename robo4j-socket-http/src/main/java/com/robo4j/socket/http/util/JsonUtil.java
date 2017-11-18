@@ -53,6 +53,7 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_SQUARE_BRACKET_RIGH
  */
 public final class JsonUtil {
 
+	private static final String DEFAULT_PATH = "/";
 	private static final Set<Class<?>> withoutQuotationTypes = Stream.of(boolean.class, int.class, short.class,
 			byte.class, long.class, double.class, float.class, char.class, Boolean.class, Integer.class, Short.class,
 			Byte.class, Long.class, Double.class, Float.class, Character.class).collect(Collectors.toSet());
@@ -215,7 +216,8 @@ public final class JsonUtil {
 	private static PathMethodDTO extractPathMethodByMatcher(Matcher matcher) {
 		String[] propertiesValues = matcher.group(2).replaceAll("[\"\\[\\]]", StringConstants.EMPTY)
 				.split(Constants.UTF8_COMMA);
-		return new PathMethodDTO(matcher.group(1).trim(), HttpMethod.getByName(propertiesValues[0].trim()),
+		String path = matcher.group(1).trim();
+		return new PathMethodDTO(path.isEmpty() ? DEFAULT_PATH : path, HttpMethod.getByName(propertiesValues[0].trim()),
 				propertiesValues.length > 1 ? propertiesValues[1].trim() : null);
 	}
 

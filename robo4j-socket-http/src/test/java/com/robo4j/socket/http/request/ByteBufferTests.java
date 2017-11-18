@@ -17,7 +17,7 @@
 
 package com.robo4j.socket.http.request;
 
-import com.robo4j.socket.http.HttpMessageDescriptor;
+import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
 import com.robo4j.socket.http.util.RoboHttpUtils;
@@ -58,7 +58,7 @@ public class ByteBufferTests {
 
     @Test
     public void testPostmanMessage() {
-        HttpMessageDescriptor messageDescriptor = ChannelBufferUtils.extractDescriptorByStringMessage(TEST_POSTMAN_STRING);
+        HttpRequestDescriptor messageDescriptor = ChannelBufferUtils.extractRequestDescriptorByStringMessage(TEST_POSTMAN_STRING);
         messageDescriptor.addMessage(TEST_POSTMAN_MESSAGE);
 
         Assert.assertNotNull(messageDescriptor.getHeader());
@@ -78,7 +78,7 @@ public class ByteBufferTests {
 
         String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientPath, bodyMessage);
 
-        HttpMessageDescriptor messageDescriptor = ChannelBufferUtils.extractDescriptorByStringMessage(postMessage);
+        HttpRequestDescriptor messageDescriptor = ChannelBufferUtils.extractRequestDescriptorByStringMessage(postMessage);
 
         Assert.assertNotNull(postMessage);
         Assert.assertTrue(postMessage.length() == messageDescriptor.getLength());

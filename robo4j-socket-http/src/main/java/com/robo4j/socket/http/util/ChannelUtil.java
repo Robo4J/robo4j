@@ -108,6 +108,16 @@ public final class ChannelUtil {
         }
     }
 
+    public static void handleWriteChannelAndBuffer(String message, ByteChannel channel, ByteBuffer buffer) {
+        try {
+            ChannelUtil.writeBuffer(channel, buffer);
+        } catch (Exception e) {
+            throw new SocketException(message, e);
+        } finally {
+            buffer.clear();
+        }
+    }
+
     /**
      * report time in moment M from start time
      *

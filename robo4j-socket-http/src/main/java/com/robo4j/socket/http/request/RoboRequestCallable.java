@@ -22,7 +22,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMessage;
-import com.robo4j.socket.http.HttpMessageDescriptor;
+import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.HttpMessageWrapper;
 import com.robo4j.socket.http.dto.RoboPathReferenceDTO;
 import com.robo4j.socket.http.enums.StatusCode;
@@ -48,10 +48,10 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 	public static final int PATH_FIRST_LEVEL = 1;
 
 	private final RoboContext context;
-	private final HttpMessageDescriptor messageDescriptor;
+	private final HttpRequestDescriptor messageDescriptor;
 	private final DefaultRequestFactory<?> factory;
 
-	public RoboRequestCallable(RoboContext context, HttpMessageDescriptor messageDescriptor, DefaultRequestFactory<Object> factory) {
+	public RoboRequestCallable(RoboContext context, HttpRequestDescriptor messageDescriptor, DefaultRequestFactory<Object> factory) {
 		assert messageDescriptor != null;
 		this.context = context;
 		this.messageDescriptor = messageDescriptor;

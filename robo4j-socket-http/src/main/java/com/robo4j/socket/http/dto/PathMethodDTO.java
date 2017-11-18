@@ -55,15 +55,13 @@ public class PathMethodDTO {
         PathMethodDTO that = (PathMethodDTO) o;
 
         if (!path.equals(that.path)) return false;
-        if (method != that.method) return false;
-        return callbackUnitName != null ? callbackUnitName.equals(that.callbackUnitName) : that.callbackUnitName == null;
+        return method == that.method;
     }
 
     @Override
     public int hashCode() {
         int result = path.hashCode();
         result = 31 * result + method.hashCode();
-        result = 31 * result + (callbackUnitName != null ? callbackUnitName.hashCode() : 0);
         return result;
     }
 

@@ -22,6 +22,7 @@ import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
+import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.units.test.CameraImageConsumerTestUnit;
 import com.robo4j.socket.http.units.test.CameraImageProducerTestUnit;
 import org.junit.Test;
@@ -58,9 +59,8 @@ public class CameraImageProducerConsumerTests {
 		consumerSystem.start();
 		producerSystem.start();
 
-		RoboReference<CameraImageProducerConsumerTests> imageProducer = producerSystem.getReference("imageController");
-		RoboReference<CameraImageConsumerTestUnit> imageConsumer = consumerSystem.getReference("imageProcessor");
-
+		RoboReference<Boolean> imageProducer = producerSystem.getReference("imageController");
+		RoboReference<CameraMessage> imageConsumer = consumerSystem.getReference("imageProcessor");
 
 		Integer numberOfImages = imageProducer.getAttribute(ATTRIBUTE_NUMBER_OF_IMAGES).get();
 		while (imageConsumer.getAttribute(ATTRIBUTE_COUNTER).get() < numberOfImages) {

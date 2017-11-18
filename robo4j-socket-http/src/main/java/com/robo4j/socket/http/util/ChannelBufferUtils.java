@@ -18,8 +18,11 @@
 package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.HttpHeaderFieldNames;
-import com.robo4j.socket.http.HttpMessageDescriptor;
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.socket.http.enums.StatusCode;
+import com.robo4j.socket.http.message.HttpRequestDescriptor;
+import com.robo4j.socket.http.message.HttpResponseDescriptor;
 import com.robo4j.socket.http.units.Constants;
 
 import java.io.IOException;
@@ -63,19 +66,51 @@ public class ChannelBufferUtils {
 		return result;
 	}
 
-	public static HttpMessageDescriptor getHttpMessageDescriptorByChannel(ByteChannel channel) throws IOException {
+	public static HttpResponseDescriptor getHttpResponseDescriptorByChannel(ByteChannel channel) throws IOException {
 		final StringBuilder sbBasic = new StringBuilder();
 		int readBytes = channel.read(buffer);
-		if(readBytes != BUFFER_MARK_END){
+		if (readBytes != BUFFER_MARK_END) {
+			buffer.flip();
+			addToStringBuilder(sbBasic, buffer, readBytes);
+			final StringBuilder sbAdditional = new StringBuilder();
+			final HttpResponseDescriptor result = extractResponseDescriptorByStringMessage(sbBasic.toString());
+
+			int totalReadBytes = readBytes;
+
+			if (result.getLength() != 0) {
+				while (totalReadBytes < result.getLength()) {
+					readBytes = channel.read(buffer);
+					buffer.flip();
+					addToStringBuilder(sbAdditional, buffer, readBytes);
+
+					totalReadBytes += readBytes;
+					buffer.clear();
+				}
+				if (sbAdditional.length() > 0) {
+					result.addMessage(sbAdditional.toString());
+				}
+			}
+			buffer.clear();
+			return result;
+
+		} else {
+			return new HttpResponseDescriptor(new HashMap<>(), StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1.getValue());
+		}
+	}
+
+	public static HttpRequestDescriptor getHttpRequestDescriptorByChannel(ByteChannel channel) throws IOException {
+		final StringBuilder sbBasic = new StringBuilder();
+		int readBytes = channel.read(buffer);
+		if (readBytes != BUFFER_MARK_END) {
 
 			buffer.flip();
 			addToStringBuilder(sbBasic, buffer, readBytes);
 			final StringBuilder sbAdditional = new StringBuilder();
-			final HttpMessageDescriptor result = extractDescriptorByStringMessage(sbBasic.toString());
+			final HttpRequestDescriptor result = extractRequestDescriptorByStringMessage(sbBasic.toString());
 
 			int totalReadBytes = readBytes;
 
-			if (result.getLength() != null) {
+			if (result.getLength() != 0) {
 				while (totalReadBytes < result.getLength()) {
 					readBytes = channel.read(buffer);
 					buffer.flip();
@@ -91,7 +126,7 @@ public class ChannelBufferUtils {
 			buffer.clear();
 			return result;
 		} else {
-			return new HttpMessageDescriptor(new HashMap<>(), null, null, null);
+			return new HttpRequestDescriptor(new HashMap<>(), null, null, null);
 		}
 	}
 
@@ -111,8 +146,7 @@ public class ChannelBufferUtils {
 		return Arrays.equals(stopWindow, window);
 	}
 
-
-	public static HttpMessageDescriptor extractDescriptorByStringMessage(String message) {
+	public static HttpRequestDescriptor extractRequestDescriptorByStringMessage(String message) {
 		final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
 		final String[] header = headerAndBody[POSITION_HEADER].split("[" + NEXT_LINE + "]+");
 		final String firstLine = RoboHttpUtils.correctLine(header[0]);
@@ -122,17 +156,9 @@ public class ChannelBufferUtils {
 		final HttpMethod method = HttpMethod.getByName(tokens[HttpMessageUtil.METHOD_KEY_POSITION]);
 		final String path = tokens[HttpMessageUtil.URI_VALUE_POSITION];
 		final String version = tokens[HttpMessageUtil.VERSION_POSITION];
-		final Map<String, String> headerParams = new HashMap<>();
+		final Map<String, String> headerParams = getHeaderParametersByArray(paramArray);
 
-		for (int i = 1; i < paramArray.length; i++) {
-			final String[] array = paramArray[i].split(HttpMessageUtil.getHttpSeparator(HTTP_HEADER_SEP));
-
-			String key = array[HttpMessageUtil.METHOD_KEY_POSITION].toLowerCase();
-			String value = array[HttpMessageUtil.URI_VALUE_POSITION].trim();
-			headerParams.put(key, value);
-		}
-
-		HttpMessageDescriptor result = new HttpMessageDescriptor(headerParams, method, version, path);
+		HttpRequestDescriptor result = new HttpRequestDescriptor(headerParams, method, version, path);
 		if (headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)) {
 			result.setLength(calculateMessageSize(headerAndBody[POSITION_HEADER].length(), headerParams));
 		}
@@ -140,6 +166,40 @@ public class ChannelBufferUtils {
 			result.addMessage(headerAndBody[POSITION_BODY]);
 		}
 
+		return result;
+	}
+
+	public static HttpResponseDescriptor extractResponseDescriptorByStringMessage(String message) {
+		final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
+		final String[] header = headerAndBody[POSITION_HEADER].split("[" + NEXT_LINE + "]+");
+		final String firstLine = RoboHttpUtils.correctLine(header[0]);
+		final String[] tokens = firstLine.split(Constants.HTTP_EMPTY_SEP);
+		final String[] paramArray = Arrays.copyOfRange(header, 1, header.length);
+
+		final String version = tokens[0];
+		final StatusCode statusCode = StatusCode.getByCode(Integer.valueOf(tokens[1]));
+		final Map<String, String> headerParams = getHeaderParametersByArray(paramArray);
+
+		HttpResponseDescriptor result = new HttpResponseDescriptor(headerParams, statusCode, version);
+		if (headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)) {
+			result.setLength(calculateMessageSize(headerAndBody[POSITION_HEADER].length(), headerParams));
+		}
+		if (headerAndBody.length > 1) {
+			result.addMessage(headerAndBody[POSITION_BODY]);
+		}
+
+		return result;
+	}
+
+	private static Map<String, String> getHeaderParametersByArray(String[] paramArray) {
+		final Map<String, String> result = new HashMap<>();
+		for (int i = 1; i < paramArray.length; i++) {
+			final String[] array = paramArray[i].split(HttpMessageUtil.getHttpSeparator(HTTP_HEADER_SEP));
+
+			String key = array[HttpMessageUtil.METHOD_KEY_POSITION].toLowerCase();
+			String value = array[HttpMessageUtil.URI_VALUE_POSITION].trim();
+			result.put(key, value);
+		}
 		return result;
 	}
 

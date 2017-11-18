@@ -19,6 +19,9 @@ package com.robo4j.socket.http.units;
 
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.util.SystemUtil;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.InputStream;
@@ -31,14 +34,43 @@ import java.io.InputStream;
  */
 public class RoboHttpClientWithResponseTests {
 
+	@Ignore
 	@Test
 	public void simpleRoboSystemGetRequestTest() throws Exception {
-		RoboBuilder builderConsumer = new RoboBuilder(
-				Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemTest.xml"));
+
+		RoboBuilder builderProducer = new RoboBuilder();
+		InputStream clientConfigInputStream = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream("robo_client_request_producer_text.xml");
+		builderProducer.add(clientConfigInputStream);
+		RoboContext producerSystem = builderProducer.build();
+
+		RoboBuilder builderConsumer = new RoboBuilder();
 		InputStream serverConfigInputStream = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream("robo_camara_consumer_test.xml");
+				.getResourceAsStream("robo_client_request_consumer_text.xml");
 		builderConsumer.add(serverConfigInputStream);
 		RoboContext consumerSystem = builderConsumer.build();
+
+
+		consumerSystem.start();
+		producerSystem.start();
+
+		System.out.println("consumer: State after start:");
+		System.out.println(SystemUtil.printStateReport(consumerSystem));
+
+		System.out.println("producer: State after start:");
+		System.out.println(SystemUtil.printStateReport(producerSystem));
+
+
+		RoboReference<Integer> descriptorProducer = producerSystem.getReference("descriptorProducer");
+		descriptorProducer.sendMessage(1);
+
+		System.out.println("Press Key...");
+		System.in.read();
+
+		producerSystem.shutdown();
+		consumerSystem.shutdown();
+
+
 	}
 
 }

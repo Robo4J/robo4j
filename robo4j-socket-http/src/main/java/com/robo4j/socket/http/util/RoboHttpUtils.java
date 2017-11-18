@@ -47,7 +47,8 @@ public final class RoboHttpUtils {
 
 
 	public static String createResponseWithHeaderAndMessage(String header, String message) {
-		return header.concat(NEW_LINE_MAC).concat(NEW_LINE_UNIX).concat(message);
+		String result = header.concat(NEW_LINE_MAC).concat(NEW_LINE_UNIX);
+		return  message.isEmpty() ? result : result.concat(message);
 	}
 
 	public static String createResponseByCode(StatusCode code) {

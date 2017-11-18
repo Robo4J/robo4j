@@ -19,7 +19,7 @@ package com.robo4j.socket.http.channel;
 
 import com.robo4j.RoboContext;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.HttpMessageDescriptor;
+import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.request.RoboRequestCallable;
 import com.robo4j.socket.http.request.RoboRequestFactory;
 import com.robo4j.socket.http.request.RoboResponseProcess;
@@ -54,8 +54,8 @@ public class ReadSelectionKeyHandler implements SelectionKeyHandler {
 	public SelectionKey handle() {
 		SocketChannel channel = (SocketChannel) key.channel();
 		try {
-			final HttpMessageDescriptor messageDescriptor = ChannelBufferUtils
-					.getHttpMessageDescriptorByChannel(channel);
+			final HttpRequestDescriptor messageDescriptor = ChannelBufferUtils
+					.getHttpRequestDescriptorByChannel(channel);
 			final RoboRequestFactory factory = new RoboRequestFactory(codecRegistry);
 			final RoboRequestCallable callable = new RoboRequestCallable(context, messageDescriptor, factory);
 			final Future<RoboResponseProcess> futureResult = context.getScheduler().submit(callable);

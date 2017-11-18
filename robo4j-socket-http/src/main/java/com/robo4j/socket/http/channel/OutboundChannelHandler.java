@@ -17,10 +17,12 @@
 
 package com.robo4j.socket.http.channel;
 
-import com.robo4j.socket.http.HttpMessageDescriptor;
+import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.SocketException;
 import com.robo4j.socket.http.dto.PathMethodDTO;
+import com.robo4j.socket.http.message.HttpResponseDescriptor;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
+import com.robo4j.socket.http.util.ChannelUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
@@ -34,63 +36,60 @@ import java.util.List;
  */
 public class OutboundChannelHandler implements SocketHandler {
 
-    private ByteChannel byteChannel;
-    private List<PathMethodDTO> targetUnitByMethodMap;
-    private HttpMessageDescriptor message;
-    private HttpMessageDescriptor receivedMessage;
+	private ByteChannel byteChannel;
+	private List<PathMethodDTO> targetUnitByMethodMap;
+	private HttpRequestDescriptor message;
+	private HttpResponseDescriptor receivedMessage;
 
-    public  OutboundChannelHandler(List<PathMethodDTO> targetUnitByMethodMap, ByteChannel byteChannel, HttpMessageDescriptor message) {
-        this.targetUnitByMethodMap = targetUnitByMethodMap;
-        this.byteChannel = byteChannel;
-        this.message = message;
-    }
+	public OutboundChannelHandler(List<PathMethodDTO> targetUnitByMethodMap, ByteChannel byteChannel,
+			HttpRequestDescriptor message) {
+		this.targetUnitByMethodMap = targetUnitByMethodMap;
+		this.byteChannel = byteChannel;
+		this.message = message;
+	}
 
-    @Override
-    public void start() {
-        final PathMethodDTO pathMethod = new PathMethodDTO(message.getPath(), message.getMethod(), null);
-        if(targetUnitByMethodMap.contains(pathMethod)){
-            final ByteBuffer buffer = processMessageToClient(message);
-            switch (message.getMethod()) {
-                case GET:
-                case HEAD:
-                    break;
-                case PUT:
-                case POST:
-                case PATCH:
-                    try {
-                        receivedMessage = ChannelBufferUtils.getHttpMessageDescriptorByChannel(byteChannel);
-                    } catch (Exception e){
-                        throw new SocketException("message body write problem", e);
-                    }
-                    break;
-                case TRACE:
-                case OPTIONS:
-                case DELETE:
-                default:
-                    throw new SocketException(String.format("not implemented method: %s", message));
-            }
-            buffer.clear();
-        }
-    }
+	@Override
+	public void start() {
+		final PathMethodDTO pathMethod = new PathMethodDTO(message.getPath(), message.getMethod(), null);
+		if (targetUnitByMethodMap.contains(pathMethod)) {
+			// final ByteBuffer buffer = processMessageToClient(message);
+			final ByteBuffer buffer = ChannelBufferUtils.getByteBufferByString(message.getMessage());
+			ChannelUtil.handleWriteChannelAndBuffer("client send message", byteChannel, buffer);
+			switch (message.getMethod()) {
+			case GET:
+				try {
+					System.out.println(getClass() + " try to read received message");
+					receivedMessage = ChannelBufferUtils.getHttpResponseDescriptorByChannel(byteChannel);
+				} catch (Exception e) {
+					throw new SocketException("message body write problem", e);
+				}
+				break;
+			case HEAD:
+			case PUT:
+			case POST:
+			case PATCH:
+				break;
+			case TRACE:
+			case OPTIONS:
+			case DELETE:
+			default:
+				throw new SocketException(String.format("not implemented method: %s", message));
+			}
+			buffer.clear();
+		}
+	}
 
-    @Override
-    public void stop() {
-        try {
-            byteChannel.close();
-        } catch (Exception e){
-            throw new SocketException("closing channel problem", e);
-        }
-    }
+	@Override
+	public void stop() {
+		try {
+			byteChannel.close();
+		} catch (Exception e) {
+			throw new SocketException("closing channel problem", e);
+		}
+	}
 
-    public HttpMessageDescriptor getReceivedMessage() {
-        return receivedMessage;
-    }
+	public HttpResponseDescriptor getResponseMessage() {
+		return receivedMessage;
+	}
 
-    private ByteBuffer processMessageToClient(HttpMessageDescriptor message) {
-        byte[] requestBytes = message.getMessage().getBytes();
-        ByteBuffer buffer = ByteBuffer.allocate(requestBytes.length);
-        buffer.put(requestBytes);
-        buffer.flip();
-        return buffer;
-    }
 }

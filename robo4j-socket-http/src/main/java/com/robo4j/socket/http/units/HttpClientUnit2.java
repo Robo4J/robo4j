@@ -22,9 +22,9 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.HttpMessageDescriptor;
 import com.robo4j.socket.http.channel.OutboundChannelHandler;
 import com.robo4j.socket.http.dto.PathMethodDTO;
+import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 
@@ -43,16 +43,16 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class HttpClientUnit2 extends RoboUnit<HttpMessageDescriptor> {
+public class HttpClientUnit2 extends RoboUnit<HttpRequestDescriptor> {
 
 	private InetSocketAddress address;
 	private String responseUnit;
 	private Integer responseSize;
 	private Integer bufferCapacity;
-	private List<PathMethodDTO> targetUnitByMethodMap;
+	private List<PathMethodDTO> targetPathMethodList;
 
 	public HttpClientUnit2(RoboContext context, String id) {
-		super(HttpMessageDescriptor.class, context, id);
+		super(HttpRequestDescriptor.class, context, id);
 	}
 
 	@Override
@@ -62,23 +62,25 @@ public class HttpClientUnit2 extends RoboUnit<HttpMessageDescriptor> {
 		responseUnit = configuration.getString("responseUnit", null);
 		responseSize = configuration.getInteger("responseSize", null);
 		bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, null);
-		targetUnitByMethodMap = JsonUtil.convertJsonToPathMethodList(configuration.getString("targetUnits", null));
+		targetPathMethodList = JsonUtil.convertJsonToPathMethodList(configuration.getString("targetUnits", null));
 
 		address = new InetSocketAddress(confAddress, confPort);
 	}
 
 	@Override
-	public void onMessage(HttpMessageDescriptor message) {
+	public void onMessage(HttpRequestDescriptor message) {
 		try {
 			SocketChannel channel = SocketChannel.open(address);
 			if (bufferCapacity != null) {
 				channel.socket().setSendBufferSize(bufferCapacity);
 			}
-			OutboundChannelHandler handler = new OutboundChannelHandler(targetUnitByMethodMap, channel, message);
+			OutboundChannelHandler handler = new OutboundChannelHandler(targetPathMethodList, channel, message);
 			handler.start();
 			if (channel.isConnectionPending() && channel.finishConnect()) {
 				handler.stop();
 			}
+
+			System.out.println(getClass() + ":: OutboundChannelHandler message: " + handler.getResponseMessage());
 
 
 		} catch (IOException e) {

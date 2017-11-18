@@ -15,72 +15,41 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http;
+package com.robo4j.socket.http.message;
+
+import com.robo4j.socket.http.HttpMethod;
 
 import java.util.Map;
 
 /**
- * Generic message used by Server and Client units.
+ * Inbound Http message used by Server units.
  *
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class HttpMessageDescriptor {
+public final class HttpRequestDescriptor extends AbstractHttpMessageDescriptor {
 
-	final private Map<String, String> header;
 	final private HttpMethod method;
-	final private String version;
 	final private String path;
-	private Integer length;
-	private String message;
-	private String callbackUnit;
 
-
-	public HttpMessageDescriptor(Map<String, String> header, HttpMethod method, String version, String path) {
-		this.header = header;
+	public HttpRequestDescriptor(Map<String, String> header, HttpMethod method, String version, String path) {
+		super(header, version);
 		this.method = method;
-		this.version = version;
 		this.path = path;
-		this.length = null;
-		this.message = null;
-	}
-
-	public Map<String, String> getHeader() {
-		return header;
 	}
 
 	public HttpMethod getMethod() {
 		return method;
 	}
 
-	public String getVersion() {
-		return version;
-	}
-
 	public String getPath() {
 		return path;
 	}
 
-	public Integer getLength() {
-		return length;
+	@Override
+	public String toString() {
+		return "HttpRequestDescriptor{" + ", method=" + method + ", path='" + path + '\'' + super.toString()
+				+ '}';
 	}
-
-	public void setLength(Integer length){
-		this.length = length;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public void addMessage(String message) {
-		this.message = this.message == null ? message : this.message.concat(message);
-	}
-
-	public String getCallbackUnit() {
-		return callbackUnit;
-	}
-
-
 }

@@ -29,20 +29,31 @@ import com.robo4j.socket.http.enums.StatusCode;
  */
 public final class RoboResponseHeader {
 
-    public static String headerByCode(StatusCode code) {
-        return HttpFirstLineBuilder.Build(HttpVersion.HTTP_1_1.getValue())
-                .add(code.getCode())
-                .add(code.getReasonPhrase())
-                .build();
-    }
+	/**
+	 * create http 1st line without UID of RoboSystem
+	 * 
+	 * @param code
+	 *            Status code
+	 * @return fist line
+	 */
+	@Deprecated
+	public static String headerByCode(StatusCode code) {
+		return HttpFirstLineBuilder.Build(HttpVersion.HTTP_1_1.getValue()).add(code.getCode())
+				.add(code.getReasonPhrase()).build();
+	}
 
-    public static String headerByCodeWithUid(StatusCode code, String uid) {
-        return HttpFirstLineBuilder.Build(HttpVersion.HTTP_1_1.getValue())
-                .add(code.getCode())
-                .build()
-                .concat(HttpHeaderBuilder.Build()
-                        .add(HttpHeaderFieldNames.ROBO_UNIT_UID, uid)
-                        .build());
-    }
+	/**
+	 * create http 1st line with UID of RoboSystem
+     *
+	 * @param code
+	 *            response code
+	 * @param uid
+	 *            unique RoboSystem uid
+	 * @return first line
+	 */
+	public static String headerByCodeWithUid(StatusCode code, String uid) {
+		return HttpFirstLineBuilder.Build(HttpVersion.HTTP_1_1.getValue()).add(code.getCode()).build()
+				.concat(HttpHeaderBuilder.Build().add(HttpHeaderFieldNames.ROBO_UNIT_UID, uid).build());
+	}
 
 }
