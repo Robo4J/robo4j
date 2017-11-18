@@ -35,15 +35,15 @@ import java.util.concurrent.Future;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class ReadSelectorHandler implements SelectorHandler {
+public class ReadSelectionKeyHandler implements SelectionKeyHandler {
 
 	private final RoboContext context;
 	private final HttpCodecRegistry codecRegistry;
 	private final Map<SelectionKey, RoboResponseProcess> outBuffers;
 	private final SelectionKey key;
 
-	public ReadSelectorHandler(RoboContext context, HttpCodecRegistry codecRegistry,
-			Map<SelectionKey, RoboResponseProcess> outBuffers, SelectionKey key) {
+	public ReadSelectionKeyHandler(RoboContext context, HttpCodecRegistry codecRegistry,
+                                   Map<SelectionKey, RoboResponseProcess> outBuffers, SelectionKey key) {
 		this.context = context;
 		this.codecRegistry = codecRegistry;
 		this.outBuffers = outBuffers;

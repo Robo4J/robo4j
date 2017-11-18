@@ -41,15 +41,15 @@ import java.util.Map;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class WriteSelectorHandler implements SelectorHandler {
+public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 
 	private final RoboContext context;
 	private final List<RoboReference<Object>> targetRefs;
 	private final Map<SelectionKey, RoboResponseProcess> outBuffers;
 	private final SelectionKey key;
 
-	public WriteSelectorHandler(RoboContext context, List<RoboReference<Object>> targetRefs,
-			Map<SelectionKey, RoboResponseProcess> outBuffers, SelectionKey key) {
+	public WriteSelectionKeyHandler(RoboContext context, List<RoboReference<Object>> targetRefs,
+                                    Map<SelectionKey, RoboResponseProcess> outBuffers, SelectionKey key) {
 		this.context = context;
 		this.targetRefs = targetRefs;
 		this.outBuffers = outBuffers;

@@ -45,8 +45,8 @@ public class ChannelBufferUtils {
 	public static final byte CHAR_NEW_LINE = 0x0A;
 	public static final byte CHAR_RETURN = 0x0D;
 	public static final byte[] END_WINDOW = { CHAR_NEW_LINE, CHAR_NEW_LINE };
-	private static final ByteBuffer buffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
 	private static final int BUFFER_MARK_END = -1;
+	private static final ByteBuffer buffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
 
 	public static ByteBuffer copy(ByteBuffer source, int start, int end) {
 		ByteBuffer result = ByteBuffer.allocate(end);

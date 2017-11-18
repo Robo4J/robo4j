@@ -15,16 +15,37 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.util;
+package com.robo4j.socket.http.units.test;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
- * Commonly used constants.
- *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class StringConstants {
-    public static final String EMPTY = "";
-    public static final String SPACE = "\u0020";
-    public static final String COMMA = "\u002C";
+public class PropertyListBuilder<Type> {
+
+    private List<Type> list;
+
+    private PropertyListBuilder() {
+        this.list = new LinkedList<>();
+    }
+
+    @SuppressWarnings("rawtypes")
+    public static <Type> PropertyListBuilder Builder() {
+        return new PropertyListBuilder<Type>();
+    }
+
+    @SuppressWarnings("rawtypes")
+    public PropertyListBuilder add(Type element) {
+        list.add(element);
+        return this;
+    }
+
+    public List<Type> build() {
+        return Collections.unmodifiableList(list);
+    }
+
 }

@@ -15,16 +15,30 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.util;
+package com.robo4j.socket.http.units;
+
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboContext;
+import org.junit.Test;
+
+import java.io.InputStream;
 
 /**
- * Commonly used constants.
+ * testing http method GET with response
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class StringConstants {
-    public static final String EMPTY = "";
-    public static final String SPACE = "\u0020";
-    public static final String COMMA = "\u002C";
+public class RoboHttpClientWithResponseTests {
+
+	@Test
+	public void simpleRoboSystemGetRequestTest() throws Exception {
+		RoboBuilder builderConsumer = new RoboBuilder(
+				Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemTest.xml"));
+		InputStream serverConfigInputStream = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream("robo_camara_consumer_test.xml");
+		builderConsumer.add(serverConfigInputStream);
+		RoboContext consumerSystem = builderConsumer.build();
+	}
+
 }

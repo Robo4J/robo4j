@@ -52,7 +52,7 @@ public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncod
 
 	@Override
 	public SimpleCommand decode(String json) {
-		Map<String, Object> map = JsonUtil.getMapNyJson(json);
+		Map<String, Object> map = JsonUtil.getMapByJson(json);
 		return map.containsKey(KEY_TYPE) ?
 				new SimpleCommand(objectToString(map.get(KEY_VALUE)), objectToString(map.get(KEY_TYPE)))
 				: new SimpleCommand(objectToString(map.get(KEY_VALUE)));

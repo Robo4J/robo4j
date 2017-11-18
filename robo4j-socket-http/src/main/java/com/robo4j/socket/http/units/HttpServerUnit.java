@@ -76,7 +76,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(","));
 		}
 
-		Map<String, Object> targetUnitsMap = JsonUtil.getMapNyJson(configuration.getString("targetUnits", null));
+		Map<String, Object> targetUnitsMap = JsonUtil.getMapByJson(configuration.getString("targetUnits", null));
 
 		if(targetUnitsMap.isEmpty()){
 			SimpleLoggingUtil.error(getClass(), "no targetUnits");

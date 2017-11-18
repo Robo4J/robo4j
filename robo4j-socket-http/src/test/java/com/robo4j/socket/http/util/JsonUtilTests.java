@@ -17,11 +17,11 @@
 
 package com.robo4j.socket.http.util;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Test json utils

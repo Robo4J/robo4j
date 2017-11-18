@@ -46,7 +46,7 @@ public class StringCodec implements HttpDecoder<String>, HttpEncoder<String> {
 
 	@Override
 	public String decode(String json) {
-		return objectToString(JsonUtil.getMapNyJson(json).get(KEY_MESSAGE));
+		return objectToString(JsonUtil.getMapByJson(json).get(KEY_MESSAGE));
 	}
 
 	@Override

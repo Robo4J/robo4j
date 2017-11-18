@@ -20,29 +20,36 @@ package com.robo4j.socket.http.channel;
 import com.robo4j.logging.SimpleLoggingUtil;
 
 import java.nio.channels.SelectionKey;
+import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
 /**
- * Handle OP_CONNECT
+ * Handle OP_ACCEPT
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class ConnectSelectorHandler implements SelectorHandler {
+public class AcceptSelectionKeyHandler implements SelectionKeyHandler {
 
-    private final SelectionKey key;
+	private final SelectionKey key;
+	private final int bufferCapacity;
 
-    public ConnectSelectorHandler(SelectionKey key) {
-        this.key = key;
-    }
+	public AcceptSelectionKeyHandler(SelectionKey key, int bufferCapacity) {
+		this.key = key;
+		this.bufferCapacity = bufferCapacity;
+	}
 
-    @Override
-    public SelectionKey handle() {
-        try{
-            ((SocketChannel) key.channel()).finishConnect();
-        } catch (Exception e){
-            SimpleLoggingUtil.error(getClass(), "handle connect", e);
-        }
-        return key;
-    }
+	@Override
+	public SelectionKey handle() {
+		try {
+			ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
+			SocketChannel channel = serverChannel.accept();
+			serverChannel.socket().setReceiveBufferSize(bufferCapacity);
+			channel.configureBlocking(false);
+			channel.register(key.selector(), SelectionKey.OP_READ);
+		} catch (Exception e) {
+			SimpleLoggingUtil.error(getClass(), "handle accept", e);
+		}
+		return key;
+	}
 }

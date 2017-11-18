@@ -36,5 +36,7 @@ public final class Constants {
 	public static final String UTF8_QUOTATION_MARK = "\"";
 	public static final String UTF8_CURLY_BRACKET_LEFT = "\u007B";
 	public static final String UTF8_CURLY_BRACKET_RIGHT = "\u007D";
+	public static final String UTF8_SQUARE_BRACKET_LEFT = "\u005B";
+	public static final String UTF8_SQUARE_BRACKET_RIGHT = "\u005D";
 
 }

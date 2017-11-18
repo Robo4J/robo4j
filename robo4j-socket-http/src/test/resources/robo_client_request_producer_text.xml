@@ -1,0 +1,23 @@
+<robo4j>
+    <roboUnit id="httpClient">
+        <class>com.robo4j.socket.http.units.HttpClientUnit2</class>
+        <config name="com.robo4j.root">
+            <value name="address" type="String">0.0.0.0</value>
+            <value name="port" type="int">8050</value>
+            <value name="targetUnits" type="String">{"imageController":"POST"}</value>
+        </config>
+    </roboUnit>
+    <roboUnit id="stringConsumer">
+        <class>com.robo4j.StringConsumer</class>
+    </roboUnit>
+    <roboUnit id="outboundController">
+        <class>com.robo4j.socket.http.units.test.CameraImageProducerTestUnit</class>
+        <config name="com.robo4j.root">
+            <value name="targetOut" type="String">httpClient</value>
+            <value name="client" type="String">0.0.0.0</value>
+            <value name="clientPort" type="String">8050</value>
+            <value name="clientUri" type="String">/units/imageProcessor</value>
+            <value name="numberOfImages" type="int">40</value>
+        </config>
+    </roboUnit>
+</robo4j>

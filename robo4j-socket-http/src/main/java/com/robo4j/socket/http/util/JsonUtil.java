@@ -18,6 +18,8 @@
 package com.robo4j.socket.http.util;
 
 import com.robo4j.LifecycleState;
+import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.dto.PathMethodDTO;
 import com.robo4j.socket.http.dto.ResponseUnitDTO;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.util.StringConstants;
@@ -27,9 +29,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.robo4j.socket.http.units.Constants.UTF8_CURLY_BRACKET_LEFT;
+import static com.robo4j.socket.http.units.Constants.UTF8_QUOTATION_MARK;
 import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COLON;
 import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COMMA;
 import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_LEFT;
@@ -51,21 +57,23 @@ public final class JsonUtil {
 			byte.class, long.class, double.class, float.class, char.class, Boolean.class, Integer.class, Short.class,
 			Byte.class, Long.class, Double.class, Float.class, Character.class).collect(Collectors.toSet());
 	private static final Set<Class<?>> quoatationTypes = Stream.of(String.class).collect(Collectors.toSet());
+	private static final String DELIMITER_JSON_OBJECTS = "(?<=\\})(?=\\,\\{)";
+	public static final String PATTERN_OBJ_FROM_ARRAY = "^\\[(.*)\\]$";
 
 	@SuppressWarnings(value = "unchecked")
 	public static String getJsonByMap(Map<String, Object> map) {
 		StringBuilder sb = new StringBuilder(Constants.UTF8_CURLY_BRACKET_LEFT);
 		sb.append(map.entrySet().stream().map(e -> {
-			StringBuilder sb2 = new StringBuilder(Constants.UTF8_QUOTATION_MARK).append(e.getKey())
-					.append(Constants.UTF8_QUOTATION_MARK).append(Constants.UTF8_COLON);
+			StringBuilder sb2 = new StringBuilder(UTF8_QUOTATION_MARK).append(e.getKey()).append(UTF8_QUOTATION_MARK)
+					.append(Constants.UTF8_COLON);
 			Class<?> clazz = e.getValue().getClass();
 			if (checkPrimitiveOrWrapper(clazz)) {
 				sb2.append(e.getValue());
 			} else if (checkString(clazz)) {
-				sb2.append(Constants.UTF8_QUOTATION_MARK).append(e.getValue()).append(Constants.UTF8_QUOTATION_MARK);
-			} else if (e.getValue() instanceof Enum<?>){
-				Enum<?> en = (Enum<?>)e.getValue();
-				sb2.append(Constants.UTF8_QUOTATION_MARK).append(en.name()).append(Constants.UTF8_QUOTATION_MARK);
+				sb2.append(UTF8_QUOTATION_MARK).append(e.getValue()).append(UTF8_QUOTATION_MARK);
+			} else if (e.getValue() instanceof Enum<?>) {
+				Enum<?> en = (Enum<?>) e.getValue();
+				sb2.append(UTF8_QUOTATION_MARK).append(en.name()).append(UTF8_QUOTATION_MARK);
 			} else if (e.getValue() instanceof Map) {
 				sb2.append(getJsonByMap((Map<String, Object>) e.getValue()));
 			}
@@ -74,9 +82,9 @@ public final class JsonUtil {
 		return sb.toString();
 	}
 
-	public static Map<String, Object> getMapNyJson(String json){
+	public static Map<String, Object> getMapByJson(String json) {
 		final Map<String, Object> result = new HashMap<>();
-		if(json == null){
+		if (json == null) {
 			return result;
 		}
 
@@ -90,44 +98,110 @@ public final class JsonUtil {
 
 	}
 
-	public static List<ResponseUnitDTO> getListByUnitJsonArray(String json){
+	/**
+	 * Converting json {"imageProcessor":["POST","callBack"]} to PathMethodDTO
+	 *
+	 * @param json
+	 *            - string
+	 * @return List of elements
+	 */
+	public static PathMethodDTO getPathMethodByJson(String json) {
+
+		Pattern pattern = Pattern.compile("\\{\\s*\"(\\w*)\"\\s*:\\s*\\[(.*)\\]\\s*\\}");
+		Matcher matcher = pattern.matcher(json);
+		return matcher.find() ? extractPathMethodByMatcher(matcher) : null;
+	}
+
+	public static String getJsonByPathMethodList(List<PathMethodDTO> pathMethodList) {
+		return JsonElementStringBuilder.Builder().add(Constants.UTF8_SQUARE_BRACKET_LEFT)
+				.add(pathMethodList.stream().map(JsonUtil::getJsonByPathMethod)
+						.collect(Collectors.joining(Constants.UTF8_COMMA)))
+				.add(Constants.UTF8_SQUARE_BRACKET_RIGHT).build();
+	}
+
+	/**
+	 * Create desired Json String: {"imageProcessor":["POST","callBack"]}
+	 *
+	 * @param pathMethod
+	 *            valid method
+	 * @return jsonString
+	 */
+	public static String getJsonByPathMethod(PathMethodDTO pathMethod) {
+		JsonElementStringBuilder builder = JsonElementStringBuilder.Builder().add(UTF8_CURLY_BRACKET_LEFT)
+				.addQuotationWithDelimiter(Constants.UTF8_COLON, pathMethod.getPath())
+				.add(Constants.UTF8_SQUARE_BRACKET_LEFT);
+		if (pathMethod.getCallbackUnitName() == null) {
+			builder.addQuotation(pathMethod.getMethod().getName());
+		} else {
+			builder.addQuotationWithDelimiter(Constants.UTF8_COMMA, pathMethod.getMethod().getName())
+					.addQuotation(pathMethod.getCallbackUnitName());
+		}
+
+		//@formatter:off
+		return builder.add(Constants.UTF8_SQUARE_BRACKET_RIGHT)
+				.add(Constants.UTF8_CURLY_BRACKET_RIGHT)
+				.build();
+		//@formatter:on
+	}
+
+	/**
+	 * convert targetUnit json,
+	 * [{"imageController":["POST","callbackPOSTController"]},...] to the PathMethod
+	 * List List doesn't contain duplicates
+	 *
+	 *
+	 * [{"imageController":["POST","callbackPOSTController"]},{"imageController":["POST","callbackPOSTController"]}]
+	 *
+	 * @param json
+	 *            targetUnit json
+	 * @return extracted List
+	 */
+	public static List<PathMethodDTO> convertJsonToPathMethodList(String json) {
+
+		Pattern patternObjFromArray = Pattern.compile(PATTERN_OBJ_FROM_ARRAY);
+		Matcher matcher = patternObjFromArray.matcher(json);
+
+		return matcher.find()
+				? Stream.of(matcher.group(1).split(DELIMITER_JSON_OBJECTS)).map(JsonUtil::getPathMethodByJson)
+						.distinct().collect(Collectors.toList())
+				: new ArrayList<>();
+	}
+
+	public static List<ResponseUnitDTO> convertJsonToResponseUnitList(String json) {
 		List<ResponseUnitDTO> result = new ArrayList<>();
-		String array = json.replace(CHAR_SQUARE_BRACKET_LEFT,StringConstants.EMPTY)
-				.replace(CHAR_SQUARE_BRACKET_RIGHT, StringConstants.EMPTY);
+		String array = json.replace(CHAR_SQUARE_BRACKET_LEFT, StringConstants.EMPTY).replace(CHAR_SQUARE_BRACKET_RIGHT,
+				StringConstants.EMPTY);
 		final String[] parts = array.replaceAll("\\{\\s*\"|\"\\s*\\}", StringConstants.EMPTY)
 				.split("\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?");
-		for(int i=0; i < parts.length; i=i+4){
-			result.add(new ResponseUnitDTO(parts[i+1], LifecycleState.valueOf(parts[i+3])));
+		for (int i = 0; i < parts.length; i = i + 4) {
+			result.add(new ResponseUnitDTO(parts[i + 1], LifecycleState.valueOf(parts[i + 3])));
 		}
 		return result;
 
 	}
 
+	// TODO (miro) -> change it to JsonElementStringBuilder
+	public static String getArrayByListResponseUnitDTO(List<ResponseUnitDTO> units) {
 
-	public static String getArrayByListResponseUnitDTO(List<ResponseUnitDTO> units){
+		return new StringBuilder(CHAR_SQUARE_BRACKET_LEFT).append(units.stream()
+				.map(u -> new StringBuilder(CHAR_CURLY_BRACKET_LEFT).append(CHAR_QUOTATION_MARK).append("id")
+						.append(CHAR_QUOTATION_MARK).append(CHAR_COLON).append(CHAR_QUOTATION_MARK).append(u.getId())
+						.append(CHAR_QUOTATION_MARK).append(CHAR_COMMA).append(CHAR_QUOTATION_MARK)
+						.append(u.getState().getClass().getCanonicalName()).append(CHAR_QUOTATION_MARK)
+						.append(CHAR_COLON).append(CHAR_QUOTATION_MARK)
+						.append(u.getState().getLocalizedName().toUpperCase()).append(CHAR_QUOTATION_MARK)
+						.append(CHAR_CURLY_BRACKET_RIGHT).toString())
 
-		return new StringBuilder(CHAR_SQUARE_BRACKET_LEFT)
-						.append(units.stream().map(u -> new StringBuilder(CHAR_CURLY_BRACKET_LEFT)
-								.append(CHAR_QUOTATION_MARK).append("id").append(CHAR_QUOTATION_MARK).append(CHAR_COLON)
-								.append(CHAR_QUOTATION_MARK).append(u.getId()).append(CHAR_QUOTATION_MARK).append(CHAR_COMMA)
-								.append(CHAR_QUOTATION_MARK).append(u.getState().getClass().getCanonicalName()).append(CHAR_QUOTATION_MARK)
-								.append(CHAR_COLON).append(CHAR_QUOTATION_MARK).append(u.getState().getLocalizedName().toUpperCase()).append(CHAR_QUOTATION_MARK)
-								.append(CHAR_CURLY_BRACKET_RIGHT).toString())
-
-								.collect(Collectors.joining(CHAR_COMMA)))
-						.append(CHAR_SQUARE_BRACKET_RIGHT).toString();
+				.collect(Collectors.joining(CHAR_COMMA))).append(CHAR_SQUARE_BRACKET_RIGHT).toString();
 	}
 
-	public static String getArraysByMethodList(List<String> list){
-		return new StringBuilder(CHAR_SQUARE_BRACKET_LEFT).append(list.stream().map(m -> new StringBuilder(CHAR_CURLY_BRACKET_LEFT)
-						.append(CHAR_QUOTATION_MARK).append("type").append(CHAR_QUOTATION_MARK)
-						.append(CHAR_COLON).append(CHAR_QUOTATION_MARK).append(m).append(CHAR_QUOTATION_MARK)
-						.append(CHAR_CURLY_BRACKET_RIGHT).toString()).collect(Collectors.joining(CHAR_COMMA)))
-				.append(CHAR_SQUARE_BRACKET_RIGHT).toString();
+	public static String getArraysByMethodList(List<String> list) {
+		return new StringBuilder(CHAR_SQUARE_BRACKET_LEFT).append(list.stream()
+				.map(m -> new StringBuilder(CHAR_CURLY_BRACKET_LEFT).append(CHAR_QUOTATION_MARK).append("type")
+						.append(CHAR_QUOTATION_MARK).append(CHAR_COLON).append(CHAR_QUOTATION_MARK).append(m)
+						.append(CHAR_QUOTATION_MARK).append(CHAR_CURLY_BRACKET_RIGHT).toString())
+				.collect(Collectors.joining(CHAR_COMMA))).append(CHAR_SQUARE_BRACKET_RIGHT).toString();
 	}
-
-
-
 
 	// Private Methods
 	private static boolean checkPrimitiveOrWrapper(Class<?> clazz) {
@@ -136,6 +210,13 @@ public final class JsonUtil {
 
 	private static boolean checkString(Class<?> clazz) {
 		return quoatationTypes.contains(clazz);
+	}
+
+	private static PathMethodDTO extractPathMethodByMatcher(Matcher matcher) {
+		String[] propertiesValues = matcher.group(2).replaceAll("[\"\\[\\]]", StringConstants.EMPTY)
+				.split(Constants.UTF8_COMMA);
+		return new PathMethodDTO(matcher.group(1).trim(), HttpMethod.getByName(propertiesValues[0].trim()),
+				propertiesValues.length > 1 ? propertiesValues[1].trim() : null);
 	}
 
 }

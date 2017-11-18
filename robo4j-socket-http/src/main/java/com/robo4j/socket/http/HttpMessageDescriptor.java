@@ -34,6 +34,8 @@ public class HttpMessageDescriptor {
 	final private String path;
 	private Integer length;
 	private String message;
+	private String callbackUnit;
+
 
 	public HttpMessageDescriptor(Map<String, String> header, HttpMethod method, String version, String path) {
 		this.header = header;
@@ -76,9 +78,9 @@ public class HttpMessageDescriptor {
 		this.message = this.message == null ? message : this.message.concat(message);
 	}
 
-	@Override
-	public String toString() {
-		return "HttpMessageDescriptor{" + "header=" + header + ", method=" + method + ", version='" + version + '\''
-				+ ", path='" + path + '\'' + ", length=" + length + ", message='" + message + '\'' + '}';
+	public String getCallbackUnit() {
+		return callbackUnit;
 	}
+
+
 }

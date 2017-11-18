@@ -101,19 +101,19 @@ public class InboundSocketHandler implements SocketHandler {
 				selectedIterator.remove();
 
 				if (selectedKey.isAcceptable()) {
-					handleSelectorHandler(new AcceptSelectorHandler(selectedKey, bufferCapacity));
+					handleSelectorHandler(new AcceptSelectionKeyHandler(selectedKey, bufferCapacity));
 				} else if (selectedKey.isConnectable()) {
-					handleSelectorHandler(new ConnectSelectorHandler(selectedKey));
+					handleSelectorHandler(new ConnectSelectionKeyHandler(selectedKey));
 				} else if (selectedKey.isReadable()) {
-					handleSelectorHandler(new ReadSelectorHandler(context, codecRegistry, outBuffers, selectedKey));
+					handleSelectorHandler(new ReadSelectionKeyHandler(context, codecRegistry, outBuffers, selectedKey));
 				} else if (selectedKey.isWritable()) {
-					handleSelectorHandler(new WriteSelectorHandler(context, targetRefs, outBuffers, selectedKey));
+					handleSelectorHandler(new WriteSelectionKeyHandler(context, targetRefs, outBuffers, selectedKey));
 				}
 			}
 		}
 	}
 
-	private void handleSelectorHandler(SelectorHandler handler) {
+	private void handleSelectorHandler(SelectionKeyHandler handler) {
 		handler.handle();
 	}
 

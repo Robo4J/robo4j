@@ -27,10 +27,12 @@ public class PathMethodDTO {
 
     private final String path;
     private final HttpMethod method;
+    private final String callbackUnitName;
 
-    public PathMethodDTO(String path, HttpMethod method) {
+    public PathMethodDTO(String path, HttpMethod method, String callbackUnitName) {
         this.path = path;
         this.method = method;
+        this.callbackUnitName = callbackUnitName;
     }
 
     public String getPath() {
@@ -41,6 +43,10 @@ public class PathMethodDTO {
         return method;
     }
 
+    public String getCallbackUnitName() {
+        return callbackUnitName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -49,13 +55,15 @@ public class PathMethodDTO {
         PathMethodDTO that = (PathMethodDTO) o;
 
         if (!path.equals(that.path)) return false;
-        return method == that.method;
+        if (method != that.method) return false;
+        return callbackUnitName != null ? callbackUnitName.equals(that.callbackUnitName) : that.callbackUnitName == null;
     }
 
     @Override
     public int hashCode() {
         int result = path.hashCode();
         result = 31 * result + method.hashCode();
+        result = 31 * result + (callbackUnitName != null ? callbackUnitName.hashCode() : 0);
         return result;
     }
 
@@ -64,6 +72,7 @@ public class PathMethodDTO {
         return "PathMethodDTO{" +
                 "path='" + path + '\'' +
                 ", method=" + method +
+                ", callbackUnitName='" + callbackUnitName + '\'' +
                 '}';
     }
 }
