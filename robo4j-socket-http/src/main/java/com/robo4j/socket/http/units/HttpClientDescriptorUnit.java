@@ -44,13 +44,13 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class HttpClientUnit2 extends RoboUnit<HttpRequestDescriptor> {
+public class HttpClientDescriptorUnit extends RoboUnit<HttpRequestDescriptor> {
 
 	private InetSocketAddress address;
 	private Integer bufferCapacity;
 	private List<PathMethodDTO> targetPathMethodList;
 
-	public HttpClientUnit2(RoboContext context, String id) {
+	public HttpClientDescriptorUnit(RoboContext context, String id) {
 		super(HttpRequestDescriptor.class, context, id);
 	}
 
@@ -66,8 +66,7 @@ public class HttpClientUnit2 extends RoboUnit<HttpRequestDescriptor> {
 
 	@Override
 	public void onMessage(HttpRequestDescriptor message) {
-		try {
-			SocketChannel channel = SocketChannel.open(address);
+		try(SocketChannel channel = SocketChannel.open(address)) {
 			if (bufferCapacity != null) {
 				channel.socket().setSendBufferSize(bufferCapacity);
 			}
@@ -77,8 +76,9 @@ public class HttpClientUnit2 extends RoboUnit<HttpRequestDescriptor> {
 				handler.stop();
 			}
 
+			//TODO (miro) improve response handling about status code states
 			HttpResponseDescriptor descriptor = handler.getResponseMessage();
-			if(descriptor.getCode().equals(StatusCode.OK) && descriptor.getCallbackUnit() != null){
+			if(descriptor != null && descriptor.getCode().equals(StatusCode.OK) && descriptor.getCallbackUnit() != null){
 				sendMessageToResponseUnit(descriptor.getCallbackUnit(), descriptor.getMessage());
 			}
 		} catch (IOException e) {

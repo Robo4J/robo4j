@@ -17,6 +17,12 @@
 
 package com.robo4j.units.rpi.camera;
 
+import com.robo4j.hw.rpi.camera.CameraClientException;
+import com.robo4j.socket.http.units.Constants;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Base64;
+
 /**
  *
  * raspistill specific utilities
@@ -28,6 +34,14 @@ final class RaspistillUtils {
 
 	static final String RASPISTILL_COMMAND = "raspistill";
 
+
+	public static String bytesToBase64String(byte[] array){
+		try {
+			return new String(Base64.getEncoder().encode(array), Constants.DEFAULT_ENCODING);
+		} catch (UnsupportedEncodingException e) {
+			throw new CameraClientException("image capture", e);
+		}
+	}
 
 
 }

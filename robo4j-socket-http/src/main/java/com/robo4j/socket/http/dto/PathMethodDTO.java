@@ -25,52 +25,52 @@ import com.robo4j.socket.http.HttpMethod;
  */
 public class PathMethodDTO {
 
-    private final String path;
-    private final HttpMethod method;
-    private final String callbackUnitName;
+	private final String path;
+	private final HttpMethod method;
+	private final String callbackUnitName;
 
-    public PathMethodDTO(String path, HttpMethod method, String callbackUnitName) {
-        this.path = path;
-        this.method = method;
-        this.callbackUnitName = callbackUnitName;
-    }
+	public PathMethodDTO(String path, HttpMethod method, String callbackUnitName) {
+		this.path = path;
+		this.method = method;
+		this.callbackUnitName = callbackUnitName;
+	}
 
-    public String getPath() {
-        return path;
-    }
+	public String getPath() {
+		return path;
+	}
 
-    public HttpMethod getMethod() {
-        return method;
-    }
+	public HttpMethod getMethod() {
+		return method;
+	}
 
-    public String getCallbackUnitName() {
-        return callbackUnitName;
-    }
+	public String getCallbackUnitName() {
+		return callbackUnitName;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PathMethodDTO)) return false;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof PathMethodDTO))
+			return false;
 
-        PathMethodDTO that = (PathMethodDTO) o;
+		PathMethodDTO that = (PathMethodDTO) o;
 
-        if (!path.equals(that.path)) return false;
-        return method == that.method;
-    }
+		if (!path.equals(that.path))
+			return false;
+		return method == that.method;
+	}
 
-    @Override
-    public int hashCode() {
-        int result = path.hashCode();
-        result = 31 * result + method.hashCode();
-        return result;
-    }
+	@Override
+	public int hashCode() {
+		int result = path.hashCode();
+		result = 31 * result + method.hashCode();
+		return result;
+	}
 
-    @Override
-    public String toString() {
-        return "PathMethodDTO{" +
-                "path='" + path + '\'' +
-                ", method=" + method +
-                ", callbackUnitName='" + callbackUnitName + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "PathMethodDTO{" + "path='" + path + '\'' + ", method=" + method + ", callbackUnitName='"
+				+ callbackUnitName + '\'' + '}';
+	}
 }

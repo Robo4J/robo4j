@@ -29,7 +29,7 @@ import java.util.stream.Stream;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum RaspiCamProperties {
+public enum RpiCameraProperty {
 
 	//@formatter:off
     WIDTH                   ("width",           "-w"),
@@ -69,20 +69,20 @@ public enum RaspiCamProperties {
     ;
     //@formatter:on
 
-	private static Map<String, RaspiCamProperties> nameToProperty;
+	private static Map<String, RpiCameraProperty> nameToProperty;
 	private String name;
 	private String property;
 
-	RaspiCamProperties(String name, String property) {
+	RpiCameraProperty(String name, String property) {
 		this.name = name;
 		this.property = property;
 	}
 
-	private static Map<String, RaspiCamProperties> initMapping() {
-		return Stream.of(values()).collect(Collectors.toMap(RaspiCamProperties::getName, e -> e));
+	private static Map<String, RpiCameraProperty> initMapping() {
+		return Stream.of(values()).collect(Collectors.toMap(RpiCameraProperty::getName, e -> e));
 	}
 
-	public static RaspiCamProperties getByName(String name) {
+	public static RpiCameraProperty getByName(String name) {
 		if (nameToProperty == null) {
 			nameToProperty = initMapping();
 		}
@@ -99,6 +99,6 @@ public enum RaspiCamProperties {
 
 	@Override
 	public String toString() {
-		return "RaspiCamProperties{" + "name='" + name + '\'' + ", property='" + property + '\'' + '}';
+		return "RpiCameraProperty{" + "name='" + name + '\'' + ", property='" + property + '\'' + '}';
 	}
 }

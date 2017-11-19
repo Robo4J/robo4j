@@ -162,10 +162,12 @@ public final class JsonUtil {
 		Pattern patternObjFromArray = Pattern.compile(PATTERN_OBJ_FROM_ARRAY);
 		Matcher matcher = patternObjFromArray.matcher(json);
 
-		return matcher.find()
-				? Stream.of(matcher.group(1).split(DELIMITER_JSON_OBJECTS)).map(JsonUtil::getPathMethodByJson)
-						.distinct().collect(Collectors.toList())
-				: new ArrayList<>();
+		//@formatter:off
+		return matcher.find() ? Stream.of(matcher.group(1).split(DELIMITER_JSON_OBJECTS))
+				.map(JsonUtil::getPathMethodByJson)
+				.distinct()
+				.collect(Collectors.toList()) : new ArrayList<>();
+		//@formatter:on
 	}
 
 	public static List<ResponseUnitDTO> convertJsonToResponseUnitList(String json) {

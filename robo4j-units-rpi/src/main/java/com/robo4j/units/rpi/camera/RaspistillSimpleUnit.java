@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
 
 @BlockingTrait
 @CriticalSectionTrait
-public class RaspistillUnit extends RoboUnit<Boolean> {
+public class RaspistillSimpleUnit extends RoboUnit<Boolean> {
 
 	private static final String ATTRIBUTE_COMMAND = "command";
 	private final static Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections.unmodifiableCollection(
@@ -75,33 +75,33 @@ public class RaspistillUnit extends RoboUnit<Boolean> {
 	private String clientUri;
 	private String imageEncoding;
 
-	public RaspistillUnit(RoboContext context, String id) {
+	public RaspistillSimpleUnit(RoboContext context, String id) {
 		super(Boolean.class, context, id);
 	}
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		imageEncoding = configuration.getString(RaspiCamProperties.ENCODING.getName(), "jpg");
+		imageEncoding = configuration.getString(RpiCameraProperty.ENCODING.getName(), "jpg");
 		// @fomatter:off
-		Map<RaspiCamProperties, String> parameters = new LinkedHashMap<>();
-		parameters.put(RaspiCamProperties.WIDTH, configuration.getString(RaspiCamProperties.WIDTH.getName(), "320"));
-		parameters.put(RaspiCamProperties.HEIGHT, configuration.getString(RaspiCamProperties.HEIGHT.getName(), "240"));
-		parameters.put(RaspiCamProperties.EXPORSURE,
-				configuration.getString(RaspiCamProperties.EXPORSURE.getName(), "sport"));
-		parameters.put(RaspiCamProperties.BRIGHTNESS,
-				configuration.getString(RaspiCamProperties.BRIGHTNESS.getName(), null));
-		parameters.put(RaspiCamProperties.SHARPNESS,
-				configuration.getString(RaspiCamProperties.SHARPNESS.getName(), null));
-		parameters.put(RaspiCamProperties.CONTRAST,
-				configuration.getString(RaspiCamProperties.CONTRAST.getName(), null));
-		parameters.put(RaspiCamProperties.TIMEOUT, configuration.getString(RaspiCamProperties.TIMEOUT.getName(), "1"));
-		parameters.put(RaspiCamProperties.TIMELAPSE,
-				configuration.getString(RaspiCamProperties.TIMELAPSE.getName(), "100"));
-		parameters.put(RaspiCamProperties.ROTATION,
-				configuration.getString(RaspiCamProperties.ROTATION.getName(), null));
-		parameters.put(RaspiCamProperties.ENCODING, imageEncoding);
-		parameters.put(RaspiCamProperties.NOPREVIEW, "");
-		parameters.put(RaspiCamProperties.OUTPUT, "-");
+		Map<RpiCameraProperty, String> parameters = new LinkedHashMap<>();
+		parameters.put(RpiCameraProperty.WIDTH, configuration.getString(RpiCameraProperty.WIDTH.getName(), "320"));
+		parameters.put(RpiCameraProperty.HEIGHT, configuration.getString(RpiCameraProperty.HEIGHT.getName(), "240"));
+		parameters.put(RpiCameraProperty.EXPORSURE,
+				configuration.getString(RpiCameraProperty.EXPORSURE.getName(), "sport"));
+		parameters.put(RpiCameraProperty.BRIGHTNESS,
+				configuration.getString(RpiCameraProperty.BRIGHTNESS.getName(), null));
+		parameters.put(RpiCameraProperty.SHARPNESS,
+				configuration.getString(RpiCameraProperty.SHARPNESS.getName(), null));
+		parameters.put(RpiCameraProperty.CONTRAST,
+				configuration.getString(RpiCameraProperty.CONTRAST.getName(), null));
+		parameters.put(RpiCameraProperty.TIMEOUT, configuration.getString(RpiCameraProperty.TIMEOUT.getName(), "1"));
+		parameters.put(RpiCameraProperty.TIMELAPSE,
+				configuration.getString(RpiCameraProperty.TIMELAPSE.getName(), "100"));
+		parameters.put(RpiCameraProperty.ROTATION,
+				configuration.getString(RpiCameraProperty.ROTATION.getName(), null));
+		parameters.put(RpiCameraProperty.ENCODING, imageEncoding);
+		parameters.put(RpiCameraProperty.NOPREVIEW, "");
+		parameters.put(RpiCameraProperty.OUTPUT, "-");
 		// formatter:on
 
 		//@formatter:off

@@ -1,6 +1,6 @@
 <robo4j>
     <roboUnit id="httpClient">
-        <class>com.robo4j.socket.http.units.HttpClientUnit2</class>
+        <class>com.robo4j.socket.http.units.HttpClientDescriptorUnit</class>
         <config name="com.robo4j.root">
             <value name="address" type="String">0.0.0.0</value>
             <value name="port" type="int">8050</value>

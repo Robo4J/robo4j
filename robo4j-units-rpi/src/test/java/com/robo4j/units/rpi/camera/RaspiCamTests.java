@@ -34,7 +34,7 @@ public class RaspiCamTests {
 //    @Test
     public void testCameraCommandBuilderEnd() throws  Exception{
 
-        RaspistillUnit imageController = new RaspistillUnit(null, "camera");
+        RaspistillSimpleUnit imageController = new RaspistillSimpleUnit(null, "camera");
         Configuration config = ConfigurationFactory.createEmptyConfiguration();
         config.setString("targetOut", "out");
         config.setString("client", "client");
