@@ -24,13 +24,14 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.channel.OutboundChannelHandler;
 import com.robo4j.socket.http.dto.PathMethodDTO;
+import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.message.HttpRequestDescriptor;
+import com.robo4j.socket.http.message.HttpResponseDescriptor;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.List;
 
@@ -46,8 +47,6 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 public class HttpClientUnit2 extends RoboUnit<HttpRequestDescriptor> {
 
 	private InetSocketAddress address;
-	private String responseUnit;
-	private Integer responseSize;
 	private Integer bufferCapacity;
 	private List<PathMethodDTO> targetPathMethodList;
 
@@ -59,8 +58,6 @@ public class HttpClientUnit2 extends RoboUnit<HttpRequestDescriptor> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		String confAddress = configuration.getString("address", null);
 		int confPort = configuration.getInteger(HTTP_PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
-		responseUnit = configuration.getString("responseUnit", null);
-		responseSize = configuration.getInteger("responseSize", null);
 		bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, null);
 		targetPathMethodList = JsonUtil.convertJsonToPathMethodList(configuration.getString("targetUnits", null));
 
@@ -80,9 +77,10 @@ public class HttpClientUnit2 extends RoboUnit<HttpRequestDescriptor> {
 				handler.stop();
 			}
 
-			System.out.println(getClass() + ":: OutboundChannelHandler message: " + handler.getResponseMessage());
-
-
+			HttpResponseDescriptor descriptor = handler.getResponseMessage();
+			if(descriptor.getCode().equals(StatusCode.OK) && descriptor.getCallbackUnit() != null){
+				sendMessageToResponseUnit(descriptor.getCallbackUnit(), descriptor.getMessage());
+			}
 		} catch (IOException e) {
 			SimpleLoggingUtil.error(getClass(),
 					String.format("not available: %s, no worry I continue sending. Error: %s", address, e));
@@ -90,8 +88,8 @@ public class HttpClientUnit2 extends RoboUnit<HttpRequestDescriptor> {
 	}
 
 	// Private Methods
-	private void sendMessageToResponseUnit(ByteBuffer byteBuffer) {
-		getContext().getReference(responseUnit).sendMessage(byteBuffer.array());
+	private void sendMessageToResponseUnit(String responseUnit, String message) {
+		getContext().getReference(responseUnit).sendMessage(message);
 	}
 
 }

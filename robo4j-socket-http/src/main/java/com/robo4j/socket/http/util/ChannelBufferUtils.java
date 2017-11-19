@@ -193,7 +193,7 @@ public class ChannelBufferUtils {
 
 	private static Map<String, String> getHeaderParametersByArray(String[] paramArray) {
 		final Map<String, String> result = new HashMap<>();
-		for (int i = 1; i < paramArray.length; i++) {
+		for (int i = 0; i < paramArray.length; i++) {
 			final String[] array = paramArray[i].split(HttpMessageUtil.getHttpSeparator(HTTP_HEADER_SEP));
 
 			String key = array[HttpMessageUtil.METHOD_KEY_POSITION].toLowerCase();

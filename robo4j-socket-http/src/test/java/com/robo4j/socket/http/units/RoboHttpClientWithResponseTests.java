@@ -17,14 +17,17 @@
 
 package com.robo4j.socket.http.units;
 
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.util.SystemUtil;
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * testing http method GET with response
@@ -33,8 +36,9 @@ import java.io.InputStream;
  * @author Miro Wengner (@miragemiko)
  */
 public class RoboHttpClientWithResponseTests {
+	private static final int MAX_NUMBER = 1;
 
-	@Ignore
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Test
 	public void simpleRoboSystemGetRequestTest() throws Exception {
 
@@ -62,13 +66,22 @@ public class RoboHttpClientWithResponseTests {
 
 
 		RoboReference<Integer> descriptorProducer = producerSystem.getReference("descriptorProducer");
-		descriptorProducer.sendMessage(1);
+		descriptorProducer.sendMessage(MAX_NUMBER);
+		RoboReference<String> stringConsumer = producerSystem.getReference("stringConsumer");
 
-		System.out.println("Press Key...");
-		System.in.read();
+
+		AttributeDescriptor<List> receivedMessagesAttribute = new DefaultAttributeDescriptor<>(List.class,
+				"getReceivedMessages");
+		AttributeDescriptor<Integer> setMessagesAttribute = new DefaultAttributeDescriptor<>(Integer.class,
+				"getNumberOfSentMessages");
+		List<String> receivedMessageList = (List<String>)stringConsumer.getAttribute(receivedMessagesAttribute).get();
+		while (stringConsumer.getAttribute(setMessagesAttribute).get() < MAX_NUMBER) {
+		}
+		Assert.assertTrue(stringConsumer.getAttribute(setMessagesAttribute).get() == MAX_NUMBER);
 
 		producerSystem.shutdown();
 		consumerSystem.shutdown();
+
 
 
 	}

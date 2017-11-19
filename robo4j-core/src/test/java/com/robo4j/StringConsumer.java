@@ -16,15 +16,11 @@
  */
 package com.robo4j;
 
+import com.robo4j.configuration.Configuration;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import com.robo4j.AttributeDescriptor;
-import com.robo4j.ConfigurationException;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboUnit;
-import com.robo4j.configuration.Configuration;
 
 /**
  * 
@@ -34,6 +30,7 @@ import com.robo4j.configuration.Configuration;
 public class StringConsumer extends RoboUnit<String> {
 	private static final int DEFAULT = 0;
 	public static final String PROP_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
+	public static final String PROP_GET_RECEIVED_MESSAGES = "getReceivedMessages";
 	private AtomicInteger counter;
 	private List<String> receivedMessages = new ArrayList<>();
 
@@ -49,7 +46,7 @@ public class StringConsumer extends RoboUnit<String> {
 	public synchronized List<String> getReceivedMessages() {
 		return receivedMessages;
 	}
-	
+
 	@Override
 	public synchronized void onMessage(String message) {
 		counter.incrementAndGet();
@@ -58,16 +55,18 @@ public class StringConsumer extends RoboUnit<String> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		
+
 	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals(PROP_GET_NUMBER_OF_SENT_MESSAGES) && attribute.getAttributeType() == Integer.class) {
-			return (R) (Integer)counter.get();
+		if (attribute.getAttributeName().equals(PROP_GET_NUMBER_OF_SENT_MESSAGES)
+				&& attribute.getAttributeType() == Integer.class) {
+			return (R) (Integer) counter.get();
 		}
-		if (attribute.getAttributeName().equals("getReceivedMessages")
-				&& attribute.getAttributeType() == ArrayList.class) {
+		if (attribute.getAttributeName().equals(PROP_GET_RECEIVED_MESSAGES)
+				&& attribute.getAttributeType() == List.class) {
 			return (R) receivedMessages;
 		}
 		return null;
