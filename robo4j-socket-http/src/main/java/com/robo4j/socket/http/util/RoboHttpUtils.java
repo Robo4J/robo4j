@@ -82,7 +82,7 @@ public final class RoboHttpUtils {
 		return createResponseWithHeaderAndMessage(header, message);
 	}
 
-	public static String correctLine(String line) {
+	public synchronized static String correctLine(String line) {
 		return line == null ? StringConstants.EMPTY : line;
 	}
 

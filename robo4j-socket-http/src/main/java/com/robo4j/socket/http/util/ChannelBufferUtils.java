@@ -49,7 +49,8 @@ public class ChannelBufferUtils {
 	public static final byte CHAR_RETURN = 0x0D;
 	public static final byte[] END_WINDOW = { CHAR_NEW_LINE, CHAR_NEW_LINE };
 	private static final int BUFFER_MARK_END = -1;
-	private static final ByteBuffer buffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
+	private static final ByteBuffer requestBuffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
+	private static final ByteBuffer responseBuffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
 
 	public static ByteBuffer copy(ByteBuffer source, int start, int end) {
 		ByteBuffer result = ByteBuffer.allocate(end);
@@ -68,10 +69,10 @@ public class ChannelBufferUtils {
 
 	public static HttpResponseDescriptor getHttpResponseDescriptorByChannel(ByteChannel channel) throws IOException {
 		final StringBuilder sbBasic = new StringBuilder();
-		int readBytes = channel.read(buffer);
+		int readBytes = channel.read(responseBuffer);
 		if (readBytes != BUFFER_MARK_END) {
-			buffer.flip();
-			addToStringBuilder(sbBasic, buffer, readBytes);
+			responseBuffer.flip();
+			addToStringBuilder(sbBasic, responseBuffer, readBytes);
 			final StringBuilder sbAdditional = new StringBuilder();
 			final HttpResponseDescriptor result = extractResponseDescriptorByStringMessage(sbBasic.toString());
 
@@ -79,18 +80,18 @@ public class ChannelBufferUtils {
 
 			if (result.getLength() != 0) {
 				while (totalReadBytes < result.getLength()) {
-					readBytes = channel.read(buffer);
-					buffer.flip();
-					addToStringBuilder(sbAdditional, buffer, readBytes);
+					readBytes = channel.read(responseBuffer);
+					responseBuffer.flip();
+					addToStringBuilder(sbAdditional, responseBuffer, readBytes);
 
 					totalReadBytes += readBytes;
-					buffer.clear();
+					responseBuffer.clear();
 				}
 				if (sbAdditional.length() > 0) {
 					result.addMessage(sbAdditional.toString());
 				}
 			}
-			buffer.clear();
+			responseBuffer.clear();
 			return result;
 
 		} else {
@@ -100,30 +101,31 @@ public class ChannelBufferUtils {
 
 	public static HttpRequestDescriptor getHttpRequestDescriptorByChannel(ByteChannel channel) throws IOException {
 		final StringBuilder sbBasic = new StringBuilder();
-		int readBytes = channel.read(buffer);
+		int readBytes = channel.read(requestBuffer);
 		if (readBytes != BUFFER_MARK_END) {
 
-			buffer.flip();
-			addToStringBuilder(sbBasic, buffer, readBytes);
+			requestBuffer.flip();
+			addToStringBuilder(sbBasic, requestBuffer, readBytes);
 			final StringBuilder sbAdditional = new StringBuilder();
 			final HttpRequestDescriptor result = extractRequestDescriptorByStringMessage(sbBasic.toString());
+
 
 			int totalReadBytes = readBytes;
 
 			if (result.getLength() != 0) {
 				while (totalReadBytes < result.getLength()) {
-					readBytes = channel.read(buffer);
-					buffer.flip();
-					addToStringBuilder(sbAdditional, buffer, readBytes);
+					readBytes = channel.read(requestBuffer);
+					requestBuffer.flip();
+					addToStringBuilder(sbAdditional, requestBuffer, readBytes);
 
 					totalReadBytes += readBytes;
-					buffer.clear();
+					requestBuffer.clear();
 				}
 				if (sbAdditional.length() > 0) {
 					result.addMessage(sbAdditional.toString());
 				}
 			}
-			buffer.clear();
+			requestBuffer.clear();
 			return result;
 		} else {
 			return new HttpRequestDescriptor(new HashMap<>(), null, null, null);

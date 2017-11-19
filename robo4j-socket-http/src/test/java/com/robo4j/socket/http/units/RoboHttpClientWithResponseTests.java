@@ -36,7 +36,9 @@ import java.util.List;
  * @author Miro Wengner (@miragemiko)
  */
 public class RoboHttpClientWithResponseTests {
-	private static final int MAX_NUMBER = 1;
+	private static final int MAX_NUMBER = 600;
+	private static final String ROBO_SYSTEM_DESC = "[{\"id\":\"stringConsumer\",\"com.robo4j.LifecycleState\":\"STARTED\"}" +
+			",{\"id\":\"httpServer\",\"com.robo4j.LifecycleState\":\"STARTED\"}]";
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Test
@@ -74,10 +76,11 @@ public class RoboHttpClientWithResponseTests {
 				"getReceivedMessages");
 		AttributeDescriptor<Integer> setMessagesAttribute = new DefaultAttributeDescriptor<>(Integer.class,
 				"getNumberOfSentMessages");
-		List<String> receivedMessageList = (List<String>)stringConsumer.getAttribute(receivedMessagesAttribute).get();
 		while (stringConsumer.getAttribute(setMessagesAttribute).get() < MAX_NUMBER) {
 		}
+		List<String> receivedMessageList = (List<String>)stringConsumer.getAttribute(receivedMessagesAttribute).get();
 		Assert.assertTrue(stringConsumer.getAttribute(setMessagesAttribute).get() == MAX_NUMBER);
+		Assert.assertTrue(receivedMessageList.contains(ROBO_SYSTEM_DESC));
 
 		producerSystem.shutdown();
 		consumerSystem.shutdown();

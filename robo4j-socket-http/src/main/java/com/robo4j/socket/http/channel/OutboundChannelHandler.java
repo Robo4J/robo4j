@@ -59,8 +59,9 @@ public class OutboundChannelHandler implements SocketHandler {
 			switch (message.getMethod()) {
 			case GET:
 				try {
-					System.out.println(getClass() + " try to read received message");
-					Optional<PathMethodDTO> desiredPathMethodOptional = targetUnitByMethodMap.stream().filter(e -> e.equals(pathMethod)).findFirst();
+					Optional<PathMethodDTO> desiredPathMethodOptional = targetUnitByMethodMap
+							.stream().filter(e -> e.equals(pathMethod))
+							.findFirst();
 					if(desiredPathMethodOptional.isPresent()){
 						receivedMessage = ChannelBufferUtils.getHttpResponseDescriptorByChannel(byteChannel);
 						receivedMessage.setCallbackUnit(desiredPathMethodOptional.get().getCallbackUnitName());
