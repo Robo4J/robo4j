@@ -86,4 +86,14 @@ public final class RoboHttpUtils {
 		return line == null ? StringConstants.EMPTY : line;
 	}
 
+	/**
+	 * report time in moment M from start time
+	 *
+	 * @param message message
+	 * @param start   start time
+	 */
+	public static void printMeasuredTime(Class<?> clazz, String message, long start) {
+		System.out.println(String.format("%s message: %s duration: %d%n", clazz.getSimpleName(), message, System.currentTimeMillis() - start));
+	}
+
 }

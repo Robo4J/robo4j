@@ -25,6 +25,7 @@ import com.robo4j.RoboReference;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.units.test.CameraImageConsumerTestUnit;
 import com.robo4j.socket.http.units.test.CameraImageProducerTestUnit;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 import org.junit.Test;
 
 import java.io.InputStream;
@@ -56,6 +57,7 @@ public class CameraImageProducerConsumerTests {
 		builderConsumer.add(serverConfigInputStream);
 		RoboContext consumerSystem = builderConsumer.build();
 
+		long startTime = System.currentTimeMillis();
 		consumerSystem.start();
 		producerSystem.start();
 
@@ -65,6 +67,7 @@ public class CameraImageProducerConsumerTests {
 		Integer numberOfImages = imageProducer.getAttribute(ATTRIBUTE_NUMBER_OF_IMAGES).get();
 		while (imageConsumer.getAttribute(ATTRIBUTE_COUNTER).get() < numberOfImages) {
 		}
+		RoboHttpUtils.printMeasuredTime(getClass(), "duration", startTime);
 		System.out.println("sendImages: " + numberOfImages);
 		producerSystem.shutdown();
 		consumerSystem.shutdown();

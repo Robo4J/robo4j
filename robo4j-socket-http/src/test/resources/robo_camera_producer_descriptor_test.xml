@@ -16,7 +16,7 @@
   -->
 
 <robo4j>
-    <roboUnit id="httpClientDescriptor">
+    <roboUnit id="httpClient">
         <class>com.robo4j.socket.http.units.HttpClientDescriptorUnit</class>
         <config name="com.robo4j.root">
             <value name="address" type="String">0.0.0.0</value>
@@ -24,14 +24,21 @@
             <value name="targetUnits" type="String">[{"imageProcessor":["POST"]}]</value>
         </config>
     </roboUnit>
-    <roboUnit id="imageController">
-        <class>com.robo4j.socket.http.units.test.CameraImageProducerTestUnit</class>
+    <roboUnit id="imageDescriptor">
+        <class>com.robo4j.units.rpi.camera.RaspistillDescriptorUnit</class>
         <config name="com.robo4j.root">
-            <value name="targetOut" type="String">httpClient</value>
-            <value name="client" type="String">0.0.0.0</value>
-            <value name="clientPort" type="String">8032</value>
-            <value name="clientUri" type="String">/units/imageProcessor</value>
-            <value name="numberOfImages" type="int">50</value>
+            <value name="target" type="String">httpClient</value>
+            <value name="host" type="String">0.0.0.0</value>
+            <value name="hostPort" type="String">8032</value>
+            <value name="remoteUnits" type="String">[{"imageProcessor":["POST"]}]</value>
+        </config>
+    </roboUnit>
+    <roboUnit id="camera">
+        <class>com.robo4j.socket.http.units.test.CameraImageProducerDescTestUnit</class>
+        <config name="com.robo4j.root">
+            <value name="target" type="String">imageDescriptor</value>
+            <value name="fileName" type="String">snapshot.png</value>
+            <value name="numberOfImages" type="int">40</value>
         </config>
     </roboUnit>
 </robo4j>

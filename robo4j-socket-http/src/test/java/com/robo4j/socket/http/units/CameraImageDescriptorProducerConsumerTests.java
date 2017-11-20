@@ -25,6 +25,8 @@ import com.robo4j.RoboReference;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.units.test.CameraImageConsumerTestUnit;
 import com.robo4j.socket.http.units.test.CameraImageProducerTestUnit;
+import com.robo4j.socket.http.util.RoboHttpUtils;
+import org.junit.Test;
 
 import java.io.InputStream;
 
@@ -40,12 +42,13 @@ public class CameraImageDescriptorProducerConsumerTests {
             CameraImageConsumerTestUnit.ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME);
 
 
-    public void simpleTest() throws Exception {
+    @Test
+    public void descriptorProducerConsumerTest() throws Exception {
 
         RoboBuilder builderProducer = new RoboBuilder(
                 Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemTest.xml"));
         InputStream clientConfigInputStream = Thread.currentThread().getContextClassLoader()
-                .getResourceAsStream("robo_camera_producer_descriptor_test..xml");
+                .getResourceAsStream("robo_camera_producer_descriptor_test.xml");
         builderProducer.add(clientConfigInputStream);
         RoboContext producerSystem = builderProducer.build();
 
@@ -56,15 +59,17 @@ public class CameraImageDescriptorProducerConsumerTests {
         builderConsumer.add(serverConfigInputStream);
         RoboContext consumerSystem = builderConsumer.build();
 
+        long startTime = System.currentTimeMillis();
         consumerSystem.start();
         producerSystem.start();
 
-        RoboReference<Boolean> imageProducer = producerSystem.getReference("imageController");
+        RoboReference<Boolean> imageProducer = producerSystem.getReference("camera");
         RoboReference<CameraMessage> imageConsumer = consumerSystem.getReference("imageProcessor");
 
         Integer numberOfImages = imageProducer.getAttribute(ATTRIBUTE_NUMBER_OF_IMAGES).get();
         while (imageConsumer.getAttribute(ATTRIBUTE_COUNTER).get() < numberOfImages) {
         }
+        RoboHttpUtils.printMeasuredTime(getClass(), "duration", startTime);
         System.out.println("sendImages: " + numberOfImages);
         producerSystem.shutdown();
         consumerSystem.shutdown();

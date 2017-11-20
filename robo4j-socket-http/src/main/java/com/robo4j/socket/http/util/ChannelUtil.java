@@ -36,95 +36,86 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
  * @author Miro Wengner (@miragemiko)
  */
 public final class ChannelUtil {
-    /**
-     * reading buffer
-     *
-     * @param channel
-     * @param buffer
-     * @return
-     * @throws IOException
-     */
-    public static int readBuffer(ByteChannel channel, ByteBuffer buffer) throws IOException {
-        int numberRead = channel.read(buffer);
-        int position = 0;
-        int totalRead = numberRead;
-        while (numberRead >= 0 && position <= buffer.capacity()) {
-            numberRead = channel.read(buffer);
-            if (numberRead > 0) {
-                totalRead += numberRead;
-            }
-            position++;
-        }
-        return totalRead;
-    }
+	/**
+	 * reading buffer
+	 *
+	 * @param channel
+	 * @param buffer
+	 * @return
+	 * @throws IOException
+	 */
+	public static int readBuffer(ByteChannel channel, ByteBuffer buffer) throws IOException {
+		int numberRead = channel.read(buffer);
+		int position = 0;
+		int totalRead = numberRead;
+		while (numberRead >= 0 && position <= buffer.capacity()) {
+			numberRead = channel.read(buffer);
+			if (numberRead > 0) {
+				totalRead += numberRead;
+			}
+			position++;
+		}
+		return totalRead;
+	}
 
-    /**
-     * writing to channel buffer
-     *
-     * @param channel
-     * @param buffer
-     * @return
-     * @throws IOException
-     */
-    public static int writeBuffer(ByteChannel channel, ByteBuffer buffer) throws IOException {
-        int numberWriten = 0;
-        int totalWritten = numberWriten;
+	/**
+	 * writing to channel buffer
+	 *
+	 * @param channel
+	 * @param buffer
+	 * @return
+	 * @throws IOException
+	 */
+	public static int writeBuffer(ByteChannel channel, ByteBuffer buffer) throws IOException {
+		int numberWriten = 0;
+		int totalWritten = numberWriten;
 
-        while (numberWriten >= 0 && buffer.hasRemaining()) {
-            numberWriten = channel.write(buffer);
-            totalWritten += numberWriten;
-        }
-        return totalWritten;
-    }
+		while (numberWriten >= 0 && buffer.hasRemaining()) {
+			numberWriten = channel.write(buffer);
+			totalWritten += numberWriten;
+		}
+		return totalWritten;
+	}
 
-    public static SelectionKey registerSelectionKey(ServerSocketChannel result){
-        try{
-            final Selector selector = Selector.open();
-            return result.register(selector, SelectionKey.OP_ACCEPT);
-        } catch (Exception e){
-            SimpleLoggingUtil.error(ChannelUtil.class, "resister selection key", e);
-            throw new SocketException("resister selection key", e);
-        }
-    }
+	public static SelectionKey registerSelectionKey(ServerSocketChannel result) {
+		try {
+			final Selector selector = Selector.open();
+			return result.register(selector, SelectionKey.OP_ACCEPT);
+		} catch (Exception e) {
+			SimpleLoggingUtil.error(ChannelUtil.class, "resister selection key", e);
+			throw new SocketException("resister selection key", e);
+		}
+	}
 
-    public static ServerSocketChannel initServerSocketChannel(PropertiesProvider properties) {
-        try{
-            ServerSocketChannel result = ServerSocketChannel.open();
-            result.configureBlocking(false);
-            result.bind(new InetSocketAddress(properties.getIntSafe(HTTP_PROPERTY_PORT)));
-            return result;
-        } catch (Exception e){
-            SimpleLoggingUtil.error(ChannelUtil.class, "init server socket channel", e);
-            throw new SocketException("init server socket channel", e);
-        }
-    }
+	public static ServerSocketChannel initServerSocketChannel(PropertiesProvider properties) {
+		try {
+			ServerSocketChannel result = ServerSocketChannel.open();
+			result.configureBlocking(false);
+			result.bind(new InetSocketAddress(properties.getIntSafe(HTTP_PROPERTY_PORT)));
+			return result;
+		} catch (Exception e) {
+			SimpleLoggingUtil.error(ChannelUtil.class, "init server socket channel", e);
+			throw new SocketException("init server socket channel", e);
+		}
+	}
 
-    public static int getReadyChannelBySelectionKey(SelectionKey key){
-        try {
-            return  key.selector().select();
-        } catch (Exception e){
-            SimpleLoggingUtil.error(ChannelUtil.class, "get ready channel by selection key", e);
-            throw new SocketException("get ready channel by selection key", e);
-        }
-    }
+	public static int getReadyChannelBySelectionKey(SelectionKey key) {
+		try {
+			return key.selector().select();
+		} catch (Exception e) {
+			SimpleLoggingUtil.error(ChannelUtil.class, "get ready channel by selection key", e);
+			throw new SocketException("get ready channel by selection key", e);
+		}
+	}
 
-    public static void handleWriteChannelAndBuffer(String message, ByteChannel channel, ByteBuffer buffer) {
-        try {
-            ChannelUtil.writeBuffer(channel, buffer);
-        } catch (Exception e) {
-            throw new SocketException(message, e);
-        } finally {
-            buffer.clear();
-        }
-    }
+	public static void handleWriteChannelAndBuffer(String message, ByteChannel channel, ByteBuffer buffer) {
+		try {
+			ChannelUtil.writeBuffer(channel, buffer);
+		} catch (Exception e) {
+			throw new SocketException(message, e);
+		} finally {
+			buffer.clear();
+		}
+	}
 
-    /**
-     * report time in moment M from start time
-     *
-     * @param message message
-     * @param start   start time
-     */
-    public static void printMeasuredTime(Class<?> clazz, String message, long start) {
-        System.out.println(String.format("%s message: %s duration: %d%n", clazz.getSimpleName(), message, System.currentTimeMillis() - start));
-    }
 }
