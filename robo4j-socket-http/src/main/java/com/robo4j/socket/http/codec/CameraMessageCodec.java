@@ -24,13 +24,16 @@ import com.robo4j.util.StringConstants;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 @HttpProducer
-public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncoder<CameraMessage> {	
+public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncoder<CameraMessage> {
+	private static final Pattern CAMERA_PATTERN = Pattern.compile("^\\{\\s*\"|\"\\s*\\}$");
+	private static final String PATTERN_SPLIT = "\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?";
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_VALUE = "value";
 	private static final String KEY_IMAGE = "image";
@@ -57,14 +60,10 @@ public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncod
     @Override
     public CameraMessage decode(String json) {
         final Map<String, String> map = new HashMap<>();
-        //@formatter:off
-		final String[] parts = json.replaceAll("^\\{\\s*\"|\"\\s*\\}$", StringConstants.EMPTY)
-				.split("\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?");
-		//@formatter:on
+		final String[] parts = CAMERA_PATTERN.matcher(json).replaceAll(StringConstants.EMPTY).split(PATTERN_SPLIT);
 		for (int i = 0; i < parts.length - 1; i += 2) {
 			map.put(parts[i].trim(), parts[i + 1].trim());
 		}
-
 		final String type = map.get(KEY_TYPE);
 		final String value =  map.get(KEY_VALUE);
 		final String image = map.get(KEY_IMAGE);
