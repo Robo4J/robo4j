@@ -39,7 +39,8 @@ public class ConnectSelectionKeyHandler implements SelectionKeyHandler {
     @Override
     public SelectionKey handle() {
         try{
-            ((SocketChannel) key.channel()).finishConnect();
+            SocketChannel channel = (SocketChannel) key.channel();
+            channel.finishConnect();
         } catch (Exception e){
             SimpleLoggingUtil.error(getClass(), "handle connect", e);
         }

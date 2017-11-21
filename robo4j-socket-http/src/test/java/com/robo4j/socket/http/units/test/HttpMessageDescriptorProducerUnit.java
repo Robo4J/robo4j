@@ -70,10 +70,10 @@ public class HttpMessageDescriptorProducerUnit extends RoboUnit<Integer> {
 	public void onMessage(Integer number) {
 		IntStream.range(DEFAULT, number).forEach(i -> {
 			targetPathMethodList.forEach(pathMethod -> {
-				HttpRequestDescriptor descriptor = new HttpRequestDescriptor(new HashMap<>(), pathMethod.getMethod(),
+				HttpRequestDescriptor request = new HttpRequestDescriptor(new HashMap<>(), pathMethod.getMethod(),
 						HttpVersion.HTTP_1_1.getValue(), pathMethod.getPath());
-				descriptor.addMessage(RoboHttpUtils.createRequest(pathMethod.getMethod(), IP_LOCALHOST, pathMethod.getPath(), StringConstants.EMPTY));
-				getContext().getReference(target).sendMessage(descriptor);
+				request.addMessage(RoboHttpUtils.createRequest(pathMethod.getMethod(), IP_LOCALHOST, pathMethod.getPath(), StringConstants.EMPTY));
+				getContext().getReference(target).sendMessage(request);
 			});
 		});
 	}

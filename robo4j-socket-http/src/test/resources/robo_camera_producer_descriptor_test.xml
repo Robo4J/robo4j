@@ -21,6 +21,7 @@
         <config name="com.robo4j.root">
             <value name="address" type="String">0.0.0.0</value>
             <value name="port" type="int">8032</value>
+            <value name="responseHandler">httpClientResponse</value>
             <value name="targetUnits" type="String">[{"imageProcessor":["POST"]}]</value>
         </config>
     </roboUnit>
@@ -38,7 +39,7 @@
         <config name="com.robo4j.root">
             <value name="target" type="String">imageDescriptor</value>
             <value name="fileName" type="String">snapshot.png</value>
-            <value name="numberOfImages" type="int">40</value>
+            <value name="numberOfImages" type="int">100</value>
         </config>
     </roboUnit>
 </robo4j>

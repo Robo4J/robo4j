@@ -51,10 +51,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
+ * unit has been replaced by {@see RaspistillRequestUnit}
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 
+@Deprecated
 @BlockingTrait
 @CriticalSectionTrait
 public class RaspistillSimpleUnit extends RoboUnit<Boolean> {

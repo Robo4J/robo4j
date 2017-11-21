@@ -53,7 +53,7 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_SQUARE_BRACKET_RIGH
  */
 public final class JsonUtil {
 
-	private static final String DEFAULT_PATH = "/";
+	public static final String DEFAULT_PATH = "/";
 	private static final Set<Class<?>> withoutQuotationTypes = Stream.of(boolean.class, int.class, short.class,
 			byte.class, long.class, double.class, float.class, char.class, Boolean.class, Integer.class, Short.class,
 			Byte.class, Long.class, Double.class, Float.class, Character.class).collect(Collectors.toSet());

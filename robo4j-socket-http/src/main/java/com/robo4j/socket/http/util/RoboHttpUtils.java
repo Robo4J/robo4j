@@ -20,6 +20,7 @@ import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.enums.StatusCode;
+import com.robo4j.socket.http.units.Constants;
 import com.robo4j.util.StringConstants;
 
 import static com.robo4j.socket.http.provider.DefaultValuesProvider.basicHeaderMap;
@@ -44,11 +45,11 @@ public final class RoboHttpUtils {
 	public static final String HTTP_TARGET_UNITS = "targetUnits";
 	public static final String HTTP_PROPERTY_PORT = "port";
 	public static final String HTTP_PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
-
+	public static final String HTTP_PROPERTY_RESPONSE_HANLDER = "responseHandler";
 
 	public static String createResponseWithHeaderAndMessage(String header, String message) {
 		String result = header.concat(NEW_LINE_MAC).concat(NEW_LINE_UNIX);
-		return  message.isEmpty() ? result : result.concat(message);
+		return message.isEmpty() ? result : result.concat(message);
 	}
 
 	public static String createResponseByCode(StatusCode code) {
@@ -86,14 +87,23 @@ public final class RoboHttpUtils {
 		return line == null ? StringConstants.EMPTY : line;
 	}
 
+	public static String createHostWithPort(String host, Object port) {
+
+		return port == null || Integer.valueOf(port.toString()) == 80 ? host
+				: new StringBuilder(host).append(Constants.UTF8_COLON).append(port).toString();
+	}
+
 	/**
 	 * report time in moment M from start time
 	 *
-	 * @param message message
-	 * @param start   start time
+	 * @param message
+	 *            message
+	 * @param start
+	 *            start time
 	 */
 	public static void printMeasuredTime(Class<?> clazz, String message, long start) {
-		System.out.println(String.format("%s message: %s duration: %d%n", clazz.getSimpleName(), message, System.currentTimeMillis() - start));
+		System.out.println(String.format("%s message: %s duration: %d%n", clazz.getSimpleName(), message,
+				System.currentTimeMillis() - start));
 	}
 
 }

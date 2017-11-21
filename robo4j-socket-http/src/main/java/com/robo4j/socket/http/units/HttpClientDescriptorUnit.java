@@ -33,10 +33,14 @@ import com.robo4j.socket.http.util.RoboHttpUtils;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_RESPONSE_HANLDER;
 
 /**
  * Http NIO Client for communication with external Robo4J units
@@ -46,8 +50,12 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
  */
 public class HttpClientDescriptorUnit extends RoboUnit<HttpRequestDescriptor> {
 
+	private static final EnumSet<StatusCode> PROCESS_RESPONSES_STATUSES = EnumSet.of(StatusCode.OK,
+			StatusCode.ACCEPTED);
+	private Lock lock = new ReentrantLock();
 	private InetSocketAddress address;
 	private Integer bufferCapacity;
+	private String responseHandler;
 	private List<PathMethodDTO> targetPathMethodList;
 
 	public HttpClientDescriptorUnit(RoboContext context, String id) {
@@ -59,36 +67,49 @@ public class HttpClientDescriptorUnit extends RoboUnit<HttpRequestDescriptor> {
 		String confAddress = configuration.getString("address", null);
 		int confPort = configuration.getInteger(HTTP_PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
 		bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, null);
+		responseHandler = configuration.getString(HTTP_PROPERTY_RESPONSE_HANLDER, null);
 		targetPathMethodList = JsonUtil.convertJsonToPathMethodList(configuration.getString("targetUnits", null));
-
 		address = new InetSocketAddress(confAddress, confPort);
 	}
 
 	@Override
 	public void onMessage(HttpRequestDescriptor message) {
-		try(SocketChannel channel = SocketChannel.open(address)) {
+		try (SocketChannel channel = SocketChannel.open(address)) {
 			if (bufferCapacity != null) {
 				channel.socket().setSendBufferSize(bufferCapacity);
 			}
-			OutboundChannelHandler handler = new OutboundChannelHandler(targetPathMethodList, channel, message);
-			handler.start();
-			if (channel.isConnectionPending() && channel.finishConnect()) {
-				handler.stop();
+			final OutboundChannelHandler handler = new OutboundChannelHandler(targetPathMethodList, channel, message);
+			lock.lock();
+			try {
+				handler.start();
+				if (channel.isConnectionPending() && channel.finishConnect()) {
+					handler.stop();
+				}
+			} finally {
+				lock.unlock();
 			}
 
-			//TODO (miro) improve response handling about status code states
-			HttpResponseDescriptor descriptor = handler.getResponseMessage();
-			if(descriptor != null && descriptor.getCode().equals(StatusCode.OK) && descriptor.getCallbackUnit() != null){
-				sendMessageToResponseUnit(descriptor.getCallbackUnit(), descriptor.getMessage());
+			final HttpResponseDescriptor descriptor = handler.getResponseDescriptor();
+			if (responseHandler != null) {
+				sendMessageToResponseUnit(responseHandler, descriptor);
 			}
+
+
+			if(descriptor != null && PROCESS_RESPONSES_STATUSES.contains(descriptor.getCode())){
+				if ( descriptor.getCallbackUnit() != null) {
+					sendMessageToResponseUnit(descriptor.getCallbackUnit(), descriptor.getMessage());
+				}
+			} else {
+				SimpleLoggingUtil.error(getClass(), String.format("no callback or wrong response: %s", descriptor));
+			}
+
 		} catch (IOException e) {
 			SimpleLoggingUtil.error(getClass(),
 					String.format("not available: %s, no worry I continue sending. Error: %s", address, e));
 		}
 	}
 
-	// Private Methods
-	private void sendMessageToResponseUnit(String responseUnit, String message) {
+	private void sendMessageToResponseUnit(String responseUnit, Object message) {
 		getContext().getReference(responseUnit).sendMessage(message);
 	}
 

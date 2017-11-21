@@ -51,7 +51,6 @@ public class RaspistillDescriptorUnit extends RoboUnit<RaspistillImageDTO> {
 	private static final String PROPERTY_HOST = "host";
 	private static final String PROPERTY_TARGET = "target";
 	private static final String PROPERTY_REMOTE_UNITS = "remoteUnits";
-	public static final String IMAGE_JPG = "jpg";
 
 	private final CameraMessageCodec codec = new CameraMessageCodec();
 	private final AtomicInteger imageNumber = new AtomicInteger(0);
@@ -84,9 +83,8 @@ public class RaspistillDescriptorUnit extends RoboUnit<RaspistillImageDTO> {
 			HttpRequestDescriptor descriptor = new HttpRequestDescriptor(new HashMap<>(), pathMethod.getMethod(),
 					HttpVersion.HTTP_1_1.getValue(), pathMethod.getPath());
 
-			// TODO (miro) encoding should be part of the message
-			final CameraMessage cameraMessage = new CameraMessage(image.getEncoding(), String.valueOf(imageNumber.incrementAndGet()),
-					imageBase64);
+			final CameraMessage cameraMessage = new CameraMessage(image.getEncoding(),
+					String.valueOf(imageNumber.incrementAndGet()), imageBase64);
 			final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, host,
 					PATH_UNITS.concat(pathMethod.getPath()), codec.encode(cameraMessage));
 			descriptor.addMessage(postMessage);
