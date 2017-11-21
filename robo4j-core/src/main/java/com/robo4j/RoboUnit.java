@@ -16,13 +16,13 @@
  */
 package com.robo4j;
 
+import com.robo4j.configuration.Configuration;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
-
-import com.robo4j.configuration.Configuration;
 
 /**
  * The core component. Subclass this to provide a messaging capable agent for a
@@ -73,7 +73,7 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	 * 
 	 * @param configuration
 	 *            the {@link Configuration} provided.
-	 * @throws Exception
+	 * @throws ConfigurationException
 	 */
 	public void initialize(Configuration configuration) throws ConfigurationException {
 		setConfiguration(configuration);
