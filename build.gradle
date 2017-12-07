@@ -355,7 +355,6 @@ project("robo4j-socket-http") {
     dependencies {
         compile(project(":robo4j-core"))
         testCompile project(':robo4j-core').sourceSets.test.output
-        testCompile project(":robo4j-units-rpi")
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
         testCompile "org.mockito:mockito-all:${mockitoVerison}@jar"

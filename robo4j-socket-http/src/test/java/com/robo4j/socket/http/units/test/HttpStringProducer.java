@@ -41,7 +41,6 @@ public class HttpStringProducer extends StringProducer {
     public static final String SEND_POST_MESSAGE = "sendPostMessage";
     private AtomicInteger counter;
     private String target;
-    private String method;
     private String uri;
     private String targetAddress;
 
@@ -59,7 +58,6 @@ public class HttpStringProducer extends StringProducer {
         super.onInitialization(configuration);
 
         target = configuration.getString("target", null);
-        method = configuration.getString("method", null);
         uri = configuration.getString("uri", null);
         targetAddress = configuration.getString("targetAddress", "0.0.0.0");
 
