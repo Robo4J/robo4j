@@ -30,13 +30,10 @@ import com.robo4j.socket.http.message.HttpResponseDescriptor;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
@@ -52,7 +49,6 @@ public class HttpClientDescriptorUnit extends RoboUnit<HttpRequestDescriptor> {
 
 	private static final EnumSet<StatusCode> PROCESS_RESPONSES_STATUSES = EnumSet.of(StatusCode.OK,
 			StatusCode.ACCEPTED);
-	private Lock lock = new ReentrantLock();
 	private InetSocketAddress address;
 	private Integer bufferCapacity;
 	private String responseHandler;
@@ -74,6 +70,7 @@ public class HttpClientDescriptorUnit extends RoboUnit<HttpRequestDescriptor> {
 
 	@Override
 	public void onMessage(HttpRequestDescriptor message) {
+
 		try (SocketChannel channel = SocketChannel.open(address)) {
 			if (bufferCapacity != null) {
 				channel.socket().setSendBufferSize(bufferCapacity);
@@ -81,26 +78,24 @@ public class HttpClientDescriptorUnit extends RoboUnit<HttpRequestDescriptor> {
 			final OutboundChannelHandler handler = new OutboundChannelHandler(targetPathMethodList, channel, message);
 
 			handler.start();
-			if (channel.isConnectionPending() && channel.finishConnect()) {
+//			if (channel.isConnectionPending() && channel.finishConnect()) {
 				handler.stop();
-			}
-
+//			}
 
 			final HttpResponseDescriptor descriptor = handler.getResponseDescriptor();
 			if (responseHandler != null) {
 				sendMessageToResponseUnit(responseHandler, descriptor);
 			}
 
-
-			if(descriptor != null && PROCESS_RESPONSES_STATUSES.contains(descriptor.getCode())){
-				if ( descriptor.getCallbackUnit() != null) {
+			if (descriptor != null && PROCESS_RESPONSES_STATUSES.contains(descriptor.getCode())) {
+				if (descriptor.getCallbackUnit() != null) {
 					sendMessageToResponseUnit(descriptor.getCallbackUnit(), descriptor.getMessage());
 				}
 			} else {
 				SimpleLoggingUtil.error(getClass(), String.format("no callback or wrong response: %s", descriptor));
 			}
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			SimpleLoggingUtil.error(getClass(),
 					String.format("not available: %s, no worry I continue sending. Error: %s", address, e));
 		}

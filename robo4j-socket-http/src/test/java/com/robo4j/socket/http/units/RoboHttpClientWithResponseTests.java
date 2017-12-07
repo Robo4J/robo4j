@@ -36,26 +36,16 @@ import java.util.List;
  * @author Miro Wengner (@miragemiko)
  */
 public class RoboHttpClientWithResponseTests {
-	private static final int MAX_NUMBER = 600;
-	private static final String ROBO_SYSTEM_DESC = "[{\"id\":\"stringConsumer\",\"com.robo4j.LifecycleState\":\"STARTED\"}" +
-			",{\"id\":\"httpServer\",\"com.robo4j.LifecycleState\":\"STARTED\"}]";
+	private static final int MAX_NUMBER = 2;
+	private static final String ROBO_SYSTEM_DESC = "[{\"id\":\"stringConsumer\",\"com.robo4j.LifecycleState\":\"STARTED\"}"
+			+ ",{\"id\":\"httpServer\",\"com.robo4j.LifecycleState\":\"STARTED\"}]";
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	public void simpleRoboSystemGetRequestTest() throws Exception {
 
-		RoboBuilder builderProducer = new RoboBuilder();
-		InputStream clientConfigInputStream = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream("robo_client_request_producer_text.xml");
-		builderProducer.add(clientConfigInputStream);
-		RoboContext producerSystem = builderProducer.build();
-
-		RoboBuilder builderConsumer = new RoboBuilder();
-		InputStream serverConfigInputStream = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream("robo_client_request_consumer_text.xml");
-		builderConsumer.add(serverConfigInputStream);
-		RoboContext consumerSystem = builderConsumer.build();
-
+		RoboContext producerSystem = getProducer();
+		RoboContext consumerSystem = getConsumer();
 
 		consumerSystem.start();
 		producerSystem.start();
@@ -66,11 +56,9 @@ public class RoboHttpClientWithResponseTests {
 		System.out.println("producer: State after start:");
 		System.out.println(SystemUtil.printStateReport(producerSystem));
 
-
 		RoboReference<Integer> descriptorProducer = producerSystem.getReference("descriptorProducer");
 		descriptorProducer.sendMessage(MAX_NUMBER);
 		RoboReference<String> stringConsumer = producerSystem.getReference("stringConsumer");
-
 
 		AttributeDescriptor<List> receivedMessagesAttribute = new DefaultAttributeDescriptor<>(List.class,
 				"getReceivedMessages");
@@ -78,15 +66,29 @@ public class RoboHttpClientWithResponseTests {
 				"getNumberOfSentMessages");
 		while (stringConsumer.getAttribute(setMessagesAttribute).get() < MAX_NUMBER) {
 		}
-		List<String> receivedMessageList = (List<String>)stringConsumer.getAttribute(receivedMessagesAttribute).get();
+		List<String> receivedMessageList = (List<String>) stringConsumer.getAttribute(receivedMessagesAttribute).get();
 		Assert.assertTrue(stringConsumer.getAttribute(setMessagesAttribute).get() == MAX_NUMBER);
 		Assert.assertTrue(receivedMessageList.contains(ROBO_SYSTEM_DESC));
 
 		producerSystem.shutdown();
 		consumerSystem.shutdown();
 
+	}
 
+	private RoboContext getProducer() throws Exception {
+		RoboBuilder builderProducer = new RoboBuilder();
+		InputStream clientConfigInputStream = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream("robo_client_request_producer_text.xml");
+		builderProducer.add(clientConfigInputStream);
+		return builderProducer.build();
+	}
 
+	private RoboContext getConsumer() throws Exception {
+		RoboBuilder builderConsumer = new RoboBuilder();
+		InputStream serverConfigInputStream = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream("robo_client_request_consumer_text.xml");
+		builderConsumer.add(serverConfigInputStream);
+		return builderConsumer.build();
 	}
 
 }

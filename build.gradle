@@ -12,6 +12,7 @@ apply plugin: 'eclipse'
 apply from: 'libraries.gradle'
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -343,9 +344,9 @@ project("robo4j-socket-http") {
     apply plugin: 'idea'
     apply plugin: 'eclipse'
     apply plugin: 'maven'
-    apply plugin: "org.flywaydb.flyway"
 
     sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 
     repositories {
         mavenCentral()
@@ -354,8 +355,6 @@ project("robo4j-socket-http") {
 
     dependencies {
         compile(project(":robo4j-core"))
-        testCompile project(':robo4j-core').sourceSets.test.output
-        testCompile project(":robo4j-units-rpi")
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
         testCompile "org.mockito:mockito-all:${mockitoVerison}@jar"

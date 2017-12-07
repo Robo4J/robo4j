@@ -20,6 +20,7 @@ package com.robo4j.socket.http.util;
 import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.socket.http.SocketException;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.message.HttpResponseDescriptor;
@@ -99,9 +100,9 @@ public class ChannelBufferUtils {
 		}
 	}
 
-	public static HttpRequestDescriptor getHttpRequestDescriptorByChannel(ByteChannel channel) throws IOException {
+	public static HttpRequestDescriptor getHttpRequestDescriptorByChannel(ByteChannel channel) {
 		final StringBuilder sbBasic = new StringBuilder();
-		int readBytes = channel.read(requestBuffer);
+		int readBytes = readBytesByChannel(channel);
 		if (readBytes != BUFFER_MARK_END) {
 
 			requestBuffer.flip();
@@ -114,7 +115,7 @@ public class ChannelBufferUtils {
 
 			if (result.getLength() != 0) {
 				while (totalReadBytes < result.getLength()) {
-					readBytes = channel.read(requestBuffer);
+					readBytes = readBytesByChannel(channel);
 					requestBuffer.flip();
 					addToStringBuilder(sbAdditional, requestBuffer, readBytes);
 
@@ -129,6 +130,14 @@ public class ChannelBufferUtils {
 			return result;
 		} else {
 			return new HttpRequestDescriptor(new HashMap<>(), null, null, null);
+		}
+	}
+
+	private static int readBytesByChannel(ByteChannel channel){
+		try {
+			return channel.read(requestBuffer);
+		} catch (Exception e){
+			throw new SocketException("read bytes channel", e);
 		}
 	}
 

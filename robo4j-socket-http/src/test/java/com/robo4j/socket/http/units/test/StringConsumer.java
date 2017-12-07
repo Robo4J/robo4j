@@ -14,9 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j;
+package com.robo4j.socket.http.units.test;
 
-import com.robo4j.configuration.Configuration;
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboUnit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,11 +54,6 @@ public class StringConsumer extends RoboUnit<String> {
 		System.out.println(getClass().getSimpleName() + " onMessage: " + message);
 		counter.incrementAndGet();
 		receivedMessages.add(message);
-	}
-
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-
 	}
 
 	@SuppressWarnings("unchecked")

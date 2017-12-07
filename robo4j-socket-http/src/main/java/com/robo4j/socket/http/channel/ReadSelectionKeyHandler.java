@@ -18,7 +18,7 @@
 package com.robo4j.socket.http.channel;
 
 import com.robo4j.RoboContext;
-import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.socket.http.SocketException;
 import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.request.RoboRequestCallable;
 import com.robo4j.socket.http.request.RoboRequestFactory;
@@ -53,18 +53,29 @@ public class ReadSelectionKeyHandler implements SelectionKeyHandler {
 	@Override
 	public SelectionKey handle() {
 		SocketChannel channel = (SocketChannel) key.channel();
-		try {
-			final HttpRequestDescriptor messageDescriptor = ChannelBufferUtils
-					.getHttpRequestDescriptorByChannel(channel);
-			final RoboRequestFactory factory = new RoboRequestFactory(codecRegistry);
-			final RoboRequestCallable callable = new RoboRequestCallable(context, messageDescriptor, factory);
-			final Future<RoboResponseProcess> futureResult = context.getScheduler().submit(callable);
-			final RoboResponseProcess result = futureResult.get();
-			outBuffers.put(key, result);
-			channel.register(key.selector(), SelectionKey.OP_WRITE);
-		} catch (Exception e) {
-			SimpleLoggingUtil.error(getClass(), "handle read", e);
-		}
+		final HttpRequestDescriptor messageDescriptor = ChannelBufferUtils.getHttpRequestDescriptorByChannel(channel);
+		final RoboRequestFactory factory = new RoboRequestFactory(codecRegistry);
+		final RoboRequestCallable callable = new RoboRequestCallable(context, messageDescriptor, factory);
+		final Future<RoboResponseProcess> futureResult = context.getScheduler().submit(callable);
+		final RoboResponseProcess result = extractRoboResponseProcess(futureResult);
+		outBuffers.put(key, result);
+		registerSelectionKey(channel);
 		return key;
+	}
+
+	private RoboResponseProcess extractRoboResponseProcess(Future<RoboResponseProcess> future){
+		try {
+			return future.get();
+		}catch (Exception e){
+			throw new SocketException("extract robo response", e);
+		}
+	}
+
+	private void registerSelectionKey(SocketChannel channel){
+		try {
+			channel.register(key.selector(), SelectionKey.OP_WRITE);
+		} catch (Exception e){
+			throw  new SocketException("register selection key", e);
+		}
 	}
 }

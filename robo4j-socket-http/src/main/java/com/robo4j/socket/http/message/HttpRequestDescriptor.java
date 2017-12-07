@@ -49,7 +49,7 @@ public final class HttpRequestDescriptor extends AbstractHttpMessageDescriptor {
 
 	@Override
 	public String toString() {
-		return "HttpRequestDescriptor{" + ", method=" + method + ", path='" + path + '\'' + super.toString()
+		return "HttpRequestDescriptor{" + " method=" + method + ", path='" + path + "\' " + super.toString()
 				+ '}';
 	}
 }

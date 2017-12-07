@@ -18,13 +18,16 @@
 package com.robo4j.socket.http.util;
 
 import com.robo4j.LifecycleState;
+import com.robo4j.socket.http.HttpException;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.dto.PathMethodDTO;
 import com.robo4j.socket.http.dto.ResponseUnitDTO;
 import com.robo4j.socket.http.units.Constants;
 import com.robo4j.util.StringConstants;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +63,14 @@ public final class JsonUtil {
 	private static final Set<Class<?>> quoatationTypes = Stream.of(String.class).collect(Collectors.toSet());
 	private static final String DELIMITER_JSON_OBJECTS = "(?<=\\})(?=\\,\\{)";
 	public static final String PATTERN_OBJ_FROM_ARRAY = "^\\[(.*)\\]$";
+
+	public static String bytesToBase64String(byte[] array){
+		try {
+			return new String(Base64.getEncoder().encode(array), Constants.DEFAULT_ENCODING);
+		} catch (UnsupportedEncodingException e) {
+			throw new HttpException("image capture", e);
+		}
+	}
 
 	@SuppressWarnings(value = "unchecked")
 	public static String getJsonByMap(Map<String, Object> map) {

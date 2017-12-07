@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.rpi.camera;
+package com.robo4j.socket.http.dto;
 
 import java.util.Arrays;
 
@@ -23,14 +23,14 @@ import java.util.Arrays;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RaspistillImageDTO {
+public class CameraImageDTO {
 
     private int width;
     private int height;
     private String encoding;
     private byte[] content;
 
-    public RaspistillImageDTO(int width, int height, String encoding, byte[] content) {
+    public CameraImageDTO(int width, int height, String encoding, byte[] content) {
         this.width = width;
         this.height = height;
         this.encoding = encoding;
@@ -55,7 +55,7 @@ public class RaspistillImageDTO {
 
     @Override
     public String toString() {
-        return "RaspistillImageDTO{" +
+        return "CameraImageDTO{" +
                 "width=" + width +
                 ", height=" + height +
                 ", encoding='" + encoding + '\'' +

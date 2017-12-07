@@ -14,61 +14,60 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j;
+package com.robo4j.socket.http.units.test;
 
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.ConfigurationException;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class StringConsumer extends RoboUnit<String> {
+public class StringProducer extends RoboUnit<String> {
+	/* default sent messages */
 	private static final int DEFAULT = 0;
-	public static final String PROP_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
-	public static final String PROP_GET_RECEIVED_MESSAGES = "getReceivedMessages";
 	private AtomicInteger counter;
-	private List<String> receivedMessages = new ArrayList<>();
+	private String target;
 
 	/**
 	 * @param context
 	 * @param id
 	 */
-	public StringConsumer(RoboContext context, String id) {
+	public StringProducer(RoboContext context, String id) {
 		super(String.class, context, id);
-		this.counter = new AtomicInteger(DEFAULT);
-	}
-
-	public synchronized List<String> getReceivedMessages() {
-		return receivedMessages;
-	}
-
-	@Override
-	public void onMessage(String message) {
-		System.out.println(getClass().getSimpleName() + " onMessage: " + message);
-		counter.incrementAndGet();
-		receivedMessages.add(message);
 	}
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		target = configuration.getString("target", null);
+		if (target == null) {
+			throw ConfigurationException.createMissingConfigNameException("target");
+		}
+		counter = new AtomicInteger(DEFAULT);
 
+	}
+
+	@Override
+	public void onMessage(String message) {
+		if (message == null) {
+			System.out.println("No Message!");
+		} else {
+			counter.incrementAndGet();
+			getContext().getReference(target).sendMessage(message);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals(PROP_GET_NUMBER_OF_SENT_MESSAGES)
+		if (attribute.getAttributeName().equals("getNumberOfSentMessages")
 				&& attribute.getAttributeType() == Integer.class) {
 			return (R) (Integer) counter.get();
-		}
-		if (attribute.getAttributeName().equals(PROP_GET_RECEIVED_MESSAGES)
-				&& attribute.getAttributeType() == List.class) {
-			return (R) receivedMessages;
 		}
 		return null;
 	}

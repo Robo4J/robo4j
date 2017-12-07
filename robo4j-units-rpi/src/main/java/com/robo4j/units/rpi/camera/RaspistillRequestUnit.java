@@ -23,6 +23,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.camera.RaspistilDevice;
+import com.robo4j.socket.http.dto.CameraImageDTO;
 
 import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -79,7 +80,7 @@ public class RaspistillRequestUnit extends RoboUnit<RaspistillRequest> {
 	private void createImage(RaspistillRequest message) {
 		final byte[] image = device.executeCommand(command);
 		if (image.length > 0) {
-			RaspistillImageDTO imageDTO = new RaspistillImageDTO(
+			CameraImageDTO imageDTO = new CameraImageDTO(
 					Integer.valueOf(message.getProperty(RpiCameraProperty.WIDTH)),
 					Integer.valueOf(message.getProperty(RpiCameraProperty.HEIGHT)),
 					message.getProperty(RpiCameraProperty.ENCODING), image);

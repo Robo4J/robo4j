@@ -25,7 +25,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.socket.http.codec.CameraMessageCodec;
-import com.robo4j.units.rpi.camera.RaspistillImageDTO;
+import com.robo4j.socket.http.dto.CameraImageDTO;
 import com.robo4j.util.StreamUtils;
 
 import java.util.Arrays;
@@ -103,7 +103,7 @@ public class CameraImageProducerDescTestUnit extends RoboUnit<Boolean> {
     private void createImage() {
         final byte[] image = StreamUtils.inputStreamToByteArray(
                 Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName));
-        RaspistillImageDTO imageDTO = new RaspistillImageDTO(
+        CameraImageDTO imageDTO = new CameraImageDTO(
                 Integer.valueOf("800"),
                 Integer.valueOf("600"),
                 "jpg", image);

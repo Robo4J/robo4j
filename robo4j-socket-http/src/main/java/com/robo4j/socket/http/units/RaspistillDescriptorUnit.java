@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.rpi.camera;
+package com.robo4j.socket.http.units;
 
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
@@ -26,6 +26,7 @@ import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.codec.CameraMessageCodec;
+import com.robo4j.socket.http.dto.CameraImageDTO;
 import com.robo4j.socket.http.dto.PathMethodDTO;
 import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.util.JsonUtil;
@@ -39,13 +40,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Unit consumes byte[] array from {@see RaspistillRequestUnit} and create
- * Descriptor Message
+ * Descriptor Message HTTP POST
  *
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RaspistillDescriptorUnit extends RoboUnit<RaspistillImageDTO> {
+public class RaspistillDescriptorUnit extends RoboUnit<CameraImageDTO> {
 	private static final String PATH_UNITS = "units/";
 	private static final String PROPERTY_HOST_PORT = "hostPort";
 	private static final String PROPERTY_HOST = "host";
@@ -59,7 +60,7 @@ public class RaspistillDescriptorUnit extends RoboUnit<RaspistillImageDTO> {
 	private List<PathMethodDTO> remoteUnitList;
 
 	public RaspistillDescriptorUnit(RoboContext context, String id) {
-		super(RaspistillImageDTO.class, context, id);
+		super(CameraImageDTO.class, context, id);
 	}
 
 	@Override
@@ -77,8 +78,8 @@ public class RaspistillDescriptorUnit extends RoboUnit<RaspistillImageDTO> {
 	}
 
 	@Override
-	public void onMessage(RaspistillImageDTO image) {
-		final String imageBase64 = RaspistillUtils.bytesToBase64String(image.getContent());
+	public void onMessage(CameraImageDTO image) {
+		final String imageBase64 = JsonUtil.bytesToBase64String(image.getContent());
 		remoteUnitList.forEach(pathMethod -> {
 			HttpRequestDescriptor descriptor = new HttpRequestDescriptor(new HashMap<>(), pathMethod.getMethod(),
 					HttpVersion.HTTP_1_1.getValue(), pathMethod.getPath());
@@ -88,7 +89,6 @@ public class RaspistillDescriptorUnit extends RoboUnit<RaspistillImageDTO> {
 			final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, host,
 					PATH_UNITS.concat(pathMethod.getPath()), codec.encode(cameraMessage));
 			descriptor.addMessage(postMessage);
-			System.out.println(getClass() + "#onMessage image: " + cameraMessage.getValue() + " target: " + target);
 			getContext().getReference(target).sendMessage(descriptor);
 		});
 	}
