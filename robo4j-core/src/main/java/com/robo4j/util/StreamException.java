@@ -22,8 +22,9 @@ package com.robo4j.util;
  * @author Miro Wengner (@miragemiko)
  */
 public class StreamException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
-    public StreamException(String message) {
+	public StreamException(String message) {
         super(message);
     }
 
