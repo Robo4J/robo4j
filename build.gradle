@@ -19,6 +19,51 @@ repositories {
     mavenLocal()
 }
 
+project("robo4j-commons") {
+    description = "Robo4J Codec"
+
+    group 'com.robo4j'
+    version "${robo4jVersion}"
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java']
+            }
+            resources {
+                srcDirs = ['src/main/resources']
+            }
+        }
+
+        test {
+            java {
+                srcDirs = ['src/test/java']
+            }
+            resources {
+                srcDirs = ['src/test/resources']
+            }
+        }
+    }
+}
+
 project("robo4j-core") {
     description = "Robo4J Core"
 
@@ -95,7 +140,6 @@ project("robo4j-db-sql") {
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
     }
 
-    //main db
     flyway {
         url = 'jdbc:h2:~/data/robo4j1h2'
         user = 'sa'
@@ -148,6 +192,13 @@ project("robo4j-hw-lego") {
         }
     }
 
+    dependencies {
+        compile fileTree(dir: 'libs', include: 'ev3classes-9.1.jar')
+        compile(project(":robo4j-math"))
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+
     sourceSets {
         main {
             java {
@@ -166,14 +217,6 @@ project("robo4j-hw-lego") {
                 srcDirs = ['src/test/resources']
             }
         }
-    }
-
-    //sources
-    dependencies {
-        compile fileTree(dir: 'libs', include: 'ev3classes-9.1.jar')
-        compile(project(":robo4j-math"))
-        testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 }
 
@@ -354,6 +397,7 @@ project("robo4j-socket-http") {
     }
 
     dependencies {
+        compile(project(":robo4j-commons"))
         compile(project(":robo4j-core"))
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
@@ -381,7 +425,6 @@ project("robo4j-socket-http") {
     }
 
 }
-
 
 project("robo4j-units-lego") {
     description = "Robo4J Lego Abstractions"
@@ -421,11 +464,31 @@ project("robo4j-units-lego") {
     }
 
     dependencies {
-        compile(project(":robo4j-hw-lego"))
-        compile(project(":robo4j-socket-http"))
         compile(project(":robo4j-core"))
+        compile(project(":robo4j-hw-lego"))
+        testCompile(project(":robo4j-socket-http"))
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java']
+            }
+            resources {
+                srcDirs = ['src/main/resources']
+            }
+        }
+
+        test {
+            java {
+                srcDirs = ['src/test/java']
+            }
+            resources {
+                srcDirs = ['src/test/resources']
+            }
+        }
     }
 }
 
@@ -468,7 +531,14 @@ project("robo4j-units-rpi") {
         with jar
     }
 
-    //sources
+    dependencies {
+        compile(project(":robo4j-commons"))
+        compile(project(":robo4j-core"))
+        compile(project(":robo4j-hw-rpi"))
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+
     sourceSets {
         main {
             java {
@@ -487,14 +557,6 @@ project("robo4j-units-rpi") {
                 srcDirs = ['src/test/resources']
             }
         }
-    }
-
-    dependencies {
-        compile(project(":robo4j-hw-rpi"))
-        compile(project(":robo4j-socket-http"))
-        compile(project(":robo4j-core"))
-        testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 }
 

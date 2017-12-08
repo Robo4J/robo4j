@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.robo4j.util.Utf8Constant.UTF8_SPACE;
+
 /**
  * Raspistill request to take a picture
  *
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
  */
 public final class RaspistillRequest {
 
+    private static final String RASPISTILL_COMMAND = "raspistill";
     private final boolean active;
     private final Map<RpiCameraProperty, String> parameters;
 
@@ -53,15 +56,15 @@ public final class RaspistillRequest {
 
     public String create(){
         return new StringBuilder()
-                .append(RaspistillUtils.RASPISTILL_COMMAND)
-                .append(Constants.UTF8_SPACE)
+                .append(RASPISTILL_COMMAND)
+                .append(UTF8_SPACE)
                 .append(parameters.entrySet().stream()
                         .filter(e -> Objects.nonNull(e.getValue()))
                         .map(e ->
                              new StringBuilder().append(e.getKey().getProperty())
-                                    .append(Constants.UTF8_SPACE)
+                                    .append(UTF8_SPACE)
                                     .append(e.getValue()).toString())
-                        .collect(Collectors.joining(Constants.UTF8_SPACE)))
+                        .collect(Collectors.joining(UTF8_SPACE)))
                 .toString();
     }
 
