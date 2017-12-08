@@ -17,17 +17,19 @@
 
 package com.robo4j.net;
 
-import com.robo4j.RoboContext;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.robo4j.RoboContext;
+
 /**
+ * Note that on Mac OS X, it seems the easiest way to get this test to run is to
+ * set -Djava.net.preferIPv4Stack=true.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -51,14 +53,12 @@ public class LookupServiceTests {
 	}
 
 	@Test
-	@Ignore
 	public void testLookup() throws IOException, InterruptedException {
-		LookupService service = new LookupServiceImpl(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS,
-				LookupServiceProvider.DEFAULT_PORT, ALLOWED_HEARTBEAT_MISSES);
+		LookupService service = new LookupServiceImpl(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS, LookupServiceProvider.DEFAULT_PORT,
+				ALLOWED_HEARTBEAT_MISSES);
 		service.start();
 		RoboContextDescriptor descriptor = createRoboContextDescriptor();
-		ContextEmitter emitter = new ContextEmitter(descriptor,
-				InetAddress.getByName(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS),
+		ContextEmitter emitter = new ContextEmitter(descriptor, InetAddress.getByName(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS),
 				LookupServiceProvider.DEFAULT_PORT);
 
 		for (int i = 0; i < 10; i++) {
