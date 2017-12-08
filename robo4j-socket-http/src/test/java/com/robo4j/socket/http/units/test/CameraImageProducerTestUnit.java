@@ -28,7 +28,7 @@ import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.codec.CameraMessageCodec;
-import com.robo4j.socket.http.units.Constants;
+import com.robo4j.socket.http.util.HttpConstant;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.StreamUtils;
 import com.robo4j.util.StringConstants;
@@ -123,7 +123,7 @@ public class CameraImageProducerTestUnit extends RoboUnit<Boolean> {
 				Thread.currentThread().getContextClassLoader().getResourceAsStream("snapshot.png"));
 		String encodeString = new String(Base64.getEncoder().encode(imageBytes));
 
-		if (encodeString.length() != Constants.DEFAULT_VALUE_0) {
+		if (encodeString.length() != HttpConstant.DEFAULT_VALUE_0) {
 			final CameraMessage cameraMessage = new CameraMessage("jpg", String.valueOf(counter.incrementAndGet()),
 					encodeString);
 

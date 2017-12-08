@@ -29,11 +29,6 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.camera.CameraClientException;
 import com.robo4j.hw.rpi.camera.RaspistilDevice;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.HttpMethod;
-import com.robo4j.socket.http.codec.CameraMessage;
-import com.robo4j.socket.http.codec.CameraMessageCodec;
-import com.robo4j.socket.http.units.Constants;
-import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.StringConstants;
 
 import java.io.UnsupportedEncodingException;
@@ -50,6 +45,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static com.robo4j.util.Utf8Constant.DEFAULT_ENCODING;
+import static com.robo4j.util.Utf8Constant.UTF8_SPACE;
+
 /**
  * unit has been replaced by {@see RaspistillRequestUnit}
  *
@@ -62,6 +60,7 @@ import java.util.stream.Collectors;
 @CriticalSectionTrait
 public class RaspistillSimpleUnit extends RoboUnit<Boolean> {
 
+	private static final String RASPISTILL_COMMAND = "raspistill";
 	private static final String ATTRIBUTE_COMMAND = "command";
 	private final static Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections.unmodifiableCollection(
 			Collections.singleton(DefaultAttributeDescriptor.create(String.class, ATTRIBUTE_COMMAND)));
@@ -109,17 +108,17 @@ public class RaspistillSimpleUnit extends RoboUnit<Boolean> {
 
 		//@formatter:off
 		command = new StringBuilder()
-			.append(RaspistillUtils.RASPISTILL_COMMAND)
-			.append(Constants.UTF8_SPACE)
+			.append(RASPISTILL_COMMAND)
+			.append(UTF8_SPACE)
 			.append(parameters.entrySet().stream()
 					.filter(e -> Objects.nonNull(e.getValue()))
 					.map(e -> {
 						StringBuilder c = new StringBuilder();
 							return c.append(e.getKey().getProperty())
-									.append(Constants.UTF8_SPACE)
+									.append(UTF8_SPACE)
 									.append(e.getValue()).toString();
 					})
-					.collect(Collectors.joining(Constants.UTF8_SPACE)))
+					.collect(Collectors.joining(UTF8_SPACE)))
 			.toString();
 
 		//@formatter:on
@@ -186,7 +185,7 @@ public class RaspistillSimpleUnit extends RoboUnit<Boolean> {
 
 	private void createImage() {
 		final String encodeString = executeCommand(command);
-		if (encodeString.length() != Constants.DEFAULT_VALUE_0) {
+		if (encodeString.length() != 0) {
 			final CameraMessage cameraMessage = new CameraMessage(imageEncoding, String.valueOf(imageValue.incrementAndGet()), encodeString);
 
 			if(client != null){
@@ -217,7 +216,7 @@ public class RaspistillSimpleUnit extends RoboUnit<Boolean> {
 			getContext().getReference(storeTarget).sendMessage(image);
 		}
 		try {
-			return new String(Base64.getEncoder().encode(image), Constants.DEFAULT_ENCODING);
+			return new String(Base64.getEncoder().encode(image), DEFAULT_ENCODING);
 		} catch (UnsupportedEncodingException e) {
 			throw new CameraClientException("image capture", e);
 		}

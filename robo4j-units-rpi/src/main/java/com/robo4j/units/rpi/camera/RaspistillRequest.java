@@ -17,8 +17,6 @@
 
 package com.robo4j.units.rpi.camera;
 
-import com.robo4j.socket.http.units.Constants;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;

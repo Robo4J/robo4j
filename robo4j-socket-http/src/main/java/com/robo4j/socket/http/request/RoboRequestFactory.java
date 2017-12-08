@@ -37,7 +37,7 @@ import com.robo4j.RoboReference;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMessageWrapper;
 import com.robo4j.socket.http.dto.ResponseUnitDTO;
-import com.robo4j.socket.http.units.Constants;
+import com.robo4j.socket.http.util.HttpConstant;
 import com.robo4j.socket.http.units.HttpCodecRegistry;
 import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpUriRegister;
@@ -78,10 +78,10 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 		Future<?> future = desiredReference.getAttribute(attributeDescriptor);
 		try {
 			Object result = future.get();
-			return result != null ? result : new byte[Constants.DEFAULT_VALUE_0];
+			return result != null ? result : new byte[HttpConstant.DEFAULT_VALUE_0];
 		} catch (InterruptedException | ExecutionException e) {
 			SimpleLoggingUtil.error(getClass(), "problem", e);
-			return new byte[Constants.DEFAULT_VALUE_0];
+			return new byte[HttpConstant.DEFAULT_VALUE_0];
 		}
 	}
 

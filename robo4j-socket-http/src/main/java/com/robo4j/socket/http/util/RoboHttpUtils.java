@@ -20,10 +20,10 @@ import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.enums.StatusCode;
-import com.robo4j.socket.http.units.Constants;
 import com.robo4j.util.StringConstants;
 
 import static com.robo4j.socket.http.provider.DefaultValuesProvider.basicHeaderMap;
+import static com.robo4j.util.Utf8Constant.UTF8_COLON;
 
 /**
  * Basic Http constants and utils methods
@@ -90,7 +90,7 @@ public final class RoboHttpUtils {
 	public static String createHostWithPort(String host, Object port) {
 
 		return port == null || Integer.valueOf(port.toString()) == 80 ? host
-				: new StringBuilder(host).append(Constants.UTF8_COLON).append(port).toString();
+				: new StringBuilder(host).append(UTF8_COLON).append(port).toString();
 	}
 
 	/**

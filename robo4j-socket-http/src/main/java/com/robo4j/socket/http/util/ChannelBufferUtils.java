@@ -24,7 +24,6 @@ import com.robo4j.socket.http.SocketException;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.message.HttpResponseDescriptor;
-import com.robo4j.socket.http.units.Constants;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -161,7 +160,7 @@ public class ChannelBufferUtils {
 		final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
 		final String[] header = headerAndBody[POSITION_HEADER].split("[" + NEXT_LINE + "]+");
 		final String firstLine = RoboHttpUtils.correctLine(header[0]);
-		final String[] tokens = firstLine.split(Constants.HTTP_EMPTY_SEP);
+		final String[] tokens = firstLine.split(HttpConstant.HTTP_EMPTY_SEP);
 		final String[] paramArray = Arrays.copyOfRange(header, 1, header.length);
 
 		final HttpMethod method = HttpMethod.getByName(tokens[HttpMessageUtil.METHOD_KEY_POSITION]);
@@ -184,7 +183,7 @@ public class ChannelBufferUtils {
 		final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
 		final String[] header = headerAndBody[POSITION_HEADER].split("[" + NEXT_LINE + "]+");
 		final String firstLine = RoboHttpUtils.correctLine(header[0]);
-		final String[] tokens = firstLine.split(Constants.HTTP_EMPTY_SEP);
+		final String[] tokens = firstLine.split(HttpConstant.HTTP_EMPTY_SEP);
 		final String[] paramArray = Arrays.copyOfRange(header, 1, header.length);
 
 		final String version = tokens[0];

@@ -26,7 +26,6 @@ import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.codec.CameraMessageCodec;
-import com.robo4j.socket.http.units.Constants;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.StringConstants;
 
@@ -39,6 +38,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.robo4j.util.Utf8Constant.DEFAULT_ENCODING;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -151,7 +152,7 @@ public class TestClientImageController extends RoboUnit<Boolean> {
 		try {
 			byte[] imageArray = new byte[imageData.available()];
 			imageData.read(imageArray);
-			return new String(Base64.getEncoder().encode(imageArray), Constants.DEFAULT_ENCODING);
+			return new String(Base64.getEncoder().encode(imageArray), DEFAULT_ENCODING);
 		} catch (IOException e) {
 			throw new RuntimeException("error: ", e);
 		}

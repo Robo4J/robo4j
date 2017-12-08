@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.socket.http.units;
+package com.robo4j.socket.http.util;
 
 /**
  * Commonly used constants
@@ -22,21 +22,11 @@ package com.robo4j.socket.http.units;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class Constants {
+public final class HttpConstant {
 
-	public static final String DEFAULT_ENCODING = "UTF-8";
 	public static final int DEFAULT_VALUE_0 = 0;
 	public static final int DEFAULT_VALUE_1 = 1;
 	public static final String HTTP_QUERY_SEP = "\u0026"; // AMPERSAND &
 	public static final String HTTP_EMPTY_SEP = "\\s+";
 	public static final String HTTP_NEW_LINE = "\n";
-	public static final String UTF8_COMMA = "\u002C";
-	public static final String UTF8_SPACE = "\u0020";
-	public static final String UTF8_COLON = "\u003A";
-	public static final String UTF8_QUOTATION_MARK = "\"";
-	public static final String UTF8_CURLY_BRACKET_LEFT = "\u007B";
-	public static final String UTF8_CURLY_BRACKET_RIGHT = "\u007D";
-	public static final String UTF8_SQUARE_BRACKET_LEFT = "\u005B";
-	public static final String UTF8_SQUARE_BRACKET_RIGHT = "\u005D";
-
 }

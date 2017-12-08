@@ -19,12 +19,12 @@ package com.robo4j.socket.http.provider;
 
 import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpHeaderFieldValues;
-import com.robo4j.socket.http.units.Constants;
 import com.robo4j.util.PropertyMapBuilder;
 
 import java.util.Map;
 
 import static com.robo4j.socket.http.HttpHeaderFieldValues.CONNECTION_KEEP_ALIVE;
+import static com.robo4j.util.Utf8Constant.UTF8_SPACE;
 
 /**
  * provides default values for http related structures construction
@@ -43,7 +43,7 @@ public final class DefaultValuesProvider {
             .put(HttpHeaderFieldNames.ACCEPT, "*/*")
             .put(HttpHeaderFieldNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
             .put(HttpHeaderFieldNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8")
-            .put(HttpHeaderFieldNames.CONTENT_TYPE, "text/html;".concat(Constants.UTF8_SPACE).concat("charset=utf-8"))
+            .put(HttpHeaderFieldNames.CONTENT_TYPE, "text/html;".concat(UTF8_SPACE).concat("charset=utf-8"))
             .create();
 
 

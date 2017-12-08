@@ -17,7 +17,7 @@
 
 package com.robo4j.socket.http.util;
 
-import static com.robo4j.socket.http.units.Constants.UTF8_QUOTATION_MARK;
+import static com.robo4j.util.Utf8Constant.UTF8_QUOTATION_MARK;
 
 /**
  *

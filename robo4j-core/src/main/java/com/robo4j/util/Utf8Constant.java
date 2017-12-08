@@ -15,33 +15,17 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.rpi.camera;
+package com.robo4j.util;
 
-import com.robo4j.hw.rpi.camera.CameraClientException;
-import com.robo4j.socket.http.units.Constants;
-
-import java.io.UnsupportedEncodingException;
-import java.util.Base64;
-
-/**
- *
- * raspistill specific utilities
- * 
- * @author Marcus Hirt (@hirt)
- * @author Miro Wengner (@miragemiko)
- */
-final class RaspistillUtils {
-
-	static final String RASPISTILL_COMMAND = "raspistill";
-
-
-	public static String bytesToBase64String(byte[] array){
-		try {
-			return new String(Base64.getEncoder().encode(array), Constants.DEFAULT_ENCODING);
-		} catch (UnsupportedEncodingException e) {
-			throw new CameraClientException("image capture", e);
-		}
-	}
-
+public class Utf8Constant {
+    public static final String DEFAULT_ENCODING = "UTF-8";
+    public static final String UTF8_COMMA = "\u002C";
+    public static final String UTF8_SPACE = "\u0020";
+    public static final String UTF8_COLON = "\u003A";
+    public static final String UTF8_QUOTATION_MARK = "\"";
+    public static final String UTF8_CURLY_BRACKET_LEFT = "\u007B";
+    public static final String UTF8_CURLY_BRACKET_RIGHT = "\u007D";
+    public static final String UTF8_SQUARE_BRACKET_LEFT = "\u005B";
+    public static final String UTF8_SQUARE_BRACKET_RIGHT = "\u005D";
 
 }

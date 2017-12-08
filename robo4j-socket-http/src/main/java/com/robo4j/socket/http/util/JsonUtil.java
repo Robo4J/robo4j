@@ -22,7 +22,6 @@ import com.robo4j.socket.http.HttpException;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.dto.PathMethodDTO;
 import com.robo4j.socket.http.dto.ResponseUnitDTO;
-import com.robo4j.socket.http.units.Constants;
 import com.robo4j.util.StringConstants;
 
 import java.io.UnsupportedEncodingException;
@@ -37,8 +36,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.robo4j.socket.http.units.Constants.UTF8_CURLY_BRACKET_LEFT;
-import static com.robo4j.socket.http.units.Constants.UTF8_QUOTATION_MARK;
 import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COLON;
 import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COMMA;
 import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_LEFT;
@@ -46,6 +43,14 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_RIGHT
 import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_QUOTATION_MARK;
 import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_SQUARE_BRACKET_LEFT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_SQUARE_BRACKET_RIGHT;
+import static com.robo4j.util.Utf8Constant.DEFAULT_ENCODING;
+import static com.robo4j.util.Utf8Constant.UTF8_COLON;
+import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
+import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_LEFT;
+import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_RIGHT;
+import static com.robo4j.util.Utf8Constant.UTF8_QUOTATION_MARK;
+import static com.robo4j.util.Utf8Constant.UTF8_SQUARE_BRACKET_LEFT;
+import static com.robo4j.util.Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT;
 
 /**
  *
@@ -60,13 +65,13 @@ public final class JsonUtil {
 	private static final Set<Class<?>> withoutQuotationTypes = Stream.of(boolean.class, int.class, short.class,
 			byte.class, long.class, double.class, float.class, char.class, Boolean.class, Integer.class, Short.class,
 			Byte.class, Long.class, Double.class, Float.class, Character.class).collect(Collectors.toSet());
-	private static final Set<Class<?>> quoatationTypes = Stream.of(String.class).collect(Collectors.toSet());
+	private static final Set<Class<?>> quotationTypes = Stream.of(String.class).collect(Collectors.toSet());
 	private static final String DELIMITER_JSON_OBJECTS = "(?<=\\})(?=\\,\\{)";
 	public static final String PATTERN_OBJ_FROM_ARRAY = "^\\[(.*)\\]$";
 
 	public static String bytesToBase64String(byte[] array){
 		try {
-			return new String(Base64.getEncoder().encode(array), Constants.DEFAULT_ENCODING);
+			return new String(Base64.getEncoder().encode(array), DEFAULT_ENCODING);
 		} catch (UnsupportedEncodingException e) {
 			throw new HttpException("image capture", e);
 		}
@@ -74,10 +79,10 @@ public final class JsonUtil {
 
 	@SuppressWarnings(value = "unchecked")
 	public static String getJsonByMap(Map<String, Object> map) {
-		StringBuilder sb = new StringBuilder(Constants.UTF8_CURLY_BRACKET_LEFT);
+		StringBuilder sb = new StringBuilder(UTF8_CURLY_BRACKET_LEFT);
 		sb.append(map.entrySet().stream().map(e -> {
 			StringBuilder sb2 = new StringBuilder(UTF8_QUOTATION_MARK).append(e.getKey()).append(UTF8_QUOTATION_MARK)
-					.append(Constants.UTF8_COLON);
+					.append(UTF8_COLON);
 			Class<?> clazz = e.getValue().getClass();
 			if (checkPrimitiveOrWrapper(clazz)) {
 				sb2.append(e.getValue());
@@ -90,7 +95,7 @@ public final class JsonUtil {
 				sb2.append(getJsonByMap((Map<String, Object>) e.getValue()));
 			}
 			return sb2.toString();
-		}).collect(Collectors.joining(Constants.UTF8_COMMA))).append(Constants.UTF8_CURLY_BRACKET_RIGHT);
+		}).collect(Collectors.joining(UTF8_COMMA))).append(UTF8_CURLY_BRACKET_RIGHT);
 		return sb.toString();
 	}
 
@@ -125,10 +130,13 @@ public final class JsonUtil {
 	}
 
 	public static String getJsonByPathMethodList(List<PathMethodDTO> pathMethodList) {
-		return JsonElementStringBuilder.Builder().add(Constants.UTF8_SQUARE_BRACKET_LEFT)
+		//@formatter:off
+		return JsonElementStringBuilder.Builder().add(UTF8_SQUARE_BRACKET_LEFT)
 				.add(pathMethodList.stream().map(JsonUtil::getJsonByPathMethod)
-						.collect(Collectors.joining(Constants.UTF8_COMMA)))
-				.add(Constants.UTF8_SQUARE_BRACKET_RIGHT).build();
+						.collect(Collectors.joining(UTF8_COMMA)))
+				.add(UTF8_SQUARE_BRACKET_RIGHT)
+				.build();
+		//@formatter:on
 	}
 
 	/**
@@ -140,18 +148,18 @@ public final class JsonUtil {
 	 */
 	public static String getJsonByPathMethod(PathMethodDTO pathMethod) {
 		JsonElementStringBuilder builder = JsonElementStringBuilder.Builder().add(UTF8_CURLY_BRACKET_LEFT)
-				.addQuotationWithDelimiter(Constants.UTF8_COLON, pathMethod.getPath())
-				.add(Constants.UTF8_SQUARE_BRACKET_LEFT);
+				.addQuotationWithDelimiter(UTF8_COLON, pathMethod.getPath())
+				.add(UTF8_SQUARE_BRACKET_LEFT);
 		if (pathMethod.getCallbackUnitName() == null) {
 			builder.addQuotation(pathMethod.getMethod().getName());
 		} else {
-			builder.addQuotationWithDelimiter(Constants.UTF8_COMMA, pathMethod.getMethod().getName())
+			builder.addQuotationWithDelimiter(UTF8_COMMA, pathMethod.getMethod().getName())
 					.addQuotation(pathMethod.getCallbackUnitName());
 		}
 
 		//@formatter:off
-		return builder.add(Constants.UTF8_SQUARE_BRACKET_RIGHT)
-				.add(Constants.UTF8_CURLY_BRACKET_RIGHT)
+		return builder.add(UTF8_SQUARE_BRACKET_RIGHT)
+				.add(UTF8_CURLY_BRACKET_RIGHT)
 				.build();
 		//@formatter:on
 	}
@@ -223,12 +231,12 @@ public final class JsonUtil {
 	}
 
 	private static boolean checkString(Class<?> clazz) {
-		return quoatationTypes.contains(clazz);
+		return quotationTypes.contains(clazz);
 	}
 
 	private static PathMethodDTO extractPathMethodByMatcher(Matcher matcher) {
 		String[] propertiesValues = matcher.group(2).replaceAll("[\"\\[\\]]", StringConstants.EMPTY)
-				.split(Constants.UTF8_COMMA);
+				.split(UTF8_COMMA);
 		String path = matcher.group(1).trim();
 		return new PathMethodDTO(path.isEmpty() ? DEFAULT_PATH : path, HttpMethod.getByName(propertiesValues[0].trim()),
 				propertiesValues.length > 1 ? propertiesValues[1].trim() : null);
