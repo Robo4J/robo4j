@@ -87,6 +87,10 @@ project("robo4j-core") {
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
     }
 
+    test {
+        systemProperty "java.net.preferIPv4Stack", "true"
+    }
+
     sourceSets {
         main {
             java {
