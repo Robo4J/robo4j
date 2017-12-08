@@ -20,6 +20,7 @@ package com.robo4j.units.rpi.camera;
 import com.robo4j.ConfigurationException;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.commons.ImageDTO;
 import com.robo4j.configuration.Configuration;
@@ -67,8 +68,6 @@ public class RaspistillUnit extends RoboUnit<RaspistillRequest> {
 		}
 	}
 
-
-
 	private void startUnit(RaspistillRequest message) {
 		getContext().getScheduler().execute(() -> {
 			while (acceptedStates.contains(getState())) {
@@ -81,13 +80,13 @@ public class RaspistillUnit extends RoboUnit<RaspistillRequest> {
 
 	private void createImage(RaspistillRequest message) {
 		final byte[] image = device.executeCommand(command);
-		if (image.length > 0) {
-			ImageDTO imageDTO = new ImageDTO(
-					Integer.valueOf(message.getProperty(RpiCameraProperty.WIDTH)),
+		final RoboReference<ImageDTO> targetReference = getContext().getReference(target);
+		if (targetReference != null && image.length > 0) {
+			ImageDTO imageDTO = new ImageDTO(Integer.valueOf(message.getProperty(RpiCameraProperty.WIDTH)),
 					Integer.valueOf(message.getProperty(RpiCameraProperty.HEIGHT)),
 					message.getProperty(RpiCameraProperty.ENCODING), image);
-			getContext().getReference(target).sendMessage(imageDTO);
-			progress.set(false);
+			targetReference.sendMessage(imageDTO);
 		}
+		progress.set(false);
 	}
 }

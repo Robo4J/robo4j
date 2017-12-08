@@ -68,4 +68,12 @@ public final class RaspistillRequest {
                 .toString();
     }
 
+
+    @Override
+    public String toString() {
+        return "RaspistillRequest{" +
+                "active=" + active +
+                ", parameters=" + parameters +
+                '}';
+    }
 }
