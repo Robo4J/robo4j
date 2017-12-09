@@ -19,8 +19,8 @@ package com.robo4j.net;
 
 import com.robo4j.RoboContext;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -35,13 +35,9 @@ import java.util.Map;
  * @author Miroslav Wengner (@miragemiko)
  */
 
+@RunWith(LookupServiceTestRunner.class)
 public class LookupServiceTests {
 	private static final float ALLOWED_HEARTBEAT_MISSES = 22f;
-
-	@BeforeClass
-	public static void setSystemProperties() {
-		System.setProperty("java.net.preferIPv4Stack", "true");
-	}
 
 
 	@Test
