@@ -23,10 +23,14 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.codec.CameraMessageCodec;
-import com.robo4j.socket.http.util.RoboHttpUtils;
+import com.robo4j.socket.http.util.HttpDenominator;
+import com.robo4j.socket.http.util.HttpMessageBuilder;
+import com.robo4j.socket.http.util.RequestDenominator;
 import com.robo4j.util.StringConstants;
 
 import java.io.IOException;
@@ -135,10 +139,16 @@ public class TestClientImageController extends RoboUnit<Boolean> {
 	// Private Methods
 	private void createImage() {
 		final CameraMessage cameraMessage = new CameraMessage("jpg", "default", getSampleImage(cameraCommand));
-		// "default", getSampleImage(cameraCommand));
 		final String message = codec.encode(cameraMessage);
 		if (cameraMessage.getImage().length() != 0) {
-			final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientUri, message);
+
+			final HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, clientUri, HttpVersion.HTTP_1_1);
+			final String postMessage = HttpMessageBuilder.Build()
+					.setDenominator(denominator)
+					.addHeaderElement(HttpHeaderFieldNames.HOST, client)
+					.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()))
+					.build(message);
+
 			sendClientMessage(getContext(), postMessage);
 		}
 	}

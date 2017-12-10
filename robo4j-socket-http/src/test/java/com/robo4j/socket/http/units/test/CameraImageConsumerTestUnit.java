@@ -34,7 +34,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Miro Wengner (@miragemiko)
  */
 public class CameraImageConsumerTestUnit extends RoboUnit<CameraMessage> {
-
 	public static final String ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME = "numberOfReceivedImages";
 	public static final Collection<AttributeDescriptor<?>> ATTRIBUTES_COLLECTION = Collections
 			.unmodifiableCollection(Collections.singletonList(
@@ -44,7 +43,7 @@ public class CameraImageConsumerTestUnit extends RoboUnit<CameraMessage> {
 
 	public CameraImageConsumerTestUnit(RoboContext context, String id) {
 		super(CameraMessage.class, context, id);
-		System.out.println(getClass() + "init");
+		System.out.println(getClass() + " Constructor");
 	}
 
 	@Override

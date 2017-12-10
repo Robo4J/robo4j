@@ -36,7 +36,7 @@ public final class DefaultValuesProvider {
     public static final String ROBO4J_CLIENT = "Robo4J-HttpClient";
 
     @SuppressWarnings("unchecked")
-    public static final Map<String, String> basicHeaderMap = new PropertyMapBuilder<String, String>()
+    public static final Map<String, String> BASIC_HEADER_MAP = new PropertyMapBuilder<String, String>()
             .put(HttpHeaderFieldNames.CACHE_CONTROL, HttpHeaderFieldValues.NO_CACHE)
             .put(HttpHeaderFieldNames.USER_AGENT, ROBO4J_CLIENT)
             .put(HttpHeaderFieldNames.CONNECTION, CONNECTION_KEEP_ALIVE)

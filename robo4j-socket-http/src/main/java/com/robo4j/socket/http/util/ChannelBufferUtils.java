@@ -95,7 +95,8 @@ public class ChannelBufferUtils {
 			return result;
 
 		} else {
-			return new HttpResponseDescriptor(new HashMap<>(), StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1.getValue());
+
+			return new HttpResponseDescriptor(new HashMap<>(), new ResponseDenominator(StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1));
 		}
 	}
 
@@ -128,7 +129,7 @@ public class ChannelBufferUtils {
 			requestBuffer.clear();
 			return result;
 		} else {
-			return new HttpRequestDescriptor(new HashMap<>(), null, null, null);
+			return new HttpRequestDescriptor(new HashMap<>(), new RequestDenominator(HttpMethod.GET, HttpVersion.HTTP_1_1));
 		}
 	}
 
@@ -168,11 +169,12 @@ public class ChannelBufferUtils {
 		final String version = tokens[HttpMessageUtil.VERSION_POSITION];
 		final Map<String, String> headerParams = getHeaderParametersByArray(paramArray);
 
-		HttpRequestDescriptor result = new HttpRequestDescriptor(headerParams, method, version, path);
+		final RequestDenominator denominator = new RequestDenominator(method, path, HttpVersion.getByValue(version));
+		HttpRequestDescriptor result = new HttpRequestDescriptor(headerParams, denominator);
+
+		// FIXME: 12/10/17 (miro) adde to the request descriptor
 		if (headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)) {
 			result.setLength(calculateMessageSize(headerAndBody[POSITION_HEADER].length(), headerParams));
-		}
-		if (headerAndBody.length > 1) {
 			result.addMessage(headerAndBody[POSITION_BODY]);
 		}
 
@@ -190,11 +192,10 @@ public class ChannelBufferUtils {
 		final StatusCode statusCode = StatusCode.getByCode(Integer.valueOf(tokens[1]));
 		final Map<String, String> headerParams = getHeaderParametersByArray(paramArray);
 
-		HttpResponseDescriptor result = new HttpResponseDescriptor(headerParams, statusCode, version);
+		ResponseDenominator denominator = new ResponseDenominator(statusCode, HttpVersion.getByValue(version));
+		HttpResponseDescriptor result = new HttpResponseDescriptor(headerParams, denominator);
 		if (headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)) {
 			result.setLength(calculateMessageSize(headerAndBody[POSITION_HEADER].length(), headerParams));
-		}
-		if (headerAndBody.length > 1) {
 			result.addMessage(headerAndBody[POSITION_BODY]);
 		}
 

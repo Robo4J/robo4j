@@ -18,6 +18,8 @@
 package com.robo4j.socket.http.message;
 
 import com.robo4j.socket.http.enums.StatusCode;
+import com.robo4j.socket.http.util.HttpDenominator;
+import com.robo4j.socket.http.util.ResponseDenominator;
 
 import java.util.Map;
 
@@ -29,34 +31,39 @@ import java.util.Map;
  */
 public final class HttpResponseDescriptor extends AbstractHttpMessageDescriptor {
 
-	private final StatusCode code;
+	private final ResponseDenominator denominator;
 	private String callbackUnit;
 
-	public HttpResponseDescriptor(Map<String, String> header, StatusCode code, String version) {
-		super(header, version);
-		this.code = code;
+	public HttpResponseDescriptor(Map<String, String> header, ResponseDenominator denominator) {
+		super(header, denominator.getVersion());
+		this.denominator = denominator;
+	}
+
+	@Override
+	public HttpDenominator getDenominator() {
+		return denominator;
 	}
 
 	public StatusCode getCode() {
-		return code;
+		return denominator.getStatus();
 	}
 
-    /**
-     * define unit RoboUnit to be call after response message
-     *
-     * @param callbackUnit robo unit name that should be called
-     */
-	public String getCallbackUnit() {
-		return callbackUnit;
-	}
-
+	/**
+	 * define unit RoboUnit to be call after response message
+	 *
+	 * @param callbackUnit robo unit name that should be called
+	 */
 	public void setCallbackUnit(String callbackUnit) {
 		this.callbackUnit = callbackUnit;
 	}
 
+	public String getCallbackUnit() {
+		return callbackUnit;
+	}
+
 	@Override
 	public String toString() {
-		return "HttpResponseDescriptor{" + "code=" + code + ", callbackUnit='" + callbackUnit + '\''
+		return "HttpResponseDescriptor{" + "denominator=" + denominator + ", callbackUnit='" + callbackUnit + '\''
 				+ super.toString() + '}';
 	}
 }

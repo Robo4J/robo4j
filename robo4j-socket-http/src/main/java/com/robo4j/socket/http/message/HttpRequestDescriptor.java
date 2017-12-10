@@ -18,6 +18,8 @@
 package com.robo4j.socket.http.message;
 
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.util.HttpDenominator;
+import com.robo4j.socket.http.util.RequestDenominator;
 
 import java.util.Map;
 
@@ -30,26 +32,34 @@ import java.util.Map;
  */
 public final class HttpRequestDescriptor extends AbstractHttpMessageDescriptor {
 
-	final private HttpMethod method;
-	final private String path;
+	private final RequestDenominator denominator;
 
-	public HttpRequestDescriptor(Map<String, String> header, HttpMethod method, String version, String path) {
-		super(header, version);
-		this.method = method;
-		this.path = path;
+	public HttpRequestDescriptor(RequestDenominator denominator){
+		super(denominator.getVersion());
+		this.denominator = denominator;
 	}
 
-	public HttpMethod getMethod() {
-		return method;
-	}
-
-	public String getPath() {
-		return path;
+	public HttpRequestDescriptor(Map<String, String> header, RequestDenominator denominator) {
+		super(header, denominator.getVersion());
+		this.denominator = denominator;
 	}
 
 	@Override
+	public HttpDenominator getDenominator() {
+		return denominator;
+	}
+
+	public HttpMethod getMethod() {
+		return denominator.getMethod();
+	}
+
+	public String getPath() {
+		return denominator.getPath();
+	}
+
+
+	@Override
 	public String toString() {
-		return "HttpRequestDescriptor{" + " method=" + method + ", path='" + path + "\' " + super.toString()
-				+ '}';
+		return "HttpRequestDescriptor{" + " denominator=" + denominator + "\' " + super.toString() + '}';
 	}
 }

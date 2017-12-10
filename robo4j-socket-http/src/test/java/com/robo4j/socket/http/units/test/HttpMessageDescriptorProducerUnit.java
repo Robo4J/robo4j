@@ -22,12 +22,12 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.socket.http.message.HttpRequestDescriptor;
+import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.dto.PathMethodDTO;
+import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.util.JsonUtil;
-import com.robo4j.socket.http.util.RoboHttpUtils;
-import com.robo4j.util.StringConstants;
+import com.robo4j.socket.http.util.RequestDenominator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -70,9 +70,9 @@ public class HttpMessageDescriptorProducerUnit extends RoboUnit<Integer> {
 	public void onMessage(Integer number) {
 		IntStream.range(DEFAULT, number).forEach(i -> {
 			targetPathMethodList.forEach(pathMethod -> {
-				HttpRequestDescriptor request = new HttpRequestDescriptor(new HashMap<>(), pathMethod.getMethod(),
-						HttpVersion.HTTP_1_1.getValue(), pathMethod.getPath());
-				request.addMessage(RoboHttpUtils.createRequest(pathMethod.getMethod(), IP_LOCALHOST, pathMethod.getPath(), StringConstants.EMPTY));
+			    RequestDenominator denominator = new RequestDenominator(pathMethod.getMethod(), pathMethod.getPath(), HttpVersion.HTTP_1_1);
+				HttpRequestDescriptor request = new HttpRequestDescriptor(new HashMap<>(), denominator);
+				request.addHeaderElement(HttpHeaderFieldNames.HOST, IP_LOCALHOST);
 				getContext().getReference(target).sendMessage(request);
 			});
 		});

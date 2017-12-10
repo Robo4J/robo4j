@@ -18,30 +18,14 @@
 package com.robo4j.socket.http.util;
 
 /**
+ *
+ * @see RequestDenominator
+ * @see ResponseDenominator
+ *
  * @author Marcus Hirt (@hirt)
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  */
-public final class HttpFirstLineBuilder {
-	private final StringBuilder sb;
-
-	private HttpFirstLineBuilder(Object value) {
-		sb = new StringBuilder(String.valueOf(value));
-	}
-
-	public static HttpFirstLineBuilder Build(Object value) {
-		return new HttpFirstLineBuilder(value);
-	}
-
-	public HttpFirstLineBuilder add(Object value) {
-		sb.append(HttpMessageUtil.SPACE).append(value);
-		return this;
-	}
-
-	public boolean isEmpty(){
-		return sb.length() == 0;
-	}
-
-	public String build() {
-		return sb.toString();
-	}
+public interface HttpDenominator {
+    String getVersion();
+    String generate();
 }

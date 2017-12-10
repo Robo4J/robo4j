@@ -17,6 +17,9 @@
 
 package com.robo4j.socket.http.message;
 
+import com.robo4j.socket.http.util.HttpDenominator;
+import com.robo4j.socket.http.util.HttpHeaderBuilder;
+
 import java.util.Map;
 
 /**
@@ -26,15 +29,21 @@ import java.util.Map;
  * @author Miro Wengner (@miragemiko)
  */
 public abstract class AbstractHttpMessageDescriptor {
-	private final Map<String, String> header;
+	private final HttpHeaderBuilder headerBuilder = HttpHeaderBuilder.Build();
 	private final String version;
 	private int length;
 	private String message;
 
-	AbstractHttpMessageDescriptor(Map<String, String> header, String version) {
-		this.header = header;
+	AbstractHttpMessageDescriptor(String version){
 		this.version = version;
 	}
+
+	AbstractHttpMessageDescriptor(Map<String, String> header, String version) {
+		this.headerBuilder.addAll(header);
+		this.version = version;
+	}
+
+	public abstract HttpDenominator getDenominator();
 
 	public int getLength() {
 		return length;
@@ -52,9 +61,22 @@ public abstract class AbstractHttpMessageDescriptor {
 		this.message = this.message == null ? message : this.message.concat(message);
 	}
 
-	public Map<String, String> getHeader() {
-		return header;
+	public void addHeaderElement(String key, String value){
+		headerBuilder.add(key, value);
 	}
+
+	public void addHeaderElements(Map<String, String> map){
+		headerBuilder.addAll(map);
+	}
+
+	public Map<String, String> getHeader() {
+		return headerBuilder.getMap();
+	}
+
+	public String generateHeader(){
+		return headerBuilder.build();
+	}
+
 
 	public String getVersion() {
 		return version;
@@ -62,7 +84,7 @@ public abstract class AbstractHttpMessageDescriptor {
 
 	@Override
 	public String toString() {
-		return "header=" + header +
+		return "header=" + headerBuilder.getMap() +
 				", version='" + version + '\'' +
 				", length=" + length +
 				", message='" + message + '\'' +

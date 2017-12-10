@@ -23,6 +23,7 @@ import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.message.HttpResponseDescriptor;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
 import com.robo4j.socket.http.util.ChannelUtil;
+import com.robo4j.socket.http.util.HttpMessageBuilder;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -49,12 +50,19 @@ public class OutboundChannelHandler implements SocketHandler {
 		this.message = message;
 	}
 
+	// TODO: 12/10/17 (miro) -> think about correct Path
 	@Override
 	public void start() {
-		final PathMethodDTO pathMethod = new PathMethodDTO(message.getPath(), message.getMethod(), null);
+		final PathMethodDTO pathMethod = new PathMethodDTO(correctUnitPath(message.getPath()), message.getMethod(), null);
 		if (targetUnitByMethodMap.contains(pathMethod)) {
 			// final ByteBuffer buffer = processMessageToClient(message);
-			final ByteBuffer buffer = ChannelBufferUtils.getByteBufferByString(message.getMessage());
+
+			String resultMessage = HttpMessageBuilder.Build()
+					.setDenominator(message.getDenominator())
+					.addHeaderElements(message.getHeader())
+					.build(message.getMessage());
+
+			final ByteBuffer buffer = ChannelBufferUtils.getByteBufferByString(resultMessage);
 			ChannelUtil.handleWriteChannelAndBuffer("client send message", byteChannel, buffer);
 			responseDescriptor = getResponseDescriptor(byteChannel, pathMethod);
 		}
@@ -71,6 +79,10 @@ public class OutboundChannelHandler implements SocketHandler {
 
 	public HttpResponseDescriptor getResponseDescriptor() {
 		return responseDescriptor;
+	}
+
+	private String correctUnitPath(String path){
+		return path.replace("units/", "");
 	}
 
 	private HttpResponseDescriptor getResponseDescriptor(ByteChannel byteChannel, PathMethodDTO pathMethod){

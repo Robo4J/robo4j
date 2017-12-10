@@ -25,12 +25,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.robo4j.socket.http.util.HttpConstant.STRING_EMPTY;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public final class HttpHeaderBuilder {
-	private static final String STRING_EMPTY = "";
 	private final Map<String, String> map = new LinkedHashMap<>();
 	private HttpFirstLineBuilder firstLineBuilder;
 
@@ -42,16 +43,27 @@ public final class HttpHeaderBuilder {
 		return new HttpHeaderBuilder();
 	}
 
+	public Map<String, String> getMap(){
+		return map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+	}
+
 	public HttpHeaderBuilder add(String key, String value) {
 		map.put(key, value);
 		return this;
 	}
 
-	public HttpHeaderBuilder addAll(Map<String, String> map){
+	public HttpHeaderBuilder addAll(Map<String, String> map) {
 		this.map.putAll(map);
 		return this;
 	}
 
+	/**
+	 * Helps to build 1st line of Http Request/Response Header
+	 *
+	 * @param value
+	 *            1st available value in the string
+	 * @return
+	 */
 	public HttpHeaderBuilder addFirstLine(Object value) {
 		if (firstLineBuilder == null) {
 			firstLineBuilder = HttpFirstLineBuilder.Build(value);
@@ -62,14 +74,24 @@ public final class HttpHeaderBuilder {
 	}
 
 	public String build() {
-		final String start = firstLineBuilder.isEmpty() ? StringConstants.EMPTY
+		final String start = firstLineBuilder == null || firstLineBuilder.isEmpty() ? StringConstants.EMPTY
 				: firstLineBuilder.build().concat(HttpMessageUtil.NEXT_LINE);
 		return start.concat(map
-				.entrySet().stream().map(e -> e.getKey().concat(HttpMessageUtil.COLON).concat(HttpMessageUtil.SPACE)
+				.entrySet()
+				.stream()
+				.map(e -> e.getKey().concat(HttpMessageUtil.COLON).concat(HttpMessageUtil.SPACE)
 						.concat(e.getValue()).concat(HttpMessageUtil.NEXT_LINE))
 				.collect(Collectors.joining(STRING_EMPTY)));
 	}
 
+	/**
+	 * 
+	 * @param method
+	 *            desired Http Method
+	 * @param version
+	 *            Http Version
+	 * @return String
+	 */
 	public String build(HttpMethod method, HttpVersion version) {
 		addFirstLine(version.getValue());
 		//@formatter:off

@@ -94,8 +94,8 @@ public class RoboHttpPingPongTest {
 		System.out.println("systemPing: send messages");
 		RoboReference<Object> systemPingProducer = systemPing.getReference(ID_HTTP_PRODUCER);
 		for (int i = 0; i < MESSAGES; i++) {
-			systemPingProducer.sendMessage(
-					(HttpStringProducer.SEND_POST_MESSAGE + "::").concat(RoboHttpDynamicTests.JSON_STRING));
+			systemPingProducer
+					.sendMessage(HttpStringProducer.SEND_POST_MESSAGE + "::" + RoboHttpDynamicTests.JSON_STRING);
 		}
 
 		RoboReference<Object> pongConsumer = systemPong.getReference(REQUEST_CONSUMER);

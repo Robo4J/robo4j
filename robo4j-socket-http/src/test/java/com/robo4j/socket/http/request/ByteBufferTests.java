@@ -17,10 +17,14 @@
 
 package com.robo4j.socket.http.request;
 
-import com.robo4j.socket.http.message.HttpRequestDescriptor;
+import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
-import com.robo4j.socket.http.util.RoboHttpUtils;
+import com.robo4j.socket.http.util.HttpDenominator;
+import com.robo4j.socket.http.util.HttpMessageBuilder;
+import com.robo4j.socket.http.util.RequestDenominator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -70,13 +74,18 @@ public class ByteBufferTests {
     }
 
     @Test
-    public void testSimpleByteBufferFromRequest() {
+    public void byteBufferFromRequestTest() {
 
         String bodyMessage = "this is test message";
-        String client = "http://0.0.0.0:8080";
+        String client = "0.0.0.0:8080";
         String clientPath = "/test";
 
-        String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, client, clientPath, bodyMessage);
+        HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, clientPath, HttpVersion.HTTP_1_1);
+        String postMessage = HttpMessageBuilder.Build()
+                .setDenominator(denominator)
+                .addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(bodyMessage.length()))
+                .addHeaderElement(HttpHeaderFieldNames.HOST, client)
+                .build(bodyMessage);
 
         HttpRequestDescriptor messageDescriptor = ChannelBufferUtils.extractRequestDescriptorByStringMessage(postMessage);
 

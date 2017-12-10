@@ -16,18 +16,14 @@
  */
 package com.robo4j.socket.http.util;
 
-import com.robo4j.socket.http.HttpHeaderFieldNames;
-import com.robo4j.socket.http.HttpMethod;
-import com.robo4j.socket.http.HttpVersion;
-import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.util.StringConstants;
 
-import static com.robo4j.socket.http.provider.DefaultValuesProvider.basicHeaderMap;
 import static com.robo4j.util.Utf8Constant.UTF8_COLON;
 
 /**
  * Basic Http constants and utils methods
  *
+ * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class RoboHttpUtils {
@@ -47,41 +43,10 @@ public final class RoboHttpUtils {
 	public static final String HTTP_PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
 	public static final String HTTP_PROPERTY_RESPONSE_HANLDER = "responseHandler";
 
-	public static String createResponseWithHeaderAndMessage(String header, String message) {
-		String result = header.concat(NEW_LINE_MAC).concat(NEW_LINE_UNIX);
-		return message.isEmpty() ? result : result.concat(message);
+	public static void decorateByNewLine(StringBuilder sb){
+		sb.append(NEW_LINE_MAC).append(NEW_LINE_UNIX);
 	}
 
-	public static String createResponseByCode(StatusCode code) {
-		return RoboHttpUtils.createResponseWithHeaderAndMessage(RoboResponseHeader.headerByCode(code),
-				StringConstants.EMPTY);
-	}
-
-	/**
-	 * creat Default request Header
-	 *
-	 * @param host
-	 * @param length
-	 * @return
-	 */
-	public static String createRequestHeader(HttpMethod method, String host, String path, int length) {
-		//@formatter:off
-
-		HttpHeaderBuilder builder =  HttpHeaderBuilder.Build()
-                .addFirstLine(path)
-                .add(HttpHeaderFieldNames.HOST, host)
-                .addAll(basicHeaderMap);
-        if(length != 0){
-			builder.add(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(length));
-		}
-        return builder.build(method, HttpVersion.HTTP_1_1);
-		//@formatter:on
-	}
-
-	public static String createRequest(HttpMethod method, String host, String path, String message) {
-		final String header = createRequestHeader(method, host, path, message.length());
-		return createResponseWithHeaderAndMessage(header, message);
-	}
 
 	public static String correctLine(String line) {
 		return line == null ? StringConstants.EMPTY : line;

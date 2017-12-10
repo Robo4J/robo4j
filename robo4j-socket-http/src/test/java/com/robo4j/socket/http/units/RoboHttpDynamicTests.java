@@ -26,11 +26,16 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import com.robo4j.socket.http.units.test.StringConsumer;
+import com.robo4j.socket.http.util.HttpDenominator;
+import com.robo4j.socket.http.util.HttpMessageBuilder;
 import com.robo4j.socket.http.util.HttpPathUtil;
 import com.robo4j.socket.http.util.JsonUtil;
+import com.robo4j.socket.http.util.RequestDenominator;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
@@ -92,8 +97,14 @@ public class RoboHttpDynamicTests {
 		/* client system sending a messages to the main system */
 		List<String> paths = Arrays.asList("units", ID_TARGET_UNIT);
 		for (int i = 0; i < MESSAGES_NUMBER; i++) {
-			String messageToSend = RoboHttpUtils.createRequest(HttpMethod.POST, HOST_SYSTEM,
-					HttpPathUtil.pathsToUri(paths), JSON_STRING);
+
+			HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, HttpPathUtil.pathsToUri(paths), HttpVersion.HTTP_1_1);
+			String messageToSend = HttpMessageBuilder.Build()
+					.setDenominator(denominator)
+					.addHeaderElement(HttpHeaderFieldNames.HOST, HOST_SYSTEM)
+					.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(JSON_STRING.length()))
+					.build(JSON_STRING);
+
 			httpClientReference.sendMessage(messageToSend);
 		}
 

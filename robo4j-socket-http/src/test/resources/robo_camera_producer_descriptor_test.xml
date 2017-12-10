@@ -26,7 +26,7 @@
         </config>
     </roboUnit>
     <roboUnit id="imageDescriptor">
-        <class>com.robo4j.socket.http.units.CameraImageDescriptorUnit</class>
+        <class>com.robo4j.socket.http.units.ImageDescriptorUnit</class>
         <config name="com.robo4j.root">
             <value name="target" type="String">httpClient</value>
             <value name="host" type="String">0.0.0.0</value>
@@ -39,7 +39,7 @@
         <config name="com.robo4j.root">
             <value name="target" type="String">imageDescriptor</value>
             <value name="fileName" type="String">snapshot.png</value>
-            <value name="numberOfImages" type="int">10</value>
+            <value name="numberOfImages" type="int">20</value>
         </config>
     </roboUnit>
 </robo4j>

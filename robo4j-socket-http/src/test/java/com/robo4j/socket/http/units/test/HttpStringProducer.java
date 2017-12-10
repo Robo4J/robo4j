@@ -21,9 +21,12 @@ import com.robo4j.AttributeDescriptor;
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
+import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
-import com.robo4j.socket.http.util.RoboHttpUtils;
-import com.robo4j.util.StringConstants;
+import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.socket.http.util.HttpDenominator;
+import com.robo4j.socket.http.util.HttpMessageBuilder;
+import com.robo4j.socket.http.util.RequestDenominator;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -98,8 +101,11 @@ public class HttpStringProducer extends StringProducer {
 	}
 
 	private void sendGetSimpleMessage(String host) {
-		final String request = RoboHttpUtils.createRequest(HttpMethod.GET, host, StringConstants.EMPTY,
-				StringConstants.EMPTY);
+		final HttpDenominator denominator = new RequestDenominator(HttpMethod.GET, HttpVersion.HTTP_1_1);
+		final String request = HttpMessageBuilder.Build()
+				.setDenominator(denominator)
+				.addHeaderElement(HttpHeaderFieldNames.HOST, host)
+				.build();
 		getContext().getReference(target).sendMessage(request);
 	}
 
@@ -107,7 +113,13 @@ public class HttpStringProducer extends StringProducer {
 		if (uri == null) {
 			throw new IllegalStateException("uri not available");
 		}
-		final String postMessage = RoboHttpUtils.createRequest(HttpMethod.POST, host, uri, message);
+
+		final HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, uri, HttpVersion.HTTP_1_1);
+		final String postMessage = HttpMessageBuilder.Build()
+				.setDenominator(denominator)
+				.addHeaderElement(HttpHeaderFieldNames.HOST, host)
+				.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()))
+				.build(message);
 		getContext().getReference(target).sendMessage(postMessage);
 	}
 }
