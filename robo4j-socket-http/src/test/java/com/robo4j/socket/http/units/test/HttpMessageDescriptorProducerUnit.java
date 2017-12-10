@@ -29,7 +29,6 @@ import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RequestDenominator;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -41,11 +40,11 @@ import java.util.stream.IntStream;
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpMessageDescriptorProducerUnit extends RoboUnit<Integer> {
-    private static final int DEFAULT = 0;
+	private static final int DEFAULT = 0;
 	private static final String ATTRIBUTE_MESSAGE_NUMBER = "getNumberOfSentMessages";
-    public static final String IP_LOCALHOST = "0.0.0.0";
+	public static final String IP_LOCALHOST = "0.0.0.0";
 
-    private AtomicInteger counter;
+	private AtomicInteger counter;
 	private String target;
 	private List<PathMethodDTO> targetPathMethodList;
 
@@ -70,8 +69,9 @@ public class HttpMessageDescriptorProducerUnit extends RoboUnit<Integer> {
 	public void onMessage(Integer number) {
 		IntStream.range(DEFAULT, number).forEach(i -> {
 			targetPathMethodList.forEach(pathMethod -> {
-			    RequestDenominator denominator = new RequestDenominator(pathMethod.getMethod(), pathMethod.getPath(), HttpVersion.HTTP_1_1);
-				HttpRequestDescriptor request = new HttpRequestDescriptor(new HashMap<>(), denominator);
+				RequestDenominator denominator = new RequestDenominator(pathMethod.getMethod(), pathMethod.getPath(),
+						HttpVersion.HTTP_1_1);
+				HttpRequestDescriptor request = new HttpRequestDescriptor(denominator);
 				request.addHeaderElement(HttpHeaderFieldNames.HOST, IP_LOCALHOST);
 				getContext().getReference(target).sendMessage(request);
 			});

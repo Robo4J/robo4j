@@ -30,8 +30,8 @@
             <value name="targetOut" type="String">httpClient</value>
             <value name="client" type="String">0.0.0.0</value>
             <value name="clientPort" type="String">8030</value>
-            <value name="clientUri" type="String">/units/imageProcessor</value>
-            <value name="numberOfImages" type="int">10</value>
+            <value name="clientUri" type="String">units/imageProcessor</value>
+            <value name="numberOfImages" type="int">24</value>
         </config>
     </roboUnit>
 </robo4j>

@@ -55,7 +55,7 @@ public class CameraImageDescriptorProducerConsumerTests {
         RoboBuilder builderConsumer = new RoboBuilder(
                 Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemTest.xml"));
         InputStream serverConfigInputStream = Thread.currentThread().getContextClassLoader()
-                .getResourceAsStream("robo_camara_consumer_descriptor_test.xml");
+                .getResourceAsStream("robo_camera_consumer_descriptor_test.xml");
         builderConsumer.add(serverConfigInputStream);
         RoboContext consumerSystem = builderConsumer.build();
 

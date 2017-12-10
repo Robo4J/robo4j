@@ -36,7 +36,7 @@ import java.util.List;
  * @author Miro Wengner (@miragemiko)
  */
 public class RoboHttpClientWithResponseTests {
-	private static final int MAX_NUMBER = 2;
+	private static final int MAX_NUMBER = 10;
 	private static final String ROBO_SYSTEM_DESC = "[{\"id\":\"stringConsumer\",\"com.robo4j.LifecycleState\":\"STARTED\"}"
 			+ ",{\"id\":\"httpServer\",\"com.robo4j.LifecycleState\":\"STARTED\"}]";
 

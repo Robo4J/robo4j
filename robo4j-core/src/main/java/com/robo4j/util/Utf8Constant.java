@@ -22,6 +22,7 @@ public class Utf8Constant {
     public static final String UTF8_COMMA = "\u002C";
     public static final String UTF8_SPACE = "\u0020";
     public static final String UTF8_COLON = "\u003A";
+    public static final String UTF8_SOLIDUS = "\u002F";
     public static final String UTF8_QUOTATION_MARK = "\"";
     public static final String UTF8_CURLY_BRACKET_LEFT = "\u007B";
     public static final String UTF8_CURLY_BRACKET_RIGHT = "\u007D";

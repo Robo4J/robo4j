@@ -77,10 +77,10 @@ public class HttpClientDescriptorUnit extends RoboUnit<HttpRequestDescriptor> {
 			}
 			final OutboundChannelHandler handler = new OutboundChannelHandler(targetPathMethodList, channel, message);
 
+			// TODO: 12/10/17 (miro) -> handler
 			handler.start();
-//			if (channel.isConnectionPending() && channel.finishConnect()) {
-				handler.stop();
-//			}
+			handler.stop();
+			// }
 
 			final HttpResponseDescriptor descriptor = handler.getResponseDescriptor();
 			if (responseHandler != null) {

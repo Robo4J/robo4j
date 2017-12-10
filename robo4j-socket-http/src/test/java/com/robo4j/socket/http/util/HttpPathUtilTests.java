@@ -66,14 +66,14 @@ public class HttpPathUtilTests {
 				"{\"cameraController\":[\"GET\",\"callbackGETController\"]}," +
 				"{\"emptyController\":[\"GET\"]}]";
 
-		PathMethodDTO duplicate = new PathMethodDTO("cameraController", HttpMethod.POST, "callbackPOSTController");
+		PathMethodDTO duplicate = new PathMethodDTO("units/cameraController", HttpMethod.POST, "callbackPOSTController");
 		List<PathMethodDTO> result = JsonUtil.convertJsonToPathMethodList(jsonArray);
 
 		long duplicatesNumber = result.stream().filter(e -> e.equals(duplicate)).count();
 
 		Assert.assertNotNull(result);
 		Assert.assertTrue(result.size() == 5);
-		Assert.assertTrue(result.get(observedElement).getPath().equals("cameraController"));
+		Assert.assertTrue(result.get(observedElement).getPath().equals("units/cameraController"));
 		Assert.assertTrue(result.get(observedElement).getMethod().equals(HttpMethod.POST));
 		Assert.assertTrue(result.get(observedElement).getCallbackUnitName().equals("callbackPOSTController"));
 		Assert.assertTrue(duplicatesNumber == 1);
@@ -92,7 +92,7 @@ public class HttpPathUtilTests {
 		jsonList.forEach(json -> {
 			PathMethodDTO pathMethod = JsonUtil.getPathMethodByJson(json);
 			Assert.assertNotNull(json, pathMethod);
-			Assert.assertTrue(json, pathMethod.getPath().equals("imageController"));
+			Assert.assertTrue(json, pathMethod.getPath().equals("units/imageController"));
 			Assert.assertTrue(json, pathMethod.getMethod().equals(HttpMethod.POST));
 			Assert.assertTrue(json, pathMethod.getCallbackUnitName().equals("callbackPOSTController"));
 		});

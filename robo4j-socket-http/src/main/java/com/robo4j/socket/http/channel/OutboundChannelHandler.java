@@ -50,17 +50,17 @@ public class OutboundChannelHandler implements SocketHandler {
 		this.message = message;
 	}
 
-	// TODO: 12/10/17 (miro) -> think about correct Path
 	@Override
 	public void start() {
-		final PathMethodDTO pathMethod = new PathMethodDTO(correctUnitPath(message.getPath()), message.getMethod(), null);
+		final PathMethodDTO pathMethod = new PathMethodDTO(message.getPath(), message.getMethod(), null);
 		if (targetUnitByMethodMap.contains(pathMethod)) {
-			// final ByteBuffer buffer = processMessageToClient(message);
 
-			String resultMessage = HttpMessageBuilder.Build()
+			//@formatter:off
+			final String resultMessage = HttpMessageBuilder.Build()
 					.setDenominator(message.getDenominator())
 					.addHeaderElements(message.getHeader())
 					.build(message.getMessage());
+			//@formatter:on
 
 			final ByteBuffer buffer = ChannelBufferUtils.getByteBufferByString(resultMessage);
 			ChannelUtil.handleWriteChannelAndBuffer("client send message", byteChannel, buffer);
@@ -81,13 +81,9 @@ public class OutboundChannelHandler implements SocketHandler {
 		return responseDescriptor;
 	}
 
-	private String correctUnitPath(String path){
-		return path.replace("units/", "");
-	}
-
-	private HttpResponseDescriptor getResponseDescriptor(ByteChannel byteChannel, PathMethodDTO pathMethod){
-		try{
-			HttpResponseDescriptor result = ChannelBufferUtils.getHttpResponseDescriptorByChannel(byteChannel);;
+	private HttpResponseDescriptor getResponseDescriptor(ByteChannel byteChannel, PathMethodDTO pathMethod) {
+		try {
+			final HttpResponseDescriptor result = ChannelBufferUtils.getHttpResponseDescriptorByChannel(byteChannel);
 			//@formatter:off
 			targetUnitByMethodMap
 					.stream()
@@ -96,7 +92,7 @@ public class OutboundChannelHandler implements SocketHandler {
 					.ifPresent(e -> result.setCallbackUnit(e.getCallbackUnitName()));
 			//@formatter:on
 			return result;
-		} catch (IOException e){
+		} catch (IOException e) {
 			throw new SocketException("message body write problem", e);
 		}
 	}

@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public enum SystemPath {
 
 	//@formatter:off
-    NONE                   ("none"),
+    NONE                   (""),
     UNITS                  ("units"),
     ;
     //@formatter:on

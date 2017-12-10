@@ -50,7 +50,6 @@ import static com.robo4j.socket.http.provider.DefaultValuesProvider.BASIC_HEADER
  * @author Miro Wengner (@miragemiko)
  */
 public class ImageDescriptorUnit extends RoboUnit<ImageDTO> {
-	private static final String PATH_UNITS = "units/";
 	private static final String PROPERTY_HOST_PORT = "hostPort";
 	private static final String PROPERTY_HOST = "host";
 	private static final String PROPERTY_TARGET = "target";
@@ -86,8 +85,8 @@ public class ImageDescriptorUnit extends RoboUnit<ImageDTO> {
 		final String imageBase64 = JsonUtil.bytesToBase64String(image.getContent());
 		remoteUnitList.forEach(pathMethod -> {
 
-			final RequestDenominator denominator = new RequestDenominator(HttpMethod.POST,
-					PATH_UNITS.concat(pathMethod.getPath()), HttpVersion.HTTP_1_1);
+			final RequestDenominator denominator = new RequestDenominator(HttpMethod.POST, pathMethod.getPath(),
+					HttpVersion.HTTP_1_1);
 
 			HttpRequestDescriptor result = new HttpRequestDescriptor(new HashMap<>(), denominator);
 
