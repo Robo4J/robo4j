@@ -22,11 +22,11 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.channel.OutboundChannelHandler;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.message.HttpResponseDescriptor;
-import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
@@ -34,7 +34,6 @@ import java.util.EnumSet;
 import java.util.List;
 
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_RESPONSE_HANLDER;
 
 /**
@@ -57,17 +56,18 @@ public class HttpClientDescriptorUnit extends RoboUnit<HttpRequestDescriptor> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		String confAddress = configuration.getString("address", null);
-		int confPort = configuration.getInteger(HTTP_PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
 		bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, null);
 		responseHandler = configuration.getString(HTTP_PROPERTY_RESPONSE_HANLDER, null);
-		address = new InetSocketAddress(confAddress, confPort);
 	}
 
 	// TODO: 12/11/17 (miro) all information are in the message
 	@Override
 	public void onMessage(HttpRequestDescriptor message) {
 
+		// FIXME: 12/11/17 (miro) better
+		final String[] addressProperties = message.getHeaderValue(HttpHeaderFieldNames.HOST).split(":");
+		final int port = addressProperties.length > 1 ? Integer.valueOf(addressProperties[1]) : 80;
+		final InetSocketAddress address = new InetSocketAddress(addressProperties[0], port);
 		try (SocketChannel channel = SocketChannel.open(address)) {
 			if (bufferCapacity != null) {
 				channel.socket().setSendBufferSize(bufferCapacity);

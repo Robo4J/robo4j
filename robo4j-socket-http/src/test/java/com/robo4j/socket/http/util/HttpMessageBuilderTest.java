@@ -65,6 +65,7 @@ public class HttpMessageBuilderTest {
 	private HttpMessageBuilder getDefaultMessageBuilderByMethod(HttpMethod method) {
 		RequestDenominator getDenominator = new RequestDenominator(method, HttpVersion.HTTP_1_1);
 		return HttpMessageBuilder.Build().setDenominator(getDenominator)
-				.addHeaderElement(HttpHeaderFieldNames.HOST, "localhost").addHeaderElements(BASIC_HEADER_MAP);
+				.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost("localhost"))
+				.addHeaderElements(BASIC_HEADER_MAP);
 	}
 }

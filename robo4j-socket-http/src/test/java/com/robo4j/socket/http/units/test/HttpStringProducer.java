@@ -27,8 +27,12 @@ import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.util.HttpDenominator;
 import com.robo4j.socket.http.util.HttpMessageBuilder;
 import com.robo4j.socket.http.util.RequestDenominator;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -44,7 +48,8 @@ public class HttpStringProducer extends StringProducer {
 	private String target;
 	private String method;
 	private String uri;
-	private String targetAddress;
+	private String host;
+	private Integer port;
 
 	/**
 	 * @param context
@@ -61,7 +66,12 @@ public class HttpStringProducer extends StringProducer {
 		target = configuration.getString("target", null);
 		method = configuration.getString("method", null);
 		uri = configuration.getString("uri", null);
-		targetAddress = configuration.getString("targetAddress", "0.0.0.0");
+		host = configuration.getString(HTTP_PROPERTY_HOST, null);
+		port = configuration.getInteger(HTTP_PROPERTY_PORT, null);
+
+		if(host == null || port == null){
+			throw ConfigurationException.createMissingConfigNameException("host, port");
+		}
 
 		counter = new AtomicInteger(DEFAULT);
 
@@ -78,10 +88,10 @@ public class HttpStringProducer extends StringProducer {
 			String inMessage = input[1].trim();
 			switch (inMessageType) {
 			case SEND_GET_MESSAGE:
-				sendGetSimpleMessage(targetAddress);
+				sendGetSimpleMessage(host, port);
 				break;
 			case SEND_POST_MESSAGE:
-				sendPostSimpleMessage(targetAddress, uri, inMessage);
+				sendPostSimpleMessage(host, port, uri, inMessage);
 				break;
 			default:
 				System.out.println("don't understand message: " + message);
@@ -100,16 +110,16 @@ public class HttpStringProducer extends StringProducer {
 		return null;
 	}
 
-	private void sendGetSimpleMessage(String host) {
+	private void sendGetSimpleMessage(String host, Integer port) {
 		final HttpDenominator denominator = new RequestDenominator(HttpMethod.GET, HttpVersion.HTTP_1_1);
 		final String request = HttpMessageBuilder.Build()
 				.setDenominator(denominator)
-				.addHeaderElement(HttpHeaderFieldNames.HOST, host)
+				.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, port))
 				.build();
 		getContext().getReference(target).sendMessage(request);
 	}
 
-	private void sendPostSimpleMessage(String host, String uri, String message) {
+	private void sendPostSimpleMessage(String host, Integer port, String uri, String message) {
 		if (uri == null) {
 			throw new IllegalStateException("uri not available");
 		}
@@ -117,7 +127,7 @@ public class HttpStringProducer extends StringProducer {
 		final HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, uri, HttpVersion.HTTP_1_1);
 		final String postMessage = HttpMessageBuilder.Build()
 				.setDenominator(denominator)
-				.addHeaderElement(HttpHeaderFieldNames.HOST, host)
+				.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, port))
 				.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()))
 				.build(message);
 		getContext().getReference(target).sendMessage(postMessage);

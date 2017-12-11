@@ -24,6 +24,7 @@ import com.robo4j.socket.http.util.HttpHeaderBuilder;
 import com.robo4j.socket.http.util.HttpMessageBuilder;
 import com.robo4j.socket.http.util.HttpMessageUtil;
 import com.robo4j.socket.http.util.RequestDenominator;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -78,7 +79,7 @@ public class HttpHeaderTests {
 		String message = "message";
 		HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, HttpVersion.HTTP_1_1);
 		String postRequest = HttpMessageBuilder.Build().setDenominator(denominator)
-				.addHeaderElement(HttpHeaderFieldNames.HOST, "127.0.0.1")
+				.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost("127.0.0.1"))
 				.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()))
 				.build(message);
 		System.out.println("HEADER: " + postRequest);

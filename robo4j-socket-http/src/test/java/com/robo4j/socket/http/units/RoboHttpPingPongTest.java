@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 
 /**
@@ -153,7 +154,8 @@ public class RoboHttpPingPongTest {
 		config.setString("target", ID_HTTP_CLIENT);
 		config.setString("method", "POST");
 		config.setString("uri", HttpPathUtil.pathsToUri(paths));
-		config.setString("targetAddress", HOST_SYSTEM + ":" + PORT);
+		config.setString(HTTP_PROPERTY_HOST, HOST_SYSTEM);
+		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		builder.add(HttpStringProducer.class, config, ID_HTTP_PRODUCER);
 		return builder.build();
 	}

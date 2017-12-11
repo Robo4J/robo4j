@@ -39,6 +39,7 @@ public final class RoboHttpUtils {
 	public static final CharSequence CHAR_COMMA = ",";
 	public static final int DEFAULT_PORT = 8042;
 	public static final String HTTP_TARGET_UNITS = "targetUnits";
+	public static final String HTTP_PROPERTY_HOST = "host";
 	public static final String HTTP_PROPERTY_PORT = "port";
 	public static final String HTTP_PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
 	public static final String HTTP_PROPERTY_RESPONSE_HANLDER = "responseHandler";
@@ -56,6 +57,19 @@ public final class RoboHttpUtils {
 
 		return port == null || Integer.valueOf(port.toString()) == 80 ? host
 				: new StringBuilder(host).append(UTF8_COLON).append(port).toString();
+	}
+
+	public static String createHost(String host){
+		return createHost(host, null);
+	}
+
+	public static String createHost(String host, Integer port){
+		StringBuilder sb = new StringBuilder(host);
+		if(port != null && port != 80 && port != 443){
+			sb.append(CHAR_COLON)
+					.append(port);
+		}
+		return sb.toString();
 	}
 
 	/**

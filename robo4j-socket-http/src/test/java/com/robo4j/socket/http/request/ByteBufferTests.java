@@ -25,6 +25,7 @@ import com.robo4j.socket.http.util.ChannelBufferUtils;
 import com.robo4j.socket.http.util.HttpDenominator;
 import com.robo4j.socket.http.util.HttpMessageBuilder;
 import com.robo4j.socket.http.util.RequestDenominator;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -77,14 +78,15 @@ public class ByteBufferTests {
     public void byteBufferFromRequestTest() {
 
         String bodyMessage = "this is test message";
-        String client = "0.0.0.0:8080";
+        String host = "0.0.0.0";
+        Integer port = 8080;
         String clientPath = "/test";
 
         HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, clientPath, HttpVersion.HTTP_1_1);
         String postMessage = HttpMessageBuilder.Build()
                 .setDenominator(denominator)
                 .addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(bodyMessage.length()))
-                .addHeaderElement(HttpHeaderFieldNames.HOST, client)
+                .addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, port))
                 .build(bodyMessage);
 
         HttpRequestDescriptor messageDescriptor = ChannelBufferUtils.extractRequestDescriptorByStringMessage(postMessage);

@@ -28,10 +28,14 @@ import com.robo4j.socket.http.dto.PathMethodDTO;
 import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RequestDenominator;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
+
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 
 /**
  * Test unit to produce HttpRequestDescriptor messages
@@ -42,10 +46,11 @@ import java.util.stream.IntStream;
 public class HttpMessageDescriptorProducerUnit extends RoboUnit<Integer> {
 	private static final int DEFAULT = 0;
 	private static final String ATTRIBUTE_MESSAGE_NUMBER = "getNumberOfSentMessages";
-	public static final String IP_LOCALHOST = "0.0.0.0";
 
 	private AtomicInteger counter;
 	private String target;
+	private String host;
+	private Integer port;
 	private List<PathMethodDTO> targetPathMethodList;
 
 	public HttpMessageDescriptorProducerUnit(RoboContext context, String id) {
@@ -56,6 +61,12 @@ public class HttpMessageDescriptorProducerUnit extends RoboUnit<Integer> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		target = configuration.getString("target", null);
 		targetPathMethodList = JsonUtil.convertJsonToPathMethodList(configuration.getString("targetUnits", null));
+
+		host = configuration.getString(HTTP_PROPERTY_HOST, null);
+		port = configuration.getInteger(HTTP_PROPERTY_PORT, null);
+		if(host == null || port == null){
+			throw  new ConfigurationException("host, port");
+		}
 		counter = new AtomicInteger(DEFAULT);
 	}
 
@@ -73,7 +84,7 @@ public class HttpMessageDescriptorProducerUnit extends RoboUnit<Integer> {
 						HttpVersion.HTTP_1_1);
 				HttpRequestDescriptor request = new HttpRequestDescriptor(denominator);
 				request.addCallbacks(pathMethod.getCallbacks());
-				request.addHeaderElement(HttpHeaderFieldNames.HOST, IP_LOCALHOST);
+				request.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, port));
 				getContext().getReference(target).sendMessage(request);
 			});
 		});

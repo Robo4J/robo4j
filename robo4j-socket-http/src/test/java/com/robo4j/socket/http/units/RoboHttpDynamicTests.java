@@ -101,7 +101,7 @@ public class RoboHttpDynamicTests {
 			HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, HttpPathUtil.pathsToUri(paths), HttpVersion.HTTP_1_1);
 			String messageToSend = HttpMessageBuilder.Build()
 					.setDenominator(denominator)
-					.addHeaderElement(HttpHeaderFieldNames.HOST, HOST_SYSTEM)
+                    .addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(HOST_SYSTEM))
 					.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(JSON_STRING.length()))
 					.build(JSON_STRING);
 

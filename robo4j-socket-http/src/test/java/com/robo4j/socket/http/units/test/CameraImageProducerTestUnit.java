@@ -24,21 +24,17 @@ import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.codec.CameraMessageCodec;
+import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.util.HttpConstant;
-import com.robo4j.socket.http.util.HttpDenominator;
-import com.robo4j.socket.http.util.HttpMessageBuilder;
 import com.robo4j.socket.http.util.RequestDenominator;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.StreamUtils;
-import com.robo4j.util.StringConstants;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
@@ -46,6 +42,9 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -64,8 +63,9 @@ public class CameraImageProducerTestUnit extends RoboUnit<Boolean> {
 	private final AtomicInteger counter = new AtomicInteger(0);
 
 	private String targetOut;
-	private String client;
-	private String clientUri;
+	private String host;
+	private Integer port;
+	private String path;
 	private Integer numberOfImages;
 
 	public CameraImageProducerTestUnit(RoboContext context, String id) {
@@ -76,16 +76,13 @@ public class CameraImageProducerTestUnit extends RoboUnit<Boolean> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		targetOut = configuration.getString("targetOut", null);
 		numberOfImages = configuration.getInteger("numberOfImages", 0);
-		String tmpClient = configuration.getString("client", null);
+		path = configuration.getString("path", null);
+		host = configuration.getString(HTTP_PROPERTY_HOST, null);
+		port = configuration.getInteger(HTTP_PROPERTY_PORT, null);
 
-		if (targetOut == null) {
-			throw ConfigurationException.createMissingConfigNameException("targetOut, client");
+		if (targetOut == null || path == null || host == null || port == null) {
+			throw ConfigurationException.createMissingConfigNameException("targetOut, path, host, port");
 		}
-
-		if (tmpClient != null) {
-			initClient(tmpClient, configuration);
-		}
-		System.out.println(getClass().getSimpleName() + "init");
 
 	}
 
@@ -132,31 +129,18 @@ public class CameraImageProducerTestUnit extends RoboUnit<Boolean> {
 					encodeString);
 
 			final String message = codec.encode(cameraMessage);
-			final HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, clientUri, HttpVersion.HTTP_1_1);
-			final String postMessage = HttpMessageBuilder.Build()
-					.setDenominator(denominator)
-					.addHeaderElement(HttpHeaderFieldNames.HOST, client)
-					.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()))
-					.build(message);
+			final RequestDenominator denominator = new RequestDenominator(HttpMethod.POST, path, HttpVersion.HTTP_1_1);
+
+			HttpRequestDescriptor request = new HttpRequestDescriptor(denominator);
+			request.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, port));
+			request.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()));
+			request.addMessage(message);
 
 			System.out.println(getClass() + " image to sent number: " + cameraMessage.getValue() + " Size: "
 					+ encodeString.length());
-			getContext().getReference(targetOut).sendMessage(postMessage);
+			getContext().getReference(targetOut).sendMessage(request);
 
 			progress.set(false);
-		}
-	}
-
-	private void initClient(String tmpClient, Configuration configuration) throws ConfigurationException {
-		try {
-			InetAddress inetAddress = InetAddress.getByName(tmpClient);
-			String clientPort = configuration.getString("clientPort", null);
-			client = clientPort == null ? inetAddress.getHostAddress()
-					: inetAddress.getHostAddress().concat(":").concat(clientPort);
-			clientUri = configuration.getString("clientUri", StringConstants.EMPTY);
-		} catch (UnknownHostException e) {
-			SimpleLoggingUtil.error(getClass(), "unknown ip address", e);
-			throw ConfigurationException.createMissingConfigNameException("unknown ip address");
 		}
 	}
 

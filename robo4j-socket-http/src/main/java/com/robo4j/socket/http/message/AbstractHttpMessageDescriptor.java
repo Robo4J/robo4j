@@ -78,6 +78,7 @@ public abstract class AbstractHttpMessageDescriptor {
 		return length;
 	}
 
+	// FIXME: 12/11/17 (miro) unify usage -> 1. set by header or set by property
 	public void setLength(int length) {
 		this.length = length;
 	}
