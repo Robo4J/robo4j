@@ -17,16 +17,21 @@
 
 package com.robo4j.util;
 
+/**
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
 public class Utf8Constant {
-    public static final String DEFAULT_ENCODING = "UTF-8";
-    public static final String UTF8_COMMA = "\u002C";
-    public static final String UTF8_SPACE = "\u0020";
-    public static final String UTF8_COLON = "\u003A";
-    public static final String UTF8_SOLIDUS = "\u002F";
-    public static final String UTF8_QUOTATION_MARK = "\"";
-    public static final String UTF8_CURLY_BRACKET_LEFT = "\u007B";
-    public static final String UTF8_CURLY_BRACKET_RIGHT = "\u007D";
-    public static final String UTF8_SQUARE_BRACKET_LEFT = "\u005B";
-    public static final String UTF8_SQUARE_BRACKET_RIGHT = "\u005D";
+	public static final String DEFAULT_ENCODING = "UTF-8";
+	public static final String UTF8_COMMA = "\u002C";
+	public static final String UTF8_SPACE = "\u0020";
+	public static final String UTF8_COLON = "\u003A";
+	public static final String UTF8_SOLIDUS = "\u002F";
+	public static final String UTF8_QUOTATION_MARK = "\"";
+	public static final String UTF8_CURLY_BRACKET_LEFT = "\u007B";
+	public static final String UTF8_CURLY_BRACKET_RIGHT = "\u007D";
+	public static final String UTF8_SQUARE_BRACKET_LEFT = "\u005B";
+	public static final String UTF8_SQUARE_BRACKET_RIGHT = "\u005D";
 
 }

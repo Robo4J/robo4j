@@ -20,13 +20,21 @@ package com.robo4j.socket.http.codec;
 import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpEncoder;
 import com.robo4j.socket.http.units.HttpProducer;
+import com.robo4j.socket.http.util.JsonElementStringBuilder;
 import com.robo4j.util.StringConstants;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static com.robo4j.util.Utf8Constant.UTF8_COLON;
+import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
+import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_LEFT;
+import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_RIGHT;
+
 /**
+ * Camera Image codec
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
@@ -41,20 +49,17 @@ public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncod
 	@Override
 	public String encode(CameraMessage message) {
 		//@formatter:off
-        final StringBuilder sb = new StringBuilder("{\"")
-				.append(KEY_TYPE).append("\":\"")
-                .append(message.getType())
-                .append("\",\"")
-				.append(KEY_VALUE)
-				.append("\":\"")
-                .append(message.getValue())
-                .append("\",\"")
-				.append(KEY_IMAGE)
-				.append("\":\"")
-                .append(message.getImage())
-                .append("\"}");
-        //@formatter:off
-        return sb.toString();
+		return JsonElementStringBuilder.Builder()
+				.add(UTF8_CURLY_BRACKET_LEFT)
+				.addQuotationWithDelimiter(UTF8_COLON, KEY_TYPE)
+				.addQuotationWithDelimiter(UTF8_COMMA, message.getType())
+				.addQuotationWithDelimiter(UTF8_COLON, KEY_VALUE)
+				.addQuotationWithDelimiter(UTF8_COMMA, message.getValue())
+				.addQuotationWithDelimiter(UTF8_COLON, KEY_IMAGE)
+				.addQuotation(message.getImage())
+				.add(UTF8_CURLY_BRACKET_RIGHT)
+				.build();
+		//@formatter:on
     }
 
     @Override

@@ -51,6 +51,12 @@ public final class JsonElementStringBuilder {
 		return this;
 	}
 
+	public JsonElementStringBuilder addWithDelimiter(Object delimiter, Object element) {
+		add(element);
+		sb.append(delimiter);
+		return this;
+	}
+
 	public String build() {
 		return sb.toString();
 	}
