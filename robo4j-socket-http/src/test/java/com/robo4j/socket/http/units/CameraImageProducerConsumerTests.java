@@ -41,7 +41,7 @@ public class CameraImageProducerConsumerTests {
 			CameraImageConsumerTestUnit.ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME);
 
 	@Test
-	public void simpleTest() throws Exception {
+	public void cameraImageProdConTest() throws Exception {
 
 		RoboBuilder builderProducer = new RoboBuilder(
 				Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemTest.xml"));

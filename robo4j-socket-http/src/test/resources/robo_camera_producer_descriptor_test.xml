@@ -22,7 +22,7 @@
             <value name="address" type="String">0.0.0.0</value>
             <value name="port" type="int">8032</value>
             <value name="responseHandler">httpClientResponse</value>
-            <value name="targetUnits" type="String">[{"imageProcessor":["POST"]}]</value>
+            <value name="targetUnits" type="String">[{"/units/imageProcessor":["POST"]}]</value>
         </config>
     </roboUnit>
     <roboUnit id="imageDescriptor">
@@ -31,7 +31,7 @@
             <value name="target" type="String">httpClient</value>
             <value name="host" type="String">0.0.0.0</value>
             <value name="hostPort" type="String">8032</value>
-            <value name="remoteUnits" type="String">[{"imageProcessor":["POST"]}]</value>
+            <value name="remoteUnits" type="String">[{"/units/imageProcessor":["POST"]}]</value>
         </config>
     </roboUnit>
     <roboUnit id="camera">

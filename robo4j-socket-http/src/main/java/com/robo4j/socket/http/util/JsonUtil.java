@@ -22,7 +22,6 @@ import com.robo4j.socket.http.HttpException;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.dto.PathMethodDTO;
 import com.robo4j.socket.http.dto.ResponseUnitDTO;
-import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.util.StringConstants;
 import com.robo4j.util.Utf8Constant;
 
@@ -126,7 +125,7 @@ public final class JsonUtil {
 	 */
 	public static PathMethodDTO getPathMethodByJson(String json) {
 
-		Pattern pattern = Pattern.compile("\\{\\s*\"(\\w*)\"\\s*:\\s*\\[(.*)\\]\\s*\\}");
+		Pattern pattern = Pattern.compile("\\{\\s*\"(\\/?\\w.*)?\"\\s*:\\s*\\[(.*)\\]\\s*\\}");
 		Matcher matcher = pattern.matcher(json);
 		return matcher.find() ? extractPathMethodByMatcher(matcher) : null;
 	}
@@ -239,19 +238,13 @@ public final class JsonUtil {
 	private static PathMethodDTO extractPathMethodByMatcher(Matcher matcher) {
 		String[] propertiesValues = matcher.group(2).replaceAll("[\"\\[\\]]", StringConstants.EMPTY)
 				.split(UTF8_COMMA);
-        final String pathText = matcher.group(1).trim();
+        final String pathText = matcher.group(1);
 
-        // TODO: 12/10/17 (miro) more generic
-		final String path = pathText.isEmpty() ? Utf8Constant.UTF8_SOLIDUS :
-				correctPathBySystemPath(SystemPath.UNITS, pathText);
+		final String path = pathText == null || pathText.isEmpty() ? Utf8Constant.UTF8_SOLIDUS : pathText.trim();
 
 		return new PathMethodDTO(path.isEmpty() ? DEFAULT_PATH : path,
 				HttpMethod.getByName(propertiesValues[0].trim()),
 				propertiesValues.length > 1 ? propertiesValues[1].trim() : null);
 	}
-
-    public static String correctPathBySystemPath(SystemPath systemPath, String path){
-        return systemPath.getPath().concat(Utf8Constant.UTF8_SOLIDUS).concat(path);
-    }
 
 }

@@ -37,17 +37,17 @@ public class HttpPathUtilTests {
 	public void convertPathMethodToJson() {
 
 		//@formatter:off
-		final String expectedResult = "[{\"imageController\":[\"POST\",\"callbackPOSTController\"]}," +
-				"{\"imageController\":[\"GET\",\"callbackGETController\"]}," +
-				"{\"cameraController\":[\"POST\",\"callbackPOSTController\"]}," +
-				"{\"cameraController\":[\"GET\",\"callbackGETController\"]}," +
-				"{\"emptyController\":[\"GET\"]}]";
+		final String expectedResult = "[{\"/units/imageController\":[\"POST\",\"callbackPOSTController\"]}," +
+				"{\"/units/imageController\":[\"GET\",\"callbackGETController\"]}," +
+				"{\"/units/cameraController\":[\"POST\",\"callbackPOSTController\"]}," +
+				"{\"/units/cameraController\":[\"GET\",\"callbackGETController\"]}," +
+				"{\"/units/emptyController\":[\"GET\"]}]";
 		List<PathMethodDTO> pathMethodList = PropertyListBuilder.Builder()
-				.add(createPathMethodDTO("imageController", "POST","callbackPOSTController"))
-				.add(createPathMethodDTO("imageController", "GET","callbackGETController"))
-				.add(createPathMethodDTO("cameraController", "POST","callbackPOSTController"))
-				.add(createPathMethodDTO("cameraController", "GET","callbackGETController"))
-				.add(createPathMethodDTO("emptyController", "GET"))
+				.add(createPathMethodDTO("/units/imageController", "POST","callbackPOSTController"))
+				.add(createPathMethodDTO("/units/imageController", "GET","callbackGETController"))
+				.add(createPathMethodDTO("/units/cameraController", "POST","callbackPOSTController"))
+				.add(createPathMethodDTO("/units/cameraController", "GET","callbackGETController"))
+				.add(createPathMethodDTO("/units/emptyController", "GET"))
 				.build();
 
 
@@ -59,21 +59,21 @@ public class HttpPathUtilTests {
 	@Test
 	public void parseJsonArrayPathMethodToList(){
 		final int observedElement = 2;
-		final String jsonArray = "[{\"imageController\":[\"POST\",\"callbackPOSTController\"]}," +
-				"{\"imageController\":[\"GET\",\"callbackGETController\"]}," +
-				"{\"cameraController\":[\"POST\",\"callbackPOSTController\"]}," +
-				"{\"cameraController\":[\"POST\",\"callbackPOSTController\"]}," +
-				"{\"cameraController\":[\"GET\",\"callbackGETController\"]}," +
-				"{\"emptyController\":[\"GET\"]}]";
+		final String jsonArray = "[{\"/units/imageController\":[\"POST\",\"callbackPOSTController\"]}," +
+				"{\"/units/imageController\":[\"GET\",\"callbackGETController\"]}," +
+				"{\"/units/cameraController\":[\"POST\",\"callbackPOSTController\"]}," +
+				"{\"/units/cameraController\":[\"POST\",\"callbackPOSTController\"]}," +
+				"{\"/units/cameraController\":[\"GET\",\"callbackGETController\"]}," +
+				"{\"/units/emptyController\":[\"GET\"]}]";
 
-		PathMethodDTO duplicate = new PathMethodDTO("units/cameraController", HttpMethod.POST, "callbackPOSTController");
+		PathMethodDTO duplicate = new PathMethodDTO("/units/cameraController", HttpMethod.POST, "callbackPOSTController");
 		List<PathMethodDTO> result = JsonUtil.convertJsonToPathMethodList(jsonArray);
 
 		long duplicatesNumber = result.stream().filter(e -> e.equals(duplicate)).count();
 
 		Assert.assertNotNull(result);
 		Assert.assertTrue(result.size() == 5);
-		Assert.assertTrue(result.get(observedElement).getPath().equals("units/cameraController"));
+		Assert.assertTrue(result.get(observedElement).getPath().equals("/units/cameraController"));
 		Assert.assertTrue(result.get(observedElement).getMethod().equals(HttpMethod.POST));
 		Assert.assertTrue(result.get(observedElement).getCallbackUnitName().equals("callbackPOSTController"));
 		Assert.assertTrue(duplicatesNumber == 1);
@@ -83,18 +83,35 @@ public class HttpPathUtilTests {
 	@Test
 	public void parseJsonPathMethod(){
 		List<String> jsonList = Arrays.asList(
-				"{\"imageController\":[\"POST\",\"callbackPOSTController\"]}",
-				"{\"imageController\":[\"POST\",\"callbackPOSTController\"] }",
-				"{ \"imageController\" : [\"POST\",\"callbackPOSTController\"] }",
-				"{ \"imageController\" : [\"POST\", \"callbackPOSTController\"] }"
+				"{\"/units/imageController\":[\"POST\",\"callbackPOSTController\"]}",
+				"{\"/units/imageController\":[\"POST\",\"callbackPOSTController\"] }",
+				"{ \"/units/imageController\" : [\"POST\",\"callbackPOSTController\"] }",
+				"{ \"/units/imageController\" : [\"POST\", \"callbackPOSTController\"] }"
 		);
 
 		jsonList.forEach(json -> {
 			PathMethodDTO pathMethod = JsonUtil.getPathMethodByJson(json);
 			Assert.assertNotNull(json, pathMethod);
-			Assert.assertTrue(json, pathMethod.getPath().equals("units/imageController"));
+			Assert.assertTrue(json, pathMethod.getPath().equals("/units/imageController"));
 			Assert.assertTrue(json, pathMethod.getMethod().equals(HttpMethod.POST));
 			Assert.assertTrue(json, pathMethod.getCallbackUnitName().equals("callbackPOSTController"));
+		});
+	}
+
+	@Test
+	public void parseFullPathMethod() {
+		List<String> jsonList = Arrays.asList(
+				"{\"\":[\"POST\",\"callbackPOSTController\"]}",
+				"{\"imageController\":[\"POST\",\"callbackPOSTController\"]}",
+				"{\"/imageController\":[\"POST\",\"callbackPOSTController\"]}",
+				"{\"/units/imageController\":[\"POST\",\"callbackPOSTController\"]}"
+		);
+
+		jsonList.forEach(json -> {
+			PathMethodDTO pathMethod = JsonUtil.getPathMethodByJson(json);
+			Assert.assertNotNull(json, pathMethod);
+			Assert.assertNotNull(pathMethod.getPath());
+			Assert.assertTrue(!pathMethod.getPath().isEmpty());
 		});
 	}
 

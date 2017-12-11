@@ -21,7 +21,7 @@
         <config name="com.robo4j.root">
             <value name="address" type="String">0.0.0.0</value>
             <value name="port" type="int">8030</value>
-            <value name="targetUnits" type="String">{"imageController":"POST"}</value>
+            <value name="targetUnits" type="String">{"/units/imageController":"POST"}</value>
         </config>
     </roboUnit>
     <roboUnit id="imageController">
@@ -30,7 +30,7 @@
             <value name="targetOut" type="String">httpClient</value>
             <value name="client" type="String">0.0.0.0</value>
             <value name="clientPort" type="String">8030</value>
-            <value name="clientUri" type="String">units/imageProcessor</value>
+            <value name="clientUri" type="String">/units/imageProcessor</value>
             <value name="numberOfImages" type="int">24</value>
         </config>
     </roboUnit>
