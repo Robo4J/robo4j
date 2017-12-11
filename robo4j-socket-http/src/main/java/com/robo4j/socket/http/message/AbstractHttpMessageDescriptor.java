@@ -20,10 +20,14 @@ package com.robo4j.socket.http.message;
 import com.robo4j.socket.http.util.HttpDenominator;
 import com.robo4j.socket.http.util.HttpHeaderBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
  * General Http Message properties
+ *
+ * each HttpMessage may contains callback units
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -33,8 +37,9 @@ public abstract class AbstractHttpMessageDescriptor {
 	private final String version;
 	private int length;
 	private String message;
+	private List<String> callbacks = new ArrayList<>();
 
-	AbstractHttpMessageDescriptor(String version){
+	AbstractHttpMessageDescriptor(String version) {
 		this.version = version;
 	}
 
@@ -44,6 +49,30 @@ public abstract class AbstractHttpMessageDescriptor {
 	}
 
 	public abstract HttpDenominator getDenominator();
+
+	public Map<String, String> getHeader() {
+		return headerBuilder.getMap();
+	}
+
+	public String getHeaderValue(String key) {
+		return headerBuilder.getValue(key);
+	}
+
+	public void addHeaderElement(String key, String value) {
+		headerBuilder.add(key, value);
+	}
+
+	public void addHeaderElements(Map<String, String> map) {
+		headerBuilder.addAll(map);
+	}
+
+	public String generateHeader() {
+		return headerBuilder.build();
+	}
+
+	public String getVersion() {
+		return version;
+	}
 
 	public int getLength() {
 		return length;
@@ -61,33 +90,20 @@ public abstract class AbstractHttpMessageDescriptor {
 		this.message = this.message == null ? message : this.message.concat(message);
 	}
 
-	public void addHeaderElement(String key, String value){
-		headerBuilder.add(key, value);
+	public void addCallbacks(List<String> callbacks){
+		this.callbacks.addAll(callbacks);
+	}
+	public void addCallback(String callback){
+		callbacks.add(callback);
 	}
 
-	public void addHeaderElements(Map<String, String> map){
-		headerBuilder.addAll(map);
-	}
-
-	public Map<String, String> getHeader() {
-		return headerBuilder.getMap();
-	}
-
-	public String generateHeader(){
-		return headerBuilder.build();
-	}
-
-
-	public String getVersion() {
-		return version;
+	public List<String> getCallbacks() {
+		return callbacks;
 	}
 
 	@Override
 	public String toString() {
-		return "header=" + headerBuilder.getMap() +
-				", version='" + version + '\'' +
-				", length=" + length +
-				", message='" + message + '\'' +
-				'}';
+		return "header=" + headerBuilder.getMap() + ", version='" + version + '\'' + ", length=" + length
+				+ ", message='" + message + '\'' + '}';
 	}
 }

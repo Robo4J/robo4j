@@ -47,6 +47,10 @@ public final class HttpHeaderBuilder {
 		return map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
+	public String getValue(String key){
+		return String.valueOf(map.get(key));
+	}
+
 	public HttpHeaderBuilder add(String key, String value) {
 		map.put(key, value);
 		return this;

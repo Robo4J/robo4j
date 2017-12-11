@@ -28,7 +28,6 @@ import com.robo4j.socket.http.util.HttpMessageBuilder;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
-import java.util.List;
 
 /**
  *
@@ -39,33 +38,30 @@ import java.util.List;
 public class OutboundChannelHandler implements SocketHandler {
 
 	private ByteChannel byteChannel;
-	private List<PathMethodDTO> targetUnitByMethodMap;
 	private HttpRequestDescriptor message;
 	private HttpResponseDescriptor responseDescriptor;
 
-	public OutboundChannelHandler(List<PathMethodDTO> targetUnitByMethodMap, ByteChannel byteChannel,
+	public OutboundChannelHandler(ByteChannel byteChannel,
 			HttpRequestDescriptor message) {
-		this.targetUnitByMethodMap = targetUnitByMethodMap;
 		this.byteChannel = byteChannel;
 		this.message = message;
 	}
 
 	@Override
 	public void start() {
-		final PathMethodDTO pathMethod = new PathMethodDTO(message.getPath(), message.getMethod(), null);
-		if (targetUnitByMethodMap.contains(pathMethod)) {
+		final PathMethodDTO pathMethod = new PathMethodDTO(message.getPath(), message.getMethod(), message.getCallbacks());
 
-			//@formatter:off
-			final String resultMessage = HttpMessageBuilder.Build()
-					.setDenominator(message.getDenominator())
-					.addHeaderElements(message.getHeader())
-					.build(message.getMessage());
-			//@formatter:on
+		//@formatter:off
+		final String resultMessage = HttpMessageBuilder.Build()
+				.setDenominator(message.getDenominator())
+				.addHeaderElements(message.getHeader())
+				.build(message.getMessage());
+		//@formatter:on
 
-			final ByteBuffer buffer = ChannelBufferUtils.getByteBufferByString(resultMessage);
-			ChannelUtil.handleWriteChannelAndBuffer("client send message", byteChannel, buffer);
-			responseDescriptor = getResponseDescriptor(byteChannel, pathMethod);
-		}
+		final ByteBuffer buffer = ChannelBufferUtils.getByteBufferByString(resultMessage);
+		ChannelUtil.handleWriteChannelAndBuffer("client send message", byteChannel, buffer);
+		responseDescriptor = getResponseDescriptor(byteChannel, pathMethod);
+
 	}
 
 	@Override
@@ -84,17 +80,10 @@ public class OutboundChannelHandler implements SocketHandler {
 	private HttpResponseDescriptor getResponseDescriptor(ByteChannel byteChannel, PathMethodDTO pathMethod) {
 		try {
 			final HttpResponseDescriptor result = ChannelBufferUtils.getHttpResponseDescriptorByChannel(byteChannel);
-			//@formatter:off
-			targetUnitByMethodMap
-					.stream()
-					.filter(e -> e.equals(pathMethod))
-					.findFirst()
-					.ifPresent(e -> result.setCallbackUnit(e.getCallbackUnitName()));
-			//@formatter:on
+			result.addCallbacks(pathMethod.getCallbacks());
 			return result;
 		} catch (IOException e) {
 			throw new SocketException("message body write problem", e);
 		}
 	}
-
 }

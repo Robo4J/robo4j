@@ -22,7 +22,6 @@
             <value name="address" type="String">0.0.0.0</value>
             <value name="port" type="int">8032</value>
             <value name="responseHandler">httpClientResponse</value>
-            <value name="targetUnits" type="String">[{"/units/imageProcessor":["POST"]}]</value>
         </config>
     </roboUnit>
     <roboUnit id="imageDescriptor">

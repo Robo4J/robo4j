@@ -32,7 +32,6 @@ import java.util.Map;
 public final class HttpResponseDescriptor extends AbstractHttpMessageDescriptor {
 
 	private final ResponseDenominator denominator;
-	private String callbackUnit;
 
 	public HttpResponseDescriptor(Map<String, String> header, ResponseDenominator denominator) {
 		super(header, denominator.getVersion());
@@ -48,22 +47,8 @@ public final class HttpResponseDescriptor extends AbstractHttpMessageDescriptor 
 		return denominator.getStatus();
 	}
 
-	/**
-	 * define unit RoboUnit to be call after response message
-	 *
-	 * @param callbackUnit robo unit name that should be called
-	 */
-	public void setCallbackUnit(String callbackUnit) {
-		this.callbackUnit = callbackUnit;
-	}
-
-	public String getCallbackUnit() {
-		return callbackUnit;
-	}
-
 	@Override
 	public String toString() {
-		return "HttpResponseDescriptor{" + "denominator=" + denominator + ", callbackUnit='" + callbackUnit + '\''
-				+ super.toString() + '}';
+		return "HttpResponseDescriptor{" + "denominator=" + denominator + '\'' + super.toString() + '}';
 	}
 }

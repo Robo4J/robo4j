@@ -72,6 +72,7 @@ public class HttpMessageDescriptorProducerUnit extends RoboUnit<Integer> {
 				RequestDenominator denominator = new RequestDenominator(pathMethod.getMethod(), pathMethod.getPath(),
 						HttpVersion.HTTP_1_1);
 				HttpRequestDescriptor request = new HttpRequestDescriptor(denominator);
+				request.addCallbacks(pathMethod.getCallbacks());
 				request.addHeaderElement(HttpHeaderFieldNames.HOST, IP_LOCALHOST);
 				getContext().getReference(target).sendMessage(request);
 			});

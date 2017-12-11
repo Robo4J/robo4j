@@ -28,6 +28,7 @@ import com.robo4j.util.Utf8Constant;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_RIGHT;
 import static com.robo4j.util.Utf8Constant.UTF8_QUOTATION_MARK;
 import static com.robo4j.util.Utf8Constant.UTF8_SQUARE_BRACKET_LEFT;
 import static com.robo4j.util.Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT;
+import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
 
 /**
  *
@@ -62,7 +64,6 @@ import static com.robo4j.util.Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT;
  */
 public final class JsonUtil {
 
-	public static final String DEFAULT_PATH = "/";
 	private static final Set<Class<?>> withoutQuotationTypes = Stream.of(boolean.class, int.class, short.class,
 			byte.class, long.class, double.class, float.class, char.class, Boolean.class, Integer.class, Short.class,
 			Byte.class, Long.class, Double.class, Float.class, Character.class).collect(Collectors.toSet());
@@ -133,7 +134,8 @@ public final class JsonUtil {
 	public static String getJsonByPathMethodList(List<PathMethodDTO> pathMethodList) {
 		//@formatter:off
 		return JsonElementStringBuilder.Builder().add(UTF8_SQUARE_BRACKET_LEFT)
-				.add(pathMethodList.stream().map(JsonUtil::getJsonByPathMethod)
+				.add(pathMethodList.stream()
+						.map(JsonUtil::getJsonByPathMethod)
 						.collect(Collectors.joining(UTF8_COMMA)))
 				.add(UTF8_SQUARE_BRACKET_RIGHT)
 				.build();
@@ -151,11 +153,13 @@ public final class JsonUtil {
 		JsonElementStringBuilder builder = JsonElementStringBuilder.Builder().add(UTF8_CURLY_BRACKET_LEFT)
 				.addQuotationWithDelimiter(UTF8_COLON, pathMethod.getPath())
 				.add(UTF8_SQUARE_BRACKET_LEFT);
-		if (pathMethod.getCallbackUnitName() == null) {
+		if (pathMethod.getCallbacks() == null) {
 			builder.addQuotation(pathMethod.getMethod().getName());
 		} else {
 			builder.addQuotationWithDelimiter(UTF8_COMMA, pathMethod.getMethod().getName())
-					.addQuotation(pathMethod.getCallbackUnitName());
+					.add(UTF8_SQUARE_BRACKET_LEFT);
+			pathMethod.getCallbacks().forEach(builder::addQuotation);
+			builder.add(UTF8_SQUARE_BRACKET_RIGHT);
 		}
 
 		//@formatter:off
@@ -184,7 +188,7 @@ public final class JsonUtil {
 
 		//@formatter:off
 		return matcher.find() ? Stream.of(matcher.group(1).split(DELIMITER_JSON_OBJECTS))
-				.map(p -> getPathMethodByJson(p))
+				.map(JsonUtil::getPathMethodByJson)
 				.distinct()
 				.collect(Collectors.toList()) : new ArrayList<>();
 		//@formatter:on
@@ -242,9 +246,9 @@ public final class JsonUtil {
 
 		final String path = pathText == null || pathText.isEmpty() ? Utf8Constant.UTF8_SOLIDUS : pathText.trim();
 
-		return new PathMethodDTO(path.isEmpty() ? DEFAULT_PATH : path,
+		return new PathMethodDTO(path.isEmpty() ? UTF8_SOLIDUS : path,
 				HttpMethod.getByName(propertiesValues[0].trim()),
-				propertiesValues.length > 1 ? propertiesValues[1].trim() : null);
+				propertiesValues.length > 1 ? Collections.singletonList(propertiesValues[1].trim()) : null);
 	}
 
 }

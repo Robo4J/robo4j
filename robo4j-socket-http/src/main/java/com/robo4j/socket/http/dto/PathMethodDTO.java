@@ -19,6 +19,8 @@ package com.robo4j.socket.http.dto;
 
 import com.robo4j.socket.http.HttpMethod;
 
+import java.util.List;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -27,12 +29,12 @@ public class PathMethodDTO {
 
 	private final String path;
 	private final HttpMethod method;
-	private final String callbackUnitName;
+	private final List<String> callbacks;
 
-	public PathMethodDTO(String path, HttpMethod method, String callbackUnitName) {
+	public PathMethodDTO(String path, HttpMethod method, List<String> callbacks) {
 		this.path = path;
 		this.method = method;
-		this.callbackUnitName = callbackUnitName;
+		this.callbacks = callbacks;
 	}
 
 	public String getPath() {
@@ -43,8 +45,8 @@ public class PathMethodDTO {
 		return method;
 	}
 
-	public String getCallbackUnitName() {
-		return callbackUnitName;
+	public List<String> getCallbacks() {
+		return callbacks;
 	}
 
 	@Override
@@ -70,7 +72,7 @@ public class PathMethodDTO {
 
 	@Override
 	public String toString() {
-		return "PathMethodDTO{" + "path='" + path + '\'' + ", method=" + method + ", callbackUnitName='"
-				+ callbackUnitName + '\'' + '}';
+		return "PathMethodDTO{" + "path='" + path + '\'' + ", method=" + method + ", callbacks="
+				+ callbacks + '}';
 	}
 }

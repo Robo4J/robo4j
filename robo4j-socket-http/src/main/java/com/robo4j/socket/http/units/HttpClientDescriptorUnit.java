@@ -23,11 +23,9 @@ import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.channel.OutboundChannelHandler;
-import com.robo4j.socket.http.dto.PathMethodDTO;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.message.HttpRequestDescriptor;
 import com.robo4j.socket.http.message.HttpResponseDescriptor;
-import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.net.InetSocketAddress;
@@ -52,7 +50,6 @@ public class HttpClientDescriptorUnit extends RoboUnit<HttpRequestDescriptor> {
 	private InetSocketAddress address;
 	private Integer bufferCapacity;
 	private String responseHandler;
-	private List<PathMethodDTO> targetPathMethodList;
 
 	public HttpClientDescriptorUnit(RoboContext context, String id) {
 		super(HttpRequestDescriptor.class, context, id);
@@ -64,10 +61,10 @@ public class HttpClientDescriptorUnit extends RoboUnit<HttpRequestDescriptor> {
 		int confPort = configuration.getInteger(HTTP_PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
 		bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, null);
 		responseHandler = configuration.getString(HTTP_PROPERTY_RESPONSE_HANLDER, null);
-		targetPathMethodList = JsonUtil.convertJsonToPathMethodList(configuration.getString("targetUnits", null));
 		address = new InetSocketAddress(confAddress, confPort);
 	}
 
+	// TODO: 12/11/17 (miro) all information are in the message
 	@Override
 	public void onMessage(HttpRequestDescriptor message) {
 
@@ -75,21 +72,20 @@ public class HttpClientDescriptorUnit extends RoboUnit<HttpRequestDescriptor> {
 			if (bufferCapacity != null) {
 				channel.socket().setSendBufferSize(bufferCapacity);
 			}
-			final OutboundChannelHandler handler = new OutboundChannelHandler(targetPathMethodList, channel, message);
+			final OutboundChannelHandler handler = new OutboundChannelHandler(channel, message);
 
 			// TODO: 12/10/17 (miro) -> handler
 			handler.start();
 			handler.stop();
-			// }
 
 			final HttpResponseDescriptor descriptor = handler.getResponseDescriptor();
 			if (responseHandler != null) {
-				sendMessageToResponseUnit(responseHandler, descriptor);
+				sendMessageToCallback(responseHandler, descriptor);
 			}
 
 			if (descriptor != null && PROCESS_RESPONSES_STATUSES.contains(descriptor.getCode())) {
-				if (descriptor.getCallbackUnit() != null) {
-					sendMessageToResponseUnit(descriptor.getCallbackUnit(), descriptor.getMessage());
+				if (!descriptor.getCallbacks().isEmpty()) {
+					sendMessageToCallbacks(descriptor.getCallbacks(), descriptor.getMessage());
 				}
 			} else {
 				SimpleLoggingUtil.error(getClass(), String.format("no callback or wrong response: %s", descriptor));
@@ -101,8 +97,12 @@ public class HttpClientDescriptorUnit extends RoboUnit<HttpRequestDescriptor> {
 		}
 	}
 
-	private void sendMessageToResponseUnit(String responseUnit, Object message) {
-		getContext().getReference(responseUnit).sendMessage(message);
+	private void sendMessageToCallbacks(List<String> callbacks, Object message) {
+		callbacks.forEach(callback -> sendMessageToCallback(callback, message));
+	}
+
+	private void sendMessageToCallback(String callback, Object message) {
+		getContext().getReference(callback).sendMessage(message);
 	}
 
 }

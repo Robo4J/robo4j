@@ -4,14 +4,13 @@
         <config name="com.robo4j.root">
             <value name="address" type="String">0.0.0.0</value>
             <value name="port" type="int">8050</value>
-            <value name="targetUnits" type="String">[{"":["GET","stringConsumer"]}]</value>
         </config>
     </roboUnit>
     <roboUnit id="descriptorProducer">
         <class>com.robo4j.socket.http.units.test.HttpMessageDescriptorProducerUnit</class>
         <config name="com.robo4j.root">
             <value name="target" type="String">httpClient</value>
-            <value name="targetUnits" type="String">[{"":["GET"]}]</value>
+            <value name="targetUnits" type="String">[{"":["GET",["stringConsumer"]]}]</value>
         </config>
     </roboUnit>
     <roboUnit id="stringConsumer">

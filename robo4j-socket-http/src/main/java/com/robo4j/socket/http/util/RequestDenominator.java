@@ -21,7 +21,7 @@ import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 
 import static com.robo4j.socket.http.util.HttpMessageUtil.SPACE;
-import static com.robo4j.socket.http.util.JsonUtil.DEFAULT_PATH;
+import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -36,7 +36,7 @@ public class RequestDenominator implements HttpDenominator {
 
     public RequestDenominator(HttpMethod method, HttpVersion version) {
         this.method = method;
-        this.path = DEFAULT_PATH;
+        this.path = UTF8_SOLIDUS;
         this.version = version;
     }
 
