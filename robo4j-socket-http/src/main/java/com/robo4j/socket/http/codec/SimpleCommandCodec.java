@@ -20,10 +20,16 @@ package com.robo4j.socket.http.codec;
 import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpEncoder;
 import com.robo4j.socket.http.units.HttpProducer;
+import com.robo4j.socket.http.util.JsonElementStringBuilder;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.util.StringConstants;
 
 import java.util.Map;
+
+import static com.robo4j.util.Utf8Constant.UTF8_COLON;
+import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
+import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_LEFT;
+import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_RIGHT;
 
 /**
  * default simple codec for simple commands Simple codec is currently used for
@@ -40,21 +46,29 @@ public class SimpleCommandCodec implements HttpDecoder<SimpleCommand>, HttpEncod
 	private static final String KEY_VALUE = "value";
 
 	@Override
-	public String encode(SimpleCommand stuff) {
-		final StringBuilder sb = new StringBuilder("{\"value\":\"").append(stuff.getValue());
-		if (stuff.getType().equals(StringConstants.EMPTY)) {
-			sb.append("\"}");
+	public String encode(SimpleCommand message) {
+		//@formatter:off
+		JsonElementStringBuilder builder =  JsonElementStringBuilder.Builder()
+				.add(UTF8_CURLY_BRACKET_LEFT)
+				.addQuotationWithDelimiter(UTF8_COLON, KEY_VALUE);
+		if (message.getType().equals(StringConstants.EMPTY)) {
+			builder.addQuotation(message.getValue())
+					.add(UTF8_CURLY_BRACKET_RIGHT);
 		} else {
-			sb.append("\",\"type\":\"").append(stuff.getType()).append("\"}");
+			builder.addQuotationWithDelimiter(UTF8_COMMA, message.getValue())
+					.addQuotationWithDelimiter(UTF8_COLON, KEY_TYPE)
+					.addQuotation(message.getType())
+					.add(UTF8_CURLY_BRACKET_RIGHT);
 		}
-		return sb.toString();
+		//@formatter:on
+		return builder.build();
 	}
 
 	@Override
 	public SimpleCommand decode(String json) {
 		Map<String, Object> map = JsonUtil.getMapByJson(json);
-		return map.containsKey(KEY_TYPE) ?
-				new SimpleCommand(objectToString(map.get(KEY_VALUE)), objectToString(map.get(KEY_TYPE)))
+		return map.containsKey(KEY_TYPE)
+				? new SimpleCommand(objectToString(map.get(KEY_VALUE)), objectToString(map.get(KEY_TYPE)))
 				: new SimpleCommand(objectToString(map.get(KEY_VALUE)));
 	}
 

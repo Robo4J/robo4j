@@ -60,17 +60,17 @@ public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncod
 				.add(UTF8_CURLY_BRACKET_RIGHT)
 				.build();
 		//@formatter:on
-    }
+	}
 
-    @Override
-    public CameraMessage decode(String json) {
-        final Map<String, String> map = new HashMap<>();
+	@Override
+	public CameraMessage decode(String json) {
+		final Map<String, String> map = new HashMap<>();
 		final String[] parts = CAMERA_PATTERN.matcher(json).replaceAll(StringConstants.EMPTY).split(PATTERN_SPLIT);
 		for (int i = 0; i < parts.length - 1; i += 2) {
 			map.put(parts[i].trim(), parts[i + 1].trim());
 		}
 		final String type = map.get(KEY_TYPE);
-		final String value =  map.get(KEY_VALUE);
+		final String value = map.get(KEY_VALUE);
 		final String image = map.get(KEY_IMAGE);
 		return new CameraMessage(type, value, image);
 

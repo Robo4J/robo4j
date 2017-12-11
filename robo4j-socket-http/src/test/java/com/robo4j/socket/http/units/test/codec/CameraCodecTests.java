@@ -16,7 +16,6 @@ public class CameraCodecTests {
 
     @Test
     public void cameraConfigCodecTest(){
-
         String desiredJson = "{\"height\":800,\"width\":600,\"brightness\":80,\"sharpness\":56}";
         CameraConfigMessage message = new CameraConfigMessage(800, 600, 80, 56);
 
@@ -24,10 +23,8 @@ public class CameraCodecTests {
         String encodeJson = codec.encode(message);
 
         CameraConfigMessage decodeJson = codec.decode(desiredJson);
-    
+
         Assert.assertTrue("encode json", encodeJson.equals(desiredJson));
         Assert.assertTrue("decode json", decodeJson.equals(message));
-
-
     }
 }
