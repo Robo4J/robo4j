@@ -74,11 +74,20 @@ public abstract class AbstractHttpMessageDescriptor {
 		return version;
 	}
 
+	/**
+	 *
+	 * @return length of fully created message
+	 */
 	public int getLength() {
 		return length;
 	}
 
-	// FIXME: 12/11/17 (miro) unify usage -> 1. set by header or set by property
+	/**
+	 * don't mix with the header content length
+	 * 
+	 * @param length
+	 *            returns calculated length of fully created message
+	 */
 	public void setLength(int length) {
 		this.length = length;
 	}
@@ -91,10 +100,11 @@ public abstract class AbstractHttpMessageDescriptor {
 		this.message = this.message == null ? message : this.message.concat(message);
 	}
 
-	public void addCallbacks(List<String> callbacks){
+	public void addCallbacks(List<String> callbacks) {
 		this.callbacks.addAll(callbacks);
 	}
-	public void addCallback(String callback){
+
+	public void addCallback(String callback) {
 		callbacks.add(callback);
 	}
 
