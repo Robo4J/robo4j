@@ -61,7 +61,6 @@ public class JsonUtilTests {
 		Assert.assertNotNull(resultMap);
 		Assert.assertTrue(resultMap.containsKey(imageProcessorName));
 		Assert.assertTrue(resultMap.containsKey(configurationProcessorName));
-
 	}
 
 }

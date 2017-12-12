@@ -74,12 +74,12 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		if(targets == null){
 			SimpleLoggingUtil.info(getClass(), "no target units available");
 		} else {
-			Map<String, Object> targetsMap = JsonUtil.getMapByJson(targets);
-			this.targets = targetsMap.entrySet().stream()
+			Map<String, Object> targetUnitsMap = JsonUtil.getMapByJson(targets);
+			this.targets = targetUnitsMap.entrySet().stream()
 					.map(Map.Entry::getKey)
 					.collect(Collectors.toList());
 			// TODO: 12/12/17 (miro) improve uri(path) registration
-			targetsMap.forEach((key, value) ->
+			targetUnitsMap.forEach((key, value) ->
 					HttpUriRegister.getInstance().addUnitPathNode(key, value.toString()));
 		}
 
