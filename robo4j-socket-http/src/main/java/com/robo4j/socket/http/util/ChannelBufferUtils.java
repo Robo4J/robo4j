@@ -22,8 +22,8 @@ import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.SocketException;
 import com.robo4j.socket.http.enums.StatusCode;
-import com.robo4j.socket.http.message.HttpRequestDescriptor;
-import com.robo4j.socket.http.message.HttpResponseDescriptor;
+import com.robo4j.socket.http.message.HttpDecoratedRequest;
+import com.robo4j.socket.http.message.HttpDecoratedResponse;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -67,14 +67,14 @@ public class ChannelBufferUtils {
 		return result;
 	}
 
-	public static HttpResponseDescriptor getHttpResponseDescriptorByChannel(ByteChannel channel) throws IOException {
+	public static HttpDecoratedResponse getHttpDecoratedResponseByChannel(ByteChannel channel) throws IOException {
 		final StringBuilder sbBasic = new StringBuilder();
 		int readBytes = channel.read(responseBuffer);
 		if (readBytes != BUFFER_MARK_END) {
 			responseBuffer.flip();
 			addToStringBuilder(sbBasic, responseBuffer, readBytes);
 			final StringBuilder sbAdditional = new StringBuilder();
-			final HttpResponseDescriptor result = extractResponseDescriptorByStringMessage(sbBasic.toString());
+			final HttpDecoratedResponse result = extractDecoratedResponseByStringMessage(sbBasic.toString());
 
 			int totalReadBytes = readBytes;
 
@@ -96,11 +96,11 @@ public class ChannelBufferUtils {
 
 		} else {
 
-			return new HttpResponseDescriptor(new HashMap<>(), new ResponseDenominator(StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1));
+			return new HttpDecoratedResponse(new HashMap<>(), new ResponseDenominator(StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1));
 		}
 	}
 
-	public static HttpRequestDescriptor getHttpRequestDescriptorByChannel(ByteChannel channel) {
+	public static HttpDecoratedRequest getHttpDecoratedRequestByChannel(ByteChannel channel) {
 		final StringBuilder sbBasic = new StringBuilder();
 		int readBytes = readBytesByChannel(channel);
 		if (readBytes != BUFFER_MARK_END) {
@@ -108,7 +108,7 @@ public class ChannelBufferUtils {
 			requestBuffer.flip();
 			addToStringBuilder(sbBasic, requestBuffer, readBytes);
 			final StringBuilder sbAdditional = new StringBuilder();
-			final HttpRequestDescriptor result = extractRequestDescriptorByStringMessage(sbBasic.toString());
+			final HttpDecoratedRequest result = extractdecoratedRequestByStringMessage(sbBasic.toString());
 
 
 			int totalReadBytes = readBytes;
@@ -129,7 +129,7 @@ public class ChannelBufferUtils {
 			requestBuffer.clear();
 			return result;
 		} else {
-			return new HttpRequestDescriptor(new HashMap<>(), new RequestDenominator(HttpMethod.GET, HttpVersion.HTTP_1_1));
+			return new HttpDecoratedRequest(new HashMap<>(), new RequestDenominator(HttpMethod.GET, HttpVersion.HTTP_1_1));
 		}
 	}
 
@@ -157,7 +157,7 @@ public class ChannelBufferUtils {
 		return Arrays.equals(stopWindow, window);
 	}
 
-	public static HttpRequestDescriptor extractRequestDescriptorByStringMessage(String message) {
+	public static HttpDecoratedRequest extractdecoratedRequestByStringMessage(String message) {
 		final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
 		final String[] header = headerAndBody[POSITION_HEADER].split("[" + NEXT_LINE + "]+");
 		final String firstLine = RoboHttpUtils.correctLine(header[0]);
@@ -170,7 +170,7 @@ public class ChannelBufferUtils {
 		final Map<String, String> headerParams = getHeaderParametersByArray(paramArray);
 
 		final RequestDenominator denominator = new RequestDenominator(method, path, HttpVersion.getByValue(version));
-		HttpRequestDescriptor result = new HttpRequestDescriptor(headerParams, denominator);
+		HttpDecoratedRequest result = new HttpDecoratedRequest(headerParams, denominator);
 
 		if (headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)) {
 			result.setLength(calculateMessageSize(headerAndBody[POSITION_HEADER].length(), headerParams));
@@ -180,7 +180,7 @@ public class ChannelBufferUtils {
 		return result;
 	}
 
-	public static HttpResponseDescriptor extractResponseDescriptorByStringMessage(String message) {
+	public static HttpDecoratedResponse extractDecoratedResponseByStringMessage(String message) {
 		final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
 		final String[] header = headerAndBody[POSITION_HEADER].split("[" + NEXT_LINE + "]+");
 		final String firstLine = RoboHttpUtils.correctLine(header[0]);
@@ -192,7 +192,7 @@ public class ChannelBufferUtils {
 		final Map<String, String> headerParams = getHeaderParametersByArray(paramArray);
 
 		ResponseDenominator denominator = new ResponseDenominator(statusCode, HttpVersion.getByValue(version));
-		HttpResponseDescriptor result = new HttpResponseDescriptor(headerParams, denominator);
+		HttpDecoratedResponse result = new HttpDecoratedResponse(headerParams, denominator);
 		if (headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)) {
 			result.setLength(calculateMessageSize(headerAndBody[POSITION_HEADER].length(), headerParams));
 			result.addMessage(headerAndBody[POSITION_BODY]);

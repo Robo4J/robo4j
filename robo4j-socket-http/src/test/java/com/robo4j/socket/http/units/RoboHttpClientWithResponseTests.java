@@ -56,8 +56,8 @@ public class RoboHttpClientWithResponseTests {
 		System.out.println("producer: State after start:");
 		System.out.println(SystemUtil.printStateReport(producerSystem));
 
-		RoboReference<Integer> descriptorProducer = producerSystem.getReference("descriptorProducer");
-		descriptorProducer.sendMessage(MAX_NUMBER);
+		RoboReference<Integer> decoratedProducer = producerSystem.getReference("decoratedProducer");
+		decoratedProducer.sendMessage(MAX_NUMBER);
 		RoboReference<String> stringConsumer = producerSystem.getReference("stringConsumer");
 
 		AttributeDescriptor<List> receivedMessagesAttribute = new DefaultAttributeDescriptor<>(List.class,

@@ -22,7 +22,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMessage;
-import com.robo4j.socket.http.message.HttpRequestDescriptor;
+import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.HttpMessageWrapper;
 import com.robo4j.socket.http.dto.RoboPathReferenceDTO;
 import com.robo4j.socket.http.enums.StatusCode;
@@ -48,13 +48,13 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 	public static final int PATH_FIRST_LEVEL = 1;
 
 	private final RoboContext context;
-	private final HttpRequestDescriptor messageDescriptor;
+	private final HttpDecoratedRequest decoratedRequest;
 	private final DefaultRequestFactory<?> factory;
 
-	public RoboRequestCallable(RoboContext context, HttpRequestDescriptor messageDescriptor, DefaultRequestFactory<Object> factory) {
-		assert messageDescriptor != null;
+	public RoboRequestCallable(RoboContext context, HttpDecoratedRequest decoratedRequest, DefaultRequestFactory<Object> factory) {
+		assert decoratedRequest != null;
 		this.context = context;
-		this.messageDescriptor = messageDescriptor;
+		this.decoratedRequest = decoratedRequest;
 		this.factory = factory;
 	}
 
@@ -65,13 +65,13 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 
 		final RoboResponseProcess result = new RoboResponseProcess();
 
-		if (messageDescriptor.getMethod() != null) {
-			result.setMethod(messageDescriptor.getMethod());
+		if (decoratedRequest.getMethod() != null) {
+			result.setMethod(decoratedRequest.getMethod());
 
-			final HttpMessage httpMessage = new HttpMessage(messageDescriptor);
-			final List<String> paths = HttpPathUtil.uriStringToPathList(messageDescriptor.getPath());
+			final HttpMessage httpMessage = new HttpMessage(decoratedRequest);
+			final List<String> paths = HttpPathUtil.uriStringToPathList(decoratedRequest.getPath());
 
-			switch (messageDescriptor.getMethod()) {
+			switch (decoratedRequest.getMethod()) {
 			case GET:
 				switch (paths.size()) {
 				case PATH_DEFAULT_LEVEL:
@@ -109,7 +109,7 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 				}
 				return result;
 			case POST:
-				final String postValue = messageDescriptor.getMessage();
+				final String postValue = decoratedRequest.getMessage();
 				switch (paths.size()) {
 				case PATH_DEFAULT_LEVEL:
 				case PATH_FIRST_LEVEL:
@@ -141,7 +141,7 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 
 			default:
 				result.setCode(StatusCode.BAD_REQUEST);
-				SimpleLoggingUtil.debug(getClass(), "not implemented method: " + messageDescriptor.getMethod());
+				SimpleLoggingUtil.debug(getClass(), "not implemented method: " + decoratedRequest.getMethod());
 			}
 		} else {
 			result.setCode(StatusCode.BAD_REQUEST);

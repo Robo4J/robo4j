@@ -29,7 +29,7 @@ import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.codec.CameraMessageCodec;
-import com.robo4j.socket.http.message.HttpRequestDescriptor;
+import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.util.HttpConstant;
 import com.robo4j.socket.http.util.RequestDenominator;
 import com.robo4j.socket.http.util.RoboHttpUtils;
@@ -131,7 +131,7 @@ public class CameraImageProducerTestUnit extends RoboUnit<Boolean> {
 			final String message = codec.encode(cameraMessage);
 			final RequestDenominator denominator = new RequestDenominator(HttpMethod.POST, path, HttpVersion.HTTP_1_1);
 
-			HttpRequestDescriptor request = new HttpRequestDescriptor(denominator);
+			HttpDecoratedRequest request = new HttpDecoratedRequest(denominator);
 			request.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, port));
 			request.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()));
 			request.addMessage(message);

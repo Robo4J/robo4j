@@ -19,10 +19,6 @@ package com.robo4j;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.robo4j.AttributeDescriptor;
-import com.robo4j.ConfigurationException;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 
 /**

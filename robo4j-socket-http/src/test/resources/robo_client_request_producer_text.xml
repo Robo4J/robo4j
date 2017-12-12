@@ -1,9 +1,9 @@
 <robo4j>
     <roboUnit id="httpClient">
-        <class>com.robo4j.socket.http.units.HttpClientDescriptorUnit</class>
+        <class>com.robo4j.socket.http.units.HttpClientDecoratorUnit</class>
     </roboUnit>
-    <roboUnit id="descriptorProducer">
-        <class>com.robo4j.socket.http.units.test.HttpMessageDescriptorProducerUnit</class>
+    <roboUnit id="decoratedProducer">
+        <class>com.robo4j.socket.http.units.test.HttpMessageDecoratedProducerUnit</class>
         <config name="com.robo4j.root">
             <value name="target" type="String">httpClient</value>
             <value name="targetUnits" type="String">[{"":["GET",["stringConsumer"]]}]</value>

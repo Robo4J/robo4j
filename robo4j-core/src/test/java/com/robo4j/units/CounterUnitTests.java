@@ -19,11 +19,11 @@ package com.robo4j.units;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.DefaultAttributeDescriptor;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.AttributeDescriptor;
-import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.IntegerConsumer;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboBuilder;
@@ -32,8 +32,6 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
-import com.robo4j.units.CounterCommand;
-import com.robo4j.units.CounterUnit;
 
 /**
  * Test for the CounterUnit.

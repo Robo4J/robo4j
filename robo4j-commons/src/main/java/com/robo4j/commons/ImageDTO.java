@@ -18,6 +18,7 @@
 package com.robo4j.commons;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -51,6 +52,25 @@ public class ImageDTO {
 
     public byte[] getContent() {
         return content;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ImageDTO imageDTO = (ImageDTO) o;
+        return width == imageDTO.width &&
+                height == imageDTO.height &&
+                Objects.equals(encoding, imageDTO.encoding) &&
+                Arrays.equals(content, imageDTO.content);
+    }
+
+    @Override
+    public int hashCode() {
+
+        int result = Objects.hash(width, height, encoding);
+        result = 31 * result + Arrays.hashCode(content);
+        return result;
     }
 
     @Override

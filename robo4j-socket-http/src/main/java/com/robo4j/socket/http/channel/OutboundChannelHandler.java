@@ -19,8 +19,8 @@ package com.robo4j.socket.http.channel;
 
 import com.robo4j.socket.http.SocketException;
 import com.robo4j.socket.http.dto.PathMethodDTO;
-import com.robo4j.socket.http.message.HttpRequestDescriptor;
-import com.robo4j.socket.http.message.HttpResponseDescriptor;
+import com.robo4j.socket.http.message.HttpDecoratedRequest;
+import com.robo4j.socket.http.message.HttpDecoratedResponse;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
 import com.robo4j.socket.http.util.ChannelUtil;
 import com.robo4j.socket.http.util.HttpMessageBuilder;
@@ -38,11 +38,11 @@ import java.nio.channels.ByteChannel;
 public class OutboundChannelHandler implements SocketHandler {
 
 	private ByteChannel byteChannel;
-	private HttpRequestDescriptor message;
-	private HttpResponseDescriptor responseDescriptor;
+	private HttpDecoratedRequest message;
+	private HttpDecoratedResponse decoratedResponse;
 
 	public OutboundChannelHandler(ByteChannel byteChannel,
-			HttpRequestDescriptor message) {
+			HttpDecoratedRequest message) {
 		this.byteChannel = byteChannel;
 		this.message = message;
 	}
@@ -60,7 +60,7 @@ public class OutboundChannelHandler implements SocketHandler {
 
 		final ByteBuffer buffer = ChannelBufferUtils.getByteBufferByString(resultMessage);
 		ChannelUtil.handleWriteChannelAndBuffer("client send message", byteChannel, buffer);
-		responseDescriptor = getResponseDescriptor(byteChannel, pathMethod);
+		decoratedResponse = getDecoratedResponse(byteChannel, pathMethod);
 
 	}
 
@@ -73,13 +73,13 @@ public class OutboundChannelHandler implements SocketHandler {
 		}
 	}
 
-	public HttpResponseDescriptor getResponseDescriptor() {
-		return responseDescriptor;
+	public HttpDecoratedResponse getDecoratedResponse() {
+		return decoratedResponse;
 	}
 
-	private HttpResponseDescriptor getResponseDescriptor(ByteChannel byteChannel, PathMethodDTO pathMethod) {
+	private HttpDecoratedResponse getDecoratedResponse(ByteChannel byteChannel, PathMethodDTO pathMethod) {
 		try {
-			final HttpResponseDescriptor result = ChannelBufferUtils.getHttpResponseDescriptorByChannel(byteChannel);
+			final HttpDecoratedResponse result = ChannelBufferUtils.getHttpDecoratedResponseByChannel(byteChannel);
 			result.addCallbacks(pathMethod.getCallbacks());
 			return result;
 		} catch (IOException e) {

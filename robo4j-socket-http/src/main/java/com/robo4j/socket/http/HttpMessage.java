@@ -17,7 +17,7 @@
 
 package com.robo4j.socket.http;
 
-import com.robo4j.socket.http.message.HttpRequestDescriptor;
+import com.robo4j.socket.http.message.HttpDecoratedRequest;
 
 import java.net.URI;
 import java.util.Comparator;
@@ -43,9 +43,9 @@ public class HttpMessage implements Comparable<HttpMessage> {
 		this.header = header;
 	}
 
-	public HttpMessage(HttpRequestDescriptor messageDescriptor) {
-		this(messageDescriptor.getMethod(), URI.create(messageDescriptor.getPath()),
-				HttpVersion.getByValue(messageDescriptor.getVersion()), messageDescriptor.getHeader());
+	public HttpMessage(HttpDecoratedRequest decoratedRequest) {
+		this(decoratedRequest.getMethod(), URI.create(decoratedRequest.getPath()),
+				HttpVersion.getByValue(decoratedRequest.getVersion()), decoratedRequest.getHeader());
 	}
 
 	public HttpMethod method() {

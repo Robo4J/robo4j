@@ -17,7 +17,7 @@
 
 <robo4j>
     <roboUnit id="httpClient">
-        <class>com.robo4j.socket.http.units.HttpClientDescriptorUnit</class>
+        <class>com.robo4j.socket.http.units.HttpClientDecoratorUnit</class>
     </roboUnit>
     <roboUnit id="imageController">
         <class>com.robo4j.socket.http.units.test.CameraImageProducerTestUnit</class>

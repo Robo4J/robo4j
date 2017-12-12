@@ -20,7 +20,7 @@ package com.robo4j.socket.http.request;
 import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
-import com.robo4j.socket.http.message.HttpRequestDescriptor;
+import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
 import com.robo4j.socket.http.util.HttpDenominator;
 import com.robo4j.socket.http.util.HttpMessageBuilder;
@@ -63,14 +63,14 @@ public class ByteBufferTests {
 
     @Test
     public void testPostmanMessage() {
-        HttpRequestDescriptor messageDescriptor = ChannelBufferUtils.extractRequestDescriptorByStringMessage(TEST_POSTMAN_STRING);
-        messageDescriptor.addMessage(TEST_POSTMAN_MESSAGE);
+        HttpDecoratedRequest decoratedRequest = ChannelBufferUtils.extractdecoratedRequestByStringMessage(TEST_POSTMAN_STRING);
+        decoratedRequest.addMessage(TEST_POSTMAN_MESSAGE);
 
-        Assert.assertNotNull(messageDescriptor.getHeader());
-        Assert.assertTrue(!messageDescriptor.getHeader().isEmpty());
-        Assert.assertNotNull(messageDescriptor.getMessage());
-        System.out.println("HEADER: " + messageDescriptor.getHeader());
-        System.out.println("BODY: " + messageDescriptor.getMessage());
+        Assert.assertNotNull(decoratedRequest.getHeader());
+        Assert.assertTrue(!decoratedRequest.getHeader().isEmpty());
+        Assert.assertNotNull(decoratedRequest.getMessage());
+        System.out.println("HEADER: " + decoratedRequest.getHeader());
+        System.out.println("BODY: " + decoratedRequest.getMessage());
 
     }
 
@@ -89,12 +89,12 @@ public class ByteBufferTests {
                 .addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, port))
                 .build(bodyMessage);
 
-        HttpRequestDescriptor messageDescriptor = ChannelBufferUtils.extractRequestDescriptorByStringMessage(postMessage);
+        HttpDecoratedRequest decoratedRequest = ChannelBufferUtils.extractdecoratedRequestByStringMessage(postMessage);
 
         Assert.assertNotNull(postMessage);
-        Assert.assertTrue(postMessage.length() == messageDescriptor.getLength());
-        Assert.assertTrue(clientPath.equals(messageDescriptor.getPath()));
-        Assert.assertTrue(bodyMessage.equals(messageDescriptor.getMessage()));
+        Assert.assertTrue(postMessage.length() == decoratedRequest.getLength());
+        Assert.assertTrue(clientPath.equals(decoratedRequest.getPath()));
+        Assert.assertTrue(bodyMessage.equals(decoratedRequest.getMessage()));
     }
 
     @Test
