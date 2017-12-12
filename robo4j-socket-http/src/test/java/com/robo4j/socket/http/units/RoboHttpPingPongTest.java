@@ -122,7 +122,6 @@ public class RoboHttpPingPongTest {
 		RoboBuilder builder = new RoboBuilder();
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString("target", CONTROLLER_PING_PONG);
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		config.setString("packages", PACKAGE_CODECS);
 		/* specific configuration */

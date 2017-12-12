@@ -32,7 +32,7 @@ import java.util.Map;
 public class JsonUtilTests {
 
 	@Test
-	public void createJsonFromMap() {
+	public void createJsonByMap() {
 
 		final String expectedResult = "{\"test1\":\"1\",\"test2\":\"2\",\"prim1\":1,\"add\":{\"add1\":\"3\",\"test\":true}}";
 		final Map<String, Object> mainMap = new LinkedHashMap<>();
@@ -48,6 +48,19 @@ public class JsonUtilTests {
 		String result = JsonUtil.getJsonByMap(mainMap);
 
 		Assert.assertEquals(expectedResult, result);
+
+	}
+
+	@Test
+	public void getMapByJson(){
+		String imageProcessorName = "imageProcessor";
+		String configurationProcessorName = "configurationProcessor";
+		String json = "{\""+ imageProcessorName + "\":\"POST\",\"" + configurationProcessorName + "\":\"POST\"}";
+		final Map<String, Object> resultMap = JsonUtil.getMapByJson(json);
+
+		Assert.assertNotNull(resultMap);
+		Assert.assertTrue(resultMap.containsKey(imageProcessorName));
+		Assert.assertTrue(resultMap.containsKey(configurationProcessorName));
 
 	}
 

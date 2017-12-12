@@ -135,7 +135,6 @@ public class RoboHttpDynamicTests {
 		RoboBuilder builder = new RoboBuilder();
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString("target", ID_TARGET_UNIT);
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		config.setString("packages", "com.robo4j.socket.http.units.test.codec");
 		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
