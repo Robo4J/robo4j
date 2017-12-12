@@ -38,7 +38,7 @@ public final class RoboHttpUtils {
 	public static final CharSequence CHAR_SQUARE_BRACKET_RIGHT = "]";
 	public static final CharSequence CHAR_COMMA = ",";
 	public static final int DEFAULT_PORT = 8042;
-	public static final String HTTP_TARGET_UNITS = "targetUnits";
+	public static final String HTTP_TARGETS = "targets";
 	public static final String HTTP_PROPERTY_HOST = "host";
 	public static final String HTTP_PROPERTY_PORT = "port";
 	public static final String HTTP_PROPERTY_BUFFER_CAPACITY = "bufferCapacity";

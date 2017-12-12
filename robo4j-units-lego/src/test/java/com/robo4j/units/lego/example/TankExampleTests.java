@@ -56,7 +56,7 @@ public class TankExampleTests {
 		config.setString("target", ID_UNIT_CONTROLLER);
 		config.setInteger("port", PORT);
 		config.setString("packages", "com.robo4j.units.lego.example.codec");
-		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
+		config.setString(RoboHttpUtils.HTTP_TARGETS,
 				JsonUtil.getJsonByMap(Collections.singletonMap(ID_UNIT_CONTROLLER, "GET")));
 
 		builder.add(HttpServerUnit.class, config, ID_HTTP);

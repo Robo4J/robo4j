@@ -56,7 +56,7 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboDbContract> {
 	private static final String ATTRIBUTE_ROBO_ALL_NAME = "all";
 	private static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
 			.singletonList(DefaultAttributeDescriptor.create(List.class, ATTRIBUTE_ROBO_ALL_NAME));
-	private Map<String, Object> targetUnitSearchMap = new HashMap<>();
+	private Map<String, Object> targetsSearchMap = new HashMap<>();
 
 	private static final String PERSISTENCE_UNIT = "sourceType";
 	private static final String TARGET_UNIT = "targetUnit";
@@ -96,7 +96,8 @@ public class SQLDataSourceUnit extends RoboUnit<ERoboDbContract> {
 		if (targetUnit == null) {
 			throw ConfigurationException.createMissingConfigNameException(TARGET_UNIT);
 		}
-		targetUnitSearchMap.put("unit", targetUnit);
+		// FIXME: 12/12/17 (miro) : update
+		targetsSearchMap.put("unit", targetUnit);
 
 		packages = tmpPackages.split(UTF8_COMMA);
 		limit = configuration.getInteger("limit", 2);

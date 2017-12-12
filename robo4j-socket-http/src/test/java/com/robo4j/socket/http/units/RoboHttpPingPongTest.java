@@ -125,7 +125,7 @@ public class RoboHttpPingPongTest {
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		config.setString("packages", PACKAGE_CODECS);
 		/* specific configuration */
-		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
+		config.setString(RoboHttpUtils.HTTP_TARGETS,
 				JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, HTTP_POST_METHOD)));
 		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
 		builder.add(StringConsumer.class, REQUEST_CONSUMER);
@@ -145,7 +145,7 @@ public class RoboHttpPingPongTest {
 		config.setString("address", HOST_SYSTEM);
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		/* specific configuration */
-		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
+		config.setString(RoboHttpUtils.HTTP_TARGETS,
 				JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, HTTP_POST_METHOD)));
 		builder.add(HttpClientUnit.class, config, ID_HTTP_CLIENT);
 

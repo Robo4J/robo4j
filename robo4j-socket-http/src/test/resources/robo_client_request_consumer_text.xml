@@ -4,7 +4,7 @@
         <config name="com.robo4j.root">
             <value name="port" type="int">8050</value>
             <value name="packages" type="String">com.robo4j.socket.http.codec</value>
-            <value name="targetUnits" type="String">{"stringConsumer":"GET"}</value>
+            <value name="targets" type="String">{"stringConsumer":"GET"}</value>
         </config>
     </roboUnit>
     <roboUnit id="stringConsumer">

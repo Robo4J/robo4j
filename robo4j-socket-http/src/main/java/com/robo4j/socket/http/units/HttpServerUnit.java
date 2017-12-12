@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 import static com.robo4j.socket.http.util.ChannelBufferUtils.INIT_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_TARGET_UNITS;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_TARGETS;
 
 /**
  * Http NIO unit allows to configure format of the requests currently is only
@@ -70,16 +70,16 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(","));
 		}
 
-		String targetUnits = configuration.getString(HTTP_TARGET_UNITS, null);
-		if(targetUnits == null){
+		String targets = configuration.getString(HTTP_TARGETS, null);
+		if(targets == null){
 			SimpleLoggingUtil.info(getClass(), "no target units available");
 		} else {
-			Map<String, Object> targetUnitsMap = JsonUtil.getMapByJson(targetUnits);
-			targets = targetUnitsMap.entrySet().stream()
+			Map<String, Object> targetsMap = JsonUtil.getMapByJson(targets);
+			this.targets = targetsMap.entrySet().stream()
 					.map(Map.Entry::getKey)
 					.collect(Collectors.toList());
 			// TODO: 12/12/17 (miro) improve uri(path) registration
-			targetUnitsMap.forEach((key, value) ->
+			targetsMap.forEach((key, value) ->
 					HttpUriRegister.getInstance().addUnitPathNode(key, value.toString()));
 		}
 

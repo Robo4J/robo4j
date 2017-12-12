@@ -6,7 +6,7 @@
         <class>com.robo4j.socket.http.units.test.HttpMessageDecoratedProducerUnit</class>
         <config name="com.robo4j.root">
             <value name="target" type="String">httpClient</value>
-            <value name="targetUnits" type="String">[{"":["GET",["stringConsumer"]]}]</value>
+            <value name="targets" type="String">[{"":["GET",["stringConsumer"]]}]</value>
             <value name="host" type="String">0.0.0.0</value>
             <value name="port" type="int">8050</value>
         </config>

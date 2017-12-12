@@ -36,6 +36,7 @@ import java.util.stream.IntStream;
 
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_TARGETS;
 
 /**
  * Test unit to produce HttpDecoratedRequest messages
@@ -60,7 +61,7 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		target = configuration.getString("target", null);
-		targetPathMethodList = JsonUtil.convertJsonToPathMethodList(configuration.getString("targetUnits", null));
+		targetPathMethodList = JsonUtil.convertJsonToPathMethodList(configuration.getString(HTTP_TARGETS, null));
 
 		host = configuration.getString(HTTP_PROPERTY_HOST, null);
 		port = configuration.getInteger(HTTP_PROPERTY_PORT, null);

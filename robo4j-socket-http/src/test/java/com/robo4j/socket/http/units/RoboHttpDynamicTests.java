@@ -137,7 +137,7 @@ public class RoboHttpDynamicTests {
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		config.setString("packages", "com.robo4j.socket.http.units.test.codec");
-		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
+		config.setString(RoboHttpUtils.HTTP_TARGETS,
 				JsonUtil.getJsonByMap(Collections.singletonMap(ID_TARGET_UNIT, HTTP_METHOD)));
 		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
 
@@ -167,7 +167,7 @@ public class RoboHttpDynamicTests {
 		config.setString("address", HOST_SYSTEM);
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		/* specific configuration */
-		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
+		config.setString(RoboHttpUtils.HTTP_TARGETS,
 				JsonUtil.getJsonByMap(Collections.singletonMap(ID_TARGET_UNIT, HTTP_METHOD)));
 		builder.add(HttpClientUnit.class, config, ID_CLIENT_UNIT);
 
