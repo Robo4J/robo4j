@@ -16,8 +16,8 @@ public class CameraCodecTests {
 
     @Test
     public void cameraConfigCodecTest(){
-        String desiredJson = "{\"height\":800,\"width\":600,\"brightness\":80,\"sharpness\":56}";
-        CameraConfigMessage message = new CameraConfigMessage(800, 600, 80, 56);
+        String desiredJson = "{\"height\":800,\"width\":600,\"brightness\":80,\"sharpness\":56,\"timeout\":2,\"timelapse\":100}";
+        CameraConfigMessage message = new CameraConfigMessage(800, 600, 80, 56, 2, 100);
 
         CameraConfigMessageCodec codec = new CameraConfigMessageCodec();
         String encodeJson = codec.encode(message);

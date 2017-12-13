@@ -25,6 +25,7 @@ import com.robo4j.RoboUnit;
 import com.robo4j.commons.ImageDTO;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.camera.RaspistilDevice;
+import com.robo4j.logging.SimpleLoggingUtil;
 
 import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,11 +39,11 @@ public class RaspistillUnit extends RoboUnit<RaspistillRequest> {
 	private static final EnumSet<LifecycleState> acceptedStates = EnumSet.of(LifecycleState.STARTING,
 			LifecycleState.STARTED);
 	private static final String PROPERTY_TARGET = "target";
-	private AtomicBoolean progress = new AtomicBoolean(false);
+	private AtomicBoolean continualMode = new AtomicBoolean(false);
+	private AtomicBoolean cameraProgress = new AtomicBoolean(false);
 
 	private final RaspistilDevice device = new RaspistilDevice();
 	private String target;
-	private String command;
 
 	public RaspistillUnit(RoboContext context, String id) {
 		super(RaspistillRequest.class, context, id);
@@ -58,35 +59,51 @@ public class RaspistillUnit extends RoboUnit<RaspistillRequest> {
 
 	@Override
 	public void onMessage(RaspistillRequest message) {
-		progress.set(false);
-		command = message.create();
-
-		if (message.isActive()) {
-			startUnit(message);
-		} else {
-			createImage(message);
-		}
+		processMessage(message);
 	}
 
-	private void startUnit(RaspistillRequest message) {
+	private void processMessage(RaspistillRequest message){
 		getContext().getScheduler().execute(() -> {
-			while (acceptedStates.contains(getState())) {
-				if (progress.compareAndSet(false, true)) {
-					createImage(message);
-				}
+			if (continualMode.get()) {
+				stopProgress();
+			}
+			if (message.isActive()) {
+				startContinualMode(message);
+			} else if(cameraProgress.compareAndSet(false, true)) {
+				createImage(message);
 			}
 		});
 	}
 
-	private void createImage(RaspistillRequest message) {
-		final byte[] image = device.executeCommand(command);
-		final RoboReference<ImageDTO> targetReference = getContext().getReference(target);
-		if (targetReference != null && image.length > 0) {
-			ImageDTO imageDTO = new ImageDTO(Integer.valueOf(message.getProperty(RpiCameraProperty.WIDTH)),
-					Integer.valueOf(message.getProperty(RpiCameraProperty.HEIGHT)),
-					message.getProperty(RpiCameraProperty.ENCODING), image);
-			targetReference.sendMessage(imageDTO);
-		}
-		progress.set(false);
+	private void stopProgress() {
+		continualMode.set(false);
+		while (cameraProgress.get());
 	}
+
+	private void startContinualMode(RaspistillRequest message) {
+		getContext().getScheduler().execute(() -> {
+			continualMode.set(true);
+			while (acceptedStates.contains(getState()) && continualMode.get()) {
+				if(cameraProgress.compareAndSet(false, true)){
+					createImage(message);
+				}
+			}
+		});
+
+	}
+
+	private void createImage(RaspistillRequest message) {
+		try {
+			final byte[] image = device.executeCommand(message.create());
+			final RoboReference<ImageDTO> targetReference = getContext().getReference(target);
+			if (targetReference != null && image.length > 0) {
+				ImageDTO imageDTO = CameraUtil.createImageDTOBydMessageAndBytes(message, image);
+				targetReference.sendMessage(imageDTO);
+			}
+			cameraProgress.set(false);
+		} catch (Exception e) {
+			SimpleLoggingUtil.error(getClass(), "create image", e);
+		}
+	}
+
 }

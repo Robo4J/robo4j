@@ -12,11 +12,15 @@ public class ImageConfigDTO {
     private final int height;
     private final int width;
     private final int brightness;
+    private final int timeout;
+    private final int timelapse;
 
-    public ImageConfigDTO(int height, int width, int brightness) {
+    public ImageConfigDTO(int height, int width, int brightness, int timeout, int timelapse) {
         this.height = height;
         this.width = width;
         this.brightness = brightness;
+        this.timeout = timeout;
+        this.timelapse = timelapse;
     }
 
     public int getHeight() {
@@ -31,6 +35,14 @@ public class ImageConfigDTO {
         return brightness;
     }
 
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public int getTimelapse() {
+        return timelapse;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -38,13 +50,15 @@ public class ImageConfigDTO {
         ImageConfigDTO that = (ImageConfigDTO) o;
         return height == that.height &&
                 width == that.width &&
-                brightness == that.brightness;
+                brightness == that.brightness &&
+                timeout == that.timeout &&
+                timelapse == that.timelapse;
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(height, width, brightness);
+        return Objects.hash(height, width, brightness, timeout, timelapse);
     }
 
     @Override
@@ -53,6 +67,8 @@ public class ImageConfigDTO {
                 "height=" + height +
                 ", width=" + width +
                 ", brightness=" + brightness +
+                ", timeout=" + timeout +
+                ", timelapse=" + timelapse +
                 '}';
     }
 }

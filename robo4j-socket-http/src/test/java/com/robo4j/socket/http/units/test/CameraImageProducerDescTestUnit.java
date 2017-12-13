@@ -24,6 +24,7 @@ import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.commons.ImageDTO;
+import com.robo4j.commons.ImageDTOBuilder;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.util.StreamUtils;
 
@@ -98,7 +99,11 @@ public class CameraImageProducerDescTestUnit extends RoboUnit<Boolean> {
 	private void createImage() {
 		final byte[] image = StreamUtils
 				.inputStreamToByteArray(Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName));
-		ImageDTO imageDTO = new ImageDTO(Integer.valueOf("800"), Integer.valueOf("600"), "jpg", image);
+		final ImageDTO imageDTO = ImageDTOBuilder.Build()
+				.setWidth(800)
+				.setHeight(600)
+				.setEncoding("jpg")
+				.setContent(image).build();
 		getContext().getReference(target).sendMessage(imageDTO);
 		progress.set(false);
 	}

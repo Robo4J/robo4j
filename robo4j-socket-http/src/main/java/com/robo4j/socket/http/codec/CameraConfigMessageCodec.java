@@ -32,6 +32,8 @@ public class CameraConfigMessageCodec implements HttpDecoder<CameraConfigMessage
 	private static final String KEY_WIDTH = "width";
 	private static final String KEY_BRIGHTNESS = "brightness";
 	private static final String KEY_SHARPNESS = "sharpness";
+	private static final String KEY_TIMEOUT = "timeout";
+	private static final String KEY_TIMELAPSE = "timelapse";
 
 	@Override
 	public CameraConfigMessage decode(String json) {
@@ -45,8 +47,10 @@ public class CameraConfigMessageCodec implements HttpDecoder<CameraConfigMessage
 		Integer width = getValue(map, KEY_WIDTH);
 		Integer brightness = getValue(map, KEY_BRIGHTNESS);
 		Integer sharpness = getValue(map, KEY_SHARPNESS);
+		Integer timeout = getValue(map, KEY_TIMEOUT);
+		Integer timelapse = getValue(map, KEY_TIMELAPSE);
 
-		return new CameraConfigMessage(height, width, brightness, sharpness);
+		return new CameraConfigMessage(height, width, brightness, sharpness, timeout, timelapse);
 	}
 
 	private Integer getValue(Map<String, String> map, String key) {
@@ -70,7 +74,11 @@ public class CameraConfigMessageCodec implements HttpDecoder<CameraConfigMessage
                 .addQuotationWithDelimiter(UTF8_COLON, KEY_BRIGHTNESS)
 				.addWithDelimiter(UTF8_COMMA, message.getBrightness())
                 .addQuotationWithDelimiter(UTF8_COLON, KEY_SHARPNESS)
-				.add(message.getSharpness())
+				.addWithDelimiter(UTF8_COMMA,message.getSharpness())
+                .addQuotationWithDelimiter(UTF8_COLON, KEY_TIMEOUT)
+                .addWithDelimiter(UTF8_COMMA, message.getTimeout())
+                .addQuotationWithDelimiter(UTF8_COLON, KEY_TIMELAPSE)
+                .add(message.getTimelapse())
 				.add(UTF8_CURLY_BRACKET_RIGHT)
 				.build();
 		//@formatter:on
