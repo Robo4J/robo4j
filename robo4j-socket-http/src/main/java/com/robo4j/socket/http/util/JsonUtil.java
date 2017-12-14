@@ -107,7 +107,7 @@ public final class JsonUtil {
 			return result;
 		}
 
-		final String[] parts = json.replaceAll("^\\{\\s*\"|\"\\s*\\}$", StringConstants.EMPTY)
+		final String[] parts = json.replaceAll("^\\{\\s*\"|\"?\\s*\\}$", StringConstants.EMPTY)
 				.split("\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?");
 
 		for (int i = 0; i < parts.length - 1; i += 2) {

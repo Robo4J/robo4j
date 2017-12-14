@@ -63,4 +63,18 @@ public class JsonUtilTests {
 		Assert.assertTrue(resultMap.containsKey(configurationProcessorName));
 	}
 
+
+	@Test
+	public void jsonToMapTest(){
+		String jsonNumbers = "{\"width\":600,\"height\":800,\"brightness\":80,\"timeout\":2}";
+		String jsonStrings = "{\"width\":600,\"height\":800,\"brightness\":80,\"timeout\":2}";
+		String jsonNumberBooleanMixed = "{\"width\":600,\"height\":true,\"brightness\":\"80\",\"timeout\":\"2\", \"text\":\"something\"}";
+
+		final Map<String, Object> resultMap1 = JsonUtil.getMapByJson(jsonNumbers);
+		final Map<String, Object> resultMap2 = JsonUtil.getMapByJson(jsonStrings);
+		final Map<String, Object> resultMap3 = JsonUtil.getMapByJson(jsonNumberBooleanMixed);
+		System.out.println("resultMap1: " + resultMap1);
+		System.out.println("resultMap2: " + resultMap2);
+		System.out.println("resultMap3: " + resultMap3);
+	}
 }
