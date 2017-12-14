@@ -20,7 +20,6 @@ package com.robo4j.socket.http.util;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static com.robo4j.util.Utf8Constant.UTF8_COLON;
@@ -35,26 +34,6 @@ import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_RIGHT;
  * @author Miro Wengner (@miragemiko)
  */
 public class JsonUtilTests {
-
-	@Test
-	public void createJsonByMap() {
-
-		final String expectedResult = "{\"test1\":\"1\",\"test2\":\"2\",\"prim1\":1,\"add\":{\"add1\":\"3\",\"test\":true}}";
-		final Map<String, Object> mainMap = new LinkedHashMap<>();
-		mainMap.put("test1", "1");
-		mainMap.put("test2", "2");
-		mainMap.put("prim1", 1);
-
-		final Map<String, Object> additionalMap = new LinkedHashMap<>();
-		additionalMap.put("add1", "3");
-		additionalMap.put("test", true);
-		mainMap.put("add", additionalMap);
-
-		String result = JsonUtil.getJsonByMap(mainMap);
-
-		Assert.assertEquals(expectedResult, result);
-
-	}
 
 	@Test
 	public void getMapByJson() {

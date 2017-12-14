@@ -21,11 +21,9 @@ import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpEncoder;
 import com.robo4j.socket.http.units.HttpProducer;
 import com.robo4j.socket.http.util.JsonElementStringBuilder;
-import com.robo4j.util.StringConstants;
+import com.robo4j.socket.http.util.JsonUtil;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import static com.robo4j.util.Utf8Constant.UTF8_COLON;
 import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
@@ -40,8 +38,6 @@ import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_RIGHT;
  */
 @HttpProducer
 public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncoder<CameraMessage> {
-	private static final Pattern CAMERA_PATTERN = Pattern.compile("^\\{\\s*\"|\"\\s*\\}$");
-	private static final String PATTERN_SPLIT = "\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?";
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_VALUE = "value";
 	private static final String KEY_IMAGE = "image";
@@ -64,14 +60,11 @@ public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncod
 
 	@Override
 	public CameraMessage decode(String json) {
-		final Map<String, String> map = new HashMap<>();
-		final String[] parts = CAMERA_PATTERN.matcher(json).replaceAll(StringConstants.EMPTY).split(PATTERN_SPLIT);
-		for (int i = 0; i < parts.length - 1; i += 2) {
-			map.put(parts[i].trim(), parts[i + 1].trim());
-		}
-		final String type = map.get(KEY_TYPE);
-		final String value = map.get(KEY_VALUE);
-		final String image = map.get(KEY_IMAGE);
+		final Map<String, Object> map = JsonUtil.getMapByJson(json);
+
+		final String type = String.valueOf(map.get(KEY_TYPE));
+		final String value = String.valueOf(map.get(KEY_VALUE));
+		final String image = String.valueOf(map.get(KEY_IMAGE));
 		return new CameraMessage(type, value, image);
 
 	}

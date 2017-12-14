@@ -4,11 +4,9 @@ import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpEncoder;
 import com.robo4j.socket.http.units.HttpProducer;
 import com.robo4j.socket.http.util.JsonElementStringBuilder;
-import com.robo4j.util.StringConstants;
+import com.robo4j.socket.http.util.JsonUtil;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import static com.robo4j.util.Utf8Constant.UTF8_COLON;
 import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
@@ -26,22 +24,16 @@ import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_RIGHT;
 @HttpProducer
 public class CameraConfigMessageCodec implements HttpDecoder<CameraConfigMessage>, HttpEncoder<CameraConfigMessage> {
 
-	private static final Pattern CONFIG_PATTERN = Pattern.compile("^\\{\\s*\"|\\s*\\}$");
-	private static final String PATTERN_SPLIT = "\"?(\\s*:\\s*|\\s*,\"\\s*)";
-	private static final String KEY_HEIGHT = "height";
-	private static final String KEY_WIDTH = "width";
-	private static final String KEY_BRIGHTNESS = "brightness";
-	private static final String KEY_SHARPNESS = "sharpness";
-	private static final String KEY_TIMEOUT = "timeout";
-	private static final String KEY_TIMELAPSE = "timelapse";
+	public static final String KEY_HEIGHT = "height";
+	public static final String KEY_WIDTH = "width";
+	public static final String KEY_BRIGHTNESS = "brightness";
+	public static final String KEY_SHARPNESS = "sharpness";
+	public static final String KEY_TIMEOUT = "timeout";
+	public static final String KEY_TIMELAPSE = "timelapse";
 
 	@Override
 	public CameraConfigMessage decode(String json) {
-		final Map<String, String> map = new HashMap<>();
-		final String[] parts = CONFIG_PATTERN.matcher(json).replaceAll(StringConstants.EMPTY).split(PATTERN_SPLIT);
-		for (int i = 0; i < parts.length - 1; i += 2) {
-			map.put(parts[i].trim(), parts[i + 1].trim());
-		}
+		final Map<String, Object> map = JsonUtil.getMapByJson(json);
 
 		Integer height = getValue(map, KEY_HEIGHT);
 		Integer width = getValue(map, KEY_WIDTH);
@@ -53,8 +45,8 @@ public class CameraConfigMessageCodec implements HttpDecoder<CameraConfigMessage
 		return new CameraConfigMessage(height, width, brightness, sharpness, timeout, timelapse);
 	}
 
-	private Integer getValue(Map<String, String> map, String key) {
-		return Integer.valueOf(map.get(key));
+	private Integer getValue(Map<String, Object> map, String key) {
+		return Integer.valueOf(map.get(key).toString());
 	}
 
 	@Override
