@@ -23,6 +23,11 @@ import org.junit.Test;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.robo4j.util.Utf8Constant.UTF8_COLON;
+import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
+import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_LEFT;
+import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_RIGHT;
+
 /**
  * Test json utils
  *
@@ -52,10 +57,10 @@ public class JsonUtilTests {
 	}
 
 	@Test
-	public void getMapByJson(){
+	public void getMapByJson() {
 		String imageProcessorName = "imageProcessor";
 		String configurationProcessorName = "configurationProcessor";
-		String json = "{\""+ imageProcessorName + "\":\"POST\",\"" + configurationProcessorName + "\":\"POST\"}";
+		String json = "{\"" + imageProcessorName + "\":\"POST\",\"" + configurationProcessorName + "\":\"POST\"}";
 		final Map<String, Object> resultMap = JsonUtil.getMapByJson(json);
 
 		Assert.assertNotNull(resultMap);
@@ -63,18 +68,62 @@ public class JsonUtilTests {
 		Assert.assertTrue(resultMap.containsKey(configurationProcessorName));
 	}
 
-
 	@Test
-	public void jsonToMapTest(){
-		String jsonNumbers = "{\"width\":600,\"height\":800,\"brightness\":80,\"timeout\":2}";
-		String jsonStrings = "{\"width\":600,\"height\":800,\"brightness\":80,\"timeout\":2}";
-		String jsonNumberBooleanMixed = "{\"width\":600,\"height\":true,\"brightness\":\"80\",\"timeout\":\"2\", \"text\":\"something\"}";
+	public void jsonToMapTest() {
+		String key_width = "width";
+		String key_height = "height";
+		String key_message = "message";
+		String key_text = "text";
+		String key_active = "active";
+		int width = 600;
+		int height = 800;
+		String message = "this is a message";
+		String text = "more text";
+		Boolean active = true;
 
-		final Map<String, Object> resultMap1 = JsonUtil.getMapByJson(jsonNumbers);
-		final Map<String, Object> resultMap2 = JsonUtil.getMapByJson(jsonStrings);
-		final Map<String, Object> resultMap3 = JsonUtil.getMapByJson(jsonNumberBooleanMixed);
-		System.out.println("resultMap1: " + resultMap1);
-		System.out.println("resultMap2: " + resultMap2);
-		System.out.println("resultMap3: " + resultMap3);
+		String jsonNumbers = getInitJsonBuilder().addQuotationWithDelimiter(UTF8_COLON, key_width)
+				.addWithDelimiter(UTF8_COMMA, width).addQuotationWithDelimiter(UTF8_COLON, key_height).add(height)
+				.add(UTF8_CURLY_BRACKET_RIGHT).build();
+
+		String jsonStrings = getInitJsonBuilder().addQuotationWithDelimiter(UTF8_COLON, key_message)
+				.addQuotationWithDelimiter(UTF8_COMMA, message).addQuotationWithDelimiter(UTF8_COLON, key_text)
+				.addQuotation(text).add(UTF8_CURLY_BRACKET_RIGHT).build();
+
+		String jsonStringNumberBooleanMixed = getInitJsonBuilder().addQuotationWithDelimiter(UTF8_COLON, key_width)
+				.addWithDelimiter(UTF8_COMMA, width).addQuotationWithDelimiter(UTF8_COLON, key_height)
+				.addWithDelimiter(UTF8_COMMA, height).addQuotationWithDelimiter(UTF8_COLON, key_text)
+				.addQuotationWithDelimiter(UTF8_COMMA, text).addQuotationWithDelimiter(UTF8_COLON, key_active)
+				.add(active).add(UTF8_CURLY_BRACKET_RIGHT).build();
+
+		final Map<String, Object> resultNumbersMap = JsonUtil.getMapByJson(jsonNumbers);
+		final Map<String, Object> resultStringsMap = JsonUtil.getMapByJson(jsonStrings);
+		final Map<String, Object> resultStringNumberBooleanMap = JsonUtil.getMapByJson(jsonStringNumberBooleanMixed);
+
+		Assert.assertTrue(!resultNumbersMap.isEmpty());
+		Assert.assertTrue(getIntegerByObject(resultNumbersMap.get(key_width)).equals(width));
+		Assert.assertTrue(getIntegerByObject(resultNumbersMap.get(key_height)).equals(height));
+
+		Assert.assertTrue(!resultStringsMap.isEmpty());
+		Assert.assertTrue(resultStringsMap.get(key_message).equals(message));
+		Assert.assertTrue(resultStringsMap.get(key_text).equals(text));
+
+		Assert.assertTrue(!resultStringNumberBooleanMap.isEmpty());
+		Assert.assertTrue(getIntegerByObject(resultStringNumberBooleanMap.get(key_width)).equals(width));
+		Assert.assertTrue(getIntegerByObject(resultStringNumberBooleanMap.get(key_height)).equals(height));
+		Assert.assertTrue(resultStringNumberBooleanMap.get(key_text).equals(text));
+		Assert.assertTrue(getBooleanByObject(resultStringNumberBooleanMap.get(key_active)).equals(active));
+
+	}
+
+	private JsonElementStringBuilder getInitJsonBuilder() {
+		return JsonElementStringBuilder.Builder().add(UTF8_CURLY_BRACKET_LEFT);
+	}
+
+	private Integer getIntegerByObject(Object obj) {
+		return Integer.valueOf(obj.toString());
+	}
+
+	private Boolean getBooleanByObject(Object obj) {
+		return Boolean.valueOf(obj.toString());
 	}
 }
