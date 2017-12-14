@@ -48,6 +48,25 @@ public class JsonUtilTests {
 	}
 
 	@Test
+	public void getMapByJsonStringTest(){
+		String key_number = "number";
+		String key_text = "text ";
+		String key_active = "active";
+		int number_value = 40;
+		String text_value = "  some text";
+		boolean active_value = true;
+
+		String jsonText = "{\""+ key_number +"\" :  "+ number_value  +" , \""+ key_text +"\" :   \""+ text_value +"\", \""+ key_active +"\" :  "+ active_value +" }";
+
+		final Map<String, Object> map = JsonUtil.getMapByJson(jsonText);
+		Assert.assertTrue(!map.isEmpty());
+		Assert.assertTrue(Integer.valueOf(map.get(key_number).toString()).equals(number_value));
+		Assert.assertTrue(map.get(key_text.trim()).toString().equals(text_value));
+		Assert.assertTrue(Boolean.valueOf(map.get(key_active).toString()).equals(active_value));
+		System.out.println("MAP: " + map);
+	}
+
+	@Test
 	public void jsonToMapTest() {
 		String key_width = "width";
 		String key_height = "height";

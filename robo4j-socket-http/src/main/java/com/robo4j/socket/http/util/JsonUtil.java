@@ -111,7 +111,7 @@ public final class JsonUtil {
 				.split("\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?");
 
 		for (int i = 0; i < parts.length - 1; i += 2) {
-			result.put(parts[i], parts[i + 1]);
+			result.put(parts[i].trim(), parts[i + 1]);
 		}
 		return result;
 
