@@ -8,6 +8,7 @@ import com.robo4j.socket.http.dto.FieldValueDTO;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -47,27 +48,14 @@ public final class ReflectUtils {
 	public static String getJsonValue(ClassGetSetDTO getterDTO, Object obj) {
 		try {
 			Object value = getterDTO.getGetMethod().invoke(obj);
-			return JsonUtil.WITHOUT_QUOTATION_TYPES.contains(getterDTO.getClazz()) ? String.valueOf(value)
+			//@formatter:off
+			return value == null ? null : JsonUtil.WITHOUT_QUOTATION_TYPES.contains(getterDTO.getClazz()) ? String.valueOf(value)
 					: new StringBuilder(UTF8_QUOTATION_MARK).append(value).append(UTF8_QUOTATION_MARK).toString();
+			//@formatter:on
 		} catch (Exception e) {
 			throw new RoboReflectException("object getter value", e);
 		}
 	}
-
-//	public static Constructor<?> findConstructorByClassAndParameters(Class<?> clazz, List<Class<?>> constructorTypes) {
-//		Constructor[] constructors = clazz.getConstructors();
-//		//@formatter:off
-//        Optional<Constructor> optionalConstructor =  Stream.of(constructors)
-//                .filter(c -> c.getParameterTypes().length == constructorTypes.size())
-//                .filter(c -> constructorTypes.containsAll(Arrays.asList(c.getParameterTypes())))
-//                .findFirst();
-//	     if(optionalConstructor.isPresent()){
-//	         return optionalConstructor.get();
-//	     } else {
-//	         throw new RoboReflectException("not valid constructor");
-//	     }
-//        //@formatter:on
-//	}
 
 	@SuppressWarnings("unchecked")
 	public static <T> T createInstanceSetterByFieldMap(Class<T> clazz, Map<String, ClassGetSetDTO> getterDTOMap,
@@ -75,13 +63,15 @@ public final class ReflectUtils {
 
 		try {
 			Object instance = clazz.newInstance();
-
-			getterDTOMap.forEach((key, value) -> {
-				try {
-					value.getSetMethod().invoke(instance, JsonUtil.adjustClassCast(value.getClazz(), jsonMap.get(key).toString()));
-				} catch (Exception e) {
-					throw new RoboReflectException("create instance field", e);
-				}
+			getterDTOMap.entrySet().stream()
+                    .filter(e -> Objects.nonNull(jsonMap.get(e.getKey())))
+                    .forEach(e -> {
+                        try {
+                            ClassGetSetDTO value = e.getValue();
+                            value.getSetMethod().invoke(instance, adjustClassCast(value.getClazz(), jsonMap.get(e.getKey()).toString()));
+                        } catch (Exception e1) {
+                            throw new RoboReflectException("create instance field", e1);
+                        }
 			});
 			return (T) instance;
 		} catch (Exception e) {
@@ -89,12 +79,59 @@ public final class ReflectUtils {
 		}
 	}
 
+    // FIXME: 12/15/17 move to the type parser
+    private static Object adjustClassCast(Class<?> clazz, String value){
+        switch (clazz.getSimpleName()){
+            case "Integer":
+            case "int":
+                return Integer.valueOf(value);
+            case "Boolean":
+            case "boolean":
+                return Boolean.valueOf(value);
+            case "Float":
+            case "float":
+                return Float.valueOf(value);
+            case "Long":
+            case "long":
+                return Long.valueOf(value);
+            default:
+                return value;
+
+        }
+    }
+
+    private static class MapEntyDTO {
+		private final String key;
+		private final Object value;
+
+		public MapEntyDTO(String key, Object value) {
+			this.key = key;
+			this.value = value;
+		}
+
+		public String getKey() {
+			return key;
+		}
+
+		public Object getValue() {
+			return value;
+		}
+	}
 
 	public static String createJsonByFieldClassGetter(Map<String, ClassGetSetDTO> map, Object obj) {
-		return new StringBuilder(UTF8_CURLY_BRACKET_LEFT).append(map.entrySet().stream()
-				.map(entry -> new StringBuilder(UTF8_QUOTATION_MARK).append(entry.getKey()).append(UTF8_QUOTATION_MARK)
-						.append(UTF8_COLON).append(ReflectUtils.getJsonValue(entry.getValue(), obj)))
-				.collect(Collectors.joining(UTF8_COMMA))).append(UTF8_CURLY_BRACKET_RIGHT).toString();
+		//@formatter:off
+		return new StringBuilder(UTF8_CURLY_BRACKET_LEFT)
+				.append(map.entrySet().stream()
+						.map(entry -> new MapEntyDTO(entry.getKey(), ReflectUtils.getJsonValue(entry.getValue(), obj)))
+						.filter(entry -> Objects.nonNull(entry.getValue()))
+						.map(entry -> new StringBuilder(UTF8_QUOTATION_MARK)
+								.append(entry.getKey())
+								.append(UTF8_QUOTATION_MARK)
+								.append(UTF8_COLON)
+								.append(entry.getValue()))
+						.collect(Collectors.joining(UTF8_COMMA))).append(UTF8_CURLY_BRACKET_RIGHT)
+				.toString();
+		//@formatter:on
 	}
 
 	public static Map<String, ClassGetSetDTO> getFieldsTypeMap(Class<?> clazz){

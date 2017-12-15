@@ -122,27 +122,6 @@ public final class JsonUtil {
 		return JsonElementStringBuilder.Builder().add(UTF8_CURLY_BRACKET_LEFT);
 	}
 
-	// FIXME: 12/15/17 move to the type parser
-	public static Object adjustClassCast(Class<?> clazz, String value){
-		switch (clazz.getSimpleName()){
-			case "Integer":
-			case "int":
-				return Integer.valueOf(value);
-			case "Boolean":
-			case "boolean":
-				return Boolean.valueOf(value);
-			case "Float":
-			case "float":
-				return Float.valueOf(value);
-			case "Long":
-			case "long":
-				return Long.valueOf(value);
-			default:
-				return value;
-
-		}
-	}
-
 	/**
 	 * Converting json {"imageProcessor":["POST","callBack"]} to PathMethodDTO
 	 *
