@@ -17,14 +17,7 @@
 
 package com.robo4j.socket.http.codec;
 
-import com.robo4j.socket.http.dto.ClassGetSetDTO;
-import com.robo4j.socket.http.units.HttpDecoder;
-import com.robo4j.socket.http.units.HttpEncoder;
 import com.robo4j.socket.http.units.HttpProducer;
-import com.robo4j.socket.http.util.JsonUtil;
-import com.robo4j.socket.http.util.ReflectUtils;
-
-import java.util.Map;
 
 /**
  * Camera Image codec
@@ -33,29 +26,10 @@ import java.util.Map;
  * @author Miro Wengner (@miragemiko)
  */
 @HttpProducer
-public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncoder<CameraMessage> {
+public class CameraMessageCodec extends AbstractMessageCodec<CameraMessage> {
 
-	private static final Map<String, ClassGetSetDTO> fieldMethodMap = ReflectUtils.getFieldsTypeMap(CameraMessage.class);
-
-	@Override
-	public String encode(CameraMessage message) {
-		return ReflectUtils.createJsonByFieldClassGetter(fieldMethodMap, message);
-	}
-
-	@Override
-	public CameraMessage decode(String json) {
-		return ReflectUtils.createInstanceSetterByFieldMap(CameraMessage.class, fieldMethodMap,
-				JsonUtil.getMapByJson(json));
-	}
-
-	@Override
-	public Class<CameraMessage> getEncodedClass() {
-		return CameraMessage.class;
-	}
-
-	@Override
-	public Class<CameraMessage> getDecodedClass() {
-		return CameraMessage.class;
+	public CameraMessageCodec() {
+		super(CameraMessage.class);
 	}
 
 }

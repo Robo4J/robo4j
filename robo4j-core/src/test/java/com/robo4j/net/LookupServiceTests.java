@@ -39,7 +39,6 @@ import java.util.Map;
 public class LookupServiceTests {
 	private static final float ALLOWED_HEARTBEAT_MISSES = 22f;
 
-
 	@Test
 	public void testEncodeDecode() throws IOException {
 		Map<String, String> metadata = new HashMap<>();
