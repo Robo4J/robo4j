@@ -23,7 +23,7 @@ package com.robo4j.socket.http.util;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class HttpMessageUtil {
+public final class HttpMessageUtils {
 
 	public static final String SPACE = "\u0020";
 	public static final String NEXT_LINE = "\r\n";

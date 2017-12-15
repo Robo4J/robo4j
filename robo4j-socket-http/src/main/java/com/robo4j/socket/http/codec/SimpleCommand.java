@@ -19,6 +19,8 @@ package com.robo4j.socket.http.codec;
 
 import com.robo4j.util.StringConstants;
 
+import java.util.Objects;
+
 /**
  * used for simple http communication
  *
@@ -29,8 +31,11 @@ import com.robo4j.util.StringConstants;
  */
 public class SimpleCommand {
 
-	private final String value;
-	private final String type;
+	private String value;
+	private String type;
+
+	public SimpleCommand(){
+	}
 
 	public SimpleCommand(String value) {
 		this.value = value;
@@ -53,8 +58,31 @@ public class SimpleCommand {
 		return value;
 	}
 
+	public void setValue(String value) {
+		this.value = value;
+	}
+
 	public String getType() {
 		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		SimpleCommand that = (SimpleCommand) o;
+		return Objects.equals(value, that.value) &&
+				Objects.equals(type, that.type);
+	}
+
+	@Override
+	public int hashCode() {
+
+		return Objects.hash(value, type);
 	}
 
 	@Override

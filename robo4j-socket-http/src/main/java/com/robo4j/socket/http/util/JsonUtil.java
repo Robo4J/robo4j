@@ -29,7 +29,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,9 +51,9 @@ import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
 import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_LEFT;
 import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_RIGHT;
 import static com.robo4j.util.Utf8Constant.UTF8_QUOTATION_MARK;
+import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
 import static com.robo4j.util.Utf8Constant.UTF8_SQUARE_BRACKET_LEFT;
 import static com.robo4j.util.Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT;
-import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
 
 /**
  *
@@ -64,10 +64,10 @@ import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
  */
 public final class JsonUtil {
 
-	private static final Set<Class<?>> withoutQuotationTypes = Stream.of(boolean.class, int.class, short.class,
+	public static final Set<Class<?>> WITHOUT_QUOTATION_TYPES = Stream.of(boolean.class, int.class, short.class,
 			byte.class, long.class, double.class, float.class, char.class, Boolean.class, Integer.class, Short.class,
 			Byte.class, Long.class, Double.class, Float.class, Character.class).collect(Collectors.toSet());
-	private static final Set<Class<?>> quotationTypes = Stream.of(String.class).collect(Collectors.toSet());
+	private static final Set<Class<?>> QUOTATION_TYPES = Stream.of(String.class).collect(Collectors.toSet());
 	private static final String DELIMITER_JSON_OBJECTS = "(?<=\\})(?=\\,\\{)";
 	public static final String PATTERN_OBJ_FROM_ARRAY = "^\\[(.*)\\]$";
 
@@ -102,7 +102,7 @@ public final class JsonUtil {
 	}
 
 	public static Map<String, Object> getMapByJson(String json) {
-		final Map<String, Object> result = new HashMap<>();
+		final Map<String, Object> result = new LinkedHashMap<>();
 		if (json == null) {
 			return result;
 		}
@@ -110,11 +110,37 @@ public final class JsonUtil {
 		final String[] parts = json.replaceAll("^\\{\\s*\"|\"?\\s*\\}$", StringConstants.EMPTY)
 				.split("\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?");
 
+		// TODO: 12/15/17 (miro) -> parsing by types
 		for (int i = 0; i < parts.length - 1; i += 2) {
 			result.put(parts[i].trim(), parts[i + 1]);
 		}
 		return result;
 
+	}
+
+	public static JsonElementStringBuilder getInitJsonBuilder() {
+		return JsonElementStringBuilder.Builder().add(UTF8_CURLY_BRACKET_LEFT);
+	}
+
+	// FIXME: 12/15/17 move to the type parser
+	public static Object adjustClassCast(Class<?> clazz, String value){
+		switch (clazz.getSimpleName()){
+			case "Integer":
+			case "int":
+				return Integer.valueOf(value);
+			case "Boolean":
+			case "boolean":
+				return Boolean.valueOf(value);
+			case "Float":
+			case "float":
+				return Float.valueOf(value);
+			case "Long":
+			case "long":
+				return Long.valueOf(value);
+			default:
+				return value;
+
+		}
 	}
 
 	/**
@@ -232,11 +258,11 @@ public final class JsonUtil {
 
 	// Private Methods
 	private static boolean checkPrimitiveOrWrapper(Class<?> clazz) {
-		return withoutQuotationTypes.contains(clazz);
+		return WITHOUT_QUOTATION_TYPES.contains(clazz);
 	}
 
 	private static boolean checkString(Class<?> clazz) {
-		return quotationTypes.contains(clazz);
+		return QUOTATION_TYPES.contains(clazz);
 	}
 
 	private static PathMethodDTO extractPathMethodByMatcher(Matcher matcher) {

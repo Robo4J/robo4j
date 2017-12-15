@@ -22,7 +22,7 @@ import com.robo4j.socket.http.provider.DefaultValuesProvider;
 import com.robo4j.socket.http.util.HttpDenominator;
 import com.robo4j.socket.http.util.HttpHeaderBuilder;
 import com.robo4j.socket.http.util.HttpMessageBuilder;
-import com.robo4j.socket.http.util.HttpMessageUtil;
+import com.robo4j.socket.http.util.HttpMessageUtils;
 import com.robo4j.socket.http.util.RequestDenominator;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import org.junit.Assert;
@@ -30,7 +30,7 @@ import org.junit.Test;
 
 import static com.robo4j.socket.http.HttpHeaderFieldValues.CONNECTION_KEEP_ALIVE;
 import static com.robo4j.socket.http.provider.DefaultValuesProvider.ROBO4J_CLIENT;
-import static com.robo4j.socket.http.util.HttpMessageUtil.NEXT_LINE;
+import static com.robo4j.socket.http.util.HttpMessageUtils.NEXT_LINE;
 
 /**
  * Simple Http Header Oriented tests
@@ -55,8 +55,8 @@ public class HttpHeaderTests {
 
 	@Test
 	public void characterParser() {
-		Assert.assertTrue("[".equals(HttpMessageUtil.getHttpSeparator(13)));
-		Assert.assertTrue("]".equals(HttpMessageUtil.getHttpSeparator(14)));
+		Assert.assertTrue("[".equals(HttpMessageUtils.getHttpSeparator(13)));
+		Assert.assertTrue("]".equals(HttpMessageUtils.getHttpSeparator(14)));
 	}
 
 	@Test

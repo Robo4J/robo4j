@@ -30,7 +30,7 @@ public class InternalUtilTests {
 
     @Test
     public void testSeparator(){
-        String separator = SystemPropertyUtil.get("line.separator", "\n\n");
+        String separator = SystemPropertyUtils.get("line.separator", "\n\n");
         System.out.println("Separator: " + Arrays.asList(separator.toCharArray()));
     }
 }

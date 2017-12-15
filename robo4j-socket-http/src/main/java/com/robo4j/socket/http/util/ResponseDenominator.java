@@ -20,7 +20,7 @@ package com.robo4j.socket.http.util;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.enums.StatusCode;
 
-import static com.robo4j.socket.http.util.HttpMessageUtil.SPACE;
+import static com.robo4j.socket.http.util.HttpMessageUtils.SPACE;
 
 /**
  * @author Marcus Hirt (@hirt)

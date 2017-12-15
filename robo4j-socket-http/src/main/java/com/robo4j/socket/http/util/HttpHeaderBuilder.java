@@ -79,12 +79,12 @@ public final class HttpHeaderBuilder {
 
 	public String build() {
 		final String start = firstLineBuilder == null || firstLineBuilder.isEmpty() ? StringConstants.EMPTY
-				: firstLineBuilder.build().concat(HttpMessageUtil.NEXT_LINE);
+				: firstLineBuilder.build().concat(HttpMessageUtils.NEXT_LINE);
 		return start.concat(map
 				.entrySet()
 				.stream()
-				.map(e -> e.getKey().concat(HttpMessageUtil.COLON).concat(HttpMessageUtil.SPACE)
-						.concat(e.getValue()).concat(HttpMessageUtil.NEXT_LINE))
+				.map(e -> e.getKey().concat(HttpMessageUtils.COLON).concat(HttpMessageUtils.SPACE)
+						.concat(e.getValue()).concat(HttpMessageUtils.NEXT_LINE))
 				.collect(Collectors.joining(STRING_EMPTY)));
 	}
 
@@ -100,14 +100,14 @@ public final class HttpHeaderBuilder {
 		addFirstLine(version.getValue());
 		//@formatter:off
         return method.getName()
-                .concat(HttpMessageUtil.SPACE)
+                .concat(HttpMessageUtils.SPACE)
                 .concat(firstLineBuilder.build())
-                .concat(HttpMessageUtil.NEXT_LINE)
+                .concat(HttpMessageUtils.NEXT_LINE)
                 .concat(map.entrySet().stream()
-                        .map(e -> e.getKey().concat(HttpMessageUtil.COLON)
-                                .concat(HttpMessageUtil.SPACE)
+                        .map(e -> e.getKey().concat(HttpMessageUtils.COLON)
+                                .concat(HttpMessageUtils.SPACE)
                                 .concat(e.getValue())
-                                .concat(HttpMessageUtil.NEXT_LINE))
+                                .concat(HttpMessageUtils.NEXT_LINE))
                         .collect(Collectors.joining(STRING_EMPTY)));
         //@formatter:on
 	}

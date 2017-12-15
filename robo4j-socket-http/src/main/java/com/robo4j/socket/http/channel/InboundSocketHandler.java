@@ -23,7 +23,7 @@ import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.PropertiesProvider;
 import com.robo4j.socket.http.request.RoboResponseProcess;
 import com.robo4j.socket.http.units.HttpCodecRegistry;
-import com.robo4j.socket.http.util.ChannelUtil;
+import com.robo4j.socket.http.util.ChannelUtils;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
@@ -80,14 +80,14 @@ public class InboundSocketHandler implements SocketHandler {
 	}
 
 	private void initSocketChannel(List<RoboReference<Object>> targetRefs, PropertiesProvider properties) {
-		socketChannel = ChannelUtil.initServerSocketChannel(properties);
-		final SelectionKey key = ChannelUtil.registerSelectionKey(socketChannel);
+		socketChannel = ChannelUtils.initServerSocketChannel(properties);
+		final SelectionKey key = ChannelUtils.registerSelectionKey(socketChannel);
 
 		final HttpCodecRegistry codecRegistry = properties.getPropertySafe(PROPERTY_CODEC_REGISTRY);
 		final int bufferCapacity = properties.getIntSafe(HTTP_PROPERTY_BUFFER_CAPACITY);
 
 		while (active) {
-			int channelReady = ChannelUtil.getReadyChannelBySelectionKey(key);
+			int channelReady = ChannelUtils.getReadyChannelBySelectionKey(key);
 			if (channelReady == 0) {
 				continue;
 			}

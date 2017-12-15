@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class HttpPathUtil {
+public final class HttpPathUtils {
 	private static final int SEPARATOR_PATH = 12;
 
 	/**
@@ -37,12 +37,12 @@ public final class HttpPathUtil {
 	 * @return list of paths
 	 */
 	public static List<String> uriStringToPathList(String source) {
-		return Stream.of(source.split(HttpMessageUtil.getHttpSeparator(SEPARATOR_PATH))).filter(e -> !e.isEmpty())
+		return Stream.of(source.split(HttpMessageUtils.getHttpSeparator(SEPARATOR_PATH))).filter(e -> !e.isEmpty())
 				.collect(Collectors.toList());
 	}
 
 	public static String pathsToUri(List<String> paths) {
-		return paths.stream().collect(Collectors.joining(HttpMessageUtil.getHttpSeparator(SEPARATOR_PATH)));
+		return paths.stream().collect(Collectors.joining(HttpMessageUtils.getHttpSeparator(SEPARATOR_PATH)));
 	}
 
 }

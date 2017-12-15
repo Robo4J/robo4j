@@ -35,7 +35,7 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class ChannelUtil {
+public final class ChannelUtils {
 	/**
 	 * reading buffer
 	 *
@@ -82,7 +82,7 @@ public final class ChannelUtil {
 			final Selector selector = Selector.open();
 			return result.register(selector, SelectionKey.OP_ACCEPT);
 		} catch (Exception e) {
-			SimpleLoggingUtil.error(ChannelUtil.class, "resister selection key", e);
+			SimpleLoggingUtil.error(ChannelUtils.class, "resister selection key", e);
 			throw new SocketException("resister selection key", e);
 		}
 	}
@@ -94,7 +94,7 @@ public final class ChannelUtil {
 			result.bind(new InetSocketAddress(properties.getIntSafe(HTTP_PROPERTY_PORT)));
 			return result;
 		} catch (Exception e) {
-			SimpleLoggingUtil.error(ChannelUtil.class, "init server socket channel", e);
+			SimpleLoggingUtil.error(ChannelUtils.class, "init server socket channel", e);
 			throw new SocketException("init server socket channel", e);
 		}
 	}
@@ -103,14 +103,14 @@ public final class ChannelUtil {
 		try {
 			return key.selector().select();
 		} catch (Exception e) {
-			SimpleLoggingUtil.error(ChannelUtil.class, "get ready channel by selection key", e);
+			SimpleLoggingUtil.error(ChannelUtils.class, "get ready channel by selection key", e);
 			throw new SocketException("get ready channel by selection key", e);
 		}
 	}
 
 	public static void handleWriteChannelAndBuffer(String message, ByteChannel channel, ByteBuffer buffer) {
 		try {
-			ChannelUtil.writeBuffer(channel, buffer);
+			ChannelUtils.writeBuffer(channel, buffer);
 		} catch (Exception e) {
 			throw new SocketException(message, e);
 		} finally {

@@ -17,18 +17,14 @@
 
 package com.robo4j.socket.http.codec;
 
+import com.robo4j.socket.http.dto.ClassGetSetDTO;
 import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpEncoder;
 import com.robo4j.socket.http.units.HttpProducer;
-import com.robo4j.socket.http.util.JsonElementStringBuilder;
 import com.robo4j.socket.http.util.JsonUtil;
+import com.robo4j.socket.http.util.ReflectUtils;
 
 import java.util.Map;
-
-import static com.robo4j.util.Utf8Constant.UTF8_COLON;
-import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
-import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_LEFT;
-import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_RIGHT;
 
 /**
  * Camera Image codec
@@ -38,24 +34,15 @@ import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_RIGHT;
  */
 @HttpProducer
 public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncoder<CameraMessage> {
+
+	private static final Map<String, ClassGetSetDTO> fieldMethodMap = ReflectUtils.getFieldsTypeMap(CameraMessage.class);
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_VALUE = "value";
 	private static final String KEY_IMAGE = "image";
 
 	@Override
 	public String encode(CameraMessage message) {
-		//@formatter:off
-		return JsonElementStringBuilder.Builder()
-				.add(UTF8_CURLY_BRACKET_LEFT)
-				.addQuotationWithDelimiter(UTF8_COLON, KEY_TYPE)
-				.addQuotationWithDelimiter(UTF8_COMMA, message.getType())
-				.addQuotationWithDelimiter(UTF8_COLON, KEY_VALUE)
-				.addQuotationWithDelimiter(UTF8_COMMA, message.getValue())
-				.addQuotationWithDelimiter(UTF8_COLON, KEY_IMAGE)
-				.addQuotation(message.getImage())
-				.add(UTF8_CURLY_BRACKET_RIGHT)
-				.build();
-		//@formatter:on
+		return ReflectUtils.createJsonByFieldClassGetter(fieldMethodMap, message);
 	}
 
 	@Override

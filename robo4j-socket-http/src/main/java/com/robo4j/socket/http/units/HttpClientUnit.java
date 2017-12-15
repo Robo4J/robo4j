@@ -22,7 +22,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.util.ChannelUtil;
+import com.robo4j.socket.http.util.ChannelUtils;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.io.IOException;
@@ -75,10 +75,10 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			buffer.put(bytes);
 			buffer.flip();
 
-			ChannelUtil.writeBuffer(channel, buffer);
+			ChannelUtils.writeBuffer(channel, buffer);
 			if (responseUnit != null && responseSize != null) {
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
-				ChannelUtil.readBuffer(channel, readBuffer);
+				ChannelUtils.readBuffer(channel, readBuffer);
 				sendMessageToResponseUnit(readBuffer);
 			}
 

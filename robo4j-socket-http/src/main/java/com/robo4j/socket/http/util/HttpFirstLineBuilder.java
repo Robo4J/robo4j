@@ -33,7 +33,7 @@ public final class HttpFirstLineBuilder {
 	}
 
 	public HttpFirstLineBuilder add(Object value) {
-		sb.append(HttpMessageUtil.SPACE).append(value);
+		sb.append(HttpMessageUtils.SPACE).append(value);
 		return this;
 	}
 

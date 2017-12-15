@@ -10,15 +10,18 @@ import java.util.Objects;
  */
 public class CameraConfigMessage {
 
-	private final Integer height;
-	private final Integer width;
-	private final Integer brightness;
-	private final Integer sharpness;
-	private final Integer timeout;
-	private final Integer timelapse;
+	private Integer height;
+	private Integer width;
+	private Integer brightness;
+	private Integer sharpness;
+	private Integer timeout;
+	private Integer timelapse;
+
+	public CameraConfigMessage() {
+	}
 
 	public CameraConfigMessage(Integer height, Integer width, Integer brightness, Integer sharpness,
-			Integer timeout, Integer timelapse) {
+							   Integer timeout, Integer timelapse) {
 		this.height = height;
 		this.width = width;
 		this.brightness = brightness;
@@ -31,24 +34,48 @@ public class CameraConfigMessage {
 		return height;
 	}
 
+	public void setHeight(Integer height) {
+		this.height = height;
+	}
+
 	public Integer getWidth() {
 		return width;
+	}
+
+	public void setWidth(Integer width) {
+		this.width = width;
 	}
 
 	public Integer getBrightness() {
 		return brightness;
 	}
 
+	public void setBrightness(Integer brightness) {
+		this.brightness = brightness;
+	}
+
 	public Integer getSharpness() {
 		return sharpness;
+	}
+
+	public void setSharpness(Integer sharpness) {
+		this.sharpness = sharpness;
 	}
 
 	public Integer getTimeout() {
 		return timeout;
 	}
 
+	public void setTimeout(Integer timeout) {
+		this.timeout = timeout;
+	}
+
 	public Integer getTimelapse() {
 		return timelapse;
+	}
+
+	public void setTimelapse(Integer timelapse) {
+		this.timelapse = timelapse;
 	}
 
 	@Override

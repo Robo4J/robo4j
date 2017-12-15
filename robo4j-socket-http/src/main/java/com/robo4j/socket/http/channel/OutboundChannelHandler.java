@@ -22,7 +22,7 @@ import com.robo4j.socket.http.dto.PathMethodDTO;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.message.HttpDecoratedResponse;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
-import com.robo4j.socket.http.util.ChannelUtil;
+import com.robo4j.socket.http.util.ChannelUtils;
 import com.robo4j.socket.http.util.HttpMessageBuilder;
 
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class OutboundChannelHandler implements SocketHandler {
 		//@formatter:on
 
 		final ByteBuffer buffer = ChannelBufferUtils.getByteBufferByString(resultMessage);
-		ChannelUtil.handleWriteChannelAndBuffer("client send message", byteChannel, buffer);
+		ChannelUtils.handleWriteChannelAndBuffer("client send message", byteChannel, buffer);
 		decoratedResponse = getDecoratedResponse(byteChannel, pathMethod);
 
 	}

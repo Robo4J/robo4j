@@ -26,7 +26,7 @@ import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import com.robo4j.socket.http.units.test.HttpStringProducer;
 import com.robo4j.socket.http.units.test.StringConsumer;
-import com.robo4j.socket.http.util.HttpPathUtil;
+import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.SystemUtil;
@@ -152,7 +152,7 @@ public class RoboHttpPingPongTest {
 		config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("target", ID_HTTP_CLIENT);
 		config.setString("method", "POST");
-		config.setString("uri", HttpPathUtil.pathsToUri(paths));
+		config.setString("uri", HttpPathUtils.pathsToUri(paths));
 		config.setString(HTTP_PROPERTY_HOST, HOST_SYSTEM);
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		builder.add(HttpStringProducer.class, config, ID_HTTP_PRODUCER);

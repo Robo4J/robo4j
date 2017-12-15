@@ -20,7 +20,7 @@ package com.robo4j.socket.http.util;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 
-import static com.robo4j.socket.http.util.HttpMessageUtil.SPACE;
+import static com.robo4j.socket.http.util.HttpMessageUtils.SPACE;
 import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
 
 /**

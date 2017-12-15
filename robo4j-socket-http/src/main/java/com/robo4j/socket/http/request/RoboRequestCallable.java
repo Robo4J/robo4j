@@ -28,7 +28,7 @@ import com.robo4j.socket.http.dto.RoboPathReferenceDTO;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.socket.http.units.HttpUriRegister;
-import com.robo4j.socket.http.util.HttpPathUtil;
+import com.robo4j.socket.http.util.HttpPathUtils;
 
 import java.net.URI;
 import java.util.List;
@@ -69,7 +69,7 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 			result.setMethod(decoratedRequest.getMethod());
 
 			final HttpMessage httpMessage = new HttpMessage(decoratedRequest);
-			final List<String> paths = HttpPathUtil.uriStringToPathList(decoratedRequest.getPath());
+			final List<String> paths = HttpPathUtils.uriStringToPathList(decoratedRequest.getPath());
 
 			switch (decoratedRequest.getMethod()) {
 			case GET:

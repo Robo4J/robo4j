@@ -25,7 +25,7 @@ import com.robo4j.socket.http.SocketException;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.request.RoboResponseProcess;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
-import com.robo4j.socket.http.util.ChannelUtil;
+import com.robo4j.socket.http.util.ChannelUtils;
 import com.robo4j.socket.http.util.HttpDenominator;
 import com.robo4j.socket.http.util.HttpMessageBuilder;
 import com.robo4j.socket.http.util.ResponseDenominator;
@@ -81,7 +81,7 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 							.build();
 				}
 				buffer = ChannelBufferUtils.getByteBufferByString(getResponse);
-				ChannelUtil.handleWriteChannelAndBuffer("get write", channel, buffer);
+				ChannelUtils.handleWriteChannelAndBuffer("get write", channel, buffer);
 				break;
 			case POST:
 				if (responseProcess.getResult() != null && responseProcess.getCode().equals(StatusCode.ACCEPTED)) {
@@ -92,7 +92,7 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 							.build();
 
 					buffer = ChannelBufferUtils.getByteBufferByString(postResponse);
-					ChannelUtil.handleWriteChannelAndBuffer("post write", channel, buffer);
+					ChannelUtils.handleWriteChannelAndBuffer("post write", channel, buffer);
 					sendMessageToTargetRoboReference(targetRefs, responseProcess);
 				} else {
 					HttpDenominator denominator = new ResponseDenominator(responseProcess.getCode(), HttpVersion.HTTP_1_1);
@@ -100,7 +100,7 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 							.setDenominator(denominator)
 							.build();
 					buffer = ChannelBufferUtils.getByteBufferByString(notImplementedResponse);
-					ChannelUtil.handleWriteChannelAndBuffer("post write", channel, buffer);
+					ChannelUtils.handleWriteChannelAndBuffer("post write", channel, buffer);
 				}
 			default:
 				break;
@@ -112,7 +112,7 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 					.build();
 			buffer = ChannelBufferUtils.getByteBufferByString(badResponse);
 			try {
-				ChannelUtil.writeBuffer(channel, buffer);
+				ChannelUtils.writeBuffer(channel, buffer);
 			} catch (Exception e) {
 				throw new SocketException("post write", e);
 			}

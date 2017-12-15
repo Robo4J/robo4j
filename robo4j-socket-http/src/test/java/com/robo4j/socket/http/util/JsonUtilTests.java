@@ -22,9 +22,9 @@ import org.junit.Test;
 
 import java.util.Map;
 
+import static com.robo4j.socket.http.util.JsonUtil.getInitJsonBuilder;
 import static com.robo4j.util.Utf8Constant.UTF8_COLON;
 import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
-import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_LEFT;
 import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_RIGHT;
 
 /**
@@ -111,10 +111,6 @@ public class JsonUtilTests {
 		Assert.assertTrue(resultStringNumberBooleanMap.get(key_text).equals(text));
 		Assert.assertTrue(getBooleanByObject(resultStringNumberBooleanMap.get(key_active)).equals(active));
 
-	}
-
-	private JsonElementStringBuilder getInitJsonBuilder() {
-		return JsonElementStringBuilder.Builder().add(UTF8_CURLY_BRACKET_LEFT);
 	}
 
 	private Integer getIntegerByObject(Object obj) {

@@ -41,7 +41,7 @@ import com.robo4j.socket.http.util.HttpConstant;
 import com.robo4j.socket.http.units.HttpCodecRegistry;
 import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpUriRegister;
-import com.robo4j.socket.http.util.HttpPathUtil;
+import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.JsonUtil;
 
 /**
@@ -89,7 +89,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	public Object processGetByRegisteredPaths(final RoboReference<?> desiredReference, final List<String> paths) {
 		/* currently is supported only */
 		final HttpUriRegister register = HttpUriRegister.getInstance();
-		if (register.isUnitAvailable(HttpPathUtil.pathsToUri(paths))) {
+		if (register.isUnitAvailable(HttpPathUtils.pathsToUri(paths))) {
 			final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredReference.getMessageType());
 			if (decoder != null) {
 				List<String> methods = Arrays.asList("GET", "POST");
@@ -124,7 +124,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	public Object processPost(final RoboReference<?> desiredUnit, final List<String> paths,
 			final HttpMessageWrapper<?> wrapper) {
 		final HttpUriRegister register = HttpUriRegister.getInstance();
-		if (register.isUnitAvailable(HttpPathUtil.pathsToUri(paths))) {
+		if (register.isUnitAvailable(HttpPathUtils.pathsToUri(paths))) {
 			final String json = (String) wrapper.body();
 			final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredUnit.getMessageType());
 			if (decoder != null) {

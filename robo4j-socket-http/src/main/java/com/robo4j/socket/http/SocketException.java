@@ -24,14 +24,14 @@ package com.robo4j.socket.http;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class SocketException extends RuntimeException{
+public class SocketException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
-	public SocketException(String message){
-	    super(message);
-    }
+	public SocketException(String message) {
+		super(message);
+	}
 
 	public SocketException(String message, Throwable cause) {
-        super(message, cause);
-    }
+		super(message, cause);
+	}
 }

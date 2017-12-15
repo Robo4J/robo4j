@@ -21,7 +21,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.enums.SystemPath;
-import com.robo4j.socket.http.util.HttpPathUtil;
+import com.robo4j.socket.http.util.HttpPathUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -95,7 +95,7 @@ public final class HttpUriRegister {
 
 	public void updateUnits(RoboContext context) {
 		pathMethods.forEach((key, value) -> {
-			final List<String> paths = HttpPathUtil.uriStringToPathList(key);
+			final List<String> paths = HttpPathUtils.uriStringToPathList(key);
 			SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_VALUE_0));
 			if(systemPath != null){
 				// FIXME: 18.09.17 (miro) -> improve

@@ -17,7 +17,7 @@
 package com.robo4j.socket.http.request;
 
 import com.robo4j.socket.http.util.HttpConstant;
-import com.robo4j.socket.http.util.HttpMessageUtil;
+import com.robo4j.socket.http.util.HttpMessageUtils;
 
 /**
  * @author Miro Wengner (@miragemiko)
@@ -29,7 +29,7 @@ public class RoboBasicMapEntry {
     private String value;
 
     public RoboBasicMapEntry(String text) {
-        final String[] values = text.split(HttpMessageUtil.getHttpSeparator(3));
+        final String[] values = text.split(HttpMessageUtils.getHttpSeparator(3));
         key = values[HttpConstant.DEFAULT_VALUE_0];
         value = values[HttpConstant.DEFAULT_VALUE_1];
     }

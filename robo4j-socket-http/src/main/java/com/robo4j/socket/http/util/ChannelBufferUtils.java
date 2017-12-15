@@ -32,11 +32,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.robo4j.socket.http.util.HttpMessageUtil.HTTP_HEADER_BODY_DELIMITER;
-import static com.robo4j.socket.http.util.HttpMessageUtil.HTTP_HEADER_SEP;
-import static com.robo4j.socket.http.util.HttpMessageUtil.NEXT_LINE;
-import static com.robo4j.socket.http.util.HttpMessageUtil.POSITION_BODY;
-import static com.robo4j.socket.http.util.HttpMessageUtil.POSITION_HEADER;
+import static com.robo4j.socket.http.util.HttpMessageUtils.HTTP_HEADER_BODY_DELIMITER;
+import static com.robo4j.socket.http.util.HttpMessageUtils.HTTP_HEADER_SEP;
+import static com.robo4j.socket.http.util.HttpMessageUtils.NEXT_LINE;
+import static com.robo4j.socket.http.util.HttpMessageUtils.POSITION_BODY;
+import static com.robo4j.socket.http.util.HttpMessageUtils.POSITION_HEADER;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -164,9 +164,9 @@ public class ChannelBufferUtils {
 		final String[] tokens = firstLine.split(HttpConstant.HTTP_EMPTY_SEP);
 		final String[] paramArray = Arrays.copyOfRange(header, 1, header.length);
 
-		final HttpMethod method = HttpMethod.getByName(tokens[HttpMessageUtil.METHOD_KEY_POSITION]);
-		final String path = tokens[HttpMessageUtil.URI_VALUE_POSITION];
-		final String version = tokens[HttpMessageUtil.VERSION_POSITION];
+		final HttpMethod method = HttpMethod.getByName(tokens[HttpMessageUtils.METHOD_KEY_POSITION]);
+		final String path = tokens[HttpMessageUtils.URI_VALUE_POSITION];
+		final String version = tokens[HttpMessageUtils.VERSION_POSITION];
 		final Map<String, String> headerParams = getHeaderParametersByArray(paramArray);
 
 		final RequestDenominator denominator = new RequestDenominator(method, path, HttpVersion.getByValue(version));
@@ -204,10 +204,10 @@ public class ChannelBufferUtils {
 	private static Map<String, String> getHeaderParametersByArray(String[] paramArray) {
 		final Map<String, String> result = new HashMap<>();
 		for (int i = 0; i < paramArray.length; i++) {
-			final String[] array = paramArray[i].split(HttpMessageUtil.getHttpSeparator(HTTP_HEADER_SEP));
+			final String[] array = paramArray[i].split(HttpMessageUtils.getHttpSeparator(HTTP_HEADER_SEP));
 
-			String key = array[HttpMessageUtil.METHOD_KEY_POSITION].toLowerCase();
-			String value = array[HttpMessageUtil.URI_VALUE_POSITION].trim();
+			String key = array[HttpMessageUtils.METHOD_KEY_POSITION].toLowerCase();
+			String value = array[HttpMessageUtils.URI_VALUE_POSITION].trim();
 			result.put(key, value);
 		}
 		return result;

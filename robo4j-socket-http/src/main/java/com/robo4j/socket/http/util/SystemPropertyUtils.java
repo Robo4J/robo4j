@@ -23,7 +23,7 @@ package com.robo4j.socket.http.util;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class SystemPropertyUtil {
+public final class SystemPropertyUtils {
 
     public static String get(String key, String def){
         if(key == null){

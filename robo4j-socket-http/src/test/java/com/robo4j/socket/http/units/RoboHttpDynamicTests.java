@@ -33,7 +33,7 @@ import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpDenominator;
 import com.robo4j.socket.http.util.HttpMessageBuilder;
-import com.robo4j.socket.http.util.HttpPathUtil;
+import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RequestDenominator;
 import com.robo4j.socket.http.util.RoboHttpUtils;
@@ -98,7 +98,7 @@ public class RoboHttpDynamicTests {
 		List<String> paths = Arrays.asList("units", ID_TARGET_UNIT);
 		for (int i = 0; i < MESSAGES_NUMBER; i++) {
 
-			HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, HttpPathUtil.pathsToUri(paths), HttpVersion.HTTP_1_1);
+			HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, HttpPathUtils.pathsToUri(paths), HttpVersion.HTTP_1_1);
 			String messageToSend = HttpMessageBuilder.Build()
 					.setDenominator(denominator)
                     .addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(HOST_SYSTEM))
