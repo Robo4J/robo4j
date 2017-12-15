@@ -36,9 +36,6 @@ import java.util.Map;
 public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncoder<CameraMessage> {
 
 	private static final Map<String, ClassGetSetDTO> fieldMethodMap = ReflectUtils.getFieldsTypeMap(CameraMessage.class);
-	private static final String KEY_TYPE = "type";
-	private static final String KEY_VALUE = "value";
-	private static final String KEY_IMAGE = "image";
 
 	@Override
 	public String encode(CameraMessage message) {
@@ -47,13 +44,8 @@ public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncod
 
 	@Override
 	public CameraMessage decode(String json) {
-		final Map<String, Object> map = JsonUtil.getMapByJson(json);
-
-		final String type = String.valueOf(map.get(KEY_TYPE));
-		final String value = String.valueOf(map.get(KEY_VALUE));
-		final String image = String.valueOf(map.get(KEY_IMAGE));
-		return new CameraMessage(type, value, image);
-
+		return ReflectUtils.createInstanceSetterByFieldMap(CameraMessage.class, fieldMethodMap,
+				JsonUtil.getMapByJson(json));
 	}
 
 	@Override
