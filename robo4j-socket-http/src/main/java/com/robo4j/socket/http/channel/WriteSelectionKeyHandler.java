@@ -131,8 +131,9 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 	}
 
 	private void sendMessageToTargetRoboReference(List<RoboReference<Object>> targetRefs, RoboResponseProcess process) {
-		targetRefs.stream().filter(
-				ref -> process.getResult() != null && ref.getMessageType().equals(process.getResult().getClass()))
+		targetRefs.stream()
+				.filter(ref -> ref.getId().equals(process.getTarget()))
+				.filter(ref -> process.getResult() != null && ref.getMessageType().equals(process.getResult().getClass()))
 				.forEach(ref -> ref.sendMessage(process.getResult()));
 	}
 

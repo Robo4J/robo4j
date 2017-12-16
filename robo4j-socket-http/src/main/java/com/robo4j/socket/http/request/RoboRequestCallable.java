@@ -91,6 +91,7 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 						if (pathReference.getRoboReference() == null) {
 							result.setCode(StatusCode.NOT_FOUND);
 						} else {
+							result.setTarget(pathReference.getRoboReference().getId());
 							AttributeDescriptor<?> attributeDescriptor = getAttributeByQuery(
 									pathReference.getRoboReference(), httpMessage.uri());
 							if (attributeDescriptor != null) {
@@ -120,6 +121,7 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 					switch (pathReference.getPath()) {
 					case UNITS:
 						if (pathReference.getRoboReference() != null) {
+							result.setTarget(pathReference.getRoboReference().getId());
 							Object respObj = factory.processPost(pathReference.getRoboReference(), paths,
 									new HttpMessageWrapper<>(httpMessage, postValue));
 							if (respObj != null) {

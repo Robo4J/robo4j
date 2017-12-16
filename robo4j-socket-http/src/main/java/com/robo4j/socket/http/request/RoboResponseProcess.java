@@ -28,11 +28,20 @@ import com.robo4j.socket.http.enums.StatusCode;
  * @author Miro Wengner (@miragemiko)
  */
 public class RoboResponseProcess {
+    private String target;
     private HttpMethod method;
     private StatusCode code;
     private Object result;
 
-    public RoboResponseProcess() {
+    RoboResponseProcess() {
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
     }
 
     public void setMethod(HttpMethod method) {
@@ -62,7 +71,8 @@ public class RoboResponseProcess {
     @Override
     public String toString() {
         return "RoboResponseProcess{" +
-                "method=" + method +
+                "target='" + target + '\'' +
+                ", method=" + method +
                 ", code=" + code +
                 ", result=" + result +
                 '}';
