@@ -6,7 +6,9 @@ import com.robo4j.socket.http.dto.ClassGetSetDTO;
 import com.robo4j.socket.http.dto.FieldValueDTO;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -18,6 +20,8 @@ import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
 import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_LEFT;
 import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_RIGHT;
 import static com.robo4j.util.Utf8Constant.UTF8_QUOTATION_MARK;
+import static com.robo4j.util.Utf8Constant.UTF8_SQUARE_BRACKET_LEFT;
+import static com.robo4j.util.Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -45,12 +49,19 @@ public final class ReflectUtils {
 		// @formatter::on
 	}
 
+	/**
+	 * translate Object to proper JSON string
+	 * 
+	 * @param getterDTO
+	 * @param obj
+	 * @return
+	 */
 	public static String getJsonValue(ClassGetSetDTO getterDTO, Object obj) {
 		try {
 			Object value = getterDTO.getGetMethod().invoke(obj);
 			//@formatter:off
 			return value == null ? null : JsonUtil.WITHOUT_QUOTATION_TYPES.contains(getterDTO.getClazz()) ? String.valueOf(value)
-					: new StringBuilder(UTF8_QUOTATION_MARK).append(value).append(UTF8_QUOTATION_MARK).toString();
+					: processObjectToJson(value);
 			//@formatter:on
 		} catch (Exception e) {
 			throw new RoboReflectException("object getter value", e);
@@ -58,20 +69,51 @@ public final class ReflectUtils {
 	}
 
 	@SuppressWarnings("unchecked")
+	public static String processObjectToJson(Object obj){
+		StringBuilder result = new StringBuilder();
+		if(obj.getClass().isArray()){
+			Object[] objects =  (Object[]) obj;
+			result.append(UTF8_SQUARE_BRACKET_LEFT)
+					.append(Stream.of(objects).map(ReflectUtils::processObjectToJson)
+							.collect(Collectors.joining(UTF8_COMMA)))
+					.append(UTF8_SQUARE_BRACKET_RIGHT);
+		} else if(obj instanceof List<?>){
+			List<Object> objects = (List<Object>) obj;
+			result.append(UTF8_SQUARE_BRACKET_LEFT)
+					.append(objects.stream().map(ReflectUtils::processObjectToJson)
+							.collect(Collectors.joining(UTF8_COMMA)))
+					.append(UTF8_SQUARE_BRACKET_RIGHT);
+		} else if(obj instanceof Map<?, ?>) {
+			Map<Object,Object> objectMap = (Map<Object, Object>) obj;
+			result.append(UTF8_CURLY_BRACKET_LEFT)
+				.append(objectMap.entrySet().stream()
+							.map(entry -> new StringBuilder(ReflectUtils.processObjectToJson(entry.getKey()))
+									.append(UTF8_COLON)
+									.append(ReflectUtils.processObjectToJson(entry.getValue()))
+							        .toString())
+							.collect(Collectors.joining(UTF8_COMMA)))
+					.append(UTF8_CURLY_BRACKET_RIGHT);
+		} else {
+			result.append(UTF8_QUOTATION_MARK).append(obj)
+					.append(UTF8_QUOTATION_MARK);
+		}
+		return result.toString();
+	}
+
+	@SuppressWarnings("unchecked")
 	public static <T> T createInstanceSetterByFieldMap(Class<T> clazz, Map<String, ClassGetSetDTO> getterDTOMap,
-												 Map<String, Object> jsonMap) {
+			Map<String, Object> jsonMap) {
 
 		try {
 			Object instance = clazz.newInstance();
-			getterDTOMap.entrySet().stream()
-                    .filter(e -> Objects.nonNull(jsonMap.get(e.getKey())))
-                    .forEach(e -> {
-                        try {
-                            ClassGetSetDTO value = e.getValue();
-                            value.getSetMethod().invoke(instance, adjustClassCast(value.getClazz(), jsonMap.get(e.getKey()).toString()));
-                        } catch (Exception e1) {
-                            throw new RoboReflectException("create instance field", e1);
-                        }
+			getterDTOMap.entrySet().stream().filter(e -> Objects.nonNull(jsonMap.get(e.getKey()))).forEach(e -> {
+				try {
+					ClassGetSetDTO value = e.getValue();
+					value.getSetMethod().invoke(instance,
+							adjustClassCast(value.getClazz(), jsonMap.get(e.getKey())));
+				} catch (Exception e1) {
+					throw new RoboReflectException("create instance field", e1);
+				}
 			});
 			return (T) instance;
 		} catch (Exception e) {
@@ -79,28 +121,31 @@ public final class ReflectUtils {
 		}
 	}
 
-    // FIXME: 12/15/17 move to the type parser
-    private static Object adjustClassCast(Class<?> clazz, String value){
-        switch (clazz.getSimpleName()){
-            case "Integer":
-            case "int":
-                return Integer.valueOf(value);
-            case "Boolean":
-            case "boolean":
-                return Boolean.valueOf(value);
-            case "Float":
-            case "float":
-                return Float.valueOf(value);
-            case "Long":
-            case "long":
-                return Long.valueOf(value);
-            default:
-                return value;
+	// FIXME: 12/15/17 move to the type parser
+	private static Object adjustClassCast(Class<?> clazz, Object value) {
+		switch (clazz.getSimpleName()) {
+		case "Integer":
+		case "int":
+			return Integer.valueOf(value.toString());
+		case "Boolean":
+		case "boolean":
+			return Boolean.valueOf(value.toString());
+		case "Float":
+		case "float":
+			return Float.valueOf(value.toString());
+		case "Long":
+		case "long":
+			return Long.valueOf(value.toString());
+		case "List":
+		case "array":
+			return Arrays.asList(value);
+		default:
+			return value;
 
-        }
-    }
+		}
+	}
 
-    private static class MapEntyDTO {
+	private static class MapEntyDTO {
 		private final String key;
 		private final Object value;
 
@@ -134,24 +179,22 @@ public final class ReflectUtils {
 		//@formatter:on
 	}
 
-	public static Map<String, ClassGetSetDTO> getFieldsTypeMap(Class<?> clazz){
-        //@formatter::off
-        return Stream.of(clazz.getDeclaredFields())
-                .map(field -> {
-                    try {
-                    	String adjustedName = adjustFirstLetterUpperCase(field.getName());
-                        String getMethodName = getGetterNameByType(field.getType(), adjustedName);
-                        String setMethodName = METHOD_SET.concat(adjustedName);
-                        Method getMethod = clazz.getDeclaredMethod(getMethodName);
-                        Method setMethod = clazz.getDeclaredMethod(setMethodName, field.getType());
-                        return new ClassGetSetDTO(field.getName(), field.getType(), getMethod, setMethod);
-                    } catch (Exception e){
-                        throw new RoboReflectException("class configuration", e);
-                    }
-                })
-                .collect(Collectors.toMap(ClassGetSetDTO::getName, e -> e, (e1, e2) -> e1, LinkedHashMap::new));
-        //@formatter::on
-    }
+	public static Map<String, ClassGetSetDTO> getFieldsTypeMap(Class<?> clazz) {
+		// @formatter::off
+		return Stream.of(clazz.getDeclaredFields()).map(field -> {
+			try {
+				String adjustedName = adjustFirstLetterUpperCase(field.getName());
+				String getMethodName = getGetterNameByType(field.getType(), adjustedName);
+				String setMethodName = METHOD_SET.concat(adjustedName);
+				Method getMethod = clazz.getDeclaredMethod(getMethodName);
+				Method setMethod = clazz.getDeclaredMethod(setMethodName, field.getType());
+				return new ClassGetSetDTO(field.getName(), field.getType(), getMethod, setMethod);
+			} catch (Exception e) {
+				throw new RoboReflectException("class configuration", e);
+			}
+		}).collect(Collectors.toMap(ClassGetSetDTO::getName, e -> e, (e1, e2) -> e1, LinkedHashMap::new));
+		// @formatter::on
+	}
 
 	private static String getGetterNameByType(Class<?> clazz, String fieldName) {
 		return METHOD_IS_TYPES.contains(clazz) ? METHOD_IS + fieldName : METHOD_GET + fieldName;

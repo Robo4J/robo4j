@@ -101,7 +101,7 @@ public final class JsonUtil {
 		return sb.toString();
 	}
 
-	public static Map<String, Object> getMapByJson(String json) {
+	public static Map<String, Object> getMapByJson1(String json) {
 		final Map<String, Object> result = new LinkedHashMap<>();
 		if (json == null) {
 			return result;
@@ -118,6 +118,40 @@ public final class JsonUtil {
 
 	}
 
+	public static Map<String, Object> getMapByJson(String json) {
+		final Map<String, Object> result = new LinkedHashMap<>();
+		if (json == null) {
+			return result;
+		}
+
+		// FIXME: 12/17/17 (miro) consider array too
+		final String extractedObject= json.replaceAll("^\\{\\s*\"|\"?\\s*\\}$", StringConstants.EMPTY);
+		final String[] parts  =extractedObject.split("\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?");
+//		final String[] parts  =extractedObject.split("\"?(\"?\\s*:\\s*\"?)");
+
+		// TODO: 12/15/17 (miro) -> parsing by types
+		for (int i = 0; i < parts.length - 1; i += 2) {
+			String keyPart = parts[i].trim();
+			String valuePart = parts[i + 1].trim();
+			if(valuePart.startsWith("{")){
+				result.put(keyPart, getMapByJson(valuePart));
+			} else if(valuePart.startsWith("[")) {
+				Object[] preArray = valuePart.replaceAll("^\\[\\s*|\\s*\\]$", StringConstants.EMPTY)
+						.split(UTF8_COMMA);
+				// FIXME: 12/17/17 (miro) -> object type parser
+				result.put(keyPart, Stream.of(preArray).map(JsonUtil::parseJsonStringToObject).collect(Collectors.toList()));
+			} else {
+				result.put(keyPart, valuePart);
+			}
+		}
+		return result;
+
+	}
+
+	public static String parseJsonStringToObject(Object obj){
+		return obj.toString().replaceAll(UTF8_QUOTATION_MARK,StringConstants.EMPTY);
+	}
+
 	public static JsonElementStringBuilder getInitJsonBuilder() {
 		return JsonElementStringBuilder.Builder().add(UTF8_CURLY_BRACKET_LEFT);
 	}
@@ -125,8 +159,7 @@ public final class JsonUtil {
 	/**
 	 * Converting json {"imageProcessor":["POST","callBack"]} to PathMethodDTO
 	 *
-	 * @param json
-	 *            - string
+	 * @param json - string
 	 * @return List of elements
 	 */
 	public static PathMethodDTO getPathMethodByJson(String json) {
