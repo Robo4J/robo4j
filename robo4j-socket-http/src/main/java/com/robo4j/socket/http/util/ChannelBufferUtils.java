@@ -108,7 +108,7 @@ public class ChannelBufferUtils {
 			requestBuffer.flip();
 			addToStringBuilder(sbBasic, requestBuffer, readBytes);
 			final StringBuilder sbAdditional = new StringBuilder();
-			final HttpDecoratedRequest result = extractdecoratedRequestByStringMessage(sbBasic.toString());
+			final HttpDecoratedRequest result = extractDecoratedRequestByStringMessage(sbBasic.toString());
 
 
 			int totalReadBytes = readBytes;
@@ -157,7 +157,7 @@ public class ChannelBufferUtils {
 		return Arrays.equals(stopWindow, window);
 	}
 
-	public static HttpDecoratedRequest extractdecoratedRequestByStringMessage(String message) {
+	public static HttpDecoratedRequest extractDecoratedRequestByStringMessage(String message) {
 		final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
 		final String[] header = headerAndBody[POSITION_HEADER].split("[" + NEXT_LINE + "]+");
 		final String firstLine = RoboHttpUtils.correctLine(header[0]);

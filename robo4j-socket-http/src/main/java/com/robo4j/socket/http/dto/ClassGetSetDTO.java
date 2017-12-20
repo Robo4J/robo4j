@@ -1,5 +1,6 @@
 package com.robo4j.socket.http.dto;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
@@ -9,19 +10,19 @@ import java.util.Objects;
  */
 public class ClassGetSetDTO {
     private final String name;
-    private final Class<?> clazz;
+    private final Field field;
     private final Method getMethod;
     private final Method setMethod;
 
-    public ClassGetSetDTO(String name, Class<?> clazz, Method getMethod, Method setMethod) {
+    public ClassGetSetDTO(String name, Field field, Method getMethod, Method setMethod) {
         this.name = name;
-        this.clazz = clazz;
+        this.field = field;
         this.getMethod = getMethod;
         this.setMethod = setMethod;
     }
 
-    public Class<?> getClazz() {
-        return clazz;
+    public Field getField() {
+        return field;
     }
 
     public String getName() {
@@ -42,7 +43,7 @@ public class ClassGetSetDTO {
         if (o == null || getClass() != o.getClass()) return false;
         ClassGetSetDTO that = (ClassGetSetDTO) o;
         return Objects.equals(name, that.name) &&
-                Objects.equals(clazz, that.clazz) &&
+                Objects.equals(field, that.field) &&
                 Objects.equals(getMethod, that.getMethod) &&
                 Objects.equals(setMethod, that.setMethod);
     }
@@ -50,14 +51,14 @@ public class ClassGetSetDTO {
     @Override
     public int hashCode() {
 
-        return Objects.hash(name, clazz, getMethod, setMethod);
+        return Objects.hash(name, field, getMethod, setMethod);
     }
 
     @Override
     public String toString() {
         return "ClassGetSetDTO{" +
                 "name='" + name + '\'' +
-                ", clazz=" + clazz +
+                ", field=" + field +
                 ", getMethod=" + getMethod +
                 ", setMethod=" + setMethod +
                 '}';

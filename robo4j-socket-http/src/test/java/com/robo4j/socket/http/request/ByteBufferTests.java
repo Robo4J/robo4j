@@ -63,7 +63,7 @@ public class ByteBufferTests {
 
     @Test
     public void testPostmanMessage() {
-        HttpDecoratedRequest decoratedRequest = ChannelBufferUtils.extractdecoratedRequestByStringMessage(TEST_POSTMAN_STRING);
+        HttpDecoratedRequest decoratedRequest = ChannelBufferUtils.extractDecoratedRequestByStringMessage(TEST_POSTMAN_STRING);
         decoratedRequest.addMessage(TEST_POSTMAN_MESSAGE);
 
         Assert.assertNotNull(decoratedRequest.getHeader());
@@ -89,7 +89,7 @@ public class ByteBufferTests {
                 .addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, port))
                 .build(bodyMessage);
 
-        HttpDecoratedRequest decoratedRequest = ChannelBufferUtils.extractdecoratedRequestByStringMessage(postMessage);
+        HttpDecoratedRequest decoratedRequest = ChannelBufferUtils.extractDecoratedRequestByStringMessage(postMessage);
 
         Assert.assertNotNull(postMessage);
         Assert.assertTrue(postMessage.length() == decoratedRequest.getLength());

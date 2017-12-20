@@ -26,5 +26,4 @@ package com.robo4j.util;
 public final class StringConstants {
     public static final String EMPTY = "";
     public static final String SPACE = "\u0020";
-    public static final String COMMA = "\u002C";
 }

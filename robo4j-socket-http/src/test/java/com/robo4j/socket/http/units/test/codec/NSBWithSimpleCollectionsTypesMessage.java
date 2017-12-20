@@ -17,6 +17,8 @@ public class NSBWithSimpleCollectionsTypesMessage {
     private String[] array;
     private List<String> list;
     private Map<String, String> map;
+    private List<TestPerson> persons;
+    private Map<String, TestPerson> personMap;
 
     public NSBWithSimpleCollectionsTypesMessage() {
     }
@@ -69,6 +71,22 @@ public class NSBWithSimpleCollectionsTypesMessage {
         this.map = map;
     }
 
+    public List<TestPerson> getPersons() {
+        return persons;
+    }
+
+    public void setPersons(List<TestPerson> persons) {
+        this.persons = persons;
+    }
+
+    public Map<String, TestPerson> getPersonMap() {
+        return personMap;
+    }
+
+    public void setPersonMap(Map<String, TestPerson> personMap) {
+        this.personMap = personMap;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -79,13 +97,15 @@ public class NSBWithSimpleCollectionsTypesMessage {
                 Objects.equals(active, that.active) &&
                 Arrays.equals(array, that.array) &&
                 Objects.equals(list, that.list) &&
-                Objects.equals(map, that.map);
+                Objects.equals(map, that.map) &&
+                Objects.equals(persons, that.persons) &&
+                Objects.equals(personMap, that.personMap);
     }
 
     @Override
     public int hashCode() {
 
-        int result = Objects.hash(number, message, active, list, map);
+        int result = Objects.hash(number, message, active, list, map, persons, personMap);
         result = 31 * result + Arrays.hashCode(array);
         return result;
     }
@@ -99,6 +119,8 @@ public class NSBWithSimpleCollectionsTypesMessage {
                 ", array=" + Arrays.toString(array) +
                 ", list=" + list +
                 ", map=" + map +
+                ", persons=" + persons +
+                ", personMap=" + personMap +
                 '}';
     }
 }
