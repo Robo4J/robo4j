@@ -67,7 +67,7 @@ public final class JsonUtil {
 	public static final Set<Class<?>> WITHOUT_QUOTATION_TYPES = Stream.of(boolean.class, int.class, short.class,
 			byte.class, long.class, double.class, float.class, char.class, Boolean.class, Integer.class, Short.class,
 			Byte.class, Long.class, Double.class, Float.class, Character.class).collect(Collectors.toSet());
-	private static final Set<Class<?>> QUOTATION_TYPES = Stream.of(String.class).collect(Collectors.toSet());
+	public static final Set<Class<?>> QUOTATION_TYPES = Stream.of(String.class).collect(Collectors.toSet());
 	private static final String DELIMITER_JSON_OBJECTS = "(?<=\\})(?=\\,\\{)";
 	public static final String PATTERN_OBJ_FROM_ARRAY = "^\\[(.*)\\]$";
 
