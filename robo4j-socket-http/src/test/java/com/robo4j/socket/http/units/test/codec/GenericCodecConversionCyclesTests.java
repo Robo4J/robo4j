@@ -28,13 +28,6 @@ public class GenericCodecConversionCyclesTests {
 		collectionsTypesMessageCodec = new NSBWithSimpleCollectionsTypesMessageCodec();
 	}
 
-//	@Test
-//	public void castingTest(){
-//		boolean test = false;
-//		boolean value = ReflectUtils.adjustClassCast(boolean.class, test);
-//		System.out.println("value: " + value);
-//	}
-
 	@Test
 	public void genericClassCycleFromObjectToJsonWithNullExtractionTest() {
 		int numberValue = 22;
