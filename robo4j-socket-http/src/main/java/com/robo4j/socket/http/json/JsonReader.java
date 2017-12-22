@@ -91,69 +91,69 @@ public class JsonReader {
             char activeChar = getCharSkipWhiteSpace();
             ReadType readType = getReadType(activeChar);
 
+            //create new document
             if(readType != null && document == null && depth == 0){
                 putNewDocument(readType);
-            } else {
-                if(activeChar == QUOTATION_MARK && currentRead.equals(ReadType.START_OBJECT)) {
-                    if (currentKey == null) {
-                        currentRead = ReadType.START_KEY;
-                    } else if (currentKey != null) {
-                        currentRead = ReadType.END_KEY;
-                    }
-                } else if(currentRead == ReadType.START_KEY){
-                    if(activeChar == QUOTATION_MARK){
-                        activeChar = json.charAt(++index);
-                        currentKey= readString(activeChar);
-                        currentRead = ReadType.END_KEY;
-                    } else {
-                        currentKey = readString(activeChar);
-                        currentRead = ReadType.END_KEY;
-                    }
-                } else if(currentRead == ReadType.END_KEY && activeChar == COLON){
-                    currentRead = ReadType.START_VALUE;
-                } else if(currentRead == ReadType.START_VALUE){
-                    switch (activeChar){
-                        case QUOTATION_MARK:
-                            activeChar = json.charAt(++index);
-                            currentValue = readString(activeChar);
-                            currentRead = ReadType.END_VALUE;
-                            break;
-                        case CURLY_BRACKET_LEFT:
-                            System.out.println("read object");
-                            break;
-                        case SQUARE_BRACKET_LEFT:
-                            System.out.println("read array");
-                            break;
-                        case CHARACTER_F:
-                        case CHARACTER_T:
-                            currentValue = readBoolean(activeChar);
-                            currentRead = ReadType.END_VALUE;
-                            break;
-                        default:
-                            if(NUMBER_SET.contains(activeChar)){
-                                currentValue = readNumber(activeChar);
-                                currentRead = ReadType.END_VALUE;
-                            } else {
-                                throw new RoboReflectException("wrong json reading: " + activeChar);
-                            }
-                    }
-
-
-                } else if(currentRead == ReadType.END_VALUE && (activeChar == COMMA || activeChar == CURLY_BRACKET_RIGHT )){
+                index++;
+                activeChar = getCharSkipWhiteSpace();
+                if(activeChar == QUOTATION_MARK){
                     currentRead = ReadType.START_KEY;
-                    document.add(currentKey, currentValue);
-                    currentKey = null;
-                    currentValue = null;
+                }
+            }
+
+            if(currentRead == ReadType.START_KEY){
+                activeChar = json.charAt(++index);
+                currentKey= readString(activeChar);
+                currentRead = adjustCurrentReadingAfterString(ReadType.END_KEY);
+            } else if(currentRead == ReadType.END_KEY && activeChar == COLON){
+                currentRead = ReadType.START_VALUE;
+            } else if(currentRead == ReadType.START_VALUE){
+                switch (activeChar){
+                    case QUOTATION_MARK:
+                        activeChar = json.charAt(++index);
+                        currentValue = readString(activeChar);
+                        currentRead = adjustCurrentReadingAfterString(ReadType.END_VALUE);
+                        break;
+                    case CURLY_BRACKET_LEFT:
+                        System.out.println("read object");
+                        break;
+                    case SQUARE_BRACKET_LEFT:
+                        System.out.println("read array");
+                        break;
+                    case CHARACTER_F:
+                    case CHARACTER_T:
+                        currentValue = readBoolean(activeChar);
+                        currentRead = ReadType.END_VALUE;
+                        break;
+                    default:
+                        if(NUMBER_SET.contains(activeChar)){
+                            currentValue = readNumber(activeChar);
+                            currentRead = ReadType.END_VALUE;
+                        } else {
+                            throw new RoboReflectException("wrong json reading: " + activeChar);
+                        }
                 }
 
 
+            } else if(currentRead == ReadType.END_VALUE && (activeChar == COMMA || activeChar == CURLY_BRACKET_RIGHT )){
+                currentRead = ReadType.START_KEY;
+                document.add(currentKey, currentValue);
+                currentKey = null;
+                currentValue = null;
             }
 
             index++;
         }
     }
 
-    private void
+    private ReadType adjustCurrentReadingAfterString(ReadType type) {
+        char result = json.charAt(index);
+        if(result == QUOTATION_MARK){
+            return type;
+        } else {
+            throw new RoboReflectException("reading String: " + type);
+        }
+    }
 
     private void putNewDocument(ReadType readType) {
         switch (readType){

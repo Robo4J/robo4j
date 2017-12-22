@@ -27,6 +27,7 @@ public class JsonTest {
             "\"child\":{\"name\":\"name111\",\"value\":42}}},{\"name\":\"name2\",\"value\":5}], " +
             "\"personMap\":{\"key1\":\"value1\",\"key2,\":\"value2\"}}";
     private static final String json2 = "{ \"number\"\n :  42, \"message\" \t: \"no message\", \"active\" : false , \"floatNumber\" : 0.42}";
+    private static final String json3 = "{ \"number\"\n :  42,  \"message\" \t: \"no message\"}";
 
     @Test
     public void parsingTest(){
@@ -49,7 +50,7 @@ public class JsonTest {
 
     @Test
     public void jsonParserTest(){
-        JsonReader parser = new JsonReader(json2);
+        JsonReader parser = new JsonReader(json3);
         parser.read();
         JsonDocument document = parser.getDocument();
         System.out.println("document: " + document);
