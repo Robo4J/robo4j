@@ -62,13 +62,13 @@ public class JsonReader {
     private char getCharSkipWhiteSpace(){
         char result = json.charAt(index);
         if(WHITE_SPACE_SET.contains(result) && (currentRead == null || currentRead.equals(ReadType.END_KEY) ||
-                currentRead.equals(ReadType.START_VALUE) ||  currentRead.equals(ReadType.START_KEY))){
-            result = json.charAt(index++);
+                currentRead.equals(ReadType.START_VALUE) || currentRead.equals(ReadType.END_VALUE)  ||  currentRead.equals(ReadType.START_KEY) ||
+                currentRead.equals(ReadType.START_OBJECT))){
             while(WHITE_SPACE_SET.contains(result)){
-                result = json.charAt(index++);
+                result = json.charAt(++index);
             }
         }
-        
+
         return result;
     }
 
@@ -93,7 +93,6 @@ public class JsonReader {
 
             if(readType != null && document == null && depth == 0){
                 putNewDocument(readType);
-                index++;
             } else {
                 if(activeChar == QUOTATION_MARK && currentRead.equals(ReadType.START_OBJECT)) {
                     if (currentKey == null) {
@@ -103,7 +102,7 @@ public class JsonReader {
                     }
                 } else if(currentRead == ReadType.START_KEY){
                     if(activeChar == QUOTATION_MARK){
-                        activeChar = json.charAt(index);
+                        activeChar = json.charAt(++index);
                         currentKey= readString(activeChar);
                         currentRead = ReadType.END_KEY;
                     } else {
@@ -134,7 +133,6 @@ public class JsonReader {
                             if(NUMBER_SET.contains(activeChar)){
                                 currentValue = readNumber(activeChar);
                                 currentRead = ReadType.END_VALUE;
-                                index--;
                             } else {
                                 throw new RoboReflectException("wrong json reading: " + activeChar);
                             }
@@ -153,9 +151,9 @@ public class JsonReader {
 
             index++;
         }
-
-        System.out.println("document: " + document);
     }
+
+    private void
 
     private void putNewDocument(ReadType readType) {
         switch (readType){
@@ -186,7 +184,7 @@ public class JsonReader {
             if(activeCharacter == DOT) {
                 isInteger = false;
             }
-            activeCharacter = json.charAt(index++);
+            activeCharacter = json.charAt(++index);
 
         } while (NUMBER_SET.contains(activeCharacter) || activeCharacter == DOT);
         --index;
