@@ -44,10 +44,13 @@ public class JsonReader {
 			Arrays.asList(SPACE, NEW_LINE_MAC, NEW_LINE_UNIX, NEW_SPACE, NEW_TAB));
 	private static final Set<Character> NUMBER_SET = new HashSet<>(Arrays.asList(CHARACTER_0, CHARACTER_1, CHARACTER_2,
 			CHARACTER_3, CHARACTER_4, CHARACTER_5, CHARACTER_6, CHARACTER_7, CHARACTER_8, CHARACTER_9));
+	private static final Set<ReadType> NO_WHITE_SPACE = new HashSet<>(
+	        Arrays.asList(ReadType.START_KEY, ReadType.START_VALUE));
 
 	private final String json;
 	private ReadType currentRead;
 	private Stack<JsonDocument> stack = new Stack<>();
+	private Stack<JsonDocumentWrapper> stack2 = new Stack<>();
 	private JsonDocument document;
 	private String documentKey;
 	private int index = 0;
@@ -58,6 +61,16 @@ public class JsonReader {
 	JsonReader(String json) {
 		this.json = json;
 	}
+
+
+
+    private char getCharSkipWhiteSpace2() {
+        char result = json.charAt(index);
+        while (WHITE_SPACE_SET.contains(result)) {
+            result = json.charAt(++index);
+        }
+        return result;
+    }
 
 	private char getCharSkipWhiteSpace() {
 		char result = json.charAt(index);
@@ -116,42 +129,185 @@ public class JsonReader {
 	}
 
 	private ReadType getActualReadType(ReadType currentRead, char activeChar) {
-		return null;
+	    switch (activeChar){
+            case CURLY_BRACKET_LEFT:
+                if(currentRead != null && currentRead.equals(ReadType.START_ARRAY_ELEMENT)){
+                    activeChar = json.charAt(--index);
+                    return currentRead;
+                } else if(currentRead != null && currentRead.equals(ReadType.START_VALUE)){
+					activeChar = json.charAt(--index);
+                	return currentRead;
+				}
+                return ReadType.START_OBJECT;
+            case CURLY_BRACKET_RIGHT:
+				return ReadType.END_OBJECT;
+            case QUOTATION_MARK:
+                if(currentRead.equals(ReadType.START_OBJECT)){
+                    return ReadType.START_KEY;
+                }
+                break;
+            case SQUARE_BRACKET_LEFT:
+                return ReadType.START_ARRAY;
+            case SQUARE_BRACKET_RIGHT:
+                return ReadType.END_ARRAY;
+            case COMMA:
+                if(currentRead.equals(ReadType.END_ARRAY)){
+                    return ReadType.END_VALUE;
+                }
+            default:
+                break;
+
+        }
+
+		return currentRead;
 	}
 
+
+	private JsonDocument initDocument(ReadType readType){
+        index++;
+        return getNewDocument(readType);
+    }
+
 	public void read2() {
-		char activeChar = getCharSkipWhiteSpace();
+		char activeChar = getCharSkipWhiteSpace2();
 		currentRead = getActualReadType(currentRead, activeChar);
+        document = initDocument(currentRead);
+
 		while (index < json.length()) {
-			activeChar = getCharSkipWhiteSpace();
+			activeChar = getCharSkipWhiteSpace2();
 			currentRead = getActualReadType(currentRead, activeChar);
 
 			switch (currentRead) {
-
-			case START_ARRAY:
-				break;
-			case END_ARRAY:
-				break;
-			case START_ARRAY_ELEMENT:
-				break;
-			case END_ARRAY_ELEMENT:
-				break;
-			case START_OBJECT:
-				break;
-			case END_OBJECT:
-				break;
-			case START_DOCUMENT:
-				document = getNewDocument(currentRead);
-				break;
-			case END_DOCUMENT:
+				case START_ARRAY:
+					if (currentKey != null) {
+						JsonDocumentWrapper documentWrapper = new JsonDocumentWrapper(currentKey, document);
+						currentKey = null;
+						stack2.push(documentWrapper);
+						document = getNewDocument(currentRead);
+					}
+					currentRead = ReadType.START_ARRAY_ELEMENT;
+					break;
+				case END_ARRAY:
+					if (activeChar == SQUARE_BRACKET_RIGHT) {
+						if (stack2.size() > 0) {
+							JsonDocumentWrapper documentWrapper = stack2.pop();
+							currentKey = documentWrapper.getName();
+							currentValue = document;
+							document = documentWrapper.getDocument();
+						}
+					} else {
+						throw new RoboReflectException("not proper array close");
+					}
+					break;
+				case START_ARRAY_ELEMENT:
+					switch (activeChar) {
+						case CURLY_BRACKET_LEFT:
+							JsonDocumentWrapper documentWrapper = new JsonDocumentWrapper(null, document);
+							stack2.push(documentWrapper);
+							document = getNewDocument(ReadType.START_OBJECT);
+							break;
+						case SQUARE_BRACKET_LEFT:
+							break;
+						case QUOTATION_MARK:
+							activeChar = json.charAt(++index);
+							String elementString = readString(ReadType.END_ARRAY_ELEMENT, activeChar);
+							document.add(elementString);
+							break;
+						case CHARACTER_F:
+						case CHARACTER_T:
+							Boolean elementBoolean = readBoolean(activeChar);
+							document.add(elementBoolean);
+							currentRead = ReadType.END_ARRAY_ELEMENT;
+							break;
+						default:
+							if (NUMBER_SET.contains(activeChar)) {
+								Object elementNumber = readNumber(activeChar);
+								document.add(elementNumber);
+								currentRead = ReadType.END_ARRAY_ELEMENT;
+								break;
+							} else {
+								throw new RoboReflectException("wrong array element reading: " + activeChar);
+							}
+					}
+					break;
+				case END_ARRAY_ELEMENT:
+					if (activeChar == COMMA) {
+						currentRead = ReadType.START_ARRAY_ELEMENT;
+					} else {
+						currentRead = ReadType.END_ARRAY;
+					}
+					break;
+				case START_OBJECT:
+					currentRead = ReadType.START_KEY;
+					break;
+				case END_OBJECT:
+					putCurrentKeyValue(currentKey, currentValue);
+					// FIXME: 12/23/17 miro
+					if (stack2.size() > 0 && stack2.peek().getDocument().isArray()) {
+						JsonDocumentWrapper documentWrapper = stack2.pop();
+						documentWrapper.getDocument().add(document);
+						document = documentWrapper.getDocument();
+						currentRead = ReadType.END_ARRAY_ELEMENT;
+					} else if(stack2.size() > 0) {
+						JsonDocumentWrapper documentWrapper = stack2.pop();
+						currentKey = documentWrapper.getName();
+						currentValue = document;
+						document = documentWrapper.getDocument();
+						currentRead = ReadType.END_VALUE;
+					} else {
+						currentRead = ReadType.END_VALUE;
+					}
 				break;
 			case START_KEY:
+                activeChar = json.charAt(++index);
+                currentKey = readString(ReadType.END_KEY, activeChar);
 				break;
 			case END_KEY:
+			    if(activeChar == COLON){
+			        currentRead = ReadType.START_VALUE;
+                } else {
+			        throw new JsonException("not expected value after key");
+                }
 				break;
 			case START_VALUE:
-				break;
+			    switch (activeChar){
+                    case CURLY_BRACKET_LEFT:
+                    	JsonDocumentWrapper documentWrapper = new JsonDocumentWrapper(currentKey, document);
+						currentKey = null;
+						stack2.push(documentWrapper);
+						document = getNewDocument(ReadType.START_OBJECT);
+						break;
+                    case SQUARE_BRACKET_LEFT:
+                        break;
+                    case QUOTATION_MARK:
+                        activeChar = json.charAt(++index);
+                        currentValue = readString(ReadType.END_VALUE, activeChar);
+                        break;
+                    case CHARACTER_F:
+                    case CHARACTER_T:
+                        currentValue = readBoolean(activeChar);
+                        currentRead = ReadType.END_VALUE;
+                        break;
+                    default:
+                        if (NUMBER_SET.contains(activeChar)) {
+                            currentValue = readNumber(activeChar);
+                            currentRead = ReadType.END_VALUE;
+                            break;
+                        } else {
+                            throw new RoboReflectException("wrong json reading: " + activeChar);
+                        }
+                }
+                break;
 			case END_VALUE:
+			    switch (activeChar){
+                    case COMMA:
+                        currentRead = ReadType.START_KEY;
+                        break;
+                    default:
+
+                }
+
+				putCurrentKeyValue(currentKey, currentValue);
 				break;
 			}
 
@@ -205,7 +361,6 @@ public class JsonReader {
 					currentValue = readString(ReadType.END_VALUE, activeChar);
 					break;
 				case CURLY_BRACKET_LEFT:
-					System.out.println("read object");
 					documentKey = currentKey;
 					JsonDocument documentElement = getNewDocument(readType);
 					stack.push(document);
@@ -237,22 +392,20 @@ public class JsonReader {
 					if (currentKey == null) {
 						currentKey = documentKey;
 					}
-					document.put(currentKey, currentValue);
-					currentKey = null;
-					currentValue = null;
+					putCurrentKeyValue(currentKey, currentValue);
 					if (activeChar == COMMA) {
 						currentRead = ReadType.START_KEY;
 					} else {
 						currentRead = ReadType.END_OBJECT;
 					}
 				} else if (currentRead == ReadType.END_OBJECT) {
-					if (document.isArrays()) {
+					if (document.isArray()) {
 						currentRead = ReadType.END_ARRAY;
 					} else if (activeChar == COMMA) {
 						currentRead = ReadType.START_OBJECT;
 						JsonDocument documentElement = document;
 						document = stack.pop();
-						if (document.isArrays()) {
+						if (document.isArray()) {
 							document.add(documentElement);
 							stack.push(document);
 							document = getNewDocument(currentRead);
@@ -265,12 +418,12 @@ public class JsonReader {
 						currentValue = document;
 						document = stack.pop();
 						activeChar = getCharSkipWhiteSpace();
-						if (document.isArrays() && activeChar == SQUARE_BRACKET_RIGHT) {
+						if (document.isArray() && activeChar == SQUARE_BRACKET_RIGHT) {
 							document.add(currentValue);
 							currentValue = null;
 							currentRead = ReadType.END_ARRAY;
 						} else if (document != null && activeChar == CURLY_BRACKET_RIGHT) {
-							document.put(currentKey, currentValue);
+							putCurrentKeyValue(currentKey, currentValue);
 							currentRead = ReadType.END_OBJECT;
 						} else {
 							currentRead = ReadType.END_VALUE;
@@ -281,6 +434,12 @@ public class JsonReader {
 
 			index++;
 		}
+	}
+
+	private void putCurrentKeyValue(String key, Object value){
+		document.put(key, value);
+		currentKey = null;
+		currentValue = null;
 	}
 
 	private JsonDocument getNewDocument(ReadType readType) {

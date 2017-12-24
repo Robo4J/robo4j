@@ -41,7 +41,7 @@ public class JsonDocument {
         return type;
     }
 
-    public boolean isArrays(){
+    public boolean isArray(){
         return type.equals(Type.ARRAY);
     }
 
