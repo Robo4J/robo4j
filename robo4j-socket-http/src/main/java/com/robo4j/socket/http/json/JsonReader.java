@@ -105,7 +105,6 @@ public class JsonReader {
 		return currentRead;
 	}
 
-	// FIXME: 12/25/17 (miro) null values adding to the map
 	public JsonDocument read() {
 		char activeChar = getCharSkipWhiteSpace2();
 		currentRead = getActualReadType(currentRead, activeChar);
