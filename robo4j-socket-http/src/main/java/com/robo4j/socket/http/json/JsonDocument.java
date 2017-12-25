@@ -1,5 +1,7 @@
 package com.robo4j.socket.http.json;
 
+import com.robo4j.socket.http.util.TypeMapper;
+
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +29,20 @@ public class JsonDocument {
 
     public void add(Object value){
         array.add(value);
+    }
+
+    public Object getKey(String key){
+        return map.get(key);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getKeyValueByType(TypeMapper type, String key){
+        Class<T> sourceType = (Class<T>)type.getSource();
+        Object obj = map.get(key);
+        if(sourceType.isInstance(obj)){
+            return (T) obj;
+        }
+        return null;
     }
 
     public List<Object> getArray() {

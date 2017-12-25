@@ -2,12 +2,9 @@ package com.robo4j.socket.http.units.test.codec;
 
 import com.robo4j.socket.http.codec.CameraConfigMessage;
 import com.robo4j.socket.http.codec.CameraConfigMessageCodec;
-import com.robo4j.socket.http.util.JsonUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Map;
 
 /**
  * Camera Image, Config related tests
@@ -55,12 +52,9 @@ public class CameraCodecTests {
 	@Test
 	public void cameraConfigCodecNotFullTest() {
 		String properOrderJson = "{\"height\":800,\"width\":600,\"brightness\":80,\"sharpness\":56,\"timeout\":2,\"timelapse\":100}";
-		String testJson = "{\"width\":600,\"height\":800,\"brightness\":80,\"timeout\":2}";
 
-		Map<String, Object> map = JsonUtil.getMapByJson(testJson);
 		CameraConfigMessage configMessage = codec.decode(properOrderJson);
 
-		System.out.println("configMessage map:" + map);
 		System.out.println("configMessage:" + configMessage);
 	}
 

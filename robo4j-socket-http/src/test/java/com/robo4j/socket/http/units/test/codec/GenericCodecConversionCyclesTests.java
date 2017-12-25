@@ -61,6 +61,7 @@ public class GenericCodecConversionCyclesTests {
 		NSBTypesTestMessage obj1 = new NSBTypesTestMessage(22, "some messge", true);
 
 		String json = fieldTypesMessageCodec.encode(obj1);
+		System.out.println("json: " + json);
 		NSBTypesTestMessage createdObj = fieldTypesMessageCodec.decode(json);
 
 		Assert.assertTrue(obj1.equals(createdObj));
@@ -101,8 +102,6 @@ public class GenericCodecConversionCyclesTests {
 		Assert.assertTrue(desiredObjectToJson.equals(json));
 		Assert.assertTrue(createdObj.getMessage().equals(("no message")));
 		Assert.assertTrue(!createdObj.getActive());
-		Assert.assertTrue(createdObj.getPersons().isEmpty());
-		Assert.assertTrue(createdObj.getPersonMap().isEmpty());
 		System.out.println("createdObj: " + createdObj);
 		System.out.println("json: " + json);
 

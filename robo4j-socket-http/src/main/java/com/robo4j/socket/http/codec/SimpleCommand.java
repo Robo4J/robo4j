@@ -17,8 +17,6 @@
 
 package com.robo4j.socket.http.codec;
 
-import com.robo4j.util.StringConstants;
-
 import java.util.Objects;
 
 /**
@@ -39,7 +37,7 @@ public class SimpleCommand {
 
 	public SimpleCommand(String value) {
 		this.value = value;
-		this.type = StringConstants.EMPTY;
+		this.type = null;
 	}
 
 	/**

@@ -49,20 +49,11 @@ public class JsonTest {
     private static final String jsonBasicInnerObjects = "{\"name\":\"name1\",\"value\":22, \"child\":{\"name\":\"name11\",\"value\":0," +
             " \"child\":{\"name\":\"name111\",\"value\":42}}}";
 
-    @Test
-    public void parsingTest(){
-        JsonReader parser = new JsonReader(jsonBasicInnerObjects);
-        parser.read();
-        JsonDocument document = parser.getDocument();
-
-    }
-
 
     @Test
     public void basicValuesJsonParse(){
         JsonReader parser = new JsonReader(jsonBasicValues);
-        parser.read();
-        JsonDocument document = parser.getDocument();
+        JsonDocument document = parser.read();
         Map<String, Object> map = document.getMap();
         Assert.assertTrue(map.get("number").equals(42));
         Assert.assertTrue(map.get("message").equals("no message"));
@@ -73,8 +64,7 @@ public class JsonTest {
     @Test
     public void jsonBasicValuesAndStringArrayTest(){
         JsonReader parser = new JsonReader(jsonBasicValueWithStringArray);
-        parser.read();
-        JsonDocument document = parser.getDocument();
+        JsonDocument document = parser.read();
         Map<String, Object> map = document.getMap();
         Assert.assertTrue(map.get("number").equals(42));
         Assert.assertTrue(map.get("active").equals(false));
@@ -89,8 +79,7 @@ public class JsonTest {
     @Test
     public void jsonBasicValuesAndStringAndIntegerArraysTest(){
         JsonReader parser = new JsonReader(jsonBasicValueWithStringAndIntegerArrays);
-        parser.read();
-        JsonDocument document = parser.getDocument();
+        JsonDocument document = parser.read();
         Map<String, Object> map = document.getMap();
         List<Object> resultStringArray = ((JsonDocument) map.get("arrayOne")).getArray();
         List<Object> resultIntegerArray = ((JsonDocument) map.get("arrayTwo")).getArray();
@@ -110,8 +99,7 @@ public class JsonTest {
 
 
         JsonReader parser = new JsonReader(jsonBasicValueWithStringAndIntegerAndObjectArrays);
-        parser.read();
-        JsonDocument document = parser.getDocument();
+        JsonDocument document = parser.read();
         System.out.println("document: " + document);
         Map<String, Object> map = document.getMap();
         List<Object> resultStringArray = ((JsonDocument) map.get("arrayOne")).getArray();
@@ -133,8 +121,7 @@ public class JsonTest {
 
 
         JsonReader parser = new JsonReader(jsonBasicObjectArrays);
-        parser.read();
-        JsonDocument document = parser.getDocument();
+        JsonDocument document = parser.read();
         System.out.println("document: " + document);
         Map<String, Object> map = document.getMap();
         List<Object> resultObjectArray = ((JsonDocument) map.get("arrayThree")).getArray();
@@ -157,8 +144,7 @@ public class JsonTest {
     public void jsonBasicObjectArraysAndSimpleMapTest(){
 
         JsonReader parser = new JsonReader(jsonBasicObjectArraysAndStringMap);
-        parser.read();
-        JsonDocument document = parser.getDocument();
+        JsonDocument document = parser.read();
         System.out.println("document: " + document);
         Map<String, Object> map = document.getMap();
         List<Object> resultObjectArray = ((JsonDocument) map.get("arrayThree")).getArray();

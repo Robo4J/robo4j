@@ -1,7 +1,7 @@
 package com.robo4j.socket.http.util;
 
-import com.oracle.javafx.jmx.json.JSONDocument;
 import com.robo4j.socket.http.dto.ClassGetSetDTO;
+import com.robo4j.socket.http.json.JsonDocument;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -107,16 +107,17 @@ public final class ReflectUtils {
 		throw new RoboReflectException("not found: " + value);
 	}
 
+
 	@SuppressWarnings("unchecked")
-	public static <T> T createInstanceSetterByJSONDocument(Class<T> clazz,	JSONDocument jsonDocument) {
+	public static <T> T createInstanceSetterByRoboJsonDocument(Class<T> clazz,	JsonDocument jsonDocument) {
 
 		final Map<String, ClassGetSetDTO> getterDTOMap = getFieldsTypeMap(clazz);
 		try {
 			Object instance = clazz.newInstance();
-			getterDTOMap.entrySet().stream().filter(e -> Objects.nonNull(jsonDocument.get(e.getKey()))).forEach(e -> {
+			getterDTOMap.entrySet().stream().filter(e -> Objects.nonNull(jsonDocument.getKey(e.getKey()))).forEach(e -> {
 				try {
 					ClassGetSetDTO value = e.getValue();
-					value.getSetMethod().invoke(instance, adjustJSONDocumentCast(value, jsonDocument, e.getKey()));
+					value.getSetMethod().invoke(instance, adjustRoboJsonDocumentCast(value, jsonDocument, e.getKey()));
 				} catch (Exception e1) {
 					throw new RoboReflectException("create instance field", e1);
 				}
@@ -149,7 +150,7 @@ public final class ReflectUtils {
 		return result;
 	}
 
-	private static TypeCollection getClazzCollection(Class clazz) {
+	private static TypeCollection getClazzCollection(Class<?> clazz) {
 		if(Collection.class.isAssignableFrom(clazz)){
 			return TypeCollection.LIST;
 		} else if(Map.class.isAssignableFrom(clazz)){
@@ -159,12 +160,13 @@ public final class ReflectUtils {
 		}
 	}
 
-	private static Object adjustJSONDocumentCast(ClassGetSetDTO classGetSetDTO, JSONDocument document, String key) {
+
+	private static Object adjustRoboJsonDocumentCast(ClassGetSetDTO classGetSetDTO, JsonDocument document, String key) {
 		Class<?> clazz = classGetSetDTO.getField().getType();
 		if (clazz.isArray()) {
 			Class<?> arrayClass = extractArrayClassSignature(clazz.getName());
-			List<?> list = document.get(key).array().stream().map(arrayClass::cast).collect(Collectors.toList());
-
+			// FIXME: 12/25/17 (miro) -> correct this
+			List<?> list = ((JsonDocument)document.getKey(key)).getArray().stream().map(arrayClass::cast).collect(Collectors.toList());
 			return listToArray(list);
 		} else {
 			final TypeMapper typeMapper = TypeMapper.getBySource(clazz);
@@ -175,71 +177,41 @@ public final class ReflectUtils {
 					case LIST:
 						Class<?> listClass = extractListClassSignature(
 								classGetSetDTO.getField().getGenericType().getTypeName());
-						return document.get(key).array().stream().map(e -> castObjectByJSONDocument(listClass, e))
+						return ((JsonDocument)document.getKey(key)).getArray().stream().map(e -> castObjectByRoboJsonDocument(listClass, e))
 								.collect(Collectors.toList());
 					case MAP:
-						JSONDocument mapDocument = document.get(key);
-						Map<Object, Object> map = new LinkedHashMap<>();
-						if (mapDocument.object().size() > 0) {
-							mapDocument.object().forEach(map::put);
-						}
-						return map;
+						JsonDocument mapDocument = (JsonDocument) document.getKey(key);
+						return mapDocument.getMap();
 					default:
 						throw new RoboReflectException("wrong collection" + typeCollection);
 				}
 
 			} else if (typeMapper != null) {
-				switch (typeMapper){
-					case BOOLEAN:
-					case BOOLEAN_PRIM:
-						return document.getBoolean(key);
-					case BYTE:
-					case BYTE_PRIM:
-					case CHAR:
-					case CHAR_PRIM:
-					case SHORT:
-					case SHORT_PRIM:
-					case STRING:
-						return document.getString(key);
-					case INT:
-					case INTEGER:
-						return document.getNumber(key).intValue();
-					case LONG:
-					case LONG_PRIM:
-						return document.getNumber(key).longValue();
-					case FLOAT:
-					case FLOAT_PRIM:
-						return document.getNumber(key).floatValue();
-					case DOUBLE:
-					case DOUBLE_PRIM:
-						return document.getNumber(key).doubleValue();
-					default:
-						throw new RoboReflectException("wrong adjustment" + typeMapper);
-				}
+				return document.getKeyValueByType(typeMapper, key);
 			}
 		}
 		throw new RoboReflectException("wrong adjustment");
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T> T castObjectByJSONDocument(Class<T> clazz, Object value) {
+	private static <T> T castObjectByRoboJsonDocument(Class<T> clazz, Object value) {
 		if (clazz.equals(String.class) || JsonUtil.WITHOUT_QUOTATION_TYPES.contains(clazz)) {
-			return (T) adjustClassCast(clazz, value);
+			return (T) adjustRoboClassCast(clazz, value);
 		} else {
 			try {
 				Object instance = clazz.newInstance();
 				Map<String, ClassGetSetDTO> fieldNameMethods =  getFieldsTypeMap(clazz);
 
-                JSONDocument document = (JSONDocument) value;
-                fieldNameMethods.forEach((k, v) -> {
-                    Object setValue = adjustClassCastByField(v.getField(), document.object().get(k));
-                    try {
-                        v.getSetMethod().invoke(instance, setValue);
-                    } catch (Exception e) {
-                        throw new RoboReflectException("set value", e);
-                    }
-                });
-                return (T)instance;
+				JsonDocument document = (JsonDocument) value;
+				fieldNameMethods.forEach((k, v) -> {
+					Object setValue = adjustRoboClassCastByField(v.getField(), document.getKey(k));
+					try {
+						v.getSetMethod().invoke(instance, setValue);
+					} catch (Exception e) {
+						throw new RoboReflectException("set value", e);
+					}
+				});
+				return (T)instance;
 
 			} catch (Exception e) {
 				throw new RoboReflectException("casting: new class instance", e);
@@ -248,16 +220,16 @@ public final class ReflectUtils {
 	}
 
 	// FIXME: 12/15/17 move to the type parser
-	private static Object adjustClassCastByField(Field field, Object value) {
-		return adjustClassCast(field.getType(), value);
+	private static Object adjustRoboClassCastByField(Field field, Object value) {
+		return adjustRoboClassCast(field.getType(), value);
 	}
 
 
 	@SuppressWarnings("unchecked")
-	private static  Object adjustClassCast(Class<?> clazz, Object value) {
+	private static  Object adjustRoboClassCast(Class<?> clazz, Object value) {
 		if(value != null){
 			final TypeMapper typeMapper = TypeMapper.getBySource(clazz);
-			return typeMapper != null ? typeMapper.getTranslate().apply(value) : castObjectByJSONDocument(clazz, value);
+			return typeMapper != null ? typeMapper.getTranslate().apply(value) : castObjectByRoboJsonDocument(clazz, value);
 		}
 		return null;
 	}
