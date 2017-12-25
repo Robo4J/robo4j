@@ -105,16 +105,11 @@ public class JsonReader {
 		return currentRead;
 	}
 
-	private JsonDocument initDocument(ReadType readType) {
-		index++;
-		return getNewDocument(readType);
-	}
-
 	// FIXME: 12/25/17 (miro) null values adding to the map
 	public JsonDocument read() {
 		char activeChar = getCharSkipWhiteSpace2();
 		currentRead = getActualReadType(currentRead, activeChar);
-		document = initDocument(currentRead);
+		document = getNewDocument(currentRead);
 
 		while (index < json.length()) {
 			activeChar = getCharSkipWhiteSpace2();

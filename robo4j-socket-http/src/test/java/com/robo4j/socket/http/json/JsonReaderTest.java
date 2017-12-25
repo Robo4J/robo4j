@@ -42,9 +42,11 @@ public class JsonReaderTest {
             "{ \"floatNumber\" : 0.42, \"number\"\n :  42, \"active\" : false, \"message\" \t: \"no message\", \"arrayOne\":[\"one\",\"two\"]}}}";
 
 
+    private static final String jsonArrayStringOnly = "[\"one\", \"two\" , \"three\"]";
+
     @Test
     public void basicArrayObjectTest(){
-        JsonReader parser = new JsonReader(jsonArrayIntegerStringObject);
+        JsonReader parser = new JsonReader(jsonArrayStringOnly);
         JsonDocument document = parser.read();
         System.out.println("DOC: " + document);
     }
