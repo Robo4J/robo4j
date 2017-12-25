@@ -19,12 +19,6 @@
 
 package com.robo4j.socket.http.request;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COLON;
-import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_COMMA;
-import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_LEFT;
-import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_CURLY_BRACKET_RIGHT;
-import static com.robo4j.socket.http.util.RoboHttpUtils.CHAR_QUOTATION_MARK;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -37,12 +31,14 @@ import com.robo4j.RoboReference;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMessageWrapper;
 import com.robo4j.socket.http.dto.ResponseUnitDTO;
-import com.robo4j.socket.http.util.HttpConstant;
 import com.robo4j.socket.http.units.HttpCodecRegistry;
 import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.HttpUriRegister;
+import com.robo4j.socket.http.util.HttpConstant;
 import com.robo4j.socket.http.util.HttpPathUtils;
+import com.robo4j.socket.http.util.JsonElementStringBuilder;
 import com.robo4j.socket.http.util.JsonUtil;
+import com.robo4j.util.Utf8Constant;
 
 /**
  * Dynamically configurable request factory
@@ -51,9 +47,8 @@ import com.robo4j.socket.http.util.JsonUtil;
  * @author Miro Wengner (@miragemiko)
  */
 // TODO discuss how to use URIs
-// FIXME: 18.09.17 (miro) simplify
 public class RoboRequestFactory implements DefaultRequestFactory<Object> {
-	public static final String NO_DECODER_AVAILABLE = "no decoder available";
+	private static final String NO_DECODER_AVAILABLE = "no decoder available";
 	private final HttpCodecRegistry codecRegistry;
 
 	public RoboRequestFactory(final HttpCodecRegistry codecRegistry) {
@@ -93,15 +88,14 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 			final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredReference.getMessageType());
 			if (decoder != null) {
 				List<String> methods = Arrays.asList("GET", "POST");
-				final StringBuilder sb = new StringBuilder(CHAR_CURLY_BRACKET_LEFT).append(CHAR_QUOTATION_MARK)
-						.append("id").append(CHAR_QUOTATION_MARK).append(CHAR_COLON).append(CHAR_QUOTATION_MARK)
-						.append(desiredReference.getId()).append(CHAR_QUOTATION_MARK).append(CHAR_COMMA)
-						.append(CHAR_QUOTATION_MARK).append("codec").append(CHAR_QUOTATION_MARK).append(CHAR_COLON)
-						.append(CHAR_QUOTATION_MARK).append(desiredReference.getMessageType().getName())
-						.append(CHAR_QUOTATION_MARK).append(",").append(CHAR_QUOTATION_MARK).append("method")
-						.append(CHAR_QUOTATION_MARK).append(CHAR_COLON).append(JsonUtil.getArraysByMethodList(methods))
-						.append(CHAR_CURLY_BRACKET_RIGHT);
-				return sb.toString();
+				return JsonElementStringBuilder.Builder().add(Utf8Constant.UTF8_CURLY_BRACKET_LEFT)
+						.addQuotationWithDelimiter(Utf8Constant.UTF8_COLON, "id")
+						.addQuotationWithDelimiter(Utf8Constant.UTF8_COMMA, desiredReference.getId())
+						.addQuotationWithDelimiter(Utf8Constant.UTF8_COLON, "codec")
+						.addQuotationWithDelimiter(Utf8Constant.UTF8_COMMA, desiredReference.getMessageType().getName())
+						.addQuotationWithDelimiter(Utf8Constant.UTF8_COLON, "method")
+						.add(JsonUtil.getArraysByMethodList(methods)).add(Utf8Constant.UTF8_CURLY_BRACKET_RIGHT)
+						.build();
 			} else {
 				SimpleLoggingUtil.error(getClass(), "no decoder available");
 				return NO_DECODER_AVAILABLE;
