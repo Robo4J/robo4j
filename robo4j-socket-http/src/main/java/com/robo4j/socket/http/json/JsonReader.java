@@ -8,6 +8,9 @@ import java.util.Set;
 import java.util.Stack;
 
 /**
+ * JsonReader parses valid Json string and create JsonDocument with appropriate
+ * structure
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
@@ -28,6 +31,9 @@ public class JsonReader {
 	private static final char CURLY_BRACKET_RIGHT = '\u007D';
 	private static final char CHARACTER_F = 'f';
 	private static final char CHARACTER_T = 't';
+	private static final char CHARACTER_N = 'n';
+	private static final char CHARACTER_U = 'u';
+	private static final char CHARACTER_L = 'l';
 	private static final char CHARACTER_E = 'e';
 	private static final char CHARACTER_0 = '0';
 	private static final char CHARACTER_1 = '1';
@@ -152,8 +158,13 @@ public class JsonReader {
 					break;
 				case CHARACTER_F:
 				case CHARACTER_T:
+					// TODO: 12/25/17 (miro) -> write a test
 					Boolean elementBoolean = readBoolean(activeChar);
 					document.add(elementBoolean);
+					currentRead = ReadType.END_ARRAY_ELEMENT;
+					break;
+				case CHARACTER_N:
+					currentValue = readNull();
 					currentRead = ReadType.END_ARRAY_ELEMENT;
 					break;
 				default:
@@ -207,32 +218,36 @@ public class JsonReader {
 				break;
 			case START_VALUE:
 				switch (activeChar) {
-					case CURLY_BRACKET_LEFT:
-						JsonDocumentWrapper documentWrapper = new JsonDocumentWrapper(currentKey, document);
-						currentKey = null;
-						stack.push(documentWrapper);
-						document = getNewDocument(ReadType.START_OBJECT);
-						break;
-					case SQUARE_BRACKET_LEFT:
-						break;
-					case QUOTATION_MARK:
-						activeChar = json.charAt(++index);
-						currentValue = readString(ReadType.END_VALUE, activeChar);
-						break;
-					case CHARACTER_F:
-					case CHARACTER_T:
-						currentValue = readBoolean(activeChar);
+				case CURLY_BRACKET_LEFT:
+					JsonDocumentWrapper documentWrapper = new JsonDocumentWrapper(currentKey, document);
+					currentKey = null;
+					stack.push(documentWrapper);
+					document = getNewDocument(ReadType.START_OBJECT);
+					break;
+				case SQUARE_BRACKET_LEFT:
+					break;
+				case QUOTATION_MARK:
+					activeChar = json.charAt(++index);
+					currentValue = readString(ReadType.END_VALUE, activeChar);
+					break;
+				case CHARACTER_F:
+				case CHARACTER_T:
+					currentValue = readBoolean(activeChar);
+					currentRead = ReadType.END_VALUE;
+					break;
+				case CHARACTER_N:
+					currentValue = readNull();
+					currentRead = ReadType.END_VALUE;
+					break;
+				default:
+					if (NUMBER_SET.contains(activeChar)) {
+						currentValue = readNumber(activeChar);
 						currentRead = ReadType.END_VALUE;
 						break;
-					default:
-						if (NUMBER_SET.contains(activeChar)) {
-							currentValue = readNumber(activeChar);
-							currentRead = ReadType.END_VALUE;
-							break;
-						} else {
-							throw new RoboReflectException("wrong json reading: " + activeChar);
-						}
+					} else {
+						throw new RoboReflectException("wrong json reading: " + activeChar);
 					}
+				}
 				break;
 			case END_VALUE:
 				switch (activeChar) {
@@ -301,6 +316,20 @@ public class JsonReader {
 		}
 
 		return Boolean.valueOf(sb.toString());
+	}
+
+	private Object readNull() {
+		readCheckCurrentCharacterCompare(CHARACTER_U);
+		readCheckCurrentCharacterCompare(CHARACTER_L);
+		readCheckCurrentCharacterCompare(CHARACTER_L);
+		return null;
+	}
+
+	private void readCheckCurrentCharacterCompare(char compareCharacter) {
+		char ch = json.charAt(++index);
+		if (ch != compareCharacter) {
+			throw new RoboReflectException("not similar characters");
+		}
 	}
 
 	private String readString(ReadType endType, char activeCharacter) {

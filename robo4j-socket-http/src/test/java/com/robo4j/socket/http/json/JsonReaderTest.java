@@ -15,6 +15,8 @@ public class JsonReaderTest {
 
     private static final String jsonBooleanValues = "{\"number\":22,\"message\":\"no message\",\"active\":true,\"passive\": false, \"bool1\":false,\"bool2\" :true}";
     private static final String jsonBasicValues = "{ \"number\"\n :  42, \"message\" \t: \"no message\", \"active\" : false , \"floatNumber\" : 0.42}";
+    private static final String jsonBasicValuesWithNullValues = "{ \"number\"\n :  42, \"message\" \t: \"no message\"," +
+            " \"active\" : false , \"floatNumber\" : 0.42, \"empty1\":null, \"empty2\" : null }";
     private static final String jsonBasicValueWithStringArray = "{ \"floatNumber\" : 0.42, \"number\"\n :  42, \"active\" : false, " +
             "\"message\" \t: \"no message\", \"arrayOne\":[\"one\",\"two\"]}";
     private static final String jsonBasicValueWithStringAndIntegerArrays = "{ \"floatNumber\" : 0.42, \"number\"\n :  42, " +
@@ -59,6 +61,21 @@ public class JsonReaderTest {
         Assert.assertTrue(document.getKey("passive").equals(false));
         Assert.assertTrue(document.getKey("bool1").equals(false));
         Assert.assertTrue(document.getKey("bool2").equals(true));
+    }
+
+    @Test
+    public void basicAndNullValues(){
+        JsonReader parser = new JsonReader(jsonBasicValuesWithNullValues);
+        JsonDocument document = parser.read();
+        Map<String, Object> map = document.getMap();
+
+        System.out.println("DOC: " + document);
+        Assert.assertTrue(map.get("number").equals(42));
+        Assert.assertTrue(map.get("message").equals("no message"));
+        Assert.assertTrue(map.get("active").equals(false));
+        Assert.assertTrue(map.get("floatNumber").equals(0.42));
+        Assert.assertTrue(map.get("empty1") == null);
+        Assert.assertTrue(map.get("empty2") == null);
     }
 
     @Test
