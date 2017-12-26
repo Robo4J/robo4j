@@ -85,21 +85,37 @@ public class JsonToObjectTests {
 	@Test
 	public void jsonToObject() {
 
-		NSBWithSimpleCollectionsTypesMessage obj = collectionsTypesMessageCodec.decode(testJson);
-		NSBWithSimpleCollectionsTypesMessage gobj = gson.fromJson(testJson, NSBWithSimpleCollectionsTypesMessage.class);
-		long start = System.currentTimeMillis();
-        NSBWithSimpleCollectionsTypesMessage gobj1 = gson.fromJson(testJson,
-                NSBWithSimpleCollectionsTypesMessage.class);
-		System.out.println("translateG: " + timeDiff(start) + "ms");
+		TestPerson testPerson2 = new TestPerson();
+		testPerson2.setName("name2");
+		testPerson2.setValue(5);
 
-		start = System.currentTimeMillis();
+		TestPerson testPerson111 = new TestPerson();
+		testPerson111.setName("name111");
+		testPerson111.setValue(42);
+
+		TestPerson testPerson11 = new TestPerson();
+		testPerson11.setName("name11");
+		testPerson11.setValue(0);
+		testPerson11.setChild(testPerson111);
+
+		TestPerson testPerson1 = new TestPerson();
+		testPerson1.setName("name1");
+		testPerson1.setValue(22);
+		testPerson1.setChild(testPerson11);
+
+		Map<String, TestPerson> personMap = new LinkedHashMap<>();
+		personMap.put("person1", testPerson1);
+		personMap.put("person2", testPerson2);
+
 
         NSBWithSimpleCollectionsTypesMessage obj1 = collectionsTypesMessageCodec.decode(testJson);
-		System.out.println("translateM: " + timeDiff(start) + "ms");
 
-		System.out.println("1: " + obj1);
-		System.out.println("2: " + gobj1);
-		Assert.assertTrue(obj1.equals(gobj1));
+		Assert.assertTrue(obj1.getNumber() == 42);
+		Assert.assertTrue(obj1.getMessage().equals("no message"));
+		Assert.assertTrue(!obj1.getActive());
+		Assert.assertTrue(Arrays.equals(obj1.getArray(), new String[]{"one", "two"}));
+		Assert.assertTrue(obj1.getPersonMap().equals(personMap));
+
 
 	}
 

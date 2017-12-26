@@ -4,12 +4,10 @@ import com.robo4j.socket.http.dto.ClassGetSetDTO;
 import com.robo4j.socket.http.json.JsonDocument;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,7 +41,6 @@ public final class ReflectUtils {
 	private static final String METHOD_SET = "set";
 
 	private static final Map<Class<?>, Map<String, ClassGetSetDTO>> clazzDescriptorMap = new HashMap<>();
-	private static final Map<Type, Class<?>> mapSignatureToValueClass = new HashMap<>();
 
 	/**
 	 * translate Object to proper JSON string
@@ -56,7 +53,7 @@ public final class ReflectUtils {
 		try {
 			Object value = getterDTO.getGetMethod().invoke(obj);
 			//@formatter:off
-			return value == null ? null : JsonUtil.WITHOUT_QUOTATION_TYPES.contains(getterDTO.getField().getType()) ? String.valueOf(value)
+			return value == null ? null : JsonUtil.WITHOUT_QUOTATION_TYPES.contains(getterDTO.getValueClass()) ? String.valueOf(value)
 					: processObjectToJson(value);
 			//@formatter:on
 		} catch (Exception e) {
@@ -138,7 +135,7 @@ public final class ReflectUtils {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <E> E[] listToArray(List<E> list) {
+	private static <E> E[] listToArray(List<E> list) {
 		int s;
 		if (list == null || (s = list.size()) < 1)
 			return null;
@@ -158,73 +155,53 @@ public final class ReflectUtils {
 		return result;
 	}
 
-	private static TypeCollection getClazzCollection(Class<?> clazz) {
-		if (Collection.class.isAssignableFrom(clazz)) {
-			return TypeCollection.LIST;
-		} else if (Map.class.isAssignableFrom(clazz)) {
-			return TypeCollection.MAP;
-		} else {
-			return null;
-		}
-	}
-
 	private static Object adjustRoboJsonDocumentCast(ClassGetSetDTO classGetSetDTO, JsonDocument document, String key) {
-		Class<?> clazz = classGetSetDTO.getField().getType();
+		Class<?> clazz = classGetSetDTO.getValueClass();
 		if (clazz.isArray()) {
 			Class<?> arrayClass = extractArrayClassSignature(clazz.getName());
-			// FIXME: 12/25/17 (miro) -> correct this
-			List<?> list = ((JsonDocument) document.getKey(key)).getArray().stream().map(arrayClass::cast)
-					.collect(Collectors.toList());
+			List<?> list = ((JsonDocument) document.getKey(key)).getArray().stream()
+					.map(arrayClass::cast)
+					.collect(Collectors.toCollection(LinkedList::new));
 			return listToArray(list);
 		} else {
-			final TypeMapper typeMapper = TypeMapper.getBySource(clazz);
-			final TypeCollection typeCollection = getClazzCollection(clazz);
 
-			if (typeCollection != null) {
-				switch (typeCollection) {
+			if (classGetSetDTO.getCollection() != null) {
+				switch (classGetSetDTO.getCollection()) {
 				case LIST:
-					Class<?> listClass = extractListClassSignature(
-							classGetSetDTO.getField().getGenericType().getTypeName());
+					Class<?> listClass = classGetSetDTO.getValueClass();
+					//@formatter:off
 					return ((JsonDocument) document.getKey(key)).getArray().stream()
-							.map(e -> castObjectByRoboJsonDocument(listClass, e)).collect(Collectors.toList());
+							.filter(Objects::nonNull)
+							.map(e -> adjustRoboClassCast(listClass, e))
+							.collect(Collectors.toList());
+					//@formatter:on
 				case MAP:
 					JsonDocument mapDocument = (JsonDocument) document.getKey(key);
 					Map<String, Object> documentMap = mapDocument.getMap();
 					if (documentMap.isEmpty()) {
 						return documentMap;
 					} else {
-						return documentMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> {
-							if (e.getValue() != null && e.getValue() instanceof JsonDocument) {
-								Class<?> valueClazz = getMapValueClassByType(classGetSetDTO.getField().getGenericType());
-
-								ReflectUtils.extractMapValueClassSignature(
-										classGetSetDTO.getField().getGenericType().toString());
-								return castObjectByRoboJsonDocument(valueClazz, e.getValue());
-							}
-							return e.getValue();
-						}));
+						//@formatter:off
+						return documentMap.entrySet().stream()
+								.collect(Collectors
+										.toMap(Map.Entry::getKey, e -> {
+											if (e.getValue() != null && e.getValue() instanceof JsonDocument) {
+												Class<?> mapValueClazz = classGetSetDTO.getValueClass();
+												return adjustRoboClassCast(mapValueClazz, e.getValue());
+											}
+											return e.getValue();}));
+						//@formatter:on
 
 					}
 				default:
-					throw new RoboReflectException("wrong collection" + typeCollection);
+					throw new RoboReflectException("wrong collection" + classGetSetDTO);
 				}
-
-			} else if (typeMapper != null) {
-				return document.getKeyValueByType(typeMapper, key);
+			} else {
+				return adjustRoboClassCast(classGetSetDTO.getValueClass(), document.getKey(key));
 			}
 		}
-		throw new RoboReflectException("wrong adjustment");
 	}
 
-	private static Class<?> getMapValueClassByType(Type type){
-		Class<?> result = mapSignatureToValueClass.get(type);
-		if(result == null){
-			Class<?> clazz  = ReflectUtils.extractMapValueClassSignature(type.toString());
-			mapSignatureToValueClass.put(type, clazz);
-			return clazz;
-		}
-		return result;
-	}
 
 	@SuppressWarnings("unchecked")
 	private static <T> T castObjectByRoboJsonDocument(Class<T> clazz, Object value) {
@@ -237,7 +214,7 @@ public final class ReflectUtils {
 
 				JsonDocument document = (JsonDocument) value;
 				fieldNameMethods.forEach((k, v) -> {
-					Object setValue = adjustRoboClassCastByField(v.getField(), document.getKey(k));
+					Object setValue = adjustRoboClassCast(v.getValueClass(), document.getKey(k));
 					try {
 						v.getSetMethod().invoke(instance, setValue);
 					} catch (Exception e) {
@@ -252,11 +229,6 @@ public final class ReflectUtils {
 		}
 	}
 
-	// FIXME: 12/15/17 move to the type parser
-	private static Object adjustRoboClassCastByField(Field field, Object value) {
-		return adjustRoboClassCast(field.getType(), value);
-	}
-
 	@SuppressWarnings("unchecked")
 	private static Object adjustRoboClassCast(Class<?> clazz, Object value) {
 		if (value != null) {
@@ -267,11 +239,11 @@ public final class ReflectUtils {
 		return null;
 	}
 
-	private static class MapEntyDTO {
+	private static class MapEntryDTO {
 		private final String key;
 		private final Object value;
 
-		public MapEntyDTO(String key, Object value) {
+		public MapEntryDTO(String key, Object value) {
 			this.key = key;
 			this.value = value;
 		}
@@ -307,7 +279,7 @@ public final class ReflectUtils {
 		//@formatter:off
 		return new StringBuilder(UTF8_CURLY_BRACKET_LEFT)
 				.append(map.entrySet().stream()
-						.map(entry -> new MapEntyDTO(entry.getKey(), ReflectUtils.getJsonValue(entry.getValue(), obj)))
+						.map(entry -> new MapEntryDTO(entry.getKey(), ReflectUtils.getJsonValue(entry.getValue(), obj)))
 						.filter(entry -> Objects.nonNull(entry.getValue()))
 						.map(entry -> new StringBuilder(UTF8_QUOTATION_MARK)
 								.append(entry.getKey())
@@ -332,9 +304,19 @@ public final class ReflectUtils {
 					Method getMethod = clazz.getDeclaredMethod(getMethodName);
 					Method setMethod = clazz.getDeclaredMethod(setMethodName, field.getType());
 
-					return field.getType().isAssignableFrom(Map.class) ?
-							getMapClassGetSet(field.getGenericType(), field, getMethod, setMethod ) :
-							new ClassGetSetDTO(field.getName(), field, getMethod, setMethod);
+					if (field.getType().isAssignableFrom(Map.class)) {
+						Class<?> mapValueClazz = ReflectUtils
+								.extractMapValueClassSignature(field.getGenericType().getTypeName());
+						return new ClassGetSetDTO(field.getName(), mapValueClazz, TypeCollection.MAP, getMethod,
+								setMethod);
+					} else if (field.getType().isAssignableFrom(List.class)) {
+						Class<?> listValueClazz = extractListClassSignature(field.getGenericType().getTypeName());
+						return new ClassGetSetDTO(field.getName(), listValueClazz, TypeCollection.LIST, getMethod,
+								setMethod);
+					} else {
+						return new ClassGetSetDTO(field.getName(), field.getType(), getMethod, setMethod);
+					}
+
 				} catch (Exception e) {
 					throw new RoboReflectException("class configuration", e);
 				}
@@ -344,12 +326,6 @@ public final class ReflectUtils {
 			return clazzFields;
 		}
 
-	}
-
-	private static ClassGetSetDTO getMapClassGetSet(Type type, Field field, Method getMethod, Method setMethod){
-		// TODO: 12/26/17 (miro) -> improve here
-		Class<?> clazz = ReflectUtils.extractMapValueClassSignature(type.getTypeName());
-		return new ClassGetSetDTO(field.getName(), field, true, getMethod, setMethod);
 	}
 
 	private static String getGetterNameByType(Class<?> clazz, String fieldName) {

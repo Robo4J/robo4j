@@ -1,6 +1,7 @@
 package com.robo4j.socket.http.dto;
 
-import java.lang.reflect.Field;
+import com.robo4j.socket.http.util.TypeCollection;
+
 import java.lang.reflect.Method;
 import java.util.Objects;
 
@@ -10,29 +11,29 @@ import java.util.Objects;
  */
 public class ClassGetSetDTO {
     private final String name;
-    private final Field field;
-    private final boolean map;
+    private final Class<?> valueClass;
+    private final TypeCollection collection;
     private final Method getMethod;
     private final Method setMethod;
 
-    public ClassGetSetDTO(String name, Field field, Method getMethod, Method setMethod) {
-        this(name, field, false, getMethod, setMethod);
+    public ClassGetSetDTO(String name, Class<?> valueClass, Method getMethod, Method setMethod) {
+        this(name, valueClass, null, getMethod, setMethod);
     }
 
-    public ClassGetSetDTO(String name, Field field, boolean map, Method getMethod, Method setMethod) {
+    public ClassGetSetDTO(String name, Class<?> valueClass, TypeCollection collection, Method getMethod, Method setMethod) {
         this.name = name;
-        this.field = field;
-        this.map = map;
+        this.valueClass = valueClass;
+        this.collection = collection;
         this.getMethod = getMethod;
         this.setMethod = setMethod;
     }
 
-    public Field getField() {
-        return field;
+    public Class<?> getValueClass() {
+        return valueClass;
     }
 
-    public boolean isMap() {
-        return map;
+    public TypeCollection getCollection() {
+        return collection;
     }
 
     public String getName() {
@@ -52,9 +53,9 @@ public class ClassGetSetDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ClassGetSetDTO that = (ClassGetSetDTO) o;
-        return map == that.map &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(field, that.field) &&
+        return Objects.equals(name, that.name) &&
+                Objects.equals(valueClass, that.valueClass) &&
+                collection == that.collection &&
                 Objects.equals(getMethod, that.getMethod) &&
                 Objects.equals(setMethod, that.setMethod);
     }
@@ -62,15 +63,15 @@ public class ClassGetSetDTO {
     @Override
     public int hashCode() {
 
-        return Objects.hash(name, field, map, getMethod, setMethod);
+        return Objects.hash(name, valueClass, collection, getMethod, setMethod);
     }
 
     @Override
     public String toString() {
         return "ClassGetSetDTO{" +
                 "name='" + name + '\'' +
-                ", field=" + field +
-                ", map=" + map +
+                ", valueClass=" + valueClass +
+                ", collection=" + collection +
                 ", getMethod=" + getMethod +
                 ", setMethod=" + setMethod +
                 '}';
