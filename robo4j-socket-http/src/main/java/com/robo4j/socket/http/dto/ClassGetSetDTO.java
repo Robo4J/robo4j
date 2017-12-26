@@ -11,18 +11,28 @@ import java.util.Objects;
 public class ClassGetSetDTO {
     private final String name;
     private final Field field;
+    private final boolean map;
     private final Method getMethod;
     private final Method setMethod;
 
     public ClassGetSetDTO(String name, Field field, Method getMethod, Method setMethod) {
+        this(name, field, false, getMethod, setMethod);
+    }
+
+    public ClassGetSetDTO(String name, Field field, boolean map, Method getMethod, Method setMethod) {
         this.name = name;
         this.field = field;
+        this.map = map;
         this.getMethod = getMethod;
         this.setMethod = setMethod;
     }
 
     public Field getField() {
         return field;
+    }
+
+    public boolean isMap() {
+        return map;
     }
 
     public String getName() {
@@ -42,7 +52,8 @@ public class ClassGetSetDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ClassGetSetDTO that = (ClassGetSetDTO) o;
-        return Objects.equals(name, that.name) &&
+        return map == that.map &&
+                Objects.equals(name, that.name) &&
                 Objects.equals(field, that.field) &&
                 Objects.equals(getMethod, that.getMethod) &&
                 Objects.equals(setMethod, that.setMethod);
@@ -51,7 +62,7 @@ public class ClassGetSetDTO {
     @Override
     public int hashCode() {
 
-        return Objects.hash(name, field, getMethod, setMethod);
+        return Objects.hash(name, field, map, getMethod, setMethod);
     }
 
     @Override
@@ -59,6 +70,7 @@ public class ClassGetSetDTO {
         return "ClassGetSetDTO{" +
                 "name='" + name + '\'' +
                 ", field=" + field +
+                ", map=" + map +
                 ", getMethod=" + getMethod +
                 ", setMethod=" + setMethod +
                 '}';
