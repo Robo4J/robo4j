@@ -25,18 +25,24 @@ public class JsonToObjectTests {
 			+ "\"child\":{\"name\":\"name111\",\"value\":42}}},{\"name\":\"name2\",\"value\":5}],"
 			+ "\"personMap\":{\"person1\":{\"name\":\"name1\",\"value\":22,\"child\":{\"name\":\"name11\",\"value\":0,"
 			+ "\"child\":{\"name\":\"name111\",\"value\":42}}},\"person2\":{\"name\":\"name2\",\"value\":5}}}";
-	private Gson gson;
+
+	private static String testJsonResult = "JSON1: {\"number\":42,\"message\":\"no message\",\"active\":false," +
+			"\"array\":[\"one\",\"two\"],\"list\":[\"text1\",\"text2\"],\"map\":{\"key\":\"value\"}," +
+			"\"persons\":[\"TestPerson{name='name1', value=22, child=TestPerson{name='name11', value=0, child=TestPerson{name='name111', value=42, child=null}}}\"," +
+			"\"TestPerson{name='name2', value=5, child=null}\"]," +
+			"\"personMap\":{\"person1\":\"TestPerson{name='name1', value=22, child=TestPerson{name='name11', value=0, " +
+			"child=TestPerson{name='name111', value=42, child=null}}}\",\"person2\":\"TestPerson{name='name2', value=5, child=null}\"}}";
 	private NSBWithSimpleCollectionsTypesMessageCodec collectionsTypesMessageCodec;
 
+	private Gson gson;
 	@Before
 	public void setUp() {
-		gson = new Gson();
 		collectionsTypesMessageCodec = new NSBWithSimpleCollectionsTypesMessageCodec();
+		gson = new Gson();
 	}
 
 	@Test
-	public void gsonConvertFromJson() {
-		Gson gson = new Gson();
+	public void jsonConvertFromJson() {
 
 		TestPerson testPerson2 = new TestPerson();
 		testPerson2.setName("name2");
@@ -70,15 +76,20 @@ public class JsonToObjectTests {
 		obj1.setPersons(Arrays.asList(testPerson1, testPerson2));
 		obj1.setPersonMap(personMap);
 
+
 		long start = System.currentTimeMillis();
-		String json = gson.toJson(obj1);
-		System.out.println("translate: " + timeDiff(start) + "ms");
+		String json = collectionsTypesMessageCodec.encode(obj1);
 		System.out.println("JSON1: " + json);
+//		Assert.assertTrue(json.equals(testJson));
+		System.out.println("duration: " + timeDiff(start));
+
 
 		start = System.currentTimeMillis();
-		json = collectionsTypesMessageCodec.encode(obj1);
-		System.out.println("translate: " + timeDiff(start) + "ms");
-		System.out.println("JSON1: " + json);
+		String gSon = gson.toJson(obj1);
+		System.out.println("GSON1: " + gSon);
+		System.out.println("duration: " + timeDiff(start));
+
+		Assert.assertTrue(gSon.equals(json));
 
 	}
 
@@ -107,15 +118,15 @@ public class JsonToObjectTests {
 		personMap.put("person1", testPerson1);
 		personMap.put("person2", testPerson2);
 
-
-        NSBWithSimpleCollectionsTypesMessage obj1 = collectionsTypesMessageCodec.decode(testJson);
+		NSBWithSimpleCollectionsTypesMessage obj1 = collectionsTypesMessageCodec.decode(testJson);
 
 		Assert.assertTrue(obj1.getNumber() == 42);
 		Assert.assertTrue(obj1.getMessage().equals("no message"));
 		Assert.assertTrue(!obj1.getActive());
-		Assert.assertTrue(Arrays.equals(obj1.getArray(), new String[]{"one", "two"}));
+		Assert.assertTrue(Arrays.equals(obj1.getArray(), new String[] { "one", "two" }));
 		Assert.assertTrue(obj1.getPersonMap().equals(personMap));
 
+		System.out.println("Obj: " + obj1);
 
 	}
 

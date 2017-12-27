@@ -1,5 +1,10 @@
 package com.robo4j.socket.http.util;
 
+import com.robo4j.socket.http.json.JsonBooleanAdapter;
+import com.robo4j.socket.http.json.JsonNumberAdapter;
+import com.robo4j.socket.http.json.JsonStringAdapter;
+import com.robo4j.socket.http.json.JsonTypeAdapter;
+
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -14,35 +19,37 @@ import java.util.stream.Stream;
 public enum TypeMapper{
 
 	//@formatter:off
-    BOOLEAN         (Boolean.class, Boolean.class, (Object o) -> Boolean.valueOf(o.toString())),
-    BOOLEAN_PRIM    (boolean.class, Boolean.class, (Object o) -> Boolean.valueOf(o.toString())),
-    BYTE            (Byte.class, Byte.class, (Object o) -> Byte.valueOf(o.toString())),
-    BYTE_PRIM       (byte.class, Byte.class, (Object o) -> Byte.valueOf(o.toString())),
-    CHAR            (Character.class, Character.class, (Object o) -> Character.valueOf((char)o)),
-    CHAR_PRIM       (char.class, Character.class, (Object o) -> Character.valueOf((char)o)),
-    SHORT           (Short.class, Short.class, (Object o) -> Short.valueOf(o.toString())),
-    SHORT_PRIM      (short.class, Short.class, (Object o) -> Short.valueOf(o.toString())),
-    INTEGER         (Integer.class, Integer.class, (Object o) -> Integer.valueOf(o.toString())),
-    INT             (int.class, Integer.class, (Object o) -> Integer.valueOf(o.toString())),
-    LONG            (Long.class, Long.class, (Object o) -> Long.valueOf(o.toString())),
-    LONG_PRIM       (long.class, Long.class, (Object o) -> Long.valueOf(o.toString())),
-    FLOAT           (Float.class, Float.class, (Object o) -> Float.valueOf(o.toString())),
-    FLOAT_PRIM      (float.class, Float.class, (Object o) -> Float.valueOf(o.toString())),
-    DOUBLE          (Double.class, Double.class, (Object o) -> Double.valueOf(o.toString())),
-    DOUBLE_PRIM     (double.class, Double.class, (Object o) -> Double.valueOf(o.toString())),
-    STRING          (String.class, String.class, String::valueOf),
+    BOOLEAN         (Boolean.class, Boolean.class, (Object o) -> Boolean.valueOf(o.toString()), new JsonBooleanAdapter()),
+    BOOLEAN_PRIM    (boolean.class, Boolean.class, (Object o) -> Boolean.valueOf(o.toString()), new JsonBooleanAdapter()),
+    BYTE            (Byte.class, Byte.class, (Object o) -> Byte.valueOf(o.toString()), new JsonStringAdapter()),
+    BYTE_PRIM       (byte.class, Byte.class, (Object o) -> Byte.valueOf(o.toString()), new JsonStringAdapter()),
+    CHAR            (Character.class, Character.class, (Object o) -> o, new JsonStringAdapter()),
+    CHAR_PRIM       (char.class, Character.class, (Object o) -> Character.valueOf((char)o), new JsonStringAdapter()),
+    SHORT           (Short.class, Short.class, (Object o) -> Short.valueOf(o.toString()), new JsonNumberAdapter()),
+    SHORT_PRIM      (short.class, Short.class, (Object o) -> Short.valueOf(o.toString()), new JsonNumberAdapter()),
+    INTEGER         (Integer.class, Integer.class, (Object o) -> Integer.valueOf(o.toString()),  new JsonNumberAdapter()),
+    INT             (int.class, Integer.class, (Object o) -> Integer.valueOf(o.toString()),  new JsonNumberAdapter()),
+    LONG            (Long.class, Long.class, (Object o) -> Long.valueOf(o.toString()),  new JsonNumberAdapter()),
+    LONG_PRIM       (long.class, Long.class, (Object o) -> Long.valueOf(o.toString()),  new JsonNumberAdapter()),
+    FLOAT           (Float.class, Float.class, (Object o) -> Float.valueOf(o.toString()),  new JsonNumberAdapter()),
+    FLOAT_PRIM      (float.class, Float.class, (Object o) -> Float.valueOf(o.toString()),  new JsonNumberAdapter()),
+    DOUBLE          (Double.class, Double.class, (Object o) -> Double.valueOf(o.toString()),  new JsonNumberAdapter()),
+    DOUBLE_PRIM     (double.class, Double.class, (Object o) -> Double.valueOf(o.toString()),  new JsonNumberAdapter()),
+    STRING          (String.class, String.class, String::valueOf, new JsonStringAdapter()),
     ;
     //@formatter:on
 
 	private Class<?> source;
 	private Class<?> target;
 	private Function<Object, ?> translate;
+	private JsonTypeAdapter<?> adapter;
 	private static Map<Class<?>, TypeMapper> internMapByName;
 
-	TypeMapper(Class<?> source, Class<?> target, Function<Object, ?> translate) {
+	TypeMapper(Class<?> source, Class<?> target, Function<Object, ?> translate, JsonTypeAdapter<?> adapter) {
 		this.source = source;
 		this.target = target;
 		this.translate = translate;
+		this.adapter = adapter;
 	}
 
 	public static TypeMapper getBySource(Class<?> source) {
@@ -50,6 +57,11 @@ public enum TypeMapper{
 			internMapByName = initMapping();
 		}
 		return internMapByName.get(source);
+	}
+
+	public static JsonTypeAdapter getAdatperBySource(Class<?> source){
+		TypeMapper typeMapper = getBySource(source);
+		return typeMapper == null ? null : typeMapper.getAdapter();
 	}
 
 	public Class<?> getSource() {
@@ -64,7 +76,11 @@ public enum TypeMapper{
         return translate;
     }
 
-    private static Map<Class<?>, TypeMapper> initMapping() {
+	public JsonTypeAdapter<?> getAdapter() {
+		return adapter;
+	}
+
+	private static Map<Class<?>, TypeMapper> initMapping() {
 		return Stream.of(values()).collect(Collectors.toMap(TypeMapper::getSource, e -> e));
 	}
 
