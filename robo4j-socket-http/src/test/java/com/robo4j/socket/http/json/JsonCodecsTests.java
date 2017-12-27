@@ -1,13 +1,17 @@
 package com.robo4j.socket.http.json;
 
+import com.robo4j.socket.http.codec.CameraMessage;
+import com.robo4j.socket.http.codec.CameraMessageCodec;
 import com.robo4j.socket.http.codec.NSBWithSimpleCollectionsTypesMessageCodec;
 import com.robo4j.socket.http.units.test.codec.NSBWithSimpleCollectionsTypesMessage;
 import com.robo4j.socket.http.units.test.codec.TestPerson;
+import com.robo4j.util.StreamUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,10 +30,12 @@ public class JsonCodecsTests {
 			+ "\"child\":{\"name\":\"name111\",\"value\":42}}},\"person2\":{\"name\":\"name2\",\"value\":5}}}";
 
 	private NSBWithSimpleCollectionsTypesMessageCodec collectionsTypesMessageCodec;
+	private CameraMessageCodec cameraMessageCodec;
 
 	@Before
 	public void setUp() {
 		collectionsTypesMessageCodec = new NSBWithSimpleCollectionsTypesMessageCodec();
+		cameraMessageCodec = new CameraMessageCodec();
 	}
 
 	@Test
@@ -112,8 +118,34 @@ public class JsonCodecsTests {
 	}
 
 	@Test
-	public void cameraCodecJsonCycleTest(){
+	public void cameraCodecJsonCycleTest() {
+
+		final byte[] imageBytes = StreamUtils.inputStreamToByteArray(
+				Thread.currentThread().getContextClassLoader().getResourceAsStream("snapshot.png"));
+		String encodeString = new String(Base64.getEncoder().encode(imageBytes));
+
+		CameraMessage cameraMessage = new CameraMessage();
+		cameraMessage.setImage(encodeString);
+		cameraMessage.setType("jpg");
+		cameraMessage.setValue("22");
+
+		String cameraJson0 = cameraMessageCodec.encode(cameraMessage);
+		CameraMessage codecCameraMessage0 = cameraMessageCodec.decode(cameraJson0);
+
+		long start = System.currentTimeMillis();
+		String cameraJson = cameraMessageCodec.encode(cameraMessage);
+		System.out.println("duration 1: " + timeDiff(start));
+		System.out.println("cameraJson: " + cameraJson);
+
+		start = System.currentTimeMillis();
+		CameraMessage codecCameraMessage = cameraMessageCodec.decode(cameraJson);
+		System.out.println("duration 2: " + timeDiff(start));
+
+		Assert.assertTrue(cameraMessage.equals(codecCameraMessage));
 
 	}
 
+	private long timeDiff(long start) {
+		return System.currentTimeMillis() - start;
+	}
 }

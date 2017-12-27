@@ -352,31 +352,6 @@ public final class ReflectUtils {
 	}
 
 
-//	@SuppressWarnings("unchecked")
-//	private static String processCollectionToJson(Object obj) {
-//		StringBuilder result = new StringBuilder();
-//		if (obj.getClass().isArray()) {
-//			Object[] objects = (Object[]) obj;
-//			result.append(UTF8_SQUARE_BRACKET_LEFT).append(
-//					Stream.of(objects).map(ReflectUtils::processCollectionToJson).collect(Collectors.joining(UTF8_COMMA)))
-//					.append(UTF8_SQUARE_BRACKET_RIGHT);
-//		} else if (obj instanceof List<?>) {
-//			List<Object> objects = (List<Object>) obj;
-//			result.append(UTF8_SQUARE_BRACKET_LEFT).append(
-//					objects.stream().map(ReflectUtils::processCollectionToJson).collect(Collectors.joining(UTF8_COMMA)))
-//					.append(UTF8_SQUARE_BRACKET_RIGHT);
-//		} else if (obj instanceof Map<?, ?>) {
-//			Map<Object, Object> objectMap = (Map<Object, Object>) obj;
-//			result.append(UTF8_CURLY_BRACKET_LEFT).append(objectMap.entrySet().stream()
-//					.map(entry -> new StringBuilder(ReflectUtils.processCollectionToJson(entry.getKey())).append(UTF8_COLON)
-//							.append(ReflectUtils.processCollectionToJson(entry.getValue())).toString())
-//					.collect(Collectors.joining(UTF8_COMMA))).append(UTF8_CURLY_BRACKET_RIGHT);
-//		} else {
-//			result.append(UTF8_QUOTATION_MARK).append(obj).append(UTF8_QUOTATION_MARK);
-//		}
-//		return result.toString();
-//	}
-
 	private static Class<?> extractListClassSignature(String value) {
 		return extractSimpleClassSignatureByPattern(LIST_PATTERN, value);
 	}

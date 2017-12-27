@@ -406,8 +406,6 @@ project("robo4j-socket-http") {
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
         testCompile "org.mockito:mockito-all:${mockitoVerison}@jar"
-        testCompile "com.google.code.gson:gson:2.8.2"
-
     }
 
     sourceSets {
