@@ -1,6 +1,6 @@
 package com.robo4j.socket.http.json;
 
-import com.robo4j.util.Utf8Constant;
+import com.robo4j.socket.http.util.JsonElementStringBuilder;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -8,12 +8,9 @@ import com.robo4j.util.Utf8Constant;
  */
 public class JsonStringAdapter extends JsonAdapter<String> {
 
-    @Override
-    public String internalAdapt(String obj) {
-        return new StringBuilder()
-                .append(Utf8Constant.UTF8_QUOTATION_MARK)
-                .append(obj)
-                .append(Utf8Constant.UTF8_QUOTATION_MARK)
-                .toString();
-    }
+	@Override
+	public String internalAdapt(String obj) {
+		return JsonElementStringBuilder.Builder().addQuotation(obj).build();
+
+	}
 }
