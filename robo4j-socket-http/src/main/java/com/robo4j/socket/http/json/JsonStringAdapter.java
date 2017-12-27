@@ -6,10 +6,10 @@ import com.robo4j.util.Utf8Constant;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class JsonStringAdapter implements JsonTypeAdapter<String> {
+public class JsonStringAdapter extends JsonAdapter<String> {
 
     @Override
-    public String adapt(String obj) {
+    public String internalAdapt(String obj) {
         return new StringBuilder()
                 .append(Utf8Constant.UTF8_QUOTATION_MARK)
                 .append(obj)

@@ -15,16 +15,18 @@ import java.util.stream.Collectors;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class JsonGenericTypeAdapter<T> implements JsonTypeAdapter<T> {
+public class JsonGenericTypeAdapter<T> extends JsonAdapter<T> {
 
     private Map<String, ClassGetSetDTO> descriptorMap;
+
 
     public JsonGenericTypeAdapter(Class<T> clazz) {
         this.descriptorMap = ReflectUtils.getFieldsTypeMap(clazz);
     }
 
     @Override
-    public String adapt(T obj) {
+    @SuppressWarnings("unchecked")
+    protected String internalAdapt(T obj) {
         JsonElementStringBuilder builder = JsonElementStringBuilder.Builder()
                 .add(Utf8Constant.UTF8_CURLY_BRACKET_LEFT);
 

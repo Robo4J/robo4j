@@ -4,10 +4,10 @@ package com.robo4j.socket.http.json;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class JsonBooleanAdapter implements JsonTypeAdapter<Boolean> {
+public class JsonBooleanAdapter extends JsonAdapter<Boolean> {
 
     @Override
-    public String adapt(Boolean obj) {
+    public String internalAdapt(Boolean obj) {
         return obj.toString();
     }
 }

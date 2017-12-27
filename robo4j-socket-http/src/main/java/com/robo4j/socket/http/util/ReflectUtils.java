@@ -81,6 +81,7 @@ public final class ReflectUtils {
 	 * @param obj
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static String getJsonValue(ClassGetSetDTO getterDTO, Object obj) {
 		try {
 			Object value = getterDTO.getGetMethod().invoke(obj);

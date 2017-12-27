@@ -4,10 +4,13 @@ package com.robo4j.socket.http.json;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class JsonNumberAdapter implements JsonTypeAdapter<Integer>{
+public class JsonNumberAdapter extends JsonAdapter<Integer>{
+
+    public JsonNumberAdapter() {
+    }
 
     @Override
-    public String adapt(Integer obj) {
-		return String.valueOf(obj);
+    protected String internalAdapt(Integer obj) {
+        return String.valueOf(obj);
     }
 }

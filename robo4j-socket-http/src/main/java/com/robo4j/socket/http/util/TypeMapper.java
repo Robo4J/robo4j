@@ -16,7 +16,7 @@ import java.util.stream.Stream;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public enum TypeMapper{
+public enum TypeMapper {
 
 	//@formatter:off
     BOOLEAN         (Boolean.class, Boolean.class, (Object o) -> Boolean.valueOf(o.toString()), new JsonBooleanAdapter()),
@@ -42,10 +42,10 @@ public enum TypeMapper{
 	private Class<?> source;
 	private Class<?> target;
 	private Function<Object, ?> translate;
-	private JsonTypeAdapter<?> adapter;
+	private JsonTypeAdapter adapter;
 	private static Map<Class<?>, TypeMapper> internMapByName;
 
-	TypeMapper(Class<?> source, Class<?> target, Function<Object, ?> translate, JsonTypeAdapter<?> adapter) {
+	TypeMapper(Class<?> source, Class<?> target, Function<Object, ?> translate, JsonTypeAdapter adapter) {
 		this.source = source;
 		this.target = target;
 		this.translate = translate;
@@ -59,11 +59,6 @@ public enum TypeMapper{
 		return internMapByName.get(source);
 	}
 
-	public static JsonTypeAdapter getAdatperBySource(Class<?> source){
-		TypeMapper typeMapper = getBySource(source);
-		return typeMapper == null ? null : typeMapper.getAdapter();
-	}
-
 	public Class<?> getSource() {
 		return source;
 	}
@@ -72,11 +67,11 @@ public enum TypeMapper{
 		return target;
 	}
 
-    public Function<Object, ?> getTranslate() {
-        return translate;
-    }
+	public Function<Object, ?> getTranslate() {
+		return translate;
+	}
 
-	public JsonTypeAdapter<?> getAdapter() {
+	public JsonTypeAdapter getAdapter() {
 		return adapter;
 	}
 
