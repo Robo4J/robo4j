@@ -63,7 +63,7 @@ public class JsonReader {
 		this.json = json;
 	}
 
-	private char getCharSkipWhiteSpace2() {
+	private char getCharSkipWhiteSpace() {
 		char result = json.charAt(index);
 		while (WHITE_SPACE_SET.contains(result)) {
 			result = json.charAt(++index);
@@ -106,12 +106,12 @@ public class JsonReader {
 	}
 
 	public JsonDocument read() {
-		char activeChar = getCharSkipWhiteSpace2();
+		char activeChar = getCharSkipWhiteSpace();
 		currentRead = getActualReadType(currentRead, activeChar);
 		document = getNewDocument(currentRead);
 
 		while (index < json.length()) {
-			activeChar = getCharSkipWhiteSpace2();
+			activeChar = getCharSkipWhiteSpace();
 			currentRead = getActualReadType(currentRead, activeChar);
 
 			switch (currentRead) {
