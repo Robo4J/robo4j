@@ -61,55 +61,13 @@ public class JsonReader {
 
 	public JsonReader(String json) {
 		this.json = json;
-	}
-
-	private char getCharSkipWhiteSpace() {
-		char result = json.charAt(index);
-		while (WHITE_SPACE_SET.contains(result)) {
-			result = json.charAt(++index);
-		}
-		return result;
-	}
-
-	private ReadType getActualReadType(ReadType currentRead, char activeChar) {
-		switch (activeChar) {
-		case CURLY_BRACKET_LEFT:
-			if (currentRead != null && currentRead.equals(ReadType.START_ARRAY_ELEMENT)) {
-				activeChar = json.charAt(--index);
-				return currentRead;
-			} else if (currentRead != null && currentRead.equals(ReadType.START_VALUE)) {
-				activeChar = json.charAt(--index);
-				return currentRead;
-			}
-			return ReadType.START_OBJECT;
-		case CURLY_BRACKET_RIGHT:
-			return ReadType.END_OBJECT;
-		case QUOTATION_MARK:
-			if (currentRead.equals(ReadType.START_OBJECT)) {
-				return ReadType.START_KEY;
-			}
-			break;
-		case SQUARE_BRACKET_LEFT:
-			return ReadType.START_ARRAY;
-		case SQUARE_BRACKET_RIGHT:
-			return ReadType.END_ARRAY;
-		case COMMA:
-			if (currentRead.equals(ReadType.END_ARRAY)) {
-				return ReadType.END_VALUE;
-			}
-		default:
-			break;
-
-		}
-
-		return currentRead;
+        char activeChar = getCharSkipWhiteSpace();
+        currentRead = getActualReadType(currentRead, activeChar);
+        document = getNewDocument(currentRead);
 	}
 
 	public JsonDocument read() {
-		char activeChar = getCharSkipWhiteSpace();
-		currentRead = getActualReadType(currentRead, activeChar);
-		document = getNewDocument(currentRead);
-
+        char activeChar;
 		while (index < json.length()) {
 			activeChar = getCharSkipWhiteSpace();
 			currentRead = getActualReadType(currentRead, activeChar);
@@ -185,15 +143,65 @@ public class JsonReader {
 		return document;
 	}
 
+    private char getCharSkipWhiteSpace() {
+        char result = json.charAt(index);
+        while (WHITE_SPACE_SET.contains(result)) {
+            result = json.charAt(++index);
+        }
+        return result;
+    }
+
+    private ReadType getActualReadType(ReadType currentRead, char activeChar) {
+        switch (activeChar) {
+            case CURLY_BRACKET_LEFT:
+                if (currentRead != null && currentRead.equals(ReadType.START_ARRAY_ELEMENT)) {
+                    activeChar = json.charAt(--index);
+                    return currentRead;
+                } else if (currentRead != null && currentRead.equals(ReadType.START_VALUE)) {
+                    activeChar = json.charAt(--index);
+                    return currentRead;
+                }
+                return ReadType.START_OBJECT;
+            case CURLY_BRACKET_RIGHT:
+                return ReadType.END_OBJECT;
+            case QUOTATION_MARK:
+                if (currentRead.equals(ReadType.START_OBJECT)) {
+                    return ReadType.START_KEY;
+                }
+                break;
+            case SQUARE_BRACKET_LEFT:
+                if(currentRead != null && currentRead.equals(ReadType.START_ARRAY)){
+                    return ReadType.START_ARRAY_ELEMENT;
+                } else {
+                    return ReadType.START_ARRAY;
+                }
+            case SQUARE_BRACKET_RIGHT:
+                return ReadType.END_ARRAY;
+            case COMMA:
+                if (currentRead.equals(ReadType.END_ARRAY)) {
+                    return ReadType.END_VALUE;
+                }
+            default:
+                break;
+
+        }
+
+        return currentRead;
+    }
+
     private void startValueByActiveChar(char activeChar) {
         switch (activeChar) {
         case CURLY_BRACKET_LEFT:
-            JsonDocumentWrapper documentWrapper = new JsonDocumentWrapper(currentKey, document);
+            JsonDocumentWrapper objDocWrapper = new JsonDocumentWrapper(currentKey, document);
             currentKey = null;
-            stack.push(documentWrapper);
+            stack.push(objDocWrapper);
             document = getNewDocument(ReadType.START_OBJECT);
             break;
         case SQUARE_BRACKET_LEFT:
+            JsonDocumentWrapper arrayDocWrapper = new JsonDocumentWrapper(currentKey, document);
+            currentKey = null;
+            stack.push(arrayDocWrapper);
+            document = getNewDocument(ReadType.START_ARRAY);
             break;
         case QUOTATION_MARK:
             activeChar = json.charAt(++index);
