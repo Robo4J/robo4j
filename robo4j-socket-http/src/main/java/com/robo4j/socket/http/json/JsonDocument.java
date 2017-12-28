@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * representation of the read String stream
@@ -47,6 +48,22 @@ public class JsonDocument {
 
 	public boolean isArray() {
 		return type.equals(Type.ARRAY);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		JsonDocument document = (JsonDocument) o;
+		return Objects.equals(array, document.array) &&
+				Objects.equals(map, document.map) &&
+				type == document.type;
+	}
+
+	@Override
+	public int hashCode() {
+
+		return Objects.hash(array, map, type);
 	}
 
 	@Override
