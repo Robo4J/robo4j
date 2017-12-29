@@ -11,7 +11,7 @@ import java.util.Map;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class JsonReaderTest {
+public class JsonReaderTests {
 
     private static final String jsonBooleanValues = "{\"number\":22,\"message\":\"no message\",\"active\":true,\"passive\": false, \"bool1\":false,\"bool2\" :true}";
     private static final String jsonBasicValues = "{ \"number\"\n :  42, \"message\" \t: \"no message\", \"active\" : false , \"floatNumber\" : 0.42}";
@@ -40,86 +40,6 @@ public class JsonReaderTest {
 
     private static final String jsonNestedObject2BasicValueWithStringArray = "{\"name\" : \"nestedName1\", \"object1\" : {\"value\" : " +
             "{ \"floatNumber\" : 0.42, \"number\"\n :  42, \"active\" : false, \"message\" \t: \"no message\", \"arrayOne\":[\"one\",\"two\"]}}}";
-
-
-    private static final String jsonArrayStringOnly = "[\"one\", \"two\" , \"three\"]";
-    private static final String jsonArrayIntegerOnly = "[ 1,2,3 ,4, 5 , 6,  7]";
-    private static final String jsonArrayNumberOnly = "[ 0.2, 0.1, 0.3]";
-    private static final String jsonArrayBooleanOnly = "[ true, false, false, false, true]";
-    private static final String jsonArrayObjectOnly = "[{\"name\":\"name1\",\"value\":42}, {\"name\":\"name2\",\"value\":22}, " +
-            "{\"name\":\"name3\",\"value\":8}]";
-
-    @Test
-    public void basicArrayStringOnlyTest(){
-        JsonReader parser = new JsonReader(jsonArrayStringOnly);
-        JsonDocument document = parser.read();
-
-        System.out.println("DOC: " + document);
-        List<String> testArray = Arrays.asList("one", "two", "three");
-        Assert.assertTrue(document.getType().equals(JsonDocument.Type.ARRAY));
-        Assert.assertTrue(document.getArray().size() == testArray.size());
-        Assert.assertTrue(document.getArray().containsAll(testArray));
-    }
-
-    @Test
-    public void basicArrayIntegerOnlyTest(){
-        JsonReader parser = new JsonReader(jsonArrayIntegerOnly);
-        JsonDocument document = parser.read();
-
-        System.out.println("DOC: " + document);
-        List<Integer> testArray = Arrays.asList(1,2,3,4,5,6,7);
-        Assert.assertTrue(document.getType().equals(JsonDocument.Type.ARRAY));
-        Assert.assertTrue(document.getArray().size() == testArray.size());
-        Assert.assertTrue(document.getArray().containsAll(testArray));
-    }
-
-    @Test
-    public void basicArrayBooleanOnlyTest(){
-        JsonReader parser = new JsonReader(jsonArrayBooleanOnly);
-        JsonDocument document = parser.read();
-
-        List<Boolean> testArray = Arrays.asList(true, false, false, false, true);
-        Assert.assertTrue(document.getType().equals(JsonDocument.Type.ARRAY));
-        Assert.assertTrue(document.getArray().size() == testArray.size());
-        Assert.assertTrue(document.getArray().containsAll(testArray));
-    }
-
-    @Test
-    public void basicArrayNumberOnlyTest(){
-        JsonReader parser = new JsonReader(jsonArrayNumberOnly);
-        JsonDocument document = parser.read();
-
-        List<Double> testArray = Arrays.asList(0.2,0.1,0.3);
-        Assert.assertTrue(document.getType().equals(JsonDocument.Type.ARRAY));
-        Assert.assertTrue(document.getArray().size() == testArray.size());
-        Assert.assertTrue(document.getArray().containsAll(testArray));
-    }
-
-    @Test
-    public void basicArrayObjectOnlyTest(){
-
-        JsonDocument jsonDocumentChild1 = new JsonDocument(JsonDocument.Type.OBJECT);
-        jsonDocumentChild1.put("name", "name1");
-        jsonDocumentChild1.put("value", 42);
-
-        JsonDocument jsonDocumentChild2 = new JsonDocument(JsonDocument.Type.OBJECT);
-        jsonDocumentChild2.put("name", "name2");
-        jsonDocumentChild2.put("value", 22);
-
-        JsonDocument jsonDocumentChild3 = new JsonDocument(JsonDocument.Type.OBJECT);
-        jsonDocumentChild3.put("name", "name3");
-        jsonDocumentChild3.put("value", 8);
-
-        List<JsonDocument> expectedArrayResult = Arrays.asList(jsonDocumentChild1, jsonDocumentChild2, jsonDocumentChild3);
-
-        JsonReader parser = new JsonReader(jsonArrayObjectOnly);
-        JsonDocument document = parser.read();
-
-        System.out.println("DOC: " + document);
-        Assert.assertTrue(document.getType().equals(JsonDocument.Type.ARRAY));
-        Assert.assertTrue(document.getArray().size() == expectedArrayResult.size());
-        Assert.assertTrue(document.getArray().containsAll(expectedArrayResult));
-    }
 
 
     @Test

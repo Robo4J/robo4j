@@ -73,7 +73,9 @@ public class JsonCodecsTests {
 		obj1.setPersons(Arrays.asList(testPerson1, testPerson2));
 		obj1.setPersonMap(personMap);
 
+		long start = System.currentTimeMillis();
 		String json = collectionsTypesMessageCodec.encode(obj1);
+		System.out.println("duration: " + timeDiff(start));
 		System.out.println("JSON1: " + json);
 
 		Assert.assertTrue(testJson.equals(json));
@@ -105,7 +107,10 @@ public class JsonCodecsTests {
 		personMap.put("person1", testPerson1);
 		personMap.put("person2", testPerson2);
 
+		NSBWithSimpleCollectionsTypesMessage obj = collectionsTypesMessageCodec.decode(testJson);
+		long start = System.currentTimeMillis();
 		NSBWithSimpleCollectionsTypesMessage obj1 = collectionsTypesMessageCodec.decode(testJson);
+		System.out.println("duration " + timeDiff(start));
 
 		Assert.assertTrue(obj1.getNumber() == 42);
 		Assert.assertTrue(obj1.getMessage().equals("no message"));
