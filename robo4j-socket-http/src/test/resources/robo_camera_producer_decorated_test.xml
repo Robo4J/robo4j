@@ -36,7 +36,7 @@
         <config name="com.robo4j.root">
             <value name="target" type="String">imageDecorator</value>
             <value name="fileName" type="String">snapshot.png</value>
-            <value name="numberOfImages" type="int">32</value>
+            <value name="numberOfImages" type="int">42</value>
         </config>
     </roboUnit>
 </robo4j>
