@@ -26,9 +26,10 @@ public class JsonReaderArrayTests {
             "{\"name\":\"name12\",\"value\":12}, {\"name\":\"name13\",\"value\":13}] , [{\"name\":\"name21\",\"value\":21}, " +
             "{\"name\":\"name22\",\"value\":22}],[{\"name\":\"name31\",\"value\":31}]]";
 
-    private static final String jsonArrayOfArraysObjectsWithObejctWithArray = "[[ {\"name\":\"name11\",\"value\":11}, " +
+    private static final String jsonArrayOfArraysObjectsWithObjectWithArray = "[[ {\"name\":\"name11\",\"value\":11}, " +
             "{\"name\":\"name12\",\"value\":12}, {\"name\":\"name13\",\"value\":13}] , [{\"name\":\"name21\",\"value\":21}, " +
-            "{\"name\":\"name22\",\"value\":22}],[{\"name\":\"name31\",\"value\":31, \"array\":[31,32,33]}]]";
+            "{\"name\":\"name22\",\"value\":22}],[{\"name\":\"name31\",\"value\":31, \"array\":[31,32,33], " +
+                "\"child\":{\"name\":\"name311\", \"array\":[31,32,33]}}]]";
 
     @Test
     public void basicArrayStringOnlyTest(){
@@ -150,16 +151,45 @@ public class JsonReaderArrayTests {
 
     @Test
     public void basicArrayOfArraysObjectsOnlyTest(){
+        List<Object> array1 = Arrays.asList(testObjectJsonDocument(11), testObjectJsonDocument(12), testObjectJsonDocument(13));
+        List<Object> array2 = Arrays.asList(testObjectJsonDocument(21), testObjectJsonDocument(22));
+        List<Object> array3 = Collections.singletonList(testObjectJsonDocument(31));
+
         JsonReader parser = new JsonReader(jsonArrayOfArraysObjectsOnly);
         JsonDocument document = parser.read();
+
+        Assert.assertTrue(compareArrays(array1, document, 0));
+        Assert.assertTrue(compareArrays(array2, document, 1));
+        Assert.assertTrue(compareArrays(array3, document, 2));
 
         System.out.println("DOC: " + document);
     }
 
     @Test
     public void basicArrayOfArraysObjectsWithObjectWithArrayTest(){
-        JsonReader parser = new JsonReader(jsonArrayOfArraysObjectsWithObejctWithArray);
+        List<Object> array1 = Arrays.asList(testObjectJsonDocument(11), testObjectJsonDocument(12), testObjectJsonDocument(13));
+        List<Object> array2 = Arrays.asList(testObjectJsonDocument(21), testObjectJsonDocument(22));
+
+        JsonDocument lastJsonDocument = testObjectJsonDocument(31);
+        JsonDocument lastJsonDocumentArray = new JsonDocument(JsonDocument.Type.ARRAY);
+        lastJsonDocumentArray.add(31);
+        lastJsonDocumentArray.add(32);
+        lastJsonDocumentArray.add(33);
+        JsonDocument lastJsonDocumentObject = new JsonDocument(JsonDocument.Type.OBJECT);
+        lastJsonDocumentObject.put("name", "name311");
+        lastJsonDocumentObject.put("array", lastJsonDocumentArray);
+        lastJsonDocument.put("array", lastJsonDocumentArray);
+        lastJsonDocument.put("child", lastJsonDocumentObject);
+        List<Object> array3 = Collections.singletonList(lastJsonDocument);
+
+        JsonReader parser = new JsonReader(jsonArrayOfArraysObjectsWithObjectWithArray);
+        long start = System.currentTimeMillis();
         JsonDocument document = parser.read();
+        System.out.println("duration: " + (System.currentTimeMillis() - start));
+
+        Assert.assertTrue(compareArrays(array1, document, 0));
+        Assert.assertTrue(compareArrays(array2, document, 1));
+        Assert.assertTrue(compareArrays(array3, document, 2));
 
         System.out.println("DOC: " + document);
     }
@@ -169,5 +199,13 @@ public class JsonReaderArrayTests {
         JsonDocument desiredArrayDocument = (JsonDocument) arrayDocument.getArray().get(index);
         Assert.assertTrue(desiredArrayDocument.getType().equals(JsonDocument.Type.ARRAY));
         return sourceArray.containsAll(desiredArrayDocument.getArray());
+    }
+
+
+    private JsonDocument testObjectJsonDocument(Integer value){
+        JsonDocument result = new JsonDocument(JsonDocument.Type.OBJECT);
+        result.put("name", "name" + value);
+        result.put("value", value);
+        return result;
     }
 }
