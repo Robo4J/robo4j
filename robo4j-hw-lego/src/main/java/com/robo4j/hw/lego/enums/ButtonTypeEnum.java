@@ -46,7 +46,7 @@ public enum ButtonTypeEnum implements ILegoHardware<Key> {
 	;
 	//@formatter:on
 
-    private volatile static Map<String, ButtonTypeEnum> internMapByName;
+    private static Map<String, ButtonTypeEnum> internMapByName;
     private String name;
     private Key key;
 

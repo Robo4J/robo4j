@@ -37,13 +37,15 @@ import java.util.Collections;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+
+// FIXME: 12/8/17 (miro) -> rethink and remove dependency
 public class TankExampleTests {
 
 	private static final String ID_LCD = "lcd";
 	private static final String ID_PLATFORM = "platform";
 	private static final String ID_HTTP = "http";
 	private static final String ID_UNIT_CONTROLLER = "controller";
-	private static final int PORT = 8025;
+	private static final int PORT = 8021;
 
 	@Test
 	public void legoTankExampleTest() throws Exception {
@@ -54,7 +56,7 @@ public class TankExampleTests {
 		config.setString("target", ID_UNIT_CONTROLLER);
 		config.setInteger("port", PORT);
 		config.setString("packages", "com.robo4j.units.lego.example.codec");
-		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
+		config.setString(RoboHttpUtils.HTTP_TARGETS,
 				JsonUtil.getJsonByMap(Collections.singletonMap(ID_UNIT_CONTROLLER, "GET")));
 
 		builder.add(HttpServerUnit.class, config, ID_HTTP);

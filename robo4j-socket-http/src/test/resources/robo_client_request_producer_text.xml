@@ -1,0 +1,17 @@
+<robo4j>
+    <roboUnit id="httpClient">
+        <class>com.robo4j.socket.http.units.HttpClientDecoratorUnit</class>
+    </roboUnit>
+    <roboUnit id="decoratedProducer">
+        <class>com.robo4j.socket.http.units.test.HttpMessageDecoratedProducerUnit</class>
+        <config name="com.robo4j.root">
+            <value name="target" type="String">httpClient</value>
+            <value name="targets" type="String">[{"":["GET",["stringConsumer"]]}]</value>
+            <value name="host" type="String">0.0.0.0</value>
+            <value name="port" type="int">8050</value>
+        </config>
+    </roboUnit>
+    <roboUnit id="stringConsumer">
+        <class>com.robo4j.socket.http.units.test.StringConsumer</class>
+    </roboUnit>
+</robo4j>

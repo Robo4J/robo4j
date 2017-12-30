@@ -17,69 +17,19 @@
 
 package com.robo4j.socket.http.codec;
 
-import com.robo4j.socket.http.units.HttpDecoder;
-import com.robo4j.socket.http.units.HttpEncoder;
 import com.robo4j.socket.http.units.HttpProducer;
-import com.robo4j.util.StringConstants;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
+ * Camera Image codec
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 @HttpProducer
-public class CameraMessageCodec implements HttpDecoder<CameraMessage>, HttpEncoder<CameraMessage> {	
-	private static final String KEY_TYPE = "type";
-	private static final String KEY_VALUE = "value";
-	private static final String KEY_IMAGE = "image";
+public class CameraMessageCodec extends AbstractMessageCodec<CameraMessage> {
 
-	@Override
-	public String encode(CameraMessage message) {
-		//@formatter:off
-        final StringBuilder sb = new StringBuilder("{\"")
-				.append(KEY_TYPE).append("\":\"")
-                .append(message.getType())
-                .append("\",\"")
-				.append(KEY_VALUE)
-				.append("\":\"")
-                .append(message.getValue())
-                .append("\",\"")
-				.append(KEY_IMAGE)
-				.append("\":\"")
-                .append(message.getImage())
-                .append("\"}");
-        //@formatter:off
-        return sb.toString();
-    }
-
-    @Override
-    public CameraMessage decode(String json) {
-        final Map<String, String> map = new HashMap<>();
-        //@formatter:off
-		final String[] parts = json.replaceAll("^\\{\\s*\"|\"\\s*\\}$", StringConstants.EMPTY)
-				.split("\"?(\"?\\s*:\\s*\"?|\\s*,\\s*)\"?");
-		//@formatter:on
-		for (int i = 0; i < parts.length - 1; i += 2) {
-			map.put(parts[i].trim(), parts[i + 1].trim());
-		}
-
-		final String type = map.get(KEY_TYPE);
-		final String value =  map.get(KEY_VALUE);
-		final String image = map.get(KEY_IMAGE);
-		return new CameraMessage(type, value, image);
-
-	}
-
-	@Override
-	public Class<CameraMessage> getEncodedClass() {
-		return CameraMessage.class;
-	}
-
-	@Override
-	public Class<CameraMessage> getDecodedClass() {
-		return CameraMessage.class;
+	public CameraMessageCodec() {
+		super(CameraMessage.class);
 	}
 
 }

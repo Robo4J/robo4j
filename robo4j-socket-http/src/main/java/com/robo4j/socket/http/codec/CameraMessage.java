@@ -17,9 +17,11 @@
 
 package com.robo4j.socket.http.codec;
 
+import java.util.Objects;
+
 /**
- * Camera message contains description and image as byte array
- * used for http codec.
+ * Camera message contains description and image as byte array used for http
+ * codec.
  *
  * note: example joystick example
  *
@@ -28,33 +30,61 @@ package com.robo4j.socket.http.codec;
  */
 public class CameraMessage {
 
-    private final String type;
-    private final String value;
-    private final String image;
+	private String type;
+	private String value;
+	private String image;
 
-    public CameraMessage(String type, String value, String image) {
-        this.type = type;
-        this.value = value;
-        this.image = image;
-    }
+	public CameraMessage() {
+	}
 
-    public String getType() {
-        return type;
-    }
+	public CameraMessage(String type, String value, String image) {
+		this.type = type;
+		this.value = value;
+		this.image = image;
+	}
 
-    public String getValue() {
-        return value;
-    }
+	public String getType() {
+		return type;
+	}
 
-    public String getImage() {
-        return image;
-    }
+	public void setType(String type) {
+		this.type = type;
+	}
 
-    @Override
-    public String toString() {
-        return "{" +
-                "\"type\":\"" + type + "\"" +
-                ",\"value\":\"" + value + "\"" +
-                ",\"image\":\"" + image + "\"}";
-    }
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		CameraMessage that = (CameraMessage) o;
+		return Objects.equals(type, that.type) &&
+				Objects.equals(value, that.value) &&
+				Objects.equals(image, that.image);
+	}
+
+	@Override
+	public int hashCode() {
+
+		return Objects.hash(type, value, image);
+	}
+
+	@Override
+	public String toString() {
+		return "{" + "\"type\":\"" + type + "\"" + ",\"value\":\"" + value + "\"" + ",\"image\":\"" + image + "\"}";
+	}
 }

@@ -17,7 +17,7 @@
 
 package com.robo4j.socket.http;
 
-import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * Wrapper to Http Message.
@@ -26,24 +26,25 @@ import java.nio.ByteBuffer;
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpByteWrapper {
-	private final ByteBuffer header;
-	private final ByteBuffer body;
 
-	public HttpByteWrapper(ByteBuffer header, ByteBuffer body) {
+	private final String[] header;
+	private final String body;
+
+	public HttpByteWrapper(String[] header, String body) {
 		this.header = header;
 		this.body = body;
 	}
 
-	public ByteBuffer getHeader() {
+	public String[] getHeader() {
 		return header;
 	}
 
-	public ByteBuffer getBody() {
+	public String getBody() {
 		return body;
 	}
 
 	@Override
 	public String toString() {
-		return "HttpByteWrapper{" + "header=" + header + ", body=" + body + '}';
+		return "HttpByteWrapper{" + "header=" + Arrays.asList(header) + ", body=" + body + '}';
 	}
 }

@@ -24,13 +24,18 @@ import com.robo4j.LifecycleState;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.StringConsumer;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
-import com.robo4j.socket.http.util.HttpPathUtil;
+import com.robo4j.socket.http.units.test.StringConsumer;
+import com.robo4j.socket.http.util.HttpDenominator;
+import com.robo4j.socket.http.util.HttpMessageBuilder;
+import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.JsonUtil;
+import com.robo4j.socket.http.util.RequestDenominator;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
@@ -40,6 +45,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
+
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 
 /**
  *
@@ -52,7 +59,7 @@ public class RoboHttpDynamicTests {
 
 	private static final String ID_HTTP_SERVER = "http";
 	private static final int PORT = 8025;
-	private static final int SLEEP_DELAY = 400;						//necessary delay due to multi-threading we should fix it
+	private static final int SLEEP_DELAY = 400; // necessary delay due to multi-threading we should fix it
 	private static final String ID_CLIENT_UNIT = "httpClient";
 	private static final String ID_TARGET_UNIT = "controller";
 	private static final int MESSAGES_NUMBER = 6;
@@ -90,7 +97,14 @@ public class RoboHttpDynamicTests {
 		/* client system sending a messages to the main system */
 		List<String> paths = Arrays.asList("units", ID_TARGET_UNIT);
 		for (int i = 0; i < MESSAGES_NUMBER; i++) {
-			String messageToSend = RoboHttpUtils.createRequest(HttpMethod.POST, HOST_SYSTEM, HttpPathUtil.pathsToUri(paths), JSON_STRING);
+
+			HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, HttpPathUtils.pathsToUri(paths), HttpVersion.HTTP_1_1);
+			String messageToSend = HttpMessageBuilder.Build()
+					.setDenominator(denominator)
+                    .addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(HOST_SYSTEM))
+					.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(JSON_STRING.length()))
+					.build(JSON_STRING);
+
 			httpClientReference.sendMessage(messageToSend);
 		}
 
@@ -121,10 +135,9 @@ public class RoboHttpDynamicTests {
 		RoboBuilder builder = new RoboBuilder();
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString("target", ID_TARGET_UNIT);
-		config.setInteger("port", PORT);
+		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		config.setString("packages", "com.robo4j.socket.http.units.test.codec");
-		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
+		config.setString(RoboHttpUtils.HTTP_TARGETS,
 				JsonUtil.getJsonByMap(Collections.singletonMap(ID_TARGET_UNIT, HTTP_METHOD)));
 		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
 
@@ -152,9 +165,9 @@ public class RoboHttpDynamicTests {
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("address", HOST_SYSTEM);
-		config.setInteger("port", PORT);
+		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		/* specific configuration */
-		config.setString(RoboHttpUtils.HTTP_TARGET_UNITS,
+		config.setString(RoboHttpUtils.HTTP_TARGETS,
 				JsonUtil.getJsonByMap(Collections.singletonMap(ID_TARGET_UNIT, HTTP_METHOD)));
 		builder.add(HttpClientUnit.class, config, ID_CLIENT_UNIT);
 

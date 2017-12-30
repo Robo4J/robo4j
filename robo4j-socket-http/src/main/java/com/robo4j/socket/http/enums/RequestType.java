@@ -32,7 +32,7 @@ public enum RequestType {
 	HTTP	(1, "http"),
 	RAW		(2, "raw"),
 	;
-	private volatile static Map<String, RequestType> defNameToTypeMapping;
+	private static Map<String, RequestType> defNameToTypeMapping;
 	// @formatter:on
 	private int code;
 	private String name;
@@ -42,7 +42,6 @@ public enum RequestType {
 		this.name = name;
 	}
 
-	// Private Methods
 	private static Map<String, RequestType> initMapping() {
 		return Arrays.stream(values()).collect(Collectors.toMap(RequestType::getName, e -> e));
 	}

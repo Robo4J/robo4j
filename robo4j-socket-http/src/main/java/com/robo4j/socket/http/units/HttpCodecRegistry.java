@@ -16,12 +16,12 @@
  */
 package com.robo4j.socket.http.units;
 
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.reflect.ReflectionScan;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.reflect.ReflectionScan;
 
 /**
  * Registry for codecs.
@@ -82,7 +82,6 @@ public class HttpCodecRegistry {
 			encoders.put(encoder.getEncodedClass(), encoder);
 		}
 		// Note, not "else if". People are free to implement both in the same
-		// class
 		if (instance instanceof HttpDecoder) {
 			HttpDecoder<?> decoder = (HttpDecoder<?>) instance;
 			decoders.put(decoder.getDecodedClass(), decoder);

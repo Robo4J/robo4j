@@ -22,6 +22,8 @@ import com.robo4j.socket.http.codec.SimpleCommandCodec;
 import com.robo4j.socket.http.units.test.codec.TestArrayDecoder;
 import com.robo4j.socket.http.units.test.codec.TestArrayEncoder;
 import com.robo4j.socket.http.units.test.enums.TestCommandEnum;
+import com.robo4j.socket.http.util.HttpUnitHelper;
+import com.robo4j.util.StreamUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -162,15 +164,14 @@ public class HttpUnitTests {
 	public void testHttpCameraMessageImage() throws Exception {
 
 		final InputStream imageData = new BufferedInputStream(
-				Thread.currentThread().getContextClassLoader().getResourceAsStream("20161021_NoSignal_240.png"));
-		byte[] imageArray = new byte[imageData.available()];
-		imageData.read(imageArray);
+				Thread.currentThread().getContextClassLoader().getResourceAsStream("snapshot.png"));
+		byte[] imageArray  = StreamUtils.inputStreamToByteArray(imageData);
 
 		String encodedImage = Base64.getEncoder().encodeToString(imageArray);
 
-		final String jsonCammeraMessageCorrupted = "{ \"type\"  :  \"jpg\" ,  \"value\"   :  \"description\"  ,\"image\":\""
+		final String jsonCameraMessageCorrupted = "{ \"type\"  :  \"jpg\" ,  \"value\"   :  \"description\"  ,\"image\":\""
 				+ encodedImage + "\"}";
-		final String jsonCammeraMessage = "{\"type\":\"jpg\",\"value\":\"description\",\"image\":\"" + encodedImage
+		final String jsonCameraMessage = "{\"type\":\"jpg\",\"value\":\"description\",\"image\":\"" + encodedImage
 				+ "\"}";
 		HttpCodecRegistry registry = new HttpCodecRegistry("com.robo4j.socket.http.codec");
 		HttpEncoder<CameraMessage> encoder = registry.getEncoder(CameraMessage.class);
@@ -180,11 +181,11 @@ public class HttpUnitTests {
 
 		CameraMessage cameraMessage = new CameraMessage("jpg", "description", encodedImage);
 		String encoded = encoder.encode(cameraMessage);
-		CameraMessage decoded = decoder.decode(jsonCammeraMessageCorrupted);
+		CameraMessage decoded = decoder.decode(jsonCameraMessageCorrupted);
 
 		final byte[] imageDecoded = Base64.getDecoder().decode(decoded.getImage());
 
-		Assert.assertEquals(jsonCammeraMessage, encoded);
+		Assert.assertEquals(jsonCameraMessage, encoded);
 		Assert.assertEquals(cameraMessage.getType(), decoded.getType());
 		Assert.assertEquals(cameraMessage.getValue(), decoded.getValue());
 		Assert.assertEquals(imageArray.length, imageDecoded.length);
@@ -193,7 +194,7 @@ public class HttpUnitTests {
 	@Test
 	public void testHttpCameraRealMessageImage() throws Exception {
 
-		String encodedImage = HttpUnitHelperMain.getExampleCamera();
+		String encodedImage = HttpUnitHelper.getExampleCamera();
 
 		final String jsonCammeraMessageCorrupted = "{ \"type\"  :  \"jpg\" ,  \"value\"   :  \"description\"  ,\"image\":\""
 				+ encodedImage + "\"}";

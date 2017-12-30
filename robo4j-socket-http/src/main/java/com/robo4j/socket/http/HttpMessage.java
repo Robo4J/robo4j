@@ -17,6 +17,8 @@
 
 package com.robo4j.socket.http;
 
+import com.robo4j.socket.http.message.HttpDecoratedRequest;
+
 import java.net.URI;
 import java.util.Comparator;
 import java.util.Map;
@@ -39,6 +41,11 @@ public class HttpMessage implements Comparable<HttpMessage> {
 		this.uri = uri;
 		this.version = version;
 		this.header = header;
+	}
+
+	public HttpMessage(HttpDecoratedRequest decoratedRequest) {
+		this(decoratedRequest.getMethod(), URI.create(decoratedRequest.getPath()),
+				HttpVersion.getByValue(decoratedRequest.getVersion()), decoratedRequest.getHeader());
 	}
 
 	public HttpMethod method() {

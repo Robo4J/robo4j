@@ -1,5 +1,6 @@
 rootProject.name = 'robo4j'
 
+include 'robo4j-commons'
 include 'robo4j-core'
 include 'robo4j-socket-http'
 include 'robo4j-page'

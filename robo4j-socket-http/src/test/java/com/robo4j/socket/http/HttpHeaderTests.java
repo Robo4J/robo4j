@@ -17,14 +17,22 @@
 
 package com.robo4j.socket.http;
 
+import com.robo4j.socket.http.enums.StatusCode;
+import com.robo4j.socket.http.provider.DefaultValuesProvider;
+import com.robo4j.socket.http.util.HttpDenominator;
+import com.robo4j.socket.http.util.HttpHeaderBuilder;
+import com.robo4j.socket.http.util.HttpMessageBuilder;
+import com.robo4j.socket.http.util.HttpMessageUtils;
+import com.robo4j.socket.http.util.RequestDenominator;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.socket.http.util.HttpHeaderBuilder;
-import com.robo4j.socket.http.util.HttpMessageUtil;
+import static com.robo4j.socket.http.HttpHeaderFieldValues.CONNECTION_KEEP_ALIVE;
+import static com.robo4j.socket.http.provider.DefaultValuesProvider.ROBO4J_CLIENT;
+import static com.robo4j.socket.http.util.HttpMessageUtils.NEXT_LINE;
 
 /**
- *
  * Simple Http Header Oriented tests
  *
  * @author Marcus Hirt (@hirt)
@@ -32,24 +40,52 @@ import com.robo4j.socket.http.util.HttpMessageUtil;
  */
 public class HttpHeaderTests {
 
-	private static final String CONST_CACHE_CONTROL = "keep-alive";
-	private static final String CONST_USER_AGENT = "Robo4J-client";
-
 	@Test
-	public void simpleHttpHeader() {
-		// formatter:off
-		final String header = HttpHeaderBuilder.Build().add(HttpHeaderFieldNames.HOST, "127.0.0.1")
-				.add(HttpHeaderFieldNames.CONNECTION, CONST_CACHE_CONTROL).add(HttpHeaderFieldNames.CACHE_CONTROL, "no-cache")
-				.add(HttpHeaderFieldNames.USER_AGENT, CONST_USER_AGENT).add(HttpHeaderFieldNames.ACCEPT, "*/*")
-				.add(HttpHeaderFieldNames.ACCEPT_ENCODING, "gzip, deflate, sdch, br")
-				.add(HttpHeaderFieldNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8").build();
-		// formatter:on
+	public void createHeaderTest() {
+		String header = HttpHeaderBuilder.Build().addFirstLine("units/controller")
+				.addAll(DefaultValuesProvider.BASIC_HEADER_MAP).build(HttpMethod.GET, HttpVersion.HTTP_1_1);
+
 		Assert.assertNotNull(header);
-		Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE).length, 7);
-		Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[1],
-				HttpHeaderBuilder.Build().add(HttpHeaderFieldNames.CONNECTION, CONST_CACHE_CONTROL).build().trim());
-		Assert.assertEquals(header.split(HttpMessageUtil.NEXT_LINE)[3],
-				HttpHeaderBuilder.Build().add(HttpHeaderFieldNames.USER_AGENT, CONST_USER_AGENT).build().trim());
+		Assert.assertEquals(header.split(NEXT_LINE).length, 8);
+		Assert.assertEquals(header.split(NEXT_LINE)[2],
+				createHeaderField(HttpHeaderFieldNames.USER_AGENT, ROBO4J_CLIENT));
+		Assert.assertEquals(header.split(NEXT_LINE)[3],
+				createHeaderField(HttpHeaderFieldNames.CONNECTION, CONNECTION_KEEP_ALIVE));
 	}
 
+	@Test
+	public void characterParser() {
+		Assert.assertTrue("[".equals(HttpMessageUtils.getHttpSeparator(13)));
+		Assert.assertTrue("]".equals(HttpMessageUtils.getHttpSeparator(14)));
+	}
+
+	@Test
+	public void test() {
+		String uid = "1234";
+		String expectedResult = "HTTP/1.1 200 OK" + NEXT_LINE + "uid: " + uid + NEXT_LINE;
+		//@formatter:off
+        String getHeader =  HttpHeaderBuilder.Build()
+                .addFirstLine(HttpVersion.HTTP_1_1.getValue())
+                .addFirstLine(StatusCode.OK.getCode())
+                .addFirstLine(StatusCode.OK.getReasonPhrase())
+                .add(HttpHeaderFieldNames.ROBO_UNIT_UID, uid)
+                .build();
+        //@formatter:on
+		Assert.assertTrue(getHeader.equals(expectedResult));
+	}
+
+	@Test
+	public void extractHeaderParameter() {
+		String message = "message";
+		HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, HttpVersion.HTTP_1_1);
+		String postRequest = HttpMessageBuilder.Build().setDenominator(denominator)
+				.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost("127.0.0.1"))
+				.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()))
+				.build(message);
+		System.out.println("HEADER: " + postRequest);
+	}
+
+	private String createHeaderField(String key, String value) {
+		return key + ": " + value;
+	}
 }

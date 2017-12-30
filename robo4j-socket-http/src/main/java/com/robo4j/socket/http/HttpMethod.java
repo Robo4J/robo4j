@@ -38,28 +38,36 @@ public enum HttpMethod implements Comparator<HttpMethod> {
 	 * entity) is identified by the Request-URI. If the Request-URI refers to a
 	 * data-producing process, it is the produced data which shall be returned
 	 * as the entity in the response and not the source text of the process,
-	 * unless that text happens to be the output of the process.
+	 * unless that text happens to be the output of the process. Http 1.1 must
+	 * implement.
 	 */
 	GET		("GET"),
 
 	/**
 	 * The HEAD method is identical to GET except that the server MUST NOT
-	 * return a message-body in the response.
+	 * return a message-body in the response. Inspect resource headers.
 	 */
 	HEAD	("HEAD"),
 
 	/**
 	 * The POST method is used to request that the origin server accept the
 	 * entity enclosed in the request as a new subordinate of the resource
-	 * identified by the Request-URI in the Request-Line.
+	 * identified by the Request-URI in the Request-Line. Input data for processing
 	 */
 	POST	("POST"),
 
 	/**
 	 * The PUT method requests that the enclosed entity be stored under the
-	 * supplied Request-URI
+	 * supplied Request-URI. Deposit data on server - inverse to get
 	 */
 	PUT		("PUT"),
+
+	/**
+	 * The PATCH method requests that a set of changes described in the
+     * request entity be applied to the resource identified by the Request-URI.
+	 * Partially modify a resource
+	 */
+	PATCH	("PATCH"),
 
 	/**
 	 * The DELETE method requests that the origin server delete the resource
@@ -92,7 +100,7 @@ public enum HttpMethod implements Comparator<HttpMethod> {
 	CONNECT	("CONNECT");
 	// @formatter:on
 
-	private volatile static Map<String, HttpMethod> mapByName;
+	private static Map<String, HttpMethod> mapByName;
 	private final String name;
 
 	HttpMethod(String name) {

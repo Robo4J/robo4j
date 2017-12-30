@@ -16,11 +16,11 @@
  */
 package com.robo4j.logging;
 
+import com.robo4j.util.StringConstants;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-
-import com.robo4j.util.StringConstants;
 
 /**
  * Simple toolkit for logging.
@@ -43,6 +43,14 @@ public final class SimpleLoggingUtil {
 				(l, r) -> l.concat(StringConstants.SPACE).concat(r)));
 	}
 
+	public static void debug(Class<?> clazz, String message, Throwable e) {
+		Logger.getLogger(clazz.getName()).log(Level.INFO, message, e);
+	}
+
+	public static void info(Class<?> clazz, String message){
+		Logger.getLogger(clazz.getName()).log(Level.INFO, message);
+	}
+
 	public static void error(Class<?> clazz, String message) {
 		Logger.getLogger(clazz.getName()).log(Level.SEVERE, message);
 	}
@@ -51,7 +59,4 @@ public final class SimpleLoggingUtil {
 		Logger.getLogger(clazz.getName()).log(Level.SEVERE, string, e);
 	}
 
-	public static void debug(Class<?> clazz, String message, Throwable e) {
-		Logger.getLogger(clazz.getName()).log(Level.INFO, message, e);
-	}
 }

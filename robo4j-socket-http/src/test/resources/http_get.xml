@@ -25,9 +25,7 @@
         <config name="com.robo4j.root">
             <value name="port" type="int">8025</value>
             <value name="target" type="String">request_consumer</value>
-            <targetUnits>
-                <value name="controller" type="String">GET</value>
-            </targetUnits>
+            <value name="targets" type="String">{"controller":"GET"}</value>
         </config>
     </roboUnit>
     <roboUnit id="request_consumer">

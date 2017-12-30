@@ -1,26 +1,15 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
-    }
-}
-
 plugins {
     id "org.flywaydb.flyway" version "4.2.0"
 }
 
+group 'com.robo4j'
+
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
-apply plugin: 'maven'
-apply plugin: 'com.bmuschko.nexus'
-apply from: 'libraries.gradle'
 
-group = 'com.robo4j'
-archivesBaseName = 'robo4j'
-description = 'Robo4J is the message passing framework for Robotics/IoT'
+
+apply from: 'libraries.gradle'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -28,102 +17,52 @@ targetCompatibility = 1.8
 repositories {
     mavenCentral()
     mavenLocal()
-    jcenter()
 }
 
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-//
-//            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-//                authentication(userName: ossrhUsername, password: ossrhPassword)
-//            }
-//            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-//                authentication(userName: ossrhUsername, password: ossrhPassword)
-//            }
-//
-//            pom.project {
-//                name project.name
-//                description project.description
-//                packaging 'jar'
-//                url 'https://github.com/Robo4J/robo4j'
-//                scm {
-//                    connection 'scm:git:https://github.com/Robo4J/robo4j.git'
-//                    developerConnection 'scm:https://github.com/Robo4J/robo4j.git'
-//                    url 'https://github.com/Robo4J/robo4j.git'
-//                }
-//                licenses {
-//                    license {
-//                        name 'GNU General Public License'
-//                        url 'https://www.gnu.org/licenses/gpl-3.0.en.html'
-//                        distribution 'repo'
-//                    }
-//                }
-//                developers {
-//                    developer {
-//                        id = 'Wengner'
-//                        name = 'Miroslav Wengner'
-//                        email = 'miro@robo4j.io'
-//                    }
-//                    developer {
-//                        id = 'hirt'
-//                        name = 'Marcus Hirt'
-//                        email = 'marcus@robo4j.io'
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
+project("robo4j-commons") {
+    description = "Robo4J Codec"
 
-modifyPom {
-    project {
-        name 'Robo4J framework'
-        description "${description}"
-        url 'https://github.com/Robo4J/robo4j'
-        inceptionYear '2014'
+    group 'com.robo4j'
+    version "${robo4jVersion}"
 
-        scm {
-            url 'https://github.com/Robo4J/robo4j'
-            connection 'scm:https://github.com/Robo4J/robo4j.git'
-            developerConnection 'scm:https://github.com/Robo4J/robo4j.git'
-        }
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
 
-        licenses {
-            license {
-                name 'GNU General Public License'
-                url 'https://www.gnu.org/licenses/gpl-3.0.en.html'
-                distribution 'repo'
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java']
+            }
+            resources {
+                srcDirs = ['src/main/resources']
             }
         }
 
-        developers {
-            developer {
-                id 'Wengner'
-                name 'Miroslav Wengner'
-                email 'miro@robo4j.io'
+        test {
+            java {
+                srcDirs = ['src/test/java']
             }
-            developer {
-                id 'Hirt'
-                name 'Marcus Hirt'
-                email 'marcus@robo4j.io'
+            resources {
+                srcDirs = ['src/test/resources']
             }
         }
     }
 }
-
-extraArchive {
-    sources = false
-    tests = true
-    javadoc = false
-}
-
-//nexus {
-//    sign = true
-//    repositoryUrl = 'https://github.com/Robo4J/robo4j/'
-//    snapshotRepositoryUrl = 'https://github.com/Robo4J/robo4j/'
-//}
 
 project("robo4j-core") {
     description = "Robo4J Core"
@@ -146,6 +85,10 @@ project("robo4j-core") {
     dependencies {
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
+    }
+
+    test {
+        systemProperty "java.net.preferIPv4Stack", "true"
     }
 
     sourceSets {
@@ -201,7 +144,6 @@ project("robo4j-db-sql") {
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
     }
 
-    //main db
     flyway {
         url = 'jdbc:h2:~/data/robo4j1h2'
         user = 'sa'
@@ -246,18 +188,25 @@ project("robo4j-hw-lego") {
         mavenLocal()
     }
 
-//    uploadArchives {
-//        repositories {
-//            mavenDeployer {
-//                repository(url: "${mavenRepository}")
-//            }
-//        }
-//    }
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "${mavenRepository}")
+            }
+        }
+    }
+
+    dependencies {
+        compile fileTree(dir: 'libs', include: 'ev3classes-9.1.jar')
+        compile(project(":robo4j-math"))
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
 
     sourceSets {
         main {
             java {
-                srcDirs = ['src/main/java', 'src/examples/java', 'libs']
+                srcDirs = ['src/main/java', 'src/examples/java']
             }
             resources {
                 srcDirs = ['src/main/resources', 'src/examples/resources']
@@ -272,14 +221,6 @@ project("robo4j-hw-lego") {
                 srcDirs = ['src/test/resources']
             }
         }
-    }
-
-    //sources
-    dependencies {
-        compile fileTree(dir: 'libs', include: 'ev3classes-9.1.jar')
-        compile(project(":robo4j-math"))
-        testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 }
 
@@ -301,13 +242,13 @@ project("robo4j-hw-rpi") {
         mavenLocal()
     }
 
-//    uploadArchives {
-//        repositories {
-//            mavenDeployer {
-//                repository(url: "${mavenRepository}")
-//            }
-//        }
-//    }
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "${mavenRepository}")
+            }
+        }
+    }
 
     //create a single Jar with all dependencies
     task fatJar(type: Jar) {
@@ -450,9 +391,9 @@ project("robo4j-socket-http") {
     apply plugin: 'idea'
     apply plugin: 'eclipse'
     apply plugin: 'maven'
-    apply plugin: "org.flywaydb.flyway"
 
     sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 
     repositories {
         mavenCentral()
@@ -460,8 +401,8 @@ project("robo4j-socket-http") {
     }
 
     dependencies {
+        compile(project(":robo4j-commons"))
         compile(project(":robo4j-core"))
-        testCompile project(':robo4j-core').sourceSets.test.output
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
         testCompile "org.mockito:mockito-all:${mockitoVerison}@jar"
@@ -489,7 +430,6 @@ project("robo4j-socket-http") {
 
 }
 
-
 project("robo4j-units-lego") {
     description = "Robo4J Lego Abstractions"
 
@@ -508,13 +448,13 @@ project("robo4j-units-lego") {
         mavenLocal()
     }
 
-//    uploadArchives {
-//        repositories {
-//            mavenDeployer {
-//                repository(url: "${mavenRepository}")
-//            }
-//        }
-//    }
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "${mavenRepository}")
+            }
+        }
+    }
 
     //create a single Jar with all dependencies
     task fatJar(type: Jar) {
@@ -528,11 +468,31 @@ project("robo4j-units-lego") {
     }
 
     dependencies {
-        compile(project(":robo4j-hw-lego"))
-        compile(project(":robo4j-socket-http"))
         compile(project(":robo4j-core"))
+        compile(project(":robo4j-hw-lego"))
+        testCompile(project(":robo4j-socket-http"))
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java']
+            }
+            resources {
+                srcDirs = ['src/main/resources']
+            }
+        }
+
+        test {
+            java {
+                srcDirs = ['src/test/java']
+            }
+            resources {
+                srcDirs = ['src/test/resources']
+            }
+        }
     }
 }
 
@@ -554,13 +514,13 @@ project("robo4j-units-rpi") {
         mavenLocal()
     }
 
-//    uploadArchives {
-//        repositories {
-//            mavenDeployer {
-//                repository(url: "${mavenRepository}")
-//            }
-//        }
-//    }
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "${mavenRepository}")
+            }
+        }
+    }
 
     //create a single Jar with all dependencies
     task fatJar(type: Jar) {
@@ -575,7 +535,14 @@ project("robo4j-units-rpi") {
         with jar
     }
 
-    //sources
+    dependencies {
+        compile(project(":robo4j-commons"))
+        compile(project(":robo4j-core"))
+        compile(project(":robo4j-hw-rpi"))
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+
     sourceSets {
         main {
             java {
@@ -594,14 +561,6 @@ project("robo4j-units-rpi") {
                 srcDirs = ['src/test/resources']
             }
         }
-    }
-
-    dependencies {
-        compile(project(":robo4j-hw-rpi"))
-        compile(project(":robo4j-socket-http"))
-        compile(project(":robo4j-core"))
-        testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 }
 

@@ -19,26 +19,6 @@
 
 package com.robo4j.socket.http.units;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
-
-import com.robo4j.BlockingTrait;
 import com.robo4j.ConfigurationException;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
@@ -46,15 +26,20 @@ import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.enums.StatusCode;
-import com.robo4j.socket.http.request.RoboRequestCallable;
-import com.robo4j.socket.http.request.RoboRequestFactory;
-import com.robo4j.socket.http.request.RoboResponseProcess;
+import com.robo4j.socket.http.PropertiesProvider;
+import com.robo4j.socket.http.channel.InboundSocketHandler;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
-import com.robo4j.socket.http.util.RoboResponseHeader;
-import com.robo4j.socket.http.util.SocketUtil;
-import com.robo4j.util.StringConstants;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static com.robo4j.socket.http.util.ChannelBufferUtils.INIT_BUFFER_CAPACITY;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_TARGETS;
 
 /**
  * Http NIO unit allows to configure format of the requests currently is only
@@ -63,25 +48,13 @@ import com.robo4j.util.StringConstants;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-@BlockingTrait
 public class HttpServerUnit extends RoboUnit<Object> {
-	private static final String DELIMITER = ",";
-	private static final int _DEFAULT_PORT = 8042;
-	private static final int DEFAULT_BUFFER_CAPACITY = 32 * 1024;
-	private static final Set<LifecycleState> activeStates = EnumSet.of(LifecycleState.STARTED, LifecycleState.STARTING);
-	private static final HttpCodecRegistry CODEC_REGISTRY = new HttpCodecRegistry();
-	public static final String PROPERTY_PORT = "port";
-	public static final String PROPERTY_TARGET = "target";
-	public static final String PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
-	private static final String PROPERTY_KEEP_ALIVE = "keepAlive";
-	private boolean available;
-	private Integer port;
-	private Integer bufferCapacity;
-	private boolean keepAlive;
-	// used for encoded messages
-	private List<String> target;
-	private ServerSocketChannel server;
-	private final Map<SelectionKey, RoboResponseProcess> outBuffers = new HashMap<>();
+	public static final String PROPERTY_CODEC_REGISTRY = "codecRegistry";
+	public static final String CODEC_PACKAGES_CODE = "packages";
+	private final HttpCodecRegistry codecRegistry = new HttpCodecRegistry();
+	private final PropertiesProvider propertiesProvider = new PropertiesProvider();
+	private List<String> targets;
+	private InboundSocketHandler inboundSocketHandler;
 
 	public HttpServerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -89,230 +62,53 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		setState(LifecycleState.UNINITIALIZED);
-		/* target is always initiated as the list */
-		target = Arrays.asList(configuration.getString(PROPERTY_TARGET, StringConstants.EMPTY).split(DELIMITER));
-		port = configuration.getInteger(PROPERTY_PORT, _DEFAULT_PORT);
-		bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, DEFAULT_BUFFER_CAPACITY);
-		keepAlive = configuration.getBoolean(PROPERTY_KEEP_ALIVE, false);
+		int port = configuration.getInteger(HTTP_PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
+		int bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, INIT_BUFFER_CAPACITY);
 
-		String packages = configuration.getString("packages", null);
+		String packages = configuration.getString(CODEC_PACKAGES_CODE, null);
 		if (validatePackages(packages)) {
-			CODEC_REGISTRY.scan(Thread.currentThread().getContextClassLoader(), packages.split(","));
+			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(","));
 		}
 
-		//@formatter:off
-		Map<String, Object> targetUnitsMap = JsonUtil.getMapNyJson(configuration.getString("targetUnits", null));
-
-		if(targetUnitsMap.isEmpty()){
-			SimpleLoggingUtil.error(getClass(), "no targetUnits");
+		String targets = configuration.getString(HTTP_TARGETS, null);
+		if(targets == null){
+			SimpleLoggingUtil.info(getClass(), "no target units available");
 		} else {
+			Map<String, Object> targetUnitsMap = JsonUtil.getMapByJson(targets);
+			this.targets = targetUnitsMap.entrySet().stream()
+					.map(Map.Entry::getKey)
+					.collect(Collectors.toList());
+			// TODO: 12/12/17 (miro) improve uri(path) registration
 			targetUnitsMap.forEach((key, value) ->
-				HttpUriRegister.getInstance().addUnitPathNode(key, value.toString()));
+					HttpUriRegister.getInstance().addUnitPathNode(key, value.toString()));
 		}
-        //@formatter:on
 
-		setState(LifecycleState.INITIALIZED);
+		propertiesProvider.put(HTTP_PROPERTY_BUFFER_CAPACITY, bufferCapacity);
+		propertiesProvider.put(HTTP_PROPERTY_PORT, port);
+		propertiesProvider.put(PROPERTY_CODEC_REGISTRY, codecRegistry);
 	}
 
 	@Override
 	public void start() {
 		setState(LifecycleState.STARTING);
-		final List<RoboReference<Object>> targetRefs = target.stream().map(e -> getContext().getReference(e))
-				.filter(Objects::nonNull).collect(Collectors.toList());
-		if (!available) {
-			available = true;
-			getContext().getScheduler().execute(() -> server(targetRefs));
-		} else {
-			SimpleLoggingUtil.error(getClass(), "HttpDynamicUnit start() -> error: " + targetRefs);
-		}
+		//@formatter:off
+		final List<RoboReference<Object>> targetRefs = targets.stream()
+				.map(e -> getContext().getReference(e))
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
+		//@formatter:on
+
+		inboundSocketHandler = new InboundSocketHandler(getContext(), targetRefs, propertiesProvider);
+		HttpUriRegister.getInstance().updateUnits(getContext());
+		inboundSocketHandler.start();
 		setState(LifecycleState.STARTED);
 	}
 
 	@Override
 	public void stop() {
 		setState(LifecycleState.STOPPING);
-		stopServer("stop");
+		inboundSocketHandler.stop();
 		setState(LifecycleState.STOPPED);
-	}
-
-	// Private Methods
-	public void stopServer(String method) {
-		try {
-			if (server != null && server.isOpen()) {
-				server.close();
-			}
-		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "method:" + method + ",server problem: ", e);
-		}
-	}
-
-	/**
-	 * Start non-blocking socket server on http protocol
-	 *
-	 * @param targetRef
-	 *            - reference to the target queue
-	 */
-	private void server(final List<RoboReference<Object>> targetRefs) {
-		try {
-			/* selector is multiplexor to SelectableChannel */
-			// Selects a set of keys whose corresponding channels are ready for
-			// I/O operations
-			server = ServerSocketChannel.open();
-			server.configureBlocking(false);
-			server.bind(new InetSocketAddress(port));
-
-			// channelKeyMap.put(server, listenKey);
-
-			int ops = server.validOps();
-
-			final Selector selector = Selector.open();
-			server.register(selector, SelectionKey.OP_ACCEPT);
-
-			while (activeStates.contains(getState())) {
-
-				int channelReady = selector.select();
-				if (channelReady == 0) {
-					continue;
-				}
-
-				/*
-				 * token representing the registration of a SelectableChannel with a Selector
-				 */
-				Set<SelectionKey> selectedKeys = selector.selectedKeys();
-				Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
-
-				while (selectedIterator.hasNext()) {
-					final SelectionKey selectedKey = selectedIterator.next();
-
-					selectedIterator.remove();
-
-					if (selectedKey.isAcceptable()) {
-						accept(selector, selectedKey);
-					} else if (selectedKey.isReadable()) {
-						read(selector, selectedKey);
-					} else if (selectedKey.isWritable()) {
-						write(targetRefs, selectedKey);
-					}
-				}
-			}
-		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "SERVER CLOSED", e);
-		}
-		SimpleLoggingUtil.debug(getClass(), "stopped port: " + port);
-		setState(LifecycleState.STOPPED);
-	}
-
-	private long getMesuredTime(long start) {
-		return System.currentTimeMillis() - start;
-	}
-
-	private void accept(Selector selector, SelectionKey key) throws IOException {
-		ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
-		SocketChannel channel = serverChannel.accept();
-		serverChannel.socket().setReceiveBufferSize(bufferCapacity);
-		channel.configureBlocking(false);
-		channel.register(selector, SelectionKey.OP_READ);
-
-	}
-
-	private void write(List<RoboReference<Object>> targetRefs, SelectionKey key) throws IOException {
-		SocketChannel channel = (SocketChannel) key.channel();
-
-		RoboResponseProcess responseProcess = outBuffers.get(key);
-
-		ByteBuffer buffer;
-		if (responseProcess.getMethod() != null) {
-			switch (responseProcess.getMethod()) {
-			case GET:
-				String getResponse;
-				if (responseProcess.getResult() != null && responseProcess.getCode().equals(StatusCode.OK)) {
-					String getHeader = RoboResponseHeader.headerByCodeWithUid(responseProcess.getCode(),
-							getContext().getId());
-					getResponse = RoboHttpUtils.createResponseWithHeaderAndMessage(getHeader,
-							responseProcess.getResult().toString());
-				} else {
-					getResponse = RoboHttpUtils.createResponseByCode(responseProcess.getCode());
-				}
-				buffer = getByteBufferByMessage(getResponse);
-				SocketUtil.writeBuffer(channel, buffer);
-				buffer.clear();
-				break;
-			case POST:
-				if (responseProcess.getResult() != null && responseProcess.getCode().equals(StatusCode.ACCEPTED)) {
-					String postResponse = RoboHttpUtils.createResponseByCode(responseProcess.getCode());
-
-					buffer = getByteBufferByMessage(postResponse);
-					SocketUtil.writeBuffer(channel, buffer);
-					for (RoboReference<Object> ref : targetRefs) {
-						if (responseProcess.getResult() != null
-								&& ref.getMessageType().equals(responseProcess.getResult().getClass())) {
-							ref.sendMessage(responseProcess.getResult());
-						}
-					}
-					buffer.clear();
-				} else {
-					String notImplementedResponse = RoboHttpUtils.createResponseByCode(responseProcess.getCode());
-					buffer = getByteBufferByMessage(notImplementedResponse);
-					SocketUtil.writeBuffer(channel, buffer);
-					buffer.clear();
-				}
-			default:
-				break;
-			}
-		} else {
-			String badResponse = RoboResponseHeader.headerByCode(StatusCode.BAD_REQUEST);
-			buffer = getByteBufferByMessage(badResponse);
-			SocketUtil.writeBuffer(channel, buffer);
-			buffer.clear();
-		}
-
-		// channelKeyMap.remove(channel);
-
-		channel.close();
-		key.cancel();
-	}
-
-	private ByteBuffer getByteBufferByMessage(String message) {
-		ByteBuffer result = ByteBuffer.allocate(message.length());
-		result.put(message.getBytes());
-		result.flip();
-		return result;
-	}
-
-	private void read(Selector selector, SelectionKey key) throws IOException {
-
-		SocketChannel channel = (SocketChannel) key.channel();
-		channel.socket().setKeepAlive(keepAlive);
-
-		HttpUriRegister.getInstance().updateUnits(getContext());
-		final RoboRequestFactory factory = new RoboRequestFactory(CODEC_REGISTRY);
-
-		ByteBuffer buffer = ByteBuffer.allocate(bufferCapacity);
-		int readBytes = SocketUtil.readBuffer(channel, buffer);
-		if (buffer.remaining() == 0) {
-			SimpleLoggingUtil.error(getClass(), "buffer has a problem position: " + buffer.position() + " readBytes: "
-					+ readBytes + " limit: " + buffer.limit());
-			buffer.clear();
-			return;
-		}
-		BufferWrapper bufferWrapper = new BufferWrapper(buffer, readBytes);
-
-		// TODO: (miro) separate header and body
-		final RoboRequestCallable callable = new RoboRequestCallable(this, bufferWrapper, factory);
-
-		buffer.clear();
-
-		final Future<RoboResponseProcess> futureResult = getContext().getScheduler().submit(callable);
-
-		try {
-			RoboResponseProcess result = futureResult.get();
-			outBuffers.put(key, result);
-		} catch (InterruptedException | ExecutionException e) {
-			SimpleLoggingUtil.error(getClass(), "read" + e);
-		}
-
-		channel.register(selector, SelectionKey.OP_WRITE);
 	}
 
 	private boolean validatePackages(String packages) {
@@ -321,8 +117,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		}
 		for (int i = 0; i < packages.length(); i++) {
 			char c = packages.charAt(i);
-			// if (!Character.isJavaIdentifierPart(c) || c != ',' ||
-			// !Character.isWhitespace(c)) {
 			if (Character.isWhitespace(c)) {
 				return false;
 			}

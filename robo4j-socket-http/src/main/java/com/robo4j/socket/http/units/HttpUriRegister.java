@@ -17,16 +17,16 @@
 
 package com.robo4j.socket.http.units;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.enums.SystemPath;
-import com.robo4j.socket.http.util.HttpPathUtil;
+import com.robo4j.socket.http.util.HttpPathUtils;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Register URIs by http method (GET,POST...) and URIs path
@@ -36,6 +36,7 @@ import com.robo4j.socket.http.util.HttpPathUtil;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+// TODO: 12/12/17 (miro) -> remove singleton and replace it by a service
 public final class HttpUriRegister {
 
 	private static final int DEFAULT_VALUE_0 = 0;
@@ -91,9 +92,10 @@ public final class HttpUriRegister {
 		}
 	}
 
+
 	public void updateUnits(RoboContext context) {
 		pathMethods.forEach((key, value) -> {
-			final List<String> paths = HttpPathUtil.uriStringToPathList(key);
+			final List<String> paths = HttpPathUtils.uriStringToPathList(key);
 			SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_VALUE_0));
 			if(systemPath != null){
 				// FIXME: 18.09.17 (miro) -> improve

@@ -18,37 +18,32 @@
 package com.robo4j.socket.http.units;
 
 import com.robo4j.ConfigurationException;
-import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.util.JsonUtil;
+import com.robo4j.socket.http.util.ChannelUtils;
 import com.robo4j.socket.http.util.RoboHttpUtils;
-import com.robo4j.socket.http.util.SocketUtil;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
+
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 
 /**
- * Http NIO Client to communicate with external system/Robo4J units
+ * Http NIO Client for communication with external Robo4J units
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpClientUnit extends RoboUnit<Object> {
-	private static final String PROPERTY_KEEP_ALIVE = "keepAlive";
 	private InetSocketAddress address;
 	private String responseUnit;
 	private Integer responseSize;
 	private Integer bufferCapacity;
-	private boolean keepAlive;
-	private boolean blocking;
 
 	public HttpClientUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -56,33 +51,22 @@ public class HttpClientUnit extends RoboUnit<Object> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		setState(LifecycleState.UNINITIALIZED);
 		String confAddress = configuration.getString("address", null);
-		int confPort = configuration.getInteger("port", RoboHttpUtils._DEFAULT_PORT);
+		int confPort = configuration.getInteger(HTTP_PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
 		responseUnit = configuration.getString("responseUnit", null);
 		responseSize = configuration.getInteger("responseSize", null);
-		bufferCapacity = configuration.getInteger("bufferCapacity", null);
-		blocking = configuration.getBoolean("blocking", false);
-		keepAlive = configuration.getBoolean(PROPERTY_KEEP_ALIVE, false);
+		bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, null);
 
-		Map<String, Object> targetUnitsMap = JsonUtil.getMapNyJson(configuration.getString("targetUnits", null));
-		if (confAddress == null || targetUnitsMap.isEmpty()) {
-			throw ConfigurationException.createMissingConfigNameException("address, path, commands...");
-		}
 		address = new InetSocketAddress(confAddress, confPort);
-
-		setState(LifecycleState.INITIALIZED);
 	}
 
 	@Override
 	public void onMessage(Object message) {
 		try {
 			SocketChannel channel = SocketChannel.open(address);
-			channel.configureBlocking(blocking);
-			if(responseSize != null){
+			if (bufferCapacity != null) {
 				channel.socket().setSendBufferSize(bufferCapacity);
 			}
-			channel.socket().setKeepAlive(keepAlive);
 
 			String processMessage = message.toString();
 
@@ -91,21 +75,18 @@ public class HttpClientUnit extends RoboUnit<Object> {
 			buffer.put(bytes);
 			buffer.flip();
 
-			SocketUtil.writeBuffer(channel, buffer);
-
+			ChannelUtils.writeBuffer(channel, buffer);
 			if (responseUnit != null && responseSize != null) {
 				ByteBuffer readBuffer = ByteBuffer.allocate(responseSize);
-				// important is set stopper properly
-				SocketUtil.readBuffer(channel, readBuffer);
+				ChannelUtils.readBuffer(channel, readBuffer);
 				sendMessageToResponseUnit(readBuffer);
 			}
 
 			buffer.clear();
 			channel.close();
+
 		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "not available:" + address + ", no worry I continue sending: " + e);
-			SimpleLoggingUtil.error(getClass(), "not available:" + address + ",  stack: " +
-					Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.toList()));
+			SimpleLoggingUtil.error(getClass(), String.format("not available: %s, no worry I continue sending. Error: %s",address ,e));
 		}
 	}
 

@@ -27,33 +27,32 @@ import java.util.stream.Collectors;
  */
 public enum SystemPath {
 
-    //@formatting:off
-    NONE                   ("none"),
+	//@formatter:off
+    NONE                   (""),
     UNITS                  ("units"),
     ;
+    //@formatter:on
 
-    //@formatting:on
+	private static Map<String, SystemPath> toPathMap;
+	private String path;
 
-    private volatile static Map<String, SystemPath> toPathMap;
-    private String path;
+	SystemPath(String path) {
+		this.path = path;
+	}
 
-    SystemPath(String path) {
-        this.path = path;
-    }
+	public String getPath() {
+		return path;
+	}
 
-    public String getPath() {
-        return path;
-    }
+	public static SystemPath getByPath(String name) {
+		if (toPathMap == null) {
+			toPathMap = initMapping();
+		}
+		return toPathMap.get(name);
+	}
 
-    public static SystemPath getByPath(String name){
-        if(toPathMap == null){
-            toPathMap = initMapping();
-        }
-        return  toPathMap.get(name);
-    }
-
-    private static Map<String, SystemPath> initMapping() {
-        return Arrays.stream(values()).collect(Collectors.toMap(SystemPath::getPath, e -> e));
-    }
+	private static Map<String, SystemPath> initMapping() {
+		return Arrays.stream(values()).collect(Collectors.toMap(SystemPath::getPath, e -> e));
+	}
 
 }
