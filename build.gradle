@@ -29,6 +29,8 @@ project("robo4j-commons") {
     apply plugin: 'idea'
     apply plugin: 'eclipse'
     apply plugin: 'maven'
+    apply plugin: 'signing'
+
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -62,6 +64,8 @@ project("robo4j-commons") {
             }
         }
     }
+
+
 }
 
 project("robo4j-core") {
@@ -74,6 +78,7 @@ project("robo4j-core") {
     apply plugin: 'idea'
     apply plugin: 'eclipse'
     apply plugin: 'maven'
+    apply plugin: 'signing'
 
     sourceCompatibility = 1.8
 
@@ -110,6 +115,80 @@ project("robo4j-core") {
             }
         }
     }
+
+    //sonatype
+    group = "com.robo4j"
+    archivesBaseName = "robo4j-core"
+    version = "${robo4jVersion}"
+
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+
+    signing {
+        sign configurations.archives
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                pom.project {
+                    name 'Robo4J Core'
+                    packaging 'jar'
+                    description 'Robo4J Core library'
+                    url 'http://www.robo4j.io'
+
+                    scm {
+                        connection 'scm:git@github.com:Robo4J/robo4j.git'
+                        developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
+                        url 'scm:git@github.com:Robo4J/robo4j.git'
+                    }
+
+                    licenses {
+                        license {
+                            name 'GNU General Public License, Version 3.0'
+                            url 'http://www.gnu.org/licenses/gpl-3.0.txt'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'thegreystone'
+                            name 'Marcus Hirt'
+                            email 'marcus@robo4j.io'
+                        }
+
+                        developer {
+                            id 'mirage22'
+                            name 'Miroslav Wengner'
+                            email 'miro@robo4j.io'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 project("robo4j-db-sql") {

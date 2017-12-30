@@ -88,7 +88,7 @@ public interface Configuration {
 
 	/**
 	 * Returns the Float stored under the specified name.
-	 * 
+	 *
 	 * @param name
 	 *            the name of the Float to retrieve.
 	 * @param defaultValue
@@ -97,7 +97,7 @@ public interface Configuration {
 	 * @return the value stored under the specified name, or defaultValue if no
 	 *         such value could be found.
 	 */
-	Float getFloat(String string, Float defaultValue);
+	Float getFloat(String name, Float defaultValue);
 
 	/**
 	 * Returns the Integer stored under the specified name.
@@ -110,7 +110,7 @@ public interface Configuration {
 	 * @return the value stored under the specified name, or defaultValue if no
 	 *         such value could be found.
 	 */
-	Integer getInteger(String string, Integer defaultValue);
+	Integer getInteger(String name, Integer defaultValue);
 
 	/**
 	 * Returns the Long stored under the specified name.
@@ -143,7 +143,7 @@ public interface Configuration {
 	 * 
 	 * @param name
 	 *            the name of the Character to retrieve.
-	 * @param defaultValue
+	 * @param character
 	 *            the default value if no value is set. Use null if you wish to
 	 *            discover that no value was set.
 	 * @return the value stored under the specified name, or defaultValue if no

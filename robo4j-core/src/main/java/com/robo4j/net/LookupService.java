@@ -16,10 +16,10 @@
  */
 package com.robo4j.net;
 
+import com.robo4j.RoboContext;
+
 import java.io.IOException;
 import java.util.Map;
-
-import com.robo4j.RoboContext;
 
 /**
  * A lookup service for discovery and lookup of remote {@link RoboContext}s.
@@ -43,14 +43,20 @@ public interface LookupService {
 	 *         messages sent will be passed over the network.
 	 */
 	RoboContext getContext(String id);
-	
+
 	/**
 	 * Starts listening for information.
+	 *
+	 * @throws IOException
+	 *             possible exception
 	 */
 	void start() throws IOException;
 
 	/**
 	 * Stops listening for information.
+	 *
+	 * @throws IOException
+	 *             possible exception
 	 */
 	void stop() throws IOException;
 }

@@ -16,13 +16,13 @@
  */
 package com.robo4j.net;
 
+import com.robo4j.RoboContext;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-
-import com.robo4j.RoboContext;
 
 /**
  * This class is used by the {@link RoboContext} to make it discoverable. This
@@ -46,6 +46,7 @@ public final class ContextEmitter {
 	 * @param port
 	 *            the port.
 	 * @throws SocketException
+	 *             possible exception
 	 */
 	public ContextEmitter(RoboContextDescriptor entry, InetAddress multicastAddress, int port) throws SocketException {
 		this.multicastAddress = multicastAddress;
@@ -53,7 +54,6 @@ public final class ContextEmitter {
 		socket = new DatagramSocket();
 		message = HearbeatMessageCodec.encode(entry);
 	}
-
 
 	public void emit() throws IOException {
 		DatagramPacket packet = new DatagramPacket(message, message.length, multicastAddress, port);

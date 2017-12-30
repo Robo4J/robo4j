@@ -20,15 +20,15 @@ package com.robo4j;
  * Represents the life cycle of a RoboUnit.
  * 
  * <p>
- * UNINITIALIZED -> [INITIALIZED] -> STARTING -> STARTED -> STOPPING -> STOPPED
- * -> SHUTDOWN
+ * UNINITIALIZED -&gt; [INITIALIZED] -&gt; STARTING -&gt; STARTED -&gt; STOPPING -&gt; STOPPED
+ * -&gt; SHUTDOWN
  * <p>
  * Components which do not have any initialization parameters can skip entering
  * initialized. It is considered good form to self report when initialized.
  * <p>
  * Other valid transitions:
  * <p>
- * STOPPED -> STARTING
+ * STOPPED -&gt; STARTING
  * <p>
  * any state to FAILED is also OK.
  * <p>

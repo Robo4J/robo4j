@@ -42,6 +42,13 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 
 	/**
 	 * Constructor.
+	 *
+	 * @param messageType
+	 *            messageType
+	 * @param context
+	 *            desired Robo context
+	 * @param id
+	 *            id of RoboUnit
 	 */
 	public RoboUnit(Class<T> messageType, RoboContext context, String id) {
 		this.messageType = messageType;
@@ -74,6 +81,7 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	 * @param configuration
 	 *            the {@link Configuration} provided.
 	 * @throws ConfigurationException
+	 *             possible exception
 	 */
 	public void initialize(Configuration configuration) throws ConfigurationException {
 		setConfiguration(configuration);
@@ -82,19 +90,20 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	}
 
 	/**
-	 * Should be implemented by subclasses to do the actual Unit specific part
-	 * of the initialization.
+	 * Should be implemented by subclasses to do the actual Unit specific part of
+	 * the initialization.
 	 * 
 	 * @param configuration
 	 *            the {@link Configuration} provided.
 	 * @throws ConfigurationException
+	 *             possible exception
 	 */
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 	}
 
 	/**
-	 * Should be overridden in subclasses which need to do some initialization
-	 * on start.
+	 * Should be overridden in subclasses which need to do some initialization on
+	 * start.
 	 */
 	public void start() {
 	}
@@ -123,9 +132,9 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	}
 
 	/**
-	 * It is considered good form to return the types that you can respond to.
-	 * This method should be overriden in subclasses. Note that it is allowed
-	 * for an agent to return the empty set. Returning null is not allowed.
+	 * It is considered good form to return the types that you can respond to. This
+	 * method should be overriden in subclasses. Note that it is allowed for an
+	 * agent to return the empty set. Returning null is not allowed.
 	 * 
 	 * @return the message types accepted by this unit.
 	 */
@@ -194,15 +203,13 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	}
 
 	/**
-	 * Should be overridden in subclasses to define the behaviour of the unit.
-	 * This method should normally not be called directly, unless you have a
-	 * very good reason. It is used by the system to deliver messages to the
-	 * unit.
+	 * Should be overridden in subclasses to define the behaviour of the unit. This
+	 * method should normally not be called directly, unless you have a very good
+	 * reason. It is used by the system to deliver messages to the unit.
 	 * 
 	 * @param message
 	 *            the message received by this unit.
 	 * 
-	 * @return the unit specific result from the call.
 	 */
 	public void onMessage(T message) {
 		// Note that this method is public so the scheduler has access. We may
@@ -229,6 +236,8 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	 *
 	 * @param descriptor
 	 *            the descriptor for which to return the attribute.
+	 * @param <R>
+	 *            attribute descriptor
 	 * @return the attribute value.
 	 */
 	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {

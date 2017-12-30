@@ -60,7 +60,9 @@ public class DefaultAttributeDescriptor<T> implements AttributeDescriptor<T>, Se
 	 *            the type of the attribute.
 	 * @param attributeName
 	 *            the name of the attribute.
-	 * @return
+	 * @param <T>
+	 *            attribute type class
+	 * @return created attribute
 	 */
 	public static <T> DefaultAttributeDescriptor<T> create(Class<T> attributeType, String attributeName) {
 		return new DefaultAttributeDescriptor<>(attributeType, attributeName);

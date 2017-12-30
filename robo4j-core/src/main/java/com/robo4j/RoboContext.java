@@ -16,9 +16,9 @@
  */
 package com.robo4j;
 
-import java.util.Collection;
-
 import com.robo4j.scheduler.Scheduler;
+
+import java.util.Collection;
 
 /**
  * The execution context available for a unit. Contains a simple lookup service,
@@ -55,6 +55,7 @@ public interface RoboContext {
 	 * 
 	 * @param id
 	 *            the unique id of the robo unit for which to get a reference.
+	 * @param <T> RoboReference
 	 * @return the reference to the robo unit.
 	 */
 	<T> RoboReference<T> getReference(String id);

@@ -16,11 +16,11 @@
  */
 package com.robo4j;
 
+import com.robo4j.configuration.Configuration;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.Future;
-
-import com.robo4j.configuration.Configuration;
 
 /**
  * Reference to a RoboUnit.
@@ -72,6 +72,8 @@ public interface RoboReference<T> {
 	 * 
 	 * @param attribute
 	 *            the attribute to read.
+	 * @param <R>
+	 *            attribute descriptor
 	 * 
 	 * @return the value of the attribute.
 	 */

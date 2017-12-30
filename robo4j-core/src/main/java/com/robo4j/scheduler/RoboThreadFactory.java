@@ -48,6 +48,10 @@ public class RoboThreadFactory implements ThreadFactory {
 
 	/**
 	 * Constructor that initiates attributes
+	 *
+	 * @param threadGroup thread group
+	 * @param prefix prefix
+	 * @param isDaemon isDaemon
 	 */
 	public RoboThreadFactory(ThreadGroup threadGroup, String prefix, boolean isDaemon) {
 		this.threadGroup = threadGroup;

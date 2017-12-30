@@ -16,12 +16,12 @@
  */
 package com.robo4j.scheduler;
 
+import com.robo4j.RoboReference;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import com.robo4j.RoboReference;
 
 /**
  * Scheduler interface for a Robo4J scheduler.
@@ -47,50 +47,58 @@ public interface Scheduler {
 	 *            the number of times to repeat the execution
 	 * @param listener
 	 *            a listener which will be called after the final execution
-	 * @return a ScheduledFuture representing pending completion of the task,
-	 *         and whose get() method will throw an exception upon completing
-	 *         the number of invocations.
+	 * @param <T>
+	 *            RoboReference
+	 * @return a ScheduledFuture representing pending completion of the task, and
+	 *         whose get() method will throw an exception upon completing the number
+	 *         of invocations.
 	 */
-	<T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long period, TimeUnit unit, int numberOfInvocations,
-			FinalInvocationListener listener);
+
+	<T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long period, TimeUnit unit,
+			int numberOfInvocations, FinalInvocationListener listener);
 
 	/**
 	 * Schedules a message to the target.
-	 * 
+	 *
 	 * @param target
 	 *            the reference to schedule the reference to.
 	 * @param message
 	 *            the message to send.
 	 * @param delay
 	 *            the time to delay first execution
-	 * @param period
-	 *            the period between successive executions
+	 * @param interval
+	 *            repeating interval
 	 * @param unit
 	 *            the time unit of the initialDelay and period parameters
 	 * @param numberOfInvocations
 	 *            the number of times to repeat the execution
-	 * @return a ScheduledFuture representing pending completion of the task,
-	 *         and whose get() method will throw an exception upon completing
-	 *         the number of invocations.
+	 * @param <T>
+	 *            RoboReference
+	 * @return a ScheduledFuture representing pending completion of the task, and
+	 *         whose get() method will throw an exception upon completing the number
+	 *         of invocations.
 	 */
-	<T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval, TimeUnit unit, int numberOfInvocations);
+	<T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval, TimeUnit unit,
+			int numberOfInvocations);
 
 	/**
 	 * Schedules a message to the target. Will run the message until cancelled.
-	 * 
+	 *
 	 * @param target
 	 *            the reference to schedule the reference to.
 	 * @param message
 	 *            the message to send.
 	 * @param delay
 	 *            the time to delay first execution
-	 * @param period
-	 *            the period between successive executions
+	 * @param interval
+	 *            repeating interval
 	 * @param unit
 	 *            the time unit of the initialDelay and period parameters
-	 * @return a ScheduledFuture representing pending completion of the task,
-	 *         and whose get() method will throw an exception upon completing
-	 *         the number of invocations.
+	 * @param <T>
+	 *            RoboReference
+	 * @return a ScheduledFuture representing pending completion of the task, and
+	 *         whose get() method will throw an exception upon completing the number
+	 *         of invocations.
 	 */
 	<T> ScheduledFuture<?> schedule(RoboReference<T> target, T message, long delay, long interval, TimeUnit unit);
 
@@ -104,9 +112,12 @@ public interface Scheduler {
 
 	/**
 	 * Execute something on the scheduler thread as soon as possible.
-	 * 
+	 *
+	 * @param <T>
+	 *            RoboReference
 	 * @param r
 	 *            the runnable to execute.
+	 * @return Future of expected result type
 	 */
 	<T> Future<T> submit(Callable<T> r);
 
@@ -116,12 +127,8 @@ public interface Scheduler {
 	 *            the command to execute.
 	 * @param delay
 	 *            the delay to wait.
-	 * @param interval
-	 *            the interval between invocations.
 	 * @param unit
 	 *            the time unit.
-	 * @param listener
-	 *            the listener to execute once the last one has been run.
 	 */
 	void schedule(Runnable runnable, long delay, TimeUnit unit);
 
@@ -131,15 +138,18 @@ public interface Scheduler {
 	 *            the command to execute.
 	 * @param delay
 	 *            the delay to wait.
+	 * @param interval
+	 * 			  repeating interval
 	 * @param unit
 	 *            the time unit.
-	 * @param listener
-	 *            the listener to execute once the last one has been run.
+	 * @return scheduledFuture
 	 */
 	ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long delay, long interval, TimeUnit unit);
 
 	/**
 	 * Scheduler shutdown
+	 *
+	 * @throws InterruptedException exception
 	 */
 	void shutdown() throws InterruptedException;
 }
