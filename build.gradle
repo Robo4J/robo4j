@@ -1248,3 +1248,9 @@ configure(allprojects) { project ->
             "-Xlint:deprecation", "-Xlint:unchecked", "-Xlint:rawtypes",
     ]
 }
+
+ext {
+    ossrhUsername = ""
+    ossrhPassword = ""
+}
+
