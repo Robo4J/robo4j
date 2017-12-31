@@ -66,11 +66,6 @@ project("robo4j-commons") {
         }
     }
 
-    group = "com.robo4j"
-    archivesBaseName = "robo4j-commons"
-    version = "${robo4jVersion}"
-
-
     task javadocJar(type: Jar) {
         classifier = 'javadoc'
         from javadoc
@@ -83,60 +78,6 @@ project("robo4j-commons") {
 
     artifacts {
         archives javadocJar, sourcesJar
-    }
-
-    signing {
-        sign configurations.archives
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    name 'Robo4J Commons'
-                    packaging 'jar'
-                    description 'Robo4J Commons library'
-                    url 'http://www.robo4j.io'
-
-                    scm {
-                        connection 'scm:git@github.com:Robo4J/robo4j.git'
-                        developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                        url 'scm:git@github.com:Robo4J/robo4j.git'
-                    }
-
-                    licenses {
-                        license {
-                            name 'GNU General Public License, Version 3.0'
-                            url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id 'thegreystone'
-                            name 'Marcus Hirt'
-                            email 'marcus@robo4j.io'
-                        }
-
-                        developer {
-                            id 'mirage22'
-                            name 'Miroslav Wengner'
-                            email 'miro@robo4j.io'
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -189,10 +130,6 @@ project("robo4j-core") {
         }
     }
 
-    group = "com.robo4j"
-    archivesBaseName = "robo4j-core"
-    version = "${robo4jVersion}"
-
     task javadocJar(type: Jar) {
         classifier = 'javadoc'
         from javadoc
@@ -206,61 +143,6 @@ project("robo4j-core") {
     artifacts {
         archives javadocJar, sourcesJar
     }
-
-    signing {
-        sign configurations.archives
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    name 'Robo4J Core'
-                    packaging 'jar'
-                    description 'Robo4J Core library'
-                    url 'http://www.robo4j.io'
-
-                    scm {
-                        connection 'scm:git@github.com:Robo4J/robo4j.git'
-                        developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                        url 'scm:git@github.com:Robo4J/robo4j.git'
-                    }
-
-                    licenses {
-                        license {
-                            name 'GNU General Public License, Version 3.0'
-                            url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id 'thegreystone'
-                            name 'Marcus Hirt'
-                            email 'marcus@robo4j.io'
-                        }
-
-                        developer {
-                            id 'mirage22'
-                            name 'Miroslav Wengner'
-                            email 'miro@robo4j.io'
-                        }
-                    }
-                }
-            }
-        }
-    }
-
 }
 
 project("robo4j-db-sql") {
@@ -377,10 +259,6 @@ project("robo4j-hw-lego") {
         }
     }
 
-    group = "com.robo4j"
-    archivesBaseName = "robo4j-hw-lego"
-    version = "${robo4jVersion}"
-
     task javadocJar(type: Jar) {
         classifier = 'javadoc'
         from javadoc
@@ -393,60 +271,6 @@ project("robo4j-hw-lego") {
 
     artifacts {
         archives javadocJar, sourcesJar
-    }
-
-    signing {
-        sign configurations.archives
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    name 'robo4j-hw-lego'
-                    packaging 'jar'
-                    description 'Robo4J Lego Hardware library'
-                    url 'http://www.robo4j.io'
-
-                    scm {
-                        connection 'scm:git@github.com:Robo4J/robo4j.git'
-                        developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                        url 'scm:git@github.com:Robo4J/robo4j.git'
-                    }
-
-                    licenses {
-                        license {
-                            name 'GNU General Public License, Version 3.0'
-                            url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id 'thegreystone'
-                            name 'Marcus Hirt'
-                            email 'marcus@robo4j.io'
-                        }
-
-                        developer {
-                            id 'mirage22'
-                            name 'Miroslav Wengner'
-                            email 'miro@robo4j.io'
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -518,10 +342,6 @@ project("robo4j-hw-rpi") {
         }
     }
 
-    group = "com.robo4j"
-    archivesBaseName = "robo4j-hw-rpi"
-    version = "${robo4jVersion}"
-
     task javadocJar(type: Jar) {
         classifier = 'javadoc'
         from javadoc
@@ -534,60 +354,6 @@ project("robo4j-hw-rpi") {
 
     artifacts {
         archives javadocJar, sourcesJar
-    }
-
-    signing {
-        sign configurations.archives
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    name 'robo4j-hw-rpi'
-                    packaging 'jar'
-                    description 'Robo4J RaspberryPi Hardware library'
-                    url 'http://www.robo4j.io'
-
-                    scm {
-                        connection 'scm:git@github.com:Robo4J/robo4j.git'
-                        developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                        url 'scm:git@github.com:Robo4J/robo4j.git'
-                    }
-
-                    licenses {
-                        license {
-                            name 'GNU General Public License, Version 3.0'
-                            url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id 'thegreystone'
-                            name 'Marcus Hirt'
-                            email 'marcus@robo4j.io'
-                        }
-
-                        developer {
-                            id 'mirage22'
-                            name 'Miroslav Wengner'
-                            email 'miro@robo4j.io'
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -636,10 +402,6 @@ project("robo4j-math") {
         }
     }
 
-    group = "com.robo4j"
-    archivesBaseName = "robo4j-math"
-    version = "${robo4jVersion}"
-
     task javadocJar(type: Jar) {
         classifier = 'javadoc'
         from javadoc
@@ -652,60 +414,6 @@ project("robo4j-math") {
 
     artifacts {
         archives javadocJar, sourcesJar
-    }
-
-    signing {
-        sign configurations.archives
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    name 'robo4j-math'
-                    packaging 'jar'
-                    description 'Robo4J Math library'
-                    url 'http://www.robo4j.io'
-
-                    scm {
-                        connection 'scm:git@github.com:Robo4J/robo4j.git'
-                        developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                        url 'scm:git@github.com:Robo4J/robo4j.git'
-                    }
-
-                    licenses {
-                        license {
-                            name 'GNU General Public License, Version 3.0'
-                            url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id 'thegreystone'
-                            name 'Marcus Hirt'
-                            email 'marcus@robo4j.io'
-                        }
-
-                        developer {
-                            id 'mirage22'
-                            name 'Miroslav Wengner'
-                            email 'miro@robo4j.io'
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -755,10 +463,6 @@ project("robo4j-page") {
         }
     }
 
-    group = "com.robo4j"
-    archivesBaseName = "robo4j-page"
-    version = "${robo4jVersion}"
-
     task javadocJar(type: Jar) {
         classifier = 'javadoc'
         from javadoc
@@ -771,60 +475,6 @@ project("robo4j-page") {
 
     artifacts {
         archives javadocJar, sourcesJar
-    }
-
-    signing {
-        sign configurations.archives
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    name 'robo4j-page'
-                    packaging 'jar'
-                    description 'Robo4J Page library'
-                    url 'http://www.robo4j.io'
-
-                    scm {
-                        connection 'scm:git@github.com:Robo4J/robo4j.git'
-                        developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                        url 'scm:git@github.com:Robo4J/robo4j.git'
-                    }
-
-                    licenses {
-                        license {
-                            name 'GNU General Public License, Version 3.0'
-                            url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id 'thegreystone'
-                            name 'Marcus Hirt'
-                            email 'marcus@robo4j.io'
-                        }
-
-                        developer {
-                            id 'mirage22'
-                            name 'Miroslav Wengner'
-                            email 'miro@robo4j.io'
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -877,10 +527,6 @@ project("robo4j-socket-http") {
         }
     }
 
-    group = "com.robo4j"
-    archivesBaseName = "robo4j-socket-http"
-    version = "${robo4jVersion}"
-
     task javadocJar(type: Jar) {
         classifier = 'javadoc'
         from javadoc
@@ -893,60 +539,6 @@ project("robo4j-socket-http") {
 
     artifacts {
         archives javadocJar, sourcesJar
-    }
-
-    signing {
-        sign configurations.archives
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    name 'robo4j-socket-http'
-                    packaging 'jar'
-                    description 'Robo4J socket http library'
-                    url 'http://www.robo4j.io'
-
-                    scm {
-                        connection 'scm:git@github.com:Robo4J/robo4j.git'
-                        developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                        url 'scm:git@github.com:Robo4J/robo4j.git'
-                    }
-
-                    licenses {
-                        license {
-                            name 'GNU General Public License, Version 3.0'
-                            url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id 'thegreystone'
-                            name 'Marcus Hirt'
-                            email 'marcus@robo4j.io'
-                        }
-
-                        developer {
-                            id 'mirage22'
-                            name 'Miroslav Wengner'
-                            email 'miro@robo4j.io'
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -1017,10 +609,6 @@ project("robo4j-units-lego") {
         }
     }
 
-    group = "com.robo4j"
-    archivesBaseName = "robo4j-units-lego"
-    version = "${robo4jVersion}"
-
     task javadocJar(type: Jar) {
         classifier = 'javadoc'
         from javadoc
@@ -1035,59 +623,6 @@ project("robo4j-units-lego") {
         archives javadocJar, sourcesJar
     }
 
-    signing {
-        sign configurations.archives
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    name 'robo4j-units-lego'
-                    packaging 'jar'
-                    description 'Robo4J Lego Abstractions library'
-                    url 'http://www.robo4j.io'
-
-                    scm {
-                        connection 'scm:git@github.com:Robo4J/robo4j.git'
-                        developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                        url 'scm:git@github.com:Robo4J/robo4j.git'
-                    }
-
-                    licenses {
-                        license {
-                            name 'GNU General Public License, Version 3.0'
-                            url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id 'thegreystone'
-                            name 'Marcus Hirt'
-                            email 'marcus@robo4j.io'
-                        }
-
-                        developer {
-                            id 'mirage22'
-                            name 'Miroslav Wengner'
-                            email 'miro@robo4j.io'
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
 
 project("robo4j-units-rpi") {
@@ -1159,9 +694,6 @@ project("robo4j-units-rpi") {
         }
     }
 
-    group = "com.robo4j"
-    archivesBaseName = "robo4j-units-rpi"
-    version = "${robo4jVersion}"
 
     task javadocJar(type: Jar) {
         classifier = 'javadoc'
@@ -1175,60 +707,6 @@ project("robo4j-units-rpi") {
 
     artifacts {
         archives javadocJar, sourcesJar
-    }
-
-    signing {
-        sign configurations.archives
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    name 'robo4j-units-rpi'
-                    packaging 'jar'
-                    description 'Robo4J Raspberry Pi Abstractions library'
-                    url 'http://www.robo4j.io'
-
-                    scm {
-                        connection 'scm:git@github.com:Robo4J/robo4j.git'
-                        developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                        url 'scm:git@github.com:Robo4J/robo4j.git'
-                    }
-
-                    licenses {
-                        license {
-                            name 'GNU General Public License, Version 3.0'
-                            url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id 'thegreystone'
-                            name 'Marcus Hirt'
-                            email 'marcus@robo4j.io'
-                        }
-
-                        developer {
-                            id 'mirage22'
-                            name 'Miroslav Wengner'
-                            email 'miro@robo4j.io'
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
