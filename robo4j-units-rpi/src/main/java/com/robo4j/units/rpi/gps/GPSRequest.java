@@ -31,27 +31,27 @@ public final class GPSRequest {
 
 	public enum Operation {
 		/**
-		 * Will register a listener for GPS information. The information will be
-		 * sent to the target.
+		 * Will register a listener for GPS information. The information will be sent to
+		 * the target.
 		 */
 		REGISTER,
 		/**
-		 * Will unregister all GPS notifications to the target. Note that if the
-		 * target happens to have several listeners registered, all of them will
-		 * be removed.
+		 * Will unregister all GPS notifications to the target. Note that if the target
+		 * happens to have several listeners registered, all of them will be removed.
 		 */
 		UNREGISTER
 	}
 
 	/**
-	 * Creates a new GPS request. GPS information will continually be sent to
-	 * the target until unregistered.
+	 * Creates a new GPS request. GPS information will continually be sent to the
+	 * target until unregistered.
 	 * 
 	 * @param target
 	 *            the target to send GPS information to, or to unregister from
 	 *            getting GPS information.
 	 * @param operation
-	 * @See {@link Operation}
+	 *            operation
+	 * @see Operation
 	 */
 	public GPSRequest(RoboReference<GPSEvent> target, Operation operation) {
 		this.target = target;
@@ -70,7 +70,7 @@ public final class GPSRequest {
 	/**
 	 * The operation to perform.
 	 * 
-	 * @see {@link Operation}
+	 * @see Operation
 	 * @return the operation to perform.
 	 */
 	public Operation getOperation() {

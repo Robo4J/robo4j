@@ -16,10 +16,10 @@
  */
 package com.robo4j.hw.rpi.i2c.pwm;
 
-import java.io.IOException;
-
 import com.robo4j.hw.rpi.Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
+
+import java.io.IOException;
 
 /**
  * Simple wrapper class for simplifying working with a PWM Channel having a
@@ -48,6 +48,7 @@ public class PCA9685Servo implements Servo {
 	 * Constructs a servo wrapper instance for the specified channel.
 	 * 
 	 * @param channel
+	 *            desired channel
 	 */
 	public PCA9685Servo(PWMChannel channel) {
 		this.channel = channel;
@@ -57,7 +58,7 @@ public class PCA9685Servo implements Servo {
 	/**
 	 * Sets the normalized input to this servo, between -1 (min) and 1 (max).
 	 * 
-	 * @param newInput
+	 * @param input
 	 *            normalized input between -1 and 1.
 	 * 
 	 * @throws IOException
@@ -67,26 +68,25 @@ public class PCA9685Servo implements Servo {
 	public void setInput(float input) throws IOException {
 		float actualInput = calculateExpo(input);
 		actualInput = (actualInput * dualRate) + trim / TRIM_STEPS;
-		
-		actualInput = (actualInput + 1.0f)/2;
+
+		actualInput = (actualInput + 1.0f) / 2;
 		if (invert) {
 			actualInput = 1.0f - actualInput;
-		}	
+		}
 		int width = Math.round((max - min) * actualInput) + min;
 		channel.setPWM(0, width);
 		this.input = input;
 	}
 
-
 	@Override
 	public float getInput() throws IOException {
 		return input;
 	}
-	
+
 	/**
 	 * Sets dual rate. This can be used to limit, or expand, the output range of
-	 * your servo. 1 (100%) is the default. Be careful when setting values
-	 * higher than 1 so that you do not damage your servo.
+	 * your servo. 1 (100%) is the default. Be careful when setting values higher
+	 * than 1 so that you do not damage your servo.
 	 * 
 	 * @param dualRate
 	 *            the dual rate multiplier to use.
@@ -96,11 +96,11 @@ public class PCA9685Servo implements Servo {
 	}
 
 	/**
-	 * Sets the expo to use. This can be used to limit or increase the
-	 * sensitivity around the center. Valid values are [-1, 1] with 0 being the
-	 * default.
+	 * Sets the expo to use. This can be used to limit or increase the sensitivity
+	 * around the center. Valid values are [-1, 1] with 0 being the default.
 	 * 
 	 * @param expo
+	 *            exposition
 	 */
 	public void setExpo(float expo) {
 		this.expo = expo;
@@ -111,11 +111,11 @@ public class PCA9685Servo implements Servo {
 	 */
 	public void reset() {
 		double frequency = channel.getPWMDevice().getPWMFrequency();
-		// Literature on RC servos says a 1ms pulse is minimum, 1,5ms is centered and 2ms is max. 
+		// Literature on RC servos says a 1ms pulse is minimum, 1,5ms is centered and
+		// 2ms is max.
 		min = calculatePulseWidth(1, frequency);
 		max = calculatePulseWidth(2, frequency);
 	}
-
 
 	@Override
 	public float getTrim() {
@@ -125,7 +125,7 @@ public class PCA9685Servo implements Servo {
 	/**
 	 * Sets the trim. This will translate the entire output curve.
 	 * 
-	 * @param steps
+	 * @param trim
 	 *            the absolute position to set the trim to.
 	 */
 	@Override
@@ -137,6 +137,7 @@ public class PCA9685Servo implements Servo {
 	 * If set to true, input will be treated as inverted for this servo.
 	 * 
 	 * @param invert
+	 *            invert servo
 	 */
 	@Override
 	public void setInverted(boolean invert) {
@@ -153,10 +154,10 @@ public class PCA9685Servo implements Servo {
 
 	@Override
 	public String toString() {
-		return String.format("Servo on ch %d [min:%d, max:%d, invert:%s, trim:%f, dualrate:%f, expo:%f]", 
+		return String.format("Servo on ch %d [min:%d, max:%d, invert:%s, trim:%f, dualrate:%f, expo:%f]",
 				channel.getChannelID(), min, max, invert, trim, dualRate, expo);
 	}
-	
+
 	private float calculateExpo(float input) {
 		if (expo == 0) {
 			return input;
@@ -164,7 +165,7 @@ public class PCA9685Servo implements Servo {
 		float c = expo / 2;
 		return c * input * input * input + (1 - c) * input;
 	}
-	
+
 	private static int calculatePulseWidth(double millis, double frequency) {
 		return (int) (Math.round(4096 * millis * frequency / 1000));
 	}

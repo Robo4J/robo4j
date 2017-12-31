@@ -16,16 +16,16 @@
  */
 package com.robo4j.hw.rpi.i2c.bmp;
 
+import com.pi4j.io.i2c.I2CBus;
+import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
+
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import com.pi4j.io.i2c.I2CBus;
-import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
-import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
-
 /**
- * Abstraction to read a Bosch digital barometric pressure sensor (BMP085/BMP180).
+ * Abstraction to read a Bosch digital barometric pressure sensor
+ * (BMP085/BMP180).
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -78,29 +78,29 @@ public final class BMP085Device extends AbstractI2CDevice {
 		 * Max conversion time (pressure): 25.5ms Current draw: 12µA
 		 */
 		ULTRA_HIGH_RES(255, 12);
-	
+
 		int waitTime;
 		int currentDraw;
-	
+
 		OperatingMode(int maxConversionTime, int currentDraw) {
 			this.waitTime = (maxConversionTime + 5) / 10;
 			this.currentDraw = currentDraw;
 		}
-	
+
 		/**
 		 * @return the over sampling setting.
 		 */
 		public int getOverSamplingSetting() {
 			return this.ordinal();
 		}
-	
+
 		/**
 		 * @return time to wait for a result, in ms.
 		 */
 		public int getWaitTime() {
 			return waitTime;
 		}
-	
+
 		/**
 		 * @return the average typical current at 1 sample per second, in µA.
 		 */
@@ -112,7 +112,10 @@ public final class BMP085Device extends AbstractI2CDevice {
 	/**
 	 * Constructs a BMPDevice using the default settings. (I2CBUS.BUS_1, 0x77)
 	 * 
-	 * @see #BMPDevice(int, int, OperatingMode)
+	 * @see #BMP085Device(int, int, OperatingMode)
+	 *
+	 * @param mode
+	 *            operating mode
 	 * 
 	 * @throws IOException
 	 *             if there was communication problem
@@ -129,12 +132,13 @@ public final class BMP085Device extends AbstractI2CDevice {
 	 *            the I2C bus to use.
 	 * @param address
 	 *            the address to use.
+	 * @param mode
+	 *            operating mode
 	 * 
-	 * @see I2CBus
+	 * @see I2CBus documentation
 	 * 
 	 * @throws IOException
 	 *             if there was communication problem
-	 * @throws UnsupportedBusNumberException 
 	 */
 	public BMP085Device(int bus, int address, OperatingMode mode) throws IOException {
 		super(bus, address);
@@ -258,8 +262,9 @@ public final class BMP085Device extends AbstractI2CDevice {
 		MD = calibrationData.readShort();
 
 		if (Boolean.getBoolean("se.hirt.pi.adafruit.debug")) {
-			System.out.println(String.format("AC1:%d, AC2:%d, AC3:%d, AC4:%d, AC5:%d, AC6:%d, B1:%d, B2:%d, MC:%d, MD:%d", AC1, AC2, AC3,
-					AC4, AC5, AC6, B1, B2, MC, MD));
+			System.out
+					.println(String.format("AC1:%d, AC2:%d, AC3:%d, AC4:%d, AC5:%d, AC6:%d, B1:%d, B2:%d, MC:%d, MD:%d",
+							AC1, AC2, AC3, AC4, AC5, AC6, B1, B2, MC, MD));
 		}
 	}
 }

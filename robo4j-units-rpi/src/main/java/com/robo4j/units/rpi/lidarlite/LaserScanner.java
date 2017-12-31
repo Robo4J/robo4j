@@ -16,12 +16,6 @@
  */
 package com.robo4j.units.rpi.lidarlite;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
-
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
@@ -36,23 +30,29 @@ import com.robo4j.math.jfr.ScanEvent;
 import com.robo4j.units.rpi.I2CRoboUnit;
 import com.robo4j.units.rpi.pwm.PCA9685ServoUnit;
 
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
+
 /**
  * This unit controls a servo to do laser range sweep.
  * 
- * <p>
+ * &lt;p&gt;
  * Configuration:
- * </p>
- * <li>
- * <ul>
+ * &lt;/p&gt;
+ * &lt;li&gt;
+ * &lt;ul&gt;
  * pan: the servo to use for panning the laser. Defaults to
  * "laserscanner.servo". Set to "null" to not use a servo for panning.
- * </ul>
- * <ul>
+ * &lt;/ul&gt;
+ * &lt;ul&gt;
  * servoRange: the range in degrees that send 1.0 (full) to a servo will result
  * in. This must be measured by testing your hardware. Changing configuration on
  * your servo will change this too.
- * </ul>
- * </li>
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
  * 
  * FIXME(Marcus/Mar 10, 2017): Only supports the pan servo for now.
  * 

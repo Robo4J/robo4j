@@ -57,6 +57,7 @@ public class LcdUnit extends RoboUnit<Object> {
 	 * @param configuration
 	 *            the {@link Configuration} provided.
 	 * @throws ConfigurationException
+	 *             exception
 	 */
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {

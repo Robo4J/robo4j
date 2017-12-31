@@ -49,8 +49,8 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	private static final String ATTRIBUTE_NAME_COLOR = "color";
 	private static final String ATTRIBUTE_NAME_TEXT = "text";
 
-	public static Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections.unmodifiableCollection(Arrays
-			.asList(DefaultAttributeDescriptor.create(String.class, ATTRIBUTE_NAME_TEXT),
+	public static Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
+			.unmodifiableCollection(Arrays.asList(DefaultAttributeDescriptor.create(String.class, ATTRIBUTE_NAME_TEXT),
 					DefaultAttributeDescriptor.create(Color.class, ATTRIBUTE_NAME_COLOR)));
 
 	private AdafruitLcd lcd;
@@ -89,7 +89,6 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	 * @param message
 	 *            the message received by this unit.
 	 *
-	 * @return
 	 */
 	@Override
 	public void onMessage(LcdMessage message) {
@@ -105,6 +104,7 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	 * @param configuration
 	 *            - unit configuration
 	 * @throws ConfigurationException
+	 *             exception
 	 */
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
@@ -197,11 +197,11 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	}
 
 	/**
-	 * Fill one of the first 8 CGRAM locations with custom characters. The
-	 * location parameter should be between 0 and 7 and pattern should provide
-	 * an array of 8 bytes containing the pattern. e.g. you can design your
-	 * custom character at <a
-	 * href=http://www.quinapalus.com/hd44780udg.html>http://www.quinapalus.com/hd44780udg.html<a/>.
+	 * Fill one of the first 8 CGRAM locations with custom characters. The location
+	 * parameter should be between 0 and 7 and pattern should provide an array of 8
+	 * bytes containing the pattern. e.g. you can design your custom character at
+	 * &lt;a
+	 * href=http://www.quinapalus.com/hd44780udg.html&gt; http://www.quinapalus.com/hd44780udg.html&lt;a/&gt; .
 	 * To show your custom character obtain the string representation for the
 	 * location e.g. String.format("custom char=%c", 0).
 	 * 
@@ -209,6 +209,8 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	 *            storage location for this character, between 0 and 7
 	 * @param pattern
 	 *            array of 8 bytes containing the character's pattern
+	 * @throws IOException
+	 *             exception
 	 */
 	public void createChar(final int location, final byte[] pattern) throws IOException {
 		lcd.createChar(location, pattern);

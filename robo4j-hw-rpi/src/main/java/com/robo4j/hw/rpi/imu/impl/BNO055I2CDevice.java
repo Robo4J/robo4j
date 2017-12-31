@@ -16,14 +16,14 @@
  */
 package com.robo4j.hw.rpi.imu.impl;
 
-import java.io.IOException;
-
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
 import com.robo4j.hw.rpi.imu.BNO055Device;
 import com.robo4j.math.geometry.Tuple3f;
+
+import java.io.IOException;
 
 /**
  * Abstraction for a BN0055 absolute orientation device.
@@ -39,15 +39,16 @@ import com.robo4j.math.geometry.Tuple3f;
  */
 public class BNO055I2CDevice extends AbstractBNO055Device implements ReadableDevice<Tuple3f>, BNO055Device {
 	private static final int DEFAULT_I2C_ADDRESS = 0x28;
-	
+
 	private final int bus;
 	private final int address;
 	protected final I2CDevice i2cDevice;
-	
+
 	/**
 	 * Creates a BNO055Device with the default settings.
 	 * 
 	 * @throws IOException
+	 *             exception
 	 * 
 	 * @see PowerMode
 	 * @see OperatingMode
@@ -66,6 +67,7 @@ public class BNO055I2CDevice extends AbstractBNO055Device implements ReadableDev
 	 * @param operatingMode
 	 *            the {@link OperatingMode} to initialize to.
 	 * @throws IOException
+	 *             exception
 	 */
 	public BNO055I2CDevice(int bus, int address, OperatingMode operatingMode) throws IOException {
 		this.bus = bus;
@@ -104,6 +106,6 @@ public class BNO055I2CDevice extends AbstractBNO055Device implements ReadableDev
 	}
 
 	@Override
-	public void shutdown() {		
+	public void shutdown() {
 	}
 }

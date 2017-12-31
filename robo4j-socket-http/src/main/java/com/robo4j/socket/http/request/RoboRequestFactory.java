@@ -19,12 +19,6 @@
 
 package com.robo4j.socket.http.request;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
-
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
@@ -39,6 +33,12 @@ import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.JsonElementStringBuilder;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.util.Utf8Constant;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 /**
  * Dynamically configurable request factory
@@ -110,9 +110,12 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	 * example: { "value" : "move" }
 	 *
 	 * @param desiredUnit
-	 * @param path
+	 *            desired unit
+	 * @param paths
+	 *            uri paths
 	 * @param wrapper
-	 * @return
+	 *            message wrapper
+	 * @return processed object
 	 */
 	@Override
 	public Object processPost(final RoboReference<?> desiredUnit, final List<String> paths,

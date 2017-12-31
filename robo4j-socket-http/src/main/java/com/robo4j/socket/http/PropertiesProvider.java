@@ -47,7 +47,7 @@ public final class PropertiesProvider {
 	 *
 	 * @param key
 	 *            desired property name
-	 * @return
+	 * @return integer value
 	 */
 	public Integer getIntSafe(String key) {
 		return Integer.valueOf(map.get(key).toString());

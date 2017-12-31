@@ -16,10 +16,10 @@
  */
 package com.robo4j.hw.rpi.imu;
 
-import java.io.IOException;
-
 import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.math.geometry.Tuple4d;
+
+import java.io.IOException;
 
 /**
  * Interface for the BNO055 Devices. This is shared between the I2C and Serial
@@ -71,12 +71,12 @@ public interface BNO055Device {
 	}
 
 	/**
-	 * The operation mode is used to configure how the BNO shall operate. The
-	 * modes are described in the BNO055 data sheet.
+	 * The operation mode is used to configure how the BNO shall operate. The modes
+	 * are described in the BNO055 data sheet.
 	 * 
-	 * Note that default initialization on power on for the chip will be CONFIG,
-	 * but that, if the default constructor is chosen, the BNO055Device will use
-	 * NDOF by default.
+	 * Note that default initialization on power on for the chip will be CONFIG, but
+	 * that, if the default constructor is chosen, the BNO055Device will use NDOF by
+	 * default.
 	 */
 	public enum OperatingMode {
 		//@formatter:off
@@ -249,26 +249,27 @@ public interface BNO055Device {
 	 */
 	public enum OrientationMode {
 		/**
-		 * Pitch: -180° to +180° (turing clockwise increases values) Roll: -90°
-		 * to +90° (increasing with increasing inclination) Heading (Yaw): 0° to
-		 * 360° (turning clockwise increases values)
+		 * Pitch: -180° to +180° (turing clockwise increases values) Roll: -90° to +90°
+		 * (increasing with increasing inclination) Heading (Yaw): 0° to 360° (turning
+		 * clockwise increases values)
 		 */
 		Windows,
 		/**
-		 * Pitch: +180° to -180° (turning clockwise decreases values) Roll: -90°
-		 * to +90° (increasing with increasing inclination) Heading (Yaw): 0° to
-		 * 360° (turning clockwise increases values)
+		 * Pitch: +180° to -180° (turning clockwise decreases values) Roll: -90° to +90°
+		 * (increasing with increasing inclination) Heading (Yaw): 0° to 360° (turning
+		 * clockwise increases values)
 		 */
 		Android
 	}
 
 	/**
-	 * Sets the device {@link OperatingMode}. Note that
-	 * {@link OperatingMode#CONFIG} is required for writing many registers.
+	 * Sets the device {@link OperatingMode}. Note that {@link OperatingMode#CONFIG}
+	 * is required for writing many registers.
 	 * 
 	 * @param operatingMode
 	 *            the OperatingMode to set.
 	 * @throws IOException
+	 *             exception
 	 */
 	void setOperatingMode(OperatingMode operatingMode) throws IOException;
 
@@ -277,6 +278,7 @@ public interface BNO055Device {
 	 * 
 	 * @return the current {@link OperatingMode}.
 	 * @throws IOException
+	 *             exception
 	 */
 	OperatingMode getOperatingMode() throws IOException;
 
@@ -286,21 +288,25 @@ public interface BNO055Device {
 	 * @param powerMode
 	 *            the current {@link PowerMode}
 	 * @throws IOException
+	 *             exception
 	 */
 	void setPowerMode(PowerMode powerMode) throws IOException;
 
 	/**
 	 * Returns the current {@link PowerMode} of the device. Note that this can
-	 * change automatically depending on the device configuration. For example,
-	 * if the device has not been disturbed for 5 minutes.
+	 * change automatically depending on the device configuration. For example, if
+	 * the device has not been disturbed for 5 minutes.
 	 * 
 	 * @return the current {@link PowerMode} of the device
 	 * @throws IOException
+	 *             exception
 	 */
 	PowerMode getPowerMode() throws IOException;
 
 	/**
 	 * @return the current calibration status.
+	 * @throws IOException
+	 *             exception
 	 * 
 	 * @see BNO055CalibrationStatus
 	 */
@@ -309,6 +315,7 @@ public interface BNO055Device {
 	/**
 	 * @return the system status.
 	 * @throws IOException
+	 *             exception
 	 */
 	BNO055SystemStatus getSystemStatus() throws IOException;
 
@@ -317,15 +324,17 @@ public interface BNO055Device {
 	 * 
 	 * @return the temperature.
 	 * @throws IOException
+	 *             exception
 	 */
 	float getTemperature() throws IOException;
 
 	/**
-	 * Runs a self test, performing the necessary mode changes as needed. Note
-	 * that this operating can block the calling thread for a little while.
+	 * Runs a self test, performing the necessary mode changes as needed. Note that
+	 * this operating can block the calling thread for a little while.
 	 * 
 	 * @return the result of the self test.
 	 * @throws IOException
+	 *             exception
 	 */
 	BNO055SelfTestResult performSelfTest() throws IOException;
 
@@ -334,69 +343,86 @@ public interface BNO055Device {
 	 * angular degrees, celsius and windows orientation will be used.
 	 * 
 	 * @param accelerationUnit
+	 *            acceleration unit
 	 * @param angularRateUnit
+	 *            angular rate unit
 	 * @param angleUnit
+	 *            angle unit
 	 * @param temperatureUnit
+	 *            temperature unit
 	 * @param orientationMode
+	 *            orientation mode
 	 * @throws IOException
+	 *             exception
 	 */
-	void setUnits(Unit accelerationUnit, Unit angularRateUnit, Unit angleUnit, Unit temperatureUnit, OrientationMode orientationMode)
-			throws IOException;
+	void setUnits(Unit accelerationUnit, Unit angularRateUnit, Unit angleUnit, Unit temperatureUnit,
+			OrientationMode orientationMode) throws IOException;
 
 	/**
-	 * This method returns the absolute orientation: X will contain heading, Y
-	 * will contain roll data, Z will contain pitch. The units will be the ones
-	 * selected with
-	 * {@link #setUnits(AccelerationUnit, AngularRateUnit, EulerAngleUnit, TemperatureUnit, OrientationMode)}.
+	 * This method returns the absolute orientation: X will contain heading, Y will
+	 * contain roll data, Z will contain pitch. The units will be the ones selected
+	 * with {@link #setUnits(Unit, Unit, Unit, Unit, OrientationMode)}
+	 * (AccelerationUnit, AngularRateUnit, EulerAngleUnit, TemperatureUnit,
+	 * OrientationMode)}.
+	 *
+	 * @return Tuple 3D
+	 * @throws IOException
+	 *             exception
 	 */
 	Tuple3f read() throws IOException;
 
 	/**
-	 * The fusion algorithm offset and tilt compensated absolute orientation
-	 * data in Euler angles. x = magnetic heading, y = roll, z = pitch. Note
-	 * that this is only available in one of the fusion modes.
+	 * The fusion algorithm offset and tilt compensated absolute orientation data in
+	 * Euler angles. x = magnetic heading, y = roll, z = pitch. Note that this is
+	 * only available in one of the fusion modes.
 	 * 
 	 * @return a tuple containing x = magnetic heading, y = roll, z = pitch.
 	 * @throws IOException
+	 *             exception
 	 */
 	Tuple3f readEulerAngles() throws IOException;
 
 	/**
 	 * @return the magnetometer values in x,y,z in {@link Unit#MICROTESLA}.
 	 * @throws IOException
+	 *             exception
 	 */
 	Tuple3f readMagnetometer() throws IOException;
 
 	/**
-	 * @return the accelerometer information for the accelerometer in the
-	 *         currently set acceleration unit.
+	 * @return the accelerometer information for the accelerometer in the currently
+	 *         set acceleration unit.
 	 * @throws IOException
+	 *             exception
 	 */
 	Tuple3f readAccelerometer() throws IOException;
 
 	/**
 	 * @return the gyro information in the currently set angular rate unit.
 	 * @throws IOException
+	 *             exception
 	 */
 	Tuple3f readGyro() throws IOException;
 
 	/**
-	 * Reads the quaternion data for the absolute orientation into a Tuple4d.
-	 * Note that w will be in the t field.
+	 * Reads the quaternion data for the absolute orientation into a Tuple4d. Note
+	 * that w will be in the t field.
 	 * 
 	 * @return the quaternion data for the absolute orientation.
 	 * @throws IOException
+	 *             exception
 	 */
 	Tuple4d readQuaternion() throws IOException;
 
 	/**
-	 * The fusion algorithm output for the linear acceleration data for each
-	 * axis in currently set acceleration unit. Note that this is only available
-	 * in one of the fusion modes.
+	 * The fusion algorithm output for the linear acceleration data for each axis in
+	 * currently set acceleration unit. Note that this is only available in one of
+	 * the fusion modes.
 	 * 
-	 * @return the fusion algorithm output for the linear acceleration data for
-	 *         each axis in currently set acceleration unit.
+	 * @return the fusion algorithm output for the linear acceleration data for each
+	 *         axis in currently set acceleration unit.
 	 * @throws IOException
+	 *             exception
 	 */
 	Tuple3f readLinearAcceleration() throws IOException;
 
@@ -405,17 +431,19 @@ public interface BNO055Device {
 	 * acceleration unit. Note that this is only available in one of the fusion
 	 * modes.
 	 * 
-	 * @return the fusion algorithm output for the gravity vector in the
-	 *         currently set acceleration unit.
+	 * @return the fusion algorithm output for the gravity vector in the currently
+	 *         set acceleration unit.
 	 * @throws IOException
+	 *             exception
 	 */
 	Tuple3f readGravityVector() throws IOException;
 
 	/**
-	 * Will attempt to reset the device. Note that this can be a lengthy,
-	 * blocking operation.
+	 * Will attempt to reset the device. Note that this can be a lengthy, blocking
+	 * operation.
 	 * 
 	 * @throws IOException
+	 *             exception
 	 */
 	void reset() throws IOException;
 

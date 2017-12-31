@@ -16,14 +16,14 @@
  */
 package com.robo4j.hw.rpi.imu.impl;
 
-import java.io.IOException;
-
 import com.pi4j.concurrent.ExecutorServiceFactory;
 import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialFactory;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
 import com.robo4j.hw.rpi.imu.BNO055Device;
 import com.robo4j.math.geometry.Tuple3f;
+
+import java.io.IOException;
 
 /**
  * Abstraction for a BN0055 absolute orientation device.
@@ -49,9 +49,9 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 
 	/**
 	 * The default serial port is /dev/serial0. Since Raspberry Pi 3 nabbed the
-	 * /dev/ttyAMA0 for the bluetooth, serial0 should be the new logical name to
-	 * use for the rx/tx pins. This is supposedly compatible with the older
-	 * Raspberry Pis as well.
+	 * /dev/ttyAMA0 for the bluetooth, serial0 should be the new logical name to use
+	 * for the rx/tx pins. This is supposedly compatible with the older Raspberry
+	 * Pis as well.
 	 */
 	public static final String DEFAULT_SERIAL_PORT = "/dev/serial0";
 
@@ -61,8 +61,7 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 	public static final int DEFAULT_RETRY_TIMEOUT = 2;
 
 	/**
-	 * The default number of times to retry a command before throwing an
-	 * exception.
+	 * The default number of times to retry a command before throwing an exception.
 	 */
 	public static final int DEFAULT_NO_OF_RETRIES = 3;
 
@@ -77,18 +76,27 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 	 * Constructor. Uses defaults.
 	 * 
 	 * @throws IOException
+	 *             exception
 	 */
 	public BNO055SerialDevice() throws IOException {
 		this(DEFAULT_SERIAL_PORT, OperatingMode.NDOF, DEFAULT_RETRY_TIMEOUT, DEFAULT_NO_OF_RETRIES);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param serialPort
+	 *            serial port
 	 * @param operatingMode
+	 *            operation mode
+	 * @param retryTimeout
+	 *            retry timeout
+	 * @param noOfRetries
+	 *            number of retries
 	 * @throws IOException
+	 *             exception
 	 */
-	public BNO055SerialDevice(String serialPort, OperatingMode operatingMode, long retryTimeout, int noOfRetries) throws IOException {
+	public BNO055SerialDevice(String serialPort, OperatingMode operatingMode, long retryTimeout, int noOfRetries)
+			throws IOException {
 		this.serialPort = serialPort;
 		this.retryTimeout = retryTimeout;
 		this.noOfRetries = noOfRetries;
@@ -152,7 +160,8 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 	}
 
 	private IOException createWrongLengthException(int expectedLength, byte responseLength) {
-		return new IOException(String.format("Expected length %d, but response indicates length %d", expectedLength, responseLength));
+		return new IOException(
+				String.format("Expected length %d, but response indicates length %d", expectedLength, responseLength));
 	}
 
 	private IOException createErrorCodeException(byte b) {

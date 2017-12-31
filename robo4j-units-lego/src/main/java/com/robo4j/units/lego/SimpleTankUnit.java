@@ -31,8 +31,8 @@ import com.robo4j.hw.lego.enums.MotorTypeEnum;
 import com.robo4j.hw.lego.provider.MotorProvider;
 import com.robo4j.hw.lego.wrapper.MotorWrapper;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.units.lego.platform.LegoPlatformMessage;
 import com.robo4j.units.lego.enums.MotorRotationEnum;
+import com.robo4j.units.lego.platform.LegoPlatformMessage;
 import com.robo4j.units.lego.utils.LegoUtils;
 
 import java.util.concurrent.ExecutionException;
@@ -48,6 +48,7 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	/* test visible */
 	protected volatile ILegoMotor rightMotor;
 	protected volatile ILegoMotor leftMotor;
+
 	public SimpleTankUnit(RoboContext context, String id) {
 		super(LegoPlatformMessage.class, context, id);
 	}
@@ -56,8 +57,6 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	 *
 	 * @param message
 	 *            the message received by this unit.
-	 *
-	 * @return result
 	 */
 	@Override
 	public void onMessage(LegoPlatformMessage message) {
@@ -77,6 +76,7 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 	 * @param configuration
 	 *            the {@link Configuration} provided.
 	 * @throws ConfigurationException
+	 *             exception
 	 */
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {

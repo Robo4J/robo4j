@@ -16,25 +16,25 @@
  */
 package com.robo4j.hw.rpi.i2c.pwm;
 
-import java.io.IOException;
-
 import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 
+import java.io.IOException;
+
 /**
- * Abstraction for talking to a PCA9685 PWM/Servo driver. For example 
- * an Adafruit 16 channel I2C PWM driver breakout board.
+ * Abstraction for talking to a PCA9685 PWM/Servo driver. For example an
+ * Adafruit 16 channel I2C PWM driver breakout board.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-//Not using all commands - yet.
+// Not using all commands - yet.
 @SuppressWarnings("unused")
 public class PWMPCA9685Device extends AbstractI2CDevice {
 	private static final int DEFAULT_I2C_ADDRESS = 0x40;
 
 	private static final double PRESCALE_FACTOR = 25000000.0 / 4096.0;
-	
+
 	private static final int MODE1 = 0x00;
 	private static final int MODE2 = 0x01;
 	private static final int SUBADR1 = 0x02;
@@ -70,8 +70,8 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 	}
 
 	/**
-	 * Creates a software interface to an Adafruit 16 channel I2C PWM driver
-	 * board (PCA9685).
+	 * Creates a software interface to an Adafruit 16 channel I2C PWM driver board
+	 * (PCA9685).
 	 * 
 	 * @param bus
 	 *            the I2C bus to use.
@@ -128,9 +128,10 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 		writeByte(MODE1, (byte) (oldmode | 0x80));
 		this.frequency = frequency;
 	}
-	
+
 	/**
-	 * @return the PWM frequency set, or Double.NaN if no frequency have been explicitly set.
+	 * @return the PWM frequency set, or Double.NaN if no frequency have been
+	 *         explicitly set.
 	 */
 	public double getPWMFrequency() {
 		return frequency;
@@ -158,8 +159,7 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 
 		private PWMChannel(int channel) {
 			if (channel < 0 || channel > 15) {
-				throw new IllegalArgumentException("There is no channel "
-						+ channel + " on the board.");
+				throw new IllegalArgumentException("There is no channel " + channel + " on the board.");
 			}
 			this.channel = channel;
 		}
@@ -168,13 +168,14 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 		 * Configures the PWM pulse for the PWMChannel.
 		 * 
 		 * @param on
-		 *            when to go from low to high [0, 4095]. 0 means at the very
-		 *            start of the pulse, 4095 at the very end.
+		 *            when to go from low to high [0, 4095]. 0 means at the very start
+		 *            of the pulse, 4095 at the very end.
 		 * @param off
-		 *            when to go from high to low [0, 4095]. 0 means at the very
-		 *            start of the pulse, 4095 at the very end.
+		 *            when to go from high to low [0, 4095]. 0 means at the very start
+		 *            of the pulse, 4095 at the very end.
 		 * 
 		 * @throws IOException
+		 *             exception
 		 */
 		public void setPWM(int on, int off) throws IOException {
 			i2cDevice.write(LED0_ON_L + 4 * channel, (byte) (on & 0xFF));
@@ -182,7 +183,7 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 			i2cDevice.write(LED0_OFF_L + 4 * channel, (byte) (off & 0xFF));
 			i2cDevice.write(LED0_OFF_H + 4 * channel, (byte) (off >> 8));
 		}
-		
+
 		/**
 		 * @return the PWM device that this channel is associated with.
 		 */

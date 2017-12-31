@@ -16,13 +16,12 @@
  */
 package com.robo4j.hw.rpi.i2c;
 
-import java.io.IOException;
-import java.util.logging.Logger;
-
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
-import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
+
+import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * Abstract super class for I2C devices.
@@ -47,7 +46,6 @@ public abstract class AbstractI2CDevice {
 	 * 
 	 * @throws IOException
 	 *             if there was communication problem
-	 * @throws UnsupportedBusNumberException
 	 */
 	public AbstractI2CDevice(int bus, int address) throws IOException {
 		this.bus = bus;
@@ -104,6 +102,12 @@ public abstract class AbstractI2CDevice {
 
 	/**
 	 * Read 2 bytes unsigned.
+	 *
+	 * @param address
+	 *            bus address
+	 * @return reading
+	 * @throws IOException
+	 *             exception
 	 */
 	protected int readU2(int address) throws IOException {
 		int hi = i2cDevice.read(address);
@@ -113,19 +117,29 @@ public abstract class AbstractI2CDevice {
 
 	/**
 	 * Reads 2 bytes unsigned directly from the i2cDevice.
+	 *
+	 * @return reading
+	 * @throws IOException
+	 *             exception
 	 */
 	protected int readU2Array() throws IOException {
 		byte[] result = new byte[2];
 		i2cDevice.read(result, 0, 2);
 		return (result[0] << 8) + (result[1] & 0xff);
 	}
-	
+
 	/**
 	 * Read 2 bytes unsigned, array version.
+	 *
+	 * @param address
+	 *            bus address
+	 * @return reading
+	 * @throws IOException
+	 *             exception
 	 */
-	protected int readU2Array(int address) throws IOException { 
-	    // FIXME(Marcus/Dec 20, 2016): Need to check which methods is
-	    // superior. Tmp allocation vs fewer read calls?
+	protected int readU2Array(int address) throws IOException {
+		// FIXME(Marcus/Dec 20, 2016): Need to check which methods is
+		// superior. Tmp allocation vs fewer read calls?
 		byte[] result = new byte[2];
 		i2cDevice.read(address, result, 0, 2);
 		return (result[0] << 8) + (result[1] & 0xff);
@@ -133,6 +147,12 @@ public abstract class AbstractI2CDevice {
 
 	/**
 	 * Read 3 bytes unsigned.
+	 *
+	 * @param address
+	 *            bus address
+	 * @return reading
+	 * @throws IOException
+	 *             exception
 	 */
 	protected int readU3(int address) throws IOException {
 		// TODO: Check if there is any potential performance benefit to reading
@@ -146,6 +166,12 @@ public abstract class AbstractI2CDevice {
 
 	/**
 	 * Read 3 bytes unsigned.
+	 *
+	 * @param address
+	 *            bus address
+	 * @return reading
+	 * @throws IOException
+	 *             exception
 	 */
 	protected int readU3Array(int address) throws IOException {
 		// TODO: Check if there is any potential performance benefit to reading

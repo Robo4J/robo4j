@@ -29,7 +29,7 @@ public interface Motor {
 	 * Returns the normalized speed of the motor.
 	 * 
 	 * @return the normalized speed of the motor [-1.0, 1.0]
-	 * @throws IOException
+	 * @throws IOException exception
 	 */
 	float getSpeed() throws IOException;
 
@@ -39,7 +39,7 @@ public interface Motor {
 	 * @param speed
 	 *            the normalized speed of the motor, from maximum speed reverse
 	 *            (-1.0f) via halted (0) to maximum ahead (1.0f).
-	 * @throws IOException
+	 * @throws IOException exception
 	 */
 	void setSpeed(float speed) throws IOException;
 }

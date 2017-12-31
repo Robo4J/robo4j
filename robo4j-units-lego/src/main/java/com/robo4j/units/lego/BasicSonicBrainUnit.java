@@ -17,12 +17,6 @@
 
 package com.robo4j.units.lego;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
@@ -31,13 +25,19 @@ import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
 import com.robo4j.units.lego.platform.LegoPlatformMessage;
 import com.robo4j.units.lego.sonic.LegoSonicBrainMessage;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Obstacle avoiding brain
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class BasicSonicBrainUnit extends RoboUnit<LegoSonicBrainMessage>  {
+public class BasicSonicBrainUnit extends RoboUnit<LegoSonicBrainMessage> {
 
 	/* center value is the 0 -> setup by the hand at the begining */
 	private static final int FLAG_CENTER = 0;
@@ -50,34 +50,34 @@ public class BasicSonicBrainUnit extends RoboUnit<LegoSonicBrainMessage>  {
 	private static final double SECURE_DISTANCE = (double) 0.25;
 	private volatile double[] decisionValues = new double[DECISION_VALUES];
 	private volatile LegoPlatformMessageTypeEnum currentPlatformState;
-    private String target;
+	private String target;
 
-    public BasicSonicBrainUnit(RoboContext context, String id) {
-        super(LegoSonicBrainMessage.class, context, id);
-    }
+	public BasicSonicBrainUnit(RoboContext context, String id) {
+		super(LegoSonicBrainMessage.class, context, id);
+	}
 
-    /**
-     * @param configuration
-     *            desired configuration
-     * @throws ConfigurationException
-     */
-    @Override
-    protected void onInitialization(Configuration configuration) throws ConfigurationException {
-        target = configuration.getString("target", null);
-        if (target == null) {
-            throw ConfigurationException.createMissingConfigNameException("target");
-        }
+	/**
+	 * @param configuration
+	 *            desired configuration
+	 * @throws ConfigurationException
+	 *             exception
+	 */
+	@Override
+	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		target = configuration.getString("target", null);
+		if (target == null) {
+			throw ConfigurationException.createMissingConfigNameException("target");
+		}
 		currentPlatformState = LegoPlatformMessageTypeEnum.STOP;
 		System.err.println(getClass().getSimpleName() + " target: " + target);
-    }
+	}
 
-    /**
-     * @param message
-     *            accepted message
-     * @return
-     */
-    @Override
-    public void onMessage(LegoSonicBrainMessage message) {
+	/**
+	 * @param message
+	 *            accepted message
+	 */
+	@Override
+	public void onMessage(LegoSonicBrainMessage message) {
 
 		System.err.println(getClass().getSimpleName() + " target: " + target);
 		System.err.println(getClass().getSimpleName() + " onMessage: " + message.getData());
@@ -115,14 +115,15 @@ public class BasicSonicBrainUnit extends RoboUnit<LegoSonicBrainMessage>  {
 				if (decisionValues[FLAG_CENTER] > SECURE_DISTANCE) {
 					decisionList.add(LegoPlatformMessageTypeEnum.MOVE);
 					decisionSet = true;
-					System.err.println(getClass().getSimpleName() + " CENTER  decision: " + decisionValues[FLAG_CENTER]);
+					System.err
+							.println(getClass().getSimpleName() + " CENTER  decision: " + decisionValues[FLAG_CENTER]);
 				}
 				if (decisionValues[FLAG_RIGHT] > SECURE_DISTANCE && !decisionSet) {
 					decisionList.add(LegoPlatformMessageTypeEnum.RIGHT);
 					System.err.println(getClass().getSimpleName() + " RIGHT  decision: " + decisionValues[FLAG_RIGHT]);
 					decisionSet = true;
 				}
-				if (decisionValues[FLAG_LEFT] > SECURE_DISTANCE  && !decisionSet) {
+				if (decisionValues[FLAG_LEFT] > SECURE_DISTANCE && !decisionSet) {
 					decisionList.add(LegoPlatformMessageTypeEnum.LEFT);
 					System.err.println(getClass().getSimpleName() + " LEFT  decision: " + decisionValues[FLAG_LEFT]);
 					decisionSet = true;
@@ -136,15 +137,15 @@ public class BasicSonicBrainUnit extends RoboUnit<LegoSonicBrainMessage>  {
 				if (decisionList.contains(currentPlatformState)) {
 					System.err.println(getClass().getSimpleName() + " NO DECISION CHANGE: " + currentPlatformState
 							+ " decisionValues:" + Arrays.toString(decisionValues));
-				} else if(!decisionList.isEmpty()) {
+				} else if (!decisionList.isEmpty()) {
 					/* currently we take first */
 
 					LegoPlatformMessage decisionMessage;
-					if(EnumSet.of(LegoPlatformMessageTypeEnum.RIGHT, LegoPlatformMessageTypeEnum.LEFT).contains(currentPlatformState)){
+					if (EnumSet.of(LegoPlatformMessageTypeEnum.RIGHT, LegoPlatformMessageTypeEnum.LEFT)
+							.contains(currentPlatformState)) {
 						List<LegoPlatformMessageTypeEnum> filteredList = decisionList.stream()
-								.filter(e -> !e.equals(currentPlatformState))
-								.collect(Collectors.toList());
-						if(filteredList.contains(LegoPlatformMessageTypeEnum.MOVE)){
+								.filter(e -> !e.equals(currentPlatformState)).collect(Collectors.toList());
+						if (filteredList.contains(LegoPlatformMessageTypeEnum.MOVE)) {
 							decisionMessage = new LegoPlatformMessage(LegoPlatformMessageTypeEnum.MOVE);
 						} else {
 							decisionMessage = new LegoPlatformMessage(decisionList.get(0));
@@ -153,21 +154,20 @@ public class BasicSonicBrainUnit extends RoboUnit<LegoSonicBrainMessage>  {
 						decisionMessage = new LegoPlatformMessage(decisionList.get(0));
 					}
 					currentPlatformState = decisionMessage.getType();
-					System.err.println(getClass().getSimpleName() +  " DECISION TAKEN: " + decisionMessage
+					System.err.println(getClass().getSimpleName() + " DECISION TAKEN: " + decisionMessage
 							+ " decisionValues:" + Arrays.toString(decisionValues));
 					sendMessage(decisionMessage);
 					eraseDecisionValues();
 
 				}
 
-
 			}
 
 		}
 
-    }
+	}
 
-    //Private Methods
+	// Private Methods
 	private void eraseDecisionValues() {
 		this.decisionValues = new double[DECISION_VALUES];
 	}
@@ -181,7 +181,5 @@ public class BasicSonicBrainUnit extends RoboUnit<LegoSonicBrainMessage>  {
 		System.err.println(getClass().getSimpleName() + " sendMessage reference: " + getContext());
 		getContext().getReference(target).sendMessage(message);
 	}
-
-
 
 }

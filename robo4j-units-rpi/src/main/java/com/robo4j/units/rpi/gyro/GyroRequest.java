@@ -30,12 +30,11 @@ public class GyroRequest {
 
 	public enum GyroAction {
 		/**
-		 * Performs a calibration. Note that the notification threshold can also
-		 * be set, which result in the threshold being set right after
-		 * calibration has completed.
+		 * Performs a calibration. Note that the notification threshold can also be set,
+		 * which result in the threshold being set right after calibration has
+		 * completed.
 		 * 
-		 * The target will be called once calibration is done with the the tuple
-		 * 0,0,0.
+		 * The target will be called once calibration is done with the the tuple 0,0,0.
 		 */
 		CALIBRATE,
 		/**
@@ -58,6 +57,13 @@ public class GyroRequest {
 
 	/**
 	 * Constructor.
+	 *
+	 * @param target
+	 *            robo reference
+	 * @param action
+	 *            gyro action
+	 * @param notificationThreshold
+	 *            threshold
 	 */
 	public GyroRequest(RoboReference<GyroEvent> target, GyroAction action, Tuple3f notificationThreshold) {
 		this.target = target;
@@ -75,11 +81,10 @@ public class GyroRequest {
 	}
 
 	/**
-	 * This is the threshold used to decide when to notify. Use
-	 * {@link #DO_NOT_CARE} for axes that you do not care to be notified about.
+	 * This is the threshold used to decide when to notify. Use {@link #DO_NOT_CARE}
+	 * for axes that you do not care to be notified about.
 	 * 
-	 * @return the notification threshold for when to send a message to the
-	 *         target.
+	 * @return the notification threshold for when to send a message to the target.
 	 */
 	public Tuple3f getNotificationThreshold() {
 		return notificationThreshold;

@@ -16,13 +16,13 @@
  */
 package com.robo4j.hw.rpi.imu;
 
+import com.robo4j.hw.rpi.imu.BNO055Device.OperatingMode;
+import com.robo4j.math.geometry.Tuple3f;
+
 import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import com.robo4j.hw.rpi.imu.BNO055Device.OperatingMode;
-import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * An example for the BNO device.
@@ -47,8 +47,8 @@ public class BNO055Example {
 				Tuple3f orientation = device.read();
 				float temperature = device.getTemperature();
 
-				System.out.println(String.format("heading: %f, roll: %f, pitch: %f - temp:%f", orientation.x, orientation.y, orientation.z,
-						temperature));
+				System.out.println(String.format("heading: %f, roll: %f, pitch: %f - temp:%f", orientation.x,
+						orientation.y, orientation.z, temperature));
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}
@@ -57,8 +57,15 @@ public class BNO055Example {
 	}
 
 	/**
-	 * Runs an example for the BNO running in serial. Use the appropriate
-	 * factory method to instead use I2C.
+	 * Runs an example for the BNO running in serial. Use the appropriate factory
+	 * method to instead use I2C.
+	 *
+	 * @param args
+	 *            arguments
+	 * @throws IOException
+	 *             exception
+	 * @throws InterruptedException
+	 *             exception
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
 		System.out.println("Starting the BNO055 Example.");
@@ -85,9 +92,11 @@ public class BNO055Example {
 		System.out.println("Starting calibration sequence...");
 		BNO055CalibrationStatus calibrationStatus = null;
 		while (!(calibrationStatus = bno.getCalibrationStatus()).isFullyCalibrated()) {
-			System.out.println(String.format("Calibration status: system:%s, gyro:%s, accelerometer:%s, magnetometer:%s",
+			System.out.println(String.format(
+					"Calibration status: system:%s, gyro:%s, accelerometer:%s, magnetometer:%s",
 					calibrationStatus.getSystemCalibrationStatus(), calibrationStatus.getGyroCalibrationStatus(),
-					calibrationStatus.getAccelerometerCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus()));
+					calibrationStatus.getAccelerometerCalibrationStatus(),
+					calibrationStatus.getAccelerometerCalibrationStatus()));
 			Thread.sleep(500);
 		}
 		System.out.println("System fully calibrated. Now printing data. Press enter to quit!");

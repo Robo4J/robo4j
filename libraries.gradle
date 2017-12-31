@@ -10,7 +10,7 @@ ext {
     h2Version = "1.4.195"
     postgresqlVersion = "9.4-1200-jdbc41"
     persistanceVersion = "1.0.2"
-    robo4jVersion = "alpha-0.3-SNAPSHOT"
+    robo4jVersion = "alpha-0.3.0-SNAPSHOT"
     junitVersion = "4.12"
     hamcrestAllVersion = "1.3"
     pi4jVersion = "1.1"

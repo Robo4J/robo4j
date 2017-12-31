@@ -139,7 +139,7 @@ public final class PositionEvent<R> extends GPSEvent {
 	/**
 	 * Returns a more user friendly version of the dilution of precision.
 	 * 
-	 * @return
+	 * @return accuracy category
 	 */
 	public AccuracyCategory getAccuracyCategory() {
 		return accuracyCategory;
@@ -147,6 +147,8 @@ public final class PositionEvent<R> extends GPSEvent {
 	
 	/**
 	 * Returns an estimate of the max error for the location in this measurement, in meters.
+	 *
+	 * @return max error estimate
 	 */
 	public float getMaxError() {
 		return hdop * GPS.UNAIDED_POSITION_ACCURACY;

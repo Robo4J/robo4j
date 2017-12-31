@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * RoboRequestElement type is immutable value
- * represent key -> command, value -> possible command values
+ * represent key -&gt; command, value -&gt; possible command values
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)

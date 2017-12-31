@@ -101,7 +101,9 @@ public class Matrix3f implements Matrix {
 	}
 
 	/**
-	 * Creates an identity matrix.
+	 * Creates an identity matrix
+	 *
+	 * @return Matrix 3D
 	 */
 	public static Matrix3f createIdentity() {
 		return new Matrix3f(1, 0, 0, 0, 1, 0, 0, 0, 1);
@@ -114,7 +116,7 @@ public class Matrix3f implements Matrix {
 	 *            the row
 	 * @param column
 	 *            the column
-	 * @return
+	 * @return value for row and column
 	 */
 	public float getValue(int row, int column) {
 		switch (row) {
@@ -155,11 +157,11 @@ public class Matrix3f implements Matrix {
 			throw new IllegalArgumentException("Row does not exist: " + row);
 		}
 	}
-	
+
 	@Override
 	public String toString() {
-		return String.format("m11:%f, m12:%f, m13:%f, m21:%f, m22:%f, m23:%f, m31:%f, m32:%f, m33:%f", m11, m12, m13, m21, m22, m23, m31,
-				m32, m33);
+		return String.format("m11:%f, m12:%f, m13:%f, m21:%f, m22:%f, m23:%f, m31:%f, m32:%f, m33:%f", m11, m12, m13,
+				m21, m22, m23, m31, m32, m33);
 	}
 
 	@Override

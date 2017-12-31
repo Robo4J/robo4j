@@ -33,7 +33,8 @@ public class Matrix3d implements Matrix {
 	public double m32;
 	public double m33;
 
-	public Matrix3d(double m11, double m12, double m13, double m21, double m22, double m23, double m31, double m32, double m33) {
+	public Matrix3d(double m11, double m12, double m13, double m21, double m22, double m23, double m31, double m32,
+			double m33) {
 		this.m11 = m11;
 		this.m12 = m12;
 		this.m13 = m13;
@@ -102,6 +103,8 @@ public class Matrix3d implements Matrix {
 
 	/**
 	 * Creates an identity matrix.
+	 *
+	 * @return Matrix3d matrix 3D
 	 */
 	public static Matrix3d createIdentity() {
 		return new Matrix3d(1, 0, 0, 0, 1, 0, 0, 0, 1);
@@ -114,7 +117,7 @@ public class Matrix3d implements Matrix {
 	 *            the row
 	 * @param column
 	 *            the column
-	 * @return
+	 * @return value for row and column
 	 */
 	public double getValue(int row, int column) {
 		switch (row) {
@@ -155,11 +158,11 @@ public class Matrix3d implements Matrix {
 			throw new IllegalArgumentException("Row does not exist: " + row);
 		}
 	}
-	
+
 	@Override
 	public String toString() {
-		return String.format("m11:%f, m12:%f, m13:%f, m21:%f, m22:%f, m23:%f, m31:%f, m32:%f, m33:%f", m11, m12, m13, m21, m22, m23, m31,
-				m32, m33);
+		return String.format("m11:%f, m12:%f, m13:%f, m21:%f, m22:%f, m23:%f, m31:%f, m32:%f, m33:%f", m11, m12, m13,
+				m21, m22, m23, m31, m32, m33);
 	}
 
 	@Override

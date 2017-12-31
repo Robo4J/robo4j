@@ -77,9 +77,9 @@ public final class ReflectUtils {
 	/**
 	 * translate Object to proper JSON string
 	 *
-	 * @param getterDTO
-	 * @param obj
-	 * @return
+	 * @param getterDTO class descriptor
+	 * @param obj described object
+	 * @return json string
 	 */
 	@SuppressWarnings("unchecked")
 	public static String getJsonValue(ClassGetSetDTO getterDTO, Object obj) {

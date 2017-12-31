@@ -27,6 +27,8 @@ import java.io.IOException;
 public interface Servo {
 	/**
 	 * If set to true, input will be treated as inverted for this servo.
+	 *
+	 * @return boolean value
 	 */
 	boolean isInverted();
 
@@ -34,13 +36,14 @@ public interface Servo {
 	 * If set to true, input will be treated as inverted for this servo.
 	 * 
 	 * @param invert
+	 *            boolean value
 	 */
 	void setInverted(boolean invert);
 
 	/**
 	 * Sets the trim. This will translate the entire output curve.
 	 * 
-	 * @param steps
+	 * @param trim
 	 *            the absolute position to set the trim to.
 	 */
 	void setTrim(float trim);
@@ -55,13 +58,14 @@ public interface Servo {
 	 * 
 	 * @return the last input used for this servo.
 	 * @throws IOException
+	 *             possible exception
 	 */
 	float getInput() throws IOException;
 
 	/**
 	 * Sets the normalized input to this servo, between -1 (min) and 1 (max).
 	 * 
-	 * @param newInput
+	 * @param input
 	 *            normalized input between -1 and 1.
 	 * 
 	 * @throws IOException

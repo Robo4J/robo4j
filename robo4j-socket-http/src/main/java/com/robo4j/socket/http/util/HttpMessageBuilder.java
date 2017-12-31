@@ -53,7 +53,7 @@ public class HttpMessageBuilder {
 
 	/**
 	 * build Http Message 1. line - request/response 2. header - available header 3.
-	 * message -> if message is available add message
+	 * message -&gt; if message is available add message
 	 *
 	 * @return HttpMessage String
 	 */

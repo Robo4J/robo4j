@@ -43,11 +43,11 @@ public final class HttpHeaderBuilder {
 		return new HttpHeaderBuilder();
 	}
 
-	public Map<String, String> getMap(){
+	public Map<String, String> getMap() {
 		return map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
-	public String getValue(String key){
+	public String getValue(String key) {
 		return String.valueOf(map.get(key));
 	}
 
@@ -66,7 +66,7 @@ public final class HttpHeaderBuilder {
 	 *
 	 * @param value
 	 *            1st available value in the string
-	 * @return
+	 * @return http header builder
 	 */
 	public HttpHeaderBuilder addFirstLine(Object value) {
 		if (firstLineBuilder == null) {
@@ -81,9 +81,7 @@ public final class HttpHeaderBuilder {
 		final String start = firstLineBuilder == null || firstLineBuilder.isEmpty() ? StringConstants.EMPTY
 				: firstLineBuilder.build().concat(HttpMessageUtils.NEXT_LINE);
 		return start.concat(map
-				.entrySet()
-				.stream()
-				.map(e -> e.getKey().concat(HttpMessageUtils.COLON).concat(HttpMessageUtils.SPACE)
+				.entrySet().stream().map(e -> e.getKey().concat(HttpMessageUtils.COLON).concat(HttpMessageUtils.SPACE)
 						.concat(e.getValue()).concat(HttpMessageUtils.NEXT_LINE))
 				.collect(Collectors.joining(STRING_EMPTY)));
 	}

@@ -137,6 +137,8 @@ public class Matrix4f implements Matrix {
 
 	/**
 	 * Creates an identity matrix.
+	 *
+	 * @return Matrix 4D
 	 */
 	public static Matrix4f createIdentity() {
 		return new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
@@ -149,7 +151,7 @@ public class Matrix4f implements Matrix {
 	 *            the row
 	 * @param column
 	 *            the column
-	 * @return
+	 * @return value for the row and the column
 	 */
 	public float getValue(int row, int column) {
 		switch (row) {

@@ -36,7 +36,7 @@ public class MotionEvent {
 	 * @param direction
 	 *            direction in radians.
 	 * 
-	 * @See {@link RoboClawRCTank#setDirection(float)}
+	 * @see RoboClawRCTank#setDirection(float)
 	 */
 	public MotionEvent(float speed, float direction) {
 		this.speed = speed;

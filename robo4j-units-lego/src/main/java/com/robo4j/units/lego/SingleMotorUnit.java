@@ -49,7 +49,6 @@ public class SingleMotorUnit extends RoboUnit<MotorRotationEnum> implements Robo
 	 * @param message
 	 *            the message received by this unit.
 	 *
-	 * @return result
 	 */
 	@Override
 	public void onMessage(MotorRotationEnum message) {
@@ -68,6 +67,7 @@ public class SingleMotorUnit extends RoboUnit<MotorRotationEnum> implements Robo
 	 * @param configuration
 	 *            the {@link Configuration} provided.
 	 * @throws ConfigurationException
+	 *             exception
 	 */
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
@@ -77,7 +77,8 @@ public class SingleMotorUnit extends RoboUnit<MotorRotationEnum> implements Robo
 		Character motorType = configuration.getCharacter("motorType", MotorTypeEnum.NXT.getType());
 
 		MotorProvider motorProvider = new MotorProvider();
-		motor = new MotorWrapper<>(motorProvider, AnalogPortEnum.getByType(motorPort), MotorTypeEnum.getByType(motorType));
+		motor = new MotorWrapper<>(motorProvider, AnalogPortEnum.getByType(motorPort),
+				MotorTypeEnum.getByType(motorType));
 		setState(LifecycleState.INITIALIZED);
 	}
 

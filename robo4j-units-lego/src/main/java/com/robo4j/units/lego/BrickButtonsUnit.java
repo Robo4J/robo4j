@@ -61,6 +61,7 @@ public class BrickButtonsUnit extends RoboUnit<String> {
 	 * @param configuration
 	 *            the {@link Configuration} provided.
 	 * @throws ConfigurationException
+	 *             exception
 	 */
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
@@ -88,7 +89,8 @@ public class BrickButtonsUnit extends RoboUnit<String> {
 	public void start() {
 		setState(LifecycleState.STARTING);
 		final RoboReference<LegoPlatformMessageTypeEnum> targetRef = getContext().getReference(target);
-		buttons.forEach((key, value) -> value.getType().addKeyListener(new ButtonListener(targetRef, key, COLOR_GREEN)));
+		buttons.forEach(
+				(key, value) -> value.getType().addKeyListener(new ButtonListener(targetRef, key, COLOR_GREEN)));
 		setState(LifecycleState.STARTED);
 	}
 

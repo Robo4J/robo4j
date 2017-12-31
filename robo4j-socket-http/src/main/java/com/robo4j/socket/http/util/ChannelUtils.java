@@ -40,9 +40,12 @@ public final class ChannelUtils {
 	 * reading buffer
 	 *
 	 * @param channel
+	 *            byte channel
 	 * @param buffer
-	 * @return
+	 *            buffer
+	 * @return read bytes
 	 * @throws IOException
+	 *             exception
 	 */
 	public static int readBuffer(ByteChannel channel, ByteBuffer buffer) throws IOException {
 		int numberRead = channel.read(buffer);
@@ -62,9 +65,12 @@ public final class ChannelUtils {
 	 * writing to channel buffer
 	 *
 	 * @param channel
+	 *            byte channel
 	 * @param buffer
-	 * @return
+	 *            buffer
+	 * @return written bytes
 	 * @throws IOException
+	 *             exception
 	 */
 	public static int writeBuffer(ByteChannel channel, ByteBuffer buffer) throws IOException {
 		int numberWriten = 0;

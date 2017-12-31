@@ -16,12 +16,12 @@
  */
 package com.robo4j.hw.rpi.i2c.accelerometer;
 
-import java.io.IOException;
-
 import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
 import com.robo4j.math.geometry.Tuple3f;
+
+import java.io.IOException;
 
 /**
  * Abstraction for reading data from a LSM303 accelerometer, for example the one
@@ -51,13 +51,13 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 	public enum DataRate {
 		POWER_DOWN(0x0), HZ_1(0x10), HZ_10(0x20), HZ_25(0x30), HZ_50(0x40), HZ_100(0x50), HZ_200(0x60), HZ_400(
 				0x70), HZ_LP_1620(0x80), HZ_N_1354_LP_5376(0x81);
-	
+
 		private int ctrlCode;
-	
+
 		DataRate(int ctrlCode) {
 			this.ctrlCode = ctrlCode;
 		}
-	
+
 		public int getCtrlCode() {
 			return ctrlCode;
 		}
@@ -66,11 +66,11 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 	public enum PowerMode {
 		NORMAL(0x0), LOW_POWER(0x8);
 		private int ctrlCode;
-	
+
 		PowerMode(int ctrlCode) {
 			this.ctrlCode = ctrlCode;
 		}
-	
+
 		public int getCtrlCode() {
 			return ctrlCode;
 		}
@@ -80,16 +80,16 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 		G_2(0x0, 1), G_4(0x10, 1), G_8(0x20, 4), G_16(0x30, 12);
 		private int ctrlCode;
 		private int sensitivity;
-	
+
 		FullScale(int ctrlCode, int sensitivity) {
 			this.ctrlCode = ctrlCode;
 			this.sensitivity = sensitivity;
 		}
-	
+
 		public int getCtrlCode() {
 			return ctrlCode;
 		}
-	
+
 		/**
 		 * @return the sensitivity in mg/LSB.
 		 */
@@ -102,12 +102,13 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 		this(PowerMode.NORMAL, DataRate.HZ_10, FullScale.G_2, false);
 	}
 
-	public AccelerometerLSM303Device(PowerMode mode, DataRate rate, FullScale scale, boolean highres) throws IOException {
+	public AccelerometerLSM303Device(PowerMode mode, DataRate rate, FullScale scale, boolean highres)
+			throws IOException {
 		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, mode, rate, AXIS_ENABLE_ALL, scale, highres);
 	}
 
-	public AccelerometerLSM303Device(int bus, int address, PowerMode mode, DataRate rate, int axisEnable, FullScale scale,
-			boolean highres) throws IOException {
+	public AccelerometerLSM303Device(int bus, int address, PowerMode mode, DataRate rate, int axisEnable,
+			FullScale scale, boolean highres) throws IOException {
 		super(bus, address);
 		this.scale = scale;
 		initialize(mode, rate, axisEnable, scale, highres);
@@ -116,6 +117,7 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 	/**
 	 * @return current acceleration, m/s^2
 	 * @throws IOException
+	 *             exception
 	 */
 	public synchronized Tuple3f read() throws IOException {
 		Tuple3f rawData = new Tuple3f();

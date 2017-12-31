@@ -16,15 +16,15 @@
  */
 package com.robo4j.math.features;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
 import com.robo4j.math.geometry.CurvaturePoint2f;
 import com.robo4j.math.geometry.Line2f;
 import com.robo4j.math.geometry.Point2f;
 import com.robo4j.math.jfr.FeatureExtractionEvent;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Simple and fast feature extraction from lists of Point2f.
@@ -69,7 +69,7 @@ public class FeatureExtraction {
 	private static final float CORNER_THRESHOLD = (float) (Math.PI / 3);
 
 	/**
-	 * Calculates the segments in the scan, using the Borg & Aldon adaptive
+	 * Calculates the segments in the scan, using the Borg and Aldon adaptive
 	 * break algorithm.
 	 * 
 	 * @param Point2fs

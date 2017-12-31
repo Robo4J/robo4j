@@ -61,7 +61,6 @@ public class Matrix3i implements Matrix {
 		m32 = matrix[7];
 		m33 = matrix[8];
 	}
-	
 
 	/**
 	 * Transposes the matrix.
@@ -78,7 +77,6 @@ public class Matrix3i implements Matrix {
 		m32 = tmp;
 	}
 
-	
 	/**
 	 * Transforms the tuple by multiplying with this matrix.
 	 *
@@ -139,7 +137,7 @@ public class Matrix3i implements Matrix {
 	 *            the row
 	 * @param column
 	 *            the column
-	 * @return
+	 * @return value for the row and column
 	 */
 	public int getValue(int row, int column) {
 		switch (row) {
@@ -183,8 +181,8 @@ public class Matrix3i implements Matrix {
 
 	@Override
 	public String toString() {
-		return String.format("m11:%d, m12:%d, m13:%d, m21:%d, m22:%d, m23:%d, m31:%d, m32:%d, m33:%d", m11, m12, m13, m21, m22, m23, m31,
-				m32, m33);
+		return String.format("m11:%d, m12:%d, m13:%d, m21:%d, m22:%d, m23:%d, m31:%d, m32:%d, m33:%d", m11, m12, m13,
+				m21, m22, m23, m31, m32, m33);
 	}
 
 	@Override

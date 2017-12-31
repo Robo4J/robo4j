@@ -22,9 +22,10 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-import java.io.IOException;
 
 import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl.Direction;
+
+import java.io.IOException;
 
 public interface AdafruitLcd {
 	// Not using the Pi4J bus specification here, since we may not be able to
@@ -34,12 +35,13 @@ public interface AdafruitLcd {
 
 	/**
 	 * Sets the text to display. Use "\n" to begin a new line. Each line will be
-	 * padded to the full 16 columns to clear anything still in the VRAM
-	 * following the new line.
+	 * padded to the full 16 columns to clear anything still in the VRAM following
+	 * the new line.
 	 * 
 	 * @param s
 	 *            the text to display.
 	 * @throws IOException
+	 *             exception
 	 */
 	void setText(String s) throws IOException;
 
@@ -51,6 +53,7 @@ public interface AdafruitLcd {
 	 * @param string
 	 *            the string to display.
 	 * @throws IOException
+	 *             exception
 	 */
 	void setText(int row, String string) throws IOException;
 
@@ -62,6 +65,7 @@ public interface AdafruitLcd {
 	 * @param column
 	 *            the column to move the cursor to.
 	 * @throws IOException
+	 *             exception
 	 */
 	void setCursorPosition(int row, int column) throws IOException;
 
@@ -69,6 +73,7 @@ public interface AdafruitLcd {
 	 * Stop the LCD. Will turn of the backlight.
 	 * 
 	 * @throws IOException
+	 *             exception
 	 */
 	void stop() throws IOException;
 
@@ -76,6 +81,7 @@ public interface AdafruitLcd {
 	 * Clear the text on the display.
 	 * 
 	 * @throws IOException
+	 *             exception
 	 */
 	void clear() throws IOException;
 
@@ -83,6 +89,7 @@ public interface AdafruitLcd {
 	 * Will move the cursor home.
 	 * 
 	 * @throws IOException
+	 *             exception
 	 */
 	void home() throws IOException;
 
@@ -92,6 +99,7 @@ public interface AdafruitLcd {
 	 * @param enable
 	 *            true to enable, false to disable.
 	 * @throws IOException
+	 *             exception
 	 */
 	void setCursorEnabled(boolean enable) throws IOException;
 
@@ -106,6 +114,7 @@ public interface AdafruitLcd {
 	 * @param enable
 	 *            true to enable, false to disable.
 	 * @throws IOException
+	 *             exception
 	 */
 	void setDisplayEnabled(boolean enable) throws IOException;
 
@@ -118,6 +127,7 @@ public interface AdafruitLcd {
 	 * @param enable
 	 *            to enable blink, false to disable.
 	 * @throws IOException
+	 *             exception
 	 */
 	void setBlinkEnabled(boolean enable) throws IOException;
 
@@ -127,18 +137,20 @@ public interface AdafruitLcd {
 	boolean isBlinkEnabled();
 
 	/**
-	 * Sets the backlight color. Note that not all colors will be available on
-	 * all devices.
+	 * Sets the backlight color. Note that not all colors will be available on all
+	 * devices.
 	 * 
 	 * @param color
 	 *            the color to set
 	 * @throws IOException
+	 *             exception
 	 */
 	void setBacklight(Color color) throws IOException;
 
 	/**
 	 * @return the current backlight color in use.
 	 * @throws IOException
+	 *             exception
 	 */
 	Color getBacklight() throws IOException;
 
@@ -148,6 +160,7 @@ public interface AdafruitLcd {
 	 * @param direction
 	 *            the direction to scroll the display.
 	 * @throws IOException
+	 *             exception
 	 */
 	void scrollDisplay(Direction direction) throws IOException;
 
@@ -157,6 +170,7 @@ public interface AdafruitLcd {
 	 * @param direction
 	 *            the directon for text flow.
 	 * @throws IOException
+	 *             exception
 	 */
 	void setTextFlowDirection(Direction direction) throws IOException;
 
@@ -166,6 +180,7 @@ public interface AdafruitLcd {
 	 * @param enable
 	 *            true to enable automatic scrolling, false to disable.
 	 * @throws IOException
+	 *             exception
 	 */
 	void setAutoScrollEnabled(boolean enable) throws IOException;
 
@@ -179,6 +194,7 @@ public interface AdafruitLcd {
 	 *            the button to check.
 	 * @return true if the button is currently depressed, false otherwise.
 	 * @throws IOException
+	 *             exception
 	 */
 	boolean isButtonPressed(Button button) throws IOException;
 
@@ -186,6 +202,7 @@ public interface AdafruitLcd {
 	 * @return the bitmask for the press status of all buttons at once.
 	 * 
 	 * @throws IOException
+	 *             exception
 	 */
 	int buttonsPressedBitmask() throws IOException;
 
@@ -193,15 +210,16 @@ public interface AdafruitLcd {
 	 * Full reset of the LCD.
 	 * 
 	 * @throws IOException
+	 *             exception
 	 */
 	void reset() throws IOException;
 
 	/**
-	 * Fill one of the first 8 CGRAM locations with custom characters. The
-	 * location parameter should be between 0 and 7 and pattern should provide
-	 * an array of 8 bytes containing the pattern. e.g. you can design your
-	 * custom character at <a
-	 * href=http://www.quinapalus.com/hd44780udg.html>http://www.quinapalus.com/hd44780udg.html<a/>.
+	 * Fill one of the first 8 CGRAM locations with custom characters. The location
+	 * parameter should be between 0 and 7 and pattern should provide an array of 8
+	 * bytes containing the pattern. e.g. you can design your custom character at
+	 * &lt;a
+	 * href=http://www.quinapalus.com/hd44780udg.html&gt;http://www.quinapalus.com/hd44780udg.html&lt;a&gt;.
 	 * To show your custom character obtain the string representation for the
 	 * location e.g. String.format("custom char=%c", 0).
 	 * 
@@ -209,6 +227,8 @@ public interface AdafruitLcd {
 	 *            storage location for this character, between 0 and 7
 	 * @param pattern
 	 *            array of 8 bytes containing the character's pattern
+	 * @throws IOException
+	 *             exception
 	 */
 	void createChar(int location, byte[] pattern) throws IOException;
 }

@@ -67,6 +67,8 @@ public final class RoboHttpUtils {
 	/**
 	 * report time in moment M from start time
 	 *
+	 * @param clazz
+	 *            desired class
 	 * @param message
 	 *            message
 	 * @param start

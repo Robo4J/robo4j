@@ -18,7 +18,7 @@ package com.robo4j.hw.rpi.serial.gps;
 
 /**
  * Abstract super class for event classes.
- * implements {@see GPSVisitable} interface to simplify reacting on
+ * implements {@link GPSVisitable} interface to simplify reacting on
  * GPS specific event
  *
  * @see PositionEvent

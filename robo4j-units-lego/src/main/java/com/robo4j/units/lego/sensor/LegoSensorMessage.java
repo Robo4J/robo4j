@@ -24,7 +24,7 @@ import com.robo4j.hw.lego.enums.SensorTypeEnum;
 /**
  * Lego Sensor Message is generic for all available sensors
  * 
- * @see {@link SensorTypeEnum}
+ * @see SensorTypeEnum
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)

@@ -16,14 +16,14 @@
  */
 package com.robo4j.hw.rpi.lcd;
 
-import java.util.concurrent.TimeUnit;
-
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Hardware support for the 20x4 LCD module.
@@ -103,6 +103,21 @@ public class Lcd20x4 {
 	 * Constructor.
 	 * 
 	 * Use this constructor if you want a customized wiring.
+	 *
+	 * @param pinRS
+	 *            pin rs
+	 * @param pinE
+	 *            pin E
+	 * @param pinD4
+	 *            pin D4
+	 * @param pinD5
+	 *            pin D5
+	 * @param pinD6
+	 *            pin D6
+	 * @param pinD7
+	 *            pin D7
+	 * @param pinOn
+	 *            ping 0n
 	 */
 	public Lcd20x4(Pin pinRS, Pin pinE, Pin pinD4, Pin pinD5, Pin pinD6, Pin pinD7, Pin pinOn) {
 		GpioController gpio = GpioFactory.getInstance();
@@ -213,7 +228,7 @@ public class Lcd20x4 {
 	public void enableBacklight(boolean enable) {
 		gpioOn.setState(enable);
 	}
-	
+
 	public void clearDisplay() {
 		sendByte(0x01, Mode.CMD);
 	}

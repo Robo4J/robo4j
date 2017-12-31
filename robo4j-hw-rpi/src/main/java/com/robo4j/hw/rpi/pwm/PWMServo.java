@@ -16,8 +16,6 @@
  */
 package com.robo4j.hw.rpi.pwm;
 
-import java.io.IOException;
-
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinPwmOutput;
@@ -26,21 +24,23 @@ import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.wiringpi.Gpio;
 import com.robo4j.hw.rpi.Servo;
 
+import java.io.IOException;
+
 /**
  * Abstraction for talking to a servo over one of the hardware PWM GPIO pins on
  * the RaspberryPi.
- * <p>
+ * &lt;p&gt;
  * All Raspberry Pis support hardware PWM on GPIO_01.
- * </p>
- * <p>
+ * &lt;/p&gt;
+ * &lt;p&gt;
  * Raspberry Pi models A+, B+, 2B, 3B also support hardware PWM on the following
  * GPIO pins:
- * <ul>
- * <li>GPIO_23</li>
- * <li>GPIO_24</li>
- * <li>GPIO_26</li>
- * </ul>
- * </p>
+ * &lt;ul&gt;
+ * &lt;li&gt;GPIO_23&lt;/li&gt;
+ * &lt;li&gt;GPIO_24&lt;/li&gt;
+ * &lt;li&gt;GPIO_26&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/p&gt;
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)

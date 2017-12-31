@@ -16,12 +16,12 @@
  */
 package com.robo4j.hw.rpi.pwm.roboclaw;
 
+import com.robo4j.hw.rpi.Motor;
+import com.robo4j.hw.rpi.Servo;
+
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.robo4j.hw.rpi.Motor;
-import com.robo4j.hw.rpi.Servo;
 
 /**
  * A RoboClaw engine controller, controlled with a standard servo PWM signal.
@@ -51,8 +51,9 @@ public class RoboClawRCTank implements Motor {
 	 *            the servo controlling the left engine.
 	 * @param rightEngine
 	 *            the servo controlling the right engine.
-	 *            
+	 * 
 	 * @throws IOException
+	 *             exception
 	 */
 	public RoboClawRCTank(Servo leftEngine, Servo rightEngine) throws IOException {
 		this.leftEngine = leftEngine;
@@ -87,6 +88,7 @@ public class RoboClawRCTank implements Motor {
 	 *            goes to the left engine, turning the vehicle max right.
 	 * 
 	 * @throws IOException
+	 *             exception
 	 */
 	public void setDirection(float direction) throws IOException {
 		this.direction = direction;

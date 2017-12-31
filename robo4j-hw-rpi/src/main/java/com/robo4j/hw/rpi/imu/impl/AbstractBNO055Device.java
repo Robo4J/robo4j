@@ -16,14 +16,14 @@
  */
 package com.robo4j.hw.rpi.imu.impl;
 
-import java.io.IOException;
-
 import com.robo4j.hw.rpi.imu.BNO055CalibrationStatus;
 import com.robo4j.hw.rpi.imu.BNO055Device;
 import com.robo4j.hw.rpi.imu.BNO055SelfTestResult;
 import com.robo4j.hw.rpi.imu.BNO055SystemStatus;
 import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.math.geometry.Tuple4d;
+
+import java.io.IOException;
 
 /**
  * Abstraction for a BN0055 absolute orientation device.
@@ -81,6 +81,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 * Creates a BNO055Device with the default settings.
 	 * 
 	 * @throws IOException
+	 *             exception
 	 * 
 	 * @see PowerMode
 	 * @see OperatingMode
@@ -198,6 +199,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 *            the address of the register to read from.
 	 * @return the value read.
 	 * @throws IOException
+	 *             exception
 	 */
 	protected abstract int read(int register) throws IOException;
 
@@ -209,6 +211,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 * @param b
 	 *            the byte to write.
 	 * @throws IOException
+	 *             exception
 	 */
 	protected abstract void write(int register, byte b) throws IOException;
 
@@ -232,8 +235,8 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 * com.robo4j.hw.rpi.i2c.imu.BNO055I2CDevice.Orientation)
 	 */
 	@Override
-	public void setUnits(Unit accelerationUnit, Unit angularRateUnit, Unit angleUnit, Unit temperatureUnit, OrientationMode orientationMode)
-			throws IOException {
+	public void setUnits(Unit accelerationUnit, Unit angularRateUnit, Unit angleUnit, Unit temperatureUnit,
+			OrientationMode orientationMode) throws IOException {
 		int val = 0;
 		if (accelerationUnit == Unit.MILI_G) {
 			val |= 0x01;
@@ -373,8 +376,8 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 * 
 	 * @param maxWaitTimeMillis
 	 *            max time to wait for the system to be ready.
-	 * @return returns true if the system is ready, false if the system is
-	 *         reporting an error or if the timeout was reached.
+	 * @return returns true if the system is ready, false if the system is reporting
+	 *         an error or if the timeout was reached.
 	 * @throws IOException
 	 */
 	private boolean waitForOk(int maxWaitTimeMillis) throws IOException {
@@ -420,9 +423,9 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 
 	@Override
 	public void setUseExternalChrystal(boolean useExternalChrystal) throws IOException {
-		write(REGISTER_SYS_TRIGGER, useExternalChrystal ? (byte) 0x80 : 0x00); 
+		write(REGISTER_SYS_TRIGGER, useExternalChrystal ? (byte) 0x80 : 0x00);
 	}
-	
+
 	@Override
 	public boolean isUseExternalChrystal() throws IOException {
 		return (read(REGISTER_SYS_TRIGGER) & 0x80) > 0;
@@ -449,7 +452,9 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 *            the register to read
 	 * @param length
 	 *            the total length of values to read.
+	 * @return bytes
 	 * @throws IOException
+	 *             exception
 	 */
 	protected abstract byte[] read(int register, int length) throws IOException;
 

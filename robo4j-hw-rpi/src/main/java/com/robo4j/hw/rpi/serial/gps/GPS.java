@@ -16,6 +16,10 @@
  */
 package com.robo4j.hw.rpi.serial.gps;
 
+import com.pi4j.concurrent.ExecutorServiceFactory;
+import com.pi4j.io.serial.Serial;
+import com.pi4j.io.serial.SerialFactory;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -27,10 +31,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.pi4j.concurrent.ExecutorServiceFactory;
-import com.pi4j.io.serial.Serial;
-import com.pi4j.io.serial.SerialFactory;
 
 /**
  * Code to talk to the Adafruit "ultimate GPS" over the serial port.
@@ -55,9 +55,9 @@ public class GPS {
 
 	/**
 	 * The default serial port is /dev/serial0. Since Raspberry Pi 3 nabbed the
-	 * /dev/ttyAMA0 for the bluetooth, serial0 should be the new logical name to
-	 * use for the rx/tx pins. This is supposedly compatible with the older
-	 * Raspberry Pis as well.
+	 * /dev/ttyAMA0 for the bluetooth, serial0 should be the new logical name to use
+	 * for the rx/tx pins. This is supposedly compatible with the older Raspberry
+	 * Pis as well.
 	 */
 	public static final String DEFAULT_GPS_PORT = "/dev/serial0";
 
@@ -84,10 +84,11 @@ public class GPS {
 	private ScheduledFuture<?> scheduledFuture;
 
 	/**
-	 * Creates a new GPS instance. Will use an internal thread to read data, and
-	 * the default read interval.
+	 * Creates a new GPS instance. Will use an internal thread to read data, and the
+	 * default read interval.
 	 *
 	 * @throws IOException
+	 *             exception
 	 */
 	public GPS() throws IOException {
 		this(DEFAULT_GPS_PORT, DEFAULT_READ_INTERVAL);
@@ -96,7 +97,13 @@ public class GPS {
 	/**
 	 * Creates a new GPS instance.
 	 *
+	 * @param serialPort
+	 *            serial port
+	 * @param readInterval
+	 *            read internal
+	 *
 	 * @throws IOException
+	 *             exception
 	 */
 	public GPS(String serialPort, int readInterval) throws IOException {
 		this.serialPort = serialPort;
@@ -113,7 +120,7 @@ public class GPS {
 	 * @param gpsListener
 	 *            the new listener to add.
 	 *
-	 * @see GPSListener
+	 * @see GPSListener documentation
 	 */
 	public void addListener(GPSListener gpsListener) {
 		listeners.add(gpsListener);
@@ -125,15 +132,15 @@ public class GPS {
 	 * @param gpsListener
 	 *            the listener to remove.
 	 *
-	 * @see GPSListener
+	 * @see GPSListener documentation
 	 */
 	public void removeListener(GPSListener gpsListener) {
 		listeners.remove(gpsListener);
 	}
 
 	/**
-	 * Shuts down the GPS listener. After the shutdown is completed, no more
-	 * events will be sent to listeners.
+	 * Shuts down the GPS listener. After the shutdown is completed, no more events
+	 * will be sent to listeners.
 	 */
 	public void shutdown() {
 		synchronized (internalExecutor) {
@@ -161,8 +168,8 @@ public class GPS {
 	}
 
 	/**
-	 * Call this to perform a read of data from the device in the current
-	 * thread. Use this for scheduling reads yourself.
+	 * Call this to perform a read of data from the device in the current thread.
+	 * Use this for scheduling reads yourself.
 	 */
 	public void update() {
 		dataRetriever.update();
@@ -174,7 +181,8 @@ public class GPS {
 	public void startAutoUpdate() {
 		synchronized (internalExecutor) {
 			if (scheduledFuture == null) {
-				scheduledFuture = internalExecutor.scheduleAtFixedRate(dataRetriever, 0, readInterval, TimeUnit.MILLISECONDS);
+				scheduledFuture = internalExecutor.scheduleAtFixedRate(dataRetriever, 0, readInterval,
+						TimeUnit.MILLISECONDS);
 			}
 			throw new IllegalStateException("Auto update already started!");
 		}

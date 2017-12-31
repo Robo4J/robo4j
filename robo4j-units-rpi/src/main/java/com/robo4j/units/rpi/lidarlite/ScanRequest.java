@@ -49,9 +49,6 @@ public class ScanRequest {
 	 * 
 	 * @param receiver
 	 *            the reference to the receiver of the scans.
-	 * @param servoRange
-	 *            how much of the full servo range should be scanned (in
-	 *            radians).
 	 */
 	public ScanRequest(RoboReference<ScanResult2D> receiver, float startAngle, float range, float step) {
 		this(receiver, startAngle, range, step, Float.MAX_VALUE);
@@ -74,7 +71,7 @@ public class ScanRequest {
 	 * 
 	 * @param receiver
 	 *            the id of the receiver for the result of the scan.
-	 * @param servoRange
+	 * @param step
 	 *            how much of the full servo range should be scanned (in
 	 *            radians).
 	 * @param abortRange

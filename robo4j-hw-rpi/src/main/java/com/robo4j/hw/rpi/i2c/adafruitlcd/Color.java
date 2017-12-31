@@ -41,8 +41,8 @@ public enum Color {
 	/**
 	 * Returns the matching color value, or WHITE if no matching color could be found.
 	 * 
-	 * @param colorValue
-	 * @return
+	 * @param colorValue color value
+	 * @return color
 	 */
 	public static Color getByValue(int colorValue) {
 		for (Color c : values()) {

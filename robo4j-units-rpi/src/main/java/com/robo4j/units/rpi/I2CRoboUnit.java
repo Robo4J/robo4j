@@ -37,8 +37,12 @@ public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
 	private Integer address;
 
 	/**
+	 * @param messageType
+	 *            message type
 	 * @param context
+	 *            robo context
 	 * @param id
+	 *            unit id
 	 */
 	public I2CRoboUnit(Class<T> messageType, RoboContext context, String id) {
 		super(messageType, context, id);

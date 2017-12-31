@@ -16,11 +16,11 @@
  */
 package com.robo4j.hw.rpi.imu;
 
-import java.io.IOException;
-
 import com.robo4j.hw.rpi.imu.BNO055Device.OperatingMode;
 import com.robo4j.hw.rpi.imu.impl.BNO055I2CDevice;
 import com.robo4j.hw.rpi.imu.impl.BNO055SerialDevice;
+
+import java.io.IOException;
 
 /**
  * Factory for creating BNO055 devices
@@ -37,6 +37,7 @@ public final class BNO055Factory {
 	 * 
 	 * @return an I2C connected BNO055Device
 	 * @throws IOException
+	 *             exception
 	 */
 	public static BNO055Device createDefaultI2CDevice() throws IOException {
 		return new BNO055I2CDevice();
@@ -47,6 +48,7 @@ public final class BNO055Factory {
 	 * 
 	 * @return a serial connected BNO55 device.
 	 * @throws IOException
+	 *             exception
 	 */
 	public static BNO055Device createDefaultSerialDevice() throws IOException {
 		return new BNO055SerialDevice();
@@ -61,8 +63,9 @@ public final class BNO055Factory {
 	 *            the I2C address to use.
 	 * @param operatingMode
 	 *            the (initial) operating mode.
-	 * @returnan I2C connected BNO055Device
+	 * @return I2C connected BNO055Device
 	 * @throws IOException
+	 *             exception
 	 */
 	public static BNO055Device createDevice(int bus, int address, OperatingMode operatingMode) throws IOException {
 		return new BNO055I2CDevice(bus, address, operatingMode);
@@ -81,9 +84,10 @@ public final class BNO055Factory {
 	 *            the number of times to retry.
 	 * @return a serial connected BNO55 device.
 	 * @throws IOException
+	 *             exception
 	 */
-	public static BNO055Device createDevice(String serialPort, OperatingMode operatingMode, long retryTimeout, int noOfRetries)
-			throws IOException {
+	public static BNO055Device createDevice(String serialPort, OperatingMode operatingMode, long retryTimeout,
+			int noOfRetries) throws IOException {
 		return new BNO055SerialDevice(serialPort, operatingMode, retryTimeout, noOfRetries);
 	}
 

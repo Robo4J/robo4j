@@ -16,21 +16,21 @@
  */
 package com.robo4j.units.rpi.pwm;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-
-import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.ConfigurationException;
 import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.i2c.pwm.PCA9685Servo;
+import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
+import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.rpi.I2CEndPoint;
 import com.robo4j.units.rpi.I2CRegistry;
 import com.robo4j.units.rpi.I2CRoboUnit;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Servo unit associated with the PCA9685 PWM driver.
@@ -60,13 +60,15 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 	 */
 	public static final String CONFIGURATION_KEY_EXPO = "expo";
 	/**
-	 * The setting to reset to on shutdown. If this is not set, nothing will
-	 * happen on shutdown.
+	 * The setting to reset to on shutdown. If this is not set, nothing will happen
+	 * on shutdown.
 	 */
 	public static final String CONFIGURATION_KEY_SHUTDOWN_VALUE = "shutdownValue";
 
-	public static final AttributeDescriptor<Float> ATTRIBUTE_SERVO_INPUT = DefaultAttributeDescriptor.create(Float.class, "input");
-	public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections.singleton(ATTRIBUTE_SERVO_INPUT);
+	public static final AttributeDescriptor<Float> ATTRIBUTE_SERVO_INPUT = DefaultAttributeDescriptor
+			.create(Float.class, "input");
+	public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
+			.singleton(ATTRIBUTE_SERVO_INPUT);
 
 	private PCA9685Servo servo;
 	private Integer channel;
@@ -89,6 +91,7 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 	 * @param configuration
 	 *            unit configuration
 	 * @throws ConfigurationException
+	 *             exception
 	 */
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
@@ -124,7 +127,6 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
 	 * @param message
 	 *            the message received by this unit.
 	 * 
-	 * @return the unit specific result from the call.
 	 */
 	@Override
 	public void onMessage(Float message) {
