@@ -19,7 +19,6 @@ package com.robo4j.net;
 
 import com.robo4j.RoboContext;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -55,7 +54,6 @@ public class LookupServiceTests {
 		Assert.assertEquals(descriptor.getMetadata(), decodedDescriptor.getMetadata());
 	}
 
-	@Ignore
 	@Test
 	public void testLookup() throws IOException, InterruptedException {
 		LookupService service = new LookupServiceImpl(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS,
