@@ -1249,8 +1249,3 @@ configure(allprojects) { project ->
     ]
 }
 
-ext {
-    ossrhUsername = ""
-    ossrhPassword = ""
-}
-
