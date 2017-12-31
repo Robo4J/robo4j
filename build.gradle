@@ -62,20 +62,6 @@ project("robo4j-commons") {
             }
         }
     }
-
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
-
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    artifacts {
-        archives javadocJar, sourcesJar
-    }
 }
 
 project("robo4j-core") {
@@ -124,20 +110,6 @@ project("robo4j-core") {
                 srcDirs = ['src/test/resources']
             }
         }
-    }
-
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
-
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    artifacts {
-        archives javadocJar, sourcesJar
     }
 }
 
@@ -253,20 +225,6 @@ project("robo4j-hw-lego") {
             }
         }
     }
-
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
-
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    artifacts {
-        archives javadocJar, sourcesJar
-    }
 }
 
 project("robo4j-hw-rpi") {
@@ -335,20 +293,6 @@ project("robo4j-hw-rpi") {
             }
         }
     }
-
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
-
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    artifacts {
-        archives javadocJar, sourcesJar
-    }
 }
 
 project("robo4j-math") {
@@ -393,20 +337,6 @@ project("robo4j-math") {
                 srcDirs = ['src/test/resources']
             }
         }
-    }
-
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
-
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    artifacts {
-        archives javadocJar, sourcesJar
     }
 }
 
@@ -453,20 +383,6 @@ project("robo4j-page") {
                 srcDirs = ['src/test/resources']
             }
         }
-    }
-
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
-
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    artifacts {
-        archives javadocJar, sourcesJar
     }
 }
 
@@ -516,20 +432,6 @@ project("robo4j-socket-http") {
                 srcDirs = ['src/test/resources']
             }
         }
-    }
-
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
-
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    artifacts {
-        archives javadocJar, sourcesJar
     }
 }
 
@@ -598,21 +500,6 @@ project("robo4j-units-lego") {
             }
         }
     }
-
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
-
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    artifacts {
-        archives javadocJar, sourcesJar
-    }
-
 }
 
 project("robo4j-units-rpi") {
@@ -681,21 +568,6 @@ project("robo4j-units-rpi") {
                 srcDirs = ['src/test/resources']
             }
         }
-    }
-
-
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
-
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    artifacts {
-        archives javadocJar, sourcesJar
     }
 }
 
