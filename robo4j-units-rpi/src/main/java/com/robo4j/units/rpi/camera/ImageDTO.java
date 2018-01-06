@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.commons;
+package com.robo4j.units.rpi.camera;
 
 import java.util.Arrays;
 import java.util.Objects;

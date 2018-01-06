@@ -19,51 +19,6 @@ repositories {
     mavenLocal()
 }
 
-project("robo4j-commons") {
-    description = "Robo4J Codec"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
-
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
-    dependencies {
-        testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
-    }
-
-    sourceSets {
-        main {
-            java {
-                srcDirs = ['src/main/java']
-            }
-            resources {
-                srcDirs = ['src/main/resources']
-            }
-        }
-
-        test {
-            java {
-                srcDirs = ['src/test/java']
-            }
-            resources {
-                srcDirs = ['src/test/resources']
-            }
-        }
-    }
-}
-
 project("robo4j-core") {
     description = "Robo4J Core"
 
@@ -407,7 +362,6 @@ project("robo4j-socket-http") {
     }
 
     dependencies {
-        compile(project(":robo4j-commons"))
         compile(project(":robo4j-core"))
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
@@ -543,7 +497,6 @@ project("robo4j-units-rpi") {
     }
 
     dependencies {
-        compile(project(":robo4j-commons"))
         compile(project(":robo4j-core"))
         compile(project(":robo4j-hw-rpi"))
         testCompile "junit:junit:${junitVersion}"
@@ -570,6 +523,51 @@ project("robo4j-units-rpi") {
         }
     }
 }
+
+project("robo4j-units-rpi-http") {
+    description = "Robo4J Codecs for rpi units"
+
+    group 'com.robo4j'
+    version "${robo4jVersion}"
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+    	compile(project(":robo4j-socket-http"))
+    	compile(project(":robo4j-units-rpi"))
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java']
+            }
+        }
+
+        test {
+            java {
+                srcDirs = ['src/test/java']
+            }
+            resources {
+                srcDirs = ['src/test/resources']
+            }
+        }
+    }
+}
+
 
 task wrapper(type: Wrapper) {
     gradleVersion = "${roboGradleVersion}"

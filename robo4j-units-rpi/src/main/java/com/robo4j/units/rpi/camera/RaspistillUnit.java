@@ -22,7 +22,6 @@ import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
-import com.robo4j.commons.ImageDTO;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.camera.RaspistilDevice;
 import com.robo4j.logging.SimpleLoggingUtil;

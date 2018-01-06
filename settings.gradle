@@ -1,6 +1,5 @@
 rootProject.name = 'robo4j'
 
-include 'robo4j-commons'
 include 'robo4j-core'
 include 'robo4j-socket-http'
 include 'robo4j-page'
@@ -9,6 +8,7 @@ include 'robo4j-units-lego'
 include 'robo4j-hw-lego'
 include 'robo4j-hw-rpi'
 include 'robo4j-units-rpi'
+include 'robo4j-units-rpi-http'
 include 'robo4j-db-sql'
 
 

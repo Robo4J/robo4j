@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http.units;
+package com.robo4j.units.rpi.http.camera;
 
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.DefaultAttributeDescriptor;
@@ -23,9 +23,8 @@ import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.socket.http.codec.CameraMessage;
-import com.robo4j.socket.http.units.test.CameraImageConsumerTestUnit;
-import com.robo4j.socket.http.units.test.CameraImageProducerTestUnit;
 import com.robo4j.socket.http.util.RoboHttpUtils;
+
 import org.junit.Test;
 
 import java.io.InputStream;

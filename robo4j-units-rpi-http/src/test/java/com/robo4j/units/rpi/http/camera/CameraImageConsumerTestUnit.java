@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http.units.test;
+package com.robo4j.units.rpi.http.camera;
 
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.DefaultAttributeDescriptor;

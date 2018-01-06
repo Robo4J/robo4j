@@ -15,12 +15,11 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http.units;
+package com.robo4j.units.rpi.http.camera;
 
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
-import com.robo4j.commons.ImageDTO;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
@@ -32,6 +31,7 @@ import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RequestDenominator;
 import com.robo4j.socket.http.util.RoboHttpUtils;
+import com.robo4j.units.rpi.camera.ImageDTO;
 
 import java.util.HashMap;
 import java.util.List;

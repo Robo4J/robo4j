@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.socket.http.units.test;
+package com.robo4j.units.rpi.http.camera;
 
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.ConfigurationException;
@@ -23,23 +23,34 @@ import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
-import com.robo4j.commons.ImageDTO;
-import com.robo4j.commons.ImageDTOBuilder;
 import com.robo4j.configuration.Configuration;
+import com.robo4j.socket.http.HttpHeaderFieldNames;
+import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.socket.http.codec.CameraMessage;
+import com.robo4j.socket.http.codec.CameraMessageCodec;
+import com.robo4j.socket.http.message.HttpDecoratedRequest;
+import com.robo4j.socket.http.util.HttpConstant;
+import com.robo4j.socket.http.util.RequestDenominator;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.StreamUtils;
 
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class CameraImageProducerDescTestUnit extends RoboUnit<Boolean> {
+public class CameraImageProducerTestUnit extends RoboUnit<Boolean> {
 
 	public static final String ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME = "numberOfSentImages";
 	public static final String ATTRIBUTE_NUMBER_OF_IMAGES_NAME = "numberOfImages";
@@ -47,21 +58,32 @@ public class CameraImageProducerDescTestUnit extends RoboUnit<Boolean> {
 			Arrays.asList(DefaultAttributeDescriptor.create(Integer.class, ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME),
 					DefaultAttributeDescriptor.create(Integer.class, ATTRIBUTE_NUMBER_OF_IMAGES_NAME)));
 
+	private final CameraMessageCodec codec = new CameraMessageCodec();
 	private final AtomicBoolean progress = new AtomicBoolean(false);
 	private final AtomicInteger counter = new AtomicInteger(0);
-	private String target;
-	private String fileName;
+
+	private String targetOut;
+	private String host;
+	private Integer port;
+	private String path;
 	private Integer numberOfImages;
 
-	public CameraImageProducerDescTestUnit(RoboContext context, String id) {
+	public CameraImageProducerTestUnit(RoboContext context, String id) {
 		super(Boolean.class, context, id);
 	}
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		target = configuration.getString("target", null);
-		fileName = configuration.getString("fileName", null);
-		numberOfImages = configuration.getInteger("numberOfImages", null);
+		targetOut = configuration.getString("targetOut", null);
+		numberOfImages = configuration.getInteger("numberOfImages", 0);
+		path = configuration.getString("path", null);
+		host = configuration.getString(HTTP_PROPERTY_HOST, null);
+		port = configuration.getInteger(HTTP_PROPERTY_PORT, null);
+
+		if (targetOut == null || path == null || host == null || port == null) {
+			throw ConfigurationException.createMissingConfigNameException("targetOut, path, host, port");
+		}
+
 	}
 
 	@Override
@@ -75,8 +97,8 @@ public class CameraImageProducerDescTestUnit extends RoboUnit<Boolean> {
 	public void start() {
 		EnumSet<LifecycleState> acceptedStates = EnumSet.of(LifecycleState.STARTING, LifecycleState.STARTED);
 		getContext().getScheduler().execute(() -> {
-			while (acceptedStates.contains(getState())) {
-				if (progress.compareAndSet(false, true) && counter.getAndIncrement() < numberOfImages) {
+			while (acceptedStates.contains(getState()) && counter.get() < numberOfImages) {
+				if (progress.compareAndSet(false, true)) {
 					createImage();
 				}
 			}
@@ -97,14 +119,29 @@ public class CameraImageProducerDescTestUnit extends RoboUnit<Boolean> {
 	}
 
 	private void createImage() {
-		final byte[] image = StreamUtils
-				.inputStreamToByteArray(Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName));
-		final ImageDTO imageDTO = ImageDTOBuilder.Build()
-				.setWidth(800)
-				.setHeight(600)
-				.setEncoding("jpg")
-				.setContent(image).build();
-		getContext().getReference(target).sendMessage(imageDTO);
-		progress.set(false);
+
+		final byte[] imageBytes = StreamUtils.inputStreamToByteArray(
+				Thread.currentThread().getContextClassLoader().getResourceAsStream("snapshot.png"));
+		String encodeString = new String(Base64.getEncoder().encode(imageBytes));
+
+		if (encodeString.length() != HttpConstant.DEFAULT_VALUE_0) {
+			final CameraMessage cameraMessage = new CameraMessage("jpg", String.valueOf(counter.incrementAndGet()),
+					encodeString);
+
+			final String message = codec.encode(cameraMessage);
+			final RequestDenominator denominator = new RequestDenominator(HttpMethod.POST, path, HttpVersion.HTTP_1_1);
+
+			HttpDecoratedRequest request = new HttpDecoratedRequest(denominator);
+			request.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, port));
+			request.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()));
+			request.addMessage(message);
+
+			System.out.println(getClass() + " image to sent number: " + cameraMessage.getValue() + " Size: "
+					+ encodeString.length());
+			getContext().getReference(targetOut).sendMessage(request);
+
+			progress.set(false);
+		}
 	}
+
 }

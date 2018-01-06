@@ -1,8 +1,5 @@
 package com.robo4j.units.rpi.camera;
 
-import com.robo4j.commons.ImageDTO;
-import com.robo4j.commons.ImageDTOBuilder;
-
 /**
  *
  * @author Marcus Hirt (@hirt)

@@ -1,4 +1,4 @@
-package com.robo4j.commons;
+package com.robo4j.units.rpi.camera;
 
 import java.util.Objects;
 
