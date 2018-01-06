@@ -20,7 +20,7 @@
         <class>com.robo4j.socket.http.units.HttpClientDecoratorUnit</class>
     </roboUnit>
     <roboUnit id="imageController">
-        <class>com.robo4j.socket.http.units.test.CameraImageProducerTestUnit</class>
+        <class>com.robo4j.units.rpi.http.camera.CameraImageProducerTestUnit</class>
         <config name="com.robo4j.root">
             <value name="targetOut" type="String">httpClient</value>
             <value name="host" type="String">0.0.0.0</value>

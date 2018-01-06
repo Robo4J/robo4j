@@ -17,7 +17,7 @@
 
 <robo4j>
     <roboUnit id="imageProcessor">
-        <class>com.robo4j.socket.http.units.test.CameraImageConsumerTestUnit</class>
+        <class>com.robo4j.units.rpi.http.camera.CameraImageConsumerTestUnit</class>
     </roboUnit>
     <roboUnit id="httpServer">
         <class>com.robo4j.socket.http.units.HttpServerUnit</class>

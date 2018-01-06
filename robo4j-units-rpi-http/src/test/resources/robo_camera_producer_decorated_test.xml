@@ -23,7 +23,7 @@
         </config>
     </roboUnit>
     <roboUnit id="imageDecorator">
-        <class>com.robo4j.socket.http.units.ImageDecoratorUnit</class>
+        <class>com.robo4j.units.rpi.http.camera.ImageDecoratorUnit</class>
         <config name="com.robo4j.root">
             <value name="target" type="String">httpClient</value>
             <value name="host" type="String">0.0.0.0</value>
@@ -32,7 +32,7 @@
         </config>
     </roboUnit>
     <roboUnit id="camera">
-        <class>com.robo4j.socket.http.units.test.CameraImageProducerDescTestUnit</class>
+        <class>com.robo4j.units.rpi.http.camera.CameraImageProducerDescTestUnit</class>
         <config name="com.robo4j.root">
             <value name="target" type="String">imageDecorator</value>
             <value name="fileName" type="String">snapshot.png</value>
