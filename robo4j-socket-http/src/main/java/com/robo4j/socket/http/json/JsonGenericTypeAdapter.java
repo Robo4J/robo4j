@@ -25,7 +25,6 @@ public class JsonGenericTypeAdapter<T> extends JsonAdapter<T> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected String internalAdapt(T obj) {
         JsonElementStringBuilder builder = JsonElementStringBuilder.Builder()
                 .add(Utf8Constant.UTF8_CURLY_BRACKET_LEFT);

@@ -81,7 +81,6 @@ public final class ReflectUtils {
 	 * @param obj described object
 	 * @return json string
 	 */
-	@SuppressWarnings("unchecked")
 	public static String getJsonValue(ClassGetSetDTO getterDTO, Object obj) {
 		try {
 			Object value = getterDTO.getGetMethod().invoke(obj);
@@ -188,7 +187,6 @@ public final class ReflectUtils {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private static Object adjustRoboClassCast(Class<?> clazz, Object value) {
 		if (value != null) {
 			final TypeMapper typeMapper = TypeMapper.getBySource(clazz);
@@ -338,7 +336,6 @@ public final class ReflectUtils {
 		return result.build();
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> JsonTypeAdapter getJsonTypeAdapter(Class<T> clazz){
 		JsonTypeAdapter result = clazzAdapter.get(clazz);
 		if(result != null){
