@@ -116,7 +116,7 @@ class LookupServiceImpl implements LookupService {
 		}
 
 		private int readShort(int i, byte[] data) {
-			return data[i] << 8 + data[i + 1];
+			return (data[i] << 8) + data[i + 1];
 		}
 
 		public void stop() {
