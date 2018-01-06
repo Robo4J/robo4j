@@ -473,6 +473,6 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	}
 
 	private short read16bitSigned(byte[] data, int offset) {
-		return (short) (data[offset + 1] << 8 | data[offset]);
+		return (short) (data[offset + 1] << 8 | (data[offset] & 0xFF));
 	}
 }

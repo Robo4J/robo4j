@@ -22,6 +22,7 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Abstraction to read a Bosch digital barometric pressure sensor
@@ -245,7 +246,7 @@ public final class BMP085Device extends AbstractI2CDevice {
 		byte[] bytes = new byte[totalBytes];
 		int bytesRead = i2cDevice.read(CALIBRATION_START, bytes, 0, totalBytes);
 		if (bytesRead != totalBytes) {
-			throw new IOException("Could not read calibration data. Read " + bytes + " of " + totalBytes);
+			throw new IOException("Could not read calibration data. Read " + Arrays.toString(bytes) + " of " + totalBytes);
 		}
 
 		DataInputStream calibrationData = new DataInputStream(new ByteArrayInputStream(bytes));

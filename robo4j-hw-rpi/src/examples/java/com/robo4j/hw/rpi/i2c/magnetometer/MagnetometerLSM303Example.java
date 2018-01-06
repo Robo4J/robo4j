@@ -70,7 +70,7 @@ public class MagnetometerLSM303Example {
 					break;
 				default:
 					val = read();
-					System.out.println(String.format("Value %d = %s\\tHeading:%000.0f", count, val.toString(),
+					System.out.println(String.format("Value %d = %s\\tHeading:%f", count, val.toString(),
 							MagnetometerLSM303Device.getCompassHeading(val)));
 				}
 			}

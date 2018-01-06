@@ -54,6 +54,10 @@ public enum Color {
 	}
 	
 	public static Color getByName(String name) {
-		return valueOf(name);
+		Color color = valueOf(name);
+		if (color != null) {
+			return color;
+		}
+		return WHITE;
 	}
 }

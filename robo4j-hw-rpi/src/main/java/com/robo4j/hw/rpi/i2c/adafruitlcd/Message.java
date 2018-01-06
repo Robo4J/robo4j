@@ -33,7 +33,6 @@ public class Message {
 		}
 		Color color = Color.GREEN;
 		String message = "";
-		//FIXME TODO  (@miro) : null po
 		for(int i = 0; i < params.length; i++) {
 			if (params[i].startsWith(COLOR_PREFIX)) {
 				color = Color.getByName(params[i].substring(COLOR_PREFIX.length()));
