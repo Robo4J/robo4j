@@ -37,6 +37,7 @@ import java.util.Objects;
  * @author Miro Wengner (@miragemiko)
  */
 // TODO: 12/12/17 (miro) -> remove singleton and replace it by a service
+@Deprecated
 public final class HttpUriRegister {
 
 	private static final int DEFAULT_VALUE_0 = 0;
