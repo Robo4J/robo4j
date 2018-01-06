@@ -30,7 +30,9 @@ import com.robo4j.socket.http.PropertiesProvider;
 import com.robo4j.socket.http.channel.InboundSocketHandler;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
+import com.robo4j.util.StringConstants;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -70,23 +72,27 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(","));
 		}
 
-		String targets = configuration.getString(HTTP_TARGETS, null);
-		if(targets == null){
+		String configTarget = configuration.getString(HTTP_TARGETS, StringConstants.EMPTY);
+		if(configTarget.equals(StringConstants.EMPTY)){
 			SimpleLoggingUtil.info(getClass(), "no target units available");
+			targets = new ArrayList<>();
 		} else {
-			Map<String, Object> targetUnitsMap = JsonUtil.getMapByJson(targets);
-			this.targets = targetUnitsMap.entrySet().stream()
-					.map(Map.Entry::getKey)
-					.collect(Collectors.toList());
-			// TODO: 12/12/17 (miro) improve uri(path) registration
-			targetUnitsMap.forEach((key, value) ->
-					HttpUriRegister.getInstance().addUnitPathNode(key, value.toString()));
+			Map<String, Object> targetUnitsMap = JsonUtil.getMapByJson(configTarget);
+			targets = extractTargetUnits(targetUnitsMap);
 		}
 
 		propertiesProvider.put(HTTP_PROPERTY_BUFFER_CAPACITY, bufferCapacity);
 		propertiesProvider.put(HTTP_PROPERTY_PORT, port);
 		propertiesProvider.put(PROPERTY_CODEC_REGISTRY, codecRegistry);
 	}
+
+	@Deprecated
+	private List<String> extractTargetUnits(Map<String, Object> targetUnitsMap){
+        return targetUnitsMap.entrySet().stream()
+                .peek( entry -> HttpUriRegister.getInstance().addUnitPathNode(entry.getKey(), entry.getValue().toString()))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+    }
 
 	@Override
 	public void start() {
