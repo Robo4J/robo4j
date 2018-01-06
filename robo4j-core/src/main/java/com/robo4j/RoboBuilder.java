@@ -201,7 +201,11 @@ public final class RoboBuilder {
 				try {
 					config = currentConfiguration.trim().equals("") ? null
 							: XmlConfigurationFactory.fromXml(currentConfiguration);
-					system = currentId == null ? new RoboSystem(config) : new RoboSystem(currentId, config);
+					if (currentId == null) {
+						system = new RoboSystem(config);
+					} else {
+						system = new RoboSystem(currentId, config);
+					}
 				} catch (ConfigurationFactoryException e) {
 					SimpleLoggingUtil.error(getClass(), "Error parsing system", e);
 				}
