@@ -51,7 +51,7 @@ public class JsonReader {
 	private static final Set<Character> NUMBER_SET = new HashSet<>(Arrays.asList(CHARACTER_0, CHARACTER_1, CHARACTER_2,
 			CHARACTER_3, CHARACTER_4, CHARACTER_5, CHARACTER_6, CHARACTER_7, CHARACTER_8, CHARACTER_9));
 
-	private final String json;
+	private final char[] jsonChars;
 	private ReadType currentRead;
 	private Stack<JsonDocumentWrapper> stack = new Stack<>();
 	private JsonDocument document;
@@ -60,7 +60,7 @@ public class JsonReader {
 	private Object currentValue;
 
 	public JsonReader(String json) {
-		this.json = json;
+		this.jsonChars = json.toCharArray();
         char activeChar = getCharSkipWhiteSpace();
         currentRead = getInitialReadType(activeChar);
         document = getNewDocument(currentRead);
@@ -68,7 +68,7 @@ public class JsonReader {
 	}
 
 	public JsonDocument read() {
-		while (index < json.length()) {
+		while (index < jsonChars.length) {
 			char activeChar = getCharSkipWhiteSpace();
 			currentRead = getActualReadType(currentRead, activeChar);
 
@@ -116,7 +116,7 @@ public class JsonReader {
 					}
 					break;
 				case START_KEY:
-					activeChar = json.charAt(++index);
+					activeChar = jsonChars[++index];
 					currentKey = readString(ReadType.END_KEY, activeChar);
 					break;
 				case END_KEY:
@@ -144,10 +144,12 @@ public class JsonReader {
 		return document;
 	}
 
+
+
     private char getCharSkipWhiteSpace() {
-        char result = json.charAt(index);
+        char result = jsonChars[index];
         while (WHITE_SPACE_SET.contains(result)) {
-            result = json.charAt(++index);
+            result = jsonChars[++index];
         }
         return result;
     }
@@ -222,7 +224,7 @@ public class JsonReader {
             document = getNewDocument(ReadType.START_ARRAY);
             break;
         case QUOTATION_MARK:
-            activeChar = json.charAt(++index);
+            activeChar = jsonChars[++index];
             currentValue = readString(ReadType.END_VALUE, activeChar);
             break;
         case CHARACTER_F:
@@ -253,13 +255,12 @@ public class JsonReader {
                 document = getNewDocument(ReadType.START_OBJECT);
                 break;
             case SQUARE_BRACKET_LEFT:
-                // TODO: 12/28/17 (miro) implement + test
 				JsonDocumentWrapper arrayDocumentWrapper = new JsonDocumentWrapper(null, document);
 				stack.push(arrayDocumentWrapper);
 				document = getNewDocument(ReadType.START_ARRAY);
                 break;
             case QUOTATION_MARK:
-                activeChar = json.charAt(++index);
+                activeChar = jsonChars[++index];
                 String elementString = readString(ReadType.END_ARRAY_ELEMENT, activeChar);
                 document.add(elementString);
                 break;
@@ -327,7 +328,7 @@ public class JsonReader {
 			if (activeCharacter == DOT) {
 				isInteger = false;
 			}
-			activeCharacter = json.charAt(++index);
+			activeCharacter = jsonChars[++index];
 
 		} while (NUMBER_SET.contains(activeCharacter) || activeCharacter == DOT);
 		--index;
@@ -343,7 +344,7 @@ public class JsonReader {
 		sb.append(startCharacter);
 		char activeCharacter = startCharacter;
 		while (activeCharacter != CHARACTER_E) {
-			activeCharacter = json.charAt(++index);
+			activeCharacter = jsonChars[++index];
 			sb.append(activeCharacter);
 		}
 
@@ -358,7 +359,7 @@ public class JsonReader {
 	}
 
 	private void readCheckCurrentCharacterCompare(char compareCharacter) {
-		char ch = json.charAt(++index);
+		char ch = jsonChars[++index];
 		if (ch != compareCharacter) {
 			throw new RoboReflectException("not similar characters");
 		}
@@ -366,10 +367,10 @@ public class JsonReader {
 
 	private String readString(ReadType endType, char activeCharacter) {
 		StringBuilder sb = new StringBuilder();
-		while (activeCharacter != QUOTATION_MARK) {
+		do {
 			sb.append(activeCharacter);
-			activeCharacter = json.charAt(++index);
-		}
+			activeCharacter = jsonChars[++index];
+		} while (activeCharacter != QUOTATION_MARK);
 		currentRead = endType;
 		return sb.toString();
 	}
