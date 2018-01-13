@@ -12,13 +12,13 @@ import java.util.Objects;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class JsonDocument {
+public final class JsonDocument {
 
 	private final List<Object> array = new LinkedList<>();
 	private final Map<String, Object> map = new LinkedHashMap<>();
 	private final Type type;
 
-	public JsonDocument(Type type) {
+	JsonDocument(Type type) {
 		this.type = type;
 	}
 
@@ -44,10 +44,6 @@ public class JsonDocument {
 
 	public Type getType() {
 		return type;
-	}
-
-	public boolean isArray() {
-		return type.equals(Type.ARRAY);
 	}
 
 	@Override

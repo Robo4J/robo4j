@@ -6,20 +6,20 @@ import java.util.Objects;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class JsonDocumentWrapper {
+public final class JsonDocumentWrapper {
     private String name;
     private JsonDocument document;
 
-    public JsonDocumentWrapper(String name, JsonDocument document) {
+    JsonDocumentWrapper(String name, JsonDocument document) {
         this.name = name;
         this.document = document;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public JsonDocument getDocument() {
+    JsonDocument getDocument() {
         return document;
     }
 

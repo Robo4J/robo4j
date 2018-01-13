@@ -73,7 +73,7 @@ public class JsonCodecsTests {
 		obj1.setPersons(Arrays.asList(testPerson1, testPerson2));
 		obj1.setPersonMap(personMap);
 
-		long start = System.currentTimeMillis();
+		long start = System.nanoTime();
 		String json = collectionsTypesMessageCodec.encode(obj1);
 		System.out.println("duration: " + timeDiff(start));
 		System.out.println("JSON1: " + json);
@@ -108,7 +108,7 @@ public class JsonCodecsTests {
 		personMap.put("person2", testPerson2);
 
 		NSBWithSimpleCollectionsTypesMessage obj = collectionsTypesMessageCodec.decode(testJson);
-		long start = System.currentTimeMillis();
+		long start = System.nanoTime();
 		NSBWithSimpleCollectionsTypesMessage obj1 = collectionsTypesMessageCodec.decode(testJson);
 		System.out.println("duration " + timeDiff(start));
 
@@ -137,12 +137,12 @@ public class JsonCodecsTests {
 		String cameraJson0 = cameraMessageCodec.encode(cameraMessage);
 		CameraMessage codecCameraMessage0 = cameraMessageCodec.decode(cameraJson0);
 
-		long start = System.currentTimeMillis();
+		long start = System.nanoTime();
 		String cameraJson = cameraMessageCodec.encode(cameraMessage);
 		System.out.println("duration 1: " + timeDiff(start));
 		System.out.println("cameraJson: " + cameraJson);
 
-		start = System.currentTimeMillis();
+		start = System.nanoTime();
 		CameraMessage codecCameraMessage = cameraMessageCodec.decode(cameraJson);
 		System.out.println("duration 2: " + timeDiff(start));
 
@@ -151,6 +151,6 @@ public class JsonCodecsTests {
 	}
 
 	private long timeDiff(long start) {
-		return System.currentTimeMillis() - start;
+		return System.nanoTime() - start;
 	}
 }
