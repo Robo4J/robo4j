@@ -35,11 +35,23 @@ public class JsonReader {
 	private static final char CHARACTER_U = 'u';
 	private static final char CHARACTER_L = 'l';
 	private static final char CHARACTER_E = 'e';
+	private static final char CHARACTER_MINUS = '-';
 	private static final char CHARACTER_0 = '0';
+	private static final char CHARACTER_1 = '1';
+	private static final char CHARACTER_2 = '2';
+	private static final char CHARACTER_3 = '3';
+	private static final char CHARACTER_4 = '4';
+	private static final char CHARACTER_5 = '5';
+	private static final char CHARACTER_6 = '6';
+	private static final char CHARACTER_7 = '7';
+	private static final char CHARACTER_8 = '8';
 	private static final char CHARACTER_9 = '9';
 
 	private static final Set<Character> WHITE_SPACE_SET = new HashSet<>(
 			Arrays.asList(SPACE, NEW_LINE_MAC, NEW_LINE_UNIX, NEW_SPACE, NEW_TAB));
+	private static final Set<Character> NUMBER_SET = new HashSet<>(
+			Arrays.asList(CHARACTER_MINUS, CHARACTER_0, CHARACTER_1, CHARACTER_2, CHARACTER_3, CHARACTER_4, CHARACTER_5,
+					CHARACTER_6,CHARACTER_7, CHARACTER_8, CHARACTER_9, DOT));
 
 	private final char[] jsonChars;
 	private ReadType currentRead;
@@ -118,7 +130,6 @@ public class JsonReader {
 				break;
 			case START_KEY:
 				// reading element
-//				activeChar = jsonChars[++index];
 				currentKey = readString(ReadType.END_KEY);
 				break;
 			case END_KEY:
@@ -221,7 +232,6 @@ public class JsonReader {
 			currentKey = null;
 			break;
 		case QUOTATION_MARK:
-//			activeChar = jsonChars[++index];
 			currentValue = readString(ReadType.END_VALUE);
 			break;
 		case CHARACTER_F:
@@ -234,7 +244,7 @@ public class JsonReader {
 			currentRead = ReadType.END_VALUE;
 			break;
 		default:
-			if (activeChar >= CHARACTER_0 && activeChar <= CHARACTER_9) {
+			if (NUMBER_SET.contains(activeChar)) {
 				currentValue = readNumber(activeChar);
 				currentRead = ReadType.END_VALUE;
 				break;
@@ -267,14 +277,10 @@ public class JsonReader {
 			currentRead = ReadType.END_ARRAY_ELEMENT;
 			break;
 		default:
-			if (activeChar >= CHARACTER_0 && activeChar <= CHARACTER_9) {
-				Number elementNumber = readNumber(activeChar);
-				document.add(elementNumber);
-				currentRead = ReadType.END_ARRAY_ELEMENT;
-				break;
-			} else {
-				throw new RoboReflectException("wrong array element reading: " + activeChar);
-			}
+			Number elementNumber = readNumber(activeChar);
+			document.add(elementNumber);
+			currentRead = ReadType.END_ARRAY_ELEMENT;
+			break;
 		}
 	}
 
@@ -327,7 +333,7 @@ public class JsonReader {
 				isInteger = false;
 			}
 			activeCharacter = jsonChars[++index];
-		} while (activeCharacter >= CHARACTER_0 && activeCharacter <= CHARACTER_9 || activeCharacter == DOT);
+		} while (NUMBER_SET.contains(activeCharacter));
 		--index;
 		if (isInteger) {
 			return Integer.valueOf(sb.toString());

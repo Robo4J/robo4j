@@ -185,7 +185,7 @@ public class JsonReaderArrayTests {
         JsonReader parser = new JsonReader(jsonArrayOfArraysObjectsWithObjectWithArray);
         long start = System.nanoTime();
         JsonDocument document = parser.read();
-        System.out.println("duration: " + (System.nanoTime() - start));
+        TimeUtils.printTimeDiffNano("robo4j:", start);
 
         Assert.assertTrue(compareArrays(array1, document, 0));
         Assert.assertTrue(compareArrays(array2, document, 1));

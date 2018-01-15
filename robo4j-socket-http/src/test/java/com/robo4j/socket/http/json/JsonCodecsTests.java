@@ -75,7 +75,7 @@ public class JsonCodecsTests {
 
 		long start = System.nanoTime();
 		String json = collectionsTypesMessageCodec.encode(obj1);
-		System.out.println("duration: " + timeDiff(start));
+		TimeUtils.printTimeDiffNano("decodeFromJson", start);
 		System.out.println("JSON1: " + json);
 
 		Assert.assertTrue(testJson.equals(json));
@@ -110,7 +110,7 @@ public class JsonCodecsTests {
 		NSBWithSimpleCollectionsTypesMessage obj = collectionsTypesMessageCodec.decode(testJson);
 		long start = System.nanoTime();
 		NSBWithSimpleCollectionsTypesMessage obj1 = collectionsTypesMessageCodec.decode(testJson);
-		System.out.println("duration " + timeDiff(start));
+		TimeUtils.printTimeDiffNano("decodeFromJson", start);
 
 		Assert.assertTrue(obj1.getNumber() == 42);
 		Assert.assertTrue(obj1.getMessage().equals("no message"));
@@ -134,23 +134,25 @@ public class JsonCodecsTests {
 		cameraMessage.setType("jpg");
 		cameraMessage.setValue("22");
 
-		String cameraJson0 = cameraMessageCodec.encode(cameraMessage);
-		CameraMessage codecCameraMessage0 = cameraMessageCodec.decode(cameraJson0);
-
 		long start = System.nanoTime();
+		String cameraJson0 = cameraMessageCodec.encode(cameraMessage);
+		TimeUtils.printTimeDiffNano("cameraJson0", start);
+
+		start = System.nanoTime();
+		CameraMessage codecCameraMessage0 = cameraMessageCodec.decode(cameraJson0);
+		TimeUtils.printTimeDiffNano("decodeCameraMessage0", start);
+
+		start = System.nanoTime();
 		String cameraJson = cameraMessageCodec.encode(cameraMessage);
-		System.out.println("duration 1: " + timeDiff(start));
+		TimeUtils.printTimeDiffNano("decodeFromJson", start);
 		System.out.println("cameraJson: " + cameraJson);
 
 		start = System.nanoTime();
 		CameraMessage codecCameraMessage = cameraMessageCodec.decode(cameraJson);
-		System.out.println("duration 2: " + timeDiff(start));
+		TimeUtils.printTimeDiffNano("decodeFromJson", start);
 
 		Assert.assertTrue(cameraMessage.equals(codecCameraMessage));
 
 	}
 
-	private long timeDiff(long start) {
-		return System.nanoTime() - start;
-	}
 }
