@@ -17,6 +17,10 @@
 
 package com.robo4j.reflect;
 
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.util.StreamUtils;
+import com.robo4j.util.StringConstants;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,10 +35,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.util.StreamUtils;
-import com.robo4j.util.StringConstants;
 
 /**
  * Util class for reflection scan.
@@ -86,7 +86,7 @@ public final class ReflectionScan {
         String slashifyPackage = slashify(packageName);
         Enumeration<URL> resources = loader.getResources(slashifyPackage);
 
-        StreamUtils.enumerationAsStream(resources, false).map(url -> {
+        StreamUtils.streamOfEnumeration(resources, false).map(url -> {
             try {
                 String jarFile = url.getFile().split(EXCLAMATION)[0].replace(FILE, StringConstants.EMPTY);
                 if (new File(jarFile).isDirectory()) {
@@ -101,6 +101,7 @@ public final class ReflectionScan {
                 for (ZipEntry entry = e.getNextEntry(); entry != null; entry = e.getNextEntry()) {
                     if (!entry.isDirectory() && entry.getName().contains(slashifyPackage)
                             && entry.getName().endsWith(SUFFIX)) {
+
                         String cName = entry.getName().replace(SLASH, DOT).replace(SUFFIX, StringConstants.EMPTY);
                         classes.add(cName);
                     }
@@ -114,7 +115,7 @@ public final class ReflectionScan {
 
     private List<String> scanPackageOnDisk(ClassLoader loader, String packageName) throws IOException {
         Enumeration<URL> resources = loader.getResources(slashify(packageName));
-        return StreamUtils.enumerationAsStream(resources, false).map(URL::getFile).map(File::new)
+        return StreamUtils.streamOfEnumeration(resources, false).map(URL::getFile).map(File::new)
                 .map(f -> findClasses(f, packageName)).flatMap(List::stream).collect(Collectors.toList());
     }
 
@@ -125,14 +126,17 @@ public final class ReflectionScan {
     private List<String> findClassesIntern(File dir, String path) {
         List<String> result = new ArrayList<>();
         File[] files = dir.listFiles();
-        assert files != null;
+        Objects.requireNonNull(files, "files not allowed null");
         Stream.of(files).forEach(file -> {
             if (file.isDirectory()) {
-                assert !file.getName().contains(String.valueOf(DOT));
-                result.addAll(findClassesIntern(file, path + DOT + file.getName()));
+                result.addAll(findClassesIntern(file, new StringBuilder().append(path).append(DOT).append(file.getName()).toString()));
             } else if (file.getName().endsWith(SUFFIX)) {
-                String tmpPath = path.replace(File.separatorChar, DOT);
-                result.add(tmpPath + DOT + file.getName().substring(0, file.getName().length() - SUFFIX.length()));
+                final StringBuilder sb = new StringBuilder();
+                sb.append(path.replace(File.separatorChar, DOT))
+                    .append(DOT)
+                    .append(file.getName().substring(0, file.getName().length() - SUFFIX.length()));
+
+                result.add(sb.toString());
             }
         });
         return result;

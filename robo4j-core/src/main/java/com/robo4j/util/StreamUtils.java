@@ -37,9 +37,20 @@ import java.util.stream.StreamSupport;
 public final class StreamUtils {
 	private static final int CONTENT_END = -1;
 
-	public static <Type> Stream<Type> enumerationAsStream(Enumeration<Type> e, boolean parallel) {
-		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<Type>() {
-			public Type next() {
+	/**
+	 * convert Enumeration to the Stream
+	 * 
+	 * @param e
+	 *            enumeration of element E
+	 * @param parallel
+	 *            parallel
+	 * @param <E>
+	 *            element instance
+	 * @return stream of elements E
+	 */
+	public static <E> Stream<E> streamOfEnumeration(Enumeration<E> e, boolean parallel) {
+		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<E>() {
+			public E next() {
 				return e.nextElement();
 			}
 
@@ -49,6 +60,41 @@ public final class StreamUtils {
 		}, Spliterator.ORDERED), parallel);
 	}
 
+	/**
+	 * convert iterable to the stream
+	 * 
+	 * @param iterable
+	 *            iterable of element E
+	 * @param parallel
+	 *            parallel
+	 * @param <E>
+	 *            element instance
+	 * @return Stream of elements
+	 */
+	public static <E> Stream<E> streamOf(Iterable<E> iterable, boolean parallel) {
+		return StreamSupport.stream(iterable.spliterator(), parallel);
+	}
+
+	/**
+	 * convert stream to iterable
+	 * 
+	 * @param stream
+	 *            stream of element E
+	 * @param <E>
+	 *            element instance
+	 * @return iterable of elements E
+	 */
+	public static <E> Iterable<E> iterableOf(Stream<E> stream) {
+		return stream::iterator;
+	}
+
+	/**
+	 * converting input stream to byte array
+	 * 
+	 * @param inputStream
+	 *            input stream
+	 * @return byte array
+	 */
 	public static byte[] inputStreamToByteArray(InputStream inputStream) {
 		try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 			int imageCh;
@@ -58,7 +104,7 @@ public final class StreamUtils {
 			inputStream.close();
 			baos.flush();
 			return baos.toByteArray();
-		} catch (Exception e){
+		} catch (Exception e) {
 			SimpleLoggingUtil.error(StreamUtils.class, e.getMessage());
 			return new byte[0];
 		}
