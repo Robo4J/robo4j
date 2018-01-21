@@ -61,8 +61,15 @@ public final class ReflectUtils {
 					.forEach(e -> {
 						try {
 							ClassGetSetDTO value = e.getValue();
-							value.getSetMethod().invoke(instance,
-									adjustRoboJsonDocumentCast(value, jsonDocument, e.getKey()));
+							if(value.getValueClass().isEnum()){
+								value.getSetMethod().invoke(instance,
+										extractEnumConstant(jsonDocument.getKey(e.getKey()).toString(),
+												(Enum<?>[]) value.getValueClass().getEnumConstants()));
+							} else {
+								value.getSetMethod().invoke(instance,
+										adjustRoboJsonDocumentCast(value, jsonDocument, e.getKey()));
+
+							}
 						} catch (Exception e1) {
 							throw new RoboReflectException("create instance field", e1);
 						}
@@ -72,6 +79,15 @@ public final class ReflectUtils {
 			throw new RoboReflectException("create instance with setter", e);
 		}
 
+	}
+
+	private static Object extractEnumConstant(String name, Enum<?>[] constants){
+		for(Enum<?> constant: constants){
+			if(constant.name().equals(name)){
+				return constant;
+			}
+		}
+		return null;
 	}
 
 	/**

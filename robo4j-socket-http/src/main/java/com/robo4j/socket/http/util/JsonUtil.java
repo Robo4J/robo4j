@@ -75,7 +75,7 @@ public final class JsonUtil {
 
 	@SuppressWarnings(value = "unchecked")
 	public static String getJsonByMap(Map<String, Object> map) {
-		StringBuilder sb = new StringBuilder(UTF8_CURLY_BRACKET_LEFT);
+		final StringBuilder sb = new StringBuilder(UTF8_CURLY_BRACKET_LEFT);
 		sb.append(map.entrySet().stream().map(e -> {
 			StringBuilder sb2 = new StringBuilder(UTF8_QUOTATION_MARK).append(e.getKey()).append(UTF8_QUOTATION_MARK)
 					.append(UTF8_COLON);
@@ -107,9 +107,9 @@ public final class JsonUtil {
 		for (int i = 0; i < parts.length - 1; i += 2) {
 			String keyPart = parts[i].trim();
 			String valuePart = parts[i + 1].trim();
-			if (valuePart.startsWith("{")) {
+			if (valuePart.startsWith(UTF8_CURLY_BRACKET_LEFT)) {
 				result.put(keyPart, getMapByJson(valuePart));
-			} else if (valuePart.startsWith("[")) {
+			} else if (valuePart.startsWith(UTF8_SQUARE_BRACKET_LEFT)) {
 				Object[] preArray = valuePart.replaceAll("^\\[\\s*|\\s*\\]$", StringConstants.EMPTY).split(UTF8_COMMA);
 				result.put(keyPart,
 						Stream.of(preArray).map(JsonUtil::parseJsonStringToObject).collect(Collectors.toList()));

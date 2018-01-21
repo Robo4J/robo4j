@@ -19,7 +19,6 @@ package com.robo4j.socket.http.units;
 
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.socket.http.util.HttpPathUtils;
 
@@ -66,11 +65,14 @@ public final class HttpUriRegister {
 	/**
 	 * register requested pathe with method
 	 *
-	 * @param path uri path
-	 * @param method used http method
+	 * @param path
+	 *            uri path
+	 * @param method
+	 *            used http method
 	 */
 	public void addUnitPathNode(String path, String method) {
-		final String tmpPath = SOLIDUS.concat(PATH_UNITS).concat(SOLIDUS).concat(path);
+		final String tmpPath = new StringBuilder().append(SOLIDUS).append(PATH_UNITS).append(SOLIDUS).append(path)
+				.toString();
 		if (pathMethods.containsKey(tmpPath)) {
 			pathMethods.get(tmpPath).addMethod(method);
 		} else {
@@ -78,33 +80,17 @@ public final class HttpUriRegister {
 		}
 	}
 
-	/**
-	 * register RoboUnit to the Uri path
-	 *
-	 * @param path uri path
-	 * @param unit unit responsible for this uri
-	 */
-	public void addUnitToNode(String path, RoboReference<?> unit) {
-		final String tmpPath = SOLIDUS.concat(PATH_UNITS).concat(SOLIDUS).concat(path);
-		if (pathMethods.containsKey(tmpPath)) {
-			pathMethods.get(tmpPath).setUnit(unit);
-		} else {
-			SimpleLoggingUtil.error(getClass(), "there is not path: " + path);
-		}
-	}
-
-
 	public void updateUnits(RoboContext context) {
 		pathMethods.forEach((key, value) -> {
 			final List<String> paths = HttpPathUtils.uriStringToPathList(key);
 			SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_VALUE_0));
-			if(systemPath != null){
+			if (systemPath != null) {
 				// FIXME: 18.09.17 (miro) -> improve
-				switch (systemPath){
-					case UNITS:
-						final RoboReference<?> roboUnit = getRoboUnitById(context, paths.get(DEFAULT_VALUE_1));
-						value.setUnit(roboUnit);
-						break;
+				switch (systemPath) {
+				case UNITS:
+					final RoboReference<?> roboUnit = getRoboUnitById(context, paths.get(DEFAULT_VALUE_1));
+					value.setUnit(roboUnit);
+					break;
 				default:
 					throw new IllegalArgumentException("Unsupported path " + systemPath);
 				}
@@ -112,12 +98,9 @@ public final class HttpUriRegister {
 		});
 	}
 
-	public RoboUriInfo getMethodsBytPath(String path) {
-		return pathMethods.get(SOLIDUS.concat(path));
-	}
-
 	public RoboReference<?> getRoboUnitByPath(String path) {
-		final RoboUriInfo uri = pathMethods.get(SOLIDUS.concat(SystemPath.UNITS.getPath()).concat(SOLIDUS).concat(path));
+		final RoboUriInfo uri = pathMethods
+				.get(SOLIDUS.concat(SystemPath.UNITS.getPath()).concat(SOLIDUS).concat(path));
 		return uri != null ? uri.getUnit() : null;
 	}
 

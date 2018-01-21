@@ -21,7 +21,6 @@ import com.robo4j.AttributeDescriptor;
 import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.codec.CameraMessage;
 
 import java.util.Base64;
@@ -43,7 +42,6 @@ public class CameraImageConsumerTestUnit extends RoboUnit<CameraMessage> {
 
 	public CameraImageConsumerTestUnit(RoboContext context, String id) {
 		super(CameraMessage.class, context, id);
-		System.out.println(getClass() + " Constructor");
 	}
 
 	@Override
@@ -53,7 +51,7 @@ public class CameraImageConsumerTestUnit extends RoboUnit<CameraMessage> {
 			System.out.println(getClass().getSimpleName() + " Delivered image: " + counter.incrementAndGet() + " size: "
 					+ bytes.length + " imageSize: " + message.getImage().length());
 		} else {
-			SimpleLoggingUtil.error(getClass(), "no imageView: " + counter.getAndIncrement());
+			throw new IllegalStateException("no image view");
 		}
 	}
 

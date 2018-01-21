@@ -17,7 +17,16 @@
 
 package com.robo4j.socket.http.util;
 
+import com.robo4j.socket.http.dto.ClassGetSetDTO;
+import com.robo4j.socket.http.dto.ServerPathDTO;
+import com.robo4j.socket.http.json.JsonDocument;
+import com.robo4j.socket.http.json.JsonReader;
+import com.robo4j.socket.http.units.ServerPathConfig;
+import com.robo4j.socket.http.units.ServerPathMethod;
+
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,6 +52,45 @@ public final class HttpPathUtils {
 
 	public static String pathsToUri(List<String> paths) {
 		return paths.stream().collect(Collectors.joining(HttpMessageUtils.getHttpSeparator(SEPARATOR_PATH)));
+	}
+
+
+
+
+	/**
+	 * parse json string to mutable path properties
+	 * @param configurationJson configuration json
+	 * @return return server path dto with method and possible properties
+	 */
+	public static ServerPathDTO readServerPathDTO(String configurationJson){
+		Class<ServerPathDTO> clazz = ServerPathDTO.class;
+		Map<String, ClassGetSetDTO> descriptorMap = ReflectUtils.getFieldsTypeMap(clazz);
+		JsonReader jsonReader = new JsonReader(configurationJson);
+		JsonDocument document = jsonReader.read();
+		return ReflectUtils.createInstanceByClazzAndDescriptorAndJsonDocument(clazz,
+				descriptorMap, document);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static ServerPathConfig readHttpServerPathConfig(String configurationJson){
+		Class<ServerPathDTO> clazz = ServerPathDTO.class;
+		Map<String, ClassGetSetDTO> descriptorMap = ReflectUtils.getFieldsTypeMap(clazz);
+		JsonReader jsonReader = new JsonReader(configurationJson);
+		JsonDocument document = jsonReader.read();
+
+		List<ServerPathMethod> serverPathMethods = document.getArray().stream()
+				.map(JsonDocument.class::cast)
+				.map(e -> ReflectUtils.createInstanceByClazzAndDescriptorAndJsonDocument(clazz,
+						descriptorMap, e))
+				.map(HttpPathUtils::toServerPathMethod)
+				.collect(Collectors.toCollection(LinkedList::new));
+
+		return new ServerPathConfig(serverPathMethods);
+	}
+
+
+	public static ServerPathMethod toServerPathMethod(ServerPathDTO dto){
+		return new ServerPathMethod(dto.getRoboUnit(), dto.getMethod(), dto.getFilters());
 	}
 
 }

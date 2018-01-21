@@ -42,6 +42,7 @@ import static com.robo4j.socket.http.util.ChannelBufferUtils.INIT_BUFFER_CAPACIT
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_TARGETS;
+import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
 
 /**
  * Http NIO unit allows to configure format of the requests currently is only
@@ -55,7 +56,10 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	public static final String CODEC_PACKAGES_CODE = "packages";
 	private final HttpCodecRegistry codecRegistry = new HttpCodecRegistry();
 	private final PropertiesProvider propertiesProvider = new PropertiesProvider();
+
+	@Deprecated
 	private List<String> targets;
+	private ServerPathConfig serverPathConfig;
 	private InboundSocketHandler inboundSocketHandler;
 
 	public HttpServerUnit(RoboContext context, String id) {
@@ -69,7 +73,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 		String packages = configuration.getString(CODEC_PACKAGES_CODE, null);
 		if (validatePackages(packages)) {
-			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(","));
+			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(UTF8_COMMA));
 		}
 
 		String configTarget = configuration.getString(HTTP_TARGETS, StringConstants.EMPTY);
@@ -80,6 +84,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			Map<String, Object> targetUnitsMap = JsonUtil.getMapByJson(configTarget);
 			targets = extractTargetUnits(targetUnitsMap);
 		}
+
+		String serverPathConfig = configuration.getString("serverPaths", StringConstants.EMPTY);
+
 
 		propertiesProvider.put(HTTP_PROPERTY_BUFFER_CAPACITY, bufferCapacity);
 		propertiesProvider.put(HTTP_PROPERTY_PORT, port);
