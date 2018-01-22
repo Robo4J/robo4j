@@ -3,6 +3,7 @@ package com.robo4j.socket.http.dto;
 import com.robo4j.socket.http.HttpMethod;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -15,6 +16,17 @@ public class ServerPathDTO {
     private List<String> filters;
 
     public ServerPathDTO() {
+    }
+
+    public ServerPathDTO(String roboUnit, HttpMethod method) {
+        this.roboUnit = roboUnit;
+        this.method = method;
+    }
+
+    public ServerPathDTO(String roboUnit, HttpMethod method, List<String> filters) {
+        this.roboUnit = roboUnit;
+        this.method = method;
+        this.filters = filters;
     }
 
     public String getRoboUnit() {
@@ -39,6 +51,22 @@ public class ServerPathDTO {
 
     public void setFilters(List<String> filters) {
         this.filters = filters;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ServerPathDTO that = (ServerPathDTO) o;
+        return Objects.equals(roboUnit, that.roboUnit) &&
+                method == that.method &&
+                Objects.equals(filters, that.filters);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(roboUnit, method, filters);
     }
 
     @Override

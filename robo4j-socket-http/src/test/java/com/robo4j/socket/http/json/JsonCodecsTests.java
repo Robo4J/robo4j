@@ -1,10 +1,18 @@
 package com.robo4j.socket.http.json;
 
+import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.codec.CameraMessageCodec;
+import com.robo4j.socket.http.codec.NSBETypesAndCollectionTestMessageCodec;
+import com.robo4j.socket.http.codec.NSBETypesTestMessageCodec;
 import com.robo4j.socket.http.codec.NSBWithSimpleCollectionsTypesMessageCodec;
+import com.robo4j.socket.http.codec.ServerPathDTOCodec;
+import com.robo4j.socket.http.dto.ServerPathDTO;
+import com.robo4j.socket.http.units.test.codec.NSBETypesAndCollectionTestMessage;
+import com.robo4j.socket.http.units.test.codec.NSBETypesTestMessage;
 import com.robo4j.socket.http.units.test.codec.NSBWithSimpleCollectionsTypesMessage;
 import com.robo4j.socket.http.units.test.codec.TestPerson;
+import com.robo4j.socket.http.units.test.enums.TestCommandEnum;
 import com.robo4j.util.StreamUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,13 +38,78 @@ public class JsonCodecsTests {
 			+ "\"child\":{\"name\":\"name111\",\"value\":42}}},\"person2\":{\"name\":\"name2\",\"value\":5}}}";
 
 	private NSBWithSimpleCollectionsTypesMessageCodec collectionsTypesMessageCodec;
+	private NSBETypesTestMessageCodec enumTypesMessageCodec;
+	private NSBETypesAndCollectionTestMessageCodec collectionEnumTypesMessageCodec;
 	private CameraMessageCodec cameraMessageCodec;
+	private ServerPathDTOCodec serverPathDTOCodec;
 
 	@Before
 	public void setUp() {
 		collectionsTypesMessageCodec = new NSBWithSimpleCollectionsTypesMessageCodec();
+		enumTypesMessageCodec = new NSBETypesTestMessageCodec();
+		collectionEnumTypesMessageCodec = new NSBETypesAndCollectionTestMessageCodec();
 		cameraMessageCodec = new CameraMessageCodec();
+		serverPathDTOCodec = new ServerPathDTOCodec();
 	}
+
+	@Test
+	public void encodeServerPathDTOMessageNoFilterTest(){
+		String expectedJson = "{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\"}";
+		ServerPathDTO message = new ServerPathDTO();
+		message.setRoboUnit("roboUnit1");
+		message.setMethod(HttpMethod.GET);
+
+		String resultJson = serverPathDTOCodec.encode(message);
+		ServerPathDTO decodedMessage = serverPathDTOCodec.decode(resultJson);
+
+		System.out.println("resultJson: " + resultJson);
+		System.out.println("decodedMessage: " + decodedMessage);
+
+		Assert.assertTrue(expectedJson.equals(resultJson));
+		Assert.assertTrue(message.equals(decodedMessage));
+	}
+
+	@Test
+	public void encodeMessageWithEnumTypeTest(){
+		String expectedJson = "{\"number\":42,\"message\":\"enum type 1\",\"active\":true,\"command\":\"MOVE\"}";
+		NSBETypesTestMessage message = new NSBETypesTestMessage();
+		message.setNumber(42);
+		message.setMessage("enum type 1");
+		message.setActive(true);
+		message.setCommand(TestCommandEnum.MOVE);
+
+		String resultJson = enumTypesMessageCodec.encode(message);
+		NSBETypesTestMessage decodedMessage = enumTypesMessageCodec.decode(resultJson);
+
+		System.out.println("resultJson: " + resultJson);
+		System.out.println("decodedMessage: " + decodedMessage);
+		Assert.assertNotNull(resultJson);
+		Assert.assertTrue(expectedJson.equals(resultJson));
+		Assert.assertTrue(message.equals(decodedMessage));
+	}
+
+	@Test
+	public void encodeMessageWithEnumCollectionTypeTest(){
+
+		String expectedJson = "{\"number\":42,\"message\":\"enum type 1\",\"active\":true,\"command\":\"MOVE\",\"commands\":[\"MOVE\",\"STOP\",\"BACK\"]}";
+		NSBETypesAndCollectionTestMessage message = new NSBETypesAndCollectionTestMessage();
+		message.setNumber(42);
+		message.setMessage("enum type 1");
+		message.setActive(true);
+		message.setCommand(TestCommandEnum.MOVE);
+		message.setCommands(Arrays.asList(TestCommandEnum.MOVE, TestCommandEnum.STOP, TestCommandEnum.BACK));
+
+		String resultJson = collectionEnumTypesMessageCodec.encode(message);
+		NSBETypesAndCollectionTestMessage decodeMessage = collectionEnumTypesMessageCodec.decode(expectedJson);
+
+		System.out.println("resultJson: " + resultJson);
+		System.out.println("decodeMessage: " + decodeMessage);
+		Assert.assertNotNull(resultJson);
+		Assert.assertTrue(expectedJson.equals(resultJson));
+		Assert.assertTrue(message.equals(decodeMessage));
+	}
+
+
 
 	@Test
 	public void nestedObjectToJson() {

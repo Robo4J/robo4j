@@ -17,16 +17,15 @@
 
 package com.robo4j.socket.http.util;
 
-import com.robo4j.socket.http.dto.ClassGetSetDTO;
 import com.robo4j.socket.http.dto.ServerPathDTO;
 import com.robo4j.socket.http.json.JsonDocument;
 import com.robo4j.socket.http.json.JsonReader;
 import com.robo4j.socket.http.units.ServerPathConfig;
 import com.robo4j.socket.http.units.ServerPathMethod;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -54,9 +53,6 @@ public final class HttpPathUtils {
 		return paths.stream().collect(Collectors.joining(HttpMessageUtils.getHttpSeparator(SEPARATOR_PATH)));
 	}
 
-
-
-
 	/**
 	 * parse json string to mutable path properties
 	 * @param configurationJson configuration json
@@ -64,30 +60,28 @@ public final class HttpPathUtils {
 	 */
 	public static ServerPathDTO readServerPathDTO(String configurationJson){
 		Class<ServerPathDTO> clazz = ServerPathDTO.class;
-		Map<String, ClassGetSetDTO> descriptorMap = ReflectUtils.getFieldsTypeMap(clazz);
 		JsonReader jsonReader = new JsonReader(configurationJson);
 		JsonDocument document = jsonReader.read();
-		return ReflectUtils.createInstanceByClazzAndDescriptorAndJsonDocument(clazz,
-				descriptorMap, document);
+		return ReflectUtils.createInstanceByClazzAndDescriptorAndJsonDocument(clazz, document);
 	}
 
 	@SuppressWarnings("unchecked")
 	public static ServerPathConfig readHttpServerPathConfig(String configurationJson){
-		Class<ServerPathDTO> clazz = ServerPathDTO.class;
-		Map<String, ClassGetSetDTO> descriptorMap = ReflectUtils.getFieldsTypeMap(clazz);
-		JsonReader jsonReader = new JsonReader(configurationJson);
-		JsonDocument document = jsonReader.read();
+		if(configurationJson == null || configurationJson.isEmpty()){
+			return new ServerPathConfig(Collections.emptyList());
+		}
+		final Class<ServerPathDTO> clazz = ServerPathDTO.class;
+		final JsonReader jsonReader = new JsonReader(configurationJson);
+		final JsonDocument document = jsonReader.read();
 
-		List<ServerPathMethod> serverPathMethods = document.getArray().stream()
+		final List<ServerPathMethod> serverPathMethods = document.getArray().stream()
 				.map(JsonDocument.class::cast)
-				.map(e -> ReflectUtils.createInstanceByClazzAndDescriptorAndJsonDocument(clazz,
-						descriptorMap, e))
+				.map(e -> ReflectUtils.createInstanceByClazzAndDescriptorAndJsonDocument(clazz, e))
 				.map(HttpPathUtils::toServerPathMethod)
 				.collect(Collectors.toCollection(LinkedList::new));
 
 		return new ServerPathConfig(serverPathMethods);
 	}
-
 
 	public static ServerPathMethod toServerPathMethod(ServerPathDTO dto){
 		return new ServerPathMethod(dto.getRoboUnit(), dto.getMethod(), dto.getFilters());

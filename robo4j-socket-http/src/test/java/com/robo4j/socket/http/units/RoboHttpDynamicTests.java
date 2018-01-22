@@ -33,8 +33,8 @@ import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpDenominator;
 import com.robo4j.socket.http.util.HttpMessageBuilder;
+import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
 import com.robo4j.socket.http.util.HttpPathUtils;
-import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RequestDenominator;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.SystemUtil;
@@ -42,7 +42,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -137,9 +136,10 @@ public class RoboHttpDynamicTests {
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		config.setString("packages", "com.robo4j.socket.http.units.test.codec");
-		config.setString(RoboHttpUtils.HTTP_TARGETS,
-				JsonUtil.getJsonByMap(Collections.singletonMap(ID_TARGET_UNIT, HTTP_METHOD)));
+		config.setString(RoboHttpUtils.HTTP_PATHS_CONFIG,
+				HttpPathConfigJsonBuilder.Builder().addPath(ID_TARGET_UNIT, HttpMethod.POST).build());
 		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
+
 
 		config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("target", REQUEST_CONSUMER);
@@ -167,8 +167,8 @@ public class RoboHttpDynamicTests {
 		config.setString("address", HOST_SYSTEM);
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		/* specific configuration */
-		config.setString(RoboHttpUtils.HTTP_TARGETS,
-				JsonUtil.getJsonByMap(Collections.singletonMap(ID_TARGET_UNIT, HTTP_METHOD)));
+		config.setString(RoboHttpUtils.HTTP_PATHS_CONFIG,
+				HttpPathConfigJsonBuilder.Builder().addPath(ID_TARGET_UNIT, HttpMethod.POST).build());
 		builder.add(HttpClientUnit.class, config, ID_CLIENT_UNIT);
 
 		RoboContext result = builder.build();

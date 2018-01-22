@@ -1,6 +1,7 @@
 package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.json.JsonBooleanAdapter;
+import com.robo4j.socket.http.json.JsonEnumAdapter;
 import com.robo4j.socket.http.json.JsonNumberAdapter;
 import com.robo4j.socket.http.json.JsonStringAdapter;
 import com.robo4j.socket.http.json.JsonTypeAdapter;
@@ -36,6 +37,7 @@ public enum TypeMapper {
     DOUBLE          (Double.class, Double.class, (Object o) -> Double.valueOf(o.toString()),  new JsonNumberAdapter()),
     DOUBLE_PRIM     (double.class, Double.class, (Object o) -> Double.valueOf(o.toString()),  new JsonNumberAdapter()),
     STRING          (String.class, String.class, String::valueOf, new JsonStringAdapter()),
+	ENUM			(Enum.class, String.class, (Object e) -> ((Enum<?>)e).name(), new JsonEnumAdapter()),
     ;
     //@formatter:on
 

@@ -29,7 +29,7 @@ import static com.robo4j.socket.http.provider.DefaultValuesProvider.BASIC_HEADER
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class HttpMessageBuilderTest {
+public class HttpMessageBuilderTests {
 
 	@Test
 	public void getRequestTest() {

@@ -46,25 +46,36 @@ public final class ReflectUtils {
 	private static final Map<Class<?>, JsonTypeAdapter> clazzAdapter = new HashMap<>();
 
 
-	public static <T> T createInstanceSetterByRoboJsonDocument(Class<T> clazz, JsonDocument jsonDocument) {
-		final Map<String, ClassGetSetDTO> descriptorMap = getFieldsTypeMap(clazz);
-		return createInstanceByClazzAndDescriptorAndJsonDocument(clazz, descriptorMap, jsonDocument);
-
-	}
-
 	@SuppressWarnings("unchecked")
-	public static <T> T createInstanceByClazzAndDescriptorAndJsonDocument(Class<T> clazz,
-			Map<String, ClassGetSetDTO> descriptorMap, JsonDocument jsonDocument) {
+	public static <T> T createInstanceByClazzAndDescriptorAndJsonDocument(Class<T> clazz, JsonDocument jsonDocument) {
 		try {
 			Object instance = clazz.newInstance();
-			descriptorMap.entrySet().stream().filter(e -> Objects.nonNull(jsonDocument.getKey(e.getKey())))
+
+			getFieldsTypeMap(clazz).entrySet().stream().filter(e -> Objects.nonNull(jsonDocument.getKey(e.getKey())))
 					.forEach(e -> {
 						try {
 							ClassGetSetDTO value = e.getValue();
 							if(value.getValueClass().isEnum()){
-								value.getSetMethod().invoke(instance,
-										extractEnumConstant(jsonDocument.getKey(e.getKey()).toString(),
-												(Enum<?>[]) value.getValueClass().getEnumConstants()));
+								if(e.getValue().getCollection() != null){
+									switch (e.getValue().getCollection()){
+										case LIST:
+											List<Enum<?>> enumList = ((JsonDocument)jsonDocument.getKey(e.getKey())).getArray().stream()
+													.map(el -> extractEnumConstant(el.toString(),
+															(Enum<?>[]) value.getValueClass().getEnumConstants()))
+													.collect(Collectors.toCollection(LinkedList::new));
+											value.getSetMethod().invoke(instance, enumList);
+											break;
+										case MAP:
+											break;
+										default:
+											throw new IllegalStateException("not allowed");
+									}
+								} else {
+									value.getSetMethod().invoke(instance,
+											extractEnumConstant(jsonDocument.getKey(e.getKey()).toString(),
+													(Enum<?>[]) value.getValueClass().getEnumConstants()));
+								}
+
 							} else {
 								value.getSetMethod().invoke(instance,
 										adjustRoboJsonDocumentCast(value, jsonDocument, e.getKey()));
@@ -81,7 +92,7 @@ public final class ReflectUtils {
 
 	}
 
-	private static Object extractEnumConstant(String name, Enum<?>[] constants){
+	private static Enum<?> extractEnumConstant(String name, Enum<?>[] constants){
 		for(Enum<?> constant: constants){
 			if(constant.name().equals(name)){
 				return constant;
@@ -90,24 +101,18 @@ public final class ReflectUtils {
 		return null;
 	}
 
-	/**
-	 * translate Object to proper JSON string
-	 *
-	 * @param getterDTO class descriptor
-	 * @param obj described object
-	 * @return json string
-	 */
-	public static String getJsonValue(ClassGetSetDTO getterDTO, Object obj) {
+	private static String getJsonValue(ClassGetSetDTO getterDTO, Object obj) {
 		try {
 			Object value = getterDTO.getGetMethod().invoke(obj);
-			TypeMapper typeMapper = TypeMapper.getBySource(getterDTO.getValueClass());
+			Class<?> clazz = getterDTO.getValueClass().isEnum() ? Enum.class : getterDTO.getValueClass();
+			TypeMapper typeMapper = TypeMapper.getBySource(clazz);
 			if(value == null){
 				return null;
 			} else if(getterDTO.getCollection() == null && typeMapper != null){
 				JsonTypeAdapter adapter = typeMapper.getAdapter();
 				return adapter.adapt(value);
 			}
-			return processCollectionToJson(getterDTO, value);
+			return processCollectionToJson(getterDTO, typeMapper, value);
 		} catch (Exception e) {
 			throw new RoboReflectException("object getter value: " + getterDTO + " obj: " + obj, e);
 		}
@@ -304,16 +309,17 @@ public final class ReflectUtils {
 		}).collect(Collectors.toMap(ClassGetSetDTO::getName, e -> e, (e1, e2) -> e1, LinkedHashMap::new));
 	}
 
-	private static JsonTypeAdapter getAdapterByClazz(Class<?> clazz){
-		TypeMapper typeMapper = TypeMapper.getBySource(clazz);
+	private static JsonTypeAdapter getAdapterByClazz(Class<?> clazz, TypeMapper mapper){
+		TypeMapper typeMapper = mapper != null ? mapper : TypeMapper.getBySource(clazz);
 		return typeMapper == null ? getJsonTypeAdapter(clazz) :
 				typeMapper.getAdapter();
 	}
 
+
 	@SuppressWarnings("unchecked")
-	private static String processCollectionToJson(ClassGetSetDTO getterDTO, Object obj) {
+	private static String processCollectionToJson(ClassGetSetDTO getterDTO, TypeMapper typeMapper, Object obj) {
 		JsonElementStringBuilder result = JsonElementStringBuilder.Builder();
-		JsonTypeAdapter jsonTypeAdapter = getAdapterByClazz(getterDTO.getValueClass());
+		JsonTypeAdapter jsonTypeAdapter = getAdapterByClazz(getterDTO.getValueClass(), typeMapper);
 		switch (getterDTO.getCollection()) {
 			case ARRAY:
 				Object[] arrayObjects = (Object[]) obj;

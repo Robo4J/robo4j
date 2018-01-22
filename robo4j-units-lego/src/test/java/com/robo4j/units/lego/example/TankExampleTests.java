@@ -17,19 +17,17 @@
 
 package com.robo4j.units.lego.example;
 
-import com.robo4j.socket.http.util.JsonUtil;
-import org.junit.Test;
-
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.units.HttpServerUnit;
+import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.units.lego.LcdTestUnit;
 import com.robo4j.units.lego.SimpleTankTestUnit;
-
-import java.util.Collections;
+import org.junit.Test;
 
 /**
  * Simple Tanks examples tests
@@ -56,9 +54,8 @@ public class TankExampleTests {
 		config.setString("target", ID_UNIT_CONTROLLER);
 		config.setInteger("port", PORT);
 		config.setString("packages", "com.robo4j.units.lego.example.codec");
-		config.setString(RoboHttpUtils.HTTP_TARGETS,
-				JsonUtil.getJsonByMap(Collections.singletonMap(ID_UNIT_CONTROLLER, "GET")));
-
+		config.setString(RoboHttpUtils.HTTP_PATHS_CONFIG,
+				HttpPathConfigJsonBuilder.Builder().addPath(ID_UNIT_CONTROLLER, HttpMethod.GET).build());
 		builder.add(HttpServerUnit.class, config, ID_HTTP);
 
 		config = ConfigurationFactory.createEmptyConfiguration();

@@ -1,11 +1,8 @@
-package com.robo4j.socket.http.dto;
+package com.robo4j.socket.http.units;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class FieldMethodDTO {
-
-
-
+public class HttpServerContext {
 }

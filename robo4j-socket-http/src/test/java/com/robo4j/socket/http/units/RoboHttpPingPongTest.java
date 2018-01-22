@@ -23,11 +23,12 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import com.robo4j.socket.http.units.test.HttpStringProducer;
 import com.robo4j.socket.http.units.test.StringConsumer;
+import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
 import com.robo4j.socket.http.util.HttpPathUtils;
-import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
@@ -35,9 +36,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PATHS_CONFIG;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 
@@ -124,9 +125,13 @@ public class RoboHttpPingPongTest {
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		config.setString("packages", PACKAGE_CODECS);
-		/* specific configuration */
-		config.setString(RoboHttpUtils.HTTP_TARGETS,
-				JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, HTTP_POST_METHOD)));
+		/* server path configuration */
+
+		final HttpPathConfigJsonBuilder pathBuilder = HttpPathConfigJsonBuilder.Builder()
+				.addPath("controller", HttpMethod.POST);
+
+		config.setString(HTTP_PATHS_CONFIG, pathBuilder.build());
+
 		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
 		builder.add(StringConsumer.class, REQUEST_CONSUMER);
 
@@ -145,8 +150,9 @@ public class RoboHttpPingPongTest {
 		config.setString("address", HOST_SYSTEM);
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		/* specific configuration */
-		config.setString(RoboHttpUtils.HTTP_TARGETS,
-				JsonUtil.getJsonByMap(Collections.singletonMap(CONTROLLER_PING_PONG, HTTP_POST_METHOD)));
+		config.setString(RoboHttpUtils.HTTP_PATHS_CONFIG,
+				HttpPathConfigJsonBuilder.Builder().addPath(CONTROLLER_PING_PONG, HttpMethod.POST).build());
+
 		builder.add(HttpClientUnit.class, config, ID_HTTP_CLIENT);
 
 		config = ConfigurationFactory.createEmptyConfiguration();

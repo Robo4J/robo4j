@@ -59,8 +59,24 @@ public class HttpServerConfigTests {
 
 	}
 
+    @Test
+    public void serverConfigurationNullPathTest(){
+        ServerPathConfig serverPathConfig = HttpPathUtils.readHttpServerPathConfig(null);
+        Assert.assertNotNull(serverPathConfig);
+        Assert.assertTrue(serverPathConfig.asList().isEmpty());
+
+    }
+
 	@Test
-    public void serverConfigurationWithMultiplePathsWithoutPropertiesDTOTest(){
+    public void serverConfigurationEmptyPathTest(){
+        ServerPathConfig serverPathConfig = HttpPathUtils.readHttpServerPathConfig(StringConstants.EMPTY);
+        Assert.assertNotNull(serverPathConfig);
+        Assert.assertTrue(serverPathConfig.asList().isEmpty());
+
+    }
+
+	@Test
+    public void serverConfigurationWithMultiplePathsWithoutPropertiesTest(){
         String configurationJson = "[{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\"}," +
                 "{\"roboUnit\":\"roboUnit2\",\"method\":\"POST\"}]";
 
@@ -68,7 +84,7 @@ public class HttpServerConfigTests {
                 new ServerPathMethod("roboUnit2", HttpMethod.POST));
 
         ServerPathConfig serverPathConfig = HttpPathUtils.readHttpServerPathConfig(configurationJson);
-        List<ServerPathMethod> pathList = serverPathConfig.getPathConfigs();
+        List<ServerPathMethod> pathList = serverPathConfig.asList();
 
         System.out.println("serverPathConfig: " + serverPathConfig);
 
@@ -78,7 +94,7 @@ public class HttpServerConfigTests {
     }
 
     @Test
-    public void serverConfigurationWithMultiplePathsWithPropertiesDTOTest(){
+    public void serverConfigurationWithMultiplePathsWithPropertiesTest(){
         String configurationJson = "[{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\" , \"filters\":[\"filter1\",\"filter2\"]}," +
                 "{\"roboUnit\":\"roboUnit2\",\"method\":\"POST\"}, {\"roboUnit\":\"roboUnit3\",\"method\":\"GET\",\"filters\":[]}]";
 
@@ -88,7 +104,7 @@ public class HttpServerConfigTests {
                 new ServerPathMethod("roboUnit3", HttpMethod.GET, Collections.emptyList()));
 
         ServerPathConfig serverPathConfig = HttpPathUtils.readHttpServerPathConfig(configurationJson);
-        List<ServerPathMethod> pathList = serverPathConfig.getPathConfigs();
+        List<ServerPathMethod> pathList = serverPathConfig.asList();
         System.out.println("serverPathConfig: " + serverPathConfig);
 
         Assert.assertNotNull(serverPathConfig);
