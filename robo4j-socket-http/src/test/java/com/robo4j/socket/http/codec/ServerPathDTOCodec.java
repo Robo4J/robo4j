@@ -1,6 +1,6 @@
 package com.robo4j.socket.http.codec;
 
-import com.robo4j.socket.http.dto.ServerPathDTO;
+import com.robo4j.socket.http.dto.ServerUnitPathDTO;
 import com.robo4j.socket.http.units.HttpProducer;
 
 /**
@@ -8,8 +8,8 @@ import com.robo4j.socket.http.units.HttpProducer;
  * @author Miroslav Wengner (@miragemiko)
  */
 @HttpProducer
-public class ServerPathDTOCodec extends AbstractMessageCodec<ServerPathDTO> {
+public class ServerPathDTOCodec extends AbstractMessageCodec<ServerUnitPathDTO> {
     public ServerPathDTOCodec() {
-        super(ServerPathDTO.class);
+        super(ServerUnitPathDTO.class);
     }
 }

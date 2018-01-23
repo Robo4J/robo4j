@@ -17,22 +17,18 @@
 
 package com.robo4j.socket.http.request;
 
-import com.robo4j.AttributeDescriptor;
 import com.robo4j.RoboContext;
-import com.robo4j.RoboReference;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMessage;
-import com.robo4j.socket.http.message.HttpDecoratedRequest;
-import com.robo4j.socket.http.HttpMessageWrapper;
-import com.robo4j.socket.http.dto.RoboPathReferenceDTO;
 import com.robo4j.socket.http.enums.StatusCode;
-import com.robo4j.socket.http.enums.SystemPath;
-import com.robo4j.socket.http.units.HttpUriRegister;
-import com.robo4j.socket.http.util.HttpPathUtils;
+import com.robo4j.socket.http.message.HttpDecoratedRequest;
+import com.robo4j.socket.http.units.ServerContext;
+import com.robo4j.socket.http.units.ServerPathConfig;
 
-import java.net.URI;
-import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
+
+import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -40,105 +36,56 @@ import java.util.concurrent.Callable;
  */
 public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 
-	private static final int PATH_SECOND_LEVEL = 2;
-	/* currently is supported only one PATH */
-	private static final int DEFAULT_PATH_POSITION_0 = 0;
-	private static final int DEFAULT_PATH_POSITION_1 = 1;
-	public static final int PATH_DEFAULT_LEVEL = 0;
-	public static final int PATH_FIRST_LEVEL = 1;
-
 	private final RoboContext context;
+	private final ServerContext serverContext;
 	private final HttpDecoratedRequest decoratedRequest;
 	private final DefaultRequestFactory<?> factory;
 
-	public RoboRequestCallable(RoboContext context, HttpDecoratedRequest decoratedRequest, DefaultRequestFactory<Object> factory) {
-		assert decoratedRequest != null;
+	public RoboRequestCallable(RoboContext context, ServerContext serverContext, HttpDecoratedRequest decoratedRequest,
+			DefaultRequestFactory<Object> factory) {
+		Objects.requireNonNull(context, "not allowed empty context");
+		Objects.requireNonNull(serverContext, "not allowed empty serverContext");
 		this.context = context;
+		this.serverContext = serverContext;
 		this.decoratedRequest = decoratedRequest;
 		this.factory = factory;
 	}
-
-
 
 	@Override
 	public RoboResponseProcess call() throws Exception {
 
 		final RoboResponseProcess result = new RoboResponseProcess();
+		final ServerPathConfig pathConfig = serverContext.getPathConfig(decoratedRequest.getPath());
 
-		if (decoratedRequest.getMethod() != null) {
-			result.setMethod(decoratedRequest.getMethod());
+		if (pathConfig.getMethod().equals(decoratedRequest.getMethod())) {
+			result.setMethod(pathConfig.getMethod());
 
+			// TODO: 1/23/18 (miro) http message wrap headers
 			final HttpMessage httpMessage = new HttpMessage(decoratedRequest);
-			final List<String> paths = HttpPathUtils.uriStringToPathList(decoratedRequest.getPath());
+			result.setPath(pathConfig.getPath());
 
-			switch (decoratedRequest.getMethod()) {
+			switch (httpMessage.method()) {
 			case GET:
-				switch (paths.size()) {
-				case PATH_DEFAULT_LEVEL:
+				if (pathConfig.getPath().equals(UTF8_SOLIDUS)) {
 					result.setCode(StatusCode.OK);
-					result.setResult(factory.processGet(context) );
-					break;
-				case PATH_FIRST_LEVEL:
-					result.setCode(StatusCode.NOT_IMPLEMENTED);
-					break;
-				case PATH_SECOND_LEVEL:
-					final RoboPathReferenceDTO pathReference = getRoboReferenceByPath(paths);
-					switch (pathReference.getPath()) {
-					case NONE:
-						result.setCode(StatusCode.NOT_FOUND);
-						break;
-					case UNITS:
-						if (pathReference.getRoboReference() == null) {
-							result.setCode(StatusCode.NOT_FOUND);
-						} else {
-							result.setTarget(pathReference.getRoboReference().getId());
-							AttributeDescriptor<?> attributeDescriptor = getAttributeByQuery(
-									pathReference.getRoboReference(), httpMessage.uri());
-							if (attributeDescriptor != null) {
-								result.setCode(StatusCode.OK);
-								result.setResult(factory.processGet(pathReference.getRoboReference(), attributeDescriptor));
-							} else {
-								final Object unitDescription = factory
-										.processGetByRegisteredPaths(pathReference.getRoboReference(), paths);
-								result.setCode(StatusCode.OK);
-								result.setResult(unitDescription);
-							}
-						}
-					}
-					break;
-				default:
+					result.setResult(factory.processGet(context));
+				} else {
+					result.setTarget(pathConfig.getRoboUnit().getId());
+					final Object unitDescription = factory.processGet(pathConfig);
+					result.setCode(StatusCode.OK);
+					result.setResult(unitDescription);
 				}
 				return result;
 			case POST:
 				final String postValue = decoratedRequest.getMessage();
-				switch (paths.size()) {
-				case PATH_DEFAULT_LEVEL:
-				case PATH_FIRST_LEVEL:
+				if (pathConfig.getPath().equals(UTF8_SOLIDUS)) {
 					result.setCode(StatusCode.NOT_IMPLEMENTED);
-					break;
-				case PATH_SECOND_LEVEL:
-					final RoboPathReferenceDTO pathReference = getRoboReferenceByPath(paths);
-					switch (pathReference.getPath()) {
-					case UNITS:
-						if (pathReference.getRoboReference() != null) {
-							result.setTarget(pathReference.getRoboReference().getId());
-							Object respObj = factory.processPost(pathReference.getRoboReference(), paths,
-									new HttpMessageWrapper<>(httpMessage, postValue));
-							if (respObj != null) {
-								result.setCode(StatusCode.ACCEPTED);
-								result.setResult(respObj);
-							} else {
-								result.setCode(StatusCode.NOT_FOUND);
-							}
-						}
-						break;
-					case NONE:
-					default:
-						result.setCode(StatusCode.NOT_FOUND);
-					}
-					break;
+				} else {
+					result.setTarget(pathConfig.getRoboUnit().getId());
+					Object respObj = factory.processPost(pathConfig.getRoboUnit(), postValue);
+					result.setCode(StatusCode.ACCEPTED);
+					result.setResult(respObj);
 				}
-
 				return result;
 
 			default:
@@ -150,50 +97,6 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 		}
 
 		return result;
-	}
-
-	// Private Methods
-	/**
-	 * @param unit
-	 *            desired unit {@see RoboReference}
-	 * @param query
-	 *            URI query attributes
-	 * @return specific Attribute
-	 */
-	private AttributeDescriptor<?> getAttributeByQuery(RoboReference<?> unit, URI query) {
-		// @formatter:off
-		return unit.getKnownAttributes().stream().filter(a -> a.getAttributeName().equals(query.getRawQuery()))
-				.findFirst().orElse(null);
-		// @formatter:on
-	}
-
-	/**
-	 * parse desired path. If no path available. System health state for all units
-	 * is returned returned note: currently is supported only one level path
-	 *
-	 * @param paths
-	 *            registered paths by the configuration
-	 * @return reference to desired RoboUnit
-	 */
-	private RoboPathReferenceDTO getRoboReferenceByPath(final List<String> paths) {
-		if (paths.isEmpty()) {
-			return new RoboPathReferenceDTO(SystemPath.NONE, null);
-		} else {
-			final SystemPath systemPath = SystemPath.getByPath(paths.get(DEFAULT_PATH_POSITION_0));
-			if (systemPath != null && paths.size() == PATH_SECOND_LEVEL) {
-				switch (systemPath) {
-				case UNITS:
-					final HttpUriRegister httpUriRegister = HttpUriRegister.getInstance();
-					final RoboReference<?> reference = httpUriRegister
-							.getRoboUnitByPath(paths.get(DEFAULT_PATH_POSITION_1));
-					return new RoboPathReferenceDTO(systemPath, reference);
-				default:
-					throw new IllegalArgumentException("Unsupported path " + systemPath);
-				}
-			}
-			return new RoboPathReferenceDTO(SystemPath.NONE, null);
-		}
-
 	}
 
 }

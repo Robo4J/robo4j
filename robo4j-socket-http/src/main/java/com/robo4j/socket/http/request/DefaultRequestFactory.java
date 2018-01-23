@@ -19,9 +19,7 @@ package com.robo4j.socket.http.request;
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.socket.http.HttpMessageWrapper;
-
-import java.util.List;
+import com.robo4j.socket.http.units.ServerPathConfig;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -33,7 +31,7 @@ public interface DefaultRequestFactory<ResponseType> {
 
 	ResponseType processGet(RoboReference<?> desiredReference, AttributeDescriptor<?> attributeDescriptor);
 
-	ResponseType processGetByRegisteredPaths(RoboReference<?> desiredReference, List<String> paths);
+	ResponseType processGet(ServerPathConfig pathConfig);
 
-	ResponseType processPost(RoboReference<?> desiredUnit, List<String> paths, HttpMessageWrapper<?> wrapper);
+	ResponseType processPost(RoboReference<?> unitReference, String message);
 }

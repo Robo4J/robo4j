@@ -23,16 +23,15 @@ import com.robo4j.AttributeDescriptor;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.HttpMessageWrapper;
+import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.dto.ResponseDecoderUnitDTO;
 import com.robo4j.socket.http.dto.ResponseUnitDTO;
 import com.robo4j.socket.http.units.HttpCodecRegistry;
 import com.robo4j.socket.http.units.HttpDecoder;
-import com.robo4j.socket.http.units.HttpUriRegister;
+import com.robo4j.socket.http.units.ServerPathConfig;
 import com.robo4j.socket.http.util.HttpConstant;
-import com.robo4j.socket.http.util.HttpPathUtils;
-import com.robo4j.socket.http.util.JsonElementStringBuilder;
 import com.robo4j.socket.http.util.JsonUtil;
-import com.robo4j.util.Utf8Constant;
+import com.robo4j.socket.http.util.ReflectUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,9 +45,8 @@ import java.util.stream.Collectors;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-// TODO discuss how to use URIs
 public class RoboRequestFactory implements DefaultRequestFactory<Object> {
-	private static final String NO_DECODER_AVAILABLE = "no decoder available";
+	private static final List<HttpMethod> GET_POST_METHODS = Arrays.asList(HttpMethod.GET, HttpMethod.POST);
 	private final HttpCodecRegistry codecRegistry;
 
 	public RoboRequestFactory(final HttpCodecRegistry codecRegistry) {
@@ -81,27 +79,13 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	}
 
 	@Override
-	public Object processGetByRegisteredPaths(final RoboReference<?> desiredReference, final List<String> paths) {
-		/* currently is supported only */
-		final HttpUriRegister register = HttpUriRegister.getInstance();
-		if (register.isUnitAvailable(HttpPathUtils.pathsToUri(paths))) {
-			final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredReference.getMessageType());
-			if (decoder != null) {
-				List<String> methods = Arrays.asList("GET", "POST");
-				return JsonElementStringBuilder.Builder().add(Utf8Constant.UTF8_CURLY_BRACKET_LEFT)
-						.addQuotationWithDelimiter(Utf8Constant.UTF8_COLON, "id")
-						.addQuotationWithDelimiter(Utf8Constant.UTF8_COMMA, desiredReference.getId())
-						.addQuotationWithDelimiter(Utf8Constant.UTF8_COLON, "codec")
-						.addQuotationWithDelimiter(Utf8Constant.UTF8_COMMA, desiredReference.getMessageType().getName())
-						.addQuotationWithDelimiter(Utf8Constant.UTF8_COLON, "method")
-						.add(JsonUtil.getArraysByMethodList(methods)).add(Utf8Constant.UTF8_CURLY_BRACKET_RIGHT)
-						.build();
-			} else {
-				SimpleLoggingUtil.error(getClass(), "no decoder available");
-				return NO_DECODER_AVAILABLE;
-			}
-		}
-		return NO_DECODER_AVAILABLE;
+	public Object processGet(ServerPathConfig pathConfig) {
+		final HttpDecoder<?> decoder = codecRegistry.getDecoder(pathConfig.getRoboUnit().getMessageType());
+		final ResponseDecoderUnitDTO result = new ResponseDecoderUnitDTO();
+		result.setId(pathConfig.getRoboUnit().getId());
+		result.setCodec(decoder.getDecodedClass().getName());
+		result.setMethods(GET_POST_METHODS);
+		return ReflectUtils.createJson(result);
 	}
 
 	/**
@@ -109,28 +93,16 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	 *
 	 * example: { "value" : "move" }
 	 *
-	 * @param desiredUnit
+	 * @param unitReference
 	 *            desired unit
-	 * @param paths
-	 *            uri paths
-	 * @param wrapper
-	 *            message wrapper
+	 * @param message
+	 *            string message
 	 * @return processed object
 	 */
 	@Override
-	public Object processPost(final RoboReference<?> desiredUnit, final List<String> paths,
-			final HttpMessageWrapper<?> wrapper) {
-		final HttpUriRegister register = HttpUriRegister.getInstance();
-		if (register.isUnitAvailable(HttpPathUtils.pathsToUri(paths))) {
-			final String json = (String) wrapper.body();
-			final HttpDecoder<?> decoder = codecRegistry.getDecoder(desiredUnit.getMessageType());
-			if (decoder != null) {
-				return decoder.decode(json);
-			} else {
-				SimpleLoggingUtil.error(getClass(), NO_DECODER_AVAILABLE);
-			}
-		}
-		return null;
+	public Object processPost(final RoboReference<?> unitReference, final String message) {
+		final HttpDecoder<?> decoder = codecRegistry.getDecoder(unitReference.getMessageType());
+		return decoder.decode(message);
 	}
 
 }

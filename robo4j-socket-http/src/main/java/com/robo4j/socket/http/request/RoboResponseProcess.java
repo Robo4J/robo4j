@@ -28,12 +28,21 @@ import com.robo4j.socket.http.enums.StatusCode;
  * @author Miro Wengner (@miragemiko)
  */
 public class RoboResponseProcess {
+    private String path;
     private String target;
     private HttpMethod method;
     private StatusCode code;
     private Object result;
 
     RoboResponseProcess() {
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public String getTarget() {

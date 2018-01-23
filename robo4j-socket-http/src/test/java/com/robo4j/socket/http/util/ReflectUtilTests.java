@@ -15,7 +15,7 @@ public class ReflectUtilTests {
 
     @Test
     public void objectWithEnumToJson(){
-        final String expectedJson = "{\"command\":MOVE,\"desc\":\"some description\"}";
+        final String expectedJson = "{\"command\":\"MOVE\",\"desc\":\"some description\"}";
         TestCommand command = new TestCommand();
         command.setCommand(TestCommandEnum.MOVE);
         command.setDesc("some description");
@@ -31,7 +31,7 @@ public class ReflectUtilTests {
     @Test
     public void objectWithEnumListToJson(){
 
-        final String expectedJson = "{\"commands\":[MOVE,STOP,BACK],\"desc\":\"commands description\"}";
+        final String expectedJson = "{\"commands\":[\"MOVE\",\"STOP\",\"BACK\"],\"desc\":\"commands description\"}";
         TestCommandList commands = new TestCommandList();
         commands.setCommands(Arrays.asList(TestCommandEnum.MOVE, TestCommandEnum.STOP, TestCommandEnum.BACK));
         commands.setDesc("commands description");

@@ -24,6 +24,7 @@ import com.robo4j.socket.http.request.RoboRequestCallable;
 import com.robo4j.socket.http.request.RoboRequestFactory;
 import com.robo4j.socket.http.request.RoboResponseProcess;
 import com.robo4j.socket.http.units.HttpCodecRegistry;
+import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
 
 import java.nio.channels.SelectionKey;
@@ -38,13 +39,15 @@ import java.util.concurrent.Future;
 public class ReadSelectionKeyHandler implements SelectionKeyHandler {
 
 	private final RoboContext context;
+	private final ServerContext serverContext;
 	private final HttpCodecRegistry codecRegistry;
 	private final Map<SelectionKey, RoboResponseProcess> outBuffers;
 	private final SelectionKey key;
 
-	public ReadSelectionKeyHandler(RoboContext context, HttpCodecRegistry codecRegistry,
-                                   Map<SelectionKey, RoboResponseProcess> outBuffers, SelectionKey key) {
+	public ReadSelectionKeyHandler(RoboContext context, ServerContext serverContext, HttpCodecRegistry codecRegistry,
+			Map<SelectionKey, RoboResponseProcess> outBuffers, SelectionKey key) {
 		this.context = context;
+		this.serverContext = serverContext;
 		this.codecRegistry = codecRegistry;
 		this.outBuffers = outBuffers;
 		this.key = key;
@@ -55,7 +58,7 @@ public class ReadSelectionKeyHandler implements SelectionKeyHandler {
 		SocketChannel channel = (SocketChannel) key.channel();
 		final HttpDecoratedRequest decoratedRequest = ChannelBufferUtils.getHttpDecoratedRequestByChannel(channel);
 		final RoboRequestFactory factory = new RoboRequestFactory(codecRegistry);
-		final RoboRequestCallable callable = new RoboRequestCallable(context, decoratedRequest, factory);
+		final RoboRequestCallable callable = new RoboRequestCallable(context, serverContext, decoratedRequest, factory);
 		final Future<RoboResponseProcess> futureResult = context.getScheduler().submit(callable);
 		final RoboResponseProcess result = extractRoboResponseProcess(futureResult);
 		outBuffers.put(key, result);
@@ -63,19 +66,19 @@ public class ReadSelectionKeyHandler implements SelectionKeyHandler {
 		return key;
 	}
 
-	private RoboResponseProcess extractRoboResponseProcess(Future<RoboResponseProcess> future){
+	private RoboResponseProcess extractRoboResponseProcess(Future<RoboResponseProcess> future) {
 		try {
 			return future.get();
-		}catch (Exception e){
+		} catch (Exception e) {
 			throw new SocketException("extract robo response", e);
 		}
 	}
 
-	private void registerSelectionKey(SocketChannel channel){
+	private void registerSelectionKey(SocketChannel channel) {
 		try {
 			channel.register(key.selector(), SelectionKey.OP_WRITE);
-		} catch (Exception e){
-			throw  new SocketException("register selection key", e);
+		} catch (Exception e) {
+			throw new SocketException("register selection key", e);
 		}
 	}
 }

@@ -29,61 +29,68 @@ import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
  */
 public class RequestDenominator implements HttpDenominator {
 
-    private final StringBuilder sb = new StringBuilder();
-    private final HttpMethod method;
-    private final String path;
-    private final HttpVersion version;
+	private final StringBuilder sb = new StringBuilder();
+	private final HttpMethod method;
+	private final String path;
+	private final HttpVersion version;
 
-    public RequestDenominator(HttpMethod method, HttpVersion version) {
-        this.method = method;
-        this.path = UTF8_SOLIDUS;
-        this.version = version;
-    }
+	/**
+	 * default request with default path
+	 * 
+	 * @param method
+	 *            http method
+	 * @param version
+	 *            http version
+	 */
+	public RequestDenominator(HttpMethod method, HttpVersion version) {
+		this.method = method;
+		this.path = UTF8_SOLIDUS;
+		this.version = version;
+	}
 
-    public RequestDenominator(HttpMethod method, String path, HttpVersion version) {
-        this.method = method;
-        this.path = path;
-        this.version = version;
-    }
+	/**
+	 *
+	 * @param method
+	 *            http method
+	 * @param path
+	 *            server path
+	 * @param version
+	 *            http version
+	 */
+	public RequestDenominator(HttpMethod method, String path, HttpVersion version) {
+		this.method = method;
+		this.path = path;
+		this.version = version;
+	}
 
-    public HttpMethod getMethod() {
-        return method;
-    }
+	public HttpMethod getMethod() {
+		return method;
+	}
 
-    public String getPath() {
-        return path;
-    }
+	public String getPath() {
+		return path;
+	}
 
-    @Override
-    public String getVersion() {
-        return version.getValue();
-    }
+	@Override
+	public String getVersion() {
+		return version.getValue();
+	}
 
-    /**
-     * Generate 1st line header
-     * example : 'GET /path HTTP/1.1'
-     *
-     * @return 1st line
-     */
-    @Override
-    public String generate() {
-        assert method != null;
-        assert path != null;
-        assert version != null;
-        return sb.append(method.getName())
-                .append(SPACE)
-                .append(path)
-                .append(SPACE)
-                .append(getVersion())
-                .toString();
-    }
+	/**
+	 * Generate 1st line header example : 'GET /path HTTP/1.1'
+	 *
+	 * @return 1st line
+	 */
+	@Override
+	public String generate() {
+		assert method != null;
+		assert path != null;
+		assert version != null;
+		return sb.append(method.getName()).append(SPACE).append(path).append(SPACE).append(getVersion()).toString();
+	}
 
-    @Override
-    public String toString() {
-        return "RequestDenominator{" +
-                "method=" + method +
-                ", path='" + path + '\'' +
-                ", version=" + version +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "RequestDenominator{" + "method=" + method + ", path='" + path + '\'' + ", version=" + version + '}';
+	}
 }

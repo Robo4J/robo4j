@@ -41,8 +41,6 @@ import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.Future;
 
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
@@ -94,10 +92,10 @@ public class RoboHttpDynamicTests {
 		System.out.println(SystemUtil.printStateReport(mainSystem));
 
 		/* client system sending a messages to the main system */
-		List<String> paths = Arrays.asList("units", ID_TARGET_UNIT);
 		for (int i = 0; i < MESSAGES_NUMBER; i++) {
 
-			HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, HttpPathUtils.pathsToUri(paths), HttpVersion.HTTP_1_1);
+			HttpDenominator denominator = new RequestDenominator(HttpMethod.POST,
+					HttpPathUtils.toPath("units", ID_TARGET_UNIT), HttpVersion.HTTP_1_1);
 			String messageToSend = HttpMessageBuilder.Build()
 					.setDenominator(denominator)
                     .addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(HOST_SYSTEM))
@@ -166,9 +164,6 @@ public class RoboHttpDynamicTests {
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("address", HOST_SYSTEM);
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
-		/* specific configuration */
-		config.setString(RoboHttpUtils.HTTP_PATHS_CONFIG,
-				HttpPathConfigJsonBuilder.Builder().addPath(ID_TARGET_UNIT, HttpMethod.POST).build());
 		builder.add(HttpClientUnit.class, config, ID_CLIENT_UNIT);
 
 		RoboContext result = builder.build();

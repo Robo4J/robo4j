@@ -22,16 +22,15 @@ package com.robo4j.socket.http.units;
 import com.robo4j.ConfigurationException;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
-import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.socket.http.PropertiesProvider;
 import com.robo4j.socket.http.channel.InboundSocketHandler;
+import com.robo4j.socket.http.dto.ServerUnitPathDTO;
 import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.robo4j.socket.http.util.ChannelBufferUtils.INIT_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PATHS_CONFIG;
@@ -52,8 +51,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	private final HttpCodecRegistry codecRegistry = new HttpCodecRegistry();
 	private final PropertiesProvider propertiesProvider = new PropertiesProvider();
 
-	private ServerPathConfig serverPathConfig;
 	private InboundSocketHandler inboundSocketHandler;
+	private List<ServerUnitPathDTO> paths;
+	private ServerContext serverContext;
 
 	public HttpServerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -69,17 +69,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(UTF8_COMMA));
 		}
 
-		serverPathConfig = HttpPathUtils.readHttpServerPathConfig(configuration.getString(HTTP_PATHS_CONFIG, null));
-//		String configTarget = configuration.getString(HTTP_TARGETS, StringConstants.EMPTY);
-//		if(configTarget.equals(StringConstants.EMPTY)){
-//			SimpleLoggingUtil.info(getClass(), "no target units available");
-//			targets = new ArrayList<>();
-//		} else {
-//			Map<String, Object> targetUnitsMap = JsonUtil.getMapByJson(configTarget);
-//			targets = extractTargetUnits(targetUnitsMap);
-//		}
-
-
+		paths = HttpPathUtils.readPathConfig(configuration.getString(HTTP_PATHS_CONFIG, null));
 
 		propertiesProvider.put(HTTP_PROPERTY_BUFFER_CAPACITY, bufferCapacity);
 		propertiesProvider.put(HTTP_PROPERTY_PORT, port);
@@ -93,17 +83,9 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	@Override
 	public void start() {
 		setState(LifecycleState.STARTING);
-		//@formatter:off
-		// TODO: 1/21/18 (miro) do we need create a new list collection, map is faster ?
-		final List<RoboReference<Object>> targetRefs = serverPathConfig.asStream()
-				.map(e -> getContext().getReference(e.getRoboUnit()))
-				.collect(Collectors.toList());
-		//@formatter:on
+		serverContext = HttpPathUtils.initServerContext(getContext(), paths);
+		inboundSocketHandler = new InboundSocketHandler(getContext(), serverContext, propertiesProvider);
 
-		inboundSocketHandler = new InboundSocketHandler(getContext(), targetRefs, propertiesProvider);
-
-		// TODO: 1/21/18 (miro) replace it by HttpServerContext
-		HttpUriRegister.getInstance().updateUnits(getContext());
 		inboundSocketHandler.start();
 		setState(LifecycleState.STARTED);
 	}
@@ -114,7 +96,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		inboundSocketHandler.stop();
 		setState(LifecycleState.STOPPED);
 	}
-
 
 	private boolean validatePackages(String packages) {
 		if (packages == null) {

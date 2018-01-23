@@ -1,30 +1,29 @@
-package com.robo4j.socket.http.units;
+package com.robo4j.socket.http.dto;
 
 import com.robo4j.socket.http.HttpMethod;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 /**
- *
- *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class ServerPathMethod {
+public class ServerUnitPathDTO {
 
-    private final String roboUnit;
-    private final HttpMethod method;
-    private final List<String> filters;
+    private String roboUnit;
+    private HttpMethod method;
+    private List<String> filters;
 
-    public ServerPathMethod(String roboUnit, HttpMethod method){
-        this.roboUnit = roboUnit;
-        this.method = method;
-        this.filters = null;
+    public ServerUnitPathDTO() {
     }
 
-    public ServerPathMethod(String roboUnit, HttpMethod method, List<String> filters) {
+    public ServerUnitPathDTO(String roboUnit, HttpMethod method) {
+        this.roboUnit = roboUnit;
+        this.method = method;
+    }
+
+    public ServerUnitPathDTO(String roboUnit, HttpMethod method, List<String> filters) {
         this.roboUnit = roboUnit;
         this.method = method;
         this.filters = filters;
@@ -34,19 +33,31 @@ public final class ServerPathMethod {
         return roboUnit;
     }
 
+    public void setRoboUnit(String roboUnit) {
+        this.roboUnit = roboUnit;
+    }
+
     public HttpMethod getMethod() {
         return method;
     }
 
+    public void setMethod(HttpMethod method) {
+        this.method = method;
+    }
+
     public List<String> getFilters() {
-        return Collections.unmodifiableList(filters);
+        return filters;
+    }
+
+    public void setFilters(List<String> filters) {
+        this.filters = filters;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ServerPathMethod that = (ServerPathMethod) o;
+        ServerUnitPathDTO that = (ServerUnitPathDTO) o;
         return Objects.equals(roboUnit, that.roboUnit) &&
                 method == that.method &&
                 Objects.equals(filters, that.filters);
@@ -54,12 +65,13 @@ public final class ServerPathMethod {
 
     @Override
     public int hashCode() {
+
         return Objects.hash(roboUnit, method, filters);
     }
 
     @Override
     public String toString() {
-        return "ServerPathMethod{" +
+        return "ServerUnitPathDTO{" +
                 "roboUnit='" + roboUnit + '\'' +
                 ", method=" + method +
                 ", filters=" + filters +

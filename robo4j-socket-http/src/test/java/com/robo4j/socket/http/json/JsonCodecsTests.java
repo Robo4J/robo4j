@@ -7,7 +7,7 @@ import com.robo4j.socket.http.codec.NSBETypesAndCollectionTestMessageCodec;
 import com.robo4j.socket.http.codec.NSBETypesTestMessageCodec;
 import com.robo4j.socket.http.codec.NSBWithSimpleCollectionsTypesMessageCodec;
 import com.robo4j.socket.http.codec.ServerPathDTOCodec;
-import com.robo4j.socket.http.dto.ServerPathDTO;
+import com.robo4j.socket.http.dto.ServerUnitPathDTO;
 import com.robo4j.socket.http.units.test.codec.NSBETypesAndCollectionTestMessage;
 import com.robo4j.socket.http.units.test.codec.NSBETypesTestMessage;
 import com.robo4j.socket.http.units.test.codec.NSBWithSimpleCollectionsTypesMessage;
@@ -55,12 +55,12 @@ public class JsonCodecsTests {
 	@Test
 	public void encodeServerPathDTOMessageNoFilterTest(){
 		String expectedJson = "{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\"}";
-		ServerPathDTO message = new ServerPathDTO();
+		ServerUnitPathDTO message = new ServerUnitPathDTO();
 		message.setRoboUnit("roboUnit1");
 		message.setMethod(HttpMethod.GET);
 
 		String resultJson = serverPathDTOCodec.encode(message);
-		ServerPathDTO decodedMessage = serverPathDTOCodec.decode(resultJson);
+		ServerUnitPathDTO decodedMessage = serverPathDTOCodec.decode(resultJson);
 
 		System.out.println("resultJson: " + resultJson);
 		System.out.println("decodedMessage: " + decodedMessage);

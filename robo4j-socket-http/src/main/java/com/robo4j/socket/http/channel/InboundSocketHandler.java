@@ -18,18 +18,17 @@
 package com.robo4j.socket.http.channel;
 
 import com.robo4j.RoboContext;
-import com.robo4j.RoboReference;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.PropertiesProvider;
 import com.robo4j.socket.http.request.RoboResponseProcess;
 import com.robo4j.socket.http.units.HttpCodecRegistry;
+import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.util.ChannelUtils;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,16 +45,16 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAP
 public class InboundSocketHandler implements SocketHandler {
 
 	private final RoboContext context;
-	private final List<RoboReference<Object>> targetRefs;
+	private final ServerContext serverContext;
 	private final Map<SelectionKey, RoboResponseProcess> outBuffers = new ConcurrentHashMap<>();
 	private ServerSocketChannel socketChannel;
 	private PropertiesProvider properties;
 	private boolean active;
 
-	public InboundSocketHandler(RoboContext context, List<RoboReference<Object>> targetRefs,
+	public InboundSocketHandler(RoboContext context, ServerContext serverContext,
 			PropertiesProvider properties) {
 		this.context = context;
-		this.targetRefs = targetRefs;
+		this.serverContext = serverContext;
 		this.properties = properties;
 	}
 
@@ -63,7 +62,7 @@ public class InboundSocketHandler implements SocketHandler {
 	public void start() {
 		if (!active) {
 			active = true;
-			context.getScheduler().execute(() -> initSocketChannel(targetRefs, properties));
+			context.getScheduler().execute(() -> initSocketChannel(serverContext, properties));
 		}
 	}
 
@@ -79,7 +78,7 @@ public class InboundSocketHandler implements SocketHandler {
 		}
 	}
 
-	private void initSocketChannel(List<RoboReference<Object>> targetRefs, PropertiesProvider properties) {
+	private void initSocketChannel(ServerContext serverContext, PropertiesProvider properties) {
 		socketChannel = ChannelUtils.initServerSocketChannel(properties);
 		final SelectionKey key = ChannelUtils.registerSelectionKey(socketChannel);
 
@@ -105,9 +104,9 @@ public class InboundSocketHandler implements SocketHandler {
 				} else if (selectedKey.isConnectable()) {
 					handleSelectorHandler(new ConnectSelectionKeyHandler(selectedKey));
 				} else if (selectedKey.isReadable()) {
-					handleSelectorHandler(new ReadSelectionKeyHandler(context, codecRegistry, outBuffers, selectedKey));
+					handleSelectorHandler(new ReadSelectionKeyHandler(context, serverContext, codecRegistry, outBuffers, selectedKey));
 				} else if (selectedKey.isWritable()) {
-					handleSelectorHandler(new WriteSelectionKeyHandler(context, targetRefs, outBuffers, selectedKey));
+					handleSelectorHandler(new WriteSelectionKeyHandler(context, serverContext, outBuffers, selectedKey));
 				}
 			}
 		}
