@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
  * @author Miro Wengner (@miragemiko)
  */
 public final class HttpPathUtils {
-	private static final int SEPARATOR_PATH = 12;
 
 	public static String toPath(String first, String... rest) {
 		final StringBuilder sb = new StringBuilder();
@@ -52,10 +51,6 @@ public final class HttpPathUtils {
 			}
 		}
 		return sb.toString();
-	}
-
-	public static String pathsToUri(List<String> paths) {
-		return paths.stream().collect(Collectors.joining(HttpMessageUtils.getHttpSeparator(SEPARATOR_PATH)));
 	}
 
 	/**
