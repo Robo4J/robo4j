@@ -25,20 +25,24 @@ import java.util.List;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class PathMethodDTO {
+public class ClientPathDTO {
 
-	private final String path;
-	private final HttpMethod method;
-	private final List<String> callbacks;
+	private String roboUnit;
+	private HttpMethod method;
+	private List<String> callbacks;
 
-	public PathMethodDTO(String path, HttpMethod method, List<String> callbacks) {
-		this.path = path;
+	public ClientPathDTO(){
+
+	}
+
+	public ClientPathDTO(String roboUnit, HttpMethod method, List<String> callbacks) {
+		this.roboUnit = roboUnit;
 		this.method = method;
 		this.callbacks = callbacks;
 	}
 
-	public String getPath() {
-		return path;
+	public String getRoboUnit() {
+		return roboUnit;
 	}
 
 	public HttpMethod getMethod() {
@@ -53,26 +57,26 @@ public class PathMethodDTO {
 	public boolean equals(Object o) {
 		if (this == o)
 			return true;
-		if (!(o instanceof PathMethodDTO))
+		if (!(o instanceof ClientPathDTO))
 			return false;
 
-		PathMethodDTO that = (PathMethodDTO) o;
+		ClientPathDTO that = (ClientPathDTO) o;
 
-		if (!path.equals(that.path))
+		if (!roboUnit.equals(that.roboUnit))
 			return false;
 		return method == that.method;
 	}
 
 	@Override
 	public int hashCode() {
-		int result = path.hashCode();
+		int result = roboUnit.hashCode();
 		result = 31 * result + method.hashCode();
 		return result;
 	}
 
 	@Override
 	public String toString() {
-		return "PathMethodDTO{" + "path='" + path + '\'' + ", method=" + method + ", callbacks="
+		return "ClientPathDTO{" + "roboUnit='" + roboUnit + '\'' + ", method=" + method + ", callbacks="
 				+ callbacks + '}';
 	}
 }

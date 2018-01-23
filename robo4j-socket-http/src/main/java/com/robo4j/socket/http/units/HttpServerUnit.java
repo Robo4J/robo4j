@@ -69,7 +69,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(UTF8_COMMA));
 		}
 
-		paths = HttpPathUtils.readPathConfig(configuration.getString(HTTP_PATHS_CONFIG, null));
+		// TODO: 1/23/18 (miro) -> thing about better usage of readPath that the class is not cashed
+		paths = HttpPathUtils.readPathConfig(ServerUnitPathDTO.class, configuration.getString(HTTP_PATHS_CONFIG, null));
 
 		propertiesProvider.put(HTTP_PROPERTY_BUFFER_CAPACITY, bufferCapacity);
 		propertiesProvider.put(HTTP_PROPERTY_PORT, port);

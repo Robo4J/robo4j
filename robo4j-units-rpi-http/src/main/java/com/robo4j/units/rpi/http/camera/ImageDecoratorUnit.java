@@ -26,7 +26,7 @@ import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.codec.CameraMessageCodec;
-import com.robo4j.socket.http.dto.PathMethodDTO;
+import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RequestDenominator;
@@ -59,7 +59,7 @@ public class ImageDecoratorUnit extends RoboUnit<ImageDTO> {
 	private String target;
 	private String host;
 	private Integer port;
-	private List<PathMethodDTO> remoteUnitList;
+	private List<ClientPathDTO> remoteUnitList;
 
 	public ImageDecoratorUnit(RoboContext context, String id) {
 		super(ImageDTO.class, context, id);
@@ -86,7 +86,7 @@ public class ImageDecoratorUnit extends RoboUnit<ImageDTO> {
 		final String imageBase64 = JsonUtil.bytesToBase64String(image.getContent());
 		remoteUnitList.forEach(pathMethod -> {
 
-			final RequestDenominator denominator = new RequestDenominator(HttpMethod.POST, pathMethod.getPath(),
+			final RequestDenominator denominator = new RequestDenominator(HttpMethod.POST, pathMethod.getRoboUnit(),
 					HttpVersion.HTTP_1_1);
 			final HttpDecoratedRequest result = new HttpDecoratedRequest(new HashMap<>(), denominator);
 

@@ -27,6 +27,7 @@ import com.robo4j.socket.http.channel.OutboundChannelHandler;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.message.HttpDecoratedResponse;
+import com.robo4j.util.Utf8Constant;
 
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
@@ -66,7 +67,7 @@ public class HttpClientDecoratorUnit extends RoboUnit<HttpDecoratedRequest> {
 	public void onMessage(HttpDecoratedRequest message) {
 
 		// FIXME: 12/11/17 (miro) better
-		final String[] addressProperties = message.getHeaderValue(HttpHeaderFieldNames.HOST).split(":");
+		final String[] addressProperties = message.getHeaderValue(HttpHeaderFieldNames.HOST).split(Utf8Constant.UTF8_COLON);
 		final int port = addressProperties.length > 1 ? Integer.valueOf(addressProperties[1]) : 80;
 		final InetSocketAddress address = new InetSocketAddress(addressProperties[0], port);
 		try (SocketChannel channel = SocketChannel.open(address)) {

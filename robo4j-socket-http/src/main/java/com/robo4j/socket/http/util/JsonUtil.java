@@ -20,7 +20,7 @@ package com.robo4j.socket.http.util;
 import com.robo4j.LifecycleState;
 import com.robo4j.socket.http.HttpException;
 import com.robo4j.socket.http.HttpMethod;
-import com.robo4j.socket.http.dto.PathMethodDTO;
+import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.dto.ResponseUnitDTO;
 import com.robo4j.util.StringConstants;
 import com.robo4j.util.Utf8Constant;
@@ -130,20 +130,20 @@ public final class JsonUtil {
 	}
 
 	/**
-	 * Converting json {"imageProcessor":["POST","callBack"]} to PathMethodDTO
+	 * Converting json {"imageProcessor":["POST","callBack"]} to ClientPathDTO
 	 *
 	 * @param json
 	 *            - string
 	 * @return List of elements
 	 */
-	public static PathMethodDTO getPathMethodByJson(String json) {
+	public static ClientPathDTO getPathMethodByJson(String json) {
 
 		Pattern pattern = Pattern.compile("\\{\\s*\"(\\/?\\w.*)?\"\\s*:\\s*\\[(.*)\\]\\s*\\}");
 		Matcher matcher = pattern.matcher(json);
 		return matcher.find() ? extractPathMethodByMatcher(matcher) : null;
 	}
 
-	public static String getJsonByPathMethodList(List<PathMethodDTO> pathMethodList) {
+	public static String getJsonByPathMethodList(List<ClientPathDTO> pathMethodList) {
 		//@formatter:off
 		return JsonElementStringBuilder.Builder().add(UTF8_SQUARE_BRACKET_LEFT)
 				.add(pathMethodList.stream()
@@ -161,9 +161,9 @@ public final class JsonUtil {
 	 *            valid method
 	 * @return jsonString
 	 */
-	public static String getJsonByPathMethod(PathMethodDTO pathMethod) {
+	public static String getJsonByPathMethod(ClientPathDTO pathMethod) {
 		JsonElementStringBuilder builder = JsonElementStringBuilder.Builder().add(UTF8_CURLY_BRACKET_LEFT)
-				.addQuotationWithDelimiter(UTF8_COLON, pathMethod.getPath()).add(UTF8_SQUARE_BRACKET_LEFT);
+				.addQuotationWithDelimiter(UTF8_COLON, pathMethod.getRoboUnit()).add(UTF8_SQUARE_BRACKET_LEFT);
 		if (pathMethod.getCallbacks() == null) {
 			builder.addQuotation(pathMethod.getMethod().getName());
 		} else {
@@ -192,7 +192,7 @@ public final class JsonUtil {
 	 *            targetUnit json
 	 * @return extracted List
 	 */
-	public static List<PathMethodDTO> convertJsonToPathMethodList(String json) {
+	public static List<ClientPathDTO> convertJsonToPathMethodList(String json) {
 
 		Pattern patternObjFromArray = Pattern.compile(PATTERN_OBJ_FROM_ARRAY);
 		Matcher matcher = patternObjFromArray.matcher(json);
@@ -255,13 +255,13 @@ public final class JsonUtil {
 		return QUOTATION_TYPES.contains(clazz);
 	}
 
-	private static PathMethodDTO extractPathMethodByMatcher(Matcher matcher) {
+	private static ClientPathDTO extractPathMethodByMatcher(Matcher matcher) {
 		String[] propertiesValues = matcher.group(2).replaceAll("[\"\\[\\]]", StringConstants.EMPTY).split(UTF8_COMMA);
 		final String pathText = matcher.group(1);
 
 		final String path = pathText == null || pathText.isEmpty() ? Utf8Constant.UTF8_SOLIDUS : pathText.trim();
 
-		return new PathMethodDTO(path.isEmpty() ? UTF8_SOLIDUS : path, HttpMethod.getByName(propertiesValues[0].trim()),
+		return new ClientPathDTO(path.isEmpty() ? UTF8_SOLIDUS : path, HttpMethod.getByName(propertiesValues[0].trim()),
 				propertiesValues.length > 1 ? Collections.singletonList(propertiesValues[1].trim()) : null);
 	}
 

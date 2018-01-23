@@ -61,7 +61,7 @@ public class HttpServerConfigTests {
 
     @Test
     public void serverConfigurationNullPathTest(){
-        List<ServerUnitPathDTO>  paths = HttpPathUtils.readPathConfig(null);
+        List<ServerUnitPathDTO>  paths = HttpPathUtils.readPathConfig(ServerUnitPathDTO.class, null);
         Assert.assertNotNull(paths);
         Assert.assertTrue(paths.isEmpty());
 
@@ -69,7 +69,7 @@ public class HttpServerConfigTests {
 
 	@Test
     public void serverConfigurationEmptyPathTest(){
-        List<ServerUnitPathDTO>  paths = HttpPathUtils.readPathConfig(StringConstants.EMPTY);
+        List<ServerUnitPathDTO>  paths = HttpPathUtils.readPathConfig(ServerUnitPathDTO.class, StringConstants.EMPTY);
         Assert.assertNotNull(paths);
         Assert.assertTrue(paths.isEmpty());
 
@@ -83,7 +83,7 @@ public class HttpServerConfigTests {
         List<ServerUnitPathDTO> expectedPathList = Arrays.asList(new ServerUnitPathDTO("roboUnit1", HttpMethod.GET),
                 new ServerUnitPathDTO("roboUnit2", HttpMethod.POST));
 
-        List<ServerUnitPathDTO>  paths = HttpPathUtils.readPathConfig(configurationJson);
+        List<ServerUnitPathDTO>  paths = HttpPathUtils.readPathConfig(ServerUnitPathDTO.class, configurationJson);
 
         Assert.assertTrue(paths.size() == expectedPathList.size());
         Assert.assertTrue(Arrays.equals(paths.toArray(), expectedPathList.toArray()));
@@ -99,7 +99,7 @@ public class HttpServerConfigTests {
                 new ServerUnitPathDTO("roboUnit2", HttpMethod.POST),
                 new ServerUnitPathDTO("roboUnit3", HttpMethod.GET, Collections.emptyList()));
 
-        List<ServerUnitPathDTO> paths = HttpPathUtils.readPathConfig(configurationJson);
+        List<ServerUnitPathDTO> paths = HttpPathUtils.readPathConfig(ServerUnitPathDTO.class, configurationJson);
         System.out.println("paths: " + paths);
 
         Assert.assertNotNull(paths);

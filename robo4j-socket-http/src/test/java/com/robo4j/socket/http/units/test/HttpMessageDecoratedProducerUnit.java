@@ -24,7 +24,7 @@ import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpVersion;
-import com.robo4j.socket.http.dto.PathMethodDTO;
+import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RequestDenominator;
@@ -52,7 +52,7 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	private String target;
 	private String host;
 	private Integer port;
-	private List<PathMethodDTO> targetPathMethodList;
+	private List<ClientPathDTO> targetPathMethodList;
 
 	public HttpMessageDecoratedProducerUnit(RoboContext context, String id) {
 		super(Integer.class, context, id);
@@ -81,7 +81,7 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	public void onMessage(Integer number) {
 		IntStream.range(DEFAULT, number).forEach(i -> {
 			targetPathMethodList.forEach(pathMethod -> {
-				RequestDenominator denominator = new RequestDenominator(pathMethod.getMethod(), pathMethod.getPath(),
+				RequestDenominator denominator = new RequestDenominator(pathMethod.getMethod(), pathMethod.getRoboUnit(),
 						HttpVersion.HTTP_1_1);
 				HttpDecoratedRequest request = new HttpDecoratedRequest(denominator);
 				request.addCallbacks(pathMethod.getCallbacks());

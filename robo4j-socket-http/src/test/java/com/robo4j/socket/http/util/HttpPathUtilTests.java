@@ -18,7 +18,7 @@
 package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.HttpMethod;
-import com.robo4j.socket.http.dto.PathMethodDTO;
+import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.units.test.PropertyListBuilder;
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,7 +43,7 @@ public class HttpPathUtilTests {
 				"{\"/units/cameraController\":[\"POST\",[\"callbackPOSTController\"]]}," +
 				"{\"/units/cameraController\":[\"GET\",[\"callbackGETController\"]]}," +
 				"{\"/units/emptyController\":[\"GET\"]}]";
-		List<PathMethodDTO> pathMethodList = PropertyListBuilder.Builder()
+		List<ClientPathDTO> pathMethodList = PropertyListBuilder.Builder()
 				.add(createPathMethodDTO("/units/imageController", "POST","callbackPOSTController"))
 				.add(createPathMethodDTO("/units/imageController", "GET","callbackGETController"))
 				.add(createPathMethodDTO("/units/cameraController", "POST","callbackPOSTController"))
@@ -69,14 +69,14 @@ public class HttpPathUtilTests {
 				"{\"/units/cameraController\":[\"GET\",[\"callbackGETController\"]]}," +
 				"{\"/units/emptyController\":[\"GET\"]}]";
 
-		PathMethodDTO duplicate = new PathMethodDTO("/units/cameraController", HttpMethod.POST, Collections.singletonList("callbackPOSTController"));
-		List<PathMethodDTO> result = JsonUtil.convertJsonToPathMethodList(jsonArray);
+		ClientPathDTO duplicate = new ClientPathDTO("/units/cameraController", HttpMethod.POST, Collections.singletonList("callbackPOSTController"));
+		List<ClientPathDTO> result = JsonUtil.convertJsonToPathMethodList(jsonArray);
 
 		long duplicatesNumber = result.stream().filter(e -> e.equals(duplicate)).count();
 
 		Assert.assertNotNull(result);
 		Assert.assertTrue(result.size() == 5);
-		Assert.assertTrue(result.get(observedElement).getPath().equals("/units/cameraController"));
+		Assert.assertTrue(result.get(observedElement).getRoboUnit().equals("/units/cameraController"));
 		Assert.assertTrue(result.get(observedElement).getMethod().equals(HttpMethod.POST));
 		Assert.assertTrue(result.get(observedElement).getCallbacks().contains("callbackPOSTController"));
 		Assert.assertTrue(duplicatesNumber == 1);
@@ -93,9 +93,9 @@ public class HttpPathUtilTests {
 		);
 
 		jsonList.forEach(json -> {
-			PathMethodDTO pathMethod = JsonUtil.getPathMethodByJson(json);
+			ClientPathDTO pathMethod = JsonUtil.getPathMethodByJson(json);
 			Assert.assertNotNull(json, pathMethod);
-			Assert.assertTrue(json, pathMethod.getPath().equals("/units/imageController"));
+			Assert.assertTrue(json, pathMethod.getRoboUnit().equals("/units/imageController"));
 			Assert.assertTrue(json, pathMethod.getMethod().equals(HttpMethod.POST));
 			Assert.assertTrue(json, pathMethod.getCallbacks().contains("callbackPOSTController"));
 		});
@@ -111,16 +111,16 @@ public class HttpPathUtilTests {
 		);
 
 		jsonList.forEach(json -> {
-			PathMethodDTO pathMethod = JsonUtil.getPathMethodByJson(json);
+			ClientPathDTO pathMethod = JsonUtil.getPathMethodByJson(json);
 			Assert.assertNotNull(json, pathMethod);
-			Assert.assertNotNull(pathMethod.getPath());
-			Assert.assertTrue(!pathMethod.getPath().isEmpty());
+			Assert.assertNotNull(pathMethod.getRoboUnit());
+			Assert.assertTrue(!pathMethod.getRoboUnit().isEmpty());
 		});
 	}
 
-	private PathMethodDTO createPathMethodDTO(String... args) {
+	private ClientPathDTO createPathMethodDTO(String... args) {
 		List<String> properties = args.length > 2 ? Collections.singletonList(args[2]) : null;
-		return new PathMethodDTO(args[0], HttpMethod.getByName(args[1]), properties);
+		return new ClientPathDTO(args[0], HttpMethod.getByName(args[1]), properties);
 	}
 
 }

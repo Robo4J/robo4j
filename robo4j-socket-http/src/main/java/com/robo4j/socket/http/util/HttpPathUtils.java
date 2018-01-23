@@ -19,11 +19,13 @@ package com.robo4j.socket.http.util;
 
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.dto.ServerUnitPathDTO;
 import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.socket.http.json.JsonDocument;
 import com.robo4j.socket.http.json.JsonReader;
+import com.robo4j.socket.http.units.ClientPathConfig;
+import com.robo4j.socket.http.units.ServerContentBuilder;
 import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.units.ServerPathConfig;
 import com.robo4j.util.Utf8Constant;
@@ -31,7 +33,6 @@ import com.robo4j.util.Utf8Constant;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -68,13 +69,11 @@ public final class HttpPathUtils {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<ServerUnitPathDTO> readPathConfig(String configurationJson) {
+	public static <T> List<T> readPathConfig(Class<T> clazz, String configurationJson) {
 		if (configurationJson == null || configurationJson.isEmpty()) {
 			return Collections.emptyList();
 		}
-		final Class<ServerUnitPathDTO> clazz = ServerUnitPathDTO.class;
-		final JsonReader jsonReader = new JsonReader(configurationJson);
-		final JsonDocument document = jsonReader.read();
+		final JsonDocument document = parseJsonByClass(configurationJson);
 
 		//@formatter:off
 		return document.getArray().stream().map(JsonDocument.class::cast)
@@ -83,14 +82,23 @@ public final class HttpPathUtils {
 		//@formatter:on
 	}
 
-	public static ServerPathConfig toServerUnitPathMethod(ServerUnitPathDTO dto, RoboReference<Object> reference) {
-		final String unitPath = new StringBuilder().append(Utf8Constant.UTF8_SOLIDUS).append(SystemPath.UNITS.getPath())
-				.append(Utf8Constant.UTF8_SOLIDUS).append(dto.getRoboUnit()).toString();
+	public static ServerPathConfig toServerPathConfig(ServerUnitPathDTO dto, RoboReference<Object> reference) {
+		final String unitPath = toPath(SystemPath.UNITS.getPath(), dto.getRoboUnit());
 		return new ServerPathConfig(unitPath, reference, dto.getMethod(), dto.getFilters());
 	}
 
+	public static ClientPathConfig toClientPathConfig(ClientPathDTO dto, List<RoboReference<Object>> references){
+		final String unitPath = toPath(SystemPath.UNITS.getPath(), dto.getRoboUnit());
+		return new ClientPathConfig(unitPath, dto.getMethod(), references);
+	}
+
+	public static JsonDocument parseJsonByClass(String json) {
+		final JsonReader jsonReader = new JsonReader(json);
+		return jsonReader.read();
+	}
+
 	/**
-	 * Server context
+	 * Server context, context does contain default path /
 	 * 
 	 * @param context
 	 *            initiated roboContext
@@ -99,12 +107,7 @@ public final class HttpPathUtils {
 	 * @return server context
 	 */
 	public static ServerContext initServerContext(final RoboContext context, final List<ServerUnitPathDTO> paths) {
-		final Map<String, ServerPathConfig> result = paths.stream().map(e -> {
-			RoboReference<Object> reference = context.getReference(e.getRoboUnit());
-			return HttpPathUtils.toServerUnitPathMethod(e, reference);
-		}).collect(Collectors.toMap(ServerPathConfig::getPath, e -> e));
-		result.put(Utf8Constant.UTF8_SOLIDUS, new ServerPathConfig(Utf8Constant.UTF8_SOLIDUS, null, HttpMethod.GET));
-		return new ServerContext(result);
+		return ServerContentBuilder.Builder().addPaths(paths).build(context);
 	}
 
 }

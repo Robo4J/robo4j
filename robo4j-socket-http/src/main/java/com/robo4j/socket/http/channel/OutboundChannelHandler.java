@@ -18,7 +18,7 @@
 package com.robo4j.socket.http.channel;
 
 import com.robo4j.socket.http.SocketException;
-import com.robo4j.socket.http.dto.PathMethodDTO;
+import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.message.HttpDecoratedResponse;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
@@ -49,7 +49,7 @@ public class OutboundChannelHandler implements SocketHandler {
 
 	@Override
 	public void start() {
-		final PathMethodDTO pathMethod = new PathMethodDTO(message.getPath(), message.getMethod(), message.getCallbacks());
+		final ClientPathDTO pathMethod = new ClientPathDTO(message.getPath(), message.getMethod(), message.getCallbacks());
 
 		//@formatter:off
 		final String resultMessage = HttpMessageBuilder.Build()
@@ -77,7 +77,7 @@ public class OutboundChannelHandler implements SocketHandler {
 		return decoratedResponse;
 	}
 
-	private HttpDecoratedResponse getDecoratedResponse(ByteChannel byteChannel, PathMethodDTO pathMethod) {
+	private HttpDecoratedResponse getDecoratedResponse(ByteChannel byteChannel, ClientPathDTO pathMethod) {
 		try {
 			final HttpDecoratedResponse result = ChannelBufferUtils.getHttpDecoratedResponseByChannel(byteChannel);
 			result.addCallbacks(pathMethod.getCallbacks());

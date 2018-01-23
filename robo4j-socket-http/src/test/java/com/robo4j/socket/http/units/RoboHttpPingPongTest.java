@@ -141,7 +141,6 @@ public class RoboHttpPingPongTest {
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("address", HOST_SYSTEM);
-		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		builder.add(HttpClientUnit.class, config, ID_HTTP_CLIENT);
 
 		config = ConfigurationFactory.createEmptyConfiguration();
