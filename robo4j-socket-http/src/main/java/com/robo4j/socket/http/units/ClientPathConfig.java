@@ -1,6 +1,5 @@
 package com.robo4j.socket.http.units;
 
-import com.robo4j.RoboReference;
 import com.robo4j.socket.http.HttpMethod;
 
 import java.util.List;
@@ -14,9 +13,9 @@ public class ClientPathConfig {
 
 	private final String path;
 	private final HttpMethod method;
-	private final List<RoboReference<Object>> callbacks;
+	private final List<String> callbacks;
 
-	public ClientPathConfig(String path, HttpMethod method, List<RoboReference<Object>> callbacks) {
+	public ClientPathConfig(String path, HttpMethod method, List<String> callbacks) {
 		this.path = path;
 		this.method = method;
 		this.callbacks = callbacks;
@@ -30,7 +29,7 @@ public class ClientPathConfig {
 		return method;
 	}
 
-	public List<RoboReference<Object>> getCallbacks() {
+	public List<String> getCallbacks() {
 		return callbacks;
 	}
 

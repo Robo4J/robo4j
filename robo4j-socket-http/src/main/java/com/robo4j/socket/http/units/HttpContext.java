@@ -1,5 +1,7 @@
 package com.robo4j.socket.http.units;
 
+import java.util.Collection;
+
 /**
  * interface for http context
  *
@@ -8,12 +10,12 @@ package com.robo4j.socket.http.units;
  */
 public interface HttpContext<T> {
 
-    boolean isEmpty();
+	boolean isEmpty();
 
-    boolean containsPath(String path);
+	boolean containsPath(String path);
 
-    T getPathConfig(String path);
+	Collection<T> getPathConfigs();
 
-
+	T getPathConfig(String path);
 
 }

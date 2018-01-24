@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class StringProducer extends RoboUnit<String> {
+public class StringProducerUnit extends RoboUnit<String> {
 	/* default sent messages */
 	private static final int DEFAULT = 0;
 	private AtomicInteger counter;
@@ -38,7 +38,7 @@ public class StringProducer extends RoboUnit<String> {
 	 * @param context
 	 * @param id
 	 */
-	public StringProducer(RoboContext context, String id) {
+	public StringProducerUnit(RoboContext context, String id) {
 		super(String.class, context, id);
 	}
 

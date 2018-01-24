@@ -49,6 +49,7 @@ public class OutboundChannelHandler implements SocketHandler {
 
 	@Override
 	public void start() {
+		// FIXME: 1/24/18 (miro) -> client context
 		final ClientPathDTO pathMethod = new ClientPathDTO(message.getPath(), message.getMethod(), message.getCallbacks());
 
 		//@formatter:off

@@ -25,7 +25,7 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
-import com.robo4j.socket.http.units.test.HttpStringProducer;
+import com.robo4j.socket.http.units.test.HttpStringProducerUnit;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
 import com.robo4j.socket.http.util.HttpPathUtils;
@@ -92,7 +92,7 @@ public class RoboHttpPingPongTest {
 		RoboReference<Object> systemPingProducer = systemPing.getReference(ID_HTTP_PRODUCER);
 		for (int i = 0; i < MESSAGES; i++) {
 			systemPingProducer
-					.sendMessage(HttpStringProducer.SEND_POST_MESSAGE + "::" + RoboHttpDynamicTests.JSON_STRING);
+					.sendMessage(HttpStringProducerUnit.SEND_POST_MESSAGE + "::" + RoboHttpDynamicTests.JSON_STRING);
 		}
 
 		RoboReference<Object> pongConsumer = systemPong.getReference(REQUEST_CONSUMER);
@@ -145,11 +145,10 @@ public class RoboHttpPingPongTest {
 
 		config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString("target", ID_HTTP_CLIENT);
-		config.setString("method", "POST");
 		config.setString("uri", HttpPathUtils.toPath("units", CONTROLLER_PING_PONG));
 		config.setString(HTTP_PROPERTY_HOST, HOST_SYSTEM);
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
-		builder.add(HttpStringProducer.class, config, ID_HTTP_PRODUCER);
+		builder.add(HttpStringProducerUnit.class, config, ID_HTTP_PRODUCER);
 		return builder.build();
 	}
 }

@@ -25,11 +25,13 @@ import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.socket.http.json.JsonDocument;
 import com.robo4j.socket.http.json.JsonReader;
 import com.robo4j.socket.http.units.ClientPathConfig;
-import com.robo4j.socket.http.units.ServerContentBuilder;
-import com.robo4j.socket.http.units.ServerContext;
+import com.robo4j.socket.http.units.ContextBuilder;
+import com.robo4j.socket.http.units.HttpContext;
 import com.robo4j.socket.http.units.ServerPathConfig;
+import com.robo4j.util.StringConstants;
 import com.robo4j.util.Utf8Constant;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -87,9 +89,10 @@ public final class HttpPathUtils {
 		return new ServerPathConfig(unitPath, reference, dto.getMethod(), dto.getFilters());
 	}
 
-	public static ClientPathConfig toClientPathConfig(ClientPathDTO dto, List<RoboReference<Object>> references){
-		final String unitPath = toPath(SystemPath.UNITS.getPath(), dto.getRoboUnit());
-		return new ClientPathConfig(unitPath, dto.getMethod(), references);
+	public static ClientPathConfig toClientPathConfig(ClientPathDTO dto) {
+		final String unitPath = dto.getRoboUnit().equals(StringConstants.EMPTY) ? Utf8Constant.UTF8_SOLIDUS
+				: toPath(SystemPath.UNITS.getPath(), dto.getRoboUnit());
+		return new ClientPathConfig(unitPath, dto.getMethod(), dto.getCallbacks());
 	}
 
 	public static JsonDocument parseJsonByClass(String json) {
@@ -104,10 +107,12 @@ public final class HttpPathUtils {
 	 *            initiated roboContext
 	 * @param paths
 	 *            available configured paths
+	 *
 	 * @return server context
 	 */
-	public static ServerContext initServerContext(final RoboContext context, final List<ServerUnitPathDTO> paths) {
-		return ServerContentBuilder.Builder().addPaths(paths).build(context);
+	public static <T, C extends HttpContext<?>> C initHttpContext(ContextBuilder<T, C> contextBuilder,
+			final RoboContext context, final Collection<T> paths) {
+		return contextBuilder.addPaths(paths).build(context);
 	}
 
 }

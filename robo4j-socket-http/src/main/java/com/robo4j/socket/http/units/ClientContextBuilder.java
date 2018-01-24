@@ -1,7 +1,6 @@
 package com.robo4j.socket.http.units;
 
 import com.robo4j.RoboContext;
-import com.robo4j.RoboReference;
 import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.util.HttpPathUtils;
 
@@ -15,7 +14,7 @@ import java.util.stream.Collectors;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class ClientContextBuilder {
+public final class ClientContextBuilder implements ContextBuilder<ClientPathDTO, ClientContext>{
 
     private List<ClientPathDTO> paths;
 
@@ -27,18 +26,19 @@ public final class ClientContextBuilder {
         return new ClientContextBuilder();
     }
 
+    @Override
     public ClientContextBuilder addPaths(Collection<ClientPathDTO> paths){
         this.paths.addAll(paths);
         return this;
     }
 
+    @Override
     public ClientContext build(RoboContext context){
-        final Map<String, ClientPathConfig> resultPaths = paths.stream().map(e -> {
-            List<RoboReference<Object>> references = e.getCallbacks().stream()
-                    .map(context::getReference)
-                    .collect(Collectors.toList());
-            return HttpPathUtils.toClientPathConfig(e, references);
-        }).collect(Collectors.toMap(ClientPathConfig::getPath, e -> e));
+        //@formatter:off
+        final Map<String, ClientPathConfig> resultPaths = paths.stream()
+                .map(HttpPathUtils::toClientPathConfig)
+                .collect(Collectors.toMap(ClientPathConfig::getPath, e -> e));
+        //@formatter:on
         return new ClientContext(resultPaths);
     }
 

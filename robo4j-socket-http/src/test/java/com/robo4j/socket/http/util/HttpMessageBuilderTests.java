@@ -20,6 +20,7 @@ package com.robo4j.socket.http.util;
 import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.socket.http.ProtocolType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -65,7 +66,7 @@ public class HttpMessageBuilderTests {
 	private HttpMessageBuilder getDefaultMessageBuilderByMethod(HttpMethod method) {
 		RequestDenominator getDenominator = new RequestDenominator(method, HttpVersion.HTTP_1_1);
 		return HttpMessageBuilder.Build().setDenominator(getDenominator)
-				.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost("localhost"))
+				.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost("localhost", ProtocolType.HTTP.getPort()))
 				.addHeaderElements(BASIC_HEADER_MAP);
 	}
 }

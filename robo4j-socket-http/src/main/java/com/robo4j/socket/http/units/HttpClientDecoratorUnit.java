@@ -22,12 +22,10 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.channel.OutboundChannelHandler;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.message.HttpDecoratedResponse;
-import com.robo4j.util.Utf8Constant;
 
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
@@ -35,7 +33,6 @@ import java.util.EnumSet;
 import java.util.List;
 
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_RESPONSE_HANLDER;
 
 /**
  * Http NIO Client for communication with external Robo4J units.
@@ -50,7 +47,6 @@ public class HttpClientDecoratorUnit extends RoboUnit<HttpDecoratedRequest> {
 	private static final EnumSet<StatusCode> PROCESS_RESPONSES_STATUSES = EnumSet.of(StatusCode.OK,
 			StatusCode.ACCEPTED);
 	private Integer bufferCapacity;
-	private String responseHandler;
 
 	public HttpClientDecoratorUnit(RoboContext context, String id) {
 		super(HttpDecoratedRequest.class, context, id);
@@ -59,17 +55,13 @@ public class HttpClientDecoratorUnit extends RoboUnit<HttpDecoratedRequest> {
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, null);
-		responseHandler = configuration.getString(HTTP_PROPERTY_RESPONSE_HANLDER, null);
 	}
 
 	// TODO: 12/11/17 (miro) all information are in the message
 	@Override
 	public void onMessage(HttpDecoratedRequest message) {
 
-		// FIXME: 12/11/17 (miro) better
-		final String[] addressProperties = message.getHeaderValue(HttpHeaderFieldNames.HOST).split(Utf8Constant.UTF8_COLON);
-		final int port = addressProperties.length > 1 ? Integer.valueOf(addressProperties[1]) : 80;
-		final InetSocketAddress address = new InetSocketAddress(addressProperties[0], port);
+		final InetSocketAddress address = new InetSocketAddress(message.getHost(), message.getPort());
 		try (SocketChannel channel = SocketChannel.open(address)) {
 			if (bufferCapacity != null) {
 				channel.socket().setSendBufferSize(bufferCapacity);
@@ -81,9 +73,6 @@ public class HttpClientDecoratorUnit extends RoboUnit<HttpDecoratedRequest> {
 			handler.stop();
 
 			final HttpDecoratedResponse decoratedResponse = handler.getDecoratedResponse();
-			if (responseHandler != null) {
-				sendMessageToCallback(responseHandler, decoratedResponse);
-			}
 
 			if (decoratedResponse != null && PROCESS_RESPONSES_STATUSES.contains(decoratedResponse.getCode())) {
 				if (!decoratedResponse.getCallbacks().isEmpty()) {

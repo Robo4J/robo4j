@@ -20,6 +20,7 @@ package com.robo4j.socket.http.dto;
 import com.robo4j.socket.http.HttpMethod;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -45,33 +46,40 @@ public class ClientPathDTO {
 		return roboUnit;
 	}
 
+	public void setRoboUnit(String roboUnit) {
+		this.roboUnit = roboUnit;
+	}
+
 	public HttpMethod getMethod() {
 		return method;
+	}
+
+	public void setMethod(HttpMethod method) {
+		this.method = method;
 	}
 
 	public List<String> getCallbacks() {
 		return callbacks;
 	}
 
+	public void setCallbacks(List<String> callbacks) {
+		this.callbacks = callbacks;
+	}
+
 	@Override
 	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (!(o instanceof ClientPathDTO))
-			return false;
-
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
 		ClientPathDTO that = (ClientPathDTO) o;
-
-		if (!roboUnit.equals(that.roboUnit))
-			return false;
-		return method == that.method;
+		return Objects.equals(roboUnit, that.roboUnit) &&
+				method == that.method &&
+				Objects.equals(callbacks, that.callbacks);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = roboUnit.hashCode();
-		result = 31 * result + method.hashCode();
-		return result;
+
+		return Objects.hash(roboUnit, method, callbacks);
 	}
 
 	@Override

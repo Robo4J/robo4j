@@ -17,16 +17,20 @@
 
 package com.robo4j.socket.http.message;
 
+import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.util.HttpDenominator;
 import com.robo4j.socket.http.util.RequestDenominator;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Inbound Http message used by Server units.
  * Message does contains all necessary information for processing the request
  *
+ * message has two mutable fields host, port
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -34,6 +38,8 @@ import java.util.Map;
 public final class HttpDecoratedRequest extends AbstractHttpDecoratedMessage {
 
 	private final RequestDenominator denominator;
+	private String host;
+	private Integer port;
 
 	public HttpDecoratedRequest(RequestDenominator denominator){
 		super(denominator.getVersion());
@@ -58,6 +64,27 @@ public final class HttpDecoratedRequest extends AbstractHttpDecoratedMessage {
 		return denominator.getPath();
 	}
 
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public Integer getPort() {
+		return port;
+	}
+
+	public void setPort(Integer port) {
+		this.port = port;
+	}
+
+	public void addHostHeader(){
+		Objects.requireNonNull(host, "host is required");
+		Objects.requireNonNull(host, "port is required");
+		addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, port));
+	}
 
 	@Override
 	public String toString() {

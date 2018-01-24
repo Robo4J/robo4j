@@ -1,6 +1,7 @@
 package com.robo4j.socket.http.json;
 
 import com.robo4j.socket.http.util.RoboReflectException;
+import com.robo4j.util.StringConstants;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -371,12 +372,15 @@ public class JsonReader {
 	private String readString(ReadType endType) {
 		StringBuilder sb = new StringBuilder();
 		char readChar = jsonChars[++index];
+		currentRead = endType;
+		if(readChar == QUOTATION_MARK){
+			return StringConstants.EMPTY;
+		}
 		do {
 			sb.append(readChar);
 			readChar = jsonChars[++index];
 		} while (readChar != QUOTATION_MARK);
 
-		currentRead = endType;
 		return sb.toString();
 	}
 

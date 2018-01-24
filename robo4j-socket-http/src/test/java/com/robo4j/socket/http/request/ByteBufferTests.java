@@ -20,6 +20,7 @@ package com.robo4j.socket.http.request;
 import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.socket.http.ProtocolType;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
 import com.robo4j.socket.http.util.HttpDenominator;
@@ -86,7 +87,7 @@ public class ByteBufferTests {
         String postMessage = HttpMessageBuilder.Build()
                 .setDenominator(denominator)
                 .addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(bodyMessage.length()))
-                .addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, port))
+                .addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, ProtocolType.HTTP.getPort()))
                 .build(bodyMessage);
 
         HttpDecoratedRequest decoratedRequest = ChannelBufferUtils.extractDecoratedRequestByStringMessage(postMessage);

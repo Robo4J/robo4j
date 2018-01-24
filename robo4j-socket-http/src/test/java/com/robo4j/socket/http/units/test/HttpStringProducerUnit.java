@@ -24,6 +24,7 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.socket.http.ProtocolType;
 import com.robo4j.socket.http.util.HttpDenominator;
 import com.robo4j.socket.http.util.HttpMessageBuilder;
 import com.robo4j.socket.http.util.RequestDenominator;
@@ -32,13 +33,14 @@ import com.robo4j.socket.http.util.RoboHttpUtils;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 
 /**
+ * Http String producer unit over Http protocol with default port
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class HttpStringProducer extends StringProducer {
+public class HttpStringProducerUnit extends StringProducerUnit {
 
 	/* default sent messages */
 	private static final int DEFAULT = 0;
@@ -46,16 +48,15 @@ public class HttpStringProducer extends StringProducer {
 	public static final String SEND_POST_MESSAGE = "sendPostMessage";
 	private AtomicInteger counter;
 	private String target;
-	private String method;
+	private ProtocolType protocol;
 	private String uri;
 	private String host;
-	private Integer port;
 
 	/**
 	 * @param context
 	 * @param id
 	 */
-	public HttpStringProducer(RoboContext context, String id) {
+	public HttpStringProducerUnit(RoboContext context, String id) {
 		super(context, id);
 	}
 
@@ -64,13 +65,12 @@ public class HttpStringProducer extends StringProducer {
 		super.onInitialization(configuration);
 
 		target = configuration.getString("target", null);
-		method = configuration.getString("method", null);
+		protocol = ProtocolType.HTTP;
 		uri = configuration.getString("uri", null);
 		host = configuration.getString(HTTP_PROPERTY_HOST, null);
-		port = configuration.getInteger(HTTP_PROPERTY_PORT, null);
 
-		if(host == null || port == null){
-			throw ConfigurationException.createMissingConfigNameException("host, port");
+		if (host == null) {
+			throw ConfigurationException.createMissingConfigNameException("host");
 		}
 
 		counter = new AtomicInteger(DEFAULT);
@@ -88,10 +88,10 @@ public class HttpStringProducer extends StringProducer {
 			String inMessage = input[1].trim();
 			switch (inMessageType) {
 			case SEND_GET_MESSAGE:
-				sendGetSimpleMessage(host, port);
+				sendGetSimpleMessage();
 				break;
 			case SEND_POST_MESSAGE:
-				sendPostSimpleMessage(host, port, uri, inMessage);
+				sendPostSimpleMessage(uri, inMessage);
 				break;
 			default:
 				System.out.println("don't understand message: " + message);
@@ -110,26 +110,23 @@ public class HttpStringProducer extends StringProducer {
 		return null;
 	}
 
-	private void sendGetSimpleMessage(String host, Integer port) {
+	private void sendGetSimpleMessage() {
 		final HttpDenominator denominator = new RequestDenominator(HttpMethod.GET, HttpVersion.HTTP_1_1);
-		final String request = HttpMessageBuilder.Build()
-				.setDenominator(denominator)
-				.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, port))
+		final String request = HttpMessageBuilder.Build().setDenominator(denominator)
+				.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, protocol.getPort()))
 				.build();
 		getContext().getReference(target).sendMessage(request);
 	}
 
-	private void sendPostSimpleMessage(String host, Integer port, String uri, String message) {
+	private void sendPostSimpleMessage(String uri, String message) {
 		if (uri == null) {
 			throw new IllegalStateException("uri not available");
 		}
 
 		final HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, uri, HttpVersion.HTTP_1_1);
-		final String postMessage = HttpMessageBuilder.Build()
-				.setDenominator(denominator)
-				.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, port))
-				.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()))
-				.build(message);
+		final String postMessage = HttpMessageBuilder.Build().setDenominator(denominator)
+				.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, protocol.getPort()))
+				.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length())).build(message);
 		getContext().getReference(target).sendMessage(postMessage);
 	}
 }

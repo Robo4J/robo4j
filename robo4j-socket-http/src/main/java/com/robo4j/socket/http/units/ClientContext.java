@@ -1,5 +1,6 @@
 package com.robo4j.socket.http.units;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -24,6 +25,11 @@ public final class ClientContext implements HttpContext<ClientPathConfig> {
     @Override
     public boolean containsPath(String path){
         return pathConfigs.containsKey(path);
+    }
+
+    @Override
+    public Collection<ClientPathConfig> getPathConfigs(){
+        return pathConfigs.values();
     }
 
     @Override

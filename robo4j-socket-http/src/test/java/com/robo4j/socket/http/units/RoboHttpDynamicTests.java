@@ -29,6 +29,7 @@ import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.socket.http.ProtocolType;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpDenominator;
@@ -94,11 +95,12 @@ public class RoboHttpDynamicTests {
 		/* client system sending a messages to the main system */
 		for (int i = 0; i < MESSAGES_NUMBER; i++) {
 
+			// FIXME: 1/24/18 (miro) -> correct the protocol type, redesign the test
 			HttpDenominator denominator = new RequestDenominator(HttpMethod.POST,
 					HttpPathUtils.toPath("units", ID_TARGET_UNIT), HttpVersion.HTTP_1_1);
 			String messageToSend = HttpMessageBuilder.Build()
 					.setDenominator(denominator)
-                    .addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(HOST_SYSTEM))
+                    .addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(HOST_SYSTEM, ProtocolType.HTTP.getPort()))
 					.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(JSON_STRING.length()))
 					.build(JSON_STRING);
 

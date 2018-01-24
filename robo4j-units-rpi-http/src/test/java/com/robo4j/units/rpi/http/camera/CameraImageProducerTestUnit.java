@@ -132,7 +132,9 @@ public class CameraImageProducerTestUnit extends RoboUnit<Boolean> {
 			final RequestDenominator denominator = new RequestDenominator(HttpMethod.POST, path, HttpVersion.HTTP_1_1);
 
 			HttpDecoratedRequest request = new HttpDecoratedRequest(denominator);
-			request.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, port));
+			request.setHost(host);
+			request.setPort(port);
+			request.addHostHeader();
 			request.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()));
 			request.addMessage(message);
 

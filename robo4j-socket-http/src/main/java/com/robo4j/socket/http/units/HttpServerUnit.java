@@ -84,7 +84,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	@Override
 	public void start() {
 		setState(LifecycleState.STARTING);
-		serverContext = HttpPathUtils.initServerContext(getContext(), paths);
+		serverContext = HttpPathUtils.initHttpContext(ServerContextBuilder.Builder(), getContext(), paths);
 		inboundSocketHandler = new InboundSocketHandler(getContext(), serverContext, propertiesProvider);
 
 		inboundSocketHandler.start();

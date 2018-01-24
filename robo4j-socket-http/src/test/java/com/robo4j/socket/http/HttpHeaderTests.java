@@ -79,7 +79,7 @@ public class HttpHeaderTests {
 		String message = "message";
 		HttpDenominator denominator = new RequestDenominator(HttpMethod.POST, HttpVersion.HTTP_1_1);
 		String postRequest = HttpMessageBuilder.Build().setDenominator(denominator)
-				.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost("127.0.0.1"))
+				.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost("127.0.0.1", ProtocolType.HTTP.getPort()))
 				.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()))
 				.build(message);
 		System.out.println("HEADER: " + postRequest);
