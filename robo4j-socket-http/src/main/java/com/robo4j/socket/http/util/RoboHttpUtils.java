@@ -35,6 +35,8 @@ public final class RoboHttpUtils {
 	public static final String HTTP_PATHS_CONFIG = "pathsConfig";
 	public static final String HTTP_PROPERTY_HOST = "host";
 	public static final String HTTP_PROPERTY_PORT = "port";
+	public static final String HTTP_PROPERTY_TARGET = "target";
+	public static final String HTTP_PROPERTY_PROTOCOL = "protocol";
 	public static final String HTTP_PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
 
 	public static void decorateByNewLine(StringBuilder sb) {

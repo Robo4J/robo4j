@@ -16,12 +16,12 @@
  */
 package com.robo4j.util;
 
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import com.robo4j.RoboContext;
-import com.robo4j.RoboReference;
 
 /**
  * Some useful little utilities.
@@ -61,6 +61,7 @@ public final class SystemUtil {
 		return builder.toString();
 	}
 
+	// TODO: 1/25/18 (miro) convert it to JSON message
 	public static String printSocketEndPoint(RoboReference<?> point, RoboReference<?> codecUnit){
 		final int port = point.getConfiguration().getInteger("port", 0);
 		StringBuilder sb = new StringBuilder();
@@ -88,4 +89,5 @@ public final class SystemUtil {
 		//@formatter:on
 		return sb.toString();
 	}
+
 }

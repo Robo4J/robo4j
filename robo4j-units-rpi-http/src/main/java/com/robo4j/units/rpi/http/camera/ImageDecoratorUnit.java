@@ -36,12 +36,11 @@ import com.robo4j.units.rpi.camera.ImageDTO;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.robo4j.socket.http.provider.DefaultValuesProvider.BASIC_HEADER_MAP;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PATHS_CONFIG;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 
 /**
  *
@@ -70,12 +69,8 @@ public class ImageDecoratorUnit extends RoboUnit<ImageDTO> {
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		target = configuration.getString(PROPERTY_TARGET, null);
-		host = configuration.getString(HTTP_PROPERTY_HOST, null);
-		port = configuration.getInteger(HTTP_PROPERTY_PORT, null);
+		Objects.requireNonNull(target, "target not available");
 
-		if (target == null || host == null || port == null) {
-			throw ConfigurationException.createMissingConfigNameException("target, host or port may be null");
-		}
 		List<ClientPathDTO> paths = HttpPathUtils.readPathConfig(ClientPathDTO.class, configuration.getString(HTTP_PATHS_CONFIG, null));
 		if (paths.isEmpty()) {
 			throw ConfigurationException.createMissingConfigNameException(PROPERTY_REMOTE_UNITS);
@@ -95,9 +90,6 @@ public class ImageDecoratorUnit extends RoboUnit<ImageDTO> {
 			final CameraMessage cameraMessage = new CameraMessage(image.getEncoding(),
 					String.valueOf(imageNumber.incrementAndGet()), imageBase64);
 			final String encodedImage = codec.encode(cameraMessage);
-			result.setHost(host);
-			result.setPort(port);
-			result.addHostHeader();
 			result.addHeaderElements(BASIC_HEADER_MAP);
 			result.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(encodedImage.length()));
 			result.addMessage(encodedImage);

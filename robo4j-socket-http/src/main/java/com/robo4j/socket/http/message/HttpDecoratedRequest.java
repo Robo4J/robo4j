@@ -82,7 +82,7 @@ public final class HttpDecoratedRequest extends AbstractHttpDecoratedMessage {
 
 	public void addHostHeader(){
 		Objects.requireNonNull(host, "host is required");
-		Objects.requireNonNull(host, "port is required");
+		Objects.requireNonNull(port, "port is required");
 		addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(host, port));
 	}
 

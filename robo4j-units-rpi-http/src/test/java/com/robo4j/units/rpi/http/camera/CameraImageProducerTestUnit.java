@@ -32,7 +32,6 @@ import com.robo4j.socket.http.codec.CameraMessageCodec;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.util.HttpConstant;
 import com.robo4j.socket.http.util.RequestDenominator;
-import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.StreamUtils;
 
 import java.util.Arrays;
@@ -40,11 +39,9 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -63,8 +60,6 @@ public class CameraImageProducerTestUnit extends RoboUnit<Boolean> {
 	private final AtomicInteger counter = new AtomicInteger(0);
 
 	private String targetOut;
-	private String host;
-	private Integer port;
 	private String path;
 	private Integer numberOfImages;
 
@@ -77,13 +72,8 @@ public class CameraImageProducerTestUnit extends RoboUnit<Boolean> {
 		targetOut = configuration.getString("targetOut", null);
 		numberOfImages = configuration.getInteger("numberOfImages", 0);
 		path = configuration.getString("path", null);
-		host = configuration.getString(HTTP_PROPERTY_HOST, null);
-		port = configuration.getInteger(HTTP_PROPERTY_PORT, null);
-
-		if (targetOut == null || path == null || host == null || port == null) {
-			throw ConfigurationException.createMissingConfigNameException("targetOut, path, host, port");
-		}
-
+		Objects.requireNonNull(path, "path not available");
+		Objects.requireNonNull(targetOut, "targetOut not available");
 	}
 
 	@Override
@@ -132,9 +122,6 @@ public class CameraImageProducerTestUnit extends RoboUnit<Boolean> {
 			final RequestDenominator denominator = new RequestDenominator(HttpMethod.POST, path, HttpVersion.HTTP_1_1);
 
 			HttpDecoratedRequest request = new HttpDecoratedRequest(denominator);
-			request.setHost(host);
-			request.setPort(port);
-			request.addHostHeader();
 			request.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()));
 			request.addMessage(message);
 

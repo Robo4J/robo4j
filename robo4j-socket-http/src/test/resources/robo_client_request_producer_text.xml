@@ -1,14 +1,16 @@
 <robo4j>
     <roboUnit id="httpClient">
         <class>com.robo4j.socket.http.units.HttpClientDecoratorUnit</class>
+        <config name="com.robo4j.root">
+            <value name="host" type="String">0.0.0.0</value>
+            <value name="port" type="int">8050</value>
+        </config>
     </roboUnit>
     <roboUnit id="decoratedProducer">
         <class>com.robo4j.socket.http.units.test.HttpMessageDecoratedProducerUnit</class>
         <config name="com.robo4j.root">
             <value name="target" type="String">httpClient</value>
             <value name="pathsConfig" type="String">[{"roboUnit":"","method":"GET","callbacks":["stringConsumer"]}]</value>
-            <value name="host" type="String">0.0.0.0</value>
-            <value name="port" type="int">8050</value>
         </config>
     </roboUnit>
     <roboUnit id="stringConsumer">

@@ -26,25 +26,21 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
-import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
-import com.robo4j.socket.http.HttpVersion;
-import com.robo4j.socket.http.ProtocolType;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
+import com.robo4j.socket.http.units.test.HttpMessageDecoratedProducerUnit;
 import com.robo4j.socket.http.units.test.StringConsumer;
-import com.robo4j.socket.http.util.HttpDenominator;
-import com.robo4j.socket.http.util.HttpMessageBuilder;
 import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
-import com.robo4j.socket.http.util.HttpPathUtils;
-import com.robo4j.socket.http.util.RequestDenominator;
-import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.concurrent.Future;
 
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PATHS_CONFIG;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
 
 /**
  *
@@ -60,11 +56,11 @@ public class RoboHttpDynamicTests {
 	private static final int SLEEP_DELAY = 400; // necessary delay due to multi-threading we should fix it
 	private static final String ID_CLIENT_UNIT = "httpClient";
 	private static final String ID_TARGET_UNIT = "controller";
-	private static final int MESSAGES_NUMBER = 6;
+	private static final int MESSAGES_NUMBER = 42;
 	private static final String HOST_SYSTEM = "0.0.0.0";
 	private static final String REQUEST_CONSUMER = "request_consumer";
-	private static final String HTTP_METHOD = "POST";
 	static final String JSON_STRING = "{\"value\":\"stop\"}";
+	public static final String DECORATED_PRODUCER = "decoratedProducer";
 
 	/**
 	 * Motivation Client system is sending messages to the main system over HTTP
@@ -79,33 +75,19 @@ public class RoboHttpDynamicTests {
 
 		/* tested system configuration */
 		RoboContext mainSystem = getServerRoboSystem();
-		System.out.println(SystemUtil.printStateReport(mainSystem));
-		System.out.println("Server start after start:");
 
 		/* system which is testing main system */
 		RoboContext clientSystem = getClientRoboSystem();
-		RoboReference<Object> httpClientReference = clientSystem.getReference(ID_CLIENT_UNIT);
+		RoboReference<Object> decoratedProducer = clientSystem.getReference(DECORATED_PRODUCER);
 
+		System.out.println("Client system state after start:");
 		System.out.println(SystemUtil.printStateReport(clientSystem));
-		System.out.println("Client State after start:");
 
-		System.out.println("State after start:");
+		System.out.println("Main system state after start:");
 		System.out.println(SystemUtil.printStateReport(mainSystem));
 
 		/* client system sending a messages to the main system */
-		for (int i = 0; i < MESSAGES_NUMBER; i++) {
-
-			// FIXME: 1/24/18 (miro) -> correct the protocol type, redesign the test
-			HttpDenominator denominator = new RequestDenominator(HttpMethod.POST,
-					HttpPathUtils.toPath("units", ID_TARGET_UNIT), HttpVersion.HTTP_1_1);
-			String messageToSend = HttpMessageBuilder.Build()
-					.setDenominator(denominator)
-                    .addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost(HOST_SYSTEM, ProtocolType.HTTP.getPort()))
-					.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(JSON_STRING.length()))
-					.build(JSON_STRING);
-
-			httpClientReference.sendMessage(messageToSend);
-		}
+		decoratedProducer.sendMessage(MESSAGES_NUMBER);
 
 		Thread.sleep(SLEEP_DELAY);
 
@@ -136,13 +118,13 @@ public class RoboHttpDynamicTests {
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		config.setString("packages", "com.robo4j.socket.http.units.test.codec");
-		config.setString(RoboHttpUtils.HTTP_PATHS_CONFIG,
+		config.setString(HTTP_PATHS_CONFIG,
 				HttpPathConfigJsonBuilder.Builder().addPath(ID_TARGET_UNIT, HttpMethod.POST).build());
 		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
 
 
 		config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString("target", REQUEST_CONSUMER);
+		config.setString(HTTP_PROPERTY_TARGET, REQUEST_CONSUMER);
 		builder.add(HttpCommandTestController.class, config, ID_TARGET_UNIT);
 
 		builder.add(StringConsumer.class, REQUEST_CONSUMER);
@@ -163,15 +145,19 @@ public class RoboHttpDynamicTests {
 		/* system which is testing main system */
 		RoboBuilder builder = new RoboBuilder();
 
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString("address", HOST_SYSTEM);
-		config.setInteger(HTTP_PROPERTY_PORT, PORT);
-		builder.add(HttpClientUnit.class, config, ID_CLIENT_UNIT);
+        Configuration config = ConfigurationFactory.createEmptyConfiguration();
+        config.setString(HTTP_PROPERTY_HOST, HOST_SYSTEM);
+        config.setInteger(HTTP_PROPERTY_PORT, PORT);
+		builder.add(HttpClientDecoratorUnit.class, config, ID_CLIENT_UNIT);
+
+		config = ConfigurationFactory.createEmptyConfiguration();
+		config.setString(HTTP_PROPERTY_TARGET, ID_CLIENT_UNIT);
+		config.setString(HTTP_PATHS_CONFIG, "[{\"roboUnit\":\""+ ID_TARGET_UNIT + "\",\"method\":\"POST\"}]");
+		config.setString("message", JSON_STRING);
+		builder.add(HttpMessageDecoratedProducerUnit.class, config, DECORATED_PRODUCER);
 
 		RoboContext result = builder.build();
 		result.start();
-		System.out.println("Client State after start:");
-		System.out.println(SystemUtil.printStateReport(result));
 		return result;
 	}
 }

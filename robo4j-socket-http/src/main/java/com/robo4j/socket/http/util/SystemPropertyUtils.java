@@ -17,6 +17,8 @@
 
 package com.robo4j.socket.http.util;
 
+import java.util.Objects;
+
 /**
  * Utility class helps to parse System Properties values
  *
@@ -29,7 +31,7 @@ public final class SystemPropertyUtils {
         if(key == null){
             throw new NullPointerException("key");
         }
-
+        Objects.requireNonNull(key, "key");
         if(key.isEmpty()){
             throw new IllegalArgumentException("key is empty");
         }

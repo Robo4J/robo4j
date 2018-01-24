@@ -18,13 +18,15 @@
 <robo4j>
     <roboUnit id="httpClient">
         <class>com.robo4j.socket.http.units.HttpClientDecoratorUnit</class>
+        <config name="com.robo4j.root">
+            <value name="host" type="String">0.0.0.0</value>
+            <value name="port" type="int">8030</value>
+        </config>
     </roboUnit>
     <roboUnit id="imageController">
         <class>com.robo4j.units.rpi.http.camera.CameraImageProducerTestUnit</class>
         <config name="com.robo4j.root">
             <value name="targetOut" type="String">httpClient</value>
-            <value name="host" type="String">0.0.0.0</value>
-            <value name="port" type="int">8030</value>
             <value name="path" type="String">/units/imageProcessor</value>
             <value name="numberOfImages" type="int">24</value>
         </config>
