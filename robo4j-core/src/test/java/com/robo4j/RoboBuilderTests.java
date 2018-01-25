@@ -49,15 +49,12 @@ public class RoboBuilderTests {
 		for (int i = 0; i < MESSAGES; i++) {
 			producer.sendMessage("sendRandomMessage");
 		}
-		Assert.assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
-
 		RoboReference<String> consumer = system.getReference("consumer");
-		Assert.assertNotNull(consumer);
 
-		synchronized (consumer.getAttribute(descriptor)) {
-			int receivedMessages = consumer.getAttribute(descriptor).get();
-			Assert.assertEquals(MESSAGES, receivedMessages);
-		}
+		Thread.sleep(400);
+
+		Assert.assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
+		Assert.assertEquals(MESSAGES, (int) consumer.getAttribute(descriptor).get());
 
 		system.stop();
 		system.shutdown();
