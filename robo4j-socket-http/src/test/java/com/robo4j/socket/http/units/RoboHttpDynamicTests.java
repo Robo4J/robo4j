@@ -149,7 +149,7 @@ public class RoboHttpDynamicTests {
         Configuration config = ConfigurationFactory.createEmptyConfiguration();
         config.setString(HTTP_PROPERTY_HOST, HOST_SYSTEM);
         config.setInteger(HTTP_PROPERTY_PORT, PORT);
-		builder.add(HttpClientDecoratorUnit.class, config, ID_CLIENT_UNIT);
+		builder.add(HttpClientUnit.class, config, ID_CLIENT_UNIT);
 
 		config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString(HTTP_PROPERTY_TARGET, ID_CLIENT_UNIT);
