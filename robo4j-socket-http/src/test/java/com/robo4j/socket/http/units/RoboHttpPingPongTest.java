@@ -25,10 +25,9 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
-import com.robo4j.socket.http.units.test.HttpStringProducerUnit;
+import com.robo4j.socket.http.units.test.HttpMessageDecoratedProducerUnit;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
-import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -37,6 +36,7 @@ import org.junit.Test;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PATHS_CONFIG;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
 
 /**
  * Ping Pong test from outside/foreign unit is send signal. The signal has been
@@ -61,6 +61,7 @@ public class RoboHttpPingPongTest {
 	private static final int MESSAGES = 50;
 	private static final String REQUEST_CONSUMER = "request_consumer";
 	private static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
+	private static final String DECORATED_PRODUCER = "decoratedProducer";
 
 	@Ignore
 	@Test
@@ -89,11 +90,8 @@ public class RoboHttpPingPongTest {
 		System.out.println(SystemUtil.printStateReport(systemPing));
 
 		System.out.println("systemPing: send messages");
-		RoboReference<Object> systemPingProducer = systemPing.getReference(ID_HTTP_PRODUCER);
-		for (int i = 0; i < MESSAGES; i++) {
-			systemPingProducer
-					.sendMessage(HttpStringProducerUnit.SEND_POST_MESSAGE + "::" + RoboHttpDynamicTests.JSON_STRING);
-		}
+		RoboReference<Object> decoratedProducer = systemPing.getReference(DECORATED_PRODUCER);
+		decoratedProducer.sendMessage(MESSAGES);
 
 		RoboReference<Object> pongConsumer = systemPong.getReference(REQUEST_CONSUMER);
 
@@ -137,18 +135,21 @@ public class RoboHttpPingPongTest {
 	}
 
 	private RoboContext configurePingSystem() throws Exception {
+
+		/* system which is testing main system */
 		RoboBuilder builder = new RoboBuilder();
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString("address", HOST_SYSTEM);
-		builder.add(HttpClientUnit.class, config, ID_HTTP_CLIENT);
-
-		config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString("target", ID_HTTP_CLIENT);
-		config.setString("uri", HttpPathUtils.toPath("units", CONTROLLER_PING_PONG));
 		config.setString(HTTP_PROPERTY_HOST, HOST_SYSTEM);
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
-		builder.add(HttpStringProducerUnit.class, config, ID_HTTP_PRODUCER);
+		builder.add(HttpClientDecoratorUnit.class, config, ID_HTTP_CLIENT);
+
+		config = ConfigurationFactory.createEmptyConfiguration();
+		config.setString(HTTP_PROPERTY_TARGET, ID_HTTP_CLIENT);
+		config.setString(HTTP_PATHS_CONFIG, "[{\"roboUnit\":\""+ CONTROLLER_PING_PONG + "\",\"method\":\"POST\"}]");
+		config.setString("message", RoboHttpDynamicTests.JSON_STRING);
+		builder.add(HttpMessageDecoratedProducerUnit.class, config, DECORATED_PRODUCER);
+
 		return builder.build();
 	}
 }

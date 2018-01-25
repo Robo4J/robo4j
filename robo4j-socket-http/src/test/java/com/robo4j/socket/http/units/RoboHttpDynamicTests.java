@@ -60,7 +60,7 @@ public class RoboHttpDynamicTests {
 	private static final String HOST_SYSTEM = "0.0.0.0";
 	private static final String REQUEST_CONSUMER = "request_consumer";
 	static final String JSON_STRING = "{\"value\":\"stop\"}";
-	public static final String DECORATED_PRODUCER = "decoratedProducer";
+	private static final String DECORATED_PRODUCER = "decoratedProducer";
 
 	/**
 	 * Motivation Client system is sending messages to the main system over HTTP
@@ -78,7 +78,7 @@ public class RoboHttpDynamicTests {
 
 		/* system which is testing main system */
 		RoboContext clientSystem = getClientRoboSystem();
-		RoboReference<Object> decoratedProducer = clientSystem.getReference(DECORATED_PRODUCER);
+
 
 		System.out.println("Client system state after start:");
 		System.out.println(SystemUtil.printStateReport(clientSystem));
@@ -87,6 +87,7 @@ public class RoboHttpDynamicTests {
 		System.out.println(SystemUtil.printStateReport(mainSystem));
 
 		/* client system sending a messages to the main system */
+        RoboReference<Object> decoratedProducer = clientSystem.getReference(DECORATED_PRODUCER);
 		decoratedProducer.sendMessage(MESSAGES_NUMBER);
 
 		Thread.sleep(SLEEP_DELAY);
