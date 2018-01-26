@@ -28,6 +28,7 @@ import com.robo4j.socket.http.channel.OutboundChannelHandler;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.message.HttpDecoratedResponse;
+import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
@@ -35,10 +36,13 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_CODEC_PACKAGES;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_CODEC_REGISTRY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PROTOCOL;
+import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
 
 /**
  * Http NIO Client for communication with external Robo4J units. Unit accepts
@@ -54,6 +58,7 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 
 	private static final EnumSet<StatusCode> PROCESS_RESPONSES_STATUSES = EnumSet.of(StatusCode.OK,
 			StatusCode.ACCEPTED);
+	private ClientContext context;
 	private Integer bufferCapacity;
 	private ProtocolType protocol;
 	private String host;
@@ -72,6 +77,13 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 		Objects.requireNonNull(host, "host required");
 		if (port == null) {
 			port = protocol.getPort();
+		}
+
+		String packages = configuration.getString(HTTP_CODEC_PACKAGES, null);
+		if (RoboHttpUtils.validatePackages(packages)) {
+			HttpCodecRegistry codecRegistry = new HttpCodecRegistry();
+			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(UTF8_COMMA));
+			context.putProperty(HTTP_CODEC_REGISTRY, codecRegistry);
 		}
 	}
 

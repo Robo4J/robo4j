@@ -27,7 +27,6 @@ import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.units.ClientContext;
-import com.robo4j.socket.http.units.ClientContextBuilder;
 import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.RequestDenominator;
 
@@ -48,9 +47,9 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	private static final int DEFAULT = 0;
 	private static final String ATTRIBUTE_MESSAGE_NUMBER = "getNumberOfSentMessages";
 
+	private final ClientContext clientContext = new ClientContext();
 	private AtomicInteger counter;
 	private String target;
-	private ClientContext clientContext;
 	private String message;
 
 	public HttpMessageDecoratedProducerUnit(RoboContext context, String id) {
@@ -62,9 +61,9 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 		target = configuration.getString(HTTP_PROPERTY_TARGET, null);
 		message = configuration.getString("message", null);
 
-		List<ClientPathDTO> paths = HttpPathUtils.readPathConfig(ClientPathDTO.class,
+		final List<ClientPathDTO> paths = HttpPathUtils.readPathConfig(ClientPathDTO.class,
 				configuration.getString(HTTP_PATHS_CONFIG, null));
-		clientContext = HttpPathUtils.initHttpContext(ClientContextBuilder.Builder(), getContext(), paths);
+		HttpPathUtils.updateHttpClientContextPaths(clientContext, paths);
 		counter = new AtomicInteger(DEFAULT);
 	}
 
@@ -78,24 +77,23 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	public void onMessage(Integer number) {
 		clientContext.getPathConfigs().forEach(pathConfig -> {
 			IntStream.range(DEFAULT, number).forEach(i -> {
-				RequestDenominator denominator = new RequestDenominator(pathConfig.getMethod(),
-						pathConfig.getPath(), HttpVersion.HTTP_1_1);
+				RequestDenominator denominator = new RequestDenominator(pathConfig.getMethod(), pathConfig.getPath(),
+						HttpVersion.HTTP_1_1);
 				HttpDecoratedRequest request = new HttpDecoratedRequest(denominator);
-				switch (pathConfig.getMethod()){
-					case GET:
-						request.addCallbacks(pathConfig.getCallbacks());
-						break;
-					case POST:
-						request.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()));
-						request.addMessage(message);
-						break;
-					default:
-						throw new IllegalStateException("not allowed state: " + pathConfig);
+				switch (pathConfig.getMethod()) {
+				case GET:
+					request.addCallbacks(pathConfig.getCallbacks());
+					break;
+				case POST:
+					request.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()));
+					request.addMessage(message);
+					break;
+				default:
+					throw new IllegalStateException("not allowed state: " + pathConfig);
 				}
 				getContext().getReference(target).sendMessage(request);
 			});
 		});
-
 
 	}
 

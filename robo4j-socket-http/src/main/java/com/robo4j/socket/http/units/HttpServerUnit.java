@@ -25,7 +25,6 @@ import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.socket.http.PropertiesProvider;
 import com.robo4j.socket.http.channel.InboundSocketHandler;
 import com.robo4j.socket.http.dto.ServerUnitPathDTO;
 import com.robo4j.socket.http.util.HttpPathUtils;
@@ -34,6 +33,8 @@ import com.robo4j.socket.http.util.RoboHttpUtils;
 import java.util.List;
 
 import static com.robo4j.socket.http.util.ChannelBufferUtils.INIT_BUFFER_CAPACITY;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_CODEC_PACKAGES;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_CODEC_REGISTRY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PATHS_CONFIG;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
@@ -48,14 +49,10 @@ import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
  */
 @CriticalSectionTrait
 public class HttpServerUnit extends RoboUnit<Object> {
-	public static final String PROPERTY_CODEC_REGISTRY = "codecRegistry";
-	public static final String CODEC_PACKAGES_CODE = "packages";
-	private final HttpCodecRegistry codecRegistry = new HttpCodecRegistry();
-	private final PropertiesProvider propertiesProvider = new PropertiesProvider();
 
+	private final ServerContext serverContext = new ServerContext();
 	private InboundSocketHandler inboundSocketHandler;
 	private List<ServerUnitPathDTO> paths;
-	private ServerContext serverContext;
 
 	public HttpServerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -66,19 +63,20 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		int port = configuration.getInteger(HTTP_PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
 		int bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, INIT_BUFFER_CAPACITY);
 
-		String packages = configuration.getString(CODEC_PACKAGES_CODE, null);
-		if (validatePackages(packages)) {
-			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(UTF8_COMMA));
-		}
-
-		// TODO: 1/23/18 (miro) -> thing about better usage of readPath that the class is not cashed
 		paths = HttpPathUtils.readPathConfig(ServerUnitPathDTO.class, configuration.getString(HTTP_PATHS_CONFIG, null));
 
-		propertiesProvider.put(HTTP_PROPERTY_BUFFER_CAPACITY, bufferCapacity);
-		propertiesProvider.put(HTTP_PROPERTY_PORT, port);
-		propertiesProvider.put(PROPERTY_CODEC_REGISTRY, codecRegistry);
-	}
 
+		serverContext.putProperty(HTTP_PROPERTY_BUFFER_CAPACITY, bufferCapacity);
+		serverContext.putProperty(HTTP_PROPERTY_PORT, port);
+
+		String packages = configuration.getString(HTTP_CODEC_PACKAGES, null);
+		if (RoboHttpUtils.validatePackages(packages)) {
+			HttpCodecRegistry codecRegistry = new HttpCodecRegistry();
+			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(UTF8_COMMA));
+			serverContext.putProperty(HTTP_CODEC_REGISTRY, codecRegistry);
+		}
+
+	}
 
 	/**
 	 * start updates context by references
@@ -86,8 +84,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	@Override
 	public void start() {
 		setState(LifecycleState.STARTING);
-		serverContext = HttpPathUtils.initHttpContext(ServerContextBuilder.Builder(), getContext(), paths);
-		inboundSocketHandler = new InboundSocketHandler(getContext(), serverContext, propertiesProvider);
+		HttpPathUtils.updateHttpServerContextPaths(getContext(), serverContext, paths);
+		inboundSocketHandler = new InboundSocketHandler(getContext(), serverContext);
 
 		inboundSocketHandler.start();
 		setState(LifecycleState.STARTED);
@@ -99,18 +97,4 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		inboundSocketHandler.stop();
 		setState(LifecycleState.STOPPED);
 	}
-
-	private boolean validatePackages(String packages) {
-		if (packages == null) {
-			return false;
-		}
-		for (int i = 0; i < packages.length(); i++) {
-			char c = packages.charAt(i);
-			if (Character.isWhitespace(c)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 }

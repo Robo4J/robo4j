@@ -38,6 +38,8 @@ public final class RoboHttpUtils {
 	public static final String HTTP_PROPERTY_TARGET = "target";
 	public static final String HTTP_PROPERTY_PROTOCOL = "protocol";
 	public static final String HTTP_PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
+	public static final String HTTP_CODEC_REGISTRY = "codecRegistry";
+	public static final String HTTP_CODEC_PACKAGES = "packages";
 
 	public static void decorateByNewLine(StringBuilder sb) {
 		sb.append(NEW_LINE_MAC).append(NEW_LINE_UNIX);
@@ -77,6 +79,20 @@ public final class RoboHttpUtils {
 	public static void printMeasuredTime(Class<?> clazz, String message, long start) {
 		System.out.println(String.format("%s message: %s duration: %d%n", clazz.getSimpleName(), message,
 				System.currentTimeMillis() - start));
+	}
+
+	// TODO: 1/26/18 (miro) improve validation
+	public static boolean validatePackages(String packages) {
+		if (packages == null) {
+			return false;
+		}
+		for (int i = 0; i < packages.length(); i++) {
+			char c = packages.charAt(i);
+			if (Character.isWhitespace(c)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

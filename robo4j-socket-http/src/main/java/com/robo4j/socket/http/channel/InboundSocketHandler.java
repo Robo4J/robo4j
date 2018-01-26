@@ -19,7 +19,6 @@ package com.robo4j.socket.http.channel;
 
 import com.robo4j.RoboContext;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.PropertiesProvider;
 import com.robo4j.socket.http.request.RoboResponseProcess;
 import com.robo4j.socket.http.units.HttpCodecRegistry;
 import com.robo4j.socket.http.units.ServerContext;
@@ -33,7 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.robo4j.socket.http.units.HttpServerUnit.PROPERTY_CODEC_REGISTRY;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_CODEC_REGISTRY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
 
 /**
@@ -48,21 +47,18 @@ public class InboundSocketHandler implements SocketHandler {
 	private final ServerContext serverContext;
 	private final Map<SelectionKey, RoboResponseProcess> outBuffers = new ConcurrentHashMap<>();
 	private ServerSocketChannel socketChannel;
-	private PropertiesProvider properties;
 	private boolean active;
 
-	public InboundSocketHandler(RoboContext context, ServerContext serverContext,
-			PropertiesProvider properties) {
+	public InboundSocketHandler(RoboContext context, ServerContext serverContext) {
 		this.context = context;
 		this.serverContext = serverContext;
-		this.properties = properties;
 	}
 
 	@Override
 	public void start() {
 		if (!active) {
 			active = true;
-			context.getScheduler().execute(() -> initSocketChannel(serverContext, properties));
+			context.getScheduler().execute(() -> initSocketChannel(serverContext));
 		}
 	}
 
@@ -78,12 +74,12 @@ public class InboundSocketHandler implements SocketHandler {
 		}
 	}
 
-	private void initSocketChannel(ServerContext serverContext, PropertiesProvider properties) {
-		socketChannel = ChannelUtils.initServerSocketChannel(properties);
+	private void initSocketChannel(ServerContext serverContext) {
+		socketChannel = ChannelUtils.initServerSocketChannel(serverContext);
 		final SelectionKey key = ChannelUtils.registerSelectionKey(socketChannel);
 
-		final HttpCodecRegistry codecRegistry = properties.getPropertySafe(PROPERTY_CODEC_REGISTRY);
-		final int bufferCapacity = properties.getIntSafe(HTTP_PROPERTY_BUFFER_CAPACITY);
+		final HttpCodecRegistry codecRegistry = serverContext.getPropertySafe(HttpCodecRegistry.class, HTTP_CODEC_REGISTRY);
+		final int bufferCapacity = serverContext.getPropertySafe(Integer.class, HTTP_PROPERTY_BUFFER_CAPACITY);
 
 		while (active) {
 			int channelReady = ChannelUtils.getReadyChannelBySelectionKey(key);

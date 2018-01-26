@@ -28,7 +28,6 @@ import com.robo4j.socket.http.codec.CameraMessageCodec;
 import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.units.ClientContext;
-import com.robo4j.socket.http.units.ClientContextBuilder;
 import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RequestDenominator;
@@ -57,8 +56,8 @@ public class ImageDecoratorUnit extends RoboUnit<ImageDTO> {
 
 	private final CameraMessageCodec codec = new CameraMessageCodec();
 	private final AtomicInteger imageNumber = new AtomicInteger(0);
+	private final ClientContext clientContext = new ClientContext();
 	private String target;
-	private ClientContext clientContext;
 
 	public ImageDecoratorUnit(RoboContext context, String id) {
 		super(ImageDTO.class, context, id);
@@ -73,13 +72,13 @@ public class ImageDecoratorUnit extends RoboUnit<ImageDTO> {
 		if (paths.isEmpty()) {
 			throw ConfigurationException.createMissingConfigNameException(PROPERTY_REMOTE_UNITS);
 		}
-		clientContext = HttpPathUtils.initHttpContext(ClientContextBuilder.Builder(), getContext(), paths);
+		HttpPathUtils.updateHttpClientContextPaths(clientContext, paths);
 	}
 
 	// TODO: 12/10/17 (miro) : review header, try to simplify
 	@Override
 	public void onMessage(ImageDTO image) {
-		final String imageBase64 = JsonUtil.bytesToBase64String(image.getContent());
+		final String imageBase64 = JsonUtil.toBase64String(image.getContent());
 		clientContext.getPathConfigs().forEach(pathConfig ->  {
 			final RequestDenominator denominator = new RequestDenominator(pathConfig.getMethod(), pathConfig.getPath(),
 					HttpVersion.HTTP_1_1);

@@ -18,8 +18,8 @@
 package com.robo4j.socket.http.util;
 
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.PropertiesProvider;
 import com.robo4j.socket.http.SocketException;
+import com.robo4j.socket.http.units.ServerContext;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -93,11 +93,11 @@ public final class ChannelUtils {
 		}
 	}
 
-	public static ServerSocketChannel initServerSocketChannel(PropertiesProvider properties) {
+	public static ServerSocketChannel initServerSocketChannel(ServerContext context) {
 		try {
 			ServerSocketChannel result = ServerSocketChannel.open();
 			result.configureBlocking(false);
-			result.bind(new InetSocketAddress(properties.getIntSafe(HTTP_PROPERTY_PORT)));
+			result.bind(new InetSocketAddress(context.getPropertySafe(Integer.class, HTTP_PROPERTY_PORT)));
 			return result;
 		} catch (Exception e) {
 			SimpleLoggingUtil.error(ChannelUtils.class, "init server socket channel", e);

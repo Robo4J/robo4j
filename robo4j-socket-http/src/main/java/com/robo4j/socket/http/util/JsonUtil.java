@@ -38,30 +38,24 @@ import static com.robo4j.util.Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT;
 
 /**
  *
- * Simple Json util
+ * Json related utilities
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public final class JsonUtil {
 
-	public static final Set<Class<?>> WITHOUT_QUOTATION_TYPES = Stream.of(boolean.class, int.class, short.class,
-			byte.class, long.class, double.class, float.class, char.class, Boolean.class, Integer.class, Short.class,
-			Byte.class, Long.class, Double.class, Float.class, Character.class).collect(Collectors.toSet());
 	public static final Set<Class<?>> QUOTATION_TYPES = Stream.of(String.class).collect(Collectors.toSet());
-	public static final String FIELD_ID = "id";
+	static final Set<Class<?>> WITHOUT_QUOTATION_TYPES = Stream.of(boolean.class, int.class, short.class, byte.class,
+			long.class, double.class, float.class, char.class, Boolean.class, Integer.class, Short.class, Byte.class,
+			Long.class, Double.class, Float.class, Character.class).collect(Collectors.toSet());
 
-	public static String bytesToBase64String(byte[] array) {
+	public static String toBase64String(byte[] array) {
 		try {
 			return new String(Base64.getEncoder().encode(array), DEFAULT_ENCODING);
 		} catch (UnsupportedEncodingException e) {
-			throw new HttpException("image capture", e);
+			throw new HttpException("byte array", e);
 		}
-	}
-
-	public static JsonDocument toJsonDocument(String json) {
-		JsonReader jsonReader = new JsonReader(json);
-		return jsonReader.read();
 	}
 
 	/**
@@ -74,7 +68,7 @@ public final class JsonUtil {
 	 * @return list of short unit response descriptions
 	 */
 	public static <T> List<T> jsonToList(Class<T> clazz, String json) {
-		JsonDocument document = toJsonDocument(json);
+		final JsonDocument document = toJsonDocument(json);
 		return document.getArray().stream().map(JsonDocument.class::cast)
 				.map(e -> ReflectUtils.createInstanceByClazzAndDescriptorAndJsonDocument(clazz, e))
 				.collect(Collectors.toList());
@@ -126,15 +120,11 @@ public final class JsonUtil {
 	public static String toJsonMap(Map<String, String> map) {
 		final JsonElementStringBuilder builder = JsonElementStringBuilder.Builder()
 				.add(Utf8Constant.UTF8_CURLY_BRACKET_LEFT);
-		if(!map.isEmpty()){
-			builder.add(map.entrySet().stream().map(entry ->
-					new StringBuilder().append(UTF8_QUOTATION_MARK)
-							.append(entry.getKey())
-							.append(UTF8_QUOTATION_MARK)
-							.append(Utf8Constant.UTF8_COLON)
-			                .append(UTF8_QUOTATION_MARK)
-							.append(entry.getValue())
-							.append(UTF8_QUOTATION_MARK))
+		if (!map.isEmpty()) {
+			builder.add(map.entrySet().stream()
+					.map(entry -> new StringBuilder().append(UTF8_QUOTATION_MARK).append(entry.getKey())
+							.append(UTF8_QUOTATION_MARK).append(Utf8Constant.UTF8_COLON).append(UTF8_QUOTATION_MARK)
+							.append(entry.getValue()).append(UTF8_QUOTATION_MARK))
 					.collect(Collectors.joining(Utf8Constant.UTF8_COMMA)));
 		}
 
@@ -144,13 +134,10 @@ public final class JsonUtil {
 	public static String toJsonMapObject(Map<String, Object> map) {
 		final JsonElementStringBuilder builder = JsonElementStringBuilder.Builder()
 				.add(Utf8Constant.UTF8_CURLY_BRACKET_LEFT);
-		if(!map.isEmpty()){
-			builder.add(map.entrySet().stream().map(entry ->
-					new StringBuilder().append(UTF8_QUOTATION_MARK)
-							.append(entry.getKey())
-							.append(UTF8_QUOTATION_MARK)
-							.append(Utf8Constant.UTF8_COLON)
-							.append(entry.getValue()))
+		if (!map.isEmpty()) {
+			builder.add(map.entrySet().stream()
+					.map(entry -> new StringBuilder().append(UTF8_QUOTATION_MARK).append(entry.getKey())
+							.append(UTF8_QUOTATION_MARK).append(Utf8Constant.UTF8_COLON).append(entry.getValue()))
 					.collect(Collectors.joining(Utf8Constant.UTF8_COMMA)));
 		}
 
@@ -169,5 +156,10 @@ public final class JsonUtil {
 		return JsonElementStringBuilder.Builder().add(Utf8Constant.UTF8_SQUARE_BRACKET_LEFT)
 				.add(list.stream().map(ReflectUtils::createJson).collect(Collectors.joining(Utf8Constant.UTF8_COMMA)))
 				.add(Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT).build();
+	}
+
+	private static JsonDocument toJsonDocument(String json) {
+		final JsonReader jsonReader = new JsonReader(json);
+		return jsonReader.read();
 	}
 }

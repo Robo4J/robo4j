@@ -3,6 +3,7 @@ package com.robo4j.socket.http.units;
 import com.robo4j.RoboBuilder;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.dto.ClientPathDTO;
+import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.util.StringConstants;
 import com.robo4j.util.Utf8Constant;
 import org.junit.Assert;
@@ -20,10 +21,23 @@ import java.util.List;
  */
 public class HttpContextTests {
 
-	@Test
-	public void serverDefaultContextBuilderTest() {
+	@Test(expected = AssertionError.class)
+	public void serverNotInitiatedContextTest() {
 
-		ServerContext context = ServerContextBuilder.Builder().build(null);
+		ServerContext context = new ServerContext();
+
+		System.out.println("context:" + context);
+		Assert.assertNotNull(context);
+		Assert.assertTrue(!context.isEmpty());
+		Assert.assertTrue(context.containsPath(Utf8Constant.UTF8_SOLIDUS));
+	}
+
+
+	@Test
+	public void serverDefaultContextTest() {
+
+		ServerContext context = new ServerContext();
+		HttpPathUtils.updateHttpServerContextPaths(null, context, Collections.emptyList());
 
 		System.out.println("context:" + context);
 		Assert.assertNotNull(context);
@@ -33,9 +47,9 @@ public class HttpContextTests {
 	}
 
 	@Test
-	public void clientDefaultContextBuilderTest() {
+	public void clientDefaultContextTest() {
 
-		ClientContext context = ClientContextBuilder.Builder().build(null);
+		ClientContext context = new ClientContext();
 
 		System.out.println("context: " + context);
 		Assert.assertNotNull(context);
@@ -43,7 +57,7 @@ public class HttpContextTests {
 	}
 
 	@Test
-	public void clientSimpleContextBuilderTest() throws Exception {
+	public void clientSimpleContextTest() throws Exception {
 
 	    final String consumerName = "stringConsumer";
 
@@ -55,7 +69,8 @@ public class HttpContextTests {
 		List<ClientPathDTO> paths = Collections
 				.singletonList(new ClientPathDTO(StringConstants.EMPTY, HttpMethod.GET, Collections.singletonList(consumerName)));
 
-		ClientContext context = ClientContextBuilder.Builder().addPaths(paths).build(builderProducer.build());
+		ClientContext context = new ClientContext();
+		HttpPathUtils.updateHttpClientContextPaths(context, paths);
 
         System.out.println("context: " + context);
         Assert.assertNotNull(context);

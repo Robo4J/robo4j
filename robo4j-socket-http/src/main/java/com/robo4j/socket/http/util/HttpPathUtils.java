@@ -19,14 +19,15 @@ package com.robo4j.socket.http.util;
 
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
+import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.dto.ServerUnitPathDTO;
 import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.socket.http.json.JsonDocument;
 import com.robo4j.socket.http.json.JsonReader;
+import com.robo4j.socket.http.units.ClientContext;
 import com.robo4j.socket.http.units.ClientPathConfig;
-import com.robo4j.socket.http.units.ContextBuilder;
-import com.robo4j.socket.http.units.HttpContext;
+import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.units.ServerPathConfig;
 import com.robo4j.util.StringConstants;
 import com.robo4j.util.Utf8Constant;
@@ -35,6 +36,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -100,19 +102,22 @@ public final class HttpPathUtils {
 		return jsonReader.read();
 	}
 
-	/**
-	 * Server context, context does contain default path /
-	 * 
-	 * @param context
-	 *            initiated roboContext
-	 * @param paths
-	 *            available configured paths
-	 *
-	 * @return server context
-	 */
-	public static <T, C extends HttpContext<?>> C initHttpContext(ContextBuilder<T, C> contextBuilder,
-			final RoboContext context, final Collection<T> paths) {
-		return contextBuilder.addPaths(paths).build(context);
+	public static void updateHttpServerContextPaths(final RoboContext context, final ServerContext serverContext,
+			final Collection<ServerUnitPathDTO> paths) {
+		final Map<String, ServerPathConfig> resultPaths = paths.stream().map(e -> {
+			RoboReference<Object> reference = context.getReference(e.getRoboUnit());
+			return HttpPathUtils.toServerPathConfig(e, reference);
+		}).collect(Collectors.toMap(ServerPathConfig::getPath, e -> e));
+		resultPaths.put(Utf8Constant.UTF8_SOLIDUS,
+				new ServerPathConfig(Utf8Constant.UTF8_SOLIDUS, null, HttpMethod.GET));
+		serverContext.addPaths(resultPaths);
+	}
+
+	public static void updateHttpClientContextPaths(final ClientContext clientContext,
+			final Collection<ClientPathDTO> paths) {
+		final Map<String, ClientPathConfig> resultPaths = paths.stream().map(HttpPathUtils::toClientPathConfig)
+				.collect(Collectors.toMap(ClientPathConfig::getPath, e -> e));
+		clientContext.addPaths(resultPaths);
 	}
 
 }
