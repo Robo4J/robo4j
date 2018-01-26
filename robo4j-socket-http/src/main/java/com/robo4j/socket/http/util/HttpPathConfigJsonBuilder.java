@@ -20,9 +20,7 @@ import java.util.stream.Collectors;
 public final class HttpPathConfigJsonBuilder {
 
     private final Map<String, ClassGetSetDTO> descriptorMap;
-    private final StringBuilder sb = new StringBuilder();
     private final List<ServerUnitPathDTO> paths = new LinkedList<>();
-
 
     private HttpPathConfigJsonBuilder() {
         descriptorMap = ReflectUtils.getFieldsTypeMap(ServerUnitPathDTO.class);
@@ -45,7 +43,7 @@ public final class HttpPathConfigJsonBuilder {
     }
 
     public String build(){
-        return sb.append(Utf8Constant.UTF8_SQUARE_BRACKET_LEFT)
+        return new StringBuilder().append(Utf8Constant.UTF8_SQUARE_BRACKET_LEFT)
                 .append(paths.stream().map(e -> ReflectUtils.createJson(descriptorMap, e)).collect(Collectors.joining(Utf8Constant.UTF8_COMMA)))
                 .append(Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT)
                 .toString();

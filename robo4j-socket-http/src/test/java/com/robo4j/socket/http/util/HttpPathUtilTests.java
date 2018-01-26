@@ -75,7 +75,7 @@ public class HttpPathUtilTests {
 				"{\"roboUnit\":\"emptyController\",\"method\":\"GET\"}]";
 
 		ClientPathDTO duplicate = new ClientPathDTO("cameraController", HttpMethod.POST, Collections.singletonList("callbackPOSTController"));
-		List<ClientPathDTO> result = JsonUtil.convertJsonToPathMethodList(jsonArray);
+		List<ClientPathDTO> result = JsonUtil.toListFromJsonArray(ClientPathDTO.class, jsonArray);
 
 		System.out.println("result: " + result);
 

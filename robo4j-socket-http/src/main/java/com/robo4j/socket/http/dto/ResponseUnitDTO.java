@@ -19,6 +19,8 @@ package com.robo4j.socket.http.dto;
 
 import com.robo4j.LifecycleState;
 
+import java.util.Objects;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -26,6 +28,9 @@ import com.robo4j.LifecycleState;
 public class ResponseUnitDTO {
     private String id;
     private LifecycleState state;
+
+    public ResponseUnitDTO() {
+    }
 
     public ResponseUnitDTO(String id, LifecycleState state) {
         this.id = id;
@@ -36,7 +41,30 @@ public class ResponseUnitDTO {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public LifecycleState getState() {
         return state;
+    }
+
+    public void setState(LifecycleState state) {
+        this.state = state;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ResponseUnitDTO that = (ResponseUnitDTO) o;
+        return Objects.equals(id, that.id) &&
+                state == that.state;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id, state);
     }
 }

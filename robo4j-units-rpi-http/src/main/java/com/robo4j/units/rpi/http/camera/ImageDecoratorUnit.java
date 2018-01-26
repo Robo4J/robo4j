@@ -58,8 +58,6 @@ public class ImageDecoratorUnit extends RoboUnit<ImageDTO> {
 	private final CameraMessageCodec codec = new CameraMessageCodec();
 	private final AtomicInteger imageNumber = new AtomicInteger(0);
 	private String target;
-	private String host;
-	private Integer port;
 	private ClientContext clientContext;
 
 	public ImageDecoratorUnit(RoboContext context, String id) {

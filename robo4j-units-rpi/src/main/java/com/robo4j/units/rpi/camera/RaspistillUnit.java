@@ -30,6 +30,12 @@ import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * Unit generates image by using Rapsberry Pi raspistill utility
+ *
+ * @see <a href=
+ *      "https://www.raspberrypi.org/documentation/usage/camera/raspicam/raspistill.md">raspistill
+ *      documentation</a>
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
@@ -61,14 +67,14 @@ public class RaspistillUnit extends RoboUnit<RaspistillRequest> {
 		processMessage(message);
 	}
 
-	private void processMessage(RaspistillRequest message){
+	private void processMessage(RaspistillRequest message) {
 		getContext().getScheduler().execute(() -> {
 			if (continualMode.get()) {
 				stopProgress();
 			}
 			if (message.isActive()) {
 				startContinualMode(message);
-			} else if(cameraProgress.compareAndSet(false, true)) {
+			} else if (cameraProgress.compareAndSet(false, true)) {
 				createImage(message);
 			}
 		});
@@ -76,14 +82,15 @@ public class RaspistillUnit extends RoboUnit<RaspistillRequest> {
 
 	private void stopProgress() {
 		continualMode.set(false);
-		while (cameraProgress.get());
+		while (cameraProgress.get())
+			;
 	}
 
 	private void startContinualMode(RaspistillRequest message) {
 		getContext().getScheduler().execute(() -> {
 			continualMode.set(true);
 			while (acceptedStates.contains(getState()) && continualMode.get()) {
-				if(cameraProgress.compareAndSet(false, true)){
+				if (cameraProgress.compareAndSet(false, true)) {
 					createImage(message);
 				}
 			}

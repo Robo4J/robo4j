@@ -18,6 +18,7 @@
 package com.robo4j.socket.http.units;
 
 import com.robo4j.ConfigurationException;
+import com.robo4j.CriticalSectionTrait;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
@@ -40,13 +41,15 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PROTOCOL;
 
 /**
- * Http NIO Client for communication with external Robo4J units.
- * Unit accepts {@link HttpDecoratedRequest} type of message.
- * Such message contains all necessary information and HttpClientDecorator unit is only implementation detail.
+ * Http NIO Client for communication with external Robo4J units. Unit accepts
+ * {@link HttpDecoratedRequest} type of message. Such message contains all
+ * necessary information and HttpClientDecorator unit is only implementation
+ * detail.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@CriticalSectionTrait
 public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 
 	private static final EnumSet<StatusCode> PROCESS_RESPONSES_STATUSES = EnumSet.of(StatusCode.OK,
@@ -65,18 +68,18 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 		bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, null);
 		protocol = ProtocolType.valueOf(configuration.getString(HTTP_PROPERTY_PROTOCOL, "HTTP"));
 		host = configuration.getString(HTTP_PROPERTY_HOST, null);
-		port = configuration.getInteger(HTTP_PROPERTY_PORT,null);
-        Objects.requireNonNull(host, "host required");
-        if(port == null){
-            port = protocol.getPort();
-        }
+		port = configuration.getInteger(HTTP_PROPERTY_PORT, null);
+		Objects.requireNonNull(host, "host required");
+		if (port == null) {
+			port = protocol.getPort();
+		}
 	}
 
 	// TODO: 12/11/17 (miro) all information are in the message
 	@Override
 	public void onMessage(HttpDecoratedRequest message) {
 
-	    final HttpDecoratedRequest resultMessage = ajdustRequest(message);
+		final HttpDecoratedRequest resultMessage = adjustRequest(message);
 		final InetSocketAddress address = new InetSocketAddress(resultMessage.getHost(), resultMessage.getPort());
 		try (SocketChannel channel = SocketChannel.open(address)) {
 			if (bufferCapacity != null) {
@@ -95,7 +98,8 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 					sendMessageToCallbacks(decoratedResponse.getCallbacks(), decoratedResponse.getMessage());
 				}
 			} else {
-				SimpleLoggingUtil.error(getClass(), String.format("no callback or wrong response: %s", decoratedResponse));
+				SimpleLoggingUtil.error(getClass(),
+						String.format("no callback or wrong response: %s", decoratedResponse));
 			}
 
 		} catch (Exception e) {
@@ -104,12 +108,12 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 		}
 	}
 
-	private HttpDecoratedRequest ajdustRequest(HttpDecoratedRequest request){
-        request.setHost(host);
-        request.setPort(port);
-        request.addHostHeader();
-	    return request;
-    }
+	private HttpDecoratedRequest adjustRequest(HttpDecoratedRequest request) {
+		request.setHost(host);
+		request.setPort(port);
+		request.addHostHeader();
+		return request;
+	}
 
 	private void sendMessageToCallbacks(List<String> callbacks, Object message) {
 		callbacks.forEach(callback -> sendMessageToCallback(callback, message));

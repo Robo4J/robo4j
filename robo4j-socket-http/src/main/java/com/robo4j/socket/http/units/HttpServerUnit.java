@@ -20,6 +20,7 @@
 package com.robo4j.socket.http.units;
 
 import com.robo4j.ConfigurationException;
+import com.robo4j.CriticalSectionTrait;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
@@ -45,6 +46,7 @@ import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@CriticalSectionTrait
 public class HttpServerUnit extends RoboUnit<Object> {
 	public static final String PROPERTY_CODEC_REGISTRY = "codecRegistry";
 	public static final String CODEC_PACKAGES_CODE = "packages";

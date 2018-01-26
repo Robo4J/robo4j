@@ -59,7 +59,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 
 			final List<ResponseUnitDTO> unitList = context.getUnits().stream()
 					.map(u -> new ResponseUnitDTO(u.getId(), u.getState())).collect(Collectors.toList());
-			return JsonUtil.getArrayByListResponseUnitDTO(unitList);
+			return JsonUtil.toJsonArray(unitList);
 		} else {
 			SimpleLoggingUtil.error(getClass(), "internal error: no units available");
 		}
