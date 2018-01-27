@@ -22,7 +22,6 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
@@ -34,8 +33,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PATHS_CONFIG;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_UNIT_PATHS_CONFIG;
 
 /**
  * Test unit to produce HttpDecoratedRequest messages
@@ -61,8 +60,8 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 		target = configuration.getString(HTTP_PROPERTY_TARGET, null);
 		message = configuration.getString("message", null);
 
-		final List<ClientPathDTO> paths = HttpPathUtils.readPathConfig(ClientPathDTO.class,
-				configuration.getString(HTTP_PATHS_CONFIG, null));
+		List<ClientPathDTO> paths = HttpPathUtils.readPathConfig(ClientPathDTO.class,
+				configuration.getString(HTTP_UNIT_PATHS_CONFIG, null));
 		HttpPathUtils.updateHttpClientContextPaths(clientContext, paths);
 		counter = new AtomicInteger(DEFAULT);
 	}
@@ -85,7 +84,6 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 					request.addCallbacks(pathConfig.getCallbacks());
 					break;
 				case POST:
-					request.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()));
 					request.addMessage(message);
 					break;
 				default:

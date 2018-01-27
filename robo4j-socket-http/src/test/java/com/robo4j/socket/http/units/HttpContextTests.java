@@ -21,15 +21,14 @@ import java.util.List;
  */
 public class HttpContextTests {
 
-	@Test(expected = AssertionError.class)
+	@Test
 	public void serverNotInitiatedContextTest() {
 
 		ServerContext context = new ServerContext();
-
 		System.out.println("context:" + context);
 		Assert.assertNotNull(context);
-		Assert.assertTrue(!context.isEmpty());
-		Assert.assertTrue(context.containsPath(Utf8Constant.UTF8_SOLIDUS));
+		Assert.assertTrue(context.isEmpty());
+
 	}
 
 

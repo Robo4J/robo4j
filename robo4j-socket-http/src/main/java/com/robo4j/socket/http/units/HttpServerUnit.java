@@ -35,7 +35,7 @@ import java.util.List;
 import static com.robo4j.socket.http.util.ChannelBufferUtils.INIT_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_CODEC_PACKAGES;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_CODEC_REGISTRY;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PATHS_CONFIG;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_UNIT_PATHS_CONFIG;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
@@ -63,7 +63,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		int port = configuration.getInteger(HTTP_PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
 		int bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, INIT_BUFFER_CAPACITY);
 
-		paths = HttpPathUtils.readPathConfig(ServerUnitPathDTO.class, configuration.getString(HTTP_PATHS_CONFIG, null));
+		paths = HttpPathUtils.readPathConfig(ServerUnitPathDTO.class, configuration.getString(HTTP_UNIT_PATHS_CONFIG, null));
 
 
 		serverContext.putProperty(HTTP_PROPERTY_BUFFER_CAPACITY, bufferCapacity);

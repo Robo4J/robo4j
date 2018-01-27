@@ -35,7 +35,7 @@ import java.io.InputStream;
  */
 public class CameraImageProducerConsumerTests {
 	AttributeDescriptor<Integer> ATTRIBUTE_NUMBER_OF_IMAGES = new DefaultAttributeDescriptor<>(Integer.class,
-			CameraImageProducerTestUnit.ATTRIBUTE_NUMBER_OF_IMAGES_NAME);
+			CameraImageProducerDesTestUnit.ATTRIBUTE_NUMBER_OF_IMAGES_NAME);
 	AttributeDescriptor<Integer> ATTRIBUTE_COUNTER = new DefaultAttributeDescriptor<>(Integer.class,
 			CameraImageConsumerTestUnit.ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME);
 

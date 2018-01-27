@@ -32,7 +32,7 @@ public final class RoboHttpUtils {
 	public static final String NEW_LINE_MAC = "\r";
 	public static final String NEW_LINE_UNIX = "\n";
 	public static final int DEFAULT_PORT = 8042;
-	public static final String HTTP_PATHS_CONFIG = "pathsConfig";
+	public static final String HTTP_UNIT_PATHS_CONFIG = "unitPathsConfig";
 	public static final String HTTP_PROPERTY_HOST = "host";
 	public static final String HTTP_PROPERTY_PORT = "port";
 	public static final String HTTP_PROPERTY_TARGET = "target";
@@ -81,7 +81,7 @@ public final class RoboHttpUtils {
 				System.currentTimeMillis() - start));
 	}
 
-	// TODO: 1/26/18 (miro) improve validation
+	// TODO: 1/26/18 (miro
 	public static boolean validatePackages(String packages) {
 		if (packages == null) {
 			return false;

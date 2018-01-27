@@ -10,7 +10,7 @@
         <class>com.robo4j.socket.http.units.test.HttpMessageDecoratedProducerUnit</class>
         <config name="com.robo4j.root">
             <value name="target" type="String">httpClient</value>
-            <value name="pathsConfig" type="String">[{"roboUnit":"","method":"GET","callbacks":["stringConsumer"]}]</value>
+            <value name="unitPathsConfig" type="String">[{"roboUnit":"","method":"GET","callbacks":["stringConsumer"]}]</value>
         </config>
     </roboUnit>
     <roboUnit id="stringConsumer">

@@ -33,7 +33,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PATHS_CONFIG;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_UNIT_PATHS_CONFIG;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
@@ -122,7 +122,7 @@ public class RoboHttpPingPongTest {
 		final HttpPathConfigJsonBuilder pathBuilder = HttpPathConfigJsonBuilder.Builder()
 				.addPath(CONTROLLER_PING_PONG, HttpMethod.POST);
 
-		config.setString(HTTP_PATHS_CONFIG, pathBuilder.build());
+		config.setString(HTTP_UNIT_PATHS_CONFIG, pathBuilder.build());
 
 		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
 		builder.add(StringConsumer.class, REQUEST_CONSUMER);
@@ -146,7 +146,7 @@ public class RoboHttpPingPongTest {
 
 		config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString(HTTP_PROPERTY_TARGET, ID_HTTP_CLIENT);
-		config.setString(HTTP_PATHS_CONFIG, "[{\"roboUnit\":\""+ CONTROLLER_PING_PONG + "\",\"method\":\"POST\"}]");
+		config.setString(HTTP_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\""+ CONTROLLER_PING_PONG + "\",\"method\":\"POST\"}]");
 		config.setString("message", RoboHttpDynamicTests.JSON_STRING);
 		builder.add(HttpMessageDecoratedProducerUnit.class, config, DECORATED_PRODUCER);
 

@@ -102,8 +102,7 @@ public final class HttpPathUtils {
 		return jsonReader.read();
 	}
 
-	public static void updateHttpServerContextPaths(final RoboContext context, final ServerContext serverContext,
-			final Collection<ServerUnitPathDTO> paths) {
+	public static void updateHttpServerContextPaths(final RoboContext context, final ServerContext serverContext, final Collection<ServerUnitPathDTO> paths){
 		final Map<String, ServerPathConfig> resultPaths = paths.stream().map(e -> {
 			RoboReference<Object> reference = context.getReference(e.getRoboUnit());
 			return HttpPathUtils.toServerPathConfig(e, reference);
@@ -113,9 +112,9 @@ public final class HttpPathUtils {
 		serverContext.addPaths(resultPaths);
 	}
 
-	public static void updateHttpClientContextPaths(final ClientContext clientContext,
-			final Collection<ClientPathDTO> paths) {
-		final Map<String, ClientPathConfig> resultPaths = paths.stream().map(HttpPathUtils::toClientPathConfig)
+	public static void updateHttpClientContextPaths(final ClientContext clientContext, final Collection<ClientPathDTO> paths){
+		final Map<String, ClientPathConfig> resultPaths = paths.stream()
+				.map(HttpPathUtils::toClientPathConfig)
 				.collect(Collectors.toMap(ClientPathConfig::getPath, e -> e));
 		clientContext.addPaths(resultPaths);
 	}

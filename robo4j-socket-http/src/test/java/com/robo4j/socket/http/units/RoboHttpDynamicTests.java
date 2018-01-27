@@ -37,7 +37,7 @@ import org.junit.Test;
 
 import java.util.concurrent.Future;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PATHS_CONFIG;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_UNIT_PATHS_CONFIG;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
@@ -119,7 +119,7 @@ public class RoboHttpDynamicTests {
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setInteger(HTTP_PROPERTY_PORT, PORT);
 		config.setString("packages", "com.robo4j.socket.http.units.test.codec");
-		config.setString(HTTP_PATHS_CONFIG,
+		config.setString(HTTP_UNIT_PATHS_CONFIG,
 				HttpPathConfigJsonBuilder.Builder().addPath(ID_TARGET_UNIT, HttpMethod.POST).build());
 		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
 
@@ -153,7 +153,7 @@ public class RoboHttpDynamicTests {
 
 		config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString(HTTP_PROPERTY_TARGET, ID_CLIENT_UNIT);
-		config.setString(HTTP_PATHS_CONFIG, "[{\"roboUnit\":\""+ ID_TARGET_UNIT + "\",\"method\":\"POST\"}]");
+		config.setString(HTTP_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\""+ ID_TARGET_UNIT + "\",\"method\":\"POST\"}]");
 		config.setString("message", JSON_STRING);
 		builder.add(HttpMessageDecoratedProducerUnit.class, config, DECORATED_PRODUCER);
 

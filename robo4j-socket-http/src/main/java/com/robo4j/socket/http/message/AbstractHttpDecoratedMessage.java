@@ -17,6 +17,7 @@
 
 package com.robo4j.socket.http.message;
 
+import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.util.HttpDenominator;
 import com.robo4j.socket.http.util.HttpHeaderBuilder;
 
@@ -99,6 +100,7 @@ public abstract class AbstractHttpDecoratedMessage implements HttpMessage {
 
 	public void addMessage(String message) {
 		this.message = this.message == null ? message : this.message.concat(message);
+		addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()));
 	}
 
 	public void addCallbacks(List<String> callbacks) {

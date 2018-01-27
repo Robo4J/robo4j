@@ -22,7 +22,7 @@
             <value name="port" type="int">8027</value>
             <value name="target" type="String">imageController</value>
             <value name="packages" type="String">com.robo4j.httpunit.codec</value>
-            <value name="pathsConfig" type="String">{"roboUnit":"imageController","method":"POST"}</value>
+            <value name="unitPathsConfig" type="String">{"roboUnit":"imageController","method":"POST"}</value>
         </config>
     </roboUnit>
     <roboUnit id="imageController">

@@ -46,7 +46,19 @@ public class HttpCodecRegistry {
 		ReflectionScan scan = new ReflectionScan(loader);
 		processClasses(loader, scan.scanForEntities(packages));
 	}
-	
+
+	public boolean containsEncoder(Class<?> clazz){
+		return encoders.containsKey(clazz);
+	}
+
+	public boolean containsDecoced(Class<?> clazz){
+		return decoders.containsKey(clazz);
+	}
+
+	public boolean isEmpty(){
+		return encoders.isEmpty() && decoders.isEmpty();
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T> HttpEncoder<T> getEncoder(Class<T> type) {
 		return (HttpEncoder<T>) encoders.get(type);

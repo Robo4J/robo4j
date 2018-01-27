@@ -23,12 +23,27 @@
             <value name="port" type="int">8030</value>
         </config>
     </roboUnit>
+    <roboUnit id="imageCodec">
+        <class>com.robo4j.socket.http.units.HttpClientCodecUnit</class>
+        <config name="com.robo4j.root">
+            <value name="target" type="String">httpClient</value>
+            <value name="packages" type="String">com.robo4j.socket.http.codec</value>
+            <value name="unitPathsConfig" type="String">[{"roboUnit":"imageProcessor","method":"POST"}]</value>
+        </config>
+    </roboUnit>
+    <roboUnit id="imageDecorator">
+        <class>com.robo4j.units.rpi.http.camera.ImageDecoratorUnit</class>
+        <config name="com.robo4j.root">
+            <value name="target" type="String">imageCodec</value>
+            <value name="httpTarget" type="String">imageProcessor</value>
+        </config>
+    </roboUnit>
     <roboUnit id="imageController">
         <class>com.robo4j.units.rpi.http.camera.CameraImageProducerTestUnit</class>
         <config name="com.robo4j.root">
-            <value name="targetOut" type="String">httpClient</value>
-            <value name="path" type="String">/units/imageProcessor</value>
-            <value name="numberOfImages" type="int">24</value>
+            <value name="target" type="String">imageDecorator</value>
+            <value name="fileName" type="String">snapshot.png</value>
+            <value name="numberOfImages" type="int">42</value>
         </config>
     </roboUnit>
 </robo4j>

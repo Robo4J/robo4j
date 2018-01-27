@@ -36,7 +36,7 @@ import java.io.InputStream;
 public class CameraDecoratedImageProducerConsumerTests {
 
     AttributeDescriptor<Integer> ATTRIBUTE_NUMBER_OF_IMAGES = new DefaultAttributeDescriptor<>(Integer.class,
-            CameraImageProducerTestUnit.ATTRIBUTE_NUMBER_OF_IMAGES_NAME);
+            CameraImageProducerDesTestUnit.ATTRIBUTE_NUMBER_OF_IMAGES_NAME);
     AttributeDescriptor<Integer> ATTRIBUTE_COUNTER = new DefaultAttributeDescriptor<>(Integer.class,
             CameraImageConsumerTestUnit.ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME);
 
@@ -62,7 +62,7 @@ public class CameraDecoratedImageProducerConsumerTests {
         consumerSystem.start();
         producerSystem.start();
 
-        RoboReference<Boolean> imageProducer = producerSystem.getReference("camera");
+        RoboReference<Boolean> imageProducer = producerSystem.getReference("imageController");
         RoboReference<CameraMessage> imageConsumer = consumerSystem.getReference("imageProcessor");
 
         Integer numberOfImages = imageProducer.getAttribute(ATTRIBUTE_NUMBER_OF_IMAGES).get();

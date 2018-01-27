@@ -24,7 +24,7 @@
         <config name="com.robo4j.root">
             <value name="port" type="int">8032</value>
             <value name="packages" type="String">com.robo4j.socket.http.codec</value>
-            <value name="pathsConfig" type="String">[{"roboUnit":"imageProcessor","method":"POST"}]</value>
+            <value name="unitPathsConfig" type="String">[{"roboUnit":"imageProcessor","method":"POST"}]</value>
         </config>
     </roboUnit>
 </robo4j>
