@@ -18,6 +18,7 @@
 package com.robo4j.units.rpi.http.camera;
 
 import com.robo4j.ConfigurationException;
+import com.robo4j.CriticalSectionTrait;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
@@ -41,6 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+@CriticalSectionTrait
 public class ImageDecoratorUnit extends RoboUnit<ImageDTO> {
 	private static final String PROPERTY_TARGET = "target";
 
@@ -70,6 +72,7 @@ public class ImageDecoratorUnit extends RoboUnit<ImageDTO> {
 				String.valueOf(imageNumber.incrementAndGet()), imageBase64);
 		final HttpClientMessageWrapper resultMessage = new HttpClientMessageWrapper(
 				HttpPathUtils.toPath(SystemPath.UNITS.getPath(), httpTarget), CameraMessage.class, cameraMessage);
+		System.out.println(getClass().getSimpleName() + " image target: "+ target + " resultMessage: " + resultMessage.getPath());
 		getContext().getReference(target).sendMessage(resultMessage);
 
 	}

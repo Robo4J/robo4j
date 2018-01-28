@@ -62,7 +62,6 @@ public class OutboundChannelHandler implements SocketHandler {
 		final ByteBuffer buffer = ChannelBufferUtils.getByteBufferByString(resultMessage);
 		ChannelUtils.handleWriteChannelAndBuffer("client send message", byteChannel, buffer);
 		decoratedResponse = getDecoratedResponse(byteChannel, pathMethod);
-
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package com.robo4j.socket.http.units;
 
 import com.robo4j.ConfigurationException;
+import com.robo4j.CriticalSectionTrait;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
@@ -24,6 +25,7 @@ import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
+@CriticalSectionTrait
 public final class HttpClientCodecUnit extends RoboUnit<HttpClientMessageWrapper> {
 
 	private final ClientContext clientContext = new ClientContext();

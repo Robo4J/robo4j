@@ -78,7 +78,6 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 	// TODO: 12/11/17 (miro) all information are in the message
 	@Override
 	public void onMessage(HttpDecoratedRequest message) {
-
 		final HttpDecoratedRequest resultMessage = adjustRequest(message);
 		final InetSocketAddress address = new InetSocketAddress(resultMessage.getHost(), resultMessage.getPort());
 		try (SocketChannel channel = SocketChannel.open(address)) {
