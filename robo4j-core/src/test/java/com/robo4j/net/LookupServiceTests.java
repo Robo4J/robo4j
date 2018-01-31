@@ -45,6 +45,7 @@ public class LookupServiceTests {
 		String id = "MyID";
 		int heartBeatInterval = 1234;
 		metadata.put("name", "Pretty Human Readable Name");
+		metadata.put("uri", "robo4j://localhost:12345");
 		RoboContextDescriptor descriptor = new RoboContextDescriptor(id, heartBeatInterval, metadata);
 		byte[] encodedDescriptor = HearbeatMessageCodec.encode(descriptor);
 		RoboContextDescriptor decodedDescriptor = HearbeatMessageCodec.decode(encodedDescriptor);
@@ -82,6 +83,7 @@ public class LookupServiceTests {
 		String id = "MyID";
 		int heartBeatInterval = 1234;
 		metadata.put("name", "Pretty Human Readable Name");
+		metadata.put("uri", "robo4j://localhost:12345");
 		return new RoboContextDescriptor(id, heartBeatInterval, metadata);
 	}
 
