@@ -41,14 +41,10 @@ final class NullLookupService implements LookupService {
 	}
 
 	@Override
-	public void start() throws IOException {
-		// TODO Auto-generated method stub
-		
+	public void start() throws IOException {		
 	}
 
 	@Override
-	public void stop() throws IOException {
-		// TODO Auto-generated method stub
-		
+	public void stop() throws IOException {		
 	}
 }
