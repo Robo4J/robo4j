@@ -18,6 +18,7 @@ package com.robo4j.util;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -58,4 +59,12 @@ public final class IOUtil {
 		Files.write(tmpFilePath, bytes);
 	}
 
+	public static void close(Closeable c) {
+		try {
+			c.close();
+		} catch (IOException e) {
+			// Ignore
+		}
+	}
+	
 }

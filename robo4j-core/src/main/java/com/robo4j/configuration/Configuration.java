@@ -16,6 +16,7 @@
  */
 package com.robo4j.configuration;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -24,7 +25,7 @@ import java.util.Set;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface Configuration {
+public interface Configuration extends Serializable {
 	/**
 	 * Creates a child configuration under this configuration, with the
 	 * specified name.

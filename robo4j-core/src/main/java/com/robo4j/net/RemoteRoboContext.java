@@ -6,6 +6,7 @@ import java.util.Collection;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
+import com.robo4j.configuration.Configuration;
 import com.robo4j.scheduler.Scheduler;
 
 public class RemoteRoboContext implements RoboContext {
@@ -63,5 +64,11 @@ public class RemoteRoboContext implements RoboContext {
 
 	public InetAddress getAddress() {
 		return descriptorEntry.address;
+	}
+
+	@Override
+	public Configuration getConfiguration() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

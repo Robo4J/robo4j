@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.scheduler.DefaultScheduler;
 import com.robo4j.scheduler.RoboThreadFactory;
@@ -71,6 +72,7 @@ final class RoboSystem implements RoboContext {
 	private final LinkedBlockingQueue<Runnable> blockingQueue = new LinkedBlockingQueue<>();
 
 	private final String uid;
+	private final Configuration configuration;
 
 	private enum DeliveryPolicy {
 		SYSTEM, WORK, BLOCKING
@@ -212,10 +214,17 @@ final class RoboSystem implements RoboContext {
 	/**
 	 * Constructor.
 	 */
-	RoboSystem(String uid, Configuration systemConfig) {
-		this(uid, systemConfig.getInteger(KEY_SCHEDULER_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE),
-				systemConfig.getInteger(KEY_WORKER_POOL_SIZE, DEFAULT_WORKING_POOL_SIZE),
-				systemConfig.getInteger(KEY_BLOCKING_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE));
+	RoboSystem(String uid, Configuration configuration) {
+		this.uid = uid;
+		this.configuration = configuration;
+		int schedulerPoolSize = configuration.getInteger(KEY_SCHEDULER_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE);
+		int workerPoolSize = configuration.getInteger(KEY_WORKER_POOL_SIZE, DEFAULT_WORKING_POOL_SIZE);
+		int blockingPoolSize = configuration.getInteger(KEY_BLOCKING_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE);
+		workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
+				new RoboThreadFactory(new ThreadGroup(NAME_WORKER_POOL), NAME_WORKER_POOL, true));
+		blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, blockingQueue,
+				new RoboThreadFactory(new ThreadGroup(NAME_BLOCKING_POOL), NAME_BLOCKING_POOL, true));
+		systemScheduler = new DefaultScheduler(this, schedulerPoolSize);
 	}
 
 	/**
@@ -226,15 +235,15 @@ final class RoboSystem implements RoboContext {
 	}
 
 	/**
-	 * Constructor.
+	 * Convenience constructor.
 	 */
 	RoboSystem(String uid, int schedulerPoolSize, int workerPoolSize, int blockingPoolSize) {
-		this.uid = uid;
-		workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
-				new RoboThreadFactory(new ThreadGroup(NAME_WORKER_POOL), NAME_WORKER_POOL, true));
-		blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, blockingQueue,
-				new RoboThreadFactory(new ThreadGroup(NAME_BLOCKING_POOL), NAME_BLOCKING_POOL, true));
-		systemScheduler = new DefaultScheduler(this, schedulerPoolSize);
+		this(uid, createConfiguration(schedulerPoolSize, workerPoolSize, blockingPoolSize));
+	}
+
+	@Override
+	public Configuration getConfiguration() {
+		return configuration;
 	}
 
 	/**
@@ -404,5 +413,13 @@ final class RoboSystem implements RoboContext {
 		// parallel.
 		unit.shutdown();
 		unit.setState(LifecycleState.SHUTDOWN);
+	}
+
+	private static Configuration createConfiguration(int schedulerPoolSize, int workerPoolSize, int blockingPoolSize) {
+		Configuration config = ConfigurationFactory.createEmptyConfiguration();
+		config.setInteger(KEY_SCHEDULER_POOL_SIZE, schedulerPoolSize);
+		config.setInteger(KEY_WORKER_POOL_SIZE, workerPoolSize);
+		config.setInteger(KEY_BLOCKING_POOL_SIZE, blockingPoolSize);
+		return config;
 	}
 }

@@ -16,9 +16,10 @@
  */
 package com.robo4j;
 
-import com.robo4j.scheduler.Scheduler;
-
 import java.util.Collection;
+
+import com.robo4j.configuration.Configuration;
+import com.robo4j.scheduler.Scheduler;
 
 /**
  * The execution context available for a unit. Contains a simple lookup service,
@@ -80,4 +81,9 @@ public interface RoboContext {
 	 * @return the globally unique id for the context.
 	 */
 	String getId();
+	
+	/**
+	 * Metadata describing the system.
+	 */
+	Configuration getConfiguration();
 }
