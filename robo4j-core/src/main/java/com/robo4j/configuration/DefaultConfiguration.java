@@ -31,6 +31,7 @@ import java.util.Set;
  * @author Miroslav Wengner (@miragemiko)
  */
 class DefaultConfiguration implements Configuration {
+	private static final long serialVersionUID = 1L;
 	private final Map<String, Object> settings = new HashMap<>();
 	private final Map<String, Configuration> configurations = new HashMap<>();
 
