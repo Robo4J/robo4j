@@ -28,8 +28,8 @@ import org.junit.runners.model.InitializationError;
  */
 public class LookupServiceTestRunner extends BlockJUnit4ClassRunner {
 
-    public LookupServiceTestRunner(Class<?> klass) throws InitializationError {
-		super(klass);
+    public LookupServiceTestRunner(Class<?> clazz) throws InitializationError {
+		super(clazz);
 		System.setProperty("java.net.preferIPv4Stack", "true");
 	}
 }
