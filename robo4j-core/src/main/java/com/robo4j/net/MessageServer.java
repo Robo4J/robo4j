@@ -88,6 +88,8 @@ public class MessageServer {
 				return objectInputStream.readUTF();
 			case MessageProtocolConstants.BYTE:
 				return objectInputStream.readByte();
+			case MessageProtocolConstants.SHORT:
+				return objectInputStream.readShort();
 			case MessageProtocolConstants.FLOAT:
 				return objectInputStream.readFloat();
 			case MessageProtocolConstants.INT:

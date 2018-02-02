@@ -82,11 +82,11 @@ public class MessageClient {
 			objectOutputStream.writeUTF((String) message);
 		} else if (message instanceof Number) {
 			if (message instanceof Float) {
-				objectOutputStream.writeByte(MessageProtocolConstants.LONG);
+				objectOutputStream.writeByte(MessageProtocolConstants.FLOAT);
 				objectOutputStream.writeFloat((Float) message);
 			} else if (message instanceof Integer) {
 				objectOutputStream.writeByte(MessageProtocolConstants.INT);
-				objectOutputStream.writeLong((Integer) message);
+				objectOutputStream.writeInt((Integer) message);
 			} else if (message instanceof Double) {
 				objectOutputStream.writeByte(MessageProtocolConstants.DOUBLE);
 				objectOutputStream.writeDouble((Double) message);
@@ -98,10 +98,10 @@ public class MessageClient {
 				objectOutputStream.writeByte((Byte) message);
 			} else if (message instanceof Short) {
 				objectOutputStream.writeByte(MessageProtocolConstants.SHORT);
-				objectOutputStream.writeLong((Short) message);
+				objectOutputStream.writeShort((Short) message);
 			}
 		} else if (message instanceof Character) {
-			objectOutputStream.writeByte(MessageProtocolConstants.BYTE);
+			objectOutputStream.writeByte(MessageProtocolConstants.CHAR);
 			objectOutputStream.writeChar((Character) message);
 		} else {
 			objectOutputStream.writeByte(MessageProtocolConstants.OBJECT);
