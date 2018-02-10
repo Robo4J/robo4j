@@ -4,7 +4,7 @@ licence.idea
 /.gradle/
 /build/
 *.bak
-
+.idea
 /.DS_Store
 robo4j-hw-rpi/out
 robo4j-math/out
