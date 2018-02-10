@@ -1,5 +1,3 @@
-println "configure $project"
-
 ext {
 //    note::it's necessary to specify local maven repository
     mavenRepository = "/home/pi/.m2"
