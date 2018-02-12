@@ -32,14 +32,16 @@ public final class RoboHttpUtils {
 	public static final String NEW_LINE_MAC = "\r";
 	public static final String NEW_LINE_UNIX = "\n";
 	public static final int DEFAULT_PORT = 8042;
+	public static final int DEFAULT_UDP_PORT = 9042;
 	public static final String HTTP_UNIT_PATHS_CONFIG = "unitPathsConfig";
 	public static final String HTTP_PROPERTY_HOST = "host";
 	public static final String HTTP_PROPERTY_PORT = "port";
 	public static final String HTTP_PROPERTY_TARGET = "target";
 	public static final String HTTP_PROPERTY_PROTOCOL = "protocol";
-	public static final String HTTP_PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
 	public static final String HTTP_CODEC_REGISTRY = "codecRegistry";
 	public static final String HTTP_CODEC_PACKAGES = "packages";
+	public static final String PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
+	public static final String PROPERTY_TIMEOUT = "timeout";
 
 	public static void decorateByNewLine(StringBuilder sb) {
 		sb.append(NEW_LINE_MAC).append(NEW_LINE_UNIX);

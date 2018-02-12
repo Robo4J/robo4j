@@ -34,7 +34,8 @@ import com.robo4j.logging.SimpleLoggingUtil;
  * 
  * TODO: Rewrite in NIO for better thread management.
  * 
- * @author Marcus
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 public class MessageServer {
 	public final static String KEY_HOST_NAME = "hostname";

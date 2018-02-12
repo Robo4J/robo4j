@@ -22,9 +22,12 @@ import com.robo4j.socket.http.SocketException;
 import com.robo4j.socket.http.units.ServerContext;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
+import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -102,6 +105,20 @@ public final class ChannelUtils {
 		} catch (Exception e) {
 			SimpleLoggingUtil.error(ChannelUtils.class, "init server socket channel", e);
 			throw new SocketException("init server socket channel", e);
+		}
+	}
+
+	public static DatagramChannel initDatagramSocketChannel(ServerContext context){
+		try {
+			DatagramChannel result = DatagramChannel.open();
+			DatagramSocket socket = result.socket();
+			SocketAddress address = new InetSocketAddress(context.getPropertySafe(Integer.class, HTTP_PROPERTY_PORT));
+			socket.bind(address);
+			return result;
+
+		} catch (Exception e){
+			SimpleLoggingUtil.error(ChannelUtils.class, "init datagram socket channel", e);
+			throw new SocketException("init datagram socket channel", e);
 		}
 	}
 

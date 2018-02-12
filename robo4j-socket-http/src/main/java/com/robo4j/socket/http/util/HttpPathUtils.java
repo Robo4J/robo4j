@@ -112,6 +112,8 @@ public final class HttpPathUtils {
 		serverContext.addPaths(resultPaths);
 	}
 
+
+
 	public static void updateHttpClientContextPaths(final ClientContext clientContext, final Collection<ClientPathDTO> paths){
 		final Map<String, ClientPathConfig> resultPaths = paths.stream()
 				.map(HttpPathUtils::toClientPathConfig)

@@ -1,14 +1,18 @@
 package com.robo4j.net;
 
-import java.net.InetAddress;
-import java.util.Collection;
-
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.scheduler.Scheduler;
 
+import java.net.InetAddress;
+import java.util.Collection;
+
+/**
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
 public class RemoteRoboContext implements RoboContext {
 
 	private RoboContextDescriptorEntry descriptorEntry;

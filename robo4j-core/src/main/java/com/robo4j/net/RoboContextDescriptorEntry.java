@@ -4,6 +4,9 @@ import java.net.InetAddress;
 
 /**
  * Internal bookkeeping class for discoveries.
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 class RoboContextDescriptorEntry {
 	public RoboContextDescriptor descriptor;

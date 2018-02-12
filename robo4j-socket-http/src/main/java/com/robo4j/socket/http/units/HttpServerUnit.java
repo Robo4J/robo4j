@@ -25,8 +25,9 @@ import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.socket.http.channel.InboundSocketHandler;
+import com.robo4j.socket.http.channel.InboundSocketChannelHandler;
 import com.robo4j.socket.http.dto.ServerUnitPathDTO;
+import com.robo4j.socket.http.util.CodeRegistryUtils;
 import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 
@@ -35,10 +36,9 @@ import java.util.List;
 import static com.robo4j.socket.http.util.ChannelBufferUtils.INIT_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_CODEC_PACKAGES;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_CODEC_REGISTRY;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_UNIT_PATHS_CONFIG;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
-import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_UNIT_PATHS_CONFIG;
 
 /**
  * Http NIO unit allows to configure format of the requests currently is only
@@ -51,7 +51,7 @@ import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
 public class HttpServerUnit extends RoboUnit<Object> {
 
 	private final ServerContext serverContext = new ServerContext();
-	private InboundSocketHandler inboundSocketHandler;
+	private InboundSocketChannelHandler inboundSocketChannelHandler;
 	private List<ServerUnitPathDTO> paths;
 
 	public HttpServerUnit(RoboContext context, String id) {
@@ -61,20 +61,17 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		int port = configuration.getInteger(HTTP_PROPERTY_PORT, RoboHttpUtils.DEFAULT_PORT);
-		int bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, INIT_BUFFER_CAPACITY);
+		int bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, INIT_BUFFER_CAPACITY);
 
 		paths = HttpPathUtils.readPathConfig(ServerUnitPathDTO.class, configuration.getString(HTTP_UNIT_PATHS_CONFIG, null));
 
-
-		serverContext.putProperty(HTTP_PROPERTY_BUFFER_CAPACITY, bufferCapacity);
+		serverContext.putProperty(PROPERTY_BUFFER_CAPACITY, bufferCapacity);
 		serverContext.putProperty(HTTP_PROPERTY_PORT, port);
 
 		String packages = configuration.getString(HTTP_CODEC_PACKAGES, null);
-		if (RoboHttpUtils.validatePackages(packages)) {
-			HttpCodecRegistry codecRegistry = new HttpCodecRegistry();
-			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(UTF8_COMMA));
-			serverContext.putProperty(HTTP_CODEC_REGISTRY, codecRegistry);
-		}
+
+		serverContext.putProperty(HTTP_CODEC_REGISTRY, CodeRegistryUtils.getCodecRegistry(packages));
+
 
 	}
 
@@ -85,16 +82,15 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	public void start() {
 		setState(LifecycleState.STARTING);
 		HttpPathUtils.updateHttpServerContextPaths(getContext(), serverContext, paths);
-		inboundSocketHandler = new InboundSocketHandler(getContext(), serverContext);
-
-		inboundSocketHandler.start();
+		inboundSocketChannelHandler = new InboundSocketChannelHandler(getContext(), serverContext);
+		inboundSocketChannelHandler.start();
 		setState(LifecycleState.STARTED);
 	}
 
 	@Override
 	public void stop() {
 		setState(LifecycleState.STOPPING);
-		inboundSocketHandler.stop();
+		inboundSocketChannelHandler.stop();
 		setState(LifecycleState.STOPPED);
 	}
 }

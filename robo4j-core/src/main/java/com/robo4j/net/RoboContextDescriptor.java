@@ -22,6 +22,7 @@ import java.util.Map;
  * A descriptor for a RoboContext on the network.
  * 
  * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 public final class RoboContextDescriptor {
 	private final String id;

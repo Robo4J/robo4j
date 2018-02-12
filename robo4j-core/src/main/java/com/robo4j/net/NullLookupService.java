@@ -16,16 +16,17 @@
  */
 package com.robo4j.net;
 
+import com.robo4j.RoboContext;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.robo4j.RoboContext;
-
 /**
  * 
  * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 final class NullLookupService implements LookupService {
 	private  Map<String, RoboContextDescriptor> NULL_CONTEXTS = Collections.unmodifiableMap(new HashMap<>());

@@ -111,6 +111,11 @@ public abstract class AbstractHttpDecoratedMessage implements HttpMessage {
 		callbacks.add(callback);
 	}
 
+	/**
+	 * units which should be informed by the successful results
+	 * 
+	 * @return list of callback to be informed
+	 */
 	public List<String> getCallbacks() {
 		return new ArrayList<>(callbacks);
 	}

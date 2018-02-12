@@ -16,6 +16,8 @@
  */
 package com.robo4j.net;
 
+import com.robo4j.configuration.Configuration;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -23,13 +25,12 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.UnknownHostException;
 
-import com.robo4j.configuration.Configuration;
-
 /**
  * Message client. Normally used by RemoteRoboContext to communicate with a
  * discovered MessageServer.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 public class MessageClient {
 	public final static String KEY_SO_TIMEOUT = "timeout";

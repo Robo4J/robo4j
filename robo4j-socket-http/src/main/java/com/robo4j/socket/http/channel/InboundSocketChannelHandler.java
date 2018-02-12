@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_CODEC_REGISTRY;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY;
 
 /**
  * Inbound context co
@@ -41,7 +41,7 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAP
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class InboundSocketHandler implements SocketHandler {
+public class InboundSocketChannelHandler implements SocketHandler {
 
 	private final RoboContext context;
 	private final ServerContext serverContext;
@@ -49,7 +49,7 @@ public class InboundSocketHandler implements SocketHandler {
 	private ServerSocketChannel socketChannel;
 	private boolean active;
 
-	public InboundSocketHandler(RoboContext context, ServerContext serverContext) {
+	public InboundSocketChannelHandler(RoboContext context, ServerContext serverContext) {
 		this.context = context;
 		this.serverContext = serverContext;
 	}
@@ -79,7 +79,7 @@ public class InboundSocketHandler implements SocketHandler {
 		final SelectionKey key = ChannelUtils.registerSelectionKey(socketChannel);
 
 		final HttpCodecRegistry codecRegistry = serverContext.getPropertySafe(HttpCodecRegistry.class, HTTP_CODEC_REGISTRY);
-		final int bufferCapacity = serverContext.getPropertySafe(Integer.class, HTTP_PROPERTY_BUFFER_CAPACITY);
+		final int bufferCapacity = serverContext.getPropertySafe(Integer.class, PROPERTY_BUFFER_CAPACITY);
 
 		while (active) {
 			int channelReady = ChannelUtils.getReadyChannelBySelectionKey(key);

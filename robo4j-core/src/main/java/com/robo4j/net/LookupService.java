@@ -26,6 +26,7 @@ import java.util.Map;
  * These exist outside of any context. In normal use, there will be one per JVM.
  * 
  * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 public interface LookupService {
 	/**

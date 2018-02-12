@@ -35,7 +35,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_BUFFER_CAPACITY;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PROTOCOL;
@@ -65,7 +65,7 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		bufferCapacity = configuration.getInteger(HTTP_PROPERTY_BUFFER_CAPACITY, null);
+		bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, null);
 		protocol = ProtocolType.valueOf(configuration.getString(HTTP_PROPERTY_PROTOCOL, "HTTP"));
 		host = configuration.getString(HTTP_PROPERTY_HOST, null);
 		port = configuration.getInteger(HTTP_PROPERTY_PORT, null);
@@ -75,11 +75,10 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 		}
 	}
 
-	// TODO: 12/11/17 (miro) all information are in the message
 	@Override
 	public void onMessage(HttpDecoratedRequest message) {
-		final HttpDecoratedRequest resultMessage = adjustRequest(message);
-		final InetSocketAddress address = new InetSocketAddress(resultMessage.getHost(), resultMessage.getPort());
+		final HttpDecoratedRequest request = adjustRequest(message);
+		final InetSocketAddress address = new InetSocketAddress(request.getHost(), request.getPort());
 		try (SocketChannel channel = SocketChannel.open(address)) {
 			if (bufferCapacity != null) {
 				channel.socket().setSendBufferSize(bufferCapacity);
@@ -87,7 +86,7 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 
 
 
-			final OutboundChannelHandler handler = new OutboundChannelHandler(channel, resultMessage);
+			final OutboundChannelHandler handler = new OutboundChannelHandler(channel, request);
 
 			// TODO: 12/10/17 (miro) -> handler
 			handler.start();

@@ -16,16 +16,17 @@
  */
 package com.robo4j.net;
 
+import com.robo4j.logging.SimpleLoggingUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import com.robo4j.logging.SimpleLoggingUtil;
 
 /**
  * Used to encode and decode heartbeat messages, with a minimum of allocation.
  * 
  * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 class HearbeatMessageCodec {
 	private static byte PROTOCOL_VERSION = 0;

@@ -26,8 +26,10 @@ import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.message.HttpDecoratedResponse;
 
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
+import java.nio.channels.DatagramChannel;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +46,7 @@ import static com.robo4j.socket.http.util.HttpMessageUtils.POSITION_HEADER;
  */
 public class ChannelBufferUtils {
 
+	public static final int CHANNEL_TIMEOUT = 60000;
 	public static final int INIT_BUFFER_CAPACITY = 4 * 4096;
 	public static final byte CHAR_NEW_LINE = 0x0A;
 	public static final byte CHAR_RETURN = 0x0D;
@@ -225,5 +228,22 @@ public class ChannelBufferUtils {
 		}
 		final String message = new String(array);
 		sb.append(message);
+	}
+
+	public static String byteBufferToString(ByteBuffer buffer){
+		StringBuilder sb = new StringBuilder();
+		while(buffer.hasRemaining()){
+			sb.append((char) buffer.get());
+		}
+		buffer.clear();
+		return sb.toString();
+	}
+
+	public static void writeDatagramResponse(SocketAddress client, DatagramChannel channel, ByteBuffer  buffer, String message) throws IOException{
+		buffer.clear();
+		buffer.put(message.getBytes());
+		buffer.flip();
+		int sentBytes = channel.send(buffer, client);
+		System.out.println("BYTES: " + sentBytes);
 	}
 }
