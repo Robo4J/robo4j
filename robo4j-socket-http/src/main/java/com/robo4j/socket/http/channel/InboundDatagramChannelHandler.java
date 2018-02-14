@@ -20,7 +20,7 @@ public class InboundDatagramChannelHandler implements SocketHandler {
 	private final RoboContext context;
 	private final ServerContext serverContext;
 	private DatagramChannel channel;
-	private boolean active;
+	private volatile boolean active;
 
 	public InboundDatagramChannelHandler(RoboContext context, ServerContext serverContext) {
 		this.context = context;
@@ -39,10 +39,10 @@ public class InboundDatagramChannelHandler implements SocketHandler {
 	public void stop() {
 		try {
             System.out.println(getClass().getSimpleName() + ":STOP");
-			if (channel != null && channel.isConnected()) {
+			if (channel != null) {
+				System.out.println(getClass().getSimpleName() + "close channel");
 				active = false;
-                channel.close();
-                System.out.println(getClass().getSimpleName());
+				if(channel.isConnected()) channel.close();
             }
         } catch (IOException e) {
 			SimpleLoggingUtil.error(getClass(), "server stop problem: ", e);

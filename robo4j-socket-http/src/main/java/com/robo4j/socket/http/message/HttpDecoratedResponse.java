@@ -18,8 +18,6 @@
 package com.robo4j.socket.http.message;
 
 import com.robo4j.socket.http.enums.StatusCode;
-import com.robo4j.socket.http.util.HttpDenominator;
-import com.robo4j.socket.http.util.ResponseDenominator;
 
 import java.util.Map;
 
@@ -32,9 +30,9 @@ import java.util.Map;
  */
 public final class HttpDecoratedResponse extends AbstractHttpDecoratedMessage {
 
-	private final ResponseDenominator denominator;
+	private final HttpResponseDenominator denominator;
 
-	public HttpDecoratedResponse(Map<String, String> header, ResponseDenominator denominator) {
+	public HttpDecoratedResponse(Map<String, String> header, HttpResponseDenominator denominator) {
 		super(header, denominator.getVersion());
 		this.denominator = denominator;
 	}

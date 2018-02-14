@@ -33,9 +33,6 @@ import com.robo4j.util.StringConstants;
 import com.robo4j.util.Utf8Constant;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -72,20 +69,13 @@ public final class HttpPathUtils {
 		return ReflectUtils.createInstanceByClazzAndDescriptorAndJsonDocument(clazz, document);
 	}
 
-	@SuppressWarnings("unchecked")
-	public static <T> List<T> readPathConfig(Class<T> clazz, String configurationJson) {
-		if (configurationJson == null || configurationJson.isEmpty()) {
-			return Collections.emptyList();
-		}
-		final JsonDocument document = parseJsonByClass(configurationJson);
-
-		//@formatter:off
-		return document.getArray().stream().map(JsonDocument.class::cast)
-				.map(e -> ReflectUtils.createInstanceByClazzAndDescriptorAndJsonDocument(clazz, e))
-				.collect(Collectors.toCollection(LinkedList::new));
-		//@formatter:on
-	}
-
+	/**
+	 * transform path dto to proper http server path
+	 *
+	 * @param dto path DTO
+	 * @param reference roboReference related to the path
+	 * @return server unit path config
+	 */
 	public static ServerPathConfig toServerPathConfig(ServerUnitPathDTO dto, RoboReference<Object> reference) {
 		final String unitPath = toPath(SystemPath.UNITS.getPath(), dto.getRoboUnit());
 		return new ServerPathConfig(unitPath, reference, dto.getMethod(), dto.getFilters());
@@ -95,11 +85,6 @@ public final class HttpPathUtils {
 		final String unitPath = dto.getRoboUnit().equals(StringConstants.EMPTY) ? Utf8Constant.UTF8_SOLIDUS
 				: toPath(SystemPath.UNITS.getPath(), dto.getRoboUnit());
 		return new ClientPathConfig(unitPath, dto.getMethod(), dto.getCallbacks());
-	}
-
-	public static JsonDocument parseJsonByClass(String json) {
-		final JsonReader jsonReader = new JsonReader(json);
-		return jsonReader.read();
 	}
 
 	public static void updateHttpServerContextPaths(final RoboContext context, final ServerContext serverContext, final Collection<ServerUnitPathDTO> paths){

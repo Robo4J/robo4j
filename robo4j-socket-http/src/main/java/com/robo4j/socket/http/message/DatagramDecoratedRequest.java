@@ -1,21 +1,32 @@
 package com.robo4j.socket.http.message;
 
+import com.robo4j.socket.http.util.ChannelBufferUtils;
+
+import java.util.Arrays;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class DatagramDecoratedRequest<T> implements DatagramMessage<T> {
+public class DatagramDecoratedRequest implements DatagramMessage<byte[]> {
+
+    private final DatagramDenominator denominator;
     private String host;
     private Integer port;
-    private T message;
+    private byte[] message;
 
-    public DatagramDecoratedRequest(T message) {
-        this.message = message;
+    public DatagramDecoratedRequest(DatagramDenominator denominator) {
+        this.denominator = denominator;
     }
 
     @Override
-    public T getMessage() {
-        return message;
+    public byte[] getMessage() {
+        return ChannelBufferUtils.joinByteArrays(denominator.generate(), message);
+    }
+
+    @Override
+    public void addMessage(byte[] message) {
+        this.message = this.message == null ? message : ChannelBufferUtils.joinByteArrays(this.message, message);
     }
 
     public String getHost() {
@@ -39,7 +50,7 @@ public class DatagramDecoratedRequest<T> implements DatagramMessage<T> {
         return "DatagramDecoratedRequest{" +
                 "host='" + host + '\'' +
                 ", port=" + port +
-                ", message=" + message +
+                ", message=" + Arrays.asList(message) +
                 '}';
     }
 }

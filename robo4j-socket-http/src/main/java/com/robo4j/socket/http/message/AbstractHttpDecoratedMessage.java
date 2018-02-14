@@ -18,7 +18,6 @@
 package com.robo4j.socket.http.message;
 
 import com.robo4j.socket.http.HttpHeaderFieldNames;
-import com.robo4j.socket.http.util.HttpDenominator;
 import com.robo4j.socket.http.util.HttpHeaderBuilder;
 
 import java.util.ArrayList;

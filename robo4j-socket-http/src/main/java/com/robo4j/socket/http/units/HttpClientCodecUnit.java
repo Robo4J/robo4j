@@ -9,7 +9,8 @@ import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.util.HttpPathUtils;
-import com.robo4j.socket.http.util.RequestDenominator;
+import com.robo4j.socket.http.util.JsonUtil;
+import com.robo4j.socket.http.message.HttpRequestDenominator;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.util.List;
@@ -17,8 +18,8 @@ import java.util.Objects;
 
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_CODEC_PACKAGES;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_CODEC_REGISTRY;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_UNIT_PATHS_CONFIG;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_UNIT_PATHS_CONFIG;
 import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
 
 /**
@@ -41,7 +42,7 @@ public final class HttpClientCodecUnit extends RoboUnit<HttpClientMessageWrapper
 		target = configuration.getString(HTTP_PROPERTY_TARGET, null);
 		Objects.requireNonNull(target, "empty target");
 
-		List<ClientPathDTO> paths = HttpPathUtils.readPathConfig(ClientPathDTO.class,
+		List<ClientPathDTO> paths = JsonUtil.readPathConfig(ClientPathDTO.class,
 				configuration.getString(HTTP_UNIT_PATHS_CONFIG, null));
 		if (paths.isEmpty()) {
 			throw ConfigurationException.createMissingConfigNameException(HTTP_UNIT_PATHS_CONFIG);
@@ -65,13 +66,13 @@ public final class HttpClientCodecUnit extends RoboUnit<HttpClientMessageWrapper
 						: processMessage(String.class, message.toString());
 
 		ClientPathConfig pathConfig = clientContext.getPathConfig(message.getPath());
-		final RequestDenominator denominator = new RequestDenominator(pathConfig.getMethod(), pathConfig.getPath(),
+		final HttpRequestDenominator denominator = new HttpRequestDenominator(pathConfig.getMethod(), pathConfig.getPath(),
 				HttpVersion.HTTP_1_1);
 		final HttpDecoratedRequest request = new HttpDecoratedRequest(denominator);
 		request.addMessage(encodedMessage);
 
 		// FIXME: 1/27/18 (miro) -> fix null list
-		if(pathConfig.getCallbacks() != null){
+		if (pathConfig.getCallbacks() != null) {
 			request.addCallbacks(pathConfig.getCallbacks());
 		}
 

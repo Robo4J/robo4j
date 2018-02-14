@@ -93,7 +93,7 @@ public class DatagramClientUnit extends RoboUnit<DatagramDecoratedRequest> {
                 }
             }
 
-
+            channel.close();
 
         } catch (IOException e){
             SimpleLoggingUtil.error(getClass(),

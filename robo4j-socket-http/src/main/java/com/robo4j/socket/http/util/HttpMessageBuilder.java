@@ -17,6 +17,8 @@
 
 package com.robo4j.socket.http.util;
 
+import com.robo4j.socket.http.message.HttpDenominator;
+
 import java.util.Map;
 
 /**

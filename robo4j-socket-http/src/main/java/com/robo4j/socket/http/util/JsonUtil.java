@@ -25,6 +25,7 @@ import com.robo4j.util.Utf8Constant;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,48 @@ public final class JsonUtil {
 			long.class, double.class, float.class, char.class, Boolean.class, Integer.class, Short.class, Byte.class,
 			Long.class, Double.class, Float.class, Character.class).collect(Collectors.toSet());
 
+	/**
+	 *
+	 * @param clazz
+	 *            desired class
+	 * @param configurationJson
+	 *            json string
+	 * @param <T>
+	 *            desired collection type
+	 * @return collection of type T
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> readPathConfig(Class<T> clazz, String configurationJson) {
+		if (configurationJson == null || configurationJson.isEmpty()) {
+			return Collections.emptyList();
+		}
+		final JsonDocument document = JsonUtil.parseJsonByClass(configurationJson);
+
+		//@formatter:off
+		return document.getArray().stream().map(JsonDocument.class::cast)
+				.map(e -> ReflectUtils.createInstanceByClazzAndDescriptorAndJsonDocument(clazz, e))
+				.collect(Collectors.toCollection(LinkedList::new));
+		//@formatter:on
+	}
+
+	/**
+	 * parse json string
+	 *
+	 * @param json
+	 *            string input
+	 * @return JsonDocument of the string input
+	 */
+	public static JsonDocument parseJsonByClass(String json) {
+		final JsonReader jsonReader = new JsonReader(json);
+		return jsonReader.read();
+	}
+
+	/**
+	 *
+	 * @param array
+	 *            input byte array
+	 * @return Base64 encoded string
+	 */
 	public static String toBase64String(byte[] array) {
 		try {
 			return new String(Base64.getEncoder().encode(array), DEFAULT_ENCODING);

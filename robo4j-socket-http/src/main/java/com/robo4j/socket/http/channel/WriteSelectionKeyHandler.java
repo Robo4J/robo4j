@@ -23,14 +23,14 @@ import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.SocketException;
 import com.robo4j.socket.http.enums.StatusCode;
+import com.robo4j.socket.http.message.HttpResponseDenominator;
 import com.robo4j.socket.http.request.RoboResponseProcess;
 import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.units.ServerPathConfig;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
 import com.robo4j.socket.http.util.ChannelUtils;
-import com.robo4j.socket.http.util.HttpDenominator;
+import com.robo4j.socket.http.message.HttpDenominator;
 import com.robo4j.socket.http.util.HttpMessageBuilder;
-import com.robo4j.socket.http.util.ResponseDenominator;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -69,7 +69,7 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 				String getResponse;
 				if (responseProcess.getResult() != null && responseProcess.getCode().equals(StatusCode.OK)) {
 					String responseMessage = responseProcess.getResult().toString();
-					HttpDenominator denominator = new ResponseDenominator(responseProcess.getCode(),
+					HttpDenominator denominator = new HttpResponseDenominator(responseProcess.getCode(),
 							HttpVersion.HTTP_1_1);
 					getResponse = HttpMessageBuilder.Build().setDenominator(denominator)
 							.addHeaderElement(HttpHeaderFieldNames.ROBO_UNIT_UID, context.getId())
@@ -77,7 +77,7 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 									String.valueOf(responseMessage.length()))
 							.build(responseMessage);
 				} else {
-					HttpDenominator denominator = new ResponseDenominator(responseProcess.getCode(),
+					HttpDenominator denominator = new HttpResponseDenominator(responseProcess.getCode(),
 							HttpVersion.HTTP_1_1);
 					getResponse = HttpMessageBuilder.Build().setDenominator(denominator).build();
 				}
@@ -87,7 +87,7 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 			case POST:
 				if (responseProcess.getResult() != null && responseProcess.getCode().equals(StatusCode.ACCEPTED)) {
 
-					HttpDenominator denominator = new ResponseDenominator(responseProcess.getCode(),
+					HttpDenominator denominator = new HttpResponseDenominator(responseProcess.getCode(),
 							HttpVersion.HTTP_1_1);
 					String postResponse = HttpMessageBuilder.Build().setDenominator(denominator).build();
 
@@ -95,7 +95,7 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 					ChannelUtils.handleWriteChannelAndBuffer("post write", channel, buffer);
 					sendMessageToTargetRoboReference(responseProcess);
 				} else {
-					HttpDenominator denominator = new ResponseDenominator(responseProcess.getCode(),
+					HttpDenominator denominator = new HttpResponseDenominator(responseProcess.getCode(),
 							HttpVersion.HTTP_1_1);
 					String notImplementedResponse = HttpMessageBuilder.Build().setDenominator(denominator).build();
 					buffer = ChannelBufferUtils.getByteBufferByString(notImplementedResponse);
@@ -105,7 +105,7 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 				break;
 			}
 		} else {
-			HttpDenominator denominator = new ResponseDenominator(StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1);
+			HttpDenominator denominator = new HttpResponseDenominator(StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1);
 			String badResponse = HttpMessageBuilder.Build().setDenominator(denominator).build();
 			buffer = ChannelBufferUtils.getByteBufferByString(badResponse);
 			try {

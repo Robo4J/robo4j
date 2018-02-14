@@ -24,6 +24,8 @@ import com.robo4j.socket.http.SocketException;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.message.HttpDecoratedResponse;
+import com.robo4j.socket.http.message.HttpRequestDenominator;
+import com.robo4j.socket.http.message.HttpResponseDenominator;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -99,7 +101,7 @@ public class ChannelBufferUtils {
 
 		} else {
 
-			return new HttpDecoratedResponse(new HashMap<>(), new ResponseDenominator(StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1));
+			return new HttpDecoratedResponse(new HashMap<>(), new HttpResponseDenominator(StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1));
 		}
 	}
 
@@ -132,7 +134,7 @@ public class ChannelBufferUtils {
 			requestBuffer.clear();
 			return result;
 		} else {
-			return new HttpDecoratedRequest(new HashMap<>(), new RequestDenominator(HttpMethod.GET, HttpVersion.HTTP_1_1));
+			return new HttpDecoratedRequest(new HashMap<>(), new HttpRequestDenominator(HttpMethod.GET, HttpVersion.HTTP_1_1));
 		}
 	}
 
@@ -142,6 +144,12 @@ public class ChannelBufferUtils {
 		} catch (Exception e){
 			throw new SocketException("read bytes channel", e);
 		}
+	}
+
+	public static byte[] joinByteArrays(final byte[] array1, byte[] array2) {
+		byte[] result = Arrays.copyOf(array1, array1.length + array2.length);
+		System.arraycopy(array2, 0, result, array1.length, array2.length);
+		return result;
 	}
 
 	public static byte[] validArray(byte[] array, int size) {
@@ -172,7 +180,7 @@ public class ChannelBufferUtils {
 		final String version = tokens[HttpMessageUtils.VERSION_POSITION];
 		final Map<String, String> headerParams = getHeaderParametersByArray(paramArray);
 
-		final RequestDenominator denominator = new RequestDenominator(method, path, HttpVersion.getByValue(version));
+		final HttpRequestDenominator denominator = new HttpRequestDenominator(method, path, HttpVersion.getByValue(version));
 		HttpDecoratedRequest result = new HttpDecoratedRequest(headerParams, denominator);
 
 		if (headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)) {
@@ -194,7 +202,7 @@ public class ChannelBufferUtils {
 		final StatusCode statusCode = StatusCode.getByCode(Integer.valueOf(tokens[1]));
 		final Map<String, String> headerParams = getHeaderParametersByArray(paramArray);
 
-		ResponseDenominator denominator = new ResponseDenominator(statusCode, HttpVersion.getByValue(version));
+		HttpResponseDenominator denominator = new HttpResponseDenominator(statusCode, HttpVersion.getByValue(version));
 		HttpDecoratedResponse result = new HttpDecoratedResponse(headerParams, denominator);
 		if (headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)) {
 			result.setLength(calculateMessageSize(headerAndBody[POSITION_HEADER].length(), headerParams));

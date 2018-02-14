@@ -27,7 +27,8 @@ import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.units.ClientContext;
 import com.robo4j.socket.http.util.HttpPathUtils;
-import com.robo4j.socket.http.util.RequestDenominator;
+import com.robo4j.socket.http.message.HttpRequestDenominator;
+import com.robo4j.socket.http.util.JsonUtil;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,7 +61,7 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 		target = configuration.getString(HTTP_PROPERTY_TARGET, null);
 		message = configuration.getString("message", null);
 
-		List<ClientPathDTO> paths = HttpPathUtils.readPathConfig(ClientPathDTO.class,
+		List<ClientPathDTO> paths = JsonUtil.readPathConfig(ClientPathDTO.class,
 				configuration.getString(HTTP_UNIT_PATHS_CONFIG, null));
 		HttpPathUtils.updateHttpClientContextPaths(clientContext, paths);
 		counter = new AtomicInteger(DEFAULT);
@@ -76,7 +77,7 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	public void onMessage(Integer number) {
 		clientContext.getPathConfigs().forEach(pathConfig -> {
 			IntStream.range(DEFAULT, number).forEach(i -> {
-				RequestDenominator denominator = new RequestDenominator(pathConfig.getMethod(), pathConfig.getPath(),
+				HttpRequestDenominator denominator = new HttpRequestDenominator(pathConfig.getMethod(), pathConfig.getPath(),
 						HttpVersion.HTTP_1_1);
 				HttpDecoratedRequest request = new HttpDecoratedRequest(denominator);
 				switch (pathConfig.getMethod()) {

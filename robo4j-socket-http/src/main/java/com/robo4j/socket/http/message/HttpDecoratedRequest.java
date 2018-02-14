@@ -19,8 +19,6 @@ package com.robo4j.socket.http.message;
 
 import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
-import com.robo4j.socket.http.util.HttpDenominator;
-import com.robo4j.socket.http.util.RequestDenominator;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.util.Map;
@@ -37,16 +35,16 @@ import java.util.Objects;
  */
 public final class HttpDecoratedRequest extends AbstractHttpDecoratedMessage {
 
-	private final RequestDenominator denominator;
+	private final HttpRequestDenominator denominator;
 	private String host;
 	private Integer port;
 
-	public HttpDecoratedRequest(RequestDenominator denominator){
+	public HttpDecoratedRequest(HttpRequestDenominator denominator){
 		super(denominator.getVersion());
 		this.denominator = denominator;
 	}
 
-	public HttpDecoratedRequest(Map<String, String> header, RequestDenominator denominator) {
+	public HttpDecoratedRequest(Map<String, String> header, HttpRequestDenominator denominator) {
 		super(header, denominator.getVersion());
 		this.denominator = denominator;
 	}

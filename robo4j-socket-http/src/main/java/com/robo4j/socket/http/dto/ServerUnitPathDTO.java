@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ *
+ * roboUnit - roboUnit
+ * method - appropriated HTTP method, UDP case is null
+ * List - list of filters
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
