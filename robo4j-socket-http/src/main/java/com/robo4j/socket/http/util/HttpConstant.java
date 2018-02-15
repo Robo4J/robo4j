@@ -23,10 +23,8 @@ package com.robo4j.socket.http.util;
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class HttpConstant {
-	public static final String STRING_EMPTY = "";
 	public static final int DEFAULT_VALUE_0 = 0;
-	public static final int DEFAULT_VALUE_1 = 1;
 	public static final String HTTP_QUERY_SEP = "\u0026"; // AMPERSAND &
 	public static final String HTTP_EMPTY_SEP = "\\s+";
-	public static final String HTTP_NEW_LINE = "\n";
+	public static final String HTTP_NEW_LINE = "\r\n";
 }

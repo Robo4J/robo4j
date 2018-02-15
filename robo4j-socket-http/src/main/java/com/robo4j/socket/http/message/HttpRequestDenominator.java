@@ -19,8 +19,8 @@ package com.robo4j.socket.http.message;
 
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.util.Utf8Constant;
 
-import static com.robo4j.socket.http.util.HttpMessageUtils.SPACE;
 import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
 
 /**
@@ -86,7 +86,8 @@ public class HttpRequestDenominator implements HttpDenominator {
 		assert method != null;
 		assert path != null;
 		assert version != null;
-		return sb.append(method.getName()).append(SPACE).append(path).append(SPACE).append(getVersion()).toString();
+		return sb.append(method.getName()).append(Utf8Constant.UTF8_SPACE).append(path).append(Utf8Constant.UTF8_SPACE)
+				.append(getVersion()).toString();
 	}
 
 	@Override

@@ -25,8 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.robo4j.socket.http.util.HttpConstant.STRING_EMPTY;
-
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -83,7 +81,7 @@ public final class HttpHeaderBuilder {
 		return start.concat(map
 				.entrySet().stream().map(e -> e.getKey().concat(HttpMessageUtils.COLON).concat(HttpMessageUtils.SPACE)
 						.concat(e.getValue()).concat(HttpMessageUtils.NEXT_LINE))
-				.collect(Collectors.joining(STRING_EMPTY)));
+				.collect(Collectors.joining(StringConstants.EMPTY)));
 	}
 
 	/**
@@ -106,7 +104,7 @@ public final class HttpHeaderBuilder {
                                 .concat(HttpMessageUtils.SPACE)
                                 .concat(e.getValue())
                                 .concat(HttpMessageUtils.NEXT_LINE))
-                        .collect(Collectors.joining(STRING_EMPTY)));
+                        .collect(Collectors.joining(StringConstants.EMPTY)));
         //@formatter:on
 	}
 

@@ -6,7 +6,9 @@ import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.socket.http.message.DatagramDecoratedRequest;
+import com.robo4j.socket.http.message.DatagramDenominator;
 import com.robo4j.socket.http.units.test.StringConsumer;
+import com.robo4j.socket.http.util.DatagramType;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.SystemUtil;
 import org.junit.Test;
@@ -35,9 +37,12 @@ public class RoboDatagramPingPongTest {
         System.out.println("UDP pingSystem: State after start:");
         System.out.println(SystemUtil.printStateReport(pingSystem));
 
-        RoboReference<DatagramDecoratedRequest<String>> udpClient = pingSystem.getReference(UDP_CLIENT);
+        RoboReference<DatagramDecoratedRequest> udpClient = pingSystem.getReference(UDP_CLIENT);
         for(int i=0; i < 100; i++){
-            DatagramDecoratedRequest<String> request = new DatagramDecoratedRequest<>("Hello robo4j" + i);
+            DatagramDenominator denominator = new DatagramDenominator(DatagramType.JSON.getType(), "/units/stringConsumer");
+            DatagramDecoratedRequest request = new DatagramDecoratedRequest(denominator);
+            String message = "{\"message\": \"Hello i:"+ i +"\"}";
+            request.addMessage(message.getBytes());
             udpClient.sendMessage(request);
         }
 

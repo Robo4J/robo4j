@@ -31,6 +31,7 @@ public final class RoboHttpUtils {
 
 	public static final String NEW_LINE_MAC = "\r";
 	public static final String NEW_LINE_UNIX = "\n";
+
 	public static final int DEFAULT_PORT = 8042;
 	public static final int DEFAULT_UDP_PORT = 9042;
 	public static final String HTTP_UNIT_PATHS_CONFIG = "unitPathsConfig";

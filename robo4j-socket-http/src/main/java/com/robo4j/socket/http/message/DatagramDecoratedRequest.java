@@ -1,7 +1,9 @@
 package com.robo4j.socket.http.message;
 
 import com.robo4j.socket.http.util.ChannelBufferUtils;
+import com.robo4j.socket.http.util.HttpConstant;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -21,7 +23,10 @@ public class DatagramDecoratedRequest implements DatagramMessage<byte[]> {
 
     @Override
     public byte[] getMessage() {
-        return ChannelBufferUtils.joinByteArrays(denominator.generate(), message);
+        ByteBuffer headerAndMessage = ByteBuffer.allocate(HttpConstant.HTTP_NEW_LINE.length() + message.length);
+        headerAndMessage.put(HttpConstant.HTTP_NEW_LINE.getBytes());
+        headerAndMessage.put(message);
+        return ChannelBufferUtils.joinByteArrays(denominator.generate(), headerAndMessage.array());
     }
 
     @Override

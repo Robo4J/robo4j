@@ -52,7 +52,7 @@ public class DatagramClientUnit extends RoboUnit<DatagramDecoratedRequest> {
 
     @Override
     public void onMessage(DatagramDecoratedRequest requestMessage) {
-        final DatagramDecoratedRequest<String> request = adjustRequest(requestMessage);
+        final DatagramDecoratedRequest request = adjustRequest(requestMessage);
         final InetSocketAddress address = new InetSocketAddress(request.getHost(), request.getPort());
 
         try (DatagramChannel channel = DatagramChannel.open()) {
@@ -81,13 +81,13 @@ public class DatagramClientUnit extends RoboUnit<DatagramDecoratedRequest> {
                         buffer.flip();
                         String decodedString = ChannelBufferUtils.byteBufferToString(buffer);
                         System.out.println("Read: " + decodedString);
-                        active =false;
+                        active = false;
                     } else if (key.isWritable()) {
                         buffer.clear();
-                        buffer.put(request.getMessage().getBytes());
+                        buffer.put(request.getMessage());
                         buffer.flip();
                         channel.write(buffer);
-                        System.out.println("Wrote: " + request.getMessage());
+                        System.out.println("Wrote: " + new String(request.getMessage()));
                         key.interestOps(SelectionKey.OP_READ);
                     }
                 }
@@ -102,8 +102,7 @@ public class DatagramClientUnit extends RoboUnit<DatagramDecoratedRequest> {
     }
 
 
-    @SuppressWarnings("unchecked")
-    private <T> DatagramDecoratedRequest<T> adjustRequest(DatagramDecoratedRequest request) {
+    private DatagramDecoratedRequest adjustRequest(DatagramDecoratedRequest request) {
         request.setHost(host);
         request.setPort(port);
         return request;
