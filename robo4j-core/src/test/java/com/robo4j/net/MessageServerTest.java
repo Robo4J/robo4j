@@ -42,8 +42,8 @@ public class MessageServerTest {
 		serverConfig.setString(MessageServer.KEY_HOST_NAME, "localhost");
 		MessageServer server = new MessageServer(new MessageCallback() {
 			@Override
-			public void handleMessage(String id, Object message) {
-				System.out.println("Got id:" + id + " message:" + message);
+			public void handleMessage(String uuid, String id, Object message) {
+				System.out.println("Got uuid: " + uuid + " id:" + id + " message:" + message);
 				messages.add(String.valueOf(message));
 				messageLatch.countDown();
 			}
@@ -71,7 +71,7 @@ public class MessageServerTest {
 		}
 
 		Configuration clientConfig = ConfigurationFactory.createEmptyConfiguration();
-		MessageClient client = new MessageClient(server.getListeningURI(), clientConfig);
+		MessageClient client = new MessageClient(server.getListeningURI(), "myuuid", clientConfig);
 		if (exception != null) {
 			throw exception;
 		}
@@ -92,8 +92,8 @@ public class MessageServerTest {
 		serverConfig.setString(MessageServer.KEY_HOST_NAME, "localhost");
 		MessageServer server = new MessageServer(new MessageCallback() {
 			@Override
-			public void handleMessage(String id, Object message) {
-				System.out.println("Got id:" + id + " message:" + message);
+			public void handleMessage(String uuid, String id, Object message) {
+				System.out.println("Got uuid: " + uuid + " got id:" + id + " message:" + message);
 				messages.add(message);
 				messageLatch.countDown();
 			}
@@ -121,7 +121,7 @@ public class MessageServerTest {
 		}
 
 		Configuration clientConfig = ConfigurationFactory.createEmptyConfiguration();
-		MessageClient client = new MessageClient(server.getListeningURI(), clientConfig);
+		MessageClient client = new MessageClient(server.getListeningURI(), "myuuid", clientConfig);
 		if (exception != null) {
 			throw exception;
 		}
@@ -171,14 +171,14 @@ public class MessageServerTest {
 		if (messages.get(6) instanceof Double) {
 			Assert.assertEquals(((Double) messages.get(6)).doubleValue(), 7.0, 0.000001);
 		} else {
-			Assert.fail("Expected Long!");
+			Assert.fail("Expected Double!");
 		}
 		if (messages.get(7) instanceof TestMessageType) {
 			TestMessageType message = (TestMessageType) messages.get(7);
 			Assert.assertEquals(message.getNumber(), 8);
 			Assert.assertEquals(message.getText(), "Lalala");
 		} else {
-			Assert.fail("Expected Long!");
+			Assert.fail("Expected TestMessageType!");
 		}
 	}
 

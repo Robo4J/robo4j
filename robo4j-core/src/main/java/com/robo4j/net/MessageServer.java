@@ -57,11 +57,12 @@ public class MessageServer {
 			try (ObjectInputStream objectInputStream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()))) {
 
 				if (checkMagic(objectInputStream.readShort())) {
+					final String uuid = objectInputStream.readUTF();
 					// Then keep reading string, byte, data triplets until dead
 					while (running) {
 						String id = (String) objectInputStream.readUTF();
 						Object message = decodeMessage(objectInputStream);
-						callback.handleMessage(id, message);
+						callback.handleMessage(uuid, id, message);
 					}
 				} else {
 					// Init protocol. First check magic

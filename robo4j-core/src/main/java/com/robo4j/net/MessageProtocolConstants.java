@@ -22,14 +22,55 @@ package com.robo4j.net;
  * @author Marcus
  */
 interface MessageProtocolConstants {
+	/**
+	 * Serialization will be done using standard java serialization.
+	 */
 	int OBJECT = 0;
+
+	/**
+	 * Message is a byte.
+	 */
 	int BYTE = 16;
+
+	/**
+	 * Message is a short.
+	 */
 	int SHORT = 17;
+
+	/**
+	 * Message is a char.
+	 */
 	int CHAR = 18;
+
+	/**
+	 * Message is an int.
+	 */
 	int INT = 19;
+
+	/**
+	 * Message is a long.
+	 */
 	int LONG = 20;
+
+	/**
+	 * Message is a float.
+	 */
 	int FLOAT = 21;
+
+	/**
+	 * Message is a double.
+	 */
 	int DOUBLE = 22;
+
+	/**
+	 * Message is a modified UTF8.
+	 */
 	int MOD_UTF8 = 32;
+
+	/**
+	 * This is a Robo4J reference. Serialization will be specially handled.
+	 */
+	int REFERENCE = 64;
+
 	short MAGIC = (short) 0xC0FE;
 }

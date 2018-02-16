@@ -16,6 +16,11 @@
  */
 package com.robo4j.net;
 
+/**
+ * 
+ * 
+ * @author Marcus
+ */
 public interface MessageCallback {
-	public void handleMessage(String id, Object message);
+	public void handleMessage(String sourceUuid, String id, Object message);
 }
