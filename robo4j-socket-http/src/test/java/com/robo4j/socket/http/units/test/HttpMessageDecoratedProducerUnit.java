@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_UNIT_PATHS_CONFIG;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
 
 /**
  * Test unit to produce HttpDecoratedRequest messages
@@ -62,7 +62,7 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 		message = configuration.getString("message", null);
 
 		List<ClientPathDTO> paths = JsonUtil.readPathConfig(ClientPathDTO.class,
-				configuration.getString(HTTP_UNIT_PATHS_CONFIG, null));
+				configuration.getString(PROPERTY_UNIT_PATHS_CONFIG, null));
 		HttpPathUtils.updateHttpClientContextPaths(clientContext, paths);
 		counter = new AtomicInteger(DEFAULT);
 	}

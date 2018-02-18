@@ -32,7 +32,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -100,7 +100,7 @@ public final class ChannelUtils {
 		try {
 			ServerSocketChannel result = ServerSocketChannel.open();
 			result.configureBlocking(false);
-			result.bind(new InetSocketAddress(context.getPropertySafe(Integer.class, HTTP_PROPERTY_PORT)));
+			result.bind(new InetSocketAddress(context.getPropertySafe(Integer.class, PROPERTY_SOCKET_PORT)));
 			return result;
 		} catch (Exception e) {
 			SimpleLoggingUtil.error(ChannelUtils.class, "init server socket channel", e);
@@ -108,11 +108,11 @@ public final class ChannelUtils {
 		}
 	}
 
-	public static DatagramChannel initDatagramSocketChannel(ServerContext context){
+	public static DatagramChannel initDatagramSocketChannelWithAddress(ServerContext context){
 		try {
 			DatagramChannel result = DatagramChannel.open();
 			DatagramSocket socket = result.socket();
-			SocketAddress address = new InetSocketAddress(context.getPropertySafe(Integer.class, HTTP_PROPERTY_PORT));
+			SocketAddress address = new InetSocketAddress(context.getPropertySafe(Integer.class, PROPERTY_SOCKET_PORT));
 			socket.bind(address);
 			return result;
 

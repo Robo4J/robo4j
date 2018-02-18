@@ -29,15 +29,15 @@ import java.util.Map;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class HttpCodecRegistry {
+public class CodecRegistry {
 	private Map<Class<?>, HttpEncoder<?>> encoders = new HashMap<>();
 	private Map<Class<?>, HttpDecoder<?>> decoders = new HashMap<>();
 
-	public HttpCodecRegistry() {
+	public CodecRegistry() {
 		registerDefaults();
 	}
 
-	public HttpCodecRegistry(String... packages) {
+	public CodecRegistry(String... packages) {
 		this();
 		scan(Thread.currentThread().getContextClassLoader(), packages);
 	}
@@ -70,7 +70,7 @@ public class HttpCodecRegistry {
 	}
 	
 	private void registerDefaults() {
-		scan(HttpCodecRegistry.class.getClassLoader(), "com.robo4j.socket.http.codec");
+		scan(CodecRegistry.class.getClassLoader(), "com.robo4j.socket.http.codec");
 	}
 
 	private void processClasses(ClassLoader loader, List<String> allClasses) {

@@ -16,10 +16,10 @@ import com.robo4j.socket.http.util.RoboHttpUtils;
 import java.util.List;
 import java.util.Objects;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_CODEC_PACKAGES;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_CODEC_REGISTRY;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_PACKAGES;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_REGISTRY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_UNIT_PATHS_CONFIG;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
 import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
 
 /**
@@ -30,7 +30,7 @@ import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
 public final class HttpClientCodecUnit extends RoboUnit<HttpClientMessageWrapper> {
 
 	private final ClientContext clientContext = new ClientContext();
-	private final HttpCodecRegistry codecRegistry = new HttpCodecRegistry();
+	private final CodecRegistry codecRegistry = new CodecRegistry();
 	private String target;
 
 	public HttpClientCodecUnit(RoboContext clientContext, String id) {
@@ -42,17 +42,17 @@ public final class HttpClientCodecUnit extends RoboUnit<HttpClientMessageWrapper
 		target = configuration.getString(HTTP_PROPERTY_TARGET, null);
 		Objects.requireNonNull(target, "empty target");
 
-		List<ClientPathDTO> paths = JsonUtil.readPathConfig(ClientPathDTO.class,
-				configuration.getString(HTTP_UNIT_PATHS_CONFIG, null));
+		final List<ClientPathDTO> paths = JsonUtil.readPathConfig(ClientPathDTO.class,
+				configuration.getString(PROPERTY_UNIT_PATHS_CONFIG, null));
 		if (paths.isEmpty()) {
-			throw ConfigurationException.createMissingConfigNameException(HTTP_UNIT_PATHS_CONFIG);
+			throw ConfigurationException.createMissingConfigNameException(PROPERTY_UNIT_PATHS_CONFIG);
 		}
 		HttpPathUtils.updateHttpClientContextPaths(clientContext, paths);
 
-		String packages = configuration.getString(HTTP_CODEC_PACKAGES, null);
+		String packages = configuration.getString(PROPERTY_CODEC_PACKAGES, null);
 		if (RoboHttpUtils.validatePackages(packages)) {
 			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(UTF8_COMMA));
-			clientContext.putProperty(HTTP_CODEC_REGISTRY, codecRegistry);
+			clientContext.putProperty(PROPERTY_CODEC_REGISTRY, codecRegistry);
 		} else {
 			throw new IllegalStateException("not available codec packages");
 		}
@@ -61,7 +61,7 @@ public final class HttpClientCodecUnit extends RoboUnit<HttpClientMessageWrapper
 	@Override
 	public void onMessage(HttpClientMessageWrapper message) {
 
-		final String encodedMessage = clientContext.getPropertySafe(HttpCodecRegistry.class, HTTP_CODEC_REGISTRY)
+		final String encodedMessage = clientContext.getPropertySafe(CodecRegistry.class, PROPERTY_CODEC_REGISTRY)
 				.containsEncoder(message.getClazz()) ? processMessage(message.getClazz(), message.getMessage())
 						: processMessage(String.class, message.toString());
 
@@ -81,7 +81,7 @@ public final class HttpClientCodecUnit extends RoboUnit<HttpClientMessageWrapper
 
 	private String processMessage(Class<?> clazz, Object message) {
 		return processMessage(message,
-				clientContext.getPropertySafe(HttpCodecRegistry.class, HTTP_CODEC_REGISTRY).getEncoder(clazz));
+				clientContext.getPropertySafe(CodecRegistry.class, PROPERTY_CODEC_REGISTRY).getEncoder(clazz));
 	}
 
 	@SuppressWarnings("unchecked")

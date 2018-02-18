@@ -20,7 +20,7 @@ package com.robo4j.socket.http.channel;
 import com.robo4j.RoboContext;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.request.RoboResponseProcess;
-import com.robo4j.socket.http.units.HttpCodecRegistry;
+import com.robo4j.socket.http.units.CodecRegistry;
 import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.util.ChannelUtils;
 
@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_CODEC_REGISTRY;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_REGISTRY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY;
 
 /**
@@ -78,7 +78,7 @@ public class InboundSocketChannelHandler implements SocketHandler {
 		socketChannel = ChannelUtils.initServerSocketChannel(serverContext);
 		final SelectionKey key = ChannelUtils.registerSelectionKey(socketChannel);
 
-		final HttpCodecRegistry codecRegistry = serverContext.getPropertySafe(HttpCodecRegistry.class, HTTP_CODEC_REGISTRY);
+		final CodecRegistry codecRegistry = serverContext.getPropertySafe(CodecRegistry.class, PROPERTY_CODEC_REGISTRY);
 		final int bufferCapacity = serverContext.getPropertySafe(Integer.class, PROPERTY_BUFFER_CAPACITY);
 
 		while (active) {

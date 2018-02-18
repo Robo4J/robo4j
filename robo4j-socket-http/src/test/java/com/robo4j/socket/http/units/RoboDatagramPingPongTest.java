@@ -14,7 +14,9 @@ import com.robo4j.util.SystemUtil;
 import org.junit.Test;
 
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_PACKAGES;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -61,8 +63,8 @@ public class RoboDatagramPingPongTest {
 		RoboBuilder builder = new RoboBuilder();
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString("packages", PACKAGE_CODECS);
-		config.setString("unitPathsConfig", "[{\"roboUnit\":\"stringConsumer\",\"filters\":[\"stringConsumer\"]}]");
+		config.setString(PROPERTY_CODEC_PACKAGES, PACKAGE_CODECS);
+		config.setString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"stringConsumer\",\"filters\":[\"stringConsumer\"]}]");
         builder.add(DatagramServerUnit.class, config, "udp_server");
 
         config = ConfigurationFactory.createEmptyConfiguration();
@@ -82,7 +84,9 @@ public class RoboDatagramPingPongTest {
         RoboBuilder builder = new RoboBuilder();
         Configuration config = ConfigurationFactory.createEmptyConfiguration();
         config.setString(HTTP_PROPERTY_HOST, "localhost");
-        config.setInteger(HTTP_PROPERTY_PORT, RoboHttpUtils.DEFAULT_UDP_PORT);
+        config.setInteger(PROPERTY_SOCKET_PORT, RoboHttpUtils.DEFAULT_UDP_PORT);
+        config.setString(PROPERTY_CODEC_PACKAGES, PACKAGE_CODECS);
+        config.setString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"udp_server\",\"callbacks\": [\"stringConsumer\"]}]");
         builder.add(DatagramClientUnit.class, config, UDP_CLIENT);
         return builder.build();
     }

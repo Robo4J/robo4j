@@ -26,7 +26,7 @@ import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.dto.ResponseDecoderUnitDTO;
 import com.robo4j.socket.http.dto.ResponseUnitDTO;
-import com.robo4j.socket.http.units.HttpCodecRegistry;
+import com.robo4j.socket.http.units.CodecRegistry;
 import com.robo4j.socket.http.units.HttpDecoder;
 import com.robo4j.socket.http.units.ServerPathConfig;
 import com.robo4j.socket.http.util.HttpConstant;
@@ -47,9 +47,9 @@ import java.util.stream.Collectors;
  */
 public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	private static final List<HttpMethod> GET_POST_METHODS = Arrays.asList(HttpMethod.GET, HttpMethod.POST);
-	private final HttpCodecRegistry codecRegistry;
+	private final CodecRegistry codecRegistry;
 
-	public RoboRequestFactory(final HttpCodecRegistry codecRegistry) {
+	public RoboRequestFactory(final CodecRegistry codecRegistry) {
 		this.codecRegistry = codecRegistry;
 	}
 

@@ -19,7 +19,7 @@ public class DatagramDecoratedRequestTest {
         DatagramDecoratedRequest request = new DatagramDecoratedRequest(denominator);
         request.addMessage("{\"number\":22}".getBytes());
 
-        byte[] requestBytes = request.getMessage();
+        byte[] requestBytes = request.toMessage();
 
         String requestMessage = new String(requestBytes);
 

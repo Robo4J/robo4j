@@ -7,7 +7,7 @@ package com.robo4j.socket.http.message;
  * @author Miroslav Wengner (@miragemiko)
  */
 public interface DatagramMessage<T> {
-    T getMessage();
+    T toMessage();
 
     void addMessage(T message);
 }

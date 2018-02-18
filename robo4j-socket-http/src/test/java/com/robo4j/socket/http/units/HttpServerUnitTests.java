@@ -10,7 +10,7 @@ import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -26,7 +26,7 @@ public class HttpServerUnitTests {
 	    RoboBuilder builder = new RoboBuilder();
 
         Configuration config = ConfigurationFactory.createEmptyConfiguration();
-        config.setInteger(HTTP_PROPERTY_PORT, PORT);
+        config.setInteger(PROPERTY_SOCKET_PORT, PORT);
 
         builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
         RoboContext system = builder.build();

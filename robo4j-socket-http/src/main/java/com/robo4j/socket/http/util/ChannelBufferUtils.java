@@ -22,10 +22,13 @@ import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.SocketException;
 import com.robo4j.socket.http.enums.StatusCode;
+import com.robo4j.socket.http.message.DatagramDecoratedRequest;
+import com.robo4j.socket.http.message.DatagramDenominator;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.message.HttpDecoratedResponse;
 import com.robo4j.socket.http.message.HttpRequestDenominator;
 import com.robo4j.socket.http.message.HttpResponseDenominator;
+import com.robo4j.util.StringConstants;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -36,9 +39,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.robo4j.socket.http.util.HttpConstant.HTTP_NEW_LINE;
 import static com.robo4j.socket.http.util.HttpMessageUtils.HTTP_HEADER_BODY_DELIMITER;
 import static com.robo4j.socket.http.util.HttpMessageUtils.HTTP_HEADER_SEP;
-import static com.robo4j.socket.http.util.HttpMessageUtils.NEXT_LINE;
 import static com.robo4j.socket.http.util.HttpMessageUtils.POSITION_BODY;
 import static com.robo4j.socket.http.util.HttpMessageUtils.POSITION_HEADER;
 
@@ -54,6 +57,8 @@ public class ChannelBufferUtils {
 	public static final byte CHAR_RETURN = 0x0D;
 	public static final byte[] END_WINDOW = { CHAR_NEW_LINE, CHAR_NEW_LINE };
 	private static final int BUFFER_MARK_END = -1;
+
+	// FIXME: 2/18/18 (miro) every unit client, server should have it's own buffer
 	private static final ByteBuffer requestBuffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
 	private static final ByteBuffer responseBuffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
 
@@ -101,7 +106,8 @@ public class ChannelBufferUtils {
 
 		} else {
 
-			return new HttpDecoratedResponse(new HashMap<>(), new HttpResponseDenominator(StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1));
+			return new HttpDecoratedResponse(new HashMap<>(),
+					new HttpResponseDenominator(StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1));
 		}
 	}
 
@@ -114,7 +120,6 @@ public class ChannelBufferUtils {
 			addToStringBuilder(sbBasic, requestBuffer, readBytes);
 			final StringBuilder sbAdditional = new StringBuilder();
 			final HttpDecoratedRequest result = extractDecoratedRequestByStringMessage(sbBasic.toString());
-
 
 			int totalReadBytes = readBytes;
 
@@ -134,14 +139,25 @@ public class ChannelBufferUtils {
 			requestBuffer.clear();
 			return result;
 		} else {
-			return new HttpDecoratedRequest(new HashMap<>(), new HttpRequestDenominator(HttpMethod.GET, HttpVersion.HTTP_1_1));
+			return new HttpDecoratedRequest(new HashMap<>(),
+					new HttpRequestDenominator(HttpMethod.GET, HttpVersion.HTTP_1_1));
 		}
 	}
 
-	private static int readBytesByChannel(ByteChannel channel){
+	public static DatagramDecoratedRequest getDatagramDecoratedRequestByChannel(int type, DatagramChannel channel,
+			ByteBuffer buffer) throws IOException {
+		final StringBuilder sbBasic = new StringBuilder();
+		buffer.clear();
+		SocketAddress client = channel.receive(buffer);
+		buffer.flip();
+
+		return new DatagramDecoratedRequest(new DatagramDenominator(type, StringConstants.EMPTY));
+	}
+
+	private static int readBytesByChannel(ByteChannel channel) {
 		try {
 			return channel.read(requestBuffer);
-		} catch (Exception e){
+		} catch (Exception e) {
 			throw new SocketException("read bytes channel", e);
 		}
 	}
@@ -170,7 +186,7 @@ public class ChannelBufferUtils {
 
 	public static HttpDecoratedRequest extractDecoratedRequestByStringMessage(String message) {
 		final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
-		final String[] header = headerAndBody[POSITION_HEADER].split("[" + NEXT_LINE + "]+");
+		final String[] header = headerAndBody[POSITION_HEADER].split("[" + HTTP_NEW_LINE + "]+");
 		final String firstLine = RoboHttpUtils.correctLine(header[0]);
 		final String[] tokens = firstLine.split(HttpConstant.HTTP_EMPTY_SEP);
 		final String[] paramArray = Arrays.copyOfRange(header, 1, header.length);
@@ -180,7 +196,8 @@ public class ChannelBufferUtils {
 		final String version = tokens[HttpMessageUtils.VERSION_POSITION];
 		final Map<String, String> headerParams = getHeaderParametersByArray(paramArray);
 
-		final HttpRequestDenominator denominator = new HttpRequestDenominator(method, path, HttpVersion.getByValue(version));
+		final HttpRequestDenominator denominator = new HttpRequestDenominator(method, path,
+				HttpVersion.getByValue(version));
 		HttpDecoratedRequest result = new HttpDecoratedRequest(headerParams, denominator);
 
 		if (headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)) {
@@ -193,7 +210,7 @@ public class ChannelBufferUtils {
 
 	public static HttpDecoratedResponse extractDecoratedResponseByStringMessage(String message) {
 		final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
-		final String[] header = headerAndBody[POSITION_HEADER].split("[" + NEXT_LINE + "]+");
+		final String[] header = headerAndBody[POSITION_HEADER].split("[" + HTTP_NEW_LINE + "]+");
 		final String firstLine = RoboHttpUtils.correctLine(header[0]);
 		final String[] tokens = firstLine.split(HttpConstant.HTTP_EMPTY_SEP);
 		final String[] paramArray = Arrays.copyOfRange(header, 1, header.length);
@@ -238,20 +255,33 @@ public class ChannelBufferUtils {
 		sb.append(message);
 	}
 
-	public static String byteBufferToString(ByteBuffer buffer){
+	/**
+	 * convert byte buffer to string and clean
+	 * 
+	 * @param buffer
+	 *            incoming buffer
+	 * @return string
+	 */
+	public static String byteBufferToString(ByteBuffer buffer) {
 		StringBuilder sb = new StringBuilder();
-		while(buffer.hasRemaining()){
+		while (buffer.hasRemaining()) {
 			sb.append((char) buffer.get());
 		}
 		buffer.clear();
 		return sb.toString();
 	}
 
-	public static void writeDatagramResponse(SocketAddress client, DatagramChannel channel, ByteBuffer  buffer, String message) throws IOException{
+	/**
+	 * write bytes to buffer and flip
+	 * 
+	 * @param buffer
+	 *            desired buffer
+	 * @param message
+	 *            message
+	 */
+	public static void writeStringToBuffer(ByteBuffer buffer, String message) {
 		buffer.clear();
 		buffer.put(message.getBytes());
 		buffer.flip();
-		int sentBytes = channel.send(buffer, client);
-		System.out.println("BYTES: " + sentBytes);
 	}
 }

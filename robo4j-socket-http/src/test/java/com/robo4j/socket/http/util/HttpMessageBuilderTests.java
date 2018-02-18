@@ -41,7 +41,7 @@ public class HttpMessageBuilderTests {
 		Assert.assertNotNull(getMessage);
 		Assert.assertTrue(getMessage.contains("GET / HTTP/1.1"));
 		Assert.assertTrue(getMessage.contains("host: localhost"));
-		System.out.println("getMessage: " + getMessage);
+		System.out.println("toMessage: " + getMessage);
 	}
 
 	@Test

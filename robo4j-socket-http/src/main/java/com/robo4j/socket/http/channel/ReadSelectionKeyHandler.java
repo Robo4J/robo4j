@@ -23,7 +23,7 @@ import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.request.RoboRequestCallable;
 import com.robo4j.socket.http.request.RoboRequestFactory;
 import com.robo4j.socket.http.request.RoboResponseProcess;
-import com.robo4j.socket.http.units.HttpCodecRegistry;
+import com.robo4j.socket.http.units.CodecRegistry;
 import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
 
@@ -40,11 +40,11 @@ public class ReadSelectionKeyHandler implements SelectionKeyHandler {
 
 	private final RoboContext context;
 	private final ServerContext serverContext;
-	private final HttpCodecRegistry codecRegistry;
+	private final CodecRegistry codecRegistry;
 	private final Map<SelectionKey, RoboResponseProcess> outBuffers;
 	private final SelectionKey key;
 
-	public ReadSelectionKeyHandler(RoboContext context, ServerContext serverContext, HttpCodecRegistry codecRegistry,
+	public ReadSelectionKeyHandler(RoboContext context, ServerContext serverContext, CodecRegistry codecRegistry,
 			Map<SelectionKey, RoboResponseProcess> outBuffers, SelectionKey key) {
 		this.context = context;
 		this.serverContext = serverContext;
