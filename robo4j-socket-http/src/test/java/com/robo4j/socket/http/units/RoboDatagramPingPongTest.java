@@ -13,9 +13,9 @@ import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.SystemUtil;
 import org.junit.Test;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
-import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_PACKAGES;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
 
 /**
@@ -29,8 +29,8 @@ public class RoboDatagramPingPongTest {
 
     @Test
 	public void datagramPingPongTest() throws Exception {
-	    RoboContext pingSystem = configurePingSystem();
-		RoboContext pongSystem = configurePongSystem();
+        RoboContext pongSystem = configurePongSystem();
+        RoboContext pingSystem = configurePingSystem();
 
         pongSystem.start();
         pingSystem.start();
@@ -59,13 +59,15 @@ public class RoboDatagramPingPongTest {
 
 	}
 
-	private RoboContext configurePongSystem() throws Exception {
+	private RoboContext configurePingSystem() throws Exception {
 		RoboBuilder builder = new RoboBuilder();
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString(PROPERTY_CODEC_PACKAGES, PACKAGE_CODECS);
-		config.setString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"stringConsumer\",\"filters\":[\"stringConsumer\"]}]");
-        builder.add(DatagramServerUnit.class, config, "udp_server");
+        config.setString(PROPERTY_HOST, "localhost");
+        config.setInteger(PROPERTY_SOCKET_PORT, RoboHttpUtils.DEFAULT_UDP_PORT);
+        config.setString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"stringConsumer\",\"callbacks\": [\"stringConsumer\"]}]");
+        builder.add(DatagramClientUnit.class, config, UDP_CLIENT);
 
         config = ConfigurationFactory.createEmptyConfiguration();
         builder.add(StringConsumer.class, config, "stringConsumer");
@@ -80,14 +82,16 @@ public class RoboDatagramPingPongTest {
      * @return roboContext
      * @throws Exception exception
      */
-	private RoboContext configurePingSystem() throws Exception {
+	private RoboContext configurePongSystem() throws Exception {
         RoboBuilder builder = new RoboBuilder();
         Configuration config = ConfigurationFactory.createEmptyConfiguration();
-        config.setString(HTTP_PROPERTY_HOST, "localhost");
-        config.setInteger(PROPERTY_SOCKET_PORT, RoboHttpUtils.DEFAULT_UDP_PORT);
         config.setString(PROPERTY_CODEC_PACKAGES, PACKAGE_CODECS);
-        config.setString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"udp_server\",\"callbacks\": [\"stringConsumer\"]}]");
-        builder.add(DatagramClientUnit.class, config, UDP_CLIENT);
+        config.setString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"stringConsumer\",\"filters\":[]}]");
+        builder.add(DatagramServerUnit.class, config, "udp_server");
+
+        config = ConfigurationFactory.createEmptyConfiguration();
+        builder.add(StringConsumer.class, config, "stringConsumer");
+
         return builder.build();
     }
 }

@@ -34,7 +34,7 @@ import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RoboRequestCallable implements Callable<RoboResponseProcess> {
+public class RoboRequestCallable implements Callable<HttpResponseProcess> {
 
 	private final RoboContext context;
 	private final ServerContext serverContext;
@@ -52,9 +52,9 @@ public class RoboRequestCallable implements Callable<RoboResponseProcess> {
 	}
 
 	@Override
-	public RoboResponseProcess call() throws Exception {
+	public HttpResponseProcess call() throws Exception {
 
-		final RoboResponseProcess result = new RoboResponseProcess();
+		final HttpResponseProcess result = new HttpResponseProcess();
 		final ServerPathConfig pathConfig = serverContext.getPathConfig(decoratedRequest.getPath());
 
 		if (pathConfig.getMethod().equals(decoratedRequest.getMethod())) {

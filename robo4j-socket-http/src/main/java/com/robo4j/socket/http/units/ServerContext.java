@@ -1,5 +1,7 @@
 package com.robo4j.socket.http.units;
 
+import com.robo4j.socket.http.util.ExceptionMessageUtils;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +14,7 @@ import java.util.Objects;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class ServerContext implements HttpContext<ServerPathConfig> {
+public final class ServerContext implements SocketContext<ServerPathConfig> {
 
 	/**
 	 * map of registered paths and related configuration
@@ -24,7 +26,7 @@ public final class ServerContext implements HttpContext<ServerPathConfig> {
 	 */
 	private final Map<String, Object> properties = new HashMap<>();
 
-	ServerContext(){
+	ServerContext() {
 	}
 
 	@Override
@@ -52,8 +54,18 @@ public final class ServerContext implements HttpContext<ServerPathConfig> {
 		return pathConfigs.get(path);
 	}
 
+	/**
+	 * null not allowed
+	 * 
+	 * @param key
+	 *            string key
+	 * @param val
+	 *            value
+	 */
 	@Override
 	public void putProperty(String key, Object val) {
+		Objects.requireNonNull(key, ExceptionMessageUtils.mapMessage(key, val));
+		Objects.requireNonNull(val, ExceptionMessageUtils.mapMessage(key, val));
 		properties.put(key, val);
 	}
 

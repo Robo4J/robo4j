@@ -34,7 +34,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
 
@@ -140,7 +140,7 @@ public class RoboHttpPingPongTest {
 		RoboBuilder builder = new RoboBuilder();
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString(HTTP_PROPERTY_HOST, HOST_SYSTEM);
+		config.setString(PROPERTY_HOST, HOST_SYSTEM);
 		config.setInteger(PROPERTY_SOCKET_PORT, PORT);
 		builder.add(HttpClientUnit.class, config, ID_HTTP_CLIENT);
 

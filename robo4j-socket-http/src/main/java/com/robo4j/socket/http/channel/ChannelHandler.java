@@ -21,7 +21,7 @@ package com.robo4j.socket.http.channel;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public interface SocketHandler {
+public interface ChannelHandler extends AutoCloseable{
     void start();
     void stop();
 }

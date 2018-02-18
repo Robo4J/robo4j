@@ -1,0 +1,58 @@
+package com.robo4j.socket.http.channel;
+
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.socket.http.SocketException;
+import com.robo4j.socket.http.request.DatagramResponseProcess;
+import com.robo4j.socket.http.units.ServerContext;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
+import java.nio.channels.SelectionKey;
+import java.util.Map;
+
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BYTE_BUFFER;
+
+/**
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
+public class WriteDatagramSelectionKeyHandler implements SelectionKeyHandler {
+
+	private final RoboContext context;
+	private final ServerContext serverContext;
+	private final Map<SelectionKey, DatagramResponseProcess> outBuffers;
+	private final SelectionKey key;
+
+	public WriteDatagramSelectionKeyHandler(RoboContext context, ServerContext serverContext, Map<SelectionKey, DatagramResponseProcess> outBuffers, SelectionKey key) {
+		this.context = context;
+		this.serverContext = serverContext;
+		this.outBuffers = outBuffers;
+		this.key = key;
+	}
+
+	@Override
+	public SelectionKey handle() {
+		final DatagramChannel channel = (DatagramChannel) key.channel();
+		ByteBuffer buffer = serverContext.getPropertySafe(ByteBuffer.class, PROPERTY_BYTE_BUFFER);
+		final DatagramResponseProcess responseProcess = outBuffers.get(key);
+
+		buffer.clear();
+		buffer.put("ACCEPTED".getBytes());
+		buffer.flip();
+		try {
+			channel.write(buffer);
+		} catch (IOException e) {
+			throw new SocketException("handle", e);
+		}
+
+		RoboReference<Object> reference  = responseProcess.getTarget();
+		Object responseMessage = responseProcess.getResult();
+		reference.sendMessage(responseMessage);
+
+		System.out.println("Wrote: " + responseMessage);
+		key.interestOps(SelectionKey.OP_READ);
+		return key;
+	}
+}

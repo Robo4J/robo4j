@@ -35,7 +35,7 @@ import java.nio.channels.ByteChannel;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class OutboundChannelHandler implements SocketHandler {
+public class OutboundChannelHandler implements ChannelHandler {
 
 	private ByteChannel byteChannel;
 	private HttpDecoratedRequest message;
@@ -73,6 +73,11 @@ public class OutboundChannelHandler implements SocketHandler {
 		}
 	}
 
+	@Override
+	public void close() {
+		stop();
+	}
+
 	public HttpDecoratedResponse getDecoratedResponse() {
 		return decoratedResponse;
 	}
@@ -86,4 +91,5 @@ public class OutboundChannelHandler implements SocketHandler {
 			throw new SocketException("message body write problem", e);
 		}
 	}
+
 }

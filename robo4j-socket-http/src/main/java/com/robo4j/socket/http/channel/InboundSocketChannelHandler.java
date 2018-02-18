@@ -19,7 +19,7 @@ package com.robo4j.socket.http.channel;
 
 import com.robo4j.RoboContext;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.request.RoboResponseProcess;
+import com.robo4j.socket.http.request.HttpResponseProcess;
 import com.robo4j.socket.http.units.CodecRegistry;
 import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.util.ChannelUtils;
@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.robo4j.socket.http.util.ChannelUtils.handleSelectorHandler;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_REGISTRY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY;
 
@@ -41,17 +42,22 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class InboundSocketChannelHandler implements SocketHandler {
+public class InboundSocketChannelHandler implements ChannelHandler {
 
 	private final RoboContext context;
 	private final ServerContext serverContext;
-	private final Map<SelectionKey, RoboResponseProcess> outBuffers = new ConcurrentHashMap<>();
+	private final Map<SelectionKey, HttpResponseProcess> outBuffers = new ConcurrentHashMap<>();
 	private ServerSocketChannel socketChannel;
 	private boolean active;
 
 	public InboundSocketChannelHandler(RoboContext context, ServerContext serverContext) {
 		this.context = context;
 		this.serverContext = serverContext;
+	}
+
+	@Override
+	public void close() {
+		stop();
 	}
 
 	@Override
@@ -108,8 +114,5 @@ public class InboundSocketChannelHandler implements SocketHandler {
 		}
 	}
 
-	private void handleSelectorHandler(SelectionKeyHandler handler) {
-		handler.handle();
-	}
 
 }

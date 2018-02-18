@@ -24,7 +24,7 @@ import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.SocketException;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.message.HttpResponseDenominator;
-import com.robo4j.socket.http.request.RoboResponseProcess;
+import com.robo4j.socket.http.request.HttpResponseProcess;
 import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.units.ServerPathConfig;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
@@ -45,11 +45,11 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 
 	private final RoboContext context;
 	private final ServerContext serverContext;
-	private final Map<SelectionKey, RoboResponseProcess> outBuffers;
+	private final Map<SelectionKey, HttpResponseProcess> outBuffers;
 	private final SelectionKey key;
 
 	public WriteSelectionKeyHandler(RoboContext context, ServerContext serverContext,
-			Map<SelectionKey, RoboResponseProcess> outBuffers, SelectionKey key) {
+                                    Map<SelectionKey, HttpResponseProcess> outBuffers, SelectionKey key) {
 		this.context = context;
 		this.serverContext = serverContext;
 		this.outBuffers = outBuffers;
@@ -60,7 +60,7 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 	public SelectionKey handle() {
 		SocketChannel channel = (SocketChannel) key.channel();
 
-		final RoboResponseProcess responseProcess = outBuffers.get(key);
+		final HttpResponseProcess responseProcess = outBuffers.get(key);
 
 		ByteBuffer buffer;
 		if (responseProcess.getMethod() != null) {
@@ -68,6 +68,7 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 			case GET:
 				String getResponse;
 				if (responseProcess.getResult() != null && responseProcess.getCode().equals(StatusCode.OK)) {
+					// FIXME: 2/18/18 (miro) put abstraction
 					String responseMessage = responseProcess.getResult().toString();
 					HttpDenominator denominator = new HttpResponseDenominator(responseProcess.getCode(),
 							HttpVersion.HTTP_1_1);
@@ -127,7 +128,7 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 		return key;
 	}
 
-	private void sendMessageToTargetRoboReference(RoboResponseProcess process) {
+	private void sendMessageToTargetRoboReference(HttpResponseProcess process) {
 		final ServerPathConfig pathConfig = serverContext.getPathConfig(process.getPath());
 		if (pathConfig.getRoboUnit() != null
 				&& pathConfig.getRoboUnit().getMessageType().equals(process.getResult().getClass())) {

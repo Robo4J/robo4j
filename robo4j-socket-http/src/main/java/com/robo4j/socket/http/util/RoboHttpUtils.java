@@ -34,14 +34,15 @@ public final class RoboHttpUtils {
 
 	public static final int DEFAULT_PORT = 8042;
 	public static final int DEFAULT_UDP_PORT = 9042;
-	public static final String HTTP_PROPERTY_HOST = "host";
-	public static final String PROPERTY_SOCKET_PORT = "port";
 	public static final String HTTP_PROPERTY_TARGET = "target";
 	public static final String HTTP_PROPERTY_PROTOCOL = "protocol";
+	public static final String PROPERTY_HOST = "host";
+	public static final String PROPERTY_SOCKET_PORT = "port";
 	public static final String PROPERTY_CODEC_REGISTRY = "codecRegistry";
 	public static final String PROPERTY_CODEC_PACKAGES = "packages";
 	public static final String PROPERTY_UNIT_PATHS_CONFIG = "unitPathsConfig";
 	public static final String PROPERTY_BUFFER_CAPACITY = "bufferCapacity";
+	public static final String PROPERTY_BYTE_BUFFER = "byteBuffer";
 	public static final String PROPERTY_TIMEOUT = "timeout";
 
 	public static void decorateByNewLine(StringBuilder sb) {

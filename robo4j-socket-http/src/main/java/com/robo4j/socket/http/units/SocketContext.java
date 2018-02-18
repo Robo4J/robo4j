@@ -4,12 +4,12 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * interface for http context
+ * interface for channel context
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface HttpContext<T> {
+public interface SocketContext<T> {
 
 	void addPaths(Map<String, T> paths);
 

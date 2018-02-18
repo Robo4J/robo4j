@@ -52,7 +52,7 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY
 public class HttpServerUnit extends RoboUnit<Object> {
 
 	private final ServerContext serverContext = new ServerContext();
-	private InboundSocketChannelHandler inboundSocketChannelHandler;
+	private InboundSocketChannelHandler handler;
 	private List<ServerUnitPathDTO> paths;
 
 	public HttpServerUnit(RoboContext context, String id) {
@@ -82,15 +82,15 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	public void start() {
 		setState(LifecycleState.STARTING);
 		HttpPathUtils.updateHttpServerContextPaths(getContext(), serverContext, paths);
-		inboundSocketChannelHandler = new InboundSocketChannelHandler(getContext(), serverContext);
-		inboundSocketChannelHandler.start();
+		handler = new InboundSocketChannelHandler(getContext(), serverContext);
+		handler.start();
 		setState(LifecycleState.STARTED);
 	}
 
 	@Override
 	public void stop() {
 		setState(LifecycleState.STOPPING);
-		inboundSocketChannelHandler.stop();
+		handler.stop();
 		setState(LifecycleState.STOPPED);
 	}
 }

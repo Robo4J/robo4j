@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_HOST;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PROTOCOL;
 
@@ -67,7 +67,7 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, null);
 		protocol = ProtocolType.valueOf(configuration.getString(HTTP_PROPERTY_PROTOCOL, "HTTP"));
-		host = configuration.getString(HTTP_PROPERTY_HOST, null);
+		host = configuration.getString(PROPERTY_HOST, null);
 		port = configuration.getInteger(PROPERTY_SOCKET_PORT, null);
 		Objects.requireNonNull(host, "host required");
 		if (port == null) {

@@ -27,16 +27,17 @@ import com.robo4j.socket.http.enums.StatusCode;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RoboResponseProcess {
+public final class HttpResponseProcess implements ChannelResponseProcess<String> {
     private String path;
     private String target;
     private HttpMethod method;
     private StatusCode code;
     private Object result;
 
-    RoboResponseProcess() {
+    HttpResponseProcess() {
     }
 
+    @Override
     public String getPath() {
         return path;
     }
@@ -45,6 +46,7 @@ public class RoboResponseProcess {
         this.path = path;
     }
 
+    @Override
     public String getTarget() {
         return target;
     }
@@ -61,6 +63,7 @@ public class RoboResponseProcess {
         return method;
     }
 
+    @Override
     public Object getResult() {
         return result;
     }
@@ -79,7 +82,7 @@ public class RoboResponseProcess {
 
     @Override
     public String toString() {
-        return "RoboResponseProcess{" +
+        return "HttpResponseProcess{" +
                 "target='" + target + '\'' +
                 ", method=" + method +
                 ", code=" + code +
