@@ -20,11 +20,13 @@ import java.util.Map;
 
 /**
  * A descriptor for a RoboContext on the network.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class RoboContextDescriptor {
+	public static final String KEY_URI = "uri";
+	
 	private final String id;
 	private final int heartBeatInterval;
 	private final Map<String, String> metaData;

@@ -33,19 +33,20 @@ import com.robo4j.logging.SimpleLoggingUtil;
  * indicated local recipient. It is associated to RoboContext.
  * 
  * TODO: Rewrite in NIO for better thread management.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class MessageServer {
 	public final static String KEY_HOST_NAME = "hostname";
-	
+
 	private volatile int listeningPort = 0;
 	private volatile String listeningHost;
-	private volatile boolean running = true;
+	private volatile boolean running = false;
+	private volatile Thread startingThread = null;
 	private MessageCallback callback;
 	private Configuration configuration;
-	
+
 	private class MessageHandler implements Runnable {
 		private Socket socket;
 
@@ -56,16 +57,18 @@ public class MessageServer {
 		@Override
 		public void run() {
 			try (ObjectInputStream objectInputStream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()))) {
-
+				// Init protocol. First check magic...
 				if (checkMagic(objectInputStream.readShort())) {
+					final String uuid = objectInputStream.readUTF();
+					final ServerRemoteRoboContext context = new ServerRemoteRoboContext(uuid, socket.getOutputStream());
 					// Then keep reading string, byte, data triplets until dead
+					ReferenceDesciptor.setCurrentContext(context);
 					while (running) {
 						String id = (String) objectInputStream.readUTF();
 						Object message = decodeMessage(objectInputStream);
-						callback.handleMessage(id, message);
+						callback.handleMessage(uuid, id, message);
 					}
 				} else {
-					// Init protocol. First check magic
 					SimpleLoggingUtil.error(getClass(),
 							"Got wrong communication magic - will shutdown communication with " + socket.getRemoteSocketAddress());
 				}
@@ -128,6 +131,7 @@ public class MessageServer {
 	 * @throws IOException
 	 */
 	public void start() throws IOException {
+		startingThread = Thread.currentThread();
 		String host = configuration.getString(KEY_HOST_NAME, null);
 		InetAddress bindAddress = null;
 		if (host != null) {
@@ -139,17 +143,25 @@ public class MessageServer {
 			listeningHost = serverSocket.getInetAddress().getHostAddress();
 			listeningPort = serverSocket.getLocalPort();
 			ThreadGroup g = new ThreadGroup("Robo4J communication threads");
+			running = true;
 			while (running) {
 				MessageHandler handler = new MessageHandler(serverSocket.accept());
 				Thread t = new Thread(g, handler, "Communication [" + handler.socket.getRemoteSocketAddress() + "]");
 				t.setDaemon(true);
 				t.start();
 			}
+		} finally {
+			running = false;
+			startingThread = null;
 		}
 	}
 
 	public void stop() {
 		running = false;
+		Thread startingThread = this.startingThread;
+		if (startingThread != null) {
+			startingThread.interrupt();
+		}
 	}
 
 	public int getListeningPort() {
@@ -158,15 +170,20 @@ public class MessageServer {
 
 	/**
 	 * @return the URI for the listening socket. This is the address to connect
-	 *         to.
+	 *         to. Will return null if the server isn't up and running yet, or
+	 *         if badly configured.
 	 */
 	public URI getListeningURI() {
+		if (!running) {
+			return null;
+		}
+
 		try {
 			String host = configuration.getString(KEY_HOST_NAME, null);
 			if (host != null) {
 				return new URI("robo4j", "", host, listeningPort, "", "", "");
 			} else {
-				return new URI("robo4j", "", listeningHost, listeningPort, "", "", "");				
+				return new URI("robo4j", "", listeningHost, listeningPort, "", "", "");
 			}
 		} catch (URISyntaxException e) {
 			SimpleLoggingUtil.error(getClass(), "Could not create URI for listening URI");

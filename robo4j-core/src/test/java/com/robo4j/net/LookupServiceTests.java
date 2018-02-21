@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2018, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ public class LookupServiceTests {
 		RoboContextDescriptor descriptor = createRoboContextDescriptor();
 		ContextEmitter emitter = new ContextEmitter(descriptor,
 				InetAddress.getByName(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS),
-				LookupServiceProvider.DEFAULT_PORT);
+				LookupServiceProvider.DEFAULT_PORT, 250);
 
 		for (int i = 0; i < 10; i++) {
 			emitter.emit();
@@ -73,7 +73,7 @@ public class LookupServiceTests {
 		System.out.println(discoveredContexts);
 		Assert.assertEquals(1, discoveredContexts.size());
 		RoboContext context = service.getContext(descriptor.getId());
-		RemoteRoboContext remoteContext = (RemoteRoboContext) context;
+		ClientRemoteRoboContext remoteContext = (ClientRemoteRoboContext) context;
 		Assert.assertNotNull(remoteContext.getAddress());
 		System.out.println("Address: " + remoteContext.getAddress());
 	}
@@ -83,7 +83,7 @@ public class LookupServiceTests {
 		String id = "MyID";
 		int heartBeatInterval = 1234;
 		metadata.put("name", "Pretty Human Readable Name");
-		metadata.put("uri", "robo4j://localhost:12345");
+		metadata.put(RoboContextDescriptor.KEY_URI, "robo4j://localhost:12345");
 		return new RoboContextDescriptor(id, heartBeatInterval, metadata);
 	}
 

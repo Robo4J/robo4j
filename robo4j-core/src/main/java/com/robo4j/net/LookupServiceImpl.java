@@ -143,7 +143,7 @@ class LookupServiceImpl implements LookupService {
 	public RoboContext getContext(String id) {
 		RoboContextDescriptorEntry entry = entries.get(id);
 		if (entry != null) {
-			return new RemoteRoboContext(entry);
+			return new ClientRemoteRoboContext(entry);
 		} else {
 			return null;
 		}
@@ -166,5 +166,11 @@ class LookupServiceImpl implements LookupService {
 			currentUpdater.stop();
 			currentUpdater = null;
 		}
+	}
+
+	@Override
+	public RoboContextDescriptor getDescriptor(String id) {
+		RoboContextDescriptorEntry entry = entries.get(id);
+		return entry != null ? entry.descriptor : null;
 	}
 }

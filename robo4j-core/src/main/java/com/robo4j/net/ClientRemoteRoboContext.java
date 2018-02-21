@@ -10,14 +10,15 @@ import java.net.InetAddress;
 import java.util.Collection;
 
 /**
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RemoteRoboContext implements RoboContext {
+public class ClientRemoteRoboContext implements RoboContext {
 
 	private RoboContextDescriptorEntry descriptorEntry;
 
-	public RemoteRoboContext(RoboContextDescriptorEntry descriptorEntry) {
+	public ClientRemoteRoboContext(RoboContextDescriptorEntry descriptorEntry) {
 		this.descriptorEntry = descriptorEntry;
 	}
 	

@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ * Copyright (c) 2014, 2018, Marcus Hirt, Miroslav Wengner
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -40,14 +40,16 @@ public class MessageClient {
 	public final static boolean DEFAULT_KEEP_ALIVE = true;
 
 	private final URI messageServerURI;
+	private final String sourceUUID;
 	private Socket socket;
 	private ObjectOutputStream objectOutputStream;
 	private Configuration configuration;
 	private int failCount;
 	private final int maxFailCount;
 
-	public MessageClient(URI messageServerURI, Configuration configuration) {
+	public MessageClient(URI messageServerURI, String sourceUUID, Configuration configuration) {
 		this.messageServerURI = messageServerURI;
+		this.sourceUUID = sourceUUID;
 		this.configuration = configuration;
 		this.maxFailCount = configuration.getInteger(KEY_RETRIES, 3);
 	}
@@ -60,6 +62,7 @@ public class MessageClient {
 		}
 		objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 		objectOutputStream.writeShort(MessageProtocolConstants.MAGIC);
+		objectOutputStream.writeUTF(sourceUUID);
 	}
 
 	public void sendMessage(String id, Object message) throws IOException {

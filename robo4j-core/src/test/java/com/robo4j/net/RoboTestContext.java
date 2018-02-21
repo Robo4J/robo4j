@@ -16,15 +16,20 @@
  */
 package com.robo4j.net;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.scheduler.Scheduler;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
 
 public class RoboTestContext implements RoboContext {
 	private final String id;

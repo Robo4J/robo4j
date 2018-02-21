@@ -16,31 +16,54 @@
  */
 package com.robo4j.net;
 
+import com.robo4j.RoboReference;
+
 import java.io.Serializable;
 
+/**
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
+
 public class TestMessageType implements Serializable {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	private int number;
 	private String text;
+	private RoboReference<?> reference;
 	
-	public TestMessageType(int number, String text) {
+	public TestMessageType(int number, String text, RoboReference<?> reference) {
 		this.number = number;
 		this.text = text;
+		this.reference = reference;
 	}
+	
 	public int getNumber() {
 		return number;
 	}
+	
 	public void setNumber(int number) {
 		this.number = number;
 	}
+	
 	public String getText() {
 		return text;
 	}
+	
 	public void setText(String text) {
 		this.text = text;
+	}
+	
+	public RoboReference<?> getReference() {
+		return reference;
+	}
+	
+	public void setReference(RoboReference<?> reference) {
+		this.reference = reference;
 	}
 	
 	public String toString() {
 		return "TestMessageType number=" + number + " text=" + text;
 	}
+	
 }

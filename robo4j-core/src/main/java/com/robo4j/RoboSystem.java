@@ -16,6 +16,12 @@
  */
 package com.robo4j;
 
+import java.io.IOException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.net.SocketException;
+import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -25,6 +31,7 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -33,15 +40,21 @@ import java.util.stream.Collectors;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.net.ContextEmitter;
+import com.robo4j.net.MessageCallback;
+import com.robo4j.net.MessageServer;
+import com.robo4j.net.ReferenceDesciptor;
+import com.robo4j.net.RoboContextDescriptor;
 import com.robo4j.scheduler.DefaultScheduler;
 import com.robo4j.scheduler.RoboThreadFactory;
 import com.robo4j.scheduler.Scheduler;
+import com.robo4j.util.SystemUtil;
 
 /**
  * This is the default implementation for a local {@link RoboContext}. Contains
  * RoboUnits, a lookup service for references to RoboUnits, and a system level
  * life cycle.
- *
+ * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
@@ -58,6 +71,9 @@ final class RoboSystem implements RoboContext {
 	private static final int KEEP_ALIVE_TIME = 10;
 	private static final EnumSet<LifecycleState> MESSAGE_DELIVERY_CRITERIA = EnumSet.of(LifecycleState.STARTED, LifecycleState.STOPPED,
 			LifecycleState.STOPPING);
+	private static final String KEY_CONFIGURATION_SERVER = "com.robo4j.messageServer";
+	private static final String KEY_CONFIGURATION_EMITTER = "com.robo4j.discovery";
+	private static final String KEY_CONFIGURATION_EMITTER_METADATA = "com.robo4j.discovery.metadata";
 
 	private final AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
 	private final Map<String, RoboUnit<?>> units = new HashMap<>();
@@ -74,6 +90,10 @@ final class RoboSystem implements RoboContext {
 	private final String uid;
 	private final Configuration configuration;
 
+	private final MessageServer messageServer;
+	private final Configuration emitterConfiguration;
+	private volatile ScheduledFuture<?> emitterFuture;
+
 	private enum DeliveryPolicy {
 		SYSTEM, WORK, BLOCKING
 	}
@@ -82,7 +102,8 @@ final class RoboSystem implements RoboContext {
 		NORMAL, CRITICAL
 	}
 
-	private class LocalRoboReference<T> implements RoboReference<T> {
+	private class LocalRoboReference<T> implements RoboReference<T>, Serializable {
+		private static final long serialVersionUID = 1L;
 		private final RoboUnit<T> unit;
 		private final DeliveryPolicy deliveryPolicy;
 		private final ThreadingPolicy threadingPolicy;
@@ -175,6 +196,10 @@ final class RoboSystem implements RoboContext {
 		public Class<T> getMessageType() {
 			return unit.getMessageType();
 		}
+
+		Object writeReplace() throws ObjectStreamException {
+			return new ReferenceDesciptor(getId(), getMessageType().getName());
+		}
 	}
 
 	// Protects the executors from problems in the units.
@@ -225,6 +250,8 @@ final class RoboSystem implements RoboContext {
 		blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, blockingQueue,
 				new RoboThreadFactory(new ThreadGroup(NAME_BLOCKING_POOL), NAME_BLOCKING_POOL, true));
 		systemScheduler = new DefaultScheduler(this, schedulerPoolSize);
+		messageServer = initServer(configuration.getChildConfiguration(KEY_CONFIGURATION_SERVER));
+		emitterConfiguration = configuration.getChildConfiguration(KEY_CONFIGURATION_EMITTER);
 	}
 
 	/**
@@ -289,6 +316,23 @@ final class RoboSystem implements RoboContext {
 			startUnits();
 		}
 
+		// If we have a server, start it, then set up emitter
+		blockingExecutor.execute(new Runnable() {
+			@Override
+			public void run() {
+				if (messageServer != null) {
+					try {
+						messageServer.start();
+					} catch (IOException e) {
+						SimpleLoggingUtil.error(getClass(), "Could not start the message server. Proceeding without.", e);
+					}
+				}
+			}
+		});
+		final ContextEmitter emitter = initEmitter(emitterConfiguration, getListeningURI(messageServer));
+		if (emitter != null) {
+			emitterFuture = getScheduler().scheduleAtFixedRate(() -> emitter.emit(), 0, emitter.getHeartBeatInterval(), TimeUnit.MILLISECONDS);
+		}
 	}
 
 	private void startUnits() {
@@ -305,6 +349,12 @@ final class RoboSystem implements RoboContext {
 	public void stop() {
 		// NOTE(Marcus/Sep 4, 2017): We may want schedule the stops in the
 		// future.
+		if (emitterFuture != null) {
+			emitterFuture.cancel(true);
+		}
+		if (messageServer != null) {
+			messageServer.stop();
+		}
 		if (state.compareAndSet(LifecycleState.STARTED, LifecycleState.STOPPING)) {
 			units.values().forEach(RoboUnit::stop);
 		}
@@ -421,5 +471,64 @@ final class RoboSystem implements RoboContext {
 		config.setInteger(KEY_WORKER_POOL_SIZE, workerPoolSize);
 		config.setInteger(KEY_BLOCKING_POOL_SIZE, blockingPoolSize);
 		return config;
+	}
+
+	private MessageServer initServer(Configuration serverConfiguration) {
+		if (serverConfiguration != null) {
+			return new MessageServer(new MessageCallback() {
+				@Override
+				public void handleMessage(String sourceUuid, String id, Object message) {
+					getReference(id).sendMessage(message);
+				}
+			}, serverConfiguration);
+		} else {
+			return null;
+		}
+	}
+
+	private ContextEmitter initEmitter(Configuration emitterConfiguration, URI uri) {
+		if (messageServer != null && uri != null) {
+			if (emitterConfiguration.getBoolean(ContextEmitter.KEY_ENABLED, Boolean.FALSE)) {
+				try {
+					return new ContextEmitter(createDescriptor(uri, emitterConfiguration), emitterConfiguration);
+				} catch (SocketException | UnknownHostException e) {
+					SimpleLoggingUtil.error(getClass(), "Could not initialize autodiscovery emitter. Proceeding without!", e);
+				}
+			} else {
+				SimpleLoggingUtil.info(getClass(), "Context emitter disabled in settings. Proceeding without!");
+			}
+		} else {
+			SimpleLoggingUtil.info(getClass(), "Will not use context emitter. Server was: " + messageServer + " uri was: " + uri);
+		}
+		return null;
+	}
+
+	private RoboContextDescriptor createDescriptor(URI uri, Configuration emitterConfiguration) {
+		int heartbeatInterval = emitterConfiguration.getInteger(ContextEmitter.KEY_HEARTBEAT_INTERVAL,
+				ContextEmitter.DEFAULT_HEARTBEAT_INTERVAL);
+		Map<String, String> metadata = toStringMap(emitterConfiguration.getChildConfiguration(KEY_CONFIGURATION_EMITTER_METADATA));
+		metadata.put(RoboContextDescriptor.KEY_URI, uri.toString());
+		return new RoboContextDescriptor(getId(), heartbeatInterval, metadata);
+	}
+
+	private Map<String, String> toStringMap(Configuration configuration) {
+		Map<String, String> map = new HashMap<>();
+		for (String name : configuration.getValueNames()) {
+			map.put(name, configuration.getString(name, null));
+		}
+		return map;
+	}
+
+	private static URI getListeningURI(MessageServer server) {
+		if (server != null) {
+			for (int i = 0; i < 5; i++) {
+				URI uri = server.getListeningURI();
+				if (uri != null) {
+					return uri;
+				}
+				SystemUtil.sleep(100);
+			}
+		}
+		return null;
 	}
 }
