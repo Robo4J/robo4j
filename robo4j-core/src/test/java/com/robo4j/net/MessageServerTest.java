@@ -32,9 +32,12 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MessageServerTest {
 	private volatile Exception exception = null;
@@ -75,11 +78,24 @@ public class MessageServerTest {
 		if (exception != null) {
 			throw exception;
 		}
+
+		List<String> testMessage = getOrderedTestMessage("My First Little Message!",
+				"My Second Little Message!", "My Third Little Message!");
 		client.connect();
-		client.sendMessage("test", "My First Little Message!");
-		client.sendMessage("test", "My Second Little Message!");
+		for(String message: testMessage){
+			client.sendMessage("test", message);
+		}
+		
 		messageLatch.await(14, TimeUnit.SECONDS);
-		Assert.assertEquals(2, messages.size());
+		Assert.assertEquals(testMessage.size(), messages.size());
+		Assert.assertArrayEquals(testMessage.toArray(), messages.toArray());
+	}
+
+	private List<String> getOrderedTestMessage(String... messages){
+		if(messages == null || messages.length == 0){
+			Assert.fail("Expected message");
+		}
+		return Stream.of(messages).collect(Collectors.toCollection(LinkedList::new));
 	}
 
 	@Test
