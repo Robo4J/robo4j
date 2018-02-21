@@ -24,6 +24,8 @@ import java.util.Map;
  * @author Marcus Hirt (@hirt)
  */
 public final class RoboContextDescriptor {
+	public static final String KEY_URI = "uri";
+	
 	private final String id;
 	private final int heartBeatInterval;
 	private final Map<String, String> metaData;

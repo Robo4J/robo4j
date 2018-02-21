@@ -1,0 +1,42 @@
+<!--
+  ~ Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
+  ~
+  ~ Robo4J is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ Robo4J is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
+  -->
+<robo4j>
+    <roboSystem id="6">
+        <config name="com.robo4j.root">
+            <value name="poolSizeScheduler" type="int">6</value>
+            <value name="poolSizeWorker" type="int">3</value>
+            <value name="poolSizeBlocking" type="int">10</value>
+	        <config name="com.robo4j.messageServer">
+	        	<value name="hostname" type="String">localhost</value>
+	        	<!-- 0 means an anonymous port will be used for the message server -->
+	        	<value name="port" type="int">0</value>
+	        </config>
+	        <!-- Shall the server be published? This is the configuration of the ContextEmitter. -->
+	        <config name="com.robo4j.discovery">
+	        	<value name="multicastAddress" type="String">238.12.15.254</value>
+	        	<value name="port" type="int">0x0FFE</value>
+	        	<value name="heartBeatInterval" type="int">250</value>
+	        	<value name="enabled" type="boolean">true</value>
+	        	<config name="com.robo4j.discovery.metadata">
+					<!-- Metadata useful to communicate with -->
+	        		<value name="name" type="String">Caprica</value>
+	        		<value name="class" type="String">Cylon</value>
+	        	</config>
+	        </config>
+        </config>
+    </roboSystem>
+</robo4j>

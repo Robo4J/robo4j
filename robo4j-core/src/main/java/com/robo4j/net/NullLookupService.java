@@ -47,4 +47,9 @@ final class NullLookupService implements LookupService {
 	@Override
 	public void stop() throws IOException {		
 	}
+
+	@Override
+	public RoboContextDescriptor getDescriptor(String id) {
+		return null;
+	}
 }

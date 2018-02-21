@@ -9,11 +9,11 @@ import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.scheduler.Scheduler;
 
-public class RemoteRoboContext implements RoboContext {
+public class ClientRemoteRoboContext implements RoboContext {
 
 	private RoboContextDescriptorEntry descriptorEntry;
 
-	public RemoteRoboContext(RoboContextDescriptorEntry descriptorEntry) {
+	public ClientRemoteRoboContext(RoboContextDescriptorEntry descriptorEntry) {
 		this.descriptorEntry = descriptorEntry;
 	}
 	

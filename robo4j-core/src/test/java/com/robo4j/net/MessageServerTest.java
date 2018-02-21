@@ -134,7 +134,7 @@ public class MessageServerTest {
 		client.sendMessage("test5", new Float(5.0f));
 		client.sendMessage("test6", new Long(6));
 		client.sendMessage("test7", new Double(7));
-		client.sendMessage("test8", new TestMessageType(8, "Lalala"));
+		client.sendMessage("test8", new TestMessageType(8, "Lalala", null));
 		messageLatch.await(140000000, TimeUnit.SECONDS);
 
 		Assert.assertEquals(8, messages.size());

@@ -45,6 +45,16 @@ public interface LookupService {
 	RoboContext getContext(String id);
 
 	/**
+	 * Returns the descriptor for the specified id, if one is on record. Returns
+	 * null if no context with the specified id is known.
+	 * 
+	 * @param id
+	 *            the UUID of the context to look for.
+	 * @return the descriptor for the specified id.
+	 */
+	RoboContextDescriptor getDescriptor(String id);
+
+	/**
 	 * Starts listening for information.
 	 *
 	 * @throws IOException
