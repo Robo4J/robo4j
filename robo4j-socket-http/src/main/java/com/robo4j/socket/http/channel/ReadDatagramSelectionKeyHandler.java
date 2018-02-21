@@ -52,7 +52,7 @@ public class ReadDatagramSelectionKeyHandler implements SelectionKeyHandler {
 			channel.receive(buffer);
 			buffer.flip();
 			String message = ChannelBufferUtils.byteBufferToString(buffer);
-			System.out.println("Read: " + message);
+			System.out.println(getClass().getSimpleName() + ": Read: " + message);
 
             final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
             final String firstLine = RoboHttpUtils.correctLine(headerAndBody[0]);
@@ -63,14 +63,13 @@ public class ReadDatagramSelectionKeyHandler implements SelectionKeyHandler {
             final RoboReference<Object> roboReference = serverPathConfig.getRoboUnit();
             final HttpDecoder<?> decoder = codecRegistry.getDecoder(roboReference.getMessageType());
             final Object decodedMessage = decoder.decode(body);
+			serverPathConfig.getRoboUnit().sendMessage(decodedMessage);
 
 			final DatagramResponseProcess responseProcess = new DatagramResponseProcess(tokens[1], roboReference, decodedMessage);
+			System.out.println(getClass().getSimpleName() + " responseProcess: " + responseProcess);
 
-            outBuffers.put(key, responseProcess);
-            channel.register(key.selector(), SelectionKey.OP_WRITE);
-            return key;
-//            Object decodedMessage = decoder.decode(body);
-//            serverPathConfig.getRoboUnit().sendMessage(decodedMessage);
+			outBuffers.put(key, responseProcess);
+			return key;
 
 		} catch (IOException e) {
 			throw new SocketException("hanlde", e);

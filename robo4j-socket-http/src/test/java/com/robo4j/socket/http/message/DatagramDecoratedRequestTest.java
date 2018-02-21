@@ -1,6 +1,6 @@
 package com.robo4j.socket.http.message;
 
-import com.robo4j.socket.http.util.DatagramType;
+import com.robo4j.socket.http.util.DatagramBodyType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,7 +15,7 @@ public class DatagramDecoratedRequestTest {
     @Test
     public void datagramDecoratedRequestTest(){
 
-        DatagramDenominator denominator = new DatagramDenominator(DatagramType.JSON.getType(), "/units/stringConsumer");
+        DatagramDenominator denominator = new DatagramDenominator(DatagramBodyType.JSON.getType(), "/units/stringConsumer");
         DatagramDecoratedRequest request = new DatagramDecoratedRequest(denominator);
         request.addMessage("{\"number\":22}".getBytes());
 

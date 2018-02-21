@@ -63,7 +63,7 @@ public class OutboundDatagramChannelHandler implements ChannelHandler {
 	}
 
 	private void initDatagramSocket(ClientContext clientContext) {
-		channel = ChannelUtils.initDatagramChannel(clientContext);
+		channel = ChannelUtils.initDatagramChannel(DatagramConnectionType.CLIENT, clientContext);
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(ChannelBufferUtils.INIT_BUFFER_CAPACITY);
 		final CodecRegistry codecRegistry = clientContext.getPropertySafe(CodecRegistry.class, PROPERTY_CODEC_REGISTRY);
 		while (active) {
@@ -71,7 +71,7 @@ public class OutboundDatagramChannelHandler implements ChannelHandler {
 			//should handle incoming communication
 
 			try {
-//				DatagramDecoratedRequest request = ChannelBufferUtils.getDatagramDecoratedRequestByChannel(DatagramType.JSON.getType(), channel, buffer);
+//				DatagramDecoratedRequest request = ChannelBufferUtils.getDatagramDecoratedRequestByChannel(DatagramBodyType.JSON.getType(), channel, buffer);
 
 				buffer.clear();
 				SocketAddress client = channel.receive(buffer);

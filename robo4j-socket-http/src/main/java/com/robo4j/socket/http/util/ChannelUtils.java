@@ -19,10 +19,11 @@ package com.robo4j.socket.http.util;
 
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.SocketException;
+import com.robo4j.socket.http.channel.DatagramConnectionType;
 import com.robo4j.socket.http.channel.SelectionKeyHandler;
 import com.robo4j.socket.http.units.ClientContext;
-import com.robo4j.socket.http.units.SocketContext;
 import com.robo4j.socket.http.units.ServerContext;
+import com.robo4j.socket.http.units.SocketContext;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -123,21 +124,43 @@ public final class ChannelUtils {
 		}
 	}
 
-	public static DatagramChannel initDatagramChannel(SocketContext<?> context){
+	public static DatagramChannel initDatagramChannel(DatagramConnectionType connectionType, SocketContext<?> context){
 		try {
 			final DatagramChannel result = DatagramChannel.open();
-			DatagramSocket socket = result.socket();
-			SocketAddress address = context instanceof ClientContext ?
-					new InetSocketAddress(context.getPropertySafe(String.class, PROPERTY_HOST),
-					context.getPropertySafe(Integer.class, PROPERTY_SOCKET_PORT)) :
-					new InetSocketAddress(context.getPropertySafe(Integer.class, PROPERTY_SOCKET_PORT));
-			socket.bind(address);
-			result.configureBlocking(false);
+			SocketAddress address = getSocketAddressByContext(context);
+			switch (connectionType){
+				case SERVER:
+					DatagramSocket socket = result.socket();
+					result.configureBlocking(false);
+					socket.bind(address);
+					break;
+				case CLIENT:
+					result.connect(address);
+					break;
+				default:
+					throw new SocketException("int not supported: " + connectionType);
+			}
 			return result;
 
 		} catch (Exception e){
 			SimpleLoggingUtil.error(ChannelUtils.class, "init datagram socket channel", e);
 			throw new SocketException("init datagram socket channel", e);
+		}
+	}
+
+	public static SocketAddress getSocketAddressByContext(SocketContext<?> context){
+		if(context instanceof ClientContext){
+			String clientHost = context.getPropertySafe(String.class, PROPERTY_HOST);
+			int clientPort = context.getPropertySafe(Integer.class, PROPERTY_SOCKET_PORT);
+			System.out.println("clientHost: " + clientHost + ", clientPort: " + clientPort);
+			return new InetSocketAddress(context.getPropertySafe(String.class, PROPERTY_HOST),
+					context.getPropertySafe(Integer.class, PROPERTY_SOCKET_PORT));
+		} else if (context instanceof ServerContext){
+			int serverPort = context.getPropertySafe(Integer.class, PROPERTY_SOCKET_PORT);
+			System.out.println("ServerPort: " + serverPort);
+			return new InetSocketAddress(context.getPropertySafe(Integer.class, PROPERTY_SOCKET_PORT));
+		} else {
+			throw new SocketException("invalid context" + context);
 		}
 	}
 
