@@ -18,8 +18,9 @@ package com.robo4j.net;
 
 /**
  * Protocol specific constants
- * 
- * @author Marcus
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 interface MessageProtocolConstants {
 	/**

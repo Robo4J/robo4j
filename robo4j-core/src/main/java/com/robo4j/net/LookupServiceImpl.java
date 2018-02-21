@@ -41,6 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * settings for the heartbeat.
  * 
  * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 class LookupServiceImpl implements LookupService {
 	// FIXME(marcus/6 Nov 2017): This should be calculated, and used when

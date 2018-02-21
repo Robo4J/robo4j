@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ * Copyright (c) 2014, 2018, Marcus Hirt, Miroslav Wengner
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -8,13 +8,15 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.robo4j.net;
+
+import com.robo4j.configuration.Configuration;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -23,13 +25,12 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.UnknownHostException;
 
-import com.robo4j.configuration.Configuration;
-
 /**
  * Message client. Normally used by RemoteRoboContext to communicate with a
  * discovered MessageServer.
  * 
- * @author Marcus Hirt
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 public class MessageClient {
 	public final static String KEY_SO_TIMEOUT = "timeout";

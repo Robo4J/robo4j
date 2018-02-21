@@ -1,6 +1,7 @@
+
 /*
- * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ * Copyright (c) 2014, 2018, Marcus Hirt, Miroslav Wengner
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -8,26 +9,32 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.robo4j.net;
+
+/**
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
+
+import com.robo4j.RoboContext;
+import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationFactory;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.robo4j.RoboContext;
-import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
 
 public class MessageServerTest {
 	private volatile Exception exception = null;
@@ -40,26 +47,19 @@ public class MessageServerTest {
 		Configuration serverConfig = ConfigurationFactory.createEmptyConfiguration();
 		serverConfig.setString("ServerName", "Server Name");
 		serverConfig.setString(MessageServer.KEY_HOST_NAME, "localhost");
-		MessageServer server = new MessageServer(new MessageCallback() {
-			@Override
-			public void handleMessage(String uuid, String id, Object message) {
+		MessageServer server = new MessageServer( (uuid, id, message) -> {
 				System.out.println("Got uuid: " + uuid + " id:" + id + " message:" + message);
 				messages.add(String.valueOf(message));
 				messageLatch.countDown();
-			}
-		}, serverConfig);
+			}, serverConfig);
 
-		Thread t = new Thread(new Runnable() {
-			@Override
-			public void run() {
+		Thread t = new Thread(() -> {
 				try {
 					server.start();
 				} catch (IOException e) {
 					exception = e;
 					Assert.fail(e.getMessage());
-				}
-			}
-		}, "Server Listener");
+				}}, "Server Listener");
 		t.setDaemon(true);
 		t.start();
 		for (int i = 0; i < 10; i++) {
@@ -90,26 +90,19 @@ public class MessageServerTest {
 		Configuration serverConfig = ConfigurationFactory.createEmptyConfiguration();
 		serverConfig.setString("ServerName", "Server Name");
 		serverConfig.setString(MessageServer.KEY_HOST_NAME, "localhost");
-		MessageServer server = new MessageServer(new MessageCallback() {
-			@Override
-			public void handleMessage(String uuid, String id, Object message) {
+		MessageServer server = new MessageServer( (uuid, id, message) -> {
 				System.out.println("Got uuid: " + uuid + " got id:" + id + " message:" + message);
 				messages.add(message);
 				messageLatch.countDown();
-			}
-		}, serverConfig);
+			}, serverConfig);
 
-		Thread t = new Thread(new Runnable() {
-			@Override
-			public void run() {
+		Thread t = new Thread(() ->  {
 				try {
 					server.start();
 				} catch (IOException e) {
 					exception = e;
 					Assert.fail(e.getMessage());
-				}
-			}
-		}, "Server Listener");
+				}}, "Server Listener");
 		t.setDaemon(true);
 		t.start();
 		for (int i = 0; i < 10; i++) {

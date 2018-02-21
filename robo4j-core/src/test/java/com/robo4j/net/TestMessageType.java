@@ -16,9 +16,15 @@
  */
 package com.robo4j.net;
 
+import com.robo4j.RoboReference;
+
 import java.io.Serializable;
 
-import com.robo4j.RoboReference;
+/**
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
 
 public class TestMessageType implements Serializable {
 	private static final long serialVersionUID = 2L;

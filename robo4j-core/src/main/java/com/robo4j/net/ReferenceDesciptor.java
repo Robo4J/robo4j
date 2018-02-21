@@ -16,15 +16,16 @@
  */
 package com.robo4j.net;
 
+import com.robo4j.logging.SimpleLoggingUtil;
+
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 
-import com.robo4j.logging.SimpleLoggingUtil;
-
 /**
  * Used for serializing descriptors over the network.
- * 
- * @author Marcus
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 public class ReferenceDesciptor implements Serializable {
 	private static final long serialVersionUID = 1L;

@@ -30,8 +30,10 @@ import java.net.UnknownHostException;
 /**
  * This class is used by the {@link RoboContext} to make it discoverable. This
  * can be configured in the settings for the {@link RoboContext}.
- * 
+ *
+ *
  * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 public final class ContextEmitter {
 

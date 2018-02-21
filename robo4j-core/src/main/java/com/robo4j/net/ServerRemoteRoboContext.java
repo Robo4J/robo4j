@@ -16,13 +16,6 @@
  */
 package com.robo4j.net;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.Future;
-
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
@@ -30,6 +23,19 @@ import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.scheduler.Scheduler;
+
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.Future;
+
+/**
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
 
 public class ServerRemoteRoboContext implements RoboContext {
 	private final String uuid;

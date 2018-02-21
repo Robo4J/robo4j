@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * used for creating a new lookup service.
  * 
  * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 public final class LookupServiceProvider {
 	public static final String DEFAULT_MULTICAST_ADDRESS = "238.12.15.254";
