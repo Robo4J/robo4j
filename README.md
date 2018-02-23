@@ -13,6 +13,7 @@ See current [Robo4j documentation][].
 ## Building from Source
 The Robo4j framework uses [Gradle][] for building
 > **Note:** If you are not using Robo4J as the standard user (pi) on a Raspberry Pi, you will have to specify the path to the local maven repository in the file _**libraries.gradle**_, variable: _mavenRepository_
+
 > **Note:** Ensure that you have JDK 8 configured properly in your IDE.
 
 ## Requirements
