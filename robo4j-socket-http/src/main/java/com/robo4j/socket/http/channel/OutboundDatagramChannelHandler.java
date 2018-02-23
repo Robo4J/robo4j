@@ -51,9 +51,7 @@ public class OutboundDatagramChannelHandler implements ChannelHandler {
 	@Override
 	public void stop() {
 		try {
-            System.out.println(getClass().getSimpleName() + ":STOP");
 			if (channel != null) {
-				System.out.println(getClass().getSimpleName() + "close channel");
 				active = false;
 				if(channel.isConnected()) channel.close();
             }

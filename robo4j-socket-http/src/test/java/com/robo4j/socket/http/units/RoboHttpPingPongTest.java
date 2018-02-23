@@ -52,7 +52,6 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
  */
 public class RoboHttpPingPongTest {
 
-	private static final String ID_HTTP_PRODUCER = "http_producer";
 	private static final String ID_HTTP_CLIENT = "http_client";
 	private static final String ID_HTTP_SERVER = "http_server";
 	private static final String CONTROLLER_PING_PONG = "controller";

@@ -92,6 +92,5 @@ public class DatagramClientUnit extends RoboUnit<DatagramDecoratedRequest> {
 			}
 
 //		}
-		System.out.println(getClass() + " Datagram Done: request: " + new String(request.toMessage()));
 	}
 }

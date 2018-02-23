@@ -150,15 +150,12 @@ public final class ChannelUtils {
 
 	public static SocketAddress getSocketAddressByContext(SocketContext<?> context){
 		if(context instanceof ClientContext){
-			String clientHost = context.getPropertySafe(String.class, PROPERTY_HOST);
-			int clientPort = context.getPropertySafe(Integer.class, PROPERTY_SOCKET_PORT);
-			System.out.println("clientHost: " + clientHost + ", clientPort: " + clientPort);
-			return new InetSocketAddress(context.getPropertySafe(String.class, PROPERTY_HOST),
-					context.getPropertySafe(Integer.class, PROPERTY_SOCKET_PORT));
+			final String clientHost = context.getPropertySafe(String.class, PROPERTY_HOST);
+			final int clientPort = context.getPropertySafe(Integer.class, PROPERTY_SOCKET_PORT);
+			return new InetSocketAddress(clientHost,clientPort);
 		} else if (context instanceof ServerContext){
-			int serverPort = context.getPropertySafe(Integer.class, PROPERTY_SOCKET_PORT);
-			System.out.println("ServerPort: " + serverPort);
-			return new InetSocketAddress(context.getPropertySafe(Integer.class, PROPERTY_SOCKET_PORT));
+			final int serverPort = context.getPropertySafe(Integer.class, PROPERTY_SOCKET_PORT);
+			return new InetSocketAddress(serverPort);
 		} else {
 			throw new SocketException("invalid context" + context);
 		}

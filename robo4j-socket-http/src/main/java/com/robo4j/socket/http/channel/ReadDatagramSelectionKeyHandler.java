@@ -52,7 +52,6 @@ public class ReadDatagramSelectionKeyHandler implements SelectionKeyHandler {
 			channel.receive(buffer);
 			buffer.flip();
 			String message = ChannelBufferUtils.byteBufferToString(buffer);
-			System.out.println(getClass().getSimpleName() + ": Read: " + message);
 
             final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
             final String firstLine = RoboHttpUtils.correctLine(headerAndBody[0]);
@@ -66,7 +65,6 @@ public class ReadDatagramSelectionKeyHandler implements SelectionKeyHandler {
 			serverPathConfig.getRoboUnit().sendMessage(decodedMessage);
 
 			final DatagramResponseProcess responseProcess = new DatagramResponseProcess(tokens[1], roboReference, decodedMessage);
-			System.out.println(getClass().getSimpleName() + " responseProcess: " + responseProcess);
 
 			outBuffers.put(key, responseProcess);
 			return key;
