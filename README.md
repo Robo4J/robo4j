@@ -19,7 +19,7 @@ The Robo4j framework uses [Gradle][] for building
 [Git][] and [Java JDK 8][]
 
 ## Staying in Touch
-Follow [@robo4j][] or authors: [@miragemiko][] , [@hirt][]
+Follow [@robo4j][] or authors: [@miragemiko][], [@hirt][]
 on Twitter. In-depth articles can be found at [Robo4j.io][], [miragemiko blog][] or [marcus blog][]
 
 ## License
