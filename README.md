@@ -3,7 +3,9 @@
 Modular framework for rapid development of interconnected hardware and robots.
 
 * [Robo4j.io][] :: is a robotics framework running on the JVM
-* [Robo4j.io][] :: is capable to handle stream of commands and process all of them properly
+* [Robo4j.io][] :: provides a threading model controlled by annotations
+* [Robo4j.io][] :: provides a library of hardware abstractions for RaspberryPi and Lego EV3 out of the box
+* [Robo4j.io][] :: provides a library of units that allows hardware to be made available and configured through XML
 * [Robo4j.io][] :: version: alpha-0.3
 
 ## Documentation
