@@ -33,9 +33,9 @@ public class RoboDatagramPingPongTest {
 	private static final String UDP_CLIENT = "udp_client";
     private static final String UDP_SERVER = "udp_server";
     public static final String STRING_CONSUMER = "stringConsumer";
-    private static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
+    public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
 			.create(CountDownLatch.class, StringConsumer.PROP_COUNT_DOWN_LATCH);
-    private static final DefaultAttributeDescriptor<Integer> messagesNumberDescriptor = DefaultAttributeDescriptor
+    public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_MESSAGES_NUMBER = DefaultAttributeDescriptor
             .create(Integer.class, StringConsumer.PROP_GET_NUMBER_OF_SENT_MESSAGES);
 
     private static final int TOTAL_NUMBER =  122;
@@ -66,7 +66,7 @@ public class RoboDatagramPingPongTest {
 		}
 
         attributeFuture.await(1, TimeUnit.MINUTES);
-        final int pongConsumerTotalNumber = pongConsumerReference.getAttribute(messagesNumberDescriptor).get();
+        final int pongConsumerTotalNumber = pongConsumerReference.getAttribute(DESCRIPTOR_MESSAGES_NUMBER).get();
 		pingSystem.shutdown();
 		pongSystem.shutdown();
 
