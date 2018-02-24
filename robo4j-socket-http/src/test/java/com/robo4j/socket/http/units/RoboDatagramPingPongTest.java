@@ -1,6 +1,5 @@
 package com.robo4j.socket.http.units;
 
-import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
@@ -32,11 +31,6 @@ public class RoboDatagramPingPongTest {
     private static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
 	private static final String UDP_CLIENT = "udp_client";
     private static final String UDP_SERVER = "udp_server";
-    public static final String STRING_CONSUMER = "stringConsumer";
-    public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
-			.create(CountDownLatch.class, StringConsumer.PROP_COUNT_DOWN_LATCH);
-    public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_MESSAGES_NUMBER = DefaultAttributeDescriptor
-            .create(Integer.class, StringConsumer.PROP_GET_NUMBER_OF_SENT_MESSAGES);
 
     private static final int TOTAL_NUMBER =  122;
 
@@ -52,8 +46,8 @@ public class RoboDatagramPingPongTest {
 		System.out.println("UDP pingSystem: State after start:");
 		System.out.println(SystemUtil.printStateReport(pingSystem));
 
-		RoboReference<String> pongConsumerReference = pongSystem.getReference(STRING_CONSUMER);
-		CountDownLatch attributeFuture = pongConsumerReference.getAttribute(DESCRIPTOR_COUNT_DOWN_LATCH).get();
+		RoboReference<String> pongStringConsumerReference = pongSystem.getReference(StringConsumer.NAME);
+		CountDownLatch countDownLatch = pongStringConsumerReference.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
 
 		RoboReference<DatagramDecoratedRequest> udpClient = pingSystem.getReference(UDP_CLIENT);
 		for (int i = 0; i < TOTAL_NUMBER; i++) {
@@ -65,8 +59,8 @@ public class RoboDatagramPingPongTest {
 			udpClient.sendMessage(request);
 		}
 
-        attributeFuture.await(1, TimeUnit.MINUTES);
-        final int pongConsumerTotalNumber = pongConsumerReference.getAttribute(DESCRIPTOR_MESSAGES_NUMBER).get();
+        countDownLatch.await(1, TimeUnit.MINUTES);
+        final int pongConsumerTotalNumber = pongStringConsumerReference.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
 		pingSystem.shutdown();
 		pongSystem.shutdown();
 
@@ -94,7 +88,7 @@ public class RoboDatagramPingPongTest {
 		builder.add(DatagramClientUnit.class, config, UDP_CLIENT);
 
 		config = ConfigurationFactory.createEmptyConfiguration();
-		builder.add(StringConsumer.class, config, "stringConsumer");
+		builder.add(StringConsumer.class, config, StringConsumer.NAME);
 
 		return builder.build();
 	}
@@ -116,7 +110,7 @@ public class RoboDatagramPingPongTest {
 
         config = ConfigurationFactory.createEmptyConfiguration();
         config.setInteger(StringConsumer.PROP_TOTAL_NUMBER_MESSAGES, totalNumberOfMessage);
-        builder.add(StringConsumer.class, config, STRING_CONSUMER);
+        builder.add(StringConsumer.class, config, StringConsumer.NAME);
 
 		return builder.build();
 	}

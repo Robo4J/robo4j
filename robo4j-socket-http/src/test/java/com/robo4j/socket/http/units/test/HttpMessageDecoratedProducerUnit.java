@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
+import static com.robo4j.socket.http.units.test.StringConsumer.PROP_GET_NUMBER_OF_SENT_MESSAGES;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
 
@@ -45,7 +46,6 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONF
  */
 public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	private static final int DEFAULT = 0;
-	private static final String ATTRIBUTE_MESSAGE_NUMBER = "getNumberOfSentMessages";
 
 	private final ClientContext clientContext = new ClientContext();
 	private AtomicInteger counter;
@@ -99,7 +99,7 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals(ATTRIBUTE_MESSAGE_NUMBER)
+		if (attribute.getAttributeName().equals(PROP_GET_NUMBER_OF_SENT_MESSAGES)
 				&& attribute.getAttributeType() == Integer.class) {
 			return (R) (Integer) counter.get();
 		}

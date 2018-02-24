@@ -3,6 +3,7 @@ package com.robo4j.socket.http.units;
 import com.robo4j.RoboBuilder;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.dto.ClientPathDTO;
+import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.util.StringConstants;
 import com.robo4j.util.Utf8Constant;
@@ -58,7 +59,6 @@ public class HttpContextTests {
 	@Test
 	public void clientSimpleContextTest() throws Exception {
 
-	    final String consumerName = "stringConsumer";
 
 		RoboBuilder builderProducer = new RoboBuilder();
 		InputStream clientConfigInputStream = Thread.currentThread().getContextClassLoader()
@@ -66,7 +66,7 @@ public class HttpContextTests {
 		builderProducer.add(clientConfigInputStream);
 
 		List<ClientPathDTO> paths = Collections
-				.singletonList(new ClientPathDTO(StringConstants.EMPTY, HttpMethod.GET, Collections.singletonList(consumerName)));
+				.singletonList(new ClientPathDTO(StringConstants.EMPTY, HttpMethod.GET, Collections.singletonList(StringConsumer.NAME)));
 
 		ClientContext context = new ClientContext();
 		HttpPathUtils.updateHttpClientContextPaths(context, paths);
@@ -77,6 +77,6 @@ public class HttpContextTests {
 		Assert.assertTrue(!context.getPathConfig(Utf8Constant.UTF8_SOLIDUS).getCallbacks().isEmpty());
 		Assert.assertTrue(context.getPathConfig(Utf8Constant.UTF8_SOLIDUS).getMethod().equals(HttpMethod.GET));
 		Assert.assertTrue(context.getPathConfig(Utf8Constant.UTF8_SOLIDUS).getCallbacks().size() == 1);
-		Assert.assertTrue(context.getPathConfig(Utf8Constant.UTF8_SOLIDUS).getCallbacks().get(0).equals(consumerName));
+		Assert.assertTrue(context.getPathConfig(Utf8Constant.UTF8_SOLIDUS).getCallbacks().get(0).equals(StringConsumer.NAME));
 	}
 }

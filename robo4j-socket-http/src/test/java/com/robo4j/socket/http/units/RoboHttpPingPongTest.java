@@ -35,8 +35,6 @@ import org.junit.Test;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static com.robo4j.socket.http.units.RoboDatagramPingPongTest.DESCRIPTOR_COUNT_DOWN_LATCH;
-import static com.robo4j.socket.http.units.RoboDatagramPingPongTest.DESCRIPTOR_MESSAGES_NUMBER;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
@@ -97,7 +95,7 @@ public class RoboHttpPingPongTest {
 		decoratedProducer.sendMessage(MESSAGES);
 
 		RoboReference<String> pongConsumer = systemPong.getReference(REQUEST_CONSUMER);
-		CountDownLatch attributeFuture = pongConsumer.getAttribute(DESCRIPTOR_COUNT_DOWN_LATCH).get();
+		CountDownLatch attributeFuture = pongConsumer.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
 
 		attributeFuture.await(1, TimeUnit.MINUTES);
 		System.out.println("systemPing : Going Down!");
@@ -106,7 +104,7 @@ public class RoboHttpPingPongTest {
 
 		System.out.println("systemPong : Going Down!");
 
-		final int number = pongConsumer.getAttribute(DESCRIPTOR_MESSAGES_NUMBER).get();
+		final int number = pongConsumer.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
 		systemPong.stop();
 		Assert.assertEquals(number, MESSAGES);
 		System.out.println("PingPong is down!");
