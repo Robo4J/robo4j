@@ -45,7 +45,7 @@ public class MessageServerTest {
 	@Test
 	public void testClientServerMessagePassing() throws Exception {
 		final List<String> messages = new ArrayList<>();
-		final CountDownLatch messageLatch = new CountDownLatch(2);
+		final CountDownLatch messageLatch = new CountDownLatch(3);
 
 		Configuration serverConfig = ConfigurationFactory.createEmptyConfiguration();
 		serverConfig.setString("ServerName", "Server Name");
@@ -86,7 +86,7 @@ public class MessageServerTest {
 			client.sendMessage("test", message);
 		}
 		
-		messageLatch.await(14, TimeUnit.SECONDS);
+		messageLatch.await(2, TimeUnit.SECONDS);
 		Assert.assertEquals(testMessage.size(), messages.size());
 		Assert.assertArrayEquals(testMessage.toArray(), messages.toArray());
 	}

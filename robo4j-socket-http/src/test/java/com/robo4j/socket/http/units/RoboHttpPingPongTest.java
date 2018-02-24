@@ -56,6 +56,7 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONF
  */
 public class RoboHttpPingPongTest {
 
+	public static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
 	private static final String ID_HTTP_CLIENT = "http_client";
 	private static final String ID_HTTP_SERVER = "http_server";
 	private static final String CONTROLLER_PING_PONG = "controller";
@@ -63,7 +64,6 @@ public class RoboHttpPingPongTest {
 	private static final int PORT = 8042;
 	private static final int MESSAGES = 50;
 	private static final String REQUEST_CONSUMER = "request_consumer";
-	private static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
 	private static final String DECORATED_PRODUCER = "decoratedProducer";
 
 	@Ignore
