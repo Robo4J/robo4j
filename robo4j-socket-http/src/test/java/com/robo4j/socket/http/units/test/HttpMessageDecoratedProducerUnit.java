@@ -81,8 +81,8 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 		countDownLatch = new CountDownLatch(number);
 		clientContext.getPathConfigs().forEach(pathConfig -> {
 			IntStream.range(DEFAULT, number).forEach(i -> {
-				HttpRequestDenominator denominator = new HttpRequestDenominator(pathConfig.getMethod(), pathConfig.getPath(),
-						HttpVersion.HTTP_1_1);
+				HttpRequestDenominator denominator = new HttpRequestDenominator(pathConfig.getMethod(),
+						pathConfig.getPath(), HttpVersion.HTTP_1_1);
 				HttpDecoratedRequest request = new HttpDecoratedRequest(denominator);
 				switch (pathConfig.getMethod()) {
 				case GET:
@@ -109,8 +109,8 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 				&& attribute.getAttributeType() == Integer.class) {
 			return (R) (Integer) counter.get();
 		}
-		if(attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH)
-				&& attribute.getAttributeType() == CountDownLatch.class){
+		if (attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH)
+				&& attribute.getAttributeType() == CountDownLatch.class) {
 			return (R) countDownLatch;
 		}
 		return null;

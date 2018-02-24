@@ -165,7 +165,7 @@ public class HttpUnitTests {
 
 		final InputStream imageData = new BufferedInputStream(
 				Thread.currentThread().getContextClassLoader().getResourceAsStream("snapshot.png"));
-		byte[] imageArray  = StreamUtils.inputStreamToByteArray(imageData);
+		byte[] imageArray = StreamUtils.inputStreamToByteArray(imageData);
 
 		String encodedImage = Base64.getEncoder().encodeToString(imageArray);
 

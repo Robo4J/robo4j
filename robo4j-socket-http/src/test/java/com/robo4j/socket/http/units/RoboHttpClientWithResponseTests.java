@@ -60,16 +60,16 @@ public class RoboHttpClientWithResponseTests {
 		decoratedProducer.sendMessage(MAX_NUMBER);
 
 		RoboReference<String> stringConsumerProducer = producerSystem.getReference(StringConsumer.NAME);
-		CountDownLatch countDownLatchStringProducer = stringConsumerProducer.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
-
-
+		CountDownLatch countDownLatchStringProducer = stringConsumerProducer
+				.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
 
 		countDownLatchStringProducer.await(1, TimeUnit.MINUTES);
-		final int consumerTotalNumber = stringConsumerProducer.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
-		List<String> consumerMessageList = stringConsumerProducer.getAttribute(StringConsumer.DESCRIPTOR_RECEIVED_MESSAGES).get();
+		final int consumerTotalNumber = stringConsumerProducer
+				.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
+		List<String> consumerMessageList = stringConsumerProducer
+				.getAttribute(StringConsumer.DESCRIPTOR_RECEIVED_MESSAGES).get();
 		producerSystem.shutdown();
 		consumerSystem.shutdown();
-
 
 		Assert.assertTrue(consumerTotalNumber == MAX_NUMBER);
 		Assert.assertTrue(consumerMessageList.contains(ROBO_SYSTEM_DESC));

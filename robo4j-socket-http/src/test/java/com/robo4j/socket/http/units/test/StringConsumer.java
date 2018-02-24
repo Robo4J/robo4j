@@ -67,7 +67,7 @@ public class StringConsumer extends RoboUnit<String> {
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		int totalNumber = configuration.getInteger(PROP_TOTAL_NUMBER_MESSAGES, 0);
-		if(totalNumber > 0){
+		if (totalNumber > 0) {
 			countDownLatch = new CountDownLatch(totalNumber);
 		}
 	}
@@ -76,7 +76,7 @@ public class StringConsumer extends RoboUnit<String> {
 	public void onMessage(String message) {
 		counter.incrementAndGet();
 		receivedMessages.add(message);
-		if(countDownLatch != null){
+		if (countDownLatch != null) {
 			countDownLatch.countDown();
 		}
 	}
@@ -92,12 +92,12 @@ public class StringConsumer extends RoboUnit<String> {
 				&& attribute.getAttributeType() == List.class) {
 			return (R) receivedMessages;
 		}
-		if(attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH)
-				&& attribute.getAttributeType() == CountDownLatch.class){
+		if (attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH)
+				&& attribute.getAttributeType() == CountDownLatch.class) {
 			return (R) countDownLatch;
 		}
-		if(attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH_COUNT)
-				&& attribute.getAttributeType() == Long.class){
+		if (attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH_COUNT)
+				&& attribute.getAttributeType() == Long.class) {
 			return (R) (countDownLatch == null ? Long.valueOf(0L) : Long.valueOf(countDownLatch.getCount()));
 		}
 		return null;

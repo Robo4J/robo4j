@@ -28,13 +28,13 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONF
  */
 public class RoboDatagramPingPongTest {
 
-    private static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
+	private static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
 	private static final String UDP_CLIENT = "udp_client";
-    private static final String UDP_SERVER = "udp_server";
+	private static final String UDP_SERVER = "udp_server";
 
-    private static final int TOTAL_NUMBER =  122;
+	private static final int TOTAL_NUMBER = 122;
 
-    @Test
+	@Test
 	public void datagramPingPongTest() throws Exception {
 		RoboContext pongSystem = configurePongSystem(TOTAL_NUMBER);
 		RoboContext pingSystem = configurePingSystem();
@@ -47,7 +47,8 @@ public class RoboDatagramPingPongTest {
 		System.out.println(SystemUtil.printStateReport(pingSystem));
 
 		RoboReference<String> pongStringConsumerReference = pongSystem.getReference(StringConsumer.NAME);
-		CountDownLatch countDownLatch = pongStringConsumerReference.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
+		CountDownLatch countDownLatch = pongStringConsumerReference
+				.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
 
 		RoboReference<DatagramDecoratedRequest> udpClient = pingSystem.getReference(UDP_CLIENT);
 		for (int i = 0; i < TOTAL_NUMBER; i++) {
@@ -59,20 +60,18 @@ public class RoboDatagramPingPongTest {
 			udpClient.sendMessage(request);
 		}
 
-        countDownLatch.await(1, TimeUnit.MINUTES);
-        final int pongConsumerTotalNumber = pongStringConsumerReference.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
+		countDownLatch.await(1, TimeUnit.MINUTES);
+		final int pongConsumerTotalNumber = pongStringConsumerReference
+				.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
 		pingSystem.shutdown();
 		pongSystem.shutdown();
 
+		System.out.println("UDP pongSystem: State after shutdown:");
+		System.out.println(SystemUtil.printStateReport(pongSystem));
+		System.out.println("UDP pingSystem: State after shutdown:");
+		System.out.println(SystemUtil.printStateReport(pingSystem));
 
-
-        System.out.println("UDP pongSystem: State after shutdown:");
-        System.out.println(SystemUtil.printStateReport(pongSystem));
-        System.out.println("UDP pingSystem: State after shutdown:");
-        System.out.println(SystemUtil.printStateReport(pingSystem));
-
-        Assert.assertTrue(TOTAL_NUMBER == pongConsumerTotalNumber);
-
+		Assert.assertTrue(TOTAL_NUMBER == pongConsumerTotalNumber);
 
 	}
 
@@ -108,9 +107,9 @@ public class RoboDatagramPingPongTest {
 		config.setString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"stringConsumer\",\"filters\":[]}]");
 		builder.add(DatagramServerUnit.class, config, UDP_SERVER);
 
-        config = ConfigurationFactory.createEmptyConfiguration();
-        config.setInteger(StringConsumer.PROP_TOTAL_NUMBER_MESSAGES, totalNumberOfMessage);
-        builder.add(StringConsumer.class, config, StringConsumer.NAME);
+		config = ConfigurationFactory.createEmptyConfiguration();
+		config.setInteger(StringConsumer.PROP_TOTAL_NUMBER_MESSAGES, totalNumberOfMessage);
+		builder.add(StringConsumer.class, config, StringConsumer.NAME);
 
 		return builder.build();
 	}
