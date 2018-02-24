@@ -53,7 +53,6 @@ public class RoboHttpDynamicTests {
 
 	private static final String ID_HTTP_SERVER = "http";
 	private static final int PORT = 8025;
-	private static final int SLEEP_DELAY = 400; // necessary delay due to multi-threading we should fix it
 	private static final String ID_CLIENT_UNIT = "httpClient";
 	private static final String ID_TARGET_UNIT = "controller";
 	private static final int MESSAGES_NUMBER = 42;
@@ -87,19 +86,17 @@ public class RoboHttpDynamicTests {
 		/* client system sending a messages to the main system */
 		RoboReference<Object> decoratedProducer = clientSystem.getReference(DECORATED_PRODUCER);
 		decoratedProducer.sendMessage(MESSAGES_NUMBER);
+		CountDownLatch countDownLatchDecoratedProducer = decoratedProducer.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
+		countDownLatchDecoratedProducer.await(1, TimeUnit.MINUTES);
 
-		Thread.sleep(SLEEP_DELAY);
-
-		System.out.println("Going Down!");
 
 		final RoboReference<String> stringConsumer = mainSystem.getReference(StringConsumer.NAME);
-		final int receivedMessages = stringConsumer.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
-
 		final CountDownLatch countDownLatch = stringConsumer.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
+		countDownLatch.await(1, TimeUnit.MINUTES);
+		final int receivedMessages = stringConsumer.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
 
 		clientSystem.shutdown();
 		mainSystem.shutdown();
-		countDownLatch.await(1, TimeUnit.MINUTES);
 
 		System.out.println("System is Down!");
 		Assert.assertNotNull(mainSystem.getUnits());

@@ -73,8 +73,6 @@ public class RoboHttpClientWithResponseTests {
 
 		Assert.assertTrue(consumerTotalNumber == MAX_NUMBER);
 		Assert.assertTrue(consumerMessageList.contains(ROBO_SYSTEM_DESC));
-
-
 	}
 
 	private RoboContext getProducer() throws Exception {

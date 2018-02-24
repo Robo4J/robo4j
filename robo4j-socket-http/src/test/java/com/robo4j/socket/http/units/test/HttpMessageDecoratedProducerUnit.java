@@ -25,15 +25,17 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
+import com.robo4j.socket.http.message.HttpRequestDenominator;
 import com.robo4j.socket.http.units.ClientContext;
 import com.robo4j.socket.http.util.HttpPathUtils;
-import com.robo4j.socket.http.message.HttpRequestDenominator;
 import com.robo4j.socket.http.util.JsonUtil;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
+import static com.robo4j.socket.http.units.test.StringConsumer.PROP_COUNT_DOWN_LATCH;
 import static com.robo4j.socket.http.units.test.StringConsumer.PROP_GET_NUMBER_OF_SENT_MESSAGES;
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
@@ -51,6 +53,7 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	private AtomicInteger counter;
 	private String target;
 	private String message;
+	private CountDownLatch countDownLatch;
 
 	public HttpMessageDecoratedProducerUnit(RoboContext context, String id) {
 		super(Integer.class, context, id);
@@ -75,6 +78,7 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	 */
 	@Override
 	public void onMessage(Integer number) {
+		countDownLatch = new CountDownLatch(number);
 		clientContext.getPathConfigs().forEach(pathConfig -> {
 			IntStream.range(DEFAULT, number).forEach(i -> {
 				HttpRequestDenominator denominator = new HttpRequestDenominator(pathConfig.getMethod(), pathConfig.getPath(),
@@ -91,7 +95,9 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 					throw new IllegalStateException("not allowed state: " + pathConfig);
 				}
 				getContext().getReference(target).sendMessage(request);
+				countDownLatch.countDown();
 			});
+			System.out.println(getClass().getSimpleName() + "messages: " + number);
 		});
 
 	}
@@ -102,6 +108,10 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 		if (attribute.getAttributeName().equals(PROP_GET_NUMBER_OF_SENT_MESSAGES)
 				&& attribute.getAttributeType() == Integer.class) {
 			return (R) (Integer) counter.get();
+		}
+		if(attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH)
+				&& attribute.getAttributeType() == CountDownLatch.class){
+			return (R) countDownLatch;
 		}
 		return null;
 	}

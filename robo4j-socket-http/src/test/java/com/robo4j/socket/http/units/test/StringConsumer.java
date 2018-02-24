@@ -33,6 +33,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
+
+@SuppressWarnings("rawtypes")
 public class StringConsumer extends RoboUnit<String> {
 	public static final String NAME = "stringConsumer";
 	public static final String PROP_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
