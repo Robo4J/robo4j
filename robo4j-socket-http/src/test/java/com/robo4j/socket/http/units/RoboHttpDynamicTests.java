@@ -37,7 +37,7 @@ import org.junit.Test;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_TARGET;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
@@ -117,7 +117,7 @@ public class RoboHttpDynamicTests {
 		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
 
 		config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString(HTTP_PROPERTY_TARGET, StringConsumer.NAME);
+		config.setString(PROPERTY_TARGET, StringConsumer.NAME);
 		builder.add(HttpCommandTestController.class, config, ID_TARGET_UNIT);
 
 		config = ConfigurationFactory.createEmptyConfiguration();
@@ -146,7 +146,7 @@ public class RoboHttpDynamicTests {
 		builder.add(HttpClientUnit.class, config, ID_CLIENT_UNIT);
 
 		config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString(HTTP_PROPERTY_TARGET, ID_CLIENT_UNIT);
+		config.setString(PROPERTY_TARGET, ID_CLIENT_UNIT);
 		config.setString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"" + ID_TARGET_UNIT + "\",\"method\":\"POST\"}]");
 		config.setString("message", JSON_STRING);
 		builder.add(HttpMessageDecoratedProducerUnit.class, config, DECORATED_PRODUCER);

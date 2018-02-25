@@ -2,18 +2,20 @@ package com.robo4j.socket.http.codec;
 
 import com.robo4j.socket.http.json.JsonDocument;
 import com.robo4j.socket.http.json.JsonReader;
-import com.robo4j.socket.http.units.HttpDecoder;
-import com.robo4j.socket.http.units.HttpEncoder;
+import com.robo4j.socket.http.units.SocketDecoder;
+import com.robo4j.socket.http.units.SocketEncoder;
 import com.robo4j.socket.http.util.ReflectUtils;
 
 /**
+ * AbstractHttpMessageCodec decodes appropriate class instance into JSON string
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public abstract class AbstractMessageCodec<T> implements HttpDecoder<T>, HttpEncoder<T> {
+public abstract class AbstractHttpMessageCodec<T> implements SocketDecoder<String, T>, SocketEncoder<T, String> {
 	private final Class<T> clazz;
 
-	protected AbstractMessageCodec(Class<T> clazz) {
+	protected AbstractHttpMessageCodec(Class<T> clazz) {
 		this.clazz = clazz;
 	}
 

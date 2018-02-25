@@ -27,7 +27,7 @@ import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.dto.ResponseDecoderUnitDTO;
 import com.robo4j.socket.http.dto.ResponseUnitDTO;
 import com.robo4j.socket.http.units.CodecRegistry;
-import com.robo4j.socket.http.units.HttpDecoder;
+import com.robo4j.socket.http.units.SocketDecoder;
 import com.robo4j.socket.http.units.ServerPathConfig;
 import com.robo4j.socket.http.util.HttpConstant;
 import com.robo4j.socket.http.util.JsonUtil;
@@ -80,7 +80,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 
 	@Override
 	public Object processGet(ServerPathConfig pathConfig) {
-		final HttpDecoder<?> decoder = codecRegistry.getDecoder(pathConfig.getRoboUnit().getMessageType());
+		final SocketDecoder<?, ?> decoder = codecRegistry.getDecoder(pathConfig.getRoboUnit().getMessageType());
 		final ResponseDecoderUnitDTO result = new ResponseDecoderUnitDTO();
 		result.setId(pathConfig.getRoboUnit().getId());
 		result.setCodec(decoder.getDecodedClass().getName());
@@ -99,9 +99,10 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	 *            string message
 	 * @return processed object
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object processPost(final RoboReference<?> unitReference, final String message) {
-		final HttpDecoder<?> decoder = codecRegistry.getDecoder(unitReference.getMessageType());
+		final SocketDecoder<Object, ?> decoder = codecRegistry.getDecoder(unitReference.getMessageType());
 		return decoder.decode(message);
 	}
 

@@ -11,7 +11,7 @@ import com.robo4j.socket.http.units.test.codec.NSBWithSimpleCollectionsTypesMess
  */
 @HttpProducer
 public class NSBWithSimpleCollectionsTypesMessageCodec
-		extends AbstractMessageCodec<NSBWithSimpleCollectionsTypesMessage> {
+		extends AbstractHttpMessageCodec<NSBWithSimpleCollectionsTypesMessage> {
 
 	public NSBWithSimpleCollectionsTypesMessageCodec() {
 		super(NSBWithSimpleCollectionsTypesMessage.class);

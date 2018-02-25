@@ -37,7 +37,7 @@ import java.util.stream.IntStream;
 
 import static com.robo4j.socket.http.units.test.StringConsumer.PROP_COUNT_DOWN_LATCH;
 import static com.robo4j.socket.http.units.test.StringConsumer.PROP_GET_NUMBER_OF_SENT_MESSAGES;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_TARGET;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
 
 /**
@@ -61,7 +61,7 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		target = configuration.getString(HTTP_PROPERTY_TARGET, null);
+		target = configuration.getString(PROPERTY_TARGET, null);
 		message = configuration.getString("message", null);
 
 		List<ClientPathDTO> paths = JsonUtil.readPathConfig(ClientPathDTO.class,

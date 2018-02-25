@@ -27,7 +27,7 @@ import com.robo4j.socket.http.units.HttpProducer;
  * @author Miro Wengner (@miragemiko)
  */
 @HttpProducer
-public class StringCodec extends AbstractMessageCodec<StringMessage> {
+public class StringCodec extends AbstractHttpMessageCodec<StringMessage> {
 
 	public StringCodec() {
 		super(StringMessage.class);

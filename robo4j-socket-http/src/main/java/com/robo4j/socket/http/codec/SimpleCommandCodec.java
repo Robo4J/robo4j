@@ -29,7 +29,7 @@ import com.robo4j.socket.http.units.HttpProducer;
  * @author Miro Wengner (@miragemiko)
  */
 @HttpProducer
-public class SimpleCommandCodec extends AbstractMessageCodec<SimpleCommand>  {
+public class SimpleCommandCodec extends AbstractHttpMessageCodec<SimpleCommand> {
 	public SimpleCommandCodec() {
 		super(SimpleCommand.class);
 	}

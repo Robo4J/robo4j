@@ -16,7 +16,7 @@
  */
 package com.robo4j.socket.http.units.test.codec;
 
-import com.robo4j.socket.http.units.HttpDecoder;
+import com.robo4j.socket.http.units.SocketDecoder;
 import com.robo4j.socket.http.units.HttpProducer;
 
 /**
@@ -26,7 +26,7 @@ import com.robo4j.socket.http.units.HttpProducer;
  * @author Miroslav Wengner (@miragemiko)
  */
 @HttpProducer
-public class TestArrayDecoder implements HttpDecoder<String[]> {
+public class TestArrayDecoder implements SocketDecoder<String, String[]> {
 	@Override
 	public String[] decode(String json) {
 		String withoutStart = json.replace("array:", "");

@@ -5,7 +5,7 @@ import com.robo4j.RoboReference;
 import com.robo4j.socket.http.SocketException;
 import com.robo4j.socket.http.request.DatagramResponseProcess;
 import com.robo4j.socket.http.units.CodecRegistry;
-import com.robo4j.socket.http.units.HttpDecoder;
+import com.robo4j.socket.http.units.SocketDecoder;
 import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.units.ServerPathConfig;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
@@ -60,7 +60,8 @@ public class ReadDatagramSelectionKeyHandler implements SelectionKeyHandler {
             final ServerPathConfig serverPathConfig = serverContext.getPathConfig(tokens[1]);
 
             final RoboReference<Object> roboReference = serverPathConfig.getRoboUnit();
-            final HttpDecoder<?> decoder = codecRegistry.getDecoder(roboReference.getMessageType());
+
+			final SocketDecoder<Object, Object> decoder = codecRegistry.getDecoder(roboReference.getMessageType());
             final Object decodedMessage = decoder.decode(body);
 			serverPathConfig.getRoboUnit().sendMessage(decodedMessage);
 

@@ -35,7 +35,7 @@ import org.junit.Test;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_TARGET;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
@@ -149,7 +149,7 @@ public class RoboHttpPingPongTest {
 		builder.add(HttpClientUnit.class, config, ID_HTTP_CLIENT);
 
 		config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString(HTTP_PROPERTY_TARGET, ID_HTTP_CLIENT);
+		config.setString(PROPERTY_TARGET, ID_HTTP_CLIENT);
 		config.setString(PROPERTY_UNIT_PATHS_CONFIG,
 				"[{\"roboUnit\":\"" + CONTROLLER_PING_PONG + "\",\"method\":\"POST\"}]");
 		config.setString("message", RoboHttpDynamicTests.JSON_STRING);

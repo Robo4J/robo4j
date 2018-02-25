@@ -35,6 +35,7 @@ import java.util.Map;
  * @author Miroslav Wengner (@miragemiko)
  */
 
+
 @RunWith(LookupServiceTestRunner.class)
 public class LookupServiceTests {
 	private static final float ALLOWED_HEARTBEAT_MISSES = 22f;

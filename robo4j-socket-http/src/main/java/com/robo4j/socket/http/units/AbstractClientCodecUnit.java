@@ -29,7 +29,7 @@ import com.robo4j.socket.http.util.RoboHttpUtils;
 import java.util.List;
 import java.util.Objects;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_TARGET;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_TARGET;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_PACKAGES;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_REGISTRY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
@@ -51,7 +51,7 @@ public abstract  class AbstractClientCodecUnit extends RoboUnit<ClientMessageWra
 
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
-        target = configuration.getString(HTTP_PROPERTY_TARGET, null);
+        target = configuration.getString(PROPERTY_TARGET, null);
         Objects.requireNonNull(target, "empty target");
 
         final List<ClientPathDTO> paths = JsonUtil.readPathConfig(ClientPathDTO.class,

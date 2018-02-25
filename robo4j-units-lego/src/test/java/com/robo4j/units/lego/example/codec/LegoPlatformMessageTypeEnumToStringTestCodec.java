@@ -17,8 +17,8 @@
 
 package com.robo4j.units.lego.example.codec;
 
-import com.robo4j.socket.http.units.HttpDecoder;
-import com.robo4j.socket.http.units.HttpEncoder;
+import com.robo4j.socket.http.units.SocketDecoder;
+import com.robo4j.socket.http.units.SocketEncoder;
 import com.robo4j.socket.http.units.HttpProducer;
 import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
 
@@ -27,7 +27,7 @@ import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
  * @author Miro Wengner (@miragemiko)
  */
 @HttpProducer
-public class LegoPlatformMessageTypeEnumToStringTestCodec implements HttpDecoder<LegoPlatformMessageTypeEnum>, HttpEncoder<LegoPlatformMessageTypeEnum> {
+public class LegoPlatformMessageTypeEnumToStringTestCodec implements SocketDecoder<LegoPlatformMessageTypeEnum>, SocketEncoder<LegoPlatformMessageTypeEnum> {
 
     @Override
     public String encode(LegoPlatformMessageTypeEnum stuff) {

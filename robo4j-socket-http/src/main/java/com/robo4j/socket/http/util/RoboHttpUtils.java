@@ -34,8 +34,8 @@ public final class RoboHttpUtils {
 
 	public static final int DEFAULT_PORT = 8042;
 	public static final int DEFAULT_UDP_PORT = 9042;
-	public static final String HTTP_PROPERTY_TARGET = "target";
 	public static final String HTTP_PROPERTY_PROTOCOL = "protocol";
+	public static final String PROPERTY_TARGET = "target";
 	public static final String PROPERTY_HOST = "host";
 	public static final String PROPERTY_SOCKET_PORT = "port";
 	public static final String PROPERTY_CODEC_REGISTRY = "codecRegistry";

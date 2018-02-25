@@ -8,7 +8,7 @@ import com.robo4j.socket.http.units.test.codec.NSBETypesAndCollectionTestMessage
  * @author Miroslav Wengner (@miragemiko)
  */
 @HttpProducer
-public class NSBETypesAndCollectionTestMessageCodec extends AbstractMessageCodec<NSBETypesAndCollectionTestMessage> {
+public class NSBETypesAndCollectionTestMessageCodec extends AbstractHttpMessageCodec<NSBETypesAndCollectionTestMessage> {
 
     public NSBETypesAndCollectionTestMessageCodec() {
         super(NSBETypesAndCollectionTestMessage.class);

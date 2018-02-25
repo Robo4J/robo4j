@@ -20,12 +20,33 @@ package com.robo4j.socket.http.units;
 import com.robo4j.RoboContext;
 
 /**
+ * DatagramClientCodecUnit decorates message the Datagram Client
+ *
+ * @see DatagramClientUnit
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class DatagramClientCodecUnit extends AbstractClientCodecUnit {
 
+    private static final String NOT_AVAILABLE = "not available";
+
     public DatagramClientCodecUnit(RoboContext context, String id) {
         super(ClientMessageWrapper.class, context, id);
     }
+
+    @Override
+    public void onMessage(ClientMessageWrapper message) {
+
+
+//        final Object encodedMessage = clientContext.getPropertySafe(CodecRegistry.class, PROPERTY_CODEC_REGISTRY)
+//                .containsEncoder(message.getClazz()) ? processMessage(message.getClazz())
+//                : NOT_AVAILABLE;
+
+    }
+
+//    private <T> Object processMessage(Class<T> clazz, T message){
+//         return clientContext.getPropertySafe(CodecRegistry.class, PROPERTY_CODEC_REGISTRY).getEncoder(clazz).encode(message);
+//    }
+
 }

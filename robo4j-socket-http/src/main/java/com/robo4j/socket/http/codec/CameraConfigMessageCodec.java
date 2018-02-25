@@ -13,7 +13,7 @@ import java.util.Map;
  */
 
 @HttpProducer
-public class CameraConfigMessageCodec extends AbstractMessageCodec<CameraConfigMessage> {
+public class CameraConfigMessageCodec extends AbstractHttpMessageCodec<CameraConfigMessage> {
 
 	public CameraConfigMessageCodec() {
 		super(CameraConfigMessage.class);

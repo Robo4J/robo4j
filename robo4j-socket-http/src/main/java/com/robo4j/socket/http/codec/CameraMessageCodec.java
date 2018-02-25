@@ -26,7 +26,7 @@ import com.robo4j.socket.http.units.HttpProducer;
  * @author Miro Wengner (@miragemiko)
  */
 @HttpProducer
-public class CameraMessageCodec extends AbstractMessageCodec<CameraMessage> {
+public class CameraMessageCodec extends AbstractHttpMessageCodec<CameraMessage> {
 
 	public CameraMessageCodec() {
 		super(CameraMessage.class);

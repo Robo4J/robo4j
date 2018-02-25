@@ -22,7 +22,7 @@ package com.robo4j.socket.http.units;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface HttpEncoder<T> {
-	String encode(T stuff);
+public interface SocketEncoder<T, R> {
+	R encode(T stuff);
 	Class<T> getEncodedClass();
 }

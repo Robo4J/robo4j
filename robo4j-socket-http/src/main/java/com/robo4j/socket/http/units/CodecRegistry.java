@@ -19,9 +19,9 @@ package com.robo4j.socket.http.units;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.reflect.ReflectionScan;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Registry for codecs.
@@ -30,8 +30,8 @@ import java.util.Map;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class CodecRegistry {
-	private Map<Class<?>, HttpEncoder<?>> encoders = new HashMap<>();
-	private Map<Class<?>, HttpDecoder<?>> decoders = new HashMap<>();
+	private Map<Class<?>, SocketEncoder<?, ?>> encoders = new ConcurrentHashMap<>();
+	private Map<Class<?>, SocketDecoder<?, ?>> decoders = new ConcurrentHashMap<>();
 
 	public CodecRegistry() {
 		registerDefaults();
@@ -60,13 +60,13 @@ public class CodecRegistry {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> HttpEncoder<T> getEncoder(Class<T> type) {
-		return (HttpEncoder<T>) encoders.get(type);
+	public <T, R> SocketEncoder<T, R> getEncoder(Class<T> type) {
+		return (SocketEncoder<T, R>) encoders.get(type);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> HttpDecoder<T> getDecoder(Class<T> type) {
-		return (HttpDecoder<T>) decoders.get(type);
+	public <T, R> SocketDecoder<R, T> getDecoder(Class<T> type) {
+		return (SocketDecoder<R, T>) decoders.get(type);
 	}
 	
 	private void registerDefaults() {
@@ -89,13 +89,13 @@ public class CodecRegistry {
 
 	private void addInstance(Class<?> loadedClass) throws InstantiationException, IllegalAccessException {
 		Object instance = loadedClass.newInstance();
-		if (instance instanceof HttpEncoder) {
-			HttpEncoder<?> encoder = (HttpEncoder<?>) instance;
+		if (instance instanceof SocketEncoder) {
+			SocketEncoder<?, ?> encoder = (SocketEncoder<?, ?>) instance;
 			encoders.put(encoder.getEncodedClass(), encoder);
 		}
 		// Note, not "else if". People are free to implement both in the same
-		if (instance instanceof HttpDecoder) {
-			HttpDecoder<?> decoder = (HttpDecoder<?>) instance;
+		if (instance instanceof SocketDecoder) {
+			SocketDecoder<?, ?> decoder = (SocketDecoder<?, ?>) instance;
 			decoders.put(decoder.getDecodedClass(), decoder);
 		}
 	}	

@@ -16,11 +16,11 @@
  */
 package com.robo4j.socket.http.units.test.codec;
 
+import com.robo4j.socket.http.units.HttpProducer;
+import com.robo4j.socket.http.units.SocketEncoder;
+
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.robo4j.socket.http.units.HttpEncoder;
-import com.robo4j.socket.http.units.HttpProducer;
 
 /**
  * Simple encoder that encodes an array of string to Json.
@@ -29,7 +29,7 @@ import com.robo4j.socket.http.units.HttpProducer;
  * @author Miroslav Wengner (@miragemiko)
  */
 @HttpProducer
-public class TestArrayEncoder implements HttpEncoder<String[]> {
+public class TestArrayEncoder implements SocketEncoder<String[], String> {
 
 	@Override
 	public String encode(String[] stuff) {

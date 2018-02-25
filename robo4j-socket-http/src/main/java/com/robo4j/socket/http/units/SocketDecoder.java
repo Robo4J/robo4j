@@ -22,7 +22,7 @@ package com.robo4j.socket.http.units;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface HttpDecoder<T> {
-	T decode(String json);
-	Class<T> getDecodedClass();
+public interface SocketDecoder<T, R> {
+	R decode(T json);
+	Class<R> getDecodedClass();
 }

@@ -49,8 +49,8 @@ public final class HttpClientCodecUnit extends AbstractClientCodecUnit {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> String processMessage(T message, HttpEncoder<?> encoder) {
-		return ((HttpEncoder<T>) encoder).encode(message);
+	private <T> String processMessage(T message, SocketEncoder<?, String> encoder) {
+		return ((SocketEncoder<T, String>) encoder).encode(message);
 	}
 
 }

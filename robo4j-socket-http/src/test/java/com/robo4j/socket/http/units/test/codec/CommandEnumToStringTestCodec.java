@@ -17,8 +17,8 @@
 
 package com.robo4j.socket.http.units.test.codec;
 
-import com.robo4j.socket.http.units.HttpDecoder;
-import com.robo4j.socket.http.units.HttpEncoder;
+import com.robo4j.socket.http.units.SocketDecoder;
+import com.robo4j.socket.http.units.SocketEncoder;
 import com.robo4j.socket.http.units.HttpProducer;
 import com.robo4j.socket.http.codec.SimpleCommand;
 import com.robo4j.socket.http.codec.SimpleCommandCodec;
@@ -29,7 +29,7 @@ import com.robo4j.socket.http.units.test.enums.TestCommandEnum;
  * @author Miroslav Wengner (@miragemiko)
  */
 @HttpProducer
-public class CommandEnumToStringTestCodec implements HttpDecoder<TestCommandEnum>, HttpEncoder<TestCommandEnum> {
+public class CommandEnumToStringTestCodec implements SocketDecoder<String, TestCommandEnum>, SocketEncoder<TestCommandEnum, String> {
 
     private final SimpleCommandCodec codec = new SimpleCommandCodec();
     @Override
