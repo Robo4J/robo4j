@@ -18,6 +18,11 @@
 package com.robo4j.socket.http.units;
 
 import com.robo4j.RoboContext;
+import com.robo4j.socket.http.message.DatagramDecoratedRequest;
+import com.robo4j.socket.http.message.DatagramDenominator;
+import com.robo4j.socket.http.util.DatagramBodyType;
+
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_REGISTRY;
 
 /**
  * DatagramClientCodecUnit decorates message the Datagram Client
@@ -39,14 +44,26 @@ public class DatagramClientCodecUnit extends AbstractClientCodecUnit {
     public void onMessage(ClientMessageWrapper message) {
 
 
-//        final Object encodedMessage = clientContext.getPropertySafe(CodecRegistry.class, PROPERTY_CODEC_REGISTRY)
-//                .containsEncoder(message.getClazz()) ? processMessage(message.getClazz())
-//                : NOT_AVAILABLE;
+        final String encodedMessage = clientContext.getPropertySafe(CodecRegistry.class, PROPERTY_CODEC_REGISTRY)
+                .containsEncoder(message.getClazz()) ? processMessage(message.getClazz(), message.getMessage())
+                : NOT_AVAILABLE;
 
+        final ClientPathConfig pathConfig = clientContext.getPathConfig(message.getPath());
+        final DatagramDenominator denominator = new DatagramDenominator(DatagramBodyType.JSON.getType(), pathConfig.getPath());
+        final DatagramDecoratedRequest request = new DatagramDecoratedRequest(denominator);
+        request.addMessage(encodedMessage.getBytes());
+
+        getContext().getReference(target).sendMessage(request);
     }
 
-//    private <T> Object processMessage(Class<T> clazz, T message){
-//         return clientContext.getPropertySafe(CodecRegistry.class, PROPERTY_CODEC_REGISTRY).getEncoder(clazz).encode(message);
-//    }
+    @SuppressWarnings("unchecked")
+    private<T, R> R processMessage(Class<T> clazz, Object message) {
+        return processMessage((T)message,
+                clientContext.getPropertySafe(CodecRegistry.class, PROPERTY_CODEC_REGISTRY).getEncoder(clazz));
+    }
+
+    private <T, R> R processMessage(T message, SocketEncoder<T, R> encoder) {
+        return encoder.encode(message);
+    }
 
 }

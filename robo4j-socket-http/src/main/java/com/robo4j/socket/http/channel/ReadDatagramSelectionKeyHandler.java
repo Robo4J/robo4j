@@ -43,6 +43,7 @@ public class ReadDatagramSelectionKeyHandler implements SelectionKeyHandler {
 		codecRegistry = serverContext.getPropertySafe(CodecRegistry.class, PROPERTY_CODEC_REGISTRY);
 	}
 
+	// TODO: 2/25/18 (miro) -> Datagram type -> not only string is possible
 	@Override
 	public SelectionKey handle() {
 		final DatagramChannel channel = (DatagramChannel) key.channel();

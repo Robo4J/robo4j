@@ -24,7 +24,7 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
-import com.robo4j.socket.http.units.test.HttpMessageDecoratedProducerUnit;
+import com.robo4j.socket.http.units.test.SocketMessageDecoratedProducerUnit;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
 import com.robo4j.util.SystemUtil;
@@ -153,7 +153,7 @@ public class RoboHttpPingPongTest {
 		config.setString(PROPERTY_UNIT_PATHS_CONFIG,
 				"[{\"roboUnit\":\"" + CONTROLLER_PING_PONG + "\",\"method\":\"POST\"}]");
 		config.setString("message", RoboHttpDynamicTests.JSON_STRING);
-		builder.add(HttpMessageDecoratedProducerUnit.class, config, DECORATED_PRODUCER);
+		builder.add(SocketMessageDecoratedProducerUnit.class, config, DECORATED_PRODUCER);
 
 		return builder.build();
 	}

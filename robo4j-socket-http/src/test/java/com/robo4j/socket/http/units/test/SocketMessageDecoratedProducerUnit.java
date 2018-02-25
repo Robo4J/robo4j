@@ -24,9 +24,14 @@ import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.dto.ClientPathDTO;
+import com.robo4j.socket.http.message.DatagramDecoratedRequest;
+import com.robo4j.socket.http.message.DatagramDenominator;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.message.HttpRequestDenominator;
 import com.robo4j.socket.http.units.ClientContext;
+import com.robo4j.socket.http.units.ClientPathConfig;
+import com.robo4j.socket.http.units.test.enums.CommunicationType;
+import com.robo4j.socket.http.util.DatagramBodyType;
 import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.JsonUtil;
 
@@ -41,21 +46,23 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_TARGET;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
 
 /**
- * Test unit to produce HttpDecoratedRequest messages
+ * SocketMessageDecoratedProducerUnit produces HttpDecoratedRequest or DatagramDecoratedRequest messages
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
+public class SocketMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	private static final int DEFAULT = 0;
+	public static final String PROPERTY_COMMUNICATION_TYPE = "communicationType";
 
 	private final ClientContext clientContext = new ClientContext();
 	private AtomicInteger counter;
 	private String target;
 	private String message;
 	private CountDownLatch countDownLatch;
+	private CommunicationType type;
 
-	public HttpMessageDecoratedProducerUnit(RoboContext context, String id) {
+	public SocketMessageDecoratedProducerUnit(RoboContext context, String id) {
 		super(Integer.class, context, id);
 	}
 
@@ -68,6 +75,7 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 				configuration.getString(PROPERTY_UNIT_PATHS_CONFIG, null));
 		HttpPathUtils.updateHttpClientContextPaths(clientContext, paths);
 		counter = new AtomicInteger(DEFAULT);
+		type = CommunicationType.valueOf(configuration.getString(PROPERTY_COMMUNICATION_TYPE, CommunicationType.HTTP.toString()).toUpperCase());
 	}
 
 	/**
@@ -81,25 +89,45 @@ public class HttpMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 		countDownLatch = new CountDownLatch(number);
 		clientContext.getPathConfigs().forEach(pathConfig -> {
 			IntStream.range(DEFAULT, number).forEach(i -> {
-				HttpRequestDenominator denominator = new HttpRequestDenominator(pathConfig.getMethod(),
-						pathConfig.getPath(), HttpVersion.HTTP_1_1);
-				HttpDecoratedRequest request = new HttpDecoratedRequest(denominator);
-				switch (pathConfig.getMethod()) {
-				case GET:
-					request.addCallbacks(pathConfig.getCallbacks());
-					break;
-				case POST:
-					request.addMessage(message);
-					break;
-				default:
-					throw new IllegalStateException("not allowed state: " + pathConfig);
+				switch (type){
+					case HTTP:
+						getContext().getReference(target).sendMessage(getHttpRequest(pathConfig));
+						break;
+					case DATAGRAM:
+						getContext().getReference(target).sendMessage(getDatagramRequest(pathConfig));
+						break;
+					default:
+						throw new IllegalStateException("not allowed");
 				}
-				getContext().getReference(target).sendMessage(request);
 				countDownLatch.countDown();
 			});
 			System.out.println(getClass().getSimpleName() + "messages: " + number);
 		});
 
+	}
+
+	private DatagramDecoratedRequest getDatagramRequest(ClientPathConfig pathConfig){
+		final DatagramDenominator denominator = new DatagramDenominator(DatagramBodyType.JSON.getType(), pathConfig.getPath());
+		final DatagramDecoratedRequest result = new DatagramDecoratedRequest(denominator);
+		result.addMessage(message.getBytes());
+		return result;
+	}
+
+	private HttpDecoratedRequest getHttpRequest(ClientPathConfig pathConfig){
+		HttpRequestDenominator denominator = new HttpRequestDenominator(pathConfig.getMethod(),
+				pathConfig.getPath(), HttpVersion.HTTP_1_1);
+		HttpDecoratedRequest result = new HttpDecoratedRequest(denominator);
+		switch (pathConfig.getMethod()) {
+			case GET:
+				result.addCallbacks(pathConfig.getCallbacks());
+				break;
+			case POST:
+				result.addMessage(message);
+				break;
+			default:
+				throw new IllegalStateException("not allowed state: " + pathConfig);
+		}
+		return result;
 	}
 
 	@SuppressWarnings("unchecked")

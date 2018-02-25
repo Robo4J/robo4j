@@ -17,7 +17,6 @@
 
 package com.robo4j.socket.http.units;
 
-import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.socket.http.units.test.StringConsumer;
@@ -25,7 +24,6 @@ import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -44,8 +42,8 @@ public class RoboHttpClientWithResponseTests {
 	@Test
 	public void simpleRoboSystemGetRequestTest() throws Exception {
 
-		RoboContext producerSystem = getProducer();
-		RoboContext consumerSystem = getConsumer();
+		RoboContext producerSystem = RoboContextUtils.loadSimpleByXml("robo_http_client_request_producer_text.xml");
+		RoboContext consumerSystem = RoboContextUtils.loadSimpleByXml("robo_http_client_request_consumer_text.xml");
 
 		consumerSystem.start();
 		producerSystem.start();
@@ -73,22 +71,6 @@ public class RoboHttpClientWithResponseTests {
 
 		Assert.assertTrue(consumerTotalNumber == MAX_NUMBER);
 		Assert.assertTrue(consumerMessageList.contains(ROBO_SYSTEM_DESC));
-	}
-
-	private RoboContext getProducer() throws Exception {
-		RoboBuilder builderProducer = new RoboBuilder();
-		InputStream clientConfigInputStream = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream("robo_client_request_producer_text.xml");
-		builderProducer.add(clientConfigInputStream);
-		return builderProducer.build();
-	}
-
-	private RoboContext getConsumer() throws Exception {
-		RoboBuilder builderConsumer = new RoboBuilder();
-		InputStream serverConfigInputStream = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream("robo_client_request_consumer_text.xml");
-		builderConsumer.add(serverConfigInputStream);
-		return builderConsumer.build();
 	}
 
 }

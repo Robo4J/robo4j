@@ -57,9 +57,12 @@ public class DatagramClientUnit extends RoboUnit<DatagramDecoratedRequest> {
 
 		final List<ClientPathDTO> paths = JsonUtil.readPathConfig(ClientPathDTO.class,
 				configuration.getString(PROPERTY_UNIT_PATHS_CONFIG, null));
+
+		// FIXME: 2/25/18 (miro) should be moved
 		if (paths.isEmpty()) {
 			throw ConfigurationException.createMissingConfigNameException(PROPERTY_UNIT_PATHS_CONFIG);
 		}
+		
 		DatagramPathUtils.updateDatagramClientContextPaths(clientContext, paths);
 
 		clientContext.putProperty(PROPERTY_HOST, host);
