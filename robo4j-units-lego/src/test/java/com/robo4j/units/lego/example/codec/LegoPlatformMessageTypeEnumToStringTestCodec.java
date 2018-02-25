@@ -27,7 +27,7 @@ import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
  * @author Miro Wengner (@miragemiko)
  */
 @HttpProducer
-public class LegoPlatformMessageTypeEnumToStringTestCodec implements SocketDecoder<LegoPlatformMessageTypeEnum>, SocketEncoder<LegoPlatformMessageTypeEnum> {
+public class LegoPlatformMessageTypeEnumToStringTestCodec implements SocketDecoder<String, LegoPlatformMessageTypeEnum>, SocketEncoder<LegoPlatformMessageTypeEnum, String> {
 
     @Override
     public String encode(LegoPlatformMessageTypeEnum stuff) {
