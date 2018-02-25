@@ -5,20 +5,13 @@ import com.robo4j.CriticalSectionTrait;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.socket.http.channel.DatagramConnectionType;
-import com.robo4j.socket.http.channel.OutboundDatagramChannelHandler;
+import com.robo4j.socket.http.channel.OutboundDatagramSocketChannelHandler;
 import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.message.DatagramDecoratedRequest;
-import com.robo4j.socket.http.util.ChannelBufferUtils;
-import com.robo4j.socket.http.util.ChannelUtils;
 import com.robo4j.socket.http.util.CodeRegistryUtils;
 import com.robo4j.socket.http.util.DatagramPathUtils;
 import com.robo4j.socket.http.util.JsonUtil;
 
-import java.net.SocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.DatagramChannel;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -38,9 +31,7 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONF
 public class DatagramClientUnit extends RoboUnit<DatagramDecoratedRequest> {
 
 	private final ClientContext clientContext = new ClientContext();
-	private OutboundDatagramChannelHandler outboundHandler;
 	private AtomicBoolean active = new AtomicBoolean(false);
-	private DatagramChannel channel;
 
 	public DatagramClientUnit(RoboContext context, String id) {
 		super(DatagramDecoratedRequest.class, context, id);
@@ -62,7 +53,7 @@ public class DatagramClientUnit extends RoboUnit<DatagramDecoratedRequest> {
 		if (paths.isEmpty()) {
 			throw ConfigurationException.createMissingConfigNameException(PROPERTY_UNIT_PATHS_CONFIG);
 		}
-		
+
 		DatagramPathUtils.updateDatagramClientContextPaths(clientContext, paths);
 
 		clientContext.putProperty(PROPERTY_HOST, host);
@@ -78,22 +69,18 @@ public class DatagramClientUnit extends RoboUnit<DatagramDecoratedRequest> {
 	}
 
 	@Override
-	public void onMessage(DatagramDecoratedRequest request) {
-		channel = ChannelUtils.initDatagramChannel(DatagramConnectionType.CLIENT, clientContext);
-		SocketAddress address = ChannelUtils.getSocketAddressByContext(clientContext);
-//		final CodecRegistry codecRegistry = clientContext.getPropertySafe(CodecRegistry.class, PROPERTY_CODEC_REGISTRY);
-//		while (active.get()){
-			try {
-				final ByteBuffer buffer = ByteBuffer.allocateDirect(ChannelBufferUtils.INIT_BUFFER_CAPACITY);
-//				SocketAddress client = channel.receive(buffer);
-				buffer.clear();
-				buffer.put(request.toMessage());
-				buffer.flip();
-				channel.send(buffer, address);
-			} catch (Exception e) {
-				SimpleLoggingUtil.error(getClass(), "datagram problem: ", e);
-			}
+	public void stop() {
+		super.stop();
+		active.set(false);
+	}
 
-//		}
+	@Override
+	public void onMessage(DatagramDecoratedRequest request) {
+
+		// TODO: 2/25/18 (miro) -> continue, handler
+		OutboundDatagramSocketChannelHandler handler = new OutboundDatagramSocketChannelHandler(getContext(),
+				clientContext, request.toMessage());
+		handler.start();
+		handler.stop();
 	}
 }

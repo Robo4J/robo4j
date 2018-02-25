@@ -6,7 +6,7 @@ import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.socket.http.channel.InboundDatagramChannelHandler;
+import com.robo4j.socket.http.channel.InboundDatagramSocketChannelHandler;
 import com.robo4j.socket.http.dto.ServerUnitPathDTO;
 import com.robo4j.socket.http.util.CodeRegistryUtils;
 import com.robo4j.socket.http.util.DatagramPathUtils;
@@ -35,7 +35,7 @@ public class DatagramServerUnit extends RoboUnit<Object> {
 
 	private final ServerContext serverContext = new ServerContext();
 	private List<ServerUnitPathDTO> paths;
-	private InboundDatagramChannelHandler handler;
+	private InboundDatagramSocketChannelHandler handler;
 
 	public DatagramServerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
@@ -67,7 +67,7 @@ public class DatagramServerUnit extends RoboUnit<Object> {
 	public void start() {
 		setState(LifecycleState.STARTING);
 		DatagramPathUtils.updateDatagramServerContextPaths(getContext(), serverContext, paths);
-		handler = new InboundDatagramChannelHandler(getContext(), serverContext);
+		handler = new InboundDatagramSocketChannelHandler(getContext(), serverContext);
 		handler.start();
 		setState(LifecycleState.STARTED);
 	}

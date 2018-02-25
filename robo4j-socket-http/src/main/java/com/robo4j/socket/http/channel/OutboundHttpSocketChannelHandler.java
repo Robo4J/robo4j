@@ -35,14 +35,14 @@ import java.nio.channels.ByteChannel;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class OutboundChannelHandler implements ChannelHandler {
+public class OutboundHttpSocketChannelHandler implements ChannelHandler {
 
 	private ByteChannel byteChannel;
 	private HttpDecoratedRequest message;
 	private HttpDecoratedResponse decoratedResponse;
 
-	public OutboundChannelHandler(ByteChannel byteChannel,
-			HttpDecoratedRequest message) {
+	public OutboundHttpSocketChannelHandler(ByteChannel byteChannel,
+											HttpDecoratedRequest message) {
 		this.byteChannel = byteChannel;
 		this.message = message;
 	}

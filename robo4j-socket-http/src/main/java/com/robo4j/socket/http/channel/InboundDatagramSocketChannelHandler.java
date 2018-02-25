@@ -19,14 +19,14 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_TIMEOUT;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class InboundDatagramChannelHandler implements ChannelHandler{
+public class InboundDatagramSocketChannelHandler implements ChannelHandler{
 
     private final Map<SelectionKey, DatagramResponseProcess> outBuffers = new ConcurrentHashMap<>();
     private final RoboContext context;
     private final ServerContext serverContext;
     private boolean active;
 
-    public InboundDatagramChannelHandler(RoboContext context, ServerContext serverContext) {
+    public InboundDatagramSocketChannelHandler(RoboContext context, ServerContext serverContext) {
         this.context = context;
         this.serverContext = serverContext;
     }

@@ -42,7 +42,7 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class InboundSocketChannelHandler implements ChannelHandler {
+public class InboundHttpSocketChannelHandler implements ChannelHandler {
 
 	private final RoboContext context;
 	private final ServerContext serverContext;
@@ -50,7 +50,7 @@ public class InboundSocketChannelHandler implements ChannelHandler {
 	private ServerSocketChannel socketChannel;
 	private boolean active;
 
-	public InboundSocketChannelHandler(RoboContext context, ServerContext serverContext) {
+	public InboundHttpSocketChannelHandler(RoboContext context, ServerContext serverContext) {
 		this.context = context;
 		this.serverContext = serverContext;
 	}

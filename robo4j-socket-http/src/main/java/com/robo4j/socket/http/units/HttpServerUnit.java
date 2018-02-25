@@ -25,7 +25,7 @@ import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.socket.http.channel.InboundSocketChannelHandler;
+import com.robo4j.socket.http.channel.InboundHttpSocketChannelHandler;
 import com.robo4j.socket.http.dto.ServerUnitPathDTO;
 import com.robo4j.socket.http.util.CodeRegistryUtils;
 import com.robo4j.socket.http.util.HttpPathUtils;
@@ -52,7 +52,7 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY
 public class HttpServerUnit extends RoboUnit<Object> {
 
 	private final ServerContext serverContext = new ServerContext();
-	private InboundSocketChannelHandler handler;
+	private InboundHttpSocketChannelHandler handler;
 	private List<ServerUnitPathDTO> paths;
 
 	public HttpServerUnit(RoboContext context, String id) {
@@ -82,7 +82,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	public void start() {
 		setState(LifecycleState.STARTING);
 		HttpPathUtils.updateHttpServerContextPaths(getContext(), serverContext, paths);
-		handler = new InboundSocketChannelHandler(getContext(), serverContext);
+		handler = new InboundHttpSocketChannelHandler(getContext(), serverContext);
 		handler.start();
 		setState(LifecycleState.STARTED);
 	}

@@ -24,7 +24,7 @@ import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.ProtocolType;
-import com.robo4j.socket.http.channel.OutboundChannelHandler;
+import com.robo4j.socket.http.channel.OutboundHttpSocketChannelHandler;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.message.HttpDecoratedResponse;
@@ -84,9 +84,7 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 				channel.socket().setSendBufferSize(bufferCapacity);
 			}
 
-
-
-			final OutboundChannelHandler handler = new OutboundChannelHandler(channel, request);
+			final OutboundHttpSocketChannelHandler handler = new OutboundHttpSocketChannelHandler(channel, request);
 
 			// TODO: 12/10/17 (miro) -> handler
 			handler.start();
