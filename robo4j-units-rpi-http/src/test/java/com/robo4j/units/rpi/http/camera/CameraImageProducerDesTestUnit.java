@@ -19,21 +19,17 @@ package com.robo4j.units.rpi.http.camera;
 
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.ConfigurationException;
-import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.enums.SystemPath;
-import com.robo4j.socket.http.units.HttpClientMessageWrapper;
+import com.robo4j.socket.http.units.ClientMessageWrapper;
 import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.util.StreamUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -46,9 +42,6 @@ public class CameraImageProducerDesTestUnit extends RoboUnit<Boolean> {
 
 	public static final String ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME = "numberOfSentImages";
 	public static final String ATTRIBUTE_NUMBER_OF_IMAGES_NAME = "numberOfImages";
-	public static final Collection<AttributeDescriptor<?>> ATTRIBUTE_DESCRIPTORS = Collections.unmodifiableCollection(
-			Arrays.asList(DefaultAttributeDescriptor.create(Integer.class, ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME),
-					DefaultAttributeDescriptor.create(Integer.class, ATTRIBUTE_NUMBER_OF_IMAGES_NAME)));
 	static final String IMAGE_ENCODING = "jpg";
 
 	protected final AtomicBoolean progress = new AtomicBoolean(false);
@@ -107,7 +100,7 @@ public class CameraImageProducerDesTestUnit extends RoboUnit<Boolean> {
 				.inputStreamToByteArray(Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName));
 		final CameraMessage cameraMessage = new CameraMessage(IMAGE_ENCODING, String.valueOf(imageNumber),
 				JsonUtil.toBase64String(image));
-		final HttpClientMessageWrapper resultMessage = new HttpClientMessageWrapper(
+		final ClientMessageWrapper resultMessage = new ClientMessageWrapper(
 				HttpPathUtils.toPath(SystemPath.UNITS.getPath(), httpTarget), CameraMessage.class, cameraMessage);
 		getContext().getReference(target).sendMessage(resultMessage);
 		progress.set(false);

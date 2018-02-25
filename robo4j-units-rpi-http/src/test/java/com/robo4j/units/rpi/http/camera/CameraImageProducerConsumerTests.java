@@ -24,10 +24,12 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.util.RoboHttpUtils;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.InputStream;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -54,6 +56,7 @@ public class CameraImageProducerConsumerTests {
 		InputStream serverConfigInputStream = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("robo_camera_consumer_test.xml");
 		builderConsumer.add(serverConfigInputStream);
+
 		RoboContext consumerSystem = builderConsumer.build();
 
 		long startTime = System.currentTimeMillis();
@@ -62,15 +65,22 @@ public class CameraImageProducerConsumerTests {
 
 		RoboReference<Boolean> imageProducer = producerSystem.getReference("imageController");
 		RoboReference<CameraMessage> imageConsumer = consumerSystem.getReference("imageProcessor");
+		CountDownLatch imageConsumerLatch = imageConsumer.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_COUNT_DOWN_LATCH).get();
+
 
 		Integer numberOfImages = imageProducer.getAttribute(ATTRIBUTE_NUMBER_OF_IMAGES).get();
-		while (imageConsumer.getAttribute(ATTRIBUTE_COUNTER).get() < numberOfImages) {
-		}
+
+		imageConsumerLatch.await(1, TimeUnit.MINUTES);
+
+        int imageConsumerReceivedNumber = imageConsumer.getAttribute(ATTRIBUTE_COUNTER).get();
+
+
 		RoboHttpUtils.printMeasuredTime(getClass(), "duration", startTime);
 		System.out.println("sendImages: " + numberOfImages);
 		producerSystem.shutdown();
 		consumerSystem.shutdown();
 
+        Assert.assertTrue(imageConsumerReceivedNumber == numberOfImages);
 		System.out.println("Press any key to End...");
 
 	}

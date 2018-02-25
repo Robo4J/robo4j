@@ -24,7 +24,7 @@ import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.enums.SystemPath;
-import com.robo4j.socket.http.units.HttpClientMessageWrapper;
+import com.robo4j.socket.http.units.ClientMessageWrapper;
 import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.units.rpi.camera.ImageDTO;
@@ -70,7 +70,7 @@ public class ImageDecoratorUnit extends RoboUnit<ImageDTO> {
 
 		final CameraMessage cameraMessage = new CameraMessage(image.getEncoding(),
 				String.valueOf(imageNumber.incrementAndGet()), imageBase64);
-		final HttpClientMessageWrapper resultMessage = new HttpClientMessageWrapper(
+		final ClientMessageWrapper resultMessage = new ClientMessageWrapper(
 				HttpPathUtils.toPath(SystemPath.UNITS.getPath(), httpTarget), CameraMessage.class, cameraMessage);
 		System.out.println(getClass().getSimpleName() + " image target: "+ target + " resultMessage: " + resultMessage.getPath());
 		getContext().getReference(target).sendMessage(resultMessage);

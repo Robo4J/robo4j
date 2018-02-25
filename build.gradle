@@ -545,7 +545,7 @@ project("robo4j-units-rpi-http") {
 
     dependencies {
     	compile(project(":robo4j-socket-http"))
-    	compile(project(":robo4j-units-rpi"))
+        compile(project(":robo4j-units-rpi"))
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
