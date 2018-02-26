@@ -22,6 +22,7 @@ import com.robo4j.RoboReference;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -38,6 +39,7 @@ public class RoboDatagramClientTest {
     private static final int MAX_NUMBER = 1000;
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Ignore
 	@Test
 	public void datagramClientServerTest() throws Exception {
 
