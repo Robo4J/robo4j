@@ -22,10 +22,8 @@ import com.robo4j.RoboReference;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -36,10 +34,9 @@ import java.util.concurrent.TimeUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboDatagramClientTest {
-    private static final int MAX_NUMBER = 1000;
+    private static final int MAX_NUMBER = 42;
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    @Ignore
 	@Test
 	public void datagramClientServerTest() throws Exception {
 
@@ -60,19 +57,15 @@ public class RoboDatagramClientTest {
 
         RoboReference<String> stringConsumerProducer = consumerSystem.getReference(StringConsumer.NAME);
         CountDownLatch countDownLatchStringProducer = stringConsumerProducer
-                .getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
-
-
+                .getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get(1, TimeUnit.MINUTES);
 
         countDownLatchStringProducer.await(1, TimeUnit.MINUTES);
         final int consumerTotalNumber = stringConsumerProducer
-                .getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
-        List<String> consumerMessageList = stringConsumerProducer
-                .getAttribute(StringConsumer.DESCRIPTOR_RECEIVED_MESSAGES).get();
+                .getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get(1, TimeUnit.MINUTES);
+
         producerSystem.shutdown();
         consumerSystem.shutdown();
 
-        System.out.println("consumerMessageListL: " + consumerMessageList);
         Assert.assertTrue(consumerTotalNumber == MAX_NUMBER);
 
 	}
