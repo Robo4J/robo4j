@@ -19,8 +19,8 @@
 
 package com.robo4j.socket.http.units;
 
+import com.robo4j.BlockingTrait;
 import com.robo4j.ConfigurationException;
-import com.robo4j.CriticalSectionTrait;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
@@ -35,11 +35,11 @@ import com.robo4j.socket.http.util.RoboHttpUtils;
 import java.util.List;
 
 import static com.robo4j.socket.http.util.ChannelBufferUtils.INIT_BUFFER_CAPACITY;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_PACKAGES;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_REGISTRY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
-import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY;
 
 /**
  * Http NIO unit allows to configure format of the requests currently is only
@@ -48,7 +48,7 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-@CriticalSectionTrait
+@BlockingTrait
 public class HttpServerUnit extends RoboUnit<Object> {
 
 	private final ServerContext serverContext = new ServerContext();
@@ -64,7 +64,8 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		int port = configuration.getInteger(PROPERTY_SOCKET_PORT, RoboHttpUtils.DEFAULT_PORT);
 		int bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, INIT_BUFFER_CAPACITY);
 
-		paths = JsonUtil.readPathConfig(ServerUnitPathDTO.class, configuration.getString(PROPERTY_UNIT_PATHS_CONFIG, null));
+		paths = JsonUtil.readPathConfig(ServerUnitPathDTO.class,
+				configuration.getString(PROPERTY_UNIT_PATHS_CONFIG, null));
 
 		serverContext.putProperty(PROPERTY_BUFFER_CAPACITY, bufferCapacity);
 		serverContext.putProperty(PROPERTY_SOCKET_PORT, port);
