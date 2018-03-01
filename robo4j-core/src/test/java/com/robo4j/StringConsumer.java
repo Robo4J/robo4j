@@ -19,6 +19,7 @@ package com.robo4j;
 import com.robo4j.configuration.Configuration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,7 +33,7 @@ public class StringConsumer extends RoboUnit<String> {
 	public static final String PROP_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
 	public static final String PROP_GET_RECEIVED_MESSAGES = "getReceivedMessages";
 	private AtomicInteger counter;
-	private List<String> receivedMessages = new ArrayList<>();
+	private List<String> receivedMessages = Collections.synchronizedList(new ArrayList<>());
 
 	/**
 	 * @param context
@@ -43,7 +44,7 @@ public class StringConsumer extends RoboUnit<String> {
 		this.counter = new AtomicInteger(DEFAULT);
 	}
 
-	public synchronized List<String> getReceivedMessages() {
+	public List<String> getReceivedMessages() {
 		return receivedMessages;
 	}
 
