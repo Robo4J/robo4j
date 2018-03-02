@@ -117,14 +117,14 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 			buffer.clear();
 		}
 
-		// channelKeyMap.remove(channel);
+//		 channelKeyMap.remove(channel);
 
-		try {
-			channel.close();
-		} catch (Exception e) {
-			throw new SocketException("handle write channel close", e);
-		}
 		key.cancel();
+//		try {
+//			channel.close();
+//		} catch (Exception e) {
+//			throw new SocketException("handle write channel close", e);
+//		}
 		return key;
 	}
 

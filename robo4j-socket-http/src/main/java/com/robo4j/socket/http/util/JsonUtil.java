@@ -108,6 +108,8 @@ public final class JsonUtil {
 	 *            desired class*
 	 * @param json
 	 *            array of json element of
+	 * @param <T>
+	 *            class type
 	 * @return list of short unit response descriptions
 	 */
 	public static <T> List<T> jsonToList(Class<T> clazz, String json) {
@@ -146,8 +148,12 @@ public final class JsonUtil {
 	 * example : [{"roboUnit":"imageController",
 	 * "method":"POST","callbacks":["callbackPOSTController"]},
 	 *
+	 * @param clazz
+	 *            class of type T
 	 * @param json
 	 *            targetUnit json
+	 * @param <T>
+	 *            class type
 	 * @return extracted List
 	 */
 	public static <T> List<T> toListFromJsonArray(Class<T> clazz, String json) {

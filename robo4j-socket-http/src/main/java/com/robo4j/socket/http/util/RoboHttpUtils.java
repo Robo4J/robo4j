@@ -60,14 +60,12 @@ public final class RoboHttpUtils {
 	 *            desired host
 	 * @param port
 	 *            default port is 80
-	 * @return
+	 * @return host string
 	 */
 	public static String createHost(String host, Integer port) {
 		Objects.requireNonNull(host, "host not available");
 		Objects.requireNonNull(host, "port not available");
-		return new StringBuilder(host)
-				.append(Utf8Constant.UTF8_COLON).append(port)
-				.toString();
+		return new StringBuilder(host).append(Utf8Constant.UTF8_COLON).append(port).toString();
 	}
 
 	/**

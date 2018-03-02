@@ -82,12 +82,12 @@ public final class ChannelUtils {
 	 *             exception
 	 */
 	public static int writeBuffer(ByteChannel channel, ByteBuffer buffer) throws IOException {
-		int numberWriten = 0;
-		int totalWritten = numberWriten;
+		int numberWritten = 0;
+		int totalWritten = numberWritten;
 
-		while (numberWriten >= 0 && buffer.hasRemaining()) {
-			numberWriten = channel.write(buffer);
-			totalWritten += numberWriten;
+		while (numberWritten >= 0 && buffer.hasRemaining()) {
+			numberWritten = channel.write(buffer);
+			totalWritten += numberWritten;
 		}
 		return totalWritten;
 	}
