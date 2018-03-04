@@ -221,10 +221,15 @@ public class ChannelBufferUtils {
 
 		HttpResponseDenominator denominator = new HttpResponseDenominator(statusCode, HttpVersion.getByValue(version));
 		HttpDecoratedResponse result = new HttpDecoratedResponse(headerParams, denominator);
-		if (headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)) {
-			result.setLength(calculateMessageSize(headerAndBody[POSITION_HEADER].length(), headerParams));
+		if (headerAndBody.length > 1) {
+			if(headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)){
+				result.setLength(calculateMessageSize(headerAndBody[POSITION_HEADER].length(), headerParams));
+			} else {
+				result.setLength(headerAndBody[POSITION_BODY].length());
+			}
 			result.addMessage(headerAndBody[POSITION_BODY]);
 		}
+
 
 		return result;
 	}

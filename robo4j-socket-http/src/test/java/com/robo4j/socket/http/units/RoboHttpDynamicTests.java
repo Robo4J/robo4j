@@ -26,20 +26,24 @@ import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.socket.http.message.HttpDecoratedRequest;
+import com.robo4j.socket.http.message.HttpRequestDenominator;
 import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import com.robo4j.socket.http.units.test.SocketMessageDecoratedProducerUnit;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
 import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_TARGET;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_TARGET;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
 
 /**
@@ -104,6 +108,41 @@ public class RoboHttpDynamicTests {
 		Assert.assertEquals("wrong received messages", receivedMessages, MESSAGES_NUMBER);
 	}
 
+	/**
+	 * testing ping external system
+	 * 
+	 * @throws Exception
+	 *             exception
+	 */
+	@Ignore
+	@Test
+	public void pingExternalSystem() throws Exception {
+		RoboBuilder pingSystemBuilder = getHttpClientRobotBuilder("127.0.0.1", 8080);
+
+		pingSystemBuilder.add(StringConsumer.class, StringConsumer.NAME);
+
+		RoboContext pingSystemContext = pingSystemBuilder.build();
+		pingSystemContext.start();
+		System.out.println("PingSystem state after start:");
+		System.out.println(SystemUtil.printStateReport(pingSystemContext));
+
+		RoboReference<HttpDecoratedRequest> httpClient = pingSystemContext.getReference(ID_CLIENT_UNIT);
+
+		Thread.sleep(1000);
+		for (int i = 0; i < 1; i++) {
+			HttpRequestDenominator denominator = new HttpRequestDenominator(HttpMethod.GET, "/noparams",
+					HttpVersion.HTTP_1_1);
+			HttpDecoratedRequest request = new HttpDecoratedRequest(denominator);
+			request.addCallback(StringConsumer.NAME);
+			httpClient.sendMessage(request);
+		}
+		Thread.sleep(1000);
+		pingSystemContext.stop();
+		System.out.println("PingSystem state after stop:");
+		System.out.println(SystemUtil.printStateReport(pingSystemContext));
+
+	}
+
 	// Private Methods
 	private RoboContext getServerRoboSystem(int totalMessageNumber) throws Exception {
 		/* tested system configuration */
@@ -136,16 +175,22 @@ public class RoboHttpDynamicTests {
 		return result;
 	}
 
-	private RoboContext getClientRoboSystem() throws Exception {
+	private RoboBuilder getHttpClientRobotBuilder(String host, int port) throws Exception {
 		/* system which is testing main system */
-		RoboBuilder builder = new RoboBuilder();
+		RoboBuilder result = new RoboBuilder();
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString(PROPERTY_HOST, HOST_SYSTEM);
-		config.setInteger(PROPERTY_SOCKET_PORT, PORT);
-		builder.add(HttpClientUnit.class, config, ID_CLIENT_UNIT);
+		config.setString(PROPERTY_HOST, host);
+		config.setInteger(PROPERTY_SOCKET_PORT, port);
+		result.add(HttpClientUnit.class, config, ID_CLIENT_UNIT);
+		return result;
+	}
 
-		config = ConfigurationFactory.createEmptyConfiguration();
+	private RoboContext getClientRoboSystem() throws Exception {
+		/* system which is testing main system */
+		RoboBuilder builder = getHttpClientRobotBuilder(HOST_SYSTEM, PORT);
+
+		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setString(PROPERTY_TARGET, ID_CLIENT_UNIT);
 		config.setString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"" + ID_TARGET_UNIT + "\",\"method\":\"POST\"}]");
 		config.setString("message", JSON_STRING);

@@ -75,6 +75,7 @@ public class StringConsumer extends RoboUnit<String> {
 	@Override
 	public void onMessage(String message) {
 		counter.incrementAndGet();
+		System.out.println(getClass().getSimpleName() + ":message:" + message);
 		receivedMessages.add(message);
 		if (countDownLatch != null) {
 			countDownLatch.countDown();
