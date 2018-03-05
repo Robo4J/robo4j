@@ -38,6 +38,8 @@ import java.nio.channels.DatagramChannel;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.robo4j.socket.http.util.HttpConstant.HTTP_NEW_LINE;
 import static com.robo4j.socket.http.util.HttpMessageUtils.HTTP_HEADER_BODY_DELIMITER;
@@ -51,6 +53,7 @@ import static com.robo4j.socket.http.util.HttpMessageUtils.POSITION_HEADER;
  */
 public class ChannelBufferUtils {
 
+	public static final Pattern RESPONSE_SPRING_PATTERN = Pattern.compile("^(\\d.\r\n)?(.*)(\r\n)?");
 	public static final int CHANNEL_TIMEOUT = 60000;
 	public static final int INIT_BUFFER_CAPACITY = 4 * 4096;
 	public static final byte CHAR_NEW_LINE = 0x0A;
@@ -61,6 +64,7 @@ public class ChannelBufferUtils {
 	// FIXME: 2/18/18 (miro) every unit client, server should have it's own buffer
 	private static final ByteBuffer requestBuffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
 	private static final ByteBuffer responseBuffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
+	public static final int RESPONSE_JSON_GROUP = 2;
 
 	public static ByteBuffer copy(ByteBuffer source, int start, int end) {
 		ByteBuffer result = ByteBuffer.allocate(end);
@@ -208,6 +212,7 @@ public class ChannelBufferUtils {
 		return result;
 	}
 
+	// TODO: 3/5/18 (miro) investigate spring responseBody
 	public static HttpDecoratedResponse extractDecoratedResponseByStringMessage(String message) {
 		final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
 		final String[] header = headerAndBody[POSITION_HEADER].split("[" + HTTP_NEW_LINE + "]+");
@@ -227,7 +232,11 @@ public class ChannelBufferUtils {
 			} else {
 				result.setLength(headerAndBody[POSITION_BODY].length());
 			}
-			result.addMessage(headerAndBody[POSITION_BODY]);
+			Matcher matcher = RESPONSE_SPRING_PATTERN.matcher(headerAndBody[POSITION_BODY]);
+			if(matcher.find()){
+//				result.addMessage(headerAndBody[POSITION_BODY]);
+				result.addMessage(matcher.group(RESPONSE_JSON_GROUP));
+			}
 		}
 
 
