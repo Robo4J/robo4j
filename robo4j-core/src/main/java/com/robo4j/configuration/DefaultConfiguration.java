@@ -68,6 +68,11 @@ class DefaultConfiguration implements Configuration {
 	}
 
 	@Override
+	public void setValue(String name, Object o) {
+		settings.put(name, o);
+	}
+
+	@Override
 	public Character getCharacter(String name, Character defaultValue) {
 		return (Character) getVal(name, defaultValue);
 	}

@@ -27,8 +27,8 @@ import java.util.Set;
  */
 public interface Configuration extends Serializable {
 	/**
-	 * Creates a child configuration under this configuration, with the
-	 * specified name.
+	 * Creates a child configuration under this configuration, with the specified
+	 * name.
 	 * 
 	 * @param name
 	 *            the name of the child configuration.
@@ -69,8 +69,8 @@ public interface Configuration extends Serializable {
 	 * @param defaultValue
 	 *            the default value if no value is set. Use null if you wish to
 	 *            discover that no value was set.
-	 * @return the value stored under the specified name, or defaultValue if no
-	 *         such value could be found.
+	 * @return the value stored under the specified name, or defaultValue if no such
+	 *         value could be found.
 	 */
 	Boolean getBoolean(String name, Boolean defaultValue);
 
@@ -82,8 +82,8 @@ public interface Configuration extends Serializable {
 	 * @param defaultValue
 	 *            the default value if no value is set. Use null if you wish to
 	 *            discover that no value was set.
-	 * @return the value stored under the specified name, or defaultValue if no
-	 *         such value could be found.
+	 * @return the value stored under the specified name, or defaultValue if no such
+	 *         value could be found.
 	 */
 	Double getDouble(String name, Double defaultValue);
 
@@ -95,8 +95,8 @@ public interface Configuration extends Serializable {
 	 * @param defaultValue
 	 *            the default value if no value is set. Use null if you wish to
 	 *            discover that no value was set.
-	 * @return the value stored under the specified name, or defaultValue if no
-	 *         such value could be found.
+	 * @return the value stored under the specified name, or defaultValue if no such
+	 *         value could be found.
 	 */
 	Float getFloat(String name, Float defaultValue);
 
@@ -108,8 +108,8 @@ public interface Configuration extends Serializable {
 	 * @param defaultValue
 	 *            the default value if no value is set. Use null if you wish to
 	 *            discover that no value was set.
-	 * @return the value stored under the specified name, or defaultValue if no
-	 *         such value could be found.
+	 * @return the value stored under the specified name, or defaultValue if no such
+	 *         value could be found.
 	 */
 	Integer getInteger(String name, Integer defaultValue);
 
@@ -121,8 +121,8 @@ public interface Configuration extends Serializable {
 	 * @param defaultValue
 	 *            the default value if no value is set. Use null if you wish to
 	 *            discover that no value was set.
-	 * @return the value stored under the specified name, or defaultValue if no
-	 *         such value could be found.
+	 * @return the value stored under the specified name, or defaultValue if no such
+	 *         value could be found.
 	 */
 	Long getLong(String name, Long defaultValue);
 
@@ -134,8 +134,8 @@ public interface Configuration extends Serializable {
 	 * @param defaultValue
 	 *            the default value if no value is set. Use null if you wish to
 	 *            discover that no value was set.
-	 * @return the value stored under the specified name, or defaultValue if no
-	 *         such value could be found.
+	 * @return the value stored under the specified name, or defaultValue if no such
+	 *         value could be found.
 	 */
 	String getString(String name, String defaultValue);
 
@@ -147,22 +147,22 @@ public interface Configuration extends Serializable {
 	 * @param character
 	 *            the default value if no value is set. Use null if you wish to
 	 *            discover that no value was set.
-	 * @return the value stored under the specified name, or defaultValue if no
-	 *         such value could be found.
+	 * @return the value stored under the specified name, or defaultValue if no such
+	 *         value could be found.
 	 */
 	Character getCharacter(String name, Character character);
 
 	/**
-	 * General getter to retrieve any named value. This method will only return an instance of a
-	 * type of the other supported getter types. This method is normally used
-	 * together with {@link #getChildNames()}.
+	 * General getter to retrieve any named value. This method will only return an
+	 * instance of a type of the other supported getter types. This method is
+	 * normally used together with {@link #getChildNames()}.
 	 * 
 	 * @param name
 	 *            the name of the configuration value to retrieve.
 	 * @param defaultValue
 	 *            the default value retrieved.
-	 * @return the value stored under the specified name, or defaultValue if no
-	 *         such value could be found.
+	 * @return the value stored under the specified name, or defaultValue if no such
+	 *         value could be found.
 	 */
 	Object getValue(String name, Object defaultValue);
 
@@ -235,4 +235,14 @@ public interface Configuration extends Serializable {
 	 *            the String to store.
 	 */
 	void setString(String name, String s);
+
+	/**
+	 * Stores the Object value under the specified name.
+	 * 
+	 * @param name
+	 *            the name under which to store the value
+	 * @param o
+	 *            the Object to store
+	 */
+	void setValue(String name, Object o);
 }
