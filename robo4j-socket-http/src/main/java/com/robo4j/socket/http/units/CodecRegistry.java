@@ -29,9 +29,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class CodecRegistry {
-	private Map<Class<?>, SocketEncoder<?, ?>> encoders = new ConcurrentHashMap<>();
-	private Map<Class<?>, SocketDecoder<?, ?>> decoders = new ConcurrentHashMap<>();
+public final class CodecRegistry {
+	private final Map<Class<?>, SocketEncoder<?, ?>> encoders = new ConcurrentHashMap<>();
+	private final Map<Class<?>, SocketDecoder<?, ?>> decoders = new ConcurrentHashMap<>();
 
 	public CodecRegistry() {
 		registerDefaults();
@@ -42,7 +42,12 @@ public class CodecRegistry {
 		scan(Thread.currentThread().getContextClassLoader(), packages);
 	}
 
-	public void scan(ClassLoader loader, String... packages) {
+	public CodecRegistry(ClassLoader classLoader, String... packages){
+		this();
+		scan(classLoader, packages);
+	}
+
+	private void scan(ClassLoader loader, String... packages) {
 		ReflectionScan scan = new ReflectionScan(loader);
 		processClasses(loader, scan.scanForEntities(packages));
 	}

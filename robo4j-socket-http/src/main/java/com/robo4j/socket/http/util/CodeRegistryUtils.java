@@ -15,9 +15,7 @@ public class CodeRegistryUtils {
 
 	public static CodecRegistry getCodecRegistry(String packages) throws ConfigurationException {
 		if (RoboHttpUtils.validatePackages(packages)) {
-			CodecRegistry codecRegistry = new CodecRegistry();
-			codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(UTF8_COMMA));
-			return codecRegistry;
+			return new CodecRegistry(Thread.currentThread().getContextClassLoader(), packages.split(UTF8_COMMA));
 		} else {
 			throw new ConfigurationException("not valid code package");
 		}

@@ -42,7 +42,6 @@ import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
 public abstract  class AbstractClientCodecUnit extends RoboUnit<ClientMessageWrapper> {
 
     final ClientContext clientContext = new ClientContext();
-    final CodecRegistry codecRegistry = new CodecRegistry();
     protected String target;
 
     AbstractClientCodecUnit(Class<ClientMessageWrapper> messageType, RoboContext context, String id) {
@@ -63,7 +62,7 @@ public abstract  class AbstractClientCodecUnit extends RoboUnit<ClientMessageWra
 
         String packages = configuration.getString(PROPERTY_CODEC_PACKAGES, null);
         if (RoboHttpUtils.validatePackages(packages)) {
-            codecRegistry.scan(Thread.currentThread().getContextClassLoader(), packages.split(UTF8_COMMA));
+            final CodecRegistry codecRegistry = new CodecRegistry(Thread.currentThread().getContextClassLoader(), packages.split(UTF8_COMMA));
             clientContext.putProperty(PROPERTY_CODEC_REGISTRY, codecRegistry);
         } else {
             throw new IllegalStateException("not available codec packages");

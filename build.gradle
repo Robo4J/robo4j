@@ -568,6 +568,54 @@ project("robo4j-units-rpi-http") {
     }
 }
 
+project("robo4j-spring") {
+
+    description = "Robo4J Spring support"
+
+    group 'com.robo4j'
+    version "${robo4jVersion}"
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+        compile(project(":robo4j-core"))
+        testCompile "junit:junit:${junitVersion}@jar"
+        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
+        testCompile "org.mockito:mockito-all:${mockitoVerison}@jar"
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java']
+            }
+            resources {
+                srcDirs = ['src/main/resources']
+            }
+        }
+
+        test {
+            java {
+                srcDirs = ['src/test/java']
+            }
+            resources {
+                srcDirs = ['src/test/resources']
+            }
+        }
+    }
+}
+
 
 task wrapper(type: Wrapper) {
     gradleVersion = "${roboGradleVersion}"
