@@ -25,8 +25,6 @@ import com.robo4j.RoboUnit;
 /**
  * @param <T>
  *            robo unit type
- * @param <C>
- *            spring component
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
@@ -43,6 +41,17 @@ public class AbstractSpringUnit<T> extends RoboUnit<T> {
 		registerUnit = getContext().getReference(RoboSpringRegisterUnit.NAME);
 	}
 
+	/**
+	 * get registered component
+	 *
+	 * @param name
+	 *            spring component name
+	 * @param clazz
+	 *            component class
+	 * @param <C>
+	 *            component class type
+	 * @return
+	 */
 	protected <C> C getComponent(String name, Class<C> clazz) {
 		final DefaultAttributeDescriptor<String> descriptor = DefaultAttributeDescriptor.create(String.class, name);
 		try {
