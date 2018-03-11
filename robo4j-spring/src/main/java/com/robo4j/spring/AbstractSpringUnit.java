@@ -17,10 +17,12 @@
 
 package com.robo4j.spring;
 
+import com.robo4j.ConfigurationException;
 import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
+import com.robo4j.configuration.Configuration;
 
 /**
  * @param <T>
@@ -37,7 +39,13 @@ public class AbstractSpringUnit<T> extends RoboUnit<T> {
 	}
 
 	@Override
+	public void initialize(Configuration configuration) throws ConfigurationException {
+		super.initialize(configuration);
+	}
+
+	@Override
 	public void start() {
+		// TODO: 3/11/18 (miro) this should go to initiation phase: it means order of initiation
 		registerUnit = getContext().getReference(RoboSpringRegisterUnit.NAME);
 	}
 

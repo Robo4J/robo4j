@@ -37,7 +37,7 @@ public class RoboSpringRegisterUnit extends RoboUnit<Object> {
 
 	public static final String PROPERTY_COMPONENTS = "components";
 
-	private final RoboSpringRegister register = new RoboSpringRegisterImpl();
+	private final RoboSpringRegister register = new RoboSpringRegisterCacheImpl();
 
 	public RoboSpringRegisterUnit(RoboContext context, String id) {
 		super(Object.class, context, id);

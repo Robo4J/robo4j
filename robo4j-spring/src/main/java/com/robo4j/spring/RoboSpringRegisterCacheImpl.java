@@ -18,20 +18,20 @@
 package com.robo4j.spring;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.WeakHashMap;
 
 /**
- * RoboSpringRegisterImpl registers components available in Spring Context
+ * RoboSpringRegisterCacheImpl registers components available in Spring Context
  *
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class RoboSpringRegisterImpl implements RoboSpringRegister {
+public final class RoboSpringRegisterCacheImpl implements RoboSpringRegister {
 
-	private final Map<String, Object> register = new ConcurrentHashMap<>();
+	private final Map<String, Object> registerCache = new WeakHashMap<>();
 
-	RoboSpringRegisterImpl() {
+	RoboSpringRegisterCacheImpl() {
 	}
 
 	/**
@@ -44,16 +44,16 @@ public final class RoboSpringRegisterImpl implements RoboSpringRegister {
 	 */
 	@Override
 	public void register(String name, Object instance) {
-		register.putIfAbsent(name, instance);
+		registerCache.putIfAbsent(name, instance);
 	}
 
 	@Override
 	public Object getComponent(String name) {
-		return register.get(name);
+		return registerCache.get(name);
 	}
 
 	@Override
 	public boolean containsComponent(String name) {
-		return register.containsKey(name);
+		return registerCache.containsKey(name);
 	}
 }
