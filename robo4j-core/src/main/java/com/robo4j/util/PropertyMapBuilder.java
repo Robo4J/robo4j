@@ -25,22 +25,21 @@ import java.util.Map;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-@SuppressWarnings("rawtypes")
-public class PropertyMapBuilder<Key, Value> {
+public class PropertyMapBuilder<K, V> {
 
-	private Map<Key, Value> map;
+	private final Map<K, V> map;
 
 	public PropertyMapBuilder() {
 		this.map = new LinkedHashMap<>();
 	}
 
-	public PropertyMapBuilder put(Key key, Value value) {
+	public PropertyMapBuilder<K, V> put(K key, V value) {
 		map.put(key, value);
 		return this;
 	}
 
-	public Map<Key, Value> create() {
-		return (Map<Key,Value>)Collections.unmodifiableMap(map);
+	public Map<K, V> create() {
+		return Collections.unmodifiableMap(map);
 	}
 
 }

@@ -24,10 +24,10 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.spring.service.SimpleServiceImpl;
 import com.robo4j.spring.unit.SimpleRoboSpringUnit;
+import com.robo4j.util.PropertyMapBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,10 +62,10 @@ public class RoboSpringTests {
 	private RoboContext getRoboSpringSystem() throws Exception {
 		/* system which is testing main system */
 
-		Map<String, Object> springComponents = new HashMap<>();
-		springComponents.put(SimpleRoboSpringUnit.COMPONENT_SIMPLE_SERVICE, new SimpleServiceImpl());
+		final Map<String, Object> springComponents = new PropertyMapBuilder<String, Object>()
+				.put(SimpleRoboSpringUnit.COMPONENT_SIMPLE_SERVICE, new SimpleServiceImpl()).create();
 
-		RoboBuilder result = new RoboBuilder();
+		final RoboBuilder result = new RoboBuilder();
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
 		config.setValue(RoboSpringRegisterUnit.PROPERTY_COMPONENTS, springComponents);
