@@ -36,6 +36,7 @@ public class SimpleRoboSpringUnit extends AbstractSpringUnit<String> {
 
     public static final String COMPONENT_SIMPLE_SERVICE = "simpleService";
     public static final String PROP_GET_RECEIVED_MESSAGES = "receivedMessages";
+    @SuppressWarnings("rawtypes")
     public static final DefaultAttributeDescriptor<List> DESCRIPTOR_RECEIVED_MESSAGES = DefaultAttributeDescriptor
             .create(List.class, PROP_GET_RECEIVED_MESSAGES);
 

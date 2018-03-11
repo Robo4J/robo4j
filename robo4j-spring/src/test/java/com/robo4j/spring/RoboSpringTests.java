@@ -30,6 +30,7 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -50,12 +51,13 @@ public class RoboSpringTests {
 		RoboReference<String> springUnit = system.getReference(ROBO_SPRING_UNIT);
 		springUnit.sendMessage(MAGIC_MESSAGE);
 
+        TimeUnit.MILLISECONDS.sleep(10);
 		List<String> receivedMessages = (List<String>) springUnit
 				.getAttribute(SimpleRoboSpringUnit.DESCRIPTOR_RECEIVED_MESSAGES).get();
 
 		system.shutdown();
 
-		Assert.assertTrue(receivedMessages.contains("SPRING:".concat(MAGIC_MESSAGE)));
+		Assert.assertTrue("message: " + receivedMessages, receivedMessages.contains("SPRING:".concat(MAGIC_MESSAGE)));
 
 	}
 
