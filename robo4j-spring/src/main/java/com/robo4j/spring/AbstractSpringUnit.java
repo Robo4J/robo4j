@@ -24,6 +24,8 @@ import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 
+import java.util.Objects;
+
 /**
  * @param <T>
  *            robo unit type
@@ -45,7 +47,8 @@ public class AbstractSpringUnit<T> extends RoboUnit<T> {
 
 	@Override
 	public void start() {
-		// TODO: 3/11/18 (miro) this should go to initiation phase: it means order of initiation
+		// TODO: 3/11/18 (miro) this should go to initiation phase: it means order of
+		// initiation
 		registerUnit = getContext().getReference(RoboSpringRegisterUnit.NAME);
 	}
 
@@ -64,6 +67,7 @@ public class AbstractSpringUnit<T> extends RoboUnit<T> {
 		final DefaultAttributeDescriptor<String> descriptor = DefaultAttributeDescriptor.create(String.class, name);
 		try {
 			Object obj = registerUnit.getAttribute(descriptor).get();
+			Objects.requireNonNull(obj, "spring component not available");
 			return clazz.cast(obj);
 		} catch (Exception e) {
 			throw new RoboSpringException("problem", e);

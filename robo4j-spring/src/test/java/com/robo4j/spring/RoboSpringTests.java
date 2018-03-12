@@ -18,6 +18,7 @@
 package com.robo4j.spring;
 
 import com.robo4j.RoboBuilder;
+import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
@@ -43,15 +44,15 @@ public class RoboSpringTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void simpleRoboSystemWithSimpleService() throws Exception {
+	public void withServiceTest() throws Exception {
 
-		RoboContext system = getRoboSpringSystem();
+		RoboContext system = getRoboWithServiceSystem(TestMode.WITH_SERVICE);
 		system.start();
 
 		RoboReference<String> springUnit = system.getReference(ROBO_SPRING_UNIT);
 		springUnit.sendMessage(MAGIC_MESSAGE);
 
-        TimeUnit.MILLISECONDS.sleep(10);
+		TimeUnit.MILLISECONDS.sleep(10);
 		List<String> receivedMessages = (List<String>) springUnit
 				.getAttribute(SimpleRoboSpringUnit.DESCRIPTOR_RECEIVED_MESSAGES).get();
 
@@ -61,21 +62,40 @@ public class RoboSpringTests {
 
 	}
 
-	private RoboContext getRoboSpringSystem() throws Exception {
+	@Test(expected = RoboBuilderException.class)
+	public void withoutServiceTest() throws Exception {
+		RoboContext system = getRoboWithServiceSystem(TestMode.WITHOUT_SERVICE);
+		system.start();
+
+	}
+
+	private enum TestMode {
+		WITH_SERVICE, WITHOUT_SERVICE
+	}
+
+	private RoboContext getRoboWithServiceSystem(TestMode testMode) throws Exception {
 		/* system which is testing main system */
 
-		final Map<String, Object> springComponents = new PropertyMapBuilder<String, Object>()
-				.put(SimpleRoboSpringUnit.COMPONENT_SIMPLE_SERVICE, new SimpleServiceImpl()).create();
-
 		final RoboBuilder result = new RoboBuilder();
+		Configuration configRegister = ConfigurationFactory.createEmptyConfiguration();
+		Configuration configSpringUnit = ConfigurationFactory.createEmptyConfiguration();
+		switch (testMode) {
+		case WITH_SERVICE:
+			final Map<String, Object> springComponents = new PropertyMapBuilder<String, Object>()
+					.put(SimpleRoboSpringUnit.COMPONENT_SIMPLE_SERVICE, new SimpleServiceImpl()).create();
 
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setValue(RoboSpringRegisterUnit.PROPERTY_COMPONENTS, springComponents);
-		result.add(RoboSpringRegisterUnit.class, config, RoboSpringRegisterUnit.NAME);
+			configRegister.setValue(RoboSpringRegisterUnit.PROPERTY_COMPONENTS, springComponents);
+			configSpringUnit.setString(SimpleRoboSpringUnit.COMPONENT_SIMPLE_SERVICE,
+					SimpleRoboSpringUnit.COMPONENT_SIMPLE_SERVICE);
 
-		config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString(SimpleRoboSpringUnit.COMPONENT_SIMPLE_SERVICE, SimpleRoboSpringUnit.COMPONENT_SIMPLE_SERVICE);
-		result.add(SimpleRoboSpringUnit.class, config, ROBO_SPRING_UNIT);
+			break;
+		case WITHOUT_SERVICE:
+			break;
+		}
+
+		result.add(RoboSpringRegisterUnit.class, configRegister, RoboSpringRegisterUnit.NAME);
+		result.add(SimpleRoboSpringUnit.class, configSpringUnit, ROBO_SPRING_UNIT);
+
 		return result.build();
 	}
 }
