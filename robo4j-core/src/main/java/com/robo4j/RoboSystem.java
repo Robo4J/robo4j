@@ -16,19 +16,6 @@
  */
 package com.robo4j;
 
-import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
-import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.net.ContextEmitter;
-import com.robo4j.net.MessageCallback;
-import com.robo4j.net.MessageServer;
-import com.robo4j.net.ReferenceDesciptor;
-import com.robo4j.net.RoboContextDescriptor;
-import com.robo4j.scheduler.DefaultScheduler;
-import com.robo4j.scheduler.RoboThreadFactory;
-import com.robo4j.scheduler.Scheduler;
-import com.robo4j.util.SystemUtil;
-
 import java.io.IOException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
@@ -42,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledFuture;
@@ -50,6 +36,19 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+
+import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.net.ContextEmitter;
+import com.robo4j.net.MessageCallback;
+import com.robo4j.net.MessageServer;
+import com.robo4j.net.ReferenceDesciptor;
+import com.robo4j.net.RoboContextDescriptor;
+import com.robo4j.scheduler.DefaultScheduler;
+import com.robo4j.scheduler.RoboThreadFactory;
+import com.robo4j.scheduler.Scheduler;
+import com.robo4j.util.SystemUtil;
 
 /**
  * This is the default implementation for a local {@link RoboContext}. Contains
@@ -77,7 +76,7 @@ final class RoboSystem implements RoboContext {
 	private static final String KEY_CONFIGURATION_EMITTER_METADATA = "com.robo4j.discovery.metadata";
 
 	private final AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
-	private final Map<String, RoboUnit<?>> units = new ConcurrentHashMap<>();
+	private final Map<String, RoboUnit<?>> units = new HashMap<>();
 	private final Map<RoboUnit<?>, RoboReference<?>> referenceCache = new WeakHashMap<>();
 
 	private final Scheduler systemScheduler;
@@ -332,7 +331,8 @@ final class RoboSystem implements RoboContext {
 		});
 		final ContextEmitter emitter = initEmitter(emitterConfiguration, getListeningURI(messageServer));
 		if (emitter != null) {
-			emitterFuture = getScheduler().scheduleAtFixedRate(() -> emitter.emit(), 0, emitter.getHeartBeatInterval(), TimeUnit.MILLISECONDS);
+			emitterFuture = getScheduler().scheduleAtFixedRate(() -> emitter.emit(), 0, emitter.getHeartBeatInterval(),
+					TimeUnit.MILLISECONDS);
 		}
 	}
 
