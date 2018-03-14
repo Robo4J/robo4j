@@ -17,12 +17,10 @@
 
 package com.robo4j.spring;
 
-import com.robo4j.ConfigurationException;
 import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
-import com.robo4j.configuration.Configuration;
 
 import java.util.Objects;
 
@@ -40,16 +38,14 @@ public class AbstractSpringUnit<T> extends RoboUnit<T> {
 		super(messageType, context, id);
 	}
 
-	@Override
-	public void initialize(Configuration configuration) throws ConfigurationException {
-		super.initialize(configuration);
-	}
-
+	/**
+	 *
+	 */
 	@Override
 	public void start() {
-		// TODO: 3/11/18 (miro) this should go to initiation phase: it means order of
-		// initiation
-		registerUnit = getContext().getReference(RoboSpringRegisterUnit.NAME);
+		RoboReference<?> reference = getContext().getReference(RoboSpringRegisterUnit.NAME);
+		Objects.requireNonNull(reference, "register not available");
+		registerUnit = reference;
 	}
 
 	/**
@@ -64,7 +60,7 @@ public class AbstractSpringUnit<T> extends RoboUnit<T> {
 	 * @return
 	 */
 	protected <C> C getComponent(String name, Class<C> clazz) {
-		final DefaultAttributeDescriptor<String> descriptor = DefaultAttributeDescriptor.create(String.class, name);
+		final DefaultAttributeDescriptor<Object> descriptor = DefaultAttributeDescriptor.create(Object.class, name);
 		try {
 			Object obj = registerUnit.getAttribute(descriptor).get();
 			Objects.requireNonNull(obj, "spring component not available");

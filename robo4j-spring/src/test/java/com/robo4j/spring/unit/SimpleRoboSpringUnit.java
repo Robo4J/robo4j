@@ -34,6 +34,7 @@ import java.util.List;
  */
 public class SimpleRoboSpringUnit extends AbstractSpringUnit<String> {
 
+    public static final String NAME = "roboSpringUnit";
     public static final String COMPONENT_SIMPLE_SERVICE = "simpleService";
     public static final String PROP_GET_RECEIVED_MESSAGES = "receivedMessages";
     @SuppressWarnings("rawtypes")

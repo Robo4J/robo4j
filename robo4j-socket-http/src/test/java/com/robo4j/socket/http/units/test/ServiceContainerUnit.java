@@ -17,11 +17,11 @@
 
 package com.robo4j.socket.http.units.test;
 
-import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
-import com.robo4j.RoboUnit;
-import com.robo4j.configuration.Configuration;
+import com.robo4j.socket.http.units.ExtendedRoboUnit;
 import com.robo4j.socket.http.units.test.service.NumberService;
+
+import java.util.Objects;
 
 /**
  * Unit holds references to another service
@@ -29,24 +29,27 @@ import com.robo4j.socket.http.units.test.service.NumberService;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class ServiceContainerUnit extends RoboUnit<Object> {
+public class ServiceContainerUnit extends ExtendedRoboUnit<Object, NumberService> {
 
     public static final String NAME = "containerUnit";
     public static final String NUMBER_SERVICE = "numberService";
-    private NumberService numberService;
 
     public ServiceContainerUnit(RoboContext context, String id) {
 		super(Object.class, context, id);
 	}
 
     @Override
-    protected void onInitialization(Configuration configuration) throws ConfigurationException {
-        numberService = (NumberService )configuration.getValue(NUMBER_SERVICE, null);
+    public void start() {
+        super.start();
+        Objects.requireNonNull(getService(), "service is not available");
+
     }
 
     @Override
     public void onMessage(Object message) {
         System.out.println(getClass().getSimpleName() + ":message:" + message);
-        System.out.println(getClass().getSimpleName() + ":number:" + numberService.getNumber());
+        System.out.println(getClass().getSimpleName() + ":number:" + getService().getNumber());
     }
+
+
 }

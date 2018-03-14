@@ -18,12 +18,9 @@
 package com.robo4j.spring;
 
 import com.robo4j.AttributeDescriptor;
-import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
-import com.robo4j.configuration.Configuration;
 
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -32,10 +29,8 @@ import java.util.Map;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RoboSpringRegisterUnit extends RoboUnit<Object> {
+public final class RoboSpringRegisterUnit extends RoboUnit<Object> {
 	public static final String NAME = "springRegisterUnit";
-
-	public static final String PROPERTY_COMPONENTS = "components";
 
 	private final RoboSpringRegister register = new RoboSpringRegisterCacheImpl();
 
@@ -43,21 +38,17 @@ public class RoboSpringRegisterUnit extends RoboUnit<Object> {
 		super(Object.class, context, id);
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		final Map<String, Object> beansMap = (Map<String, Object>) configuration.getValue(PROPERTY_COMPONENTS,
-				Collections.emptyMap());
-		if (beansMap.isEmpty()) {
-			throw new IllegalArgumentException("no beans");
+	public void registerComponents(Map<String, Object> registerMap) {
+		if (registerMap == null || registerMap.isEmpty()) {
+			throw new IllegalArgumentException("no spring components available");
 		}
-		beansMap.forEach(register::register);
+		registerMap.forEach(register::register);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeType() == String.class) {
+		if (attribute.getAttributeType() == Object.class) {
 			return register.containsComponent(attribute.getAttributeName())
 					? (R) register.getComponent(attribute.getAttributeName())
 					: null;

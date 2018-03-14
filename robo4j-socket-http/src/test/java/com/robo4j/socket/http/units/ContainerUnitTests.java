@@ -17,17 +17,14 @@
 
 package com.robo4j.socket.http.units;
 
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
+import com.robo4j.socket.http.units.test.ServiceContainerUnit;
 import com.robo4j.socket.http.units.test.service.NumberService;
 import com.robo4j.socket.http.units.test.service.NumberServiceImpl;
 import com.robo4j.util.SystemUtil;
 import org.junit.Test;
-
-import com.robo4j.RoboBuilder;
-import com.robo4j.RoboContext;
-import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
-import com.robo4j.socket.http.units.test.ServiceContainerUnit;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -35,16 +32,18 @@ import com.robo4j.socket.http.units.test.ServiceContainerUnit;
  */
 public class ContainerUnitTests {
 
-	public static final String CONTAINER_UNIT = "containerUnit";
 
 	@Test
 	public void containerUnitTest() throws Exception {
 
         NumberService numberService = new NumberServiceImpl();
 
-		Configuration configuration = ConfigurationFactory.createEmptyConfiguration();
-		configuration.setValue(ServiceContainerUnit.NUMBER_SERVICE, numberService);
-		RoboContext system = new RoboBuilder().add(ServiceContainerUnit.class, configuration, CONTAINER_UNIT).build();
+        ServiceContainerUnit unit = new ServiceContainerUnit(null, ServiceContainerUnit.NAME);
+        unit.setService(numberService);
+
+		RoboContext system = new RoboBuilder()
+                .add(unit)
+                .build();
 
 
 		system.start();

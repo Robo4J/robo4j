@@ -17,12 +17,14 @@
 
 package com.robo4j.spring;
 
+import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.spring.service.SimpleService;
 import com.robo4j.spring.service.SimpleServiceImpl;
 import com.robo4j.spring.unit.SimpleRoboSpringUnit;
 import com.robo4j.util.PropertyMapBuilder;
@@ -69,6 +71,23 @@ public class RoboSpringTests {
 
 	}
 
+	@Test
+	public void getRegisteredComponentTest() throws Exception {
+
+		DefaultAttributeDescriptor<Object> REGISTERED_SPRING_COMPONENT = DefaultAttributeDescriptor
+				.create(Object.class, SimpleRoboSpringUnit.COMPONENT_SIMPLE_SERVICE);
+		RoboContext system = getRoboWithServiceSystem(TestMode.WITH_SERVICE);
+		system.start();
+
+		RoboReference<Object> registerReference = system.getReference(RoboSpringRegisterUnit.NAME);
+
+		Object simpleServiceReference = registerReference.getAttribute(REGISTERED_SPRING_COMPONENT).get();
+		SimpleService simpleService  = SimpleService.class.cast(simpleServiceReference);
+
+		System.out.println("component: " + simpleService.getRandom());
+		Assert.assertNotNull(simpleService.getRandom());
+	}
+
 	private enum TestMode {
 		WITH_SERVICE, WITHOUT_SERVICE
 	}
@@ -77,14 +96,19 @@ public class RoboSpringTests {
 		/* system which is testing main system */
 
 		final RoboBuilder result = new RoboBuilder();
-		Configuration configRegister = ConfigurationFactory.createEmptyConfiguration();
 		Configuration configSpringUnit = ConfigurationFactory.createEmptyConfiguration();
+
 		switch (testMode) {
 		case WITH_SERVICE:
+
+			//register all spring beans use by unit under the appropriate unique names
 			final Map<String, Object> springComponents = new PropertyMapBuilder<String, Object>()
 					.put(SimpleRoboSpringUnit.COMPONENT_SIMPLE_SERVICE, new SimpleServiceImpl()).create();
 
-			configRegister.setValue(RoboSpringRegisterUnit.PROPERTY_COMPONENTS, springComponents);
+			RoboSpringRegisterUnit registerUnit = new RoboSpringRegisterUnit(null, RoboSpringRegisterUnit.NAME);
+			registerUnit.registerComponents(springComponents);
+			result.add(registerUnit);
+
 			configSpringUnit.setString(SimpleRoboSpringUnit.COMPONENT_SIMPLE_SERVICE,
 					SimpleRoboSpringUnit.COMPONENT_SIMPLE_SERVICE);
 
@@ -93,8 +117,7 @@ public class RoboSpringTests {
 			break;
 		}
 
-		result.add(RoboSpringRegisterUnit.class, configRegister, RoboSpringRegisterUnit.NAME);
-		result.add(SimpleRoboSpringUnit.class, configSpringUnit, ROBO_SPRING_UNIT);
+		result.add(SimpleRoboSpringUnit.class, configSpringUnit, SimpleRoboSpringUnit.NAME);
 
 		return result.build();
 	}
