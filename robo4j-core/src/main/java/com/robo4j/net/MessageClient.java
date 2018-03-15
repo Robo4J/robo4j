@@ -113,4 +113,8 @@ public class MessageClient {
 		}
 		objectOutputStream.flush();
 	}
+	
+	public boolean isConnected() {
+		return socket != null && socket.isConnected();
+	}
 }

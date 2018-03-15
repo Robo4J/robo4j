@@ -289,5 +289,4 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	public String toString() {
 		return String.format("%s [id=%s]", getClass().getName(), getId());
 	}
-
 }
