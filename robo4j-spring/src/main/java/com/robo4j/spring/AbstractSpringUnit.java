@@ -34,6 +34,7 @@ import java.util.Objects;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
+// TODO: 3/15/18 (miro) -> changed it to  proper spring integration
 public class AbstractSpringUnit<T> extends RoboUnit<T> {
 
 	private RoboReference<?> registerUnit;
