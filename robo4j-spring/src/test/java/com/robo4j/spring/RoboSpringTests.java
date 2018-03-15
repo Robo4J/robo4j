@@ -105,7 +105,7 @@ public class RoboSpringTests {
 			final Map<String, Object> springComponents = new PropertyMapBuilder<String, Object>()
 					.put(SimpleRoboSpringUnit.COMPONENT_SIMPLE_SERVICE, new SimpleServiceImpl()).create();
 
-			RoboSpringRegisterUnit registerUnit = new RoboSpringRegisterUnit(null, RoboSpringRegisterUnit.NAME);
+			RoboSpringRegisterUnit registerUnit = new RoboSpringRegisterUnit(result.getContext(), RoboSpringRegisterUnit.NAME);
 			registerUnit.registerComponents(springComponents);
 			result.add(registerUnit);
 
