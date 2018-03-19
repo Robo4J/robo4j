@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RoboDatagramClientTest {
     private static final int MAX_NUMBER = 42;
+    private static final int DEFAULT_TIMEOUT = 5;
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
@@ -57,11 +58,11 @@ public class RoboDatagramClientTest {
 
         RoboReference<String> stringConsumerProducer = consumerSystem.getReference(StringConsumer.NAME);
         CountDownLatch countDownLatchStringProducer = stringConsumerProducer
-                .getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get(1, TimeUnit.MINUTES);
+                .getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get(DEFAULT_TIMEOUT, TimeUnit.MINUTES);
 
         countDownLatchStringProducer.await(1, TimeUnit.MINUTES);
         final int consumerTotalNumber = stringConsumerProducer
-                .getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get(1, TimeUnit.MINUTES);
+                .getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get(DEFAULT_TIMEOUT, TimeUnit.MINUTES);
 
         producerSystem.shutdown();
         consumerSystem.shutdown();
