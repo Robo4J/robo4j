@@ -365,7 +365,6 @@ project("robo4j-socket-http") {
         compile(project(":robo4j-core"))
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
-        testCompile "org.mockito:mockito-all:${mockitoVerison}@jar"
     }
 
     sourceSets {
@@ -592,7 +591,6 @@ project("robo4j-spring") {
         compile(project(":robo4j-core"))
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
-        testCompile "org.mockito:mockito-all:${mockitoVerison}@jar"
     }
 
     sourceSets {
