@@ -60,7 +60,7 @@ public class RoboDatagramPingPongTest {
 			udpClient.sendMessage(request);
 		}
 
-		countDownLatch.await(1, TimeUnit.MINUTES);
+		countDownLatch.await(5, TimeUnit.MINUTES);
 		final int pongConsumerTotalNumber = pongStringConsumerReference
 				.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
 		pingSystem.shutdown();

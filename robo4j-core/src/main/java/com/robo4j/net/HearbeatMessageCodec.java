@@ -150,11 +150,7 @@ class HearbeatMessageCodec {
 	}
 
 	private static int calculateMetadataByteLength(Map<String, String> metadata) {
-		int totalLength = 0;
-		for (Entry<String, String> entry : metadata.entrySet()) {
-			totalLength += 1 + Math.min(entry.getKey().getBytes().length, MAX_U1) + 2
-					+ Math.min(entry.getValue().getBytes().length, MAX_U2);
-		}
-		return totalLength;
+		return metadata.entrySet().stream().map(entry -> 1 + Math.min(entry.getKey().getBytes().length, MAX_U1) + 2
+				+ Math.min(entry.getValue().getBytes().length, MAX_U2)).reduce(0, Integer::sum);
 	}
 }
