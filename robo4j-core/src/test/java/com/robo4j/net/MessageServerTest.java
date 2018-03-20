@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2014, 2018, Marcus Hirt, Miroslav Wengner
  *
@@ -18,12 +17,6 @@
 
 package com.robo4j.net;
 
-/**
- *
- * @author Marcus Hirt (@hirt)
- * @author Miroslav Wengner (@miragemiko)
- */
-
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
@@ -39,7 +32,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
 public class MessageServerTest {
+	public static final String CONST_MYUUID = "myuuid";
+	public static final String PROPERTY_SERVER_NAME = "ServerName";
 	private volatile Exception exception = null;
 
 	@Test
@@ -48,21 +48,22 @@ public class MessageServerTest {
 		final CountDownLatch messageLatch = new CountDownLatch(3);
 
 		Configuration serverConfig = ConfigurationFactory.createEmptyConfiguration();
-		serverConfig.setString("ServerName", "Server Name");
+		serverConfig.setString(PROPERTY_SERVER_NAME, "Server Name");
 		serverConfig.setString(MessageServer.KEY_HOST_NAME, "localhost");
-		MessageServer server = new MessageServer( (uuid, id, message) -> {
-				System.out.println("Got uuid: " + uuid + " id:" + id + " message:" + message);
-				messages.add(String.valueOf(message));
-				messageLatch.countDown();
-			}, serverConfig);
+		MessageServer server = new MessageServer((uuid, id, message) -> {
+			System.out.println("Got uuid: " + uuid + " id:" + id + " message:" + message);
+			messages.add(String.valueOf(message));
+			messageLatch.countDown();
+		}, serverConfig);
 
 		Thread t = new Thread(() -> {
-				try {
-					server.start();
-				} catch (IOException e) {
-					exception = e;
-					Assert.fail(e.getMessage());
-				}}, "Server Listener");
+			try {
+				server.start();
+			} catch (IOException e) {
+				exception = e;
+				Assert.fail(e.getMessage());
+			}
+		}, "Server Listener");
 		t.setDaemon(true);
 		t.start();
 		for (int i = 0; i < 10; i++) {
@@ -74,25 +75,25 @@ public class MessageServerTest {
 		}
 
 		Configuration clientConfig = ConfigurationFactory.createEmptyConfiguration();
-		MessageClient client = new MessageClient(server.getListeningURI(), "myuuid", clientConfig);
+		MessageClient client = new MessageClient(server.getListeningURI(), CONST_MYUUID, clientConfig);
 		if (exception != null) {
 			throw exception;
 		}
 
-		List<String> testMessage = getOrderedTestMessage("My First Little Message!",
-				"My Second Little Message!", "My Third Little Message!");
+		List<String> testMessage = getOrderedTestMessage("My First Little Message!", "My Second Little Message!",
+				"My Third Little Message!");
 		client.connect();
-		for(String message: testMessage){
+		for (String message : testMessage) {
 			client.sendMessage("test", message);
 		}
-		
+
 		messageLatch.await(2, TimeUnit.SECONDS);
 		Assert.assertEquals(testMessage.size(), messages.size());
 		Assert.assertArrayEquals(testMessage.toArray(), messages.toArray());
 	}
 
-	private List<String> getOrderedTestMessage(String... messages){
-		if(messages == null || messages.length == 0){
+	private List<String> getOrderedTestMessage(String... messages) {
+		if (messages == null || messages.length == 0) {
 			Assert.fail("Expected message");
 		}
 		return Stream.of(messages).collect(Collectors.toCollection(LinkedList::new));
@@ -100,25 +101,28 @@ public class MessageServerTest {
 
 	@Test
 	public void testMessageTypes() throws Exception {
-		final List<Object> messages = new ArrayList<>();
-		final CountDownLatch messageLatch = new CountDownLatch(8);
+		final String messageText = "Lalala";
+		final int messagesNumber = 8;
+		final List<Object> messages = new ArrayList<>(messagesNumber);
+		final CountDownLatch messageLatch = new CountDownLatch(messagesNumber);
 
 		Configuration serverConfig = ConfigurationFactory.createEmptyConfiguration();
-		serverConfig.setString("ServerName", "Server Name");
+		serverConfig.setString(PROPERTY_SERVER_NAME, "Server Name");
 		serverConfig.setString(MessageServer.KEY_HOST_NAME, "localhost");
-		MessageServer server = new MessageServer( (uuid, id, message) -> {
-				System.out.println("Got uuid: " + uuid + " got id:" + id + " message:" + message);
-				messages.add(message);
-				messageLatch.countDown();
-			}, serverConfig);
+		MessageServer server = new MessageServer((uuid, id, message) -> {
+			System.out.println("Got uuid: " + uuid + " got id:" + id + " message:" + message);
+			messages.add(message);
+			messageLatch.countDown();
+		}, serverConfig);
 
-		Thread t = new Thread(() ->  {
-				try {
-					server.start();
-				} catch (IOException e) {
-					exception = e;
-					Assert.fail(e.getMessage());
-				}}, "Server Listener");
+		Thread t = new Thread(() -> {
+			try {
+				server.start();
+			} catch (IOException e) {
+				exception = e;
+				Assert.fail(e.getMessage());
+			}
+		}, "Server Listener");
 		t.setDaemon(true);
 		t.start();
 		for (int i = 0; i < 10; i++) {
@@ -130,7 +134,7 @@ public class MessageServerTest {
 		}
 
 		Configuration clientConfig = ConfigurationFactory.createEmptyConfiguration();
-		MessageClient client = new MessageClient(server.getListeningURI(), "myuuid", clientConfig);
+		MessageClient client = new MessageClient(server.getListeningURI(), CONST_MYUUID, clientConfig);
 		if (exception != null) {
 			throw exception;
 		}
@@ -143,10 +147,10 @@ public class MessageServerTest {
 		client.sendMessage("test5", new Float(5.0f));
 		client.sendMessage("test6", new Long(6));
 		client.sendMessage("test7", new Double(7));
-		client.sendMessage("test8", new TestMessageType(8, "Lalala", null));
-		messageLatch.await(140000000, TimeUnit.SECONDS);
+		client.sendMessage("test8", new TestMessageType(8, messageText, null));
+		messageLatch.await(24, TimeUnit.HOURS);
 
-		Assert.assertEquals(8, messages.size());
+		Assert.assertEquals(messagesNumber, messages.size());
 		if (messages.get(0) instanceof Byte) {
 			Assert.assertEquals(((Byte) messages.get(0)).byteValue(), 1);
 		} else {
@@ -185,14 +189,15 @@ public class MessageServerTest {
 		if (messages.get(7) instanceof TestMessageType) {
 			TestMessageType message = (TestMessageType) messages.get(7);
 			Assert.assertEquals(message.getNumber(), 8);
-			Assert.assertEquals(message.getText(), "Lalala");
+			Assert.assertEquals(message.getText(), messageText);
 		} else {
 			Assert.fail("Expected TestMessageType!");
 		}
 	}
 
 	public static RoboContext createTestContext() {
-		RoboTestContext testContext = new RoboTestContext("TestContext", ConfigurationFactory.createEmptyConfiguration());
+		RoboTestContext testContext = new RoboTestContext("TestContext",
+				ConfigurationFactory.createEmptyConfiguration());
 		Configuration configuration = ConfigurationFactory.createEmptyConfiguration();
 		configuration.setString("name", "Test");
 		configuration.setString("description", "Lalalala");
