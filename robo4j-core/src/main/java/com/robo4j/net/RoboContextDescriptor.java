@@ -24,7 +24,7 @@ import java.util.Map;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class RoboContextDescriptor {
+public class RoboContextDescriptor {
 	public static final String KEY_URI = "uri";
 	
 	private final String id;

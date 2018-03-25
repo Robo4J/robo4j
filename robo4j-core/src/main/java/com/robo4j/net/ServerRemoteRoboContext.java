@@ -41,17 +41,26 @@ public class ServerRemoteRoboContext implements RoboContext {
 	private final String uuid;
 	private final ObjectOutputStream outputStream;
 
-	
 	@SuppressWarnings("rawtypes")
 	private class ServerRemoteRoboReference implements RoboReference {
+		/**
+		 * Since references can come from any context discovered in the JVM or
+		 * in the lookup services, we need to always track the context id to
+		 * send off the message to.
+		 */
+		private final String ctxId;
 		private final String id;
 		private final Class<?> actualMessageClass;
-		
-		public ServerRemoteRoboReference(String id, String fqn) {
+
+		public ServerRemoteRoboReference(String ctxId, String id, String fqn) {
+			this.ctxId = ctxId;
 			this.id = id;
 			this.actualMessageClass = resolve(fqn);
 		}
 
+		public String getTargetContextId() {
+			return ctxId;
+		}
 
 		@Override
 		public String getId() {
@@ -89,7 +98,9 @@ public class ServerRemoteRoboContext implements RoboContext {
 		@Override
 		public void sendMessage(Object message) {
 			try {
-				// Will use the same serialization protocol as server later
+				// FIXME: Change the serialization to be the same as for the
+				// client to server
+				outputStream.writeUTF(getTargetContextId());
 				outputStream.writeUTF(getId());
 				outputStream.writeObject(message);
 			} catch (IOException e) {
@@ -102,7 +113,7 @@ public class ServerRemoteRoboContext implements RoboContext {
 			// TODO Auto-generated method stub
 			return null;
 		}
-	
+
 		private Class<?> resolve(String fqn) {
 			try {
 				return Class.forName(fqn);
@@ -112,9 +123,12 @@ public class ServerRemoteRoboContext implements RoboContext {
 			}
 			return null;
 		}
+
+		public String toString() {
+			return "[RemoteRef id: " + id + " server: " + uuid + " messageType: " + actualMessageClass.getName() + "]";
+		}
 	}
-	
-	
+
 	public ServerRemoteRoboContext(String uuid, OutputStream out) throws IOException {
 		this.uuid = uuid;
 		this.outputStream = new ObjectOutputStream(out);
@@ -173,8 +187,8 @@ public class ServerRemoteRoboContext implements RoboContext {
 		return null;
 	}
 
-	public RoboReference<?> getRoboReference(String id, String fqn) {
+	public RoboReference<?> getRoboReference(String ctxId, String id, String fqn) {
 		// FIXME: Cache these?
-		return new ServerRemoteRoboReference(id, fqn);		
+		return new ServerRemoteRoboReference(ctxId, id, fqn);
 	}
 }

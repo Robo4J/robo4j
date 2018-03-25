@@ -30,9 +30,9 @@ public class TestMessageType implements Serializable {
 	private static final long serialVersionUID = 2L;
 	private int number;
 	private String text;
-	private RoboReference<?> reference;
+	private RoboReference<String> reference;
 	
-	public TestMessageType(int number, String text, RoboReference<?> reference) {
+	public TestMessageType(int number, String text, RoboReference<String> reference) {
 		this.number = number;
 		this.text = text;
 		this.reference = reference;
@@ -54,16 +54,16 @@ public class TestMessageType implements Serializable {
 		this.text = text;
 	}
 	
-	public RoboReference<?> getReference() {
+	public RoboReference<String> getReference() {
 		return reference;
 	}
 	
-	public void setReference(RoboReference<?> reference) {
+	public void setReference(RoboReference<String> reference) {
 		this.reference = reference;
 	}
 	
 	public String toString() {
-		return "TestMessageType number=" + number + " text=" + text;
+		return "TestMessageType number=" + number + " text=" + text + " reference:" + String.valueOf(reference);
 	}
 	
 }

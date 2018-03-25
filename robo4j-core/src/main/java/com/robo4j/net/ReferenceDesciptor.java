@@ -30,13 +30,13 @@ import java.io.Serializable;
 public class ReferenceDesciptor implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private transient static final ThreadLocal<ServerRemoteRoboContext> activeContex = new ThreadLocal<>();
+	
+	private String ctxId;
 	private String id;
 	private String fqn;
-
-	public ReferenceDesciptor() {
-	}
 	
-	public ReferenceDesciptor(String id, String fqn) {
+	public ReferenceDesciptor(String ctxId, String id, String fqn) {
+		this.ctxId = ctxId;
 		this.id = id;
 		this.fqn = fqn;
 	}
@@ -47,7 +47,7 @@ public class ReferenceDesciptor implements Serializable {
     		SimpleLoggingUtil.error(getClass(), "No remote context set!");
     		return null;
     	}
-    	return remoteRoboContext.getRoboReference(id, fqn);
+    	return remoteRoboContext.getRoboReference(ctxId, id, fqn);
     }
     
     public static void setCurrentContext(ServerRemoteRoboContext context) {

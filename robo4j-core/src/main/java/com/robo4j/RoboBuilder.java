@@ -21,6 +21,7 @@ import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.configuration.ConfigurationFactoryException;
 import com.robo4j.configuration.XmlConfigurationFactory;
 import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.net.LookupServiceProvider;
 import com.robo4j.util.StringConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -376,6 +377,7 @@ public final class RoboBuilder {
 	 */
 	public RoboContext build() {
 		system.addUnits(units);
+		LookupServiceProvider.registerLocalContext(system);
 		system.setState(LifecycleState.INITIALIZED);
 		return system;
 	}

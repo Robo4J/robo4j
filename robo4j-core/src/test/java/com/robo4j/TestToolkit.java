@@ -18,6 +18,7 @@ package com.robo4j;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * 
@@ -25,10 +26,16 @@ import java.util.Map;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class TestToolkit {
+	private final static Random RND = new Random();
+	
 	public static Map<String, String> createSingleValueProps(String key, String value) {
 		Map<String, String> properties = new HashMap<>();
 		properties.put(key, value);
 		return properties;
+	}
+
+	public static Random getRND() {
+		return RND;
 	}
 }
 

@@ -18,6 +18,7 @@ package com.robo4j.net;
 
 import com.robo4j.RoboContext;
 import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.net.LocalLookupServiceImpl.LocalRoboContextDescriptor;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -52,6 +53,7 @@ class LookupServiceImpl implements LookupService {
 	private int port;
 	private Updater currentUpdater;
 	private Map<String, RoboContextDescriptorEntry> entries = new ConcurrentHashMap<>();
+	private final LocalLookupServiceImpl localContexts;
 
 	private class Updater implements Runnable {
 		private byte[] buffer = new byte[MAX_PACKET_SIZE];
@@ -125,14 +127,17 @@ class LookupServiceImpl implements LookupService {
 		}
 	}
 
-	public LookupServiceImpl(String address, int port, float missedHeartbeatsBeforeRemoval) throws SocketException, UnknownHostException {
+	public LookupServiceImpl(String address, int port, float missedHeartbeatsBeforeRemoval, LocalLookupServiceImpl localContexts)
+			throws SocketException, UnknownHostException {
 		this.address = address;
 		this.port = port;
+		this.localContexts = localContexts;
 	}
 
 	@Override
 	public synchronized Map<String, RoboContextDescriptor> getDiscoveredContexts() {
-		Map<String, RoboContextDescriptor> map = new HashMap<>(entries.size());
+		Map<String, RoboContextDescriptor> map = new HashMap<>(entries.size() + localContexts.getDiscoveredContexts().size());
+		map.putAll(localContexts.getDiscoveredContexts());
 		for (Entry<String, RoboContextDescriptorEntry> entry : entries.entrySet()) {
 			map.put(entry.getKey(), entry.getValue().descriptor);
 		}
@@ -145,7 +150,8 @@ class LookupServiceImpl implements LookupService {
 		if (entry != null) {
 			return new ClientRemoteRoboContext(entry);
 		} else {
-			return null;
+			LocalRoboContextDescriptor localEntry = localContexts.getLocalDescriptor(id);
+			return localEntry != null ? localEntry.getContext() : null;
 		}
 	}
 
@@ -171,6 +177,6 @@ class LookupServiceImpl implements LookupService {
 	@Override
 	public RoboContextDescriptor getDescriptor(String id) {
 		RoboContextDescriptorEntry entry = entries.get(id);
-		return entry != null ? entry.descriptor : null;
+		return entry != null ? entry.descriptor : localContexts.getDescriptor(id);
 	}
 }

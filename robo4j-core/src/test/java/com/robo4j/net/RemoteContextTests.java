@@ -45,13 +45,13 @@ public class RemoteContextTests {
 		RoboBuilder builder = new RoboBuilder(RemoteContextTests.class.getClassLoader().getResourceAsStream("testDiscoverableSystem.xml"));
 		RoboContext ctx = builder.build();
 		ctx.start();
-		LookupService service = new LookupServiceImpl(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS,
-				LookupServiceProvider.DEFAULT_PORT, ALLOWED_HEARTBEAT_MISSES);
+		LookupService service = new LookupServiceImpl(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS, LookupServiceProvider.DEFAULT_PORT,
+				ALLOWED_HEARTBEAT_MISSES, new LocalLookupServiceImpl());
 		service.start();
 		for (int i = 0; i < 10 && (service.getDescriptor("6") == null); i++) {
 			SystemUtil.sleep(200);
 		}
-		
+
 		Assert.assertTrue(service.getDiscoveredContexts().size() > 0);
 		RoboContextDescriptor descriptor = service.getDescriptor("6");
 		Assert.assertEquals(descriptor.getMetadata().get("name"), "Caprica");
@@ -61,44 +61,97 @@ public class RemoteContextTests {
 
 	@Test
 	public void testMessageToDiscoveredContext() throws RoboBuilderException, IOException, ConfigurationException {
-		RoboBuilder builder = new RoboBuilder(RemoteContextTests.class.getClassLoader().getResourceAsStream("testRemoteMessageReceiverSystem.xml"));
+		RoboBuilder builder = new RoboBuilder(
+				RemoteContextTests.class.getClassLoader().getResourceAsStream("testRemoteMessageReceiverSystem.xml"));
 		StringConsumer consumer = new StringConsumer(builder.getContext(), CONSUMER);
 		builder.add(consumer);
 		RoboContext receiverCtx = builder.build();
 		receiverCtx.start();
 
-		LookupService service = new LookupServiceImpl(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS,
-				LookupServiceProvider.DEFAULT_PORT, ALLOWED_HEARTBEAT_MISSES);
+		
+		// Note that all this cludging about with local lookup service implementations etc would normally not be needed.
+		// This is just to isolate this test from other tests.
+		LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();		
+		LookupService service = new LookupServiceImpl(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS, LookupServiceProvider.DEFAULT_PORT,
+				ALLOWED_HEARTBEAT_MISSES, localLookup);
 		LookupServiceProvider.setDefaultLookupService(service);
 		service.start();
-		
+
 		for (int i = 0; i < 10 && (service.getDescriptor("7") == null); i++) {
 			SystemUtil.sleep(200);
 		}
 		Assert.assertTrue(service.getDiscoveredContexts().size() > 0);
 		RoboContextDescriptor descriptor = service.getDescriptor("7");
 		Assert.assertNotNull(descriptor);
-		
+
 		builder = new RoboBuilder(RemoteContextTests.class.getClassLoader().getResourceAsStream("testMessageEmitterSystem.xml"));
 		RemoteStringProducer remoteStringProducer = new RemoteStringProducer(builder.getContext(), REMOTE_EMITTER);
-		remoteStringProducer.initialize(getEmitterConfiguration());
+		remoteStringProducer.initialize(getEmitterConfiguration("7"));
 		builder.add(remoteStringProducer);
 		RoboContext emitterContext = builder.build();
-		emitterContext.start();
+		localLookup.addContext(emitterContext);
 		
+		emitterContext.start();
+
 		remoteStringProducer.sendMessage("sendRandomMessage");
 		for (int i = 0; i < 10 && consumer.getReceivedMessages().size() == 0; i++) {
-			SystemUtil.sleep(200);			
+			SystemUtil.sleep(200);
 		}
-		
+
 		Assert.assertTrue(consumer.getReceivedMessages().size() > 0);
 		System.out.println("Got messages: " + consumer.getReceivedMessages());
+		emitterContext.shutdown();
+		receiverCtx.shutdown();
 	}
 
-	private Configuration getEmitterConfiguration() {
+	@Test
+	public void testMessageIncludingReferenceToDiscoveredContext() throws RoboBuilderException, IOException, ConfigurationException {
+		RoboBuilder builder = new RoboBuilder(
+				RemoteContextTests.class.getClassLoader().getResourceAsStream("testRemoteMessageReceiverAckSystem.xml"));
+		AckingStringConsumer consumer = new AckingStringConsumer(builder.getContext(), CONSUMER);
+		builder.add(consumer);
+		RoboContext receiverCtx = builder.build();
+		receiverCtx.start();
+
+		// Note that all this cludging about with local lookup service implementations etc would normally not be needed.
+		// This is just to isolate this test from other tests.
+		LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();		
+		LookupService service = new LookupServiceImpl(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS, LookupServiceProvider.DEFAULT_PORT,
+				ALLOWED_HEARTBEAT_MISSES, localLookup);
+		LookupServiceProvider.setDefaultLookupService(service);
+		service.start();
+
+		for (int i = 0; i < 10 && (service.getDescriptor("9") == null); i++) {
+			SystemUtil.sleep(200);
+		}
+		Assert.assertTrue(service.getDiscoveredContexts().size() > 0);
+		RoboContextDescriptor descriptor = service.getDescriptor("9");
+		Assert.assertNotNull(descriptor);
+
+		builder = new RoboBuilder(RemoteContextTests.class.getClassLoader().getResourceAsStream("testTestMessageEmitterSystem.xml"));
+		RemoteTestMessageProducer remoteTestMessageProducer = new RemoteTestMessageProducer(builder.getContext(), REMOTE_EMITTER);
+		remoteTestMessageProducer.initialize(getEmitterConfiguration("9"));
+		builder.add(remoteTestMessageProducer);
+		RoboContext emitterContext = builder.build();
+		localLookup.addContext(emitterContext);
+		
+		emitterContext.start();
+
+		remoteTestMessageProducer.sendMessage("sendMessage");
+		for (int i = 0; i < 10 && consumer.getReceivedMessages().size() == 0; i++) {
+			SystemUtil.sleep(200);
+		}
+
+		Assert.assertTrue(consumer.getReceivedMessages().size() > 0);
+		System.out.println("Got messages: " + consumer.getReceivedMessages());
+
+		Assert.assertTrue(remoteTestMessageProducer.getAckCount() > 0);
+	}
+
+	private Configuration getEmitterConfiguration(String targetContext) {
 		Configuration configuration = ConfigurationFactory.createEmptyConfiguration();
 		configuration.setString("target", CONSUMER);
-		configuration.setString("targetContext", "7");
+		configuration.setString("targetContext", targetContext);
 		return configuration;
 	}
 

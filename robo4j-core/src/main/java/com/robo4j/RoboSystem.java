@@ -161,6 +161,11 @@ final class RoboSystem implements RoboContext {
 			}
 		}
 
+		@Override
+		public String toString() {
+			return "LocalReference id: " + unit.getId() + " (system: " + uid + ")";
+		}
+		
 		private void deliverOnQueue(T message) {
 			switch (deliveryPolicy) {
 			case SYSTEM:
@@ -198,7 +203,7 @@ final class RoboSystem implements RoboContext {
 		}
 
 		Object writeReplace() throws ObjectStreamException {
-			return new ReferenceDesciptor(getId(), getMessageType().getName());
+			return new ReferenceDesciptor(RoboSystem.this.getId(), getId(), getMessageType().getName());
 		}
 	}
 
@@ -442,6 +447,11 @@ final class RoboSystem implements RoboContext {
 			referenceCache.put(roboUnit, reference);
 		}
 		return reference;
+	}
+	
+	@Override
+	public String toString() {
+		return "RoboSystem id: " + uid + " unit count: " + units.size();
 	}
 
 	private <T> RoboReference<T> createReference(RoboUnit<T> roboUnit) {
