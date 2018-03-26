@@ -226,7 +226,6 @@ project("robo4j-hw-rpi") {
         compile fileTree(dir: 'libs', include: 'pi4j-core-1.2-20170907.193313-36.jar')
         compile(project(":robo4j-math"))
         testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 
     sourceSets {
@@ -271,7 +270,6 @@ project("robo4j-math") {
 
     dependencies {
         testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 
     sourceSets {

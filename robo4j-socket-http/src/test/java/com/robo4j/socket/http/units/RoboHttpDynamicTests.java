@@ -55,6 +55,8 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONF
  */
 public class RoboHttpDynamicTests {
 
+	private static final int TIMEOUT = 10;
+	private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
 	private static final String ID_HTTP_SERVER = "http";
 	private static final int PORT = 8025;
 	private static final String ID_CLIENT_UNIT = "httpClient";
@@ -92,12 +94,12 @@ public class RoboHttpDynamicTests {
 		decoratedProducer.sendMessage(MESSAGES_NUMBER);
 		CountDownLatch countDownLatchDecoratedProducer = decoratedProducer
 				.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
-		countDownLatchDecoratedProducer.await(1, TimeUnit.MINUTES);
+		countDownLatchDecoratedProducer.await(TIMEOUT, TIME_UNIT);
 
 		final RoboReference<String> stringConsumer = mainSystem.getReference(StringConsumer.NAME);
 		final CountDownLatch countDownLatch = stringConsumer.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH)
 				.get();
-		countDownLatch.await(1, TimeUnit.MINUTES);
+		countDownLatch.await(TIMEOUT, TIME_UNIT);
 		final int receivedMessages = stringConsumer.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
 
 		clientSystem.shutdown();

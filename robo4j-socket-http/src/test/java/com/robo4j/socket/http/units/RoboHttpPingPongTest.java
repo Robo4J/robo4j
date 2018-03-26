@@ -55,6 +55,8 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONF
 public class RoboHttpPingPongTest {
 
 	public static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
+	private static final int TIMEOUT = 10;
+	private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
 	private static final String ID_HTTP_CLIENT = "http_client";
 	private static final String ID_HTTP_SERVER = "http_server";
 	private static final String CONTROLLER_PING_PONG = "controller";
@@ -97,7 +99,7 @@ public class RoboHttpPingPongTest {
 		RoboReference<String> pongConsumer = systemPong.getReference(REQUEST_CONSUMER);
 		CountDownLatch attributeFuture = pongConsumer.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
 
-		attributeFuture.await(1, TimeUnit.MINUTES);
+		attributeFuture.await(TIMEOUT, TIME_UNIT);
 		System.out.println("systemPing : Going Down!");
 		systemPing.stop();
 		systemPing.shutdown();

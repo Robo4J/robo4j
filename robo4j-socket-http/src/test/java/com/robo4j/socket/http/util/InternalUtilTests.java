@@ -27,7 +27,6 @@ import java.util.Arrays;
  */
 public class InternalUtilTests {
 
-
     @Test
     public void testSeparator(){
         String separator = SystemPropertyUtils.get("line.separator", "\n\n");

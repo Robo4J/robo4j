@@ -28,6 +28,8 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONF
  */
 public class RoboDatagramPingPongTest {
 
+	private static final int TIMEOUT = 10;
+	private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
 	private static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
 	private static final String UDP_CLIENT = "udp_client";
 	private static final String UDP_SERVER = "udp_server";
@@ -60,7 +62,7 @@ public class RoboDatagramPingPongTest {
 			udpClient.sendMessage(request);
 		}
 
-		countDownLatch.await(5, TimeUnit.MINUTES);
+		countDownLatch.await(TIMEOUT, TIME_UNIT);
 		final int pongConsumerTotalNumber = pongStringConsumerReference
 				.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
 		pingSystem.shutdown();
