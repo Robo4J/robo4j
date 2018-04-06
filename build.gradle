@@ -158,7 +158,6 @@ project("robo4j-hw-lego") {
         compile fileTree(dir: 'libs', include: 'ev3classes-9.1.jar')
         compile(project(":robo4j-math"))
         testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 
     sourceSets {
