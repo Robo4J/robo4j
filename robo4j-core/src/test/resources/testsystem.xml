@@ -17,5 +17,8 @@
 
 	<roboUnit id="consumer">
 		<class>com.robo4j.StringConsumer</class>
+		<config name="com.robo4j.root">
+			<value name="totalNumberMessages" type="int">10</value>
+		</config>
 	</roboUnit>
 </robo4j>

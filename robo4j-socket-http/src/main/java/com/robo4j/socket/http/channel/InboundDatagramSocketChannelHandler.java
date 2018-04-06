@@ -19,62 +19,58 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_TIMEOUT;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class InboundDatagramSocketChannelHandler implements ChannelHandler{
+public class InboundDatagramSocketChannelHandler implements ChannelHandler {
 
-    private final Map<SelectionKey, DatagramResponseProcess> outBuffers = new ConcurrentHashMap<>();
-    private final RoboContext context;
-    private final ServerContext serverContext;
-    private boolean active;
+	private final Map<SelectionKey, DatagramResponseProcess> outBuffers = new ConcurrentHashMap<>();
+	private final RoboContext context;
+	private final ServerContext serverContext;
+	private boolean active;
 
-    public InboundDatagramSocketChannelHandler(RoboContext context, ServerContext serverContext) {
-        this.context = context;
-        this.serverContext = serverContext;
-    }
+	public InboundDatagramSocketChannelHandler(RoboContext context, ServerContext serverContext) {
+		this.context = context;
+		this.serverContext = serverContext;
+	}
 
-    @Override
-    public void start() {
-        if (!active) {
-            active = true;
-            context.getScheduler().execute(() -> initDatagramChannel(serverContext));
-        }
-    }
+	@Override
+	public void start() {
+		if (!active) {
+			active = true;
+			context.getScheduler().execute(() -> initDatagramChannel(serverContext));
+		}
+	}
 
-    @Override
-    public void stop() {
+	@Override
+	public void stop() {
 
-    }
+	}
 
-    @Override
-    public void close() {
-        stop();
-    }
+	private void initDatagramChannel(ServerContext serverContext) {
+		final DatagramChannel channel = ChannelUtils.initDatagramChannel(DatagramConnectionType.SERVER, serverContext);
+		final SelectionKey key = ChannelUtils.registerDatagramSelectionKey(channel);
 
-    private void initDatagramChannel(ServerContext serverContext){
-        final DatagramChannel channel = ChannelUtils.initDatagramChannel(DatagramConnectionType.SERVER, serverContext);
-        final SelectionKey key = ChannelUtils.registerDatagramSelectionKey(channel);
+		final int timeout = serverContext.getPropertySafe(Integer.class, PROPERTY_TIMEOUT);
+		while (active) {
+			ChannelUtils.getReadyChannelBySelectionKey(key, timeout);
 
-        final int timeout =  serverContext.getPropertySafe(Integer.class, PROPERTY_TIMEOUT);
-        while(active){
-            ChannelUtils.getReadyChannelBySelectionKey(key, timeout);
+			Set<SelectionKey> selectedKeys = key.selector().selectedKeys();
+			Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
 
-            Set<SelectionKey> selectedKeys = key.selector().selectedKeys();
-            Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
+			while (selectedIterator.hasNext()) {
+				final SelectionKey selectedKey = selectedIterator.next();
 
-            while (selectedIterator.hasNext()) {
-                final SelectionKey selectedKey = selectedIterator.next();
+				selectedIterator.remove();
 
-                selectedIterator.remove();
+				if (selectedKey.isReadable()) {
+					handleSelectorHandler(
+							new ReadDatagramSelectionKeyHandler(context, serverContext, outBuffers, selectedKey));
+				}
+				if (selectedKey.isWritable()) {
+					handleSelectorHandler(
+							new WriteDatagramSelectionKeyHandler(context, serverContext, outBuffers, selectedKey));
+				}
+			}
+		}
 
-                if (selectedKey.isReadable()) {
-                    handleSelectorHandler(new ReadDatagramSelectionKeyHandler(context, serverContext, outBuffers, selectedKey));
-                }
-                if (selectedKey.isWritable()) {
-                    handleSelectorHandler(new WriteDatagramSelectionKeyHandler(context, serverContext, outBuffers, selectedKey));
-                }
-            }
-        }
-
-    }
+	}
 
 }
-

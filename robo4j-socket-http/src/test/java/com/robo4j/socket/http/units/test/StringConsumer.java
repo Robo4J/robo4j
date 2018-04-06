@@ -40,7 +40,6 @@ public class StringConsumer extends RoboUnit<String> {
 	public static final String PROP_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
 	public static final String PROP_GET_RECEIVED_MESSAGES = "getReceivedMessages";
 	public static final String PROP_COUNT_DOWN_LATCH = "countDownLatch";
-	public static final String PROP_COUNT_DOWN_LATCH_COUNT = "countDownLatchCount";
 	public static final String PROP_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
 
 	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
@@ -96,10 +95,6 @@ public class StringConsumer extends RoboUnit<String> {
 		if (attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH)
 				&& attribute.getAttributeType() == CountDownLatch.class) {
 			return (R) countDownLatch;
-		}
-		if (attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH_COUNT)
-				&& attribute.getAttributeType() == Long.class) {
-			return (R) (countDownLatch == null ? Long.valueOf(0L) : Long.valueOf(countDownLatch.getCount()));
 		}
 		return null;
 	}

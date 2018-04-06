@@ -35,7 +35,7 @@ import java.nio.channels.ByteChannel;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class OutboundHttpSocketChannelHandler implements ChannelHandler {
+public class OutboundHttpSocketChannelHandler implements ChannelHandler, AutoCloseable {
 
 	private ByteChannel byteChannel;
 	private HttpDecoratedRequest message;
@@ -67,6 +67,7 @@ public class OutboundHttpSocketChannelHandler implements ChannelHandler {
 	@Override
 	public void stop() {
 		try {
+			System.out.println(getClass().getSimpleName() + " STOP CLOSE");
 			byteChannel.close();
 		} catch (Exception e) {
 			throw new SocketException("closing channel problem", e);

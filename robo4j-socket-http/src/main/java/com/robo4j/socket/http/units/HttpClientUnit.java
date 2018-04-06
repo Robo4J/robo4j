@@ -35,10 +35,10 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
+import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PROTOCOL;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
-import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PROTOCOL;
 
 /**
  * Http NIO Client for communication with external Robo4J units. Unit accepts
@@ -84,13 +84,7 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 				channel.socket().setSendBufferSize(bufferCapacity);
 			}
 
-			final OutboundHttpSocketChannelHandler handler = new OutboundHttpSocketChannelHandler(channel, request);
-
-			// TODO: 12/10/17 (miro) -> handler
-			handler.start();
-			handler.stop();
-
-			final HttpDecoratedResponse decoratedResponse = handler.getDecoratedResponse();
+			final HttpDecoratedResponse decoratedResponse = processRequestByChannel(channel, request);
 
 			if (decoratedResponse != null && PROCESS_RESPONSES_STATUSES.contains(decoratedResponse.getCode())) {
 				if (!decoratedResponse.getCallbacks().isEmpty()) {
@@ -104,6 +98,14 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 		} catch (Exception e) {
 			SimpleLoggingUtil.error(getClass(),
 					String.format("not available: %s, no worry I continue sending. Error: %s", address, e));
+		}
+	}
+
+	private HttpDecoratedResponse processRequestByChannel(SocketChannel byteChannel,
+														  HttpDecoratedRequest message){
+		try (OutboundHttpSocketChannelHandler handler = new OutboundHttpSocketChannelHandler(byteChannel, message)){
+			handler.start();
+			return handler.getDecoratedResponse();
 		}
 	}
 

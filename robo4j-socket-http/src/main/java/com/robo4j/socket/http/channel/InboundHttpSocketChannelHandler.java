@@ -56,11 +56,6 @@ public class InboundHttpSocketChannelHandler implements ChannelHandler {
 	}
 
 	@Override
-	public void close() {
-		stop();
-	}
-
-	@Override
 	public void start() {
 		if (!active) {
 			active = true;

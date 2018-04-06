@@ -19,7 +19,10 @@ package com.robo4j;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Test(s) for the builder.
@@ -29,9 +32,10 @@ import java.util.concurrent.ExecutionException;
  */
 public class RoboBuilderTests {
 	private static final int MESSAGES = 10;
+	public static final int TIMEOUT = 100;
 
 	@Test
-	public void testParsingFile() throws RoboBuilderException, InterruptedException, ExecutionException {
+	public void testParsingFile() throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
 		RoboBuilder builder = new RoboBuilder();
 		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("test.xml"));
 		RoboContext system = builder.build();
@@ -50,8 +54,9 @@ public class RoboBuilderTests {
 			producer.sendMessage("sendRandomMessage");
 		}
 		RoboReference<String> consumer = system.getReference("consumer");
-
-		Thread.sleep(400);
+		CountDownLatch countDownLatchConsumer = consumer
+				.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get(TIMEOUT, TimeUnit.MINUTES);
+		countDownLatchConsumer.await(TIMEOUT, TimeUnit.MINUTES);
 
 		Assert.assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
 		Assert.assertEquals(MESSAGES, (int) consumer.getAttribute(descriptor).get());
@@ -99,7 +104,7 @@ public class RoboBuilderTests {
 
 	@Test
 	public void testParsingFileWithSystemConfig()
-			throws RoboBuilderException, InterruptedException, ExecutionException {
+			throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
 		RoboBuilder builder = new RoboBuilder(
 				Thread.currentThread().getContextClassLoader().getResourceAsStream("testsystem.xml"));
 		// NOTE(Marcus/Aug 19, 2017): We have the system settings and the units
@@ -126,7 +131,10 @@ public class RoboBuilderTests {
 		Assert.assertNotNull(consumer);
 
 		// We need to fix these tests so that we can get a callback.
-		Thread.sleep(1000);
+		CountDownLatch countDownLatchConsumer = consumer
+				.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get(TIMEOUT, TimeUnit.MINUTES);
+		countDownLatchConsumer.await(TIMEOUT, TimeUnit.MINUTES);
+
 		synchronized (consumer.getAttribute(descriptor)) {
 			int receivedMessages = consumer.getAttribute(descriptor).get();
 			Assert.assertEquals(MESSAGES, receivedMessages);

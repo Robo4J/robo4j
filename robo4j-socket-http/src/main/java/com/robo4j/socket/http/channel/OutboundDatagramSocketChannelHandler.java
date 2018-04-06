@@ -44,11 +44,6 @@ public class OutboundDatagramSocketChannelHandler implements ChannelHandler {
 	}
 
 	@Override
-	public void close() {
-		stop();
-	}
-
-	@Override
 	public void stop() {
 		try {
 			if (channel != null) {

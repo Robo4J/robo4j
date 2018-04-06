@@ -21,6 +21,7 @@ import com.robo4j.configuration.Configuration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -32,7 +33,12 @@ public class StringConsumer extends RoboUnit<String> {
 	private static final int DEFAULT = 0;
 	public static final String PROP_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
 	public static final String PROP_GET_RECEIVED_MESSAGES = "getReceivedMessages";
+	public static final String PROP_COUNT_DOWN_LATCH = "countDownLatch";
+	public static final String PROP_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
+	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
+			.create(CountDownLatch.class, PROP_COUNT_DOWN_LATCH);
 	private AtomicInteger counter;
+	private CountDownLatch countDownLatch;
 	private List<String> receivedMessages = Collections.synchronizedList(new ArrayList<>());
 
 	/**
@@ -53,11 +59,17 @@ public class StringConsumer extends RoboUnit<String> {
 		System.out.println(getClass().getSimpleName() + " onMessage: " + message);
 		counter.incrementAndGet();
 		receivedMessages.add(message);
+		if(countDownLatch != null){
+			countDownLatch.countDown();
+		}
 	}
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-
+		int totalNumber = configuration.getInteger(PROP_TOTAL_NUMBER_MESSAGES, 0);
+		if (totalNumber > 0) {
+			countDownLatch = new CountDownLatch(totalNumber);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -70,6 +82,10 @@ public class StringConsumer extends RoboUnit<String> {
 		if (attribute.getAttributeName().equals(PROP_GET_RECEIVED_MESSAGES)
 				&& attribute.getAttributeType() == List.class) {
 			return (R) receivedMessages;
+		}
+		if (attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH)
+				&& attribute.getAttributeType() == CountDownLatch.class) {
+			return (R) countDownLatch;
 		}
 		return null;
 	}
