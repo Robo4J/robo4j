@@ -1,6 +1,7 @@
 package com.robo4j.socket.http.units;
 
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.util.StringConstants;
 
 import java.util.List;
 import java.util.Objects;
@@ -10,6 +11,8 @@ import java.util.Objects;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ClientPathConfig {
+
+	public static final ClientPathConfig EMPTY = new ClientPathConfig(StringConstants.EMPTY, null, null);
 
 	private final String path;
 	private final HttpMethod method;

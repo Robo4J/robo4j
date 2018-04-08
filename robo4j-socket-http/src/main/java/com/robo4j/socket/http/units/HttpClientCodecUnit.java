@@ -35,11 +35,7 @@ public final class HttpClientCodecUnit extends AbstractClientCodecUnit {
 		final HttpDecoratedRequest request = new HttpDecoratedRequest(denominator);
 		request.addMessage(encodedMessage);
 
-		// FIXME: 1/27/18 (miro) -> fix null list
-		if (pathConfig.getCallbacks() != null) {
-			request.addCallbacks(pathConfig.getCallbacks());
-		}
-
+		request.addCallbacks(pathConfig.getCallbacks());
 		getContext().getReference(target).sendMessage(request);
 	}
 

@@ -39,6 +39,9 @@ public class InboundDatagramSocketChannelHandler implements ChannelHandler {
 		}
 	}
 
+	/**
+	 * doesn't need to be stopped
+	 */
 	@Override
 	public void stop() {
 

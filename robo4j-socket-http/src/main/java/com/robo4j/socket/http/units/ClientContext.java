@@ -26,14 +26,14 @@ public final class ClientContext implements SocketContext<ClientPathConfig> {
 	private final Map<String, Object> properties = new HashMap<>();
 
 	public ClientContext() {
-    }
+	}
 
-    @Override
-    public void addPaths(Map<String, ClientPathConfig> paths) {
-        pathConfigs.putAll(paths);
-    }
+	@Override
+	public void addPaths(Map<String, ClientPathConfig> paths) {
+		pathConfigs.putAll(paths);
+	}
 
-    @Override
+	@Override
 	public boolean isEmpty() {
 		return pathConfigs.isEmpty();
 	}
@@ -50,7 +50,7 @@ public final class ClientContext implements SocketContext<ClientPathConfig> {
 
 	@Override
 	public ClientPathConfig getPathConfig(String path) {
-		return pathConfigs.get(path);
+		return pathConfigs.getOrDefault(path, ClientPathConfig.EMPTY);
 	}
 
 	@Override
