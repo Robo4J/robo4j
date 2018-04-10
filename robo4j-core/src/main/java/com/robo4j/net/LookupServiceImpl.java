@@ -25,6 +25,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -45,10 +46,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Miroslav Wengner (@miragemiko)
  */
 class LookupServiceImpl implements LookupService {
-	// FIXME(marcus/6 Nov 2017): This should be calculated, and used when
+    // FIXME(marcus/6 Nov 2017): This should be calculated, and used when
 	// constructing the packet
 	private final static int MAX_PACKET_SIZE = 1500;
-	private MulticastSocket socket;
+    public static final String NETWORK_INTERFACE_EN_0 = "en0";
+    private MulticastSocket socket;
 	private String address;
 	private int port;
 	private Updater currentUpdater;
@@ -159,6 +161,7 @@ class LookupServiceImpl implements LookupService {
 	public synchronized void start() throws IOException {
 		stop();
 		socket = new MulticastSocket(port);
+		socket.setNetworkInterface(NetworkInterface.getByName(NETWORK_INTERFACE_EN_0));
 		socket.joinGroup(InetAddress.getByName(address));
 		currentUpdater = new Updater();
 		Thread t = new Thread(currentUpdater, "LookupService listener");
