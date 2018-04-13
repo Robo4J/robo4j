@@ -16,17 +16,19 @@
  */
 package com.robo4j.net;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.ConfigurationException;
+import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 
@@ -37,8 +39,13 @@ public class AckingStringConsumer extends RoboUnit<TestMessageType> {
 	private static final int DEFAULT = 0;
 	public static final String PROP_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
 	public static final String PROP_GET_RECEIVED_MESSAGES = "getReceivedMessages";
+	public static final String PROP_COUNT_DOWN_LATCH = "countDownLatch";
+	public static final String PROP_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
+	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
+			.create(CountDownLatch.class, PROP_COUNT_DOWN_LATCH);
 	private AtomicInteger counter;
 	private List<TestMessageType> receivedMessages = Collections.synchronizedList(new ArrayList<>());
+	private CountDownLatch countDownLatch;
 
 	/**
 	 * @param context
@@ -60,11 +67,17 @@ public class AckingStringConsumer extends RoboUnit<TestMessageType> {
 		receivedMessages.add(message);
 		RoboReference<String> ackRef = message.getReference();
 		ackRef.sendMessage("acknowledge");
+		if(countDownLatch != null){
+			countDownLatch.countDown();
+		}
 	}
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-
+		int totalNumber = configuration.getInteger(PROP_TOTAL_NUMBER_MESSAGES, 0);
+		if (totalNumber > 0) {
+			countDownLatch = new CountDownLatch(totalNumber);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -75,6 +88,10 @@ public class AckingStringConsumer extends RoboUnit<TestMessageType> {
 		}
 		if (attribute.getAttributeName().equals(PROP_GET_RECEIVED_MESSAGES) && attribute.getAttributeType() == List.class) {
 			return (R) receivedMessages;
+		}
+		if (attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH)
+				&& attribute.getAttributeType() == CountDownLatch.class) {
+			return (R) countDownLatch;
 		}
 		return null;
 	}

@@ -20,6 +20,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.logging.SimpleLoggingUtil;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -38,12 +39,12 @@ public final class SystemUtil {
 		// no instances
 	}
 
-	public static final Comparator<RoboReference<?>> ID_COMPARATOR = new Comparator<RoboReference<?>>() {
-		@Override
-		public int compare(RoboReference<?> o1, RoboReference<?> o2) {
-			return o1.getId().compareTo(o2.getId());
-		}
-	};
+	public static final Comparator<RoboReference<?>> ID_COMPARATOR = Comparator.comparing(RoboReference::getId);
+
+	public static InputStream getInputStreamByResourceName(String resourceName){
+		return Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+	}
+
 
 	public static String printStateReport(RoboContext ctx) {
 		StringBuilder builder = new StringBuilder();
@@ -53,7 +54,9 @@ public final class SystemUtil {
 		builder.append("RoboSystem state ").append(ctx.getState().getLocalizedName()).append(BREAK)
 				.append("================================================").append(BREAK);
 		for (RoboReference<?> reference : references) {
-			builder.append(String.format("    %-25s   %13s", reference.getId(), reference.getState().getLocalizedName())).append(BREAK);
+			builder.append(
+					String.format("    %-25s   %13s", reference.getId(), reference.getState().getLocalizedName()))
+					.append(BREAK);
 		}
 		// formatter:on
 		return builder.toString();

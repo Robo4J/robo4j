@@ -16,27 +16,35 @@
  */
 package com.robo4j.net;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.ConfigurationException;
+import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.StringToolkit;
 import com.robo4j.TestToolkit;
 import com.robo4j.configuration.Configuration;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RemoteTestMessageProducer extends RoboUnit<String> {
+
+    public static final String PROP_COUNT_DOWN_LATCH = "countDownLatch";
+    public static final String PROP_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
+    public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
+            .create(CountDownLatch.class, PROP_COUNT_DOWN_LATCH);
     /* default sent messages */
     private static final int DEFAULT = 0;
     private AtomicInteger totalCounter;
     private AtomicInteger ackCounter;
     private String target;
 	private String targetContext;
+	private CountDownLatch countDownLatch;
 
     /**
      * @param context
@@ -58,6 +66,10 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
         }
         totalCounter = new AtomicInteger(DEFAULT);
         ackCounter = new AtomicInteger(DEFAULT);
+        int totalNumber = configuration.getInteger(PROP_TOTAL_NUMBER_MESSAGES, 0);
+        if (totalNumber > 0) {
+            countDownLatch = new CountDownLatch(totalNumber);
+        }
     }
 
     @Override
@@ -68,6 +80,9 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
             totalCounter.incrementAndGet();
             String[] input = message.split("::");
             String messageType = input[0];
+            if(countDownLatch != null){
+                countDownLatch.countDown();
+            }
             switch (messageType) {
                 case "sendMessage":
                     sendRandomMessage();
@@ -86,6 +101,10 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
     public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
         if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
             return (R) (Integer) totalCounter.get();
+        }
+        if (attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH)
+                && attribute.getAttributeType() == CountDownLatch.class) {
+            return (R) countDownLatch;
         }
         return null;
     }

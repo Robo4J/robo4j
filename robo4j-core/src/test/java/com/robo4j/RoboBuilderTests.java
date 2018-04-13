@@ -16,6 +16,7 @@
  */
 package com.robo4j;
 
+import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,7 +38,7 @@ public class RoboBuilderTests {
 	@Test
 	public void testParsingFile() throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
 		RoboBuilder builder = new RoboBuilder();
-		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("test.xml"));
+		builder.add(SystemUtil.getInputStreamByResourceName("test.xml"));
 		RoboContext system = builder.build();
 
 		Assert.assertEquals(system.getState(), LifecycleState.INITIALIZED);
@@ -68,8 +69,7 @@ public class RoboBuilderTests {
 //	@Test
 	public void testSeparateSystemUnitsSystemConfig()
 			throws RoboBuilderException, InterruptedException, ExecutionException {
-		RoboBuilder builder = new RoboBuilder(
-				Thread.currentThread().getContextClassLoader().getResourceAsStream("testRoboSystemOnly.xml"));
+		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRoboSystemOnly.xml"));
 		// NOTE(Marcus/Aug 19, 2017): We have the system settings and the units
 		// in the same file.
 		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("testRoboUnitsOnly.xml"));
