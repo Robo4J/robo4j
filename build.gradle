@@ -11,6 +11,13 @@ apply plugin: 'maven'
 
 apply from: 'libraries.gradle'
 
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+}
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -24,11 +31,6 @@ project("robo4j-core") {
 
     group 'com.robo4j'
     version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -75,10 +77,6 @@ project("robo4j-db-sql") {
     group 'com.robo4j'
     version "${robo4jVersion}"
 
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
     apply plugin: "org.flywaydb.flyway"
 
     sourceCompatibility = 1.8
@@ -133,11 +131,6 @@ project("robo4j-hw-lego") {
     group 'com.robo4j'
     version "${robo4jVersion}"
 
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
-
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
@@ -187,17 +180,15 @@ project("robo4j-hw-rpi") {
     group 'com.robo4j'
     version "${robo4jVersion}"
 
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
-
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
     repositories {
         mavenCentral()
         mavenLocal()
+        flatDir {
+            dirs "$rootProject.projectDir/libs"
+        }
     }
 
     uploadArchives {
@@ -211,7 +202,7 @@ project("robo4j-hw-rpi") {
     //create a single Jar with all dependencies
     task fatJar(type: Jar) {
         manifest {
-            attributes 'Implementation-Title': 'robo4j-hw-rpi',
+            attributes 'Implementation-Title': baseName,
                     'Implementation-Version': version,
                     'Main-Class': 'com.robo4j.hw.rpi.i2c.adafruitled.GraphBarTest'
         }
@@ -254,11 +245,6 @@ project("robo4j-math") {
     group 'com.robo4j'
     version "${robo4jVersion}"
 
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
-
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
@@ -298,11 +284,6 @@ project("robo4j-page") {
 
     group 'com.robo4j'
     version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -345,11 +326,6 @@ project("robo4j-socket-http") {
     group 'com.robo4j'
     version "${robo4jVersion}"
 
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
-
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
@@ -390,11 +366,6 @@ project("robo4j-units-lego") {
 
     group 'com.robo4j'
     version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -457,11 +428,6 @@ project("robo4j-units-rpi") {
 
     group 'com.robo4j'
     version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -526,11 +492,6 @@ project("robo4j-units-rpi-http") {
     group 'com.robo4j'
     version "${robo4jVersion}"
 
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
-
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
@@ -570,11 +531,6 @@ project("robo4j-spring") {
 
     group 'com.robo4j'
     version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
