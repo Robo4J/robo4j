@@ -25,7 +25,6 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
-import java.net.NetworkInterface;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -163,7 +162,7 @@ class LookupServiceImpl implements LookupService {
 	public synchronized void start() throws IOException {
 		stop();
 		socket = new MulticastSocket(port);
-		socket.setNetworkInterface(NetworkInterface.getByName(netInterface));
+//		socket.setNetworkInterface(NetworkInterface.getByName(netInterface));
 		socket.joinGroup(InetAddress.getByName(address));
 		currentUpdater = new Updater();
 		Thread t = new Thread(currentUpdater, "LookupService listener");
