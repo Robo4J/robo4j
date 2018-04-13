@@ -49,8 +49,8 @@ class LookupServiceImpl implements LookupService {
     // FIXME(marcus/6 Nov 2017): This should be calculated, and used when
 	// constructing the packet
 	private final static int MAX_PACKET_SIZE = 1500;
-    public static final String NETWORK_INTERFACE_EN_0 = "en0";
     private MulticastSocket socket;
+    private String netInterface;
 	private String address;
 	private int port;
 	private Updater currentUpdater;
@@ -129,11 +129,13 @@ class LookupServiceImpl implements LookupService {
 		}
 	}
 
-	public LookupServiceImpl(String address, int port, float missedHeartbeatsBeforeRemoval, LocalLookupServiceImpl localContexts)
+	public LookupServiceImpl(String netInterface, String address, int port, float missedHeartbeatsBeforeRemoval, LocalLookupServiceImpl localContexts)
 			throws SocketException, UnknownHostException {
+		this.netInterface = netInterface;
 		this.address = address;
 		this.port = port;
 		this.localContexts = localContexts;
+
 	}
 
 	@Override
@@ -161,7 +163,7 @@ class LookupServiceImpl implements LookupService {
 	public synchronized void start() throws IOException {
 		stop();
 		socket = new MulticastSocket(port);
-		socket.setNetworkInterface(NetworkInterface.getByName(NETWORK_INTERFACE_EN_0));
+		socket.setNetworkInterface(NetworkInterface.getByName(netInterface));
 		socket.joinGroup(InetAddress.getByName(address));
 		currentUpdater = new Updater();
 		Thread t = new Thread(currentUpdater, "LookupService listener");

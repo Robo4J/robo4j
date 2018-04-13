@@ -16,12 +16,9 @@
  */
 package com.robo4j.net;
 
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.concurrent.atomic.AtomicReference;
-
 import com.robo4j.RoboContext;
-import com.robo4j.logging.SimpleLoggingUtil;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Use this to get a reference to the default lookup service. It can also be
@@ -31,10 +28,12 @@ import com.robo4j.logging.SimpleLoggingUtil;
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class LookupServiceProvider {
+	public static final String DEFAULT_NETWORK_INTERFACE_EN_0 = "en0";
 	public static final String DEFAULT_MULTICAST_ADDRESS = "238.12.15.254";
 	public static final int DEFAULT_PORT = 0x0FFE;
 	private static final float DEFAULT_HEARTBEATS_BEFORE_REMOVAL = 3.5f;
-	private static final AtomicReference<LookupService> DEFAULT_SERVICE = new AtomicReference<LookupService>(createDefaultService());
+	private static final AtomicReference<LookupService> DEFAULT_SERVICE = new AtomicReference<LookupService>(
+			createDefaultService());
 	private static final LocalLookupServiceImpl LOCAL_CONTEXTS = new LocalLookupServiceImpl();
 
 	/**
@@ -53,12 +52,13 @@ public final class LookupServiceProvider {
 	}
 
 	private static LookupService createDefaultService() {
-		try {
-			return new LookupServiceImpl(DEFAULT_MULTICAST_ADDRESS, DEFAULT_PORT, DEFAULT_HEARTBEATS_BEFORE_REMOVAL, LOCAL_CONTEXTS);
-		} catch (SocketException | UnknownHostException e) {
-			SimpleLoggingUtil.error(LookupServiceProvider.class,
-					"Failed to set up LookupService! No multicast route? Will use null provider...", e);
-			return new NullLookupService();
-		}
+		//@formatter:off
+		return DefaultLookupServiceBuilder.Build().setNetworkInterface(DEFAULT_NETWORK_INTERFACE_EN_0)
+				.setAddress(DEFAULT_MULTICAST_ADDRESS)
+				.setPort(DEFAULT_PORT)
+				.setMissedHeartbeatsBeforeRemoval(DEFAULT_HEARTBEATS_BEFORE_REMOVAL)
+				.setLocalContexts(LOCAL_CONTEXTS)
+				.build();
+		//@formatter:on
 	}
 }

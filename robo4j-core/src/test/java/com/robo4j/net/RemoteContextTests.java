@@ -45,8 +45,9 @@ public class RemoteContextTests {
 		RoboBuilder builder = new RoboBuilder(RemoteContextTests.class.getClassLoader().getResourceAsStream("testDiscoverableSystem.xml"));
 		RoboContext ctx = builder.build();
 		ctx.start();
-		LookupService service = new LookupServiceImpl(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS, LookupServiceProvider.DEFAULT_PORT,
-				ALLOWED_HEARTBEAT_MISSES, new LocalLookupServiceImpl());
+
+		final LookupService service = LookupServiceTests.getLookupService(new LocalLookupServiceImpl());
+
 		service.start();
 		for (int i = 0; i < 10 && (service.getDescriptor("6") == null); i++) {
 			SystemUtil.sleep(200);
@@ -71,9 +72,9 @@ public class RemoteContextTests {
 		
 		// Note that all this cludging about with local lookup service implementations etc would normally not be needed.
 		// This is just to isolate this test from other tests.
-		LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();		
-		LookupService service = new LookupServiceImpl(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS, LookupServiceProvider.DEFAULT_PORT,
-				ALLOWED_HEARTBEAT_MISSES, localLookup);
+		final LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();
+		final LookupService service = LookupServiceTests.getLookupService(localLookup);
+
 		LookupServiceProvider.setDefaultLookupService(service);
 		service.start();
 
@@ -115,9 +116,9 @@ public class RemoteContextTests {
 
 		// Note that all this cludging about with local lookup service implementations etc would normally not be needed.
 		// This is just to isolate this test from other tests.
-		LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();		
-		LookupService service = new LookupServiceImpl(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS, LookupServiceProvider.DEFAULT_PORT,
-				ALLOWED_HEARTBEAT_MISSES, localLookup);
+		final LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();
+		final LookupService service = LookupServiceTests.getLookupService(localLookup);
+
 		LookupServiceProvider.setDefaultLookupService(service);
 		service.start();
 
@@ -154,5 +155,6 @@ public class RemoteContextTests {
 		configuration.setString("targetContext", targetContext);
 		return configuration;
 	}
+
 
 }

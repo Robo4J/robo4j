@@ -27,6 +27,10 @@ import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.robo4j.net.LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS;
+import static com.robo4j.net.LookupServiceProvider.DEFAULT_NETWORK_INTERFACE_EN_0;
+import static com.robo4j.net.LookupServiceProvider.DEFAULT_PORT;
+
 /**
  * Note that on Mac OS X, it seems the easiest way to get this test to run is to
  * set -Djava.net.preferIPv4Stack=true.
@@ -38,6 +42,15 @@ import java.util.Map;
 @RunWith(LookupServiceTestRunner.class)
 public class LookupServiceTests {
 	private static final float ALLOWED_HEARTBEAT_MISSES = 22f;
+
+	static LookupService getLookupService(LocalLookupServiceImpl localLookupService){
+		return DefaultLookupServiceBuilder.Build().setNetworkInterface(DEFAULT_NETWORK_INTERFACE_EN_0)
+				.setAddress(DEFAULT_MULTICAST_ADDRESS)
+				.setPort(DEFAULT_PORT)
+				.setMissedHeartbeatsBeforeRemoval(ALLOWED_HEARTBEAT_MISSES)
+				.setLocalContexts(localLookupService)
+				.build();
+	}
 
 	@Test
 	public void testEncodeDecode() throws IOException {
@@ -57,8 +70,7 @@ public class LookupServiceTests {
 
 	@Test
 	public void testLookup() throws IOException, InterruptedException {
-		LookupService service = new LookupServiceImpl(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS, LookupServiceProvider.DEFAULT_PORT,
-				ALLOWED_HEARTBEAT_MISSES, new LocalLookupServiceImpl());
+		final LookupService service = getLookupService(new LocalLookupServiceImpl());
 		service.start();
 		RoboContextDescriptor descriptor = createRoboContextDescriptor();
 		ContextEmitter emitter = new ContextEmitter(descriptor, InetAddress.getByName(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS),
