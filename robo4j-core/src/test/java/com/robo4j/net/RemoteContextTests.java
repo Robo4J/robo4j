@@ -154,7 +154,7 @@ public class RemoteContextTests {
 		Assert.assertTrue(remoteTestMessageProducer.getAckCount() > 0);
 	}
 
-	@Test
+//	@Test
 	public void testMessageToDiscoveredContextAndReferenceToDiscoveredContext() throws Exception {
 
 		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteReceiver.xml"));
