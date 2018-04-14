@@ -20,7 +20,6 @@ package com.robo4j.net;
 import com.robo4j.RoboContext;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -39,7 +38,6 @@ import static com.robo4j.net.LookupServiceProvider.DEFAULT_PORT;
  * @author Miroslav Wengner (@miragemiko)
  */
 
-@RunWith(LookupServiceTestRunner.class)
 public class LookupServiceTests {
 	private static final float ALLOWED_HEARTBEAT_MISSES = 22f;
 

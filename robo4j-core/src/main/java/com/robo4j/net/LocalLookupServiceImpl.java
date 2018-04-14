@@ -16,12 +16,12 @@
  */
 package com.robo4j.net;
 
+import com.robo4j.RoboContext;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.robo4j.RoboContext;
 
 public class LocalLookupServiceImpl implements LookupService {
 	private final Map<String, LocalRoboContextDescriptor> contexts = Collections.synchronizedMap(new HashMap<>());
@@ -56,6 +56,11 @@ public class LocalLookupServiceImpl implements LookupService {
 	@Override
 	public RoboContextDescriptor getDescriptor(String id) {
 		return contexts.get(id);
+	}
+
+	@Override
+	public boolean containsDescriptor(String id) {
+		return contexts.containsKey(id);
 	}
 
 	@Override

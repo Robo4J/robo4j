@@ -45,11 +45,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Miroslav Wengner (@miragemiko)
  */
 class LookupServiceImpl implements LookupService {
-    // FIXME(marcus/6 Nov 2017): This should be calculated, and used when
+	// FIXME(marcus/6 Nov 2017): This should be calculated, and used when
 	// constructing the packet
 	private final static int MAX_PACKET_SIZE = 1500;
-    private MulticastSocket socket;
-    private String netInterface;
+	private MulticastSocket socket;
 	private String address;
 	private int port;
 	private Updater currentUpdater;
@@ -68,8 +67,8 @@ class LookupServiceImpl implements LookupService {
 					socket.receive(packet);
 					process(packet);
 				} catch (IOException e) {
-					SimpleLoggingUtil.error(getClass(), "Failed to look for lookupservice packets, Stopping updates for the lookup service",
-							e);
+					SimpleLoggingUtil.error(getClass(),
+							"Failed to look for lookupservice packets, Stopping updates for the lookup service", e);
 					isRunning = false;
 				}
 			}
@@ -128,9 +127,9 @@ class LookupServiceImpl implements LookupService {
 		}
 	}
 
-	public LookupServiceImpl(String netInterface, String address, int port, float missedHeartbeatsBeforeRemoval, LocalLookupServiceImpl localContexts)
-			throws SocketException, UnknownHostException {
-		this.netInterface = netInterface;
+	public LookupServiceImpl(String netInterface, String address, int port, float missedHeartbeatsBeforeRemoval,
+			LocalLookupServiceImpl localContexts) throws SocketException, UnknownHostException {
+
 		this.address = address;
 		this.port = port;
 		this.localContexts = localContexts;
@@ -139,7 +138,8 @@ class LookupServiceImpl implements LookupService {
 
 	@Override
 	public synchronized Map<String, RoboContextDescriptor> getDiscoveredContexts() {
-		Map<String, RoboContextDescriptor> map = new HashMap<>(entries.size() + localContexts.getDiscoveredContexts().size());
+		Map<String, RoboContextDescriptor> map = new HashMap<>(
+				entries.size() + localContexts.getDiscoveredContexts().size());
 		map.putAll(localContexts.getDiscoveredContexts());
 		for (Entry<String, RoboContextDescriptorEntry> entry : entries.entrySet()) {
 			map.put(entry.getKey(), entry.getValue().descriptor);
@@ -162,7 +162,6 @@ class LookupServiceImpl implements LookupService {
 	public synchronized void start() throws IOException {
 		stop();
 		socket = new MulticastSocket(port);
-//		socket.setNetworkInterface(NetworkInterface.getByName(netInterface));
 		socket.joinGroup(InetAddress.getByName(address));
 		currentUpdater = new Updater();
 		Thread t = new Thread(currentUpdater, "LookupService listener");
@@ -182,5 +181,10 @@ class LookupServiceImpl implements LookupService {
 	public RoboContextDescriptor getDescriptor(String id) {
 		RoboContextDescriptorEntry entry = entries.get(id);
 		return entry != null ? entry.descriptor : localContexts.getDescriptor(id);
+	}
+
+	@Override
+	public boolean containsDescriptor(String id) {
+		return entries.containsKey(id) || localContexts.containsDescriptor(id);
 	}
 }

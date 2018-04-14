@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 /**
+ * Note that on Mac OS X, it seems the easiest way to get this test to run is to
+ * set -Djava.net.preferIPv4Stack=true.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -154,7 +156,7 @@ public class RemoteContextTests {
 		Assert.assertTrue(remoteTestMessageProducer.getAckCount() > 0);
 	}
 
-//	@Test
+	@Test
 	public void testMessageToDiscoveredContextAndReferenceToDiscoveredContext() throws Exception {
 
 		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteReceiver.xml"));
@@ -177,17 +179,8 @@ public class RemoteContextTests {
 		service.start();
 
 		// context has been discovered
-		CountDownLatch lookupServiceLatch = new CountDownLatch(1);
-		receiverContext.getScheduler().execute(() -> {
-			while (service.getDescriptor("remoteReceiver") == null) {
-
-			}
-			lookupServiceLatch.countDown();
-		});
-		lookupServiceLatch.await();
-
+		RoboContextDescriptor descriptor = getRoboContextDescriptor(service);
 		Assert.assertTrue(service.getDiscoveredContexts().size() > 0);
-		RoboContextDescriptor descriptor = service.getDescriptor("remoteReceiver");
 		Assert.assertNotNull(descriptor);
 
 		builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testTestMessageEmitterSystem.xml"));
@@ -213,6 +206,19 @@ public class RemoteContextTests {
 		producerCountDownLatch.await();
 		Assert.assertTrue(remoteTestMessageProducer.getAckCount() > 0);
 
+	}
+
+	//TODO (Marcus/Miro) maybe we should thing about something alike blocking queue, list, map,
+	private RoboContextDescriptor getRoboContextDescriptor(LookupService service) {
+		RoboContextDescriptor descriptor = null;
+
+		while (!service.containsDescriptor("remoteReceiver")) {
+		}
+		descriptor = service.getDescriptor("remoteReceiver");
+		if(descriptor == null){
+			throw new IllegalStateException("not allowed");
+		}
+		return descriptor;
 	}
 
 	private Configuration getEmitterConfiguration(String targetContext) {
