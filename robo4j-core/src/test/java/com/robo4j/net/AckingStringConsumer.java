@@ -43,6 +43,9 @@ public class AckingStringConsumer extends RoboUnit<TestMessageType> {
 	public static final String PROP_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
 	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
 			.create(CountDownLatch.class, PROP_COUNT_DOWN_LATCH);
+	@SuppressWarnings("rawtypes")
+	public static final DefaultAttributeDescriptor<List> DESCRIPTOR_MESSAGES = DefaultAttributeDescriptor
+			.create(List.class, PROP_GET_RECEIVED_MESSAGES);
 	private AtomicInteger counter;
 	private List<TestMessageType> receivedMessages = Collections.synchronizedList(new ArrayList<>());
 	private CountDownLatch countDownLatch;

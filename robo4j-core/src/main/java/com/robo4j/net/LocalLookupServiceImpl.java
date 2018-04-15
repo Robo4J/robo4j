@@ -23,6 +23,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
 public class LocalLookupServiceImpl implements LookupService {
 	private final Map<String, LocalRoboContextDescriptor> contexts = Collections.synchronizedMap(new HashMap<>());
 

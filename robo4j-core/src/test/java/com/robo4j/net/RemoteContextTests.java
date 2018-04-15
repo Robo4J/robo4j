@@ -20,14 +20,17 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
 import com.robo4j.StringConsumer;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -41,7 +44,8 @@ import java.util.concurrent.CountDownLatch;
 public class RemoteContextTests {
 	private static final String ACK_CONSUMER = "ackConsumer";
 	private static final String REMOTE_EMITTER = "remoteEmitter";
-	public static final int NUMBER_ITERATIONS = 10;
+	private static final int NUMBER_ITERATIONS = 10;
+	private static final String UNIT_REMOTE_RECEIVER = "remoteReceiver";
 
 	@Test
 	public void testDiscoveryOfDiscoveryEnabledRoboContext() throws RoboBuilderException, IOException {
@@ -157,17 +161,12 @@ public class RemoteContextTests {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testMessageToDiscoveredContextAndReferenceToDiscoveredContext() throws Exception {
 
-		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteReceiver.xml"));
-		Configuration configuration = ConfigurationFactory.createEmptyConfiguration();
-		configuration.setInteger("totalNumberMessages", 1);
-		AckingStringConsumer ackConsumer = new AckingStringConsumer(builder.getContext(), ACK_CONSUMER);
-		ackConsumer.initialize(configuration);
-
-		builder.add(ackConsumer);
-		RoboContext receiverContext = builder.build();
-		receiverContext.start();
+		// consumer system
+		RoboContext receiverSystem = buildReceiverSystem();
+		RoboReference<?> ackConsumer = receiverSystem.getReference(ACK_CONSUMER);
 
 		// Note that all this cludging about with local lookup service implementations
 		// etc would normally not be needed.
@@ -183,39 +182,82 @@ public class RemoteContextTests {
 		Assert.assertTrue(service.getDiscoveredContexts().size() > 0);
 		Assert.assertNotNull(descriptor);
 
-		builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testTestMessageEmitterSystem.xml"));
-		RemoteTestMessageProducer remoteTestMessageProducer = new RemoteTestMessageProducer(builder.getContext(),
-				REMOTE_EMITTER);
-		remoteTestMessageProducer.initialize(getEmitterConfiguration("remoteReceiver"));
-		builder.add(remoteTestMessageProducer);
-		RoboContext emitterContext = builder.build();
-		localLookup.addContext(emitterContext);
+		// build the producer system
+		RoboContext producerEmitterSystem = buildConsumerEmitterSystem();
+		localLookup.addContext(producerEmitterSystem);
 
-		emitterContext.start();
+		producerEmitterSystem.start();
 
+		RoboReference<String> remoteTestMessageProducer = producerEmitterSystem.getReference(REMOTE_EMITTER);
 		remoteTestMessageProducer.sendMessage("sendMessage");
 		CountDownLatch consumerCountDownLatch = ackConsumer
 				.getAttribute(AckingStringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
 		consumerCountDownLatch.await();
 
-		Assert.assertTrue(ackConsumer.getReceivedMessages().size() > 0);
-		System.out.println("Got messages: " + ackConsumer.getReceivedMessages());
+		List<TestMessageType> receivedMessages = (List<TestMessageType>) ackConsumer
+				.getAttribute(AckingStringConsumer.DESCRIPTOR_MESSAGES).get();
+		Assert.assertTrue(receivedMessages.size() > 0);
+		System.out.println("Got messages: " + receivedMessages);
 
 		CountDownLatch producerCountDownLatch = remoteTestMessageProducer
-				.getAttribute(AckingStringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
+				.getAttribute(RemoteTestMessageProducer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
 		producerCountDownLatch.await();
-		Assert.assertTrue(remoteTestMessageProducer.getAckCount() > 0);
+		Integer producerAcknowledge = remoteTestMessageProducer
+				.getAttribute(RemoteTestMessageProducer.DESCRIPTOR_ACKNOWLEDGE).get();
+		Assert.assertTrue(producerAcknowledge > 0);
 
 	}
 
-	//TODO (Marcus/Miro) maybe we should thing about something alike blocking queue, list, map,
+	private RoboContext buildConsumerEmitterSystem() throws Exception {
+		RoboBuilder builder = new RoboBuilder(
+				SystemUtil.getInputStreamByResourceName("testTestMessageEmitterSystem.xml"));
+		RemoteTestMessageProducer remoteTestMessageProducer = new RemoteTestMessageProducer(builder.getContext(),
+				REMOTE_EMITTER);
+		remoteTestMessageProducer.initialize(getEmitterConfiguration(UNIT_REMOTE_RECEIVER));
+		builder.add(remoteTestMessageProducer);
+		return builder.build();
+	}
+
+	private RoboContext buildReceiverSystem() throws RoboBuilderException, ConfigurationException {
+		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteReceiver.xml"));
+		Configuration configuration = ConfigurationFactory.createEmptyConfiguration();
+		configuration.setInteger("totalNumberMessages", 1);
+		AckingStringConsumer ackConsumer = new AckingStringConsumer(builder.getContext(), ACK_CONSUMER);
+		ackConsumer.initialize(configuration);
+
+		builder.add(ackConsumer);
+		RoboContext receiverSystem = builder.build();
+		receiverSystem.start();
+		return receiverSystem;
+	}
+
+	@Ignore
+	@Test
+	public void startRemoteReceiver() throws Exception {
+		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteReceiver.xml"));
+		Configuration configuration = ConfigurationFactory.createEmptyConfiguration();
+		configuration.setInteger("totalNumberMessages", 1);
+		AckingStringConsumer ackConsumer = new AckingStringConsumer(builder.getContext(), ACK_CONSUMER);
+		ackConsumer.initialize(configuration);
+
+		builder.add(ackConsumer);
+		RoboContext receiverSystem = builder.build();
+		receiverSystem.start();
+		System.out.println("receiverSystem: State after start:");
+		System.out.println(SystemUtil.printStateReport(receiverSystem));
+		System.out.println("press key to stop");
+		System.in.read();
+		receiverSystem.shutdown();
+	}
+
+	// TODO (Marcus/Miro) maybe we should thing about something alike blocking
+	// queue, list, map,
 	private RoboContextDescriptor getRoboContextDescriptor(LookupService service) {
-		RoboContextDescriptor descriptor = null;
 
 		while (!service.containsDescriptor("remoteReceiver")) {
 		}
-		descriptor = service.getDescriptor("remoteReceiver");
-		if(descriptor == null){
+		RoboContextDescriptor descriptor = service.getDescriptor("remoteReceiver");
+		if (descriptor == null) {
 			throw new IllegalStateException("not allowed");
 		}
 		return descriptor;
