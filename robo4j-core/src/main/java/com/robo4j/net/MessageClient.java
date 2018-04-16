@@ -47,6 +47,9 @@ public class MessageClient {
 	public final static int DEFAULT_SO_TIMEOUT = 2000000;
 	public final static boolean DEFAULT_KEEP_ALIVE = true;
 
+	/*
+	 * Executor for incoming messages from the server
+	 */
 	private final ExecutorService remoteReferenceCallExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
 		@Override
 		public Thread newThread(Runnable r) {
@@ -56,6 +59,10 @@ public class MessageClient {
 		}
 	});
 
+	/*
+	 * Listening to incoming messages from the server, initiated by serialized
+	 * robo references.
+	 */
 	private class RemoteReferenceListener implements Runnable {
 		private Socket socket;
 		private volatile boolean quit;
@@ -80,7 +87,7 @@ public class MessageClient {
 						context.getReference(id).sendMessage(message);
 					}
 				} catch (SocketTimeoutException e) {
-					// This will likely happen. 
+					// This will likely happen.
 				} catch (Exception e) {
 					SimpleLoggingUtil.debug(MessageClient.class, "Message delivery failed for recipient", e);
 				}

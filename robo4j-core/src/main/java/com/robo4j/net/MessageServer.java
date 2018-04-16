@@ -56,8 +56,7 @@ public class MessageServer {
 
 		@Override
 		public void run() {
-			try (ObjectInputStream objectInputStream = new ObjectInputStream(
-					new BufferedInputStream(socket.getInputStream()))) {
+			try (ObjectInputStream objectInputStream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()))) {
 				// Init protocol. First check magic...
 				if (checkMagic(objectInputStream.readShort())) {
 					final String uuid = objectInputStream.readUTF();
@@ -71,18 +70,14 @@ public class MessageServer {
 					}
 				} else {
 					SimpleLoggingUtil.error(getClass(),
-							"Got wrong communication magic - will shutdown communication with "
-									+ socket.getRemoteSocketAddress());
+							"Got wrong communication magic - will shutdown communication with " + socket.getRemoteSocketAddress());
 				}
 
 			} catch (IOException e) {
-				SimpleLoggingUtil.error(getClass(),
-						"IO Exception communicating with " + socket.getRemoteSocketAddress(), e);
+				SimpleLoggingUtil.error(getClass(), "IO Exception communicating with " + socket.getRemoteSocketAddress(), e);
 			} catch (ClassNotFoundException e) {
-				SimpleLoggingUtil.error(getClass(),
-						"Could not find class to deserialize message to - will stop receiving messages from "
-								+ socket.getRemoteSocketAddress(),
-						e);
+				SimpleLoggingUtil.error(getClass(), "Could not find class to deserialize message to - will stop receiving messages from "
+						+ socket.getRemoteSocketAddress(), e);
 			}
 			SimpleLoggingUtil.info(getClass(), "Shutting down socket " + socket.toString());
 
@@ -134,8 +129,8 @@ public class MessageServer {
 	}
 
 	/**
-	 * This will be blocking/running until stop is called (and perhaps for longer).
-	 * Dispatch in whatever thread you feel appropriate.
+	 * This will be blocking/running until stop is called (and perhaps for
+	 * longer). Dispatch in whatever thread you feel appropriate.
 	 * 
 	 * @throws IOException
 	 */
@@ -147,8 +142,8 @@ public class MessageServer {
 			bindAddress = InetAddress.getByName(host);
 		}
 
-		try (ServerSocket serverSocket = new ServerSocket(configuration.getInteger("port", 0),
-				configuration.getInteger("backlog", 20), bindAddress)) {
+		try (ServerSocket serverSocket = new ServerSocket(configuration.getInteger("port", 0), configuration.getInteger("backlog", 20),
+				bindAddress)) {
 			listeningHost = serverSocket.getInetAddress().getHostAddress();
 			listeningPort = serverSocket.getLocalPort();
 			ThreadGroup g = new ThreadGroup("Robo4J communication threads");
@@ -178,9 +173,9 @@ public class MessageServer {
 	}
 
 	/**
-	 * @return the URI for the listening socket. This is the address to connect to.
-	 *         Will return null if the server isn't up and running yet, or if badly
-	 *         configured.
+	 * @return the URI for the listening socket. This is the address to connect
+	 *         to. Will return null if the server isn't up and running yet, or
+	 *         if badly configured.
 	 */
 	public URI getListeningURI() {
 		if (!running) {

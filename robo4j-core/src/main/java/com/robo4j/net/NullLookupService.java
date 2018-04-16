@@ -24,12 +24,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * The empty lookup service.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 final class NullLookupService implements LookupService {
-	private  Map<String, RoboContextDescriptor> NULL_CONTEXTS = Collections.unmodifiableMap(new HashMap<>());
+	private Map<String, RoboContextDescriptor> NULL_CONTEXTS = Collections.unmodifiableMap(new HashMap<>());
 
 	@Override
 	public Map<String, RoboContextDescriptor> getDiscoveredContexts() {
@@ -42,11 +43,11 @@ final class NullLookupService implements LookupService {
 	}
 
 	@Override
-	public void start() throws IOException {		
+	public void start() throws IOException {
 	}
 
 	@Override
-	public void stop() throws IOException {		
+	public void stop() throws IOException {
 	}
 
 	@Override

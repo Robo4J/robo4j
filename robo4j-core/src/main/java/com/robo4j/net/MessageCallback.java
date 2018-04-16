@@ -17,10 +17,22 @@
 package com.robo4j.net;
 
 /**
+ * Message callback interface for handling a received message.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public interface MessageCallback {
+	/**
+	 * Handles an incoming message from a remote context.
+	 * 
+	 * @param sourceUuid
+	 *            the UUID of the remote context from which the message was
+	 *            sent.
+	 * @param id
+	 *            the id of the reference for the recipient.
+	 * @param message
+	 *            the message sent.
+	 */
 	void handleMessage(String sourceUuid, String id, Object message);
 }

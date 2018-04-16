@@ -22,7 +22,7 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 /**
- * Used for serializing descriptors over the network.
+ * Used for serializing robo references over the network.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -30,27 +30,27 @@ import java.io.Serializable;
 public class ReferenceDesciptor implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private transient static final ThreadLocal<ServerRemoteRoboContext> activeContex = new ThreadLocal<>();
-	
+
 	private String ctxId;
 	private String id;
 	private String fqn;
-	
+
 	public ReferenceDesciptor(String ctxId, String id, String fqn) {
 		this.ctxId = ctxId;
 		this.id = id;
 		this.fqn = fqn;
 	}
-		
-    Object readResolve() throws ObjectStreamException {
-    	ServerRemoteRoboContext remoteRoboContext = activeContex.get();
-    	if (remoteRoboContext == null) {
-    		SimpleLoggingUtil.error(getClass(), "No remote context set!");
-    		return null;
-    	}
-    	return remoteRoboContext.getRoboReference(ctxId, id, fqn);
-    }
-    
-    public static void setCurrentContext(ServerRemoteRoboContext context) {
-    	activeContex.set(context);
-    }
+
+	Object readResolve() throws ObjectStreamException {
+		ServerRemoteRoboContext remoteRoboContext = activeContex.get();
+		if (remoteRoboContext == null) {
+			SimpleLoggingUtil.error(getClass(), "No remote context set!");
+			return null;
+		}
+		return remoteRoboContext.getRoboReference(ctxId, id, fqn);
+	}
+
+	public static void setCurrentContext(ServerRemoteRoboContext context) {
+		activeContex.set(context);
+	}
 }

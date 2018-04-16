@@ -68,15 +68,15 @@ class LookupServiceImpl implements LookupService {
 					process(packet);
 				} catch (IOException e) {
 					SimpleLoggingUtil.error(getClass(),
-							"Failed to look for lookupservice packets, Stopping updates for the lookup service", e);
+							"Failed to look for lookupservice packets. Lookup service will no longer discover new remote contexts.", e);
 					isRunning = false;
 				}
 			}
 		}
 
 		private void process(DatagramPacket packet) {
-			// First a few quick checks. We want to
-			// reject updating anything as early as possible
+			// First a few quick checks. We want to reject updating anything as
+			// early as possible
 			if (!HearbeatMessageCodec.isHeartBeatMessage(packet.getData())) {
 				SimpleLoggingUtil.debug(getClass(), "Non-heartbeat packet sent to LookupService! Ignoring.");
 				return;
@@ -127,8 +127,8 @@ class LookupServiceImpl implements LookupService {
 		}
 	}
 
-	public LookupServiceImpl(String address, int port, float missedHeartbeatsBeforeRemoval,
-			LocalLookupServiceImpl localContexts) throws SocketException, UnknownHostException {
+	public LookupServiceImpl(String address, int port, float missedHeartbeatsBeforeRemoval, LocalLookupServiceImpl localContexts)
+			throws SocketException, UnknownHostException {
 		this.address = address;
 		this.port = port;
 		this.localContexts = localContexts;
@@ -137,8 +137,7 @@ class LookupServiceImpl implements LookupService {
 
 	@Override
 	public synchronized Map<String, RoboContextDescriptor> getDiscoveredContexts() {
-		Map<String, RoboContextDescriptor> map = new HashMap<>(
-				entries.size() + localContexts.getDiscoveredContexts().size());
+		Map<String, RoboContextDescriptor> map = new HashMap<>(entries.size() + localContexts.getDiscoveredContexts().size());
 		map.putAll(localContexts.getDiscoveredContexts());
 		for (Entry<String, RoboContextDescriptorEntry> entry : entries.entrySet()) {
 			map.put(entry.getKey(), entry.getValue().descriptor);

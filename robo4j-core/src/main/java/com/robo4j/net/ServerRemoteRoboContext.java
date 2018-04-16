@@ -32,11 +32,11 @@ import java.util.Map;
 import java.util.concurrent.Future;
 
 /**
+ * RoboContext for the serialized remote {@link RoboReference}.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-
 public class ServerRemoteRoboContext implements RoboContext {
 	private final String uuid;
 	private final ObjectOutputStream outputStream;
