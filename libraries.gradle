@@ -1,5 +1,5 @@
 ext {
-    robo4jVersion = "alpha-0.3.2"
+    robo4jVersion = "alpha-0.3"
 //    note::it's necessary to specify local maven repository
 //    mavenRepository = "/home/pi/.m2"
     roboGradleVersion = "4.6"
