@@ -21,13 +21,14 @@ package com.robo4j.spring;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RoboSpringException extends RuntimeException{
+public class RoboSpringException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
-    public RoboSpringException(String message) {
-        super(message);
-    }
+	public RoboSpringException(String message) {
+		super(message);
+	}
 
-    public RoboSpringException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public RoboSpringException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

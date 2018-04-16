@@ -61,7 +61,6 @@ public final class JsonUtil {
 	 *            desired collection type
 	 * @return collection of type T
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> List<T> readPathConfig(Class<T> clazz, String configurationJson) {
 		if (configurationJson == null || configurationJson.isEmpty()) {
 			return Collections.emptyList();

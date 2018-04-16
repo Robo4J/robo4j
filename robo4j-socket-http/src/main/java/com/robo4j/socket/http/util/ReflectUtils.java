@@ -1,9 +1,12 @@
 package com.robo4j.socket.http.util;
 
-import com.robo4j.socket.http.dto.ClassGetSetDTO;
-import com.robo4j.socket.http.json.JsonDocument;
-import com.robo4j.socket.http.json.JsonGenericTypeAdapter;
-import com.robo4j.socket.http.json.JsonTypeAdapter;
+import static com.robo4j.socket.http.util.JsonUtil.WITHOUT_QUOTATION_TYPES;
+import static com.robo4j.util.Utf8Constant.UTF8_COLON;
+import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
+import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_LEFT;
+import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_RIGHT;
+import static com.robo4j.util.Utf8Constant.UTF8_SQUARE_BRACKET_LEFT;
+import static com.robo4j.util.Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -19,15 +22,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.robo4j.socket.http.util.JsonUtil.WITHOUT_QUOTATION_TYPES;
-import static com.robo4j.util.Utf8Constant.UTF8_COLON;
-import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
-import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_LEFT;
-import static com.robo4j.util.Utf8Constant.UTF8_CURLY_BRACKET_RIGHT;
-import static com.robo4j.util.Utf8Constant.UTF8_DOT;
-import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
-import static com.robo4j.util.Utf8Constant.UTF8_SQUARE_BRACKET_LEFT;
-import static com.robo4j.util.Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT;
+import com.robo4j.socket.http.dto.ClassGetSetDTO;
+import com.robo4j.socket.http.json.JsonDocument;
+import com.robo4j.socket.http.json.JsonGenericTypeAdapter;
+import com.robo4j.socket.http.json.JsonTypeAdapter;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -233,19 +231,6 @@ public final class ReflectUtils {
 		public Object getValue() {
 			return value;
 		}
-	}
-
-	private static Class<?> getClassByPath(String path) {
-		String packageLink = adjustPathToPackage(path);
-		try {
-			return Class.forName(packageLink);
-		} catch (ClassNotFoundException e) {
-			throw new RoboReflectException("get class by path", e);
-		}
-	}
-
-	private static String adjustPathToPackage(String path) {
-		return path.replace(UTF8_SOLIDUS, UTF8_DOT);
 	}
 
 	public static String createJson(Object obj) {
