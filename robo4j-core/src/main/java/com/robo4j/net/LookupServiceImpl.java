@@ -180,9 +180,4 @@ class LookupServiceImpl implements LookupService {
 		RoboContextDescriptorEntry entry = entries.get(id);
 		return entry != null ? entry.descriptor : localContexts.getDescriptor(id);
 	}
-
-	@Override
-	public boolean containsDescriptor(String id) {
-		return entries.containsKey(id) || localContexts.containsDescriptor(id);
-	}
 }

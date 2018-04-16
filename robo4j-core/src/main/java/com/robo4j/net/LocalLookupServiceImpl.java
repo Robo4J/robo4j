@@ -64,11 +64,6 @@ public class LocalLookupServiceImpl implements LookupService {
 	}
 
 	@Override
-	public boolean containsDescriptor(String id) {
-		return contexts.containsKey(id);
-	}
-
-	@Override
 	public void start() throws IOException {
 	}
 

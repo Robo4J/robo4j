@@ -16,6 +16,14 @@
  */
 package com.robo4j.net;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
@@ -26,13 +34,6 @@ import com.robo4j.StringProducerRemote;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.util.SystemUtil;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Note that on Mac OS X, it seems the easiest way to get this test to run is to
@@ -72,14 +73,14 @@ public class RemoteContextTests {
 
 	@Test
 	public void testMessageToDiscoveredContext() throws RoboBuilderException, IOException, ConfigurationException {
-		RoboBuilder builder = new RoboBuilder(
-				SystemUtil.getInputStreamByResourceName("testRemoteMessageReceiverSystem.xml"));
+		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteMessageReceiverSystem.xml"));
 		StringConsumer consumer = new StringConsumer(builder.getContext(), ACK_CONSUMER);
 		builder.add(consumer);
 		RoboContext receiverCtx = builder.build();
 		receiverCtx.start();
 
-		// Note that all this cludging about with local lookup service implementations
+		// Note that all this cludging about with local lookup service
+		// implementations
 		// etc would normally not be needed.
 		// This is just to isolate this test from other tests.
 		final LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();
@@ -95,8 +96,7 @@ public class RemoteContextTests {
 		RoboContextDescriptor descriptor = service.getDescriptor("7");
 		Assert.assertNotNull(descriptor);
 
-		builder = new RoboBuilder(
-				RemoteContextTests.class.getClassLoader().getResourceAsStream("testMessageEmitterSystem_10.xml"));
+		builder = new RoboBuilder(RemoteContextTests.class.getClassLoader().getResourceAsStream("testMessageEmitterSystem_10.xml"));
 		RemoteStringProducer remoteStringProducer = new RemoteStringProducer(builder.getContext(), REMOTE_UNIT_EMITTER);
 		remoteStringProducer.initialize(getEmitterConfiguration("7", ACK_CONSUMER));
 		builder.add(remoteStringProducer);
@@ -117,16 +117,15 @@ public class RemoteContextTests {
 	}
 
 	@Test
-	public void testMessageIncludingReferenceToDiscoveredContext()
-			throws RoboBuilderException, IOException, ConfigurationException {
-		RoboBuilder builder = new RoboBuilder(
-				SystemUtil.getInputStreamByResourceName("testRemoteMessageReceiverAckSystem.xml"));
+	public void testMessageIncludingReferenceToDiscoveredContext() throws RoboBuilderException, IOException, ConfigurationException {
+		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteMessageReceiverAckSystem.xml"));
 		AckingStringConsumer consumer = new AckingStringConsumer(builder.getContext(), ACK_CONSUMER);
 		builder.add(consumer);
 		RoboContext receiverCtx = builder.build();
 		receiverCtx.start();
 
-		// Note that all this cludging about with local lookup service implementations
+		// Note that all this cludging about with local lookup service
+		// implementations
 		// etc would normally not be needed.
 		// This is just to isolate this test from other tests.
 		final LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();
@@ -143,8 +142,7 @@ public class RemoteContextTests {
 		Assert.assertNotNull(descriptor);
 
 		builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testMessageEmitterSystem_8.xml"));
-		RemoteTestMessageProducer remoteTestMessageProducer = new RemoteTestMessageProducer(builder.getContext(),
-				REMOTE_UNIT_EMITTER);
+		RemoteTestMessageProducer remoteTestMessageProducer = new RemoteTestMessageProducer(builder.getContext(), REMOTE_UNIT_EMITTER);
 		remoteTestMessageProducer.initialize(getEmitterConfiguration("9", ACK_CONSUMER));
 		builder.add(remoteTestMessageProducer);
 		RoboContext emitterContext = builder.build();
@@ -171,7 +169,8 @@ public class RemoteContextTests {
 		RoboContext receiverSystem = buildReceiverSystem();
 		RoboReference<TestMessageType> ackConsumer = receiverSystem.getReference(ACK_CONSUMER);
 
-		// Note that all this cludging about with local lookup service implementations
+		// Note that all this cludging about with local lookup service
+		// implementations
 		// etc would normally not be needed.
 		// This is just to isolate this test from other tests.
 		final LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();
@@ -193,20 +192,18 @@ public class RemoteContextTests {
 
 		RoboReference<String> remoteTestMessageProducer = producerEmitterSystem.getReference(REMOTE_UNIT_EMITTER);
 		remoteTestMessageProducer.sendMessage("sendMessage");
-		CountDownLatch ackConsumerCountDownLatch = ackConsumer
-				.getAttribute(AckingStringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
+		CountDownLatch ackConsumerCountDownLatch = ackConsumer.getAttribute(AckingStringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
 		ackConsumerCountDownLatch.await();
 
-		List<TestMessageType> receivedMessages = (List<TestMessageType>) ackConsumer
-				.getAttribute(AckingStringConsumer.DESCRIPTOR_MESSAGES).get();
+		List<TestMessageType> receivedMessages = (List<TestMessageType>) ackConsumer.getAttribute(AckingStringConsumer.DESCRIPTOR_MESSAGES)
+				.get();
 		Assert.assertTrue(receivedMessages.size() > 0);
 		System.out.println("Got messages: " + receivedMessages);
 
 		CountDownLatch producerCountDownLatch = remoteTestMessageProducer
 				.getAttribute(RemoteTestMessageProducer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
 		producerCountDownLatch.await();
-		Integer producerAcknowledge = remoteTestMessageProducer
-				.getAttribute(RemoteTestMessageProducer.DESCRIPTOR_ACKNOWLEDGE).get();
+		Integer producerAcknowledge = remoteTestMessageProducer.getAttribute(RemoteTestMessageProducer.DESCRIPTOR_ACKNOWLEDGE).get();
 		Assert.assertTrue(producerAcknowledge > 0);
 
 	}
@@ -215,7 +212,7 @@ public class RemoteContextTests {
 	@Test
 	public void startRemoteReceiver() throws Exception {
 		// consumer system
-		RoboContext receiverSystem = buildReceiverSystemStringConsumer();
+		buildReceiverSystemStringConsumer();
 
 		final LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();
 		final LookupService service = LookupServiceTests.getLookupService(localLookup);
@@ -223,13 +220,13 @@ public class RemoteContextTests {
 		LookupServiceProvider.setDefaultLookupService(service);
 		service.start();
 		System.in.read();
-
 	}
 
 	@Ignore
 	@Test
 	public void startRemoteSender() throws Exception {
-		// Note that all this cludging about with local lookup service implementations
+		// Note that all this cludging about with local lookup service
+		// implementations
 		// etc would normally not be needed.
 		// This is just to isolate this test from other tests.
 		final LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();
@@ -258,18 +255,16 @@ public class RemoteContextTests {
 	}
 
 	private <T> RoboContext buildConsumerEmitterSystem(Class<T> clazz, String target) throws Exception {
-		RoboBuilder builder = new RoboBuilder(
-				SystemUtil.getInputStreamByResourceName("testMessageEmitterSystem_8.xml"));
+		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testMessageEmitterSystem_8.xml"));
 
-		if(clazz.equals(String.class)){
+		if (clazz.equals(String.class)) {
 			StringProducerRemote<T> remoteTestMessageProducer = new StringProducerRemote<>(clazz, builder.getContext(),
 					REMOTE_UNIT_EMITTER);
 			remoteTestMessageProducer.initialize(getEmitterConfiguration(REMOTE_CONTEXT_RECEIVER, target));
 			builder.add(remoteTestMessageProducer);
 		}
-		if(clazz.equals(TestMessageType.class)){
-			RemoteTestMessageProducer remoteTestMessageProducer = new RemoteTestMessageProducer(builder.getContext(),
-					REMOTE_UNIT_EMITTER);
+		if (clazz.equals(TestMessageType.class)) {
+			RemoteTestMessageProducer remoteTestMessageProducer = new RemoteTestMessageProducer(builder.getContext(), REMOTE_UNIT_EMITTER);
 			remoteTestMessageProducer.initialize(getEmitterConfiguration(REMOTE_CONTEXT_RECEIVER, target));
 			builder.add(remoteTestMessageProducer);
 		}
@@ -302,11 +297,8 @@ public class RemoteContextTests {
 		return receiverSystem;
 	}
 
-	// TODO (Marcus/Miro) maybe we should thing about something alike blocking
-	// queue, list, map,
 	private RoboContextDescriptor getRoboContextDescriptor(LookupService service, String remoteContextId) {
-
-		while (!service.containsDescriptor(remoteContextId)) {
+		while (service.getDescriptor(remoteContextId) == null) {
 			service.getDiscoveredContexts();
 		}
 		RoboContextDescriptor descriptor = service.getDescriptor(remoteContextId);

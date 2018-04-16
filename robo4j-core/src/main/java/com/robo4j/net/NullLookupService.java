@@ -54,9 +54,4 @@ final class NullLookupService implements LookupService {
 	public RoboContextDescriptor getDescriptor(String id) {
 		return null;
 	}
-
-	@Override
-	public boolean containsDescriptor(String id) {
-		return false;
-	}
 }
