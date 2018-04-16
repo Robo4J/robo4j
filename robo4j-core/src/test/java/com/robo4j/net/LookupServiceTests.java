@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.robo4j.net.LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS;
-import static com.robo4j.net.LookupServiceProvider.DEFAULT_NETWORK_INTERFACE_EN_0;
 import static com.robo4j.net.LookupServiceProvider.DEFAULT_PORT;
 
 /**
@@ -42,7 +41,7 @@ public class LookupServiceTests {
 	private static final float ALLOWED_HEARTBEAT_MISSES = 22f;
 
 	static LookupService getLookupService(LocalLookupServiceImpl localLookupService){
-		return DefaultLookupServiceBuilder.Build().setNetworkInterface(DEFAULT_NETWORK_INTERFACE_EN_0)
+		return DefaultLookupServiceBuilder.Build()
 				.setAddress(DEFAULT_MULTICAST_ADDRESS)
 				.setPort(DEFAULT_PORT)
 				.setMissedHeartbeatsBeforeRemoval(ALLOWED_HEARTBEAT_MISSES)

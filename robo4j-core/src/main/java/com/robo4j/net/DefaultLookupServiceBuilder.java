@@ -30,7 +30,6 @@ import java.net.UnknownHostException;
  */
 public class DefaultLookupServiceBuilder {
 
-    private String netInterface;
     private String address;
     private Integer port;
     private Float missedHeartbeatsBeforeRemoval;
@@ -43,11 +42,6 @@ public class DefaultLookupServiceBuilder {
 
     public static DefaultLookupServiceBuilder Build(){
         return new DefaultLookupServiceBuilder();
-    }
-
-    public DefaultLookupServiceBuilder setNetworkInterface(String netInterface) {
-        this.netInterface = netInterface;
-        return this;
     }
 
     public DefaultLookupServiceBuilder setAddress(String address) {
@@ -72,7 +66,7 @@ public class DefaultLookupServiceBuilder {
 
     public LookupService build(){
         try {
-            return new LookupServiceImpl(netInterface, address, port, missedHeartbeatsBeforeRemoval, localContexts);
+            return new LookupServiceImpl(address, port, missedHeartbeatsBeforeRemoval, localContexts);
         } catch (SocketException | UnknownHostException e) {
             SimpleLoggingUtil.error(LookupServiceProvider.class,
                     "Failed to set up LookupService! No multicast route? Will use null provider...", e);

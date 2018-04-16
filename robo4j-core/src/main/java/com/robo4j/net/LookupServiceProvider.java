@@ -28,7 +28,6 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class LookupServiceProvider {
-	public static final String DEFAULT_NETWORK_INTERFACE_EN_0 = "en0";
 	public static final String DEFAULT_MULTICAST_ADDRESS = "238.12.15.254";
 	public static final int DEFAULT_PORT = 0x0FFE;
 	private static final float DEFAULT_HEARTBEATS_BEFORE_REMOVAL = 3.5f;
@@ -53,7 +52,7 @@ public final class LookupServiceProvider {
 
 	private static LookupService createDefaultService() {
 		//@formatter:off
-		return DefaultLookupServiceBuilder.Build().setNetworkInterface(DEFAULT_NETWORK_INTERFACE_EN_0)
+		return DefaultLookupServiceBuilder.Build()
 				.setAddress(DEFAULT_MULTICAST_ADDRESS)
 				.setPort(DEFAULT_PORT)
 				.setMissedHeartbeatsBeforeRemoval(DEFAULT_HEARTBEATS_BEFORE_REMOVAL)

@@ -8,8 +8,14 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
-
 apply from: 'libraries.gradle'
+
+allprojects {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+}
 
 subprojects {
     apply plugin: 'java'
@@ -21,11 +27,6 @@ subprojects {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-repositories {
-    mavenCentral()
-    mavenLocal()
-}
-
 project("robo4j-core") {
     description = "Robo4J Core"
 
@@ -34,11 +35,6 @@ project("robo4j-core") {
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
 
     dependencies {
         testCompile "junit:junit:${junitVersion}@jar"
@@ -81,11 +77,6 @@ project("robo4j-db-sql") {
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
 
     dependencies {
         compile(project(":robo4j-core"))
@@ -134,19 +125,6 @@ project("robo4j-hw-lego") {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "${mavenRepository}")
-            }
-        }
-    }
-
     dependencies {
         compile fileTree(dir: 'libs', include: 'ev3classes-9.1.jar')
         compile(project(":robo4j-math"))
@@ -188,14 +166,6 @@ project("robo4j-hw-rpi") {
         mavenLocal()
         flatDir {
             dirs "$rootProject.projectDir/libs"
-        }
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "${mavenRepository}")
-            }
         }
     }
 
@@ -248,11 +218,6 @@ project("robo4j-math") {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
     dependencies {
         testCompile "junit:junit:${junitVersion}"
     }
@@ -287,11 +252,6 @@ project("robo4j-page") {
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
 
     dependencies {
         testCompile "junit:junit:${junitVersion}@jar"
@@ -329,11 +289,6 @@ project("robo4j-socket-http") {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
     dependencies {
         compile(project(":robo4j-core"))
         testCompile "junit:junit:${junitVersion}@jar"
@@ -369,19 +324,6 @@ project("robo4j-units-lego") {
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "${mavenRepository}")
-            }
-        }
-    }
 
     //create a single Jar with all dependencies
     task fatJar(type: Jar) {
@@ -431,19 +373,6 @@ project("robo4j-units-rpi") {
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "${mavenRepository}")
-            }
-        }
-    }
 
     //create a single Jar with all dependencies
     task fatJar(type: Jar) {
@@ -495,11 +424,6 @@ project("robo4j-units-rpi-http") {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
     dependencies {
     	compile(project(":robo4j-socket-http"))
         compile(project(":robo4j-units-rpi"))
@@ -534,11 +458,6 @@ project("robo4j-spring") {
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
 
     dependencies {
         compile(project(":robo4j-core"))

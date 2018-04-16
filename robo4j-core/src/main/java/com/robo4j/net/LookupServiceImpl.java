@@ -127,9 +127,8 @@ class LookupServiceImpl implements LookupService {
 		}
 	}
 
-	public LookupServiceImpl(String netInterface, String address, int port, float missedHeartbeatsBeforeRemoval,
+	public LookupServiceImpl(String address, int port, float missedHeartbeatsBeforeRemoval,
 			LocalLookupServiceImpl localContexts) throws SocketException, UnknownHostException {
-
 		this.address = address;
 		this.port = port;
 		this.localContexts = localContexts;
