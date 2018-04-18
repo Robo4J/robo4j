@@ -16,14 +16,6 @@
  */
 package com.robo4j.net;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
@@ -34,6 +26,13 @@ import com.robo4j.StringProducerRemote;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.util.SystemUtil;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Note that on Mac OS X, it seems the easiest way to get this test to run is to
@@ -124,10 +123,6 @@ public class RemoteContextTests {
 		RoboContext receiverCtx = builder.build();
 		receiverCtx.start();
 
-		// Note that all this cludging about with local lookup service
-		// implementations
-		// etc would normally not be needed.
-		// This is just to isolate this test from other tests.
 		final LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();
 		final LookupService service = LookupServiceTests.getLookupService(localLookup);
 
