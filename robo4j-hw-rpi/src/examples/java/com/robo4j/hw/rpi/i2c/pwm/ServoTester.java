@@ -35,15 +35,16 @@ public class ServoTester {
 	private static final Servo[] SERVOS = new Servo[16];
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-		System.out.println("Creating device...");
+		System.out.print("Creating device...");
 		PWMPCA9685Device device = new PWMPCA9685Device();
 		device.setPWMFrequency(SERVO_FREQUENCY);
-
-		System.out.println("Setting start conditions...");
+		System.out.println("done!");
 		System.out.println(
-				"Type the id of the channel of the servo to control and how much to move the servo, between -1 and 1. For example:\15 -1.0\nType q and enter to quit!\n");
+				"Type the id of the channel of the servo to control and how much to move the servo, between -1 and 1.\nFor example:\15 -1.0\nType q and enter to quit!\n");
+		System.out.flush();
 		Scanner scanner = new Scanner(System.in);
 		String lastCommand;
+		printPrompt();
 		while (!"q".equals(lastCommand = scanner.nextLine())) {
 			lastCommand = lastCommand.trim();
 			String[] split = lastCommand.split(" ");
@@ -70,8 +71,23 @@ public class ServoTester {
 				continue;
 			}
 			servo.setInput(position);
+			printPrompt();
 		}
 		scanner.close();
 		System.out.println("Bye!");
+	}
+
+	private static void printPrompt() {
+		System.out.println(String.format("known servos=%d>", getNumberOfKnownServos()));
+	}
+
+	private static int getNumberOfKnownServos() {
+		int count = 0;
+		for (int i = 0; i < SERVOS.length; i++) {
+			if (SERVOS[i] != null) {
+				count++;
+			}
+		}
+		return count;
 	}
 }
