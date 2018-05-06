@@ -40,7 +40,7 @@ public class ServoTester {
 		device.setPWMFrequency(SERVO_FREQUENCY);
 		System.out.println("done!");
 		System.out.println(
-				"Type the id of the channel of the servo to control and how much to move the servo, between -1 and 1.\nFor example:\15 -1.0\nType q and enter to quit!\n");
+				"Type the id of the channel of the servo to control and how much to move the servo,\nbetween -1 and 1. For example:\nknown servos=0>15 -1.0\nType q and enter to quit!\n");
 		System.out.flush();
 		Scanner scanner = new Scanner(System.in);
 		String lastCommand;
@@ -78,7 +78,7 @@ public class ServoTester {
 	}
 
 	private static void printPrompt() {
-		System.out.println(String.format("known servos=%d>", getNumberOfKnownServos()));
+		System.out.print(String.format("known servos=%d>", getNumberOfKnownServos()));
 	}
 
 	private static int getNumberOfKnownServos() {
