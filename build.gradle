@@ -22,19 +22,19 @@ subprojects {
     apply plugin: 'idea'
     apply plugin: 'eclipse'
     apply plugin: 'maven'
-}
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-project("robo4j-core") {
-    description = "Robo4J Core"
+    compileJava {
+        sourceCompatibility = "${robo4jJavaVersion}"
+        targetCompatibility = "${robo4jJavaVersion}"
+    }
 
     group 'com.robo4j'
     version "${robo4jVersion}"
+}
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+
+project("robo4j-core") {
+    description = "Robo4J Core"
 
     dependencies {
         testCompile "junit:junit:${junitVersion}@jar"
@@ -70,13 +70,7 @@ project("robo4j-db-sql") {
 
     description = "Robo4J Database SQL"
 
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
     apply plugin: "org.flywaydb.flyway"
-
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
 
     dependencies {
         compile(project(":robo4j-core"))
@@ -119,12 +113,6 @@ project("robo4j-db-sql") {
 project("robo4j-hw-lego") {
     description = "Robo4J Lego Hardware"
 
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-
     dependencies {
         compile fileTree(dir: 'libs', include: 'ev3classes-9.1.jar')
         compile(project(":robo4j-math"))
@@ -154,12 +142,6 @@ project("robo4j-hw-lego") {
 
 project("robo4j-hw-rpi") {
     description = "Robo4J RaspberryPi Hardware"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
 
     repositories {
         mavenCentral()
@@ -212,12 +194,6 @@ project("robo4j-hw-rpi") {
 project("robo4j-math") {
     description = "Robo4J Math"
 
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-
     dependencies {
         testCompile "junit:junit:${junitVersion}"
     }
@@ -247,12 +223,6 @@ project("robo4j-math") {
 project("robo4j-page") {
     description = "Robo4J Page"
 
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-
     dependencies {
         testCompile "junit:junit:${junitVersion}@jar"
         testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
@@ -280,14 +250,7 @@ project("robo4j-page") {
 }
 
 project("robo4j-socket-http") {
-
     description = "Robo4J socket http"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
 
     dependencies {
         compile(project(":robo4j-core"))
@@ -318,12 +281,6 @@ project("robo4j-socket-http") {
 
 project("robo4j-units-lego") {
     description = "Robo4J Lego Abstractions"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
 
     //create a single Jar with all dependencies
     task fatJar(type: Jar) {
@@ -367,12 +324,6 @@ project("robo4j-units-lego") {
 
 project("robo4j-units-rpi") {
     description = "Robo4J Raspberry Pi"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
 
     //create a single Jar with all dependencies
     task fatJar(type: Jar) {
@@ -418,12 +369,6 @@ project("robo4j-units-rpi") {
 project("robo4j-units-rpi-http") {
     description = "Robo4J Codecs for rpi units"
 
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-
     dependencies {
     	compile(project(":robo4j-socket-http"))
         compile(project(":robo4j-units-rpi"))
@@ -450,14 +395,7 @@ project("robo4j-units-rpi-http") {
 }
 
 project("robo4j-spring") {
-
     description = "Robo4J Spring support"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
 
     dependencies {
         compile(project(":robo4j-core"))
