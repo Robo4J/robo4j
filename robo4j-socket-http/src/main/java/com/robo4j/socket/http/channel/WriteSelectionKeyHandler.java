@@ -23,15 +23,16 @@ import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.SocketException;
 import com.robo4j.socket.http.enums.StatusCode;
+import com.robo4j.socket.http.message.HttpDenominator;
 import com.robo4j.socket.http.message.HttpResponseDenominator;
 import com.robo4j.socket.http.request.HttpResponseProcess;
 import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.units.ServerPathConfig;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
 import com.robo4j.socket.http.util.ChannelUtils;
-import com.robo4j.socket.http.message.HttpDenominator;
 import com.robo4j.socket.http.util.HttpMessageBuilder;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -86,20 +87,17 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 				ChannelUtils.handleWriteChannelAndBuffer("get write", channel, buffer);
 				break;
 			case POST:
+				HttpDenominator denominator = new HttpResponseDenominator(responseProcess.getCode(),
+						HttpVersion.HTTP_1_1);
+				String postResponse = HttpMessageBuilder.Build().setDenominator(denominator)
+						.build();
 				if (responseProcess.getResult() != null && responseProcess.getCode().equals(StatusCode.ACCEPTED)) {
-
-					HttpDenominator denominator = new HttpResponseDenominator(responseProcess.getCode(),
-							HttpVersion.HTTP_1_1);
-					String postResponse = HttpMessageBuilder.Build().setDenominator(denominator).build();
 
 					buffer = ChannelBufferUtils.getByteBufferByString(postResponse);
 					ChannelUtils.handleWriteChannelAndBuffer("post write", channel, buffer);
 					sendMessageToTargetRoboReference(responseProcess);
 				} else {
-					HttpDenominator denominator = new HttpResponseDenominator(responseProcess.getCode(),
-							HttpVersion.HTTP_1_1);
-					String notImplementedResponse = HttpMessageBuilder.Build().setDenominator(denominator).build();
-					buffer = ChannelBufferUtils.getByteBufferByString(notImplementedResponse);
+					buffer = ChannelBufferUtils.getByteBufferByString(postResponse);
 					ChannelUtils.handleWriteChannelAndBuffer("post write", channel, buffer);
 				}
 			default:
@@ -118,8 +116,12 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 		}
 
 //		 channelKeyMap.remove(channel);
-
-		key.cancel();
+		try {
+			key.cancel();
+			key.channel().close();
+		} catch (IOException e) {
+			throw new SocketException(e.getMessage());
+		}
 		return key;
 	}
 

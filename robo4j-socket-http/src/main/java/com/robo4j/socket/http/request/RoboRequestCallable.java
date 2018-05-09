@@ -83,8 +83,12 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
 				} else {
 					result.setTarget(pathConfig.getRoboUnit().getId());
 					Object respObj = factory.processPost(pathConfig.getRoboUnit(), postValue);
-					result.setCode(StatusCode.ACCEPTED);
-					result.setResult(respObj);
+					if(respObj == null){
+						result.setCode(StatusCode.NOT_ACCEPTABLE);
+					} else {
+						result.setCode(StatusCode.ACCEPTED);
+						result.setResult(respObj);
+					}
 				}
 				return result;
 
