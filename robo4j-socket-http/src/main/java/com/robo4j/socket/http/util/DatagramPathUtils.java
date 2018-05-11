@@ -7,6 +7,7 @@ import com.robo4j.socket.http.dto.ServerUnitPathDTO;
 import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.socket.http.units.ClientContext;
 import com.robo4j.socket.http.units.ClientPathConfig;
+import com.robo4j.socket.http.units.PathHttpMethod;
 import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.units.ServerPathConfig;
 
@@ -26,17 +27,17 @@ public final class DatagramPathUtils {
 
 	public static void updateDatagramServerContextPaths(final RoboContext context, final ServerContext serverContext,
 			final Collection<ServerUnitPathDTO> paths) {
-		final Map<String, ServerPathConfig> resultPaths = paths.stream().map(e -> {
+		final Map<PathHttpMethod, ServerPathConfig> resultPaths = paths.stream().map(e -> {
 			RoboReference<Object> reference = context.getReference(e.getRoboUnit());
 			return new ServerPathConfig(toPath(SystemPath.UNITS.getPath(), e.getRoboUnit()), reference, e.getMethod(), e.getFilters());
-		}).collect(Collectors.toMap(ServerPathConfig::getPath, e -> e));
+		}).collect(Collectors.toMap(e -> new PathHttpMethod(e.getPath(), null), e -> e));
 		serverContext.addPaths(resultPaths);
 	}
 
 	public static void updateDatagramClientContextPaths(final ClientContext clientContext, final Collection<ClientPathDTO> paths){
-		final Map<String, ClientPathConfig> resultPaths = paths.stream()
+		final Map<PathHttpMethod, ClientPathConfig> resultPaths = paths.stream()
 				.map(e -> new ClientPathConfig(toPath(SystemPath.UNITS.getPath(), e.getRoboUnit()), e.getMethod(), e.getCallbacks()))
-				.collect(Collectors.toMap(ClientPathConfig::getPath, e -> e));
+				.collect(Collectors.toMap(e -> new PathHttpMethod(e.getPath(), null), e -> e));
 		clientContext.addPaths(resultPaths);
 	}
 }

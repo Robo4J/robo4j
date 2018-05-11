@@ -21,6 +21,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
+import com.robo4j.socket.http.units.PathHttpMethod;
 import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.units.ServerPathConfig;
 
@@ -54,7 +55,7 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
 	public HttpResponseProcess call() throws Exception {
 
 		final HttpResponseProcessBuilder resultBuilder = HttpResponseProcessBuilder.Builder();
-		final ServerPathConfig pathConfig = serverContext.getPathConfig(decoratedRequest.getPath());
+		final ServerPathConfig pathConfig = serverContext.getPathConfig(new PathHttpMethod(decoratedRequest.getPath(), decoratedRequest.getMethod()));
 
 		if (isValidPath(pathConfig)) {
 			resultBuilder.setMethod(pathConfig.getMethod());

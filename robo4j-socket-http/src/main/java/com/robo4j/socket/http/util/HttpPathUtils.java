@@ -27,6 +27,7 @@ import com.robo4j.socket.http.json.JsonDocument;
 import com.robo4j.socket.http.json.JsonReader;
 import com.robo4j.socket.http.units.ClientContext;
 import com.robo4j.socket.http.units.ClientPathConfig;
+import com.robo4j.socket.http.units.PathHttpMethod;
 import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.units.ServerPathConfig;
 import com.robo4j.util.StringConstants;
@@ -94,20 +95,22 @@ public final class HttpPathUtils {
 
 	public static void updateHttpServerContextPaths(final RoboContext context, final ServerContext serverContext,
 			final Collection<ServerUnitPathDTO> paths) {
-		final Map<String, ServerPathConfig> resultPaths = paths.stream().map(e -> {
+		final Map<PathHttpMethod, ServerPathConfig> resultPaths = paths.stream().map(e -> {
 			RoboReference<Object> reference = context.getReference(e.getRoboUnit());
 			return HttpPathUtils.toServerPathConfig(e, reference);
-		}).collect(Collectors.toMap(ServerPathConfig::getPath, e -> e));
-		resultPaths.put(Utf8Constant.UTF8_SOLIDUS,
+		}).collect(Collectors.toMap(e -> new PathHttpMethod(e.getPath(), e.getMethod()), e -> e));
+
+
+		resultPaths.put(new PathHttpMethod(Utf8Constant.UTF8_SOLIDUS,HttpMethod.GET),
 				new ServerPathConfig(Utf8Constant.UTF8_SOLIDUS, null, HttpMethod.GET));
 		serverContext.addPaths(resultPaths);
 	}
 
 	public static void updateHttpClientContextPaths(final ClientContext clientContext,
 			final Collection<ClientPathDTO> paths) {
-		final Map<String, ClientPathConfig> resultPaths = paths.stream()
+		final Map<PathHttpMethod, ClientPathConfig> resultPaths = paths.stream()
                 .map(HttpPathUtils::toClientPathConfig)
-				.collect(Collectors.toMap(ClientPathConfig::getPath, e -> e));
+				.collect(Collectors.toMap(e -> new PathHttpMethod(e.getPath(), e.getMethod()), e -> e));
 		clientContext.addPaths(resultPaths);
 	}
 

@@ -19,7 +19,7 @@ public final class ServerContext implements SocketContext<ServerPathConfig> {
 	/**
 	 * map of registered paths and related configuration
 	 */
-	private final Map<String, ServerPathConfig> pathConfigs = new HashMap<>();
+	private final Map<PathHttpMethod, ServerPathConfig> pathConfigs = new HashMap<>();
 
 	/**
 	 * context properties
@@ -30,7 +30,7 @@ public final class ServerContext implements SocketContext<ServerPathConfig> {
 	}
 
 	@Override
-	public void addPaths(Map<String, ServerPathConfig> paths) {
+	public void addPaths(Map<PathHttpMethod, ServerPathConfig> paths) {
 		pathConfigs.putAll(paths);
 	}
 
@@ -40,8 +40,8 @@ public final class ServerContext implements SocketContext<ServerPathConfig> {
 	}
 
 	@Override
-	public boolean containsPath(String path) {
-		return pathConfigs.containsKey(path);
+	public boolean containsPath(PathHttpMethod pathMethod) {
+		return pathConfigs.containsKey(pathMethod);
 	}
 
 	@Override
@@ -50,8 +50,8 @@ public final class ServerContext implements SocketContext<ServerPathConfig> {
 	}
 
 	@Override
-	public ServerPathConfig getPathConfig(String path) {
-		return pathConfigs.get(path);
+	public ServerPathConfig getPathConfig(PathHttpMethod pathMethod) {
+		return pathConfigs.get(pathMethod);
 	}
 
 	/**

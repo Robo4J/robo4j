@@ -48,7 +48,7 @@ public class DatagramClientCodecUnit extends AbstractClientCodecUnit {
                 .containsEncoder(message.getClazz()) ? processMessage(message.getClazz(), message.getMessage())
                 : NOT_AVAILABLE;
 
-        final ClientPathConfig pathConfig = clientContext.getPathConfig(message.getPath());
+        final ClientPathConfig pathConfig = clientContext.getPathConfig(new PathHttpMethod(message.getPath(), null));
         final DatagramDenominator denominator = new DatagramDenominator(DatagramBodyType.JSON.getType(), pathConfig.getPath());
         final DatagramDecoratedRequest request = new DatagramDecoratedRequest(denominator);
         request.addMessage(encodedMessage.getBytes());

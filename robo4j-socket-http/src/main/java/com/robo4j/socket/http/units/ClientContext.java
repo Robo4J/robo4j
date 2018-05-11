@@ -18,7 +18,7 @@ public final class ClientContext implements SocketContext<ClientPathConfig> {
 	/**
 	 * map of registered paths and related configuration
 	 */
-	private final Map<String, ClientPathConfig> pathConfigs = new HashMap<>();
+	private final Map<PathHttpMethod, ClientPathConfig> pathConfigs = new HashMap<>();
 
 	/**
 	 * context properties
@@ -29,7 +29,7 @@ public final class ClientContext implements SocketContext<ClientPathConfig> {
 	}
 
 	@Override
-	public void addPaths(Map<String, ClientPathConfig> paths) {
+	public void addPaths(Map<PathHttpMethod, ClientPathConfig> paths) {
 		pathConfigs.putAll(paths);
 	}
 
@@ -39,8 +39,8 @@ public final class ClientContext implements SocketContext<ClientPathConfig> {
 	}
 
 	@Override
-	public boolean containsPath(String path) {
-		return pathConfigs.containsKey(path);
+	public boolean containsPath(PathHttpMethod pathMethod) {
+		return pathConfigs.containsKey(pathMethod);
 	}
 
 	@Override
@@ -49,8 +49,8 @@ public final class ClientContext implements SocketContext<ClientPathConfig> {
 	}
 
 	@Override
-	public ClientPathConfig getPathConfig(String path) {
-		return pathConfigs.getOrDefault(path, ClientPathConfig.EMPTY);
+	public ClientPathConfig getPathConfig(PathHttpMethod pathMethod) {
+		return pathConfigs.getOrDefault(pathMethod, ClientPathConfig.EMPTY);
 	}
 
 	@Override

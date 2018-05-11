@@ -42,7 +42,7 @@ public class HttpContextTests {
 		System.out.println("context:" + context);
 		Assert.assertNotNull(context);
 		Assert.assertTrue(!context.isEmpty());
-		Assert.assertTrue(context.containsPath(Utf8Constant.UTF8_SOLIDUS));
+		Assert.assertTrue(context.containsPath(new PathHttpMethod(Utf8Constant.UTF8_SOLIDUS, HttpMethod.GET)));
 
 	}
 
@@ -71,12 +71,15 @@ public class HttpContextTests {
 		ClientContext context = new ClientContext();
 		HttpPathUtils.updateHttpClientContextPaths(context, paths);
 
+
+		PathHttpMethod basicGet = new PathHttpMethod(Utf8Constant.UTF8_SOLIDUS, HttpMethod.GET);
+
         System.out.println("context: " + context);
         Assert.assertNotNull(context);
-		Assert.assertNotNull(context.getPathConfig(Utf8Constant.UTF8_SOLIDUS));
-		Assert.assertTrue(!context.getPathConfig(Utf8Constant.UTF8_SOLIDUS).getCallbacks().isEmpty());
-		Assert.assertTrue(context.getPathConfig(Utf8Constant.UTF8_SOLIDUS).getMethod().equals(HttpMethod.GET));
-		Assert.assertTrue(context.getPathConfig(Utf8Constant.UTF8_SOLIDUS).getCallbacks().size() == 1);
-		Assert.assertTrue(context.getPathConfig(Utf8Constant.UTF8_SOLIDUS).getCallbacks().get(0).equals(StringConsumer.NAME));
+		Assert.assertNotNull(context.getPathConfig(basicGet));
+		Assert.assertTrue(!context.getPathConfig(basicGet).getCallbacks().isEmpty());
+		Assert.assertTrue(context.getPathConfig(basicGet).getMethod().equals(HttpMethod.GET));
+		Assert.assertTrue(context.getPathConfig(basicGet).getCallbacks().size() == 1);
+		Assert.assertTrue(context.getPathConfig(basicGet).getCallbacks().get(0).equals(StringConsumer.NAME));
 	}
 }

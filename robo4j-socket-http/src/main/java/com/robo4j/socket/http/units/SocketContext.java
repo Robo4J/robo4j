@@ -11,15 +11,15 @@ import java.util.Map;
  */
 public interface SocketContext<T> {
 
-	void addPaths(Map<String, T> paths);
+	void addPaths(Map<PathHttpMethod, T> paths);
 
 	boolean isEmpty();
 
-	boolean containsPath(String path);
+	boolean containsPath(PathHttpMethod pathMethod);
 
 	Collection<T> getPathConfigs();
 
-	T getPathConfig(String path);
+	T getPathConfig(PathHttpMethod pathMethod);
 
 	void putProperty(String key, Object val);
 

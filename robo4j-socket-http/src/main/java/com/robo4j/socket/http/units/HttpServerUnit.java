@@ -73,7 +73,6 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		String packages = configuration.getString(PROPERTY_CODEC_PACKAGES, null);
 
 		serverContext.putProperty(PROPERTY_CODEC_REGISTRY, CodeRegistryUtils.getCodecRegistry(packages));
-
 	}
 
 	/**

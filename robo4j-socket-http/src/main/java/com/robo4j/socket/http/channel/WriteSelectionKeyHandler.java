@@ -26,6 +26,7 @@ import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.message.HttpDenominator;
 import com.robo4j.socket.http.message.HttpResponseDenominator;
 import com.robo4j.socket.http.request.HttpResponseProcess;
+import com.robo4j.socket.http.units.PathHttpMethod;
 import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.units.ServerPathConfig;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
@@ -126,7 +127,7 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 	}
 
 	private void sendMessageToTargetRoboReference(HttpResponseProcess process) {
-		final ServerPathConfig pathConfig = serverContext.getPathConfig(process.getPath());
+		final ServerPathConfig pathConfig = serverContext.getPathConfig(new PathHttpMethod(process.getPath(), process.getMethod()));
 		if (pathConfig.getRoboUnit() != null
 				&& pathConfig.getRoboUnit().getMessageType().equals(process.getResult().getClass())) {
 			RoboReference<Object> reference = pathConfig.getRoboUnit();
