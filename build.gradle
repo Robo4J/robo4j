@@ -14,6 +14,7 @@ allprojects {
     repositories {
         mavenCentral()
         mavenLocal()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
 }
 
@@ -143,14 +144,6 @@ project("robo4j-hw-lego") {
 project("robo4j-hw-rpi") {
     description = "Robo4J RaspberryPi Hardware"
 
-    repositories {
-        mavenCentral()
-        mavenLocal()
-        flatDir {
-            dirs "$rootProject.projectDir/libs"
-        }
-    }
-
     //create a single Jar with all dependencies
     task fatJar(type: Jar) {
         manifest {
@@ -165,7 +158,7 @@ project("robo4j-hw-rpi") {
     }
 
     dependencies {
-        compile fileTree(dir: 'libs', include: 'pi4j-core-1.2-20170907.193313-36.jar')
+        compile "com.pi4j:pi4j-core:${pi4jVersion}"
         compile(project(":robo4j-math"))
         testCompile "junit:junit:${junitVersion}"
     }

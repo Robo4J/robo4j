@@ -103,7 +103,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	@Override
 	public Object processPost(final RoboReference<?> unitReference, final String message) {
 		final SocketDecoder<Object, ?> decoder = codecRegistry.getDecoder(unitReference.getMessageType());
-		return decoder.decode(message);
+		return decoder != null ? decoder.decode(message) : null;
 	}
 
 }

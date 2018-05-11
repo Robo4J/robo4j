@@ -34,7 +34,12 @@ public final class HttpResponseProcess implements ChannelResponseProcess<String>
     private StatusCode code;
     private Object result;
 
-    HttpResponseProcess() {
+    HttpResponseProcess(String path, String target, HttpMethod method, StatusCode code, Object result) {
+        this.path = path;
+        this.target = target;
+        this.method = method;
+        this.code = code;
+        this.result = result;
     }
 
     @Override
@@ -42,22 +47,22 @@ public final class HttpResponseProcess implements ChannelResponseProcess<String>
         return path;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
+//    public void setPath(String path) {
+//        this.path = path;
+//    }
 
     @Override
     public String getTarget() {
         return target;
     }
 
-    public void setTarget(String target) {
-        this.target = target;
-    }
+//    public void setTarget(String target) {
+//        this.target = target;
+//    }
 
-    public void setMethod(HttpMethod method) {
-        this.method = method;
-    }
+//    public void setMethod(HttpMethod method) {
+//        this.method = method;
+//    }
 
     public HttpMethod getMethod() {
         return method;
@@ -72,9 +77,9 @@ public final class HttpResponseProcess implements ChannelResponseProcess<String>
         this.result = result;
     }
 
-    public void setCode(StatusCode code){
-        this.code = code;
-    }
+//    public void setCode(StatusCode code){
+//        this.code = code;
+//    }
 
     public StatusCode getCode() {
         return code;

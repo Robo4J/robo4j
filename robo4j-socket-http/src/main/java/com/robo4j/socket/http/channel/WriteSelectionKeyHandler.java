@@ -57,6 +57,8 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 		this.key = key;
 	}
 
+
+
 	@Override
 	public SelectionKey handle() {
 		SocketChannel channel = (SocketChannel) key.channel();
@@ -92,7 +94,6 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 				String postResponse = HttpMessageBuilder.Build().setDenominator(denominator)
 						.build();
 				if (responseProcess.getResult() != null && responseProcess.getCode().equals(StatusCode.ACCEPTED)) {
-
 					buffer = ChannelBufferUtils.getByteBufferByString(postResponse);
 					ChannelUtils.handleWriteChannelAndBuffer("post write", channel, buffer);
 					sendMessageToTargetRoboReference(responseProcess);
@@ -115,7 +116,6 @@ public class WriteSelectionKeyHandler implements SelectionKeyHandler {
 			buffer.clear();
 		}
 
-//		 channelKeyMap.remove(channel);
 		try {
 			key.cancel();
 			key.channel().close();
