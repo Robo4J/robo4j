@@ -19,6 +19,7 @@ package com.robo4j.socket.http.message;
 
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
+import com.robo4j.socket.http.units.PathHttpMethod;
 import com.robo4j.util.Utf8Constant;
 
 import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
@@ -30,8 +31,7 @@ import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
 public class HttpRequestDenominator implements HttpDenominator {
 
 	private final StringBuilder sb = new StringBuilder();
-	private final HttpMethod method;
-	private final String path;
+	private final PathHttpMethod pathHttpMethod;
 	private final HttpVersion version;
 
 	/**
@@ -43,8 +43,7 @@ public class HttpRequestDenominator implements HttpDenominator {
 	 *            http version
 	 */
 	public HttpRequestDenominator(HttpMethod method, HttpVersion version) {
-		this.method = method;
-		this.path = UTF8_SOLIDUS;
+		this.pathHttpMethod = new PathHttpMethod(UTF8_SOLIDUS, method);
 		this.version = version;
 	}
 
@@ -58,17 +57,12 @@ public class HttpRequestDenominator implements HttpDenominator {
 	 *            http version
 	 */
 	public HttpRequestDenominator(HttpMethod method, String path, HttpVersion version) {
-		this.method = method;
-		this.path = path;
+		this.pathHttpMethod = new PathHttpMethod(path, method);
 		this.version = version;
 	}
 
-	public HttpMethod getMethod() {
-		return method;
-	}
-
-	public String getPath() {
-		return path;
+	public PathHttpMethod getPathHttpMethod() {
+		return pathHttpMethod;
 	}
 
 	@Override
@@ -83,15 +77,13 @@ public class HttpRequestDenominator implements HttpDenominator {
 	 */
 	@Override
 	public String generate() {
-		assert method != null;
-		assert path != null;
 		assert version != null;
-		return sb.append(method.getName()).append(Utf8Constant.UTF8_SPACE).append(path).append(Utf8Constant.UTF8_SPACE)
+		return sb.append(pathHttpMethod.getMethod().getName()).append(Utf8Constant.UTF8_SPACE).append(pathHttpMethod.getPath()).append(Utf8Constant.UTF8_SPACE)
 				.append(getVersion()).toString();
 	}
 
 	@Override
 	public String toString() {
-		return "HttpRequestDenominator{" + "method=" + method + ", path='" + path + '\'' + ", version=" + version + '}';
+		return "HttpRequestDenominator{" + "pathHttpMethod=" + pathHttpMethod + '\'' + ", version=" + version + '}';
 	}
 }

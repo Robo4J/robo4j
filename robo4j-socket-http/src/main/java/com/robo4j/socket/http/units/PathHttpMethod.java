@@ -44,6 +44,14 @@ public class PathHttpMethod {
 	}
 
 	@Override
+	public String toString() {
+		return "PathHttpMethod{" +
+				"path='" + path + '\'' +
+				", method=" + method +
+				'}';
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if (this == o)
 			return true;
@@ -55,7 +63,6 @@ public class PathHttpMethod {
 
 	@Override
 	public int hashCode() {
-
 		return Objects.hash(path, method);
 	}
 }

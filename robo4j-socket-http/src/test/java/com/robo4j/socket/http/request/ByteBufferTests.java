@@ -94,7 +94,7 @@ public class ByteBufferTests {
 
         Assert.assertNotNull(postMessage);
         Assert.assertTrue(postMessage.length() == decoratedRequest.getLength());
-        Assert.assertTrue(clientPath.equals(decoratedRequest.getPath()));
+        Assert.assertTrue(clientPath.equals(decoratedRequest.getPathMethod().getPath()));
         Assert.assertTrue(bodyMessage.equals(decoratedRequest.getMessage()));
     }
 

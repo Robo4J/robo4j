@@ -18,7 +18,7 @@
 package com.robo4j.socket.http.message;
 
 import com.robo4j.socket.http.HttpHeaderFieldNames;
-import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.units.PathHttpMethod;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 
 import java.util.Map;
@@ -54,12 +54,8 @@ public final class HttpDecoratedRequest extends AbstractHttpDecoratedMessage {
 		return denominator;
 	}
 
-	public HttpMethod getMethod() {
-		return denominator.getMethod();
-	}
-
-	public String getPath() {
-		return denominator.getPath();
+	public PathHttpMethod getPathMethod(){
+		return denominator.getPathHttpMethod();
 	}
 
 	public String getHost() {

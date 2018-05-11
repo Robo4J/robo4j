@@ -21,7 +21,6 @@ import com.robo4j.RoboContext;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
-import com.robo4j.socket.http.units.PathHttpMethod;
 import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.units.ServerPathConfig;
 
@@ -55,7 +54,7 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
 	public HttpResponseProcess call() throws Exception {
 
 		final HttpResponseProcessBuilder resultBuilder = HttpResponseProcessBuilder.Builder();
-		final ServerPathConfig pathConfig = serverContext.getPathConfig(new PathHttpMethod(decoratedRequest.getPath(), decoratedRequest.getMethod()));
+		final ServerPathConfig pathConfig = serverContext.getPathConfig(decoratedRequest.getPathMethod());
 
 		if (isValidPath(pathConfig)) {
 			resultBuilder.setMethod(pathConfig.getMethod());
@@ -89,7 +88,7 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
 				break;
 			default:
 				resultBuilder.setCode(StatusCode.BAD_REQUEST);
-				SimpleLoggingUtil.debug(getClass(), "not implemented method: " + decoratedRequest.getMethod());
+				SimpleLoggingUtil.debug(getClass(), "not implemented method: " + decoratedRequest.getPathMethod());
 			}
 		} else {
 			resultBuilder.setCode(StatusCode.BAD_REQUEST);
@@ -98,8 +97,8 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
 	}
 
 	private boolean isValidPath(ServerPathConfig pathConfig) {
-		return pathConfig != null && decoratedRequest.getMethod() != null
-				&& decoratedRequest.getMethod().equals(pathConfig.getMethod());
+		return pathConfig != null && decoratedRequest.getPathMethod() != null
+				&& decoratedRequest.getPathMethod().getMethod().equals(pathConfig.getMethod());
 	}
 
 }
