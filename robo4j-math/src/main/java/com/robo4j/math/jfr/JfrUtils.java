@@ -71,7 +71,7 @@ public class JfrUtils {
 	public static EventToken register(Class<? extends InstantEvent> clazz) {
 		try {
 			EventToken token = PRODUCER.addEvent(clazz);
-			System.out.println("Registered EventType " + clazz.getName());
+			Logger.getLogger(JfrUtils.class.getName()).log(Level.FINE, "Registered EventType " + clazz.getName());
 			return token;
 		} catch (InvalidEventDefinitionException | InvalidValueException e) {
 			Logger.getLogger(JfrUtils.class.getName()).log(Level.SEVERE, "Failed to register the event class " + clazz.getName()
