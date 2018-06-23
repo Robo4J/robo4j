@@ -21,6 +21,11 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 
 /**
+ * ExtendedRoboUnit allows to connect RoboUnit with external service.
+ * It helps Robo4J to interact with another frameworks without providing an implementation of the specific framework
+ * itself.
+ * example: JavaFx Controller, etc.
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */

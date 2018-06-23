@@ -16,8 +16,6 @@
  */
 package com.robo4j.units.rpi.roboclaw;
 
-import java.io.IOException;
-
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
@@ -28,6 +26,9 @@ import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.rpi.I2CEndPoint;
 import com.robo4j.units.rpi.I2CRegistry;
 import com.robo4j.units.rpi.I2CRoboUnit;
+import com.robo4j.units.rpi.pwm.PCA9685Utils;
+
+import java.io.IOException;
 
 /**
  * Configurable unit for a RoboClaw configured with two engines, controlled
@@ -77,18 +78,7 @@ public class RoboClawRCTankUnit extends I2CRoboUnit<MotionEvent> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		super.onInitialization(configuration);
 		Object pwmDevice = I2CRegistry.getI2CDeviceByEndPoint(new I2CEndPoint(getBus(), getAddress()));
-		PWMPCA9685Device pcaDevice = null;
-		try {
-			if (pwmDevice == null) {
-				pcaDevice = new PWMPCA9685Device(getBus(), getAddress());
-				I2CRegistry.registerI2CDevice(pcaDevice, new I2CEndPoint(getBus(), getAddress()));
-				pcaDevice.setPWMFrequency(50);
-			} else {
-				pcaDevice = (PWMPCA9685Device) pwmDevice;
-			}
-		} catch (IOException e) {
-			throw new ConfigurationException("Could not initialize hardware", e);
-		}
+		PWMPCA9685Device pcaDevice = PCA9685Utils.initPwmDevice(pwmDevice, getBus(), getAddress());
 		int leftChannel = configuration.getInteger(CONFIGURATION_KEY_LEFT_CHANNEL, -1);
 		if (leftChannel == -1) {
 			throw ConfigurationException.createMissingConfigNameException(CONFIGURATION_KEY_LEFT_CHANNEL);

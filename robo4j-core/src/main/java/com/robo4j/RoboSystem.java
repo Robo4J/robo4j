@@ -16,6 +16,19 @@
  */
 package com.robo4j;
 
+import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.net.ContextEmitter;
+import com.robo4j.net.MessageCallback;
+import com.robo4j.net.MessageServer;
+import com.robo4j.net.ReferenceDesciptor;
+import com.robo4j.net.RoboContextDescriptor;
+import com.robo4j.scheduler.DefaultScheduler;
+import com.robo4j.scheduler.RoboThreadFactory;
+import com.robo4j.scheduler.Scheduler;
+import com.robo4j.util.SystemUtil;
+
 import java.io.IOException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
@@ -36,19 +49,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
-
-import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
-import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.net.ContextEmitter;
-import com.robo4j.net.MessageCallback;
-import com.robo4j.net.MessageServer;
-import com.robo4j.net.ReferenceDesciptor;
-import com.robo4j.net.RoboContextDescriptor;
-import com.robo4j.scheduler.DefaultScheduler;
-import com.robo4j.scheduler.RoboThreadFactory;
-import com.robo4j.scheduler.Scheduler;
-import com.robo4j.util.SystemUtil;
 
 /**
  * This is the default implementation for a local {@link RoboContext}. Contains
@@ -151,12 +151,17 @@ final class RoboSystem implements RoboContext {
 		@Override
 		public void sendMessage(T message) {
 			if (MESSAGE_DELIVERY_CRITERIA.contains(getState())) {
-				if (threadingPolicy != ThreadingPolicy.CRITICAL) {
-					deliverOnQueue(message);
-				} else {
-					synchronized (unit) {
+				switch (threadingPolicy){
+					case NORMAL:
 						deliverOnQueue(message);
-					}
+						break;
+					case CRITICAL:
+						synchronized (unit) {
+							deliverOnQueue(message);
+						}
+						break;
+					default:
+						throw new IllegalStateException(String.format("not supported policy: %s", threadingPolicy));
 				}
 			}
 		}
@@ -336,7 +341,7 @@ final class RoboSystem implements RoboContext {
 		});
 		final ContextEmitter emitter = initEmitter(emitterConfiguration, getListeningURI(messageServer));
 		if (emitter != null) {
-			emitterFuture = getScheduler().scheduleAtFixedRate(() -> emitter.emit(), 0, emitter.getHeartBeatInterval(),
+			emitterFuture = getScheduler().scheduleAtFixedRate(emitter::emit, 0, emitter.getHeartBeatInterval(),
 					TimeUnit.MILLISECONDS);
 		}
 	}

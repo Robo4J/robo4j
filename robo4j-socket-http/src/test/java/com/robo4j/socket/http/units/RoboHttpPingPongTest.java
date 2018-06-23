@@ -69,12 +69,13 @@ public class RoboHttpPingPongTest {
 	@Ignore
 	@Test
 	public void pongTest() throws Exception {
-		RoboContext systemPong = configurePongSystem(0);
-		systemPong.start();
+		RoboContext system = configurePongSystem(0);
+		system.start();
 		System.out.println("systemPong: State after start:");
-		System.out.println(SystemUtil.printStateReport(systemPong));
+		System.out.println(SystemUtil.printStateReport(system));
 		System.out.println("Press Key...");
 		System.in.read();
+		system.shutdown();
 
 	}
 

@@ -85,18 +85,8 @@ public class MC33926HBridgeUnit extends I2CRoboUnit<Float> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		super.onInitialization(configuration);
 		Object pwmDevice = I2CRegistry.getI2CDeviceByEndPoint(new I2CEndPoint(getBus(), getAddress()));
-		PWMPCA9685Device pcaDevice = null;
-		try {
-			if (pwmDevice == null) {
-				pcaDevice = new PWMPCA9685Device(getBus(), getAddress());
-				I2CRegistry.registerI2CDevice(pcaDevice, new I2CEndPoint(getBus(), getAddress()));
-				pcaDevice.setPWMFrequency(50);
-			} else {
-				pcaDevice = (PWMPCA9685Device) pwmDevice;
-			}
-		} catch (IOException e) {
-			throw new ConfigurationException("Could not initialize hardware", e);
-		}
+		PWMPCA9685Device pcaDevice = PCA9685Utils.initPwmDevice(pwmDevice, getBus(), getAddress());
+
 		int channel = configuration.getInteger(CONFIGURATION_KEY_CHANNEL, -1);
 		if (channel == -1) {
 			throw ConfigurationException.createMissingConfigNameException(CONFIGURATION_KEY_CHANNEL);
