@@ -21,7 +21,6 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.lego.ILegoMotor;
 import com.robo4j.hw.lego.enums.AnalogPortEnum;
@@ -31,13 +30,11 @@ import com.robo4j.hw.lego.wrapper.MotorWrapper;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.lego.enums.MotorRotationEnum;
 
-import java.util.concurrent.Future;
-
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class SingleMotorUnit extends RoboUnit<MotorRotationEnum> implements RoboReference<MotorRotationEnum> {
+public class SingleMotorUnit extends AbstractMotorUnit<MotorRotationEnum> implements RoboReference<MotorRotationEnum> {
 	protected volatile ILegoMotor motor;
 
 	public SingleMotorUnit(RoboContext context, String id) {
@@ -95,23 +92,5 @@ public class SingleMotorUnit extends RoboUnit<MotorRotationEnum> implements Robo
 			throw new LegoUnitException("single motor command: " + message);
 		}
 
-	}
-
-	private Future<Boolean> runEngine(ILegoMotor motor, MotorRotationEnum rotation) {
-		return getContext().getScheduler().submit(() -> {
-			switch (rotation) {
-			case FORWARD:
-				motor.forward();
-				return motor.isMoving();
-			case STOP:
-				motor.stop();
-				return motor.isMoving();
-			case BACKWARD:
-				motor.backward();
-				return motor.isMoving();
-			default:
-				throw new LegoUnitException("no such rotation= " + rotation);
-			}
-		});
 	}
 }

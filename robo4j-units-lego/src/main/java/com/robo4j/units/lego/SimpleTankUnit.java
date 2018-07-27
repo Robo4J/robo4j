@@ -23,7 +23,6 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.lego.ILegoMotor;
 import com.robo4j.hw.lego.enums.AnalogPortEnum;
@@ -44,7 +43,7 @@ import java.util.concurrent.Future;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements RoboReference<LegoPlatformMessage> {
+public class SimpleTankUnit extends AbstractMotorUnit<LegoPlatformMessage> implements RoboReference<LegoPlatformMessage> {
 	/* test visible */
 	protected volatile ILegoMotor rightMotor;
 	protected volatile ILegoMotor leftMotor;
@@ -140,24 +139,6 @@ public class SimpleTankUnit extends RoboUnit<LegoPlatformMessage> implements Rob
 		} catch (InterruptedException | ExecutionException e) {
 			throw new LegoUnitException("BothEnginesByCycles error: ", e);
 		}
-	}
-
-	private Future<Boolean> runEngine(ILegoMotor motor, MotorRotationEnum rotation) {
-		return getContext().getScheduler().submit(() -> {
-			switch (rotation) {
-			case FORWARD:
-				motor.forward();
-				return motor.isMoving();
-			case STOP:
-				motor.stop();
-				return motor.isMoving();
-			case BACKWARD:
-				motor.backward();
-				return motor.isMoving();
-			default:
-				throw new LegoUnitException("no such rotation= " + rotation);
-			}
-		});
 	}
 
 	private boolean executeBothEnginesStop(ILegoMotor... motors) {

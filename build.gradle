@@ -278,7 +278,7 @@ project("robo4j-units-lego") {
         manifest {
             attributes 'Implementation-Title': 'robo4j-units-lego',
                     'Implementation-Version': version,
-                    'Main-Class': ' com.robo4j.units.lego.TankPlatformExample'
+                    'Main-Class': ' com.robo4j.units.lego.GripperSonicTankPlatformExample'
         }
         baseName = 'robo4j-units-lego'
         from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
