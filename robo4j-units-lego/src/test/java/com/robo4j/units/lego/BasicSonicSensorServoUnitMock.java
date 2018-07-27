@@ -26,15 +26,15 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
 import com.robo4j.hw.lego.wrapper.SensorTestWrapper;
-import com.robo4j.units.lego.sonic.LegoSonicMessage;
+import com.robo4j.units.lego.sonic.LegoSonicServoMessage;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class BasicSonicSensorUnitMock extends BasicSonicUnit {
+public class BasicSonicSensorServoUnitMock extends BasicSonicServoUnit {
 
-    public BasicSonicSensorUnitMock(RoboContext context, String id) {
+    public BasicSonicSensorServoUnitMock(RoboContext context, String id) {
         super(context, id);
     }
 
@@ -45,7 +45,7 @@ public class BasicSonicSensorUnitMock extends BasicSonicUnit {
     }
 
     @Override
-    public void onMessage(LegoSonicMessage message) {
+    public void onMessage(LegoSonicServoMessage message) {
         System.out.println("onMessage : " + message);
     }
 

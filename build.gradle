@@ -277,7 +277,8 @@ project("robo4j-units-lego") {
     task fatJar(type: Jar) {
         manifest {
             attributes 'Implementation-Title': 'robo4j-units-lego',
-                    'Implementation-Version': version
+                    'Implementation-Version': version,
+                    'Main-Class': ' com.robo4j.units.lego.TankPlatformExample'
         }
         baseName = 'robo4j-units-lego'
         from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
@@ -295,10 +296,10 @@ project("robo4j-units-lego") {
     sourceSets {
         main {
             java {
-                srcDirs = ['src/main/java']
+                srcDirs = ['src/main/java', 'src/examples/java']
             }
             resources {
-                srcDirs = ['src/main/resources']
+                srcDirs = ['src/main/resources', 'src/examples/resources']
             }
         }
 

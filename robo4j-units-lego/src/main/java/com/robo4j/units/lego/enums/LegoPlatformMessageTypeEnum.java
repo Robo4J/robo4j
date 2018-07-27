@@ -20,7 +20,6 @@
 package com.robo4j.units.lego.enums;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,14 +56,23 @@ public enum LegoPlatformMessageTypeEnum implements LegoEnum {
     }
     
     public static LegoPlatformMessageTypeEnum getByName(String name) {
-        if (internMapByType == null)
-            internMapByType = initMapping();
+        initiate();
         return internMapByType.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .filter(e -> e.getName().equals(name))
                 .findFirst()
                 .orElse(null);
     }
+
+    public static LegoPlatformMessageTypeEnum getById(int id){
+		initiate();
+		return internMapByType.get(id);
+	}
+
+	private static void initiate() {
+    	if (internMapByType == null)
+			internMapByType = initMapping();
+	}
     //@formatter:on
 
 	@Override
@@ -75,14 +83,6 @@ public enum LegoPlatformMessageTypeEnum implements LegoEnum {
 	@Override
 	public String getName() {
 		return name;
-	}
-
-	public Set<String> commandNames() {
-		//@formatter:off
-        return Stream.of(values())
-                .map(LegoPlatformMessageTypeEnum::getName)
-                .collect(Collectors.toSet());
-        //@formatter:on
 	}
 
 	@Override

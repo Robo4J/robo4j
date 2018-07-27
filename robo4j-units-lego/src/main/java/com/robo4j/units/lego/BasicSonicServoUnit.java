@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014, 2017. Miroslav Wengner, Marcus Hirt
- * This BasicSonicUnit.java  is part of robo4j.
+ * This BasicSonicServoUnit.java  is part of robo4j.
  * module: robo4j-units-lego
  *
  * robo4j is free software: you can redistribute it and/or modify
@@ -18,11 +18,6 @@
  */
 
 package com.robo4j.units.lego;
-
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.robo4j.ConfigurationException;
 import com.robo4j.LifecycleState;
@@ -42,18 +37,23 @@ import com.robo4j.hw.lego.wrapper.MotorWrapper;
 import com.robo4j.hw.lego.wrapper.SensorWrapper;
 import com.robo4j.units.lego.sonic.LegoServoRotationEnum;
 import com.robo4j.units.lego.sonic.LegoSonicBrainMessage;
-import com.robo4j.units.lego.sonic.LegoSonicMessage;
+import com.robo4j.units.lego.sonic.LegoSonicServoMessage;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
- * Simple Sonic unit with servo
+ * BasicSonicServoUnit unit with servo
  *
- * unit is capable to communicate with it self by passing {@link LegoSonicMessage}
+ * unit is capable to communicate with it self by passing {@link LegoSonicServoMessage}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboReference<LegoSonicMessage> {
+public class BasicSonicServoUnit extends RoboUnit<LegoSonicServoMessage> implements RoboReference<LegoSonicServoMessage> {
 	private static final int POSITION_START = 0;
 	private static final int POSITION_STEP = 30;
 	private static final int POSITION_MAX = 30; // should be degrees
@@ -62,15 +62,15 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 	private volatile AtomicBoolean unitActive = new AtomicBoolean(false);
 	private volatile AtomicInteger servoPosition = new AtomicInteger(POSITION_START);
 	/* used by wrapper */
-	protected volatile ILegoSensor sensor;
-	protected volatile ILegoMotor servo;
+	volatile ILegoSensor sensor;
+	volatile ILegoMotor servo;
 
-	public BasicSonicUnit(RoboContext context, String id) {
-		super(LegoSonicMessage.class, context, id);
+	public BasicSonicServoUnit(RoboContext context, String id) {
+		super(LegoSonicServoMessage.class, context, id);
 	}
 
 	@Override
-	public void onMessage(LegoSonicMessage message) {
+	public void onMessage(LegoSonicServoMessage message) {
 		processSonicMessage(message);
 	}
 
@@ -114,7 +114,7 @@ public class BasicSonicUnit extends RoboUnit<LegoSonicMessage> implements RoboRe
 		getContext().getReference(target).sendMessage(message);
 	}
 
-	private void processSonicMessage(LegoSonicMessage message){
+	private void processSonicMessage(LegoSonicServoMessage message){
 		try {
 			switch (message.getType()){
 				case FINISH:

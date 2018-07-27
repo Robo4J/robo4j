@@ -113,8 +113,10 @@ public class VehiclePlatformUnit extends I2CRoboUnit<VehicleEvent> {
                 vehiclePlatform.setSteering(message.getValue());
                 break;
             case LEG:
+                vehiclePlatform.setLeg(message.getValue());
                 break;
             case SHIFT:
+                vehiclePlatform.setShift(message.getValue());
                 break;
         }
     }

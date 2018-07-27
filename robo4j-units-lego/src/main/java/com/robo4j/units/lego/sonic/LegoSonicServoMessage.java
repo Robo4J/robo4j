@@ -21,28 +21,30 @@ import com.robo4j.RoboReference;
 import com.robo4j.units.lego.enums.LegoSonicMessageTypeEnum;
 
 /**
+ * LegoSonicServoMessage {@link com.robo4j.units.lego.BasicSonicServoUnit}
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class LegoSonicMessage {
+public class LegoSonicServoMessage {
 
     private final RoboReference<?> source;
     private final LegoSonicMessageTypeEnum type;
 
-    public LegoSonicMessage(String text){
+    public LegoSonicServoMessage(String text){
         this(null, LegoSonicMessageTypeEnum.getInternalByName(text));
     }
 
-    public LegoSonicMessage(LegoSonicMessageTypeEnum type) {
+    public LegoSonicServoMessage(LegoSonicMessageTypeEnum type) {
         this(null, type);
     }
 
-    public LegoSonicMessage(RoboReference<?> source, LegoSonicMessageTypeEnum type) {
+    public LegoSonicServoMessage(RoboReference<?> source, LegoSonicMessageTypeEnum type) {
         this.source = source;
         this.type = type;
     }
 
-    public LegoSonicMessage(RoboReference<?> source, String text) {
+    public LegoSonicServoMessage(RoboReference<?> source, String text) {
         this.source = source;
         this.type = LegoSonicMessageTypeEnum.getInternalByName(text);
     }
