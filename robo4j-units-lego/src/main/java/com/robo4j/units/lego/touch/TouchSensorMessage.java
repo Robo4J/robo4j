@@ -15,21 +15,45 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.lego.sonic;
+package com.robo4j.units.lego.touch;
 
 import java.util.stream.Stream;
 
 /**
- * SonicSensorEnum {@link com.robo4j.units.lego.SonicSensorUnit}
- *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public enum SonicSensorEnum {
-	START, STOP, NONE;
+public enum TouchSensorMessage {
 
-	public static SonicSensorEnum parseValue(String value) {
-		return Stream.of(values()).filter(v -> v.name().equals(value.toUpperCase())).findFirst().orElse(NONE);
-	}
+    NONE    (0, ""),
+    RELEASED(1, "0.0"),
+    PRESSED (2, "1.0");
 
+    private final int id;
+    private final String value;
+
+    TouchSensorMessage(int id, String value) {
+        this.id = id;
+        this.value = value;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public static TouchSensorMessage parseValue(String value) {
+        return Stream.of(values()).filter(v -> v.getValue().equals(value)).findFirst().orElse(NONE);
+    }
+
+    @Override
+    public String toString() {
+        return "TouchSensorMessage{" +
+                "id=" + id +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }

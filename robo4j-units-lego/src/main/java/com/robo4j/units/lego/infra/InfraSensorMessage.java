@@ -18,8 +18,27 @@
 package com.robo4j.units.lego.infra;
 
 /**
+ * InfraSensorMessage
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class InfraRedSensorEnum {
+public class InfraSensorMessage {
+
+    private final String distance;
+
+    public InfraSensorMessage(String distance) {
+        this.distance = distance;
+    }
+
+    public String getDistance() {
+        return distance;
+    }
+
+    @Override
+    public String toString() {
+        return "InfraSensorMessage{" +
+                "distance='" + distance + '\'' +
+                '}';
+    }
 }

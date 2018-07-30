@@ -18,6 +18,7 @@
 package com.robo4j.units.lego;
 
 import com.robo4j.ConfigurationException;
+import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
@@ -26,6 +27,7 @@ import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
 import com.robo4j.hw.lego.provider.SensorProvider;
 import com.robo4j.hw.lego.wrapper.SensorWrapper;
+import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.lego.sonic.SonicSensorEnum;
 import com.robo4j.units.lego.sonic.SonicSensorMessage;
 
@@ -47,19 +49,18 @@ public class SonicSensorUnit extends RoboUnit<String> {
 	public static final int VALUE_SCAN_INIT_DELAY = 1000;
 	public static final int VALUE_SCAN_PERIOD = 800;
 	private final AtomicBoolean active = new AtomicBoolean();
-
-	public SonicSensorUnit(RoboContext context, String id) {
-		super(String.class, context, id);
-	}
-
 	private ILegoSensor sensor;
 	private String target;
 	private int scanInitialDelay;
 	private int scanPeriod;
 
+	public SonicSensorUnit(RoboContext context, String id) {
+		super(String.class, context, id);
+	}
+
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-
+		setState(LifecycleState.UNINITIALIZED);
 		scanInitialDelay = configuration.getInteger(PROPERTY_SCAN_INIT_DELAY, VALUE_SCAN_INIT_DELAY);
 		scanPeriod = configuration.getInteger(PROPERTY_SCAN_PERIOD, VALUE_SCAN_PERIOD);
 		String port = configuration.getString(PROPERTY_SENSOR_PORT, null);
@@ -73,31 +74,34 @@ public class SonicSensorUnit extends RoboUnit<String> {
 		}
 		SensorProvider provider = new SensorProvider();
 		sensor = new SensorWrapper<>(provider, sensorPort, SensorTypeEnum.SONIC);
+		setState(LifecycleState.INITIALIZED);
 	}
 
 	@Override
 	public void onMessage(String message) {
+		processMessage(message);
+	}
+
+
+	private void processMessage(String message){
 		final SonicSensorEnum type = SonicSensorEnum.parseValue(message);
 		switch (type) {
-		case START:
-			active.set(true);
-			scheduleMeasurement();
-			break;
-		case STOP:
-			stopMeasurement();
-			break;
-		default:
-
+			case START:
+				active.set(true);
+				scheduleMeasurement();
+				break;
+			case STOP:
+				stopMeasurement();
+				break;
+			default:
+				SimpleLoggingUtil.error(getClass(), String.format("not supported value: %s", message));
 		}
 	}
 
 	private void scheduleMeasurement() {
 		if (active.get()) {
-			getContext().getScheduler().scheduleAtFixedRate(() -> {
-				if (active.get()) {
-					startMeasurement();
-				}
-			}, scanInitialDelay, scanPeriod, TimeUnit.MILLISECONDS);
+			getContext().getScheduler().scheduleAtFixedRate(this::startMeasurement, scanInitialDelay, scanPeriod,
+					TimeUnit.MILLISECONDS);
 		}
 	}
 

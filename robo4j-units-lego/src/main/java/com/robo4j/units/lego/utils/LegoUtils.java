@@ -19,6 +19,8 @@
 
 package com.robo4j.units.lego.utils;
 
+import com.robo4j.util.StringConstants;
+
 /**
  * Some useful utils for lego units
  *
@@ -33,6 +35,16 @@ public final class LegoUtils {
     public static final int SINGLE_THREAD_POOL_SIZE = 1;
     public static final int TERMINATION_TIMEOUT = 2;
     public static final int KEEP_ALIVE_TIME = 10;
+    public static final String VALUE_SEPARATOR = ",";
+    public  static final String VALUE_INFINITY = "Infinity";
 
+
+    public static String parseOneElementString(String value){
+        return value.replace(VALUE_SEPARATOR, StringConstants.EMPTY);
+    }
+
+    public static float parseFloatStringWithInfinityDefault(String value, float maximum){
+        return VALUE_INFINITY.equals(value) ? maximum : Float.parseFloat(value);
+    }
 
 }

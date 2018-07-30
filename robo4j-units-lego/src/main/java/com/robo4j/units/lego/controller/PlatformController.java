@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.lego;
+package com.robo4j.units.lego.controller;
 
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;

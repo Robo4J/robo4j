@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.lego;
+package com.robo4j.units.lego.controller;
 
 import com.robo4j.ConfigurationException;
 import com.robo4j.CriticalSectionTrait;
@@ -25,7 +25,7 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
 import com.robo4j.units.lego.gripper.GripperEnum;
 import com.robo4j.units.lego.sonic.SonicSensorMessage;
-import com.robo4j.util.StringConstants;
+import com.robo4j.units.lego.utils.LegoUtils;
 
 import java.util.EnumSet;
 import java.util.Random;
@@ -39,8 +39,6 @@ public class SonicPlatformController extends RoboUnit<SonicSensorMessage> {
 
     public static final String TARGET = "target";
     public static final String TARGET_GRIPPER = "targetGripper";
-    private static final String VALUE_INFINITY = "Infinity";
-    private static final String VALUE_SEPARATOR = ",";
     private static final float OMEGA = 0.833f;  // rad/second
     private static final float LARGE_MOTOR_RADIUS = 1f;
     private static final float DISTANCE_MIN = 0.4f;
@@ -69,11 +67,8 @@ public class SonicPlatformController extends RoboUnit<SonicSensorMessage> {
 
     @Override
     public void onMessage(SonicSensorMessage message) {
-        String value = message.getDistance().replace(VALUE_SEPARATOR, StringConstants.EMPTY);
-        float distanceValue = VALUE_INFINITY.equals(value) ? DISTANCE_MAX : Float.parseFloat(value);
-        System.out.println(getClass().getSimpleName() + " value: " + distanceValue);
-
-
+        final String value = LegoUtils.parseOneElementString(message.getDistance());
+        final float distanceValue = LegoUtils.parseFloatStringWithInfinityDefault(value, DISTANCE_MAX);
         if(rotationTypes.contains(currentMessage) && distanceValue < DISTANCE_OPTIMAL){
             sendMessageToGripper();
         } else if(distanceValue > DISTANCE_MIN){
@@ -93,14 +88,12 @@ public class SonicPlatformController extends RoboUnit<SonicSensorMessage> {
 
     private void sendPlatformMessage(LegoPlatformMessageTypeEnum type){
         if(!currentMessage.equals(type)){
-            System.out.println("SEND: MESSAGE TO PLATFORM: " + type);
             currentMessage = type;
             getContext().getReference(target).sendMessage(type);
         }
     }
 
     private void sendMessageToGripper(){
-        System.out.println("SEND: MESSAGE TO GRIPPER");
         getContext().getReference(targetGripper).sendMessage(GripperEnum.OPEN_CLOSE);
     }
 

@@ -16,7 +16,6 @@
   -->
 
 <robo4j>
-
     <roboUnit id="buttons">
         <class>com.robo4j.units.lego.BrickButtonsUnit</class>
         <config name="com.robo4j.root">
@@ -28,13 +27,11 @@
             <value name="button_enter" type="String">enter</value>
         </config>
     </roboUnit>
-
     <roboUnit id="lcd">
         <class>com.robo4j.units.lego.LcdUnit</class>
         <config name="com.robo4j.root">
         </config>
     </roboUnit>
-
     <roboUnit id="sonicSensor">
         <class>com.robo4j.units.lego.SonicSensorUnit</class>
         <config name="com.robo4j.root">
@@ -42,9 +39,8 @@
             <value name="sensorPort" type="String">S4</value>
         </config>
     </roboUnit>
-
     <roboUnit id="sonicController">
-        <class>com.robo4j.units.lego.SonicPlatformController</class>
+        <class>com.robo4j.units.lego.controller.SonicPlatformController</class>
         <config name="com.robo4j.root">
             <value name="target" type="String">controller</value>
             <value name="targetGripper" type="String">gripperController</value>
@@ -52,23 +48,19 @@
             <value name="scanPeriod" type="int">400</value>
         </config>
     </roboUnit>
-
     <roboUnit id="gripperController">
-        <class>com.robo4j.units.lego.GripperController</class>
+        <class>com.robo4j.units.lego.controller.GripperController</class>
         <config name="com.robo4j.root">
             <value name="motorPort" type="String">A</value>
             <value name="motorType" type="Character">N</value>
         </config>
     </roboUnit>
-
-
     <roboUnit id="controller">
-        <class>com.robo4j.units.lego.PlatformController</class>
+        <class>com.robo4j.units.lego.controller.PlatformController</class>
         <config name="com.robo4j.root">
             <value name="target" type="String">platform</value>
         </config>
     </roboUnit>
-
     <roboUnit id="platform">
         <class>com.robo4j.units.lego.SimpleTankUnit</class>
         <config name="com.robo4j.root">

@@ -27,6 +27,7 @@ import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.sensor.BaseSensor;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3GyroSensor;
+import lejos.hardware.sensor.EV3IRSensor;
 import lejos.hardware.sensor.EV3TouchSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 
@@ -49,6 +50,8 @@ public class SensorProvider implements IProvider<BaseSensor, DigitalPortEnum, Se
 			return new EV3UltrasonicSensor(LocalEV3.get().getPort(port.getType()));
 		case TOUCH:
 			return new EV3TouchSensor(LocalEV3.get().getPort(port.getType()));
+		case INFRA:
+			return new EV3IRSensor(LocalEV3.get().getPort(port.getType()));
 		default:
 			throw new LegoException("Lego sensor not supported: " + port + " type: " + type);
 		}

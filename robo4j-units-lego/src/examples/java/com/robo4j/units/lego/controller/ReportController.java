@@ -15,21 +15,23 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.lego.sonic;
+package com.robo4j.units.lego.controller;
 
-import java.util.stream.Stream;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboUnit;
 
 /**
- * SonicSensorEnum {@link com.robo4j.units.lego.SonicSensorUnit}
- *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public enum SonicSensorEnum {
-	START, STOP, NONE;
+public class ReportController extends RoboUnit<Object> {
 
-	public static SonicSensorEnum parseValue(String value) {
-		return Stream.of(values()).filter(v -> v.name().equals(value.toUpperCase())).findFirst().orElse(NONE);
-	}
+    public ReportController(RoboContext context, String id) {
+        super(Object.class, context, id);
+    }
 
+    @Override
+    public void onMessage(Object message) {
+        System.out.println(getClass().getSimpleName() + "report: " + message.toString());
+    }
 }

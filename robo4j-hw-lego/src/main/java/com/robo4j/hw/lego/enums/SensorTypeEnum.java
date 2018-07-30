@@ -55,7 +55,12 @@ public enum SensorTypeEnum {
 	/**
 	 * distance is measured in meter
 	 */
-	SONIC		(3, "Distance", "lejos.hardware.sensor.EV3UltrasonicSensor", 1);
+	SONIC		(3, "Distance", "lejos.hardware.sensor.EV3UltrasonicSensor", 1),
+
+	/**
+	 * distance is measure in meter
+	 */
+	INFRA		(4, "Infra","lejos.hardware.sensor.EV3IRSensor", 0);
 	// @formatter:on
 
 	private volatile static Map<Integer, SensorTypeEnum> internMapById;

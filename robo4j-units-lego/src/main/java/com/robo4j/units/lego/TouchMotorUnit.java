@@ -35,16 +35,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class TouchUnit extends RoboUnit<Boolean> {
+public class TouchMotorUnit extends RoboUnit<Boolean> {
 
 	private static final String PRESSED = "1.0";
 	private static final String RELEASED = "0.0";
-	private volatile AtomicBoolean sensorActive = new AtomicBoolean(false);
+	private volatile AtomicBoolean sensorActive = new AtomicBoolean();
 	private volatile MotorRotationEnum currentState;
 	private volatile ILegoSensor sensor;
 	private String target;
 
-	public TouchUnit(RoboContext context, String id) {
+	public TouchMotorUnit(RoboContext context, String id) {
 		super(Boolean.class, context, id);
 	}
 
@@ -64,9 +64,9 @@ public class TouchUnit extends RoboUnit<Boolean> {
 			throw ConfigurationException.createMissingConfigNameException("target");
 		}
 
-		String sensorType = configuration.getString("touchSensorPort", DigitalPortEnum.S1.getType());
+		String sensorPort = configuration.getString("touchSensorPort", DigitalPortEnum.S1.getType());
 		SensorProvider provider = new SensorProvider();
-		sensor = new SensorWrapper<>(provider, DigitalPortEnum.getByType(sensorType), SensorTypeEnum.TOUCH);
+		sensor = new SensorWrapper<>(provider, DigitalPortEnum.getByType(sensorPort), SensorTypeEnum.TOUCH);
 
 		sensorActive.set(true);
 		currentState = MotorRotationEnum.STOP;

@@ -1,21 +1,4 @@
-<!--
-  ~ Copyright (c) 2014, 2018, Marcus Hirt, Miroslav Wengner
-  ~
-  ~ Robo4J is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ Robo4J is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
-  -->
 <robo4j>
-
     <roboUnit id="buttons">
         <class>com.robo4j.units.lego.BrickButtonsUnit</class>
         <config name="com.robo4j.root">
@@ -27,20 +10,39 @@
             <value name="button_enter" type="String">enter</value>
         </config>
     </roboUnit>
-
     <roboUnit id="lcd">
         <class>com.robo4j.units.lego.LcdUnit</class>
         <config name="com.robo4j.root">
         </config>
     </roboUnit>
-
+    <roboUnit id="touchUnit">
+        <class>com.robo4j.units.lego.TouchSensorUnit</class>
+        <config name="com.robo4j.root">
+            <value name="target" type="String">lcd</value>
+            <value name="sensorPort" type="String">S1</value>
+        </config>
+    </roboUnit>
+    <roboUnit id="infraSensor">
+        <class>com.robo4j.units.lego.InfraSensorUnit</class>
+        <config name="com.robo4j.root">
+            <value name="target" type="String">infraController</value>
+            <value name="sensorPort" type="String">S2</value>
+        </config>
+    </roboUnit>
+    <roboUnit id="infraController">
+        <class>com.robo4j.units.lego.controller.InfraPlatformController</class>
+        <config name="com.robo4j.root">
+            <value name="target" type="String">controller</value>
+            <value name="scanInitDelay" type="int">1000</value>
+            <value name="scanPeriod" type="int">800</value>
+        </config>
+    </roboUnit>
     <roboUnit id="controller">
         <class>com.robo4j.units.lego.controller.PlatformController</class>
         <config name="com.robo4j.root">
             <value name="target" type="String">platform</value>
         </config>
     </roboUnit>
-
     <roboUnit id="platform">
         <class>com.robo4j.units.lego.SimpleTankUnit</class>
         <config name="com.robo4j.root">

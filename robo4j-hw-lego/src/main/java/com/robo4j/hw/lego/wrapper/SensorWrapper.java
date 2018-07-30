@@ -25,6 +25,7 @@ import com.robo4j.hw.lego.enums.SensorTypeEnum;
 import com.robo4j.hw.lego.provider.SensorProvider;
 
 import lejos.hardware.sensor.BaseSensor;
+import lejos.hardware.sensor.EV3IRSensor;
 import lejos.hardware.sensor.EV3TouchSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.robotics.SampleProvider;
@@ -78,6 +79,16 @@ public class SensorWrapper<Sensor extends BaseSensor> implements ILegoSensor {
 				sb.append(samples[i]).append(",");
 			}
 			((EV3UltrasonicSensor) sensor).disable();
+		}
+
+		if (sensor instanceof EV3IRSensor) {
+			sp = ((EV3IRSensor) sensor).getDistanceMode();
+			final int sampleSize = sp.sampleSize();
+			float[] samples = new float[sampleSize];
+			for (int i = 0; i < sampleSize; i++) {
+				sp.fetchSample(samples, i);
+				sb.append(samples[i]).append(",");
+			}
 		}
 
 		if(sensor instanceof EV3TouchSensor){

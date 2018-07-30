@@ -15,21 +15,20 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.lego.sonic;
+package com.robo4j.units.lego.infra;
 
 import java.util.stream.Stream;
 
 /**
- * SonicSensorEnum {@link com.robo4j.units.lego.SonicSensorUnit}
+ * InfraSensorEnum {@link com.robo4j.units.lego.InfraSensorUnit}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public enum SonicSensorEnum {
+public enum InfraSensorEnum {
 	START, STOP, NONE;
 
-	public static SonicSensorEnum parseValue(String value) {
+	public static InfraSensorEnum parseValue(String value) {
 		return Stream.of(values()).filter(v -> v.name().equals(value.toUpperCase())).findFirst().orElse(NONE);
 	}
-
 }

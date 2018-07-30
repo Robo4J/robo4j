@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.lego;
+package com.robo4j.units.lego.controller;
 
 import com.robo4j.ConfigurationException;
 import com.robo4j.LifecycleState;
@@ -101,7 +101,6 @@ public class GripperController extends RoboUnit<GripperEnum> {
 
 	private void rotateMotor(int rotation) {
 		processLock.lock();
-		System.out.println(getClass().getSimpleName() + "rotate: " + rotation);
 		gripperMotor.rotate(rotation);
 		try {
 			while (gripperMotor.isMoving()) {
