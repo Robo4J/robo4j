@@ -16,9 +16,10 @@
         </config>
     </roboUnit>
     <roboUnit id="touchUnit">
-        <class>com.robo4j.units.lego.TouchSensorUnit</class>
+        <class>com.robo4j.units.lego.TouchPlatformSpeedUnit</class>
         <config name="com.robo4j.root">
-            <value name="target" type="String">lcd</value>
+            <value name="lcdTarget" type="String">lcd</value>
+            <value name="platformTarget" type="String">platform</value>
             <value name="sensorPort" type="String">S1</value>
         </config>
     </roboUnit>
@@ -46,6 +47,7 @@
     <roboUnit id="platform">
         <class>com.robo4j.units.lego.SimpleTankUnit</class>
         <config name="com.robo4j.root">
+            <value name="speed" type="int">200</value>
             <value name="leftMotorPort" type="String">B</value>
             <value name="leftMotorType" type="Character">N</value>
             <value name="rightMotorPort" type="String">C</value>

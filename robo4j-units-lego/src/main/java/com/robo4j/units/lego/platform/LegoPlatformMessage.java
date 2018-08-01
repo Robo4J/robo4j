@@ -30,26 +30,30 @@ import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
  * @author Miro Wengner (@miragemiko)
  */
 public class LegoPlatformMessage {
+    public static final int DEFAULT_SPEED = 300;
 
     private final RoboReference<?> source;
     private final LegoPlatformMessageTypeEnum type;
+    private final int speed;
 
     public LegoPlatformMessage(String text){
-		this(null, LegoPlatformMessageTypeEnum.getByName(text));
+		this(null, LegoPlatformMessageTypeEnum.getByName(text), DEFAULT_SPEED);
     }
 
     public LegoPlatformMessage(LegoPlatformMessageTypeEnum type) {
-        this(null, type);
+        this(null, type, DEFAULT_SPEED);
     }
 
-    public LegoPlatformMessage(RoboReference<?> source, LegoPlatformMessageTypeEnum type) {
+    public LegoPlatformMessage(RoboReference<?> source, LegoPlatformMessageTypeEnum type, int speed) {
         this.source = source;
         this.type = type;
+        this.speed = speed;
     }
 
-    public LegoPlatformMessage(RoboReference<?> source, String text) {
+    public LegoPlatformMessage(RoboReference<?> source, String text, int speed) {
         this.source = source;
 		this.type = LegoPlatformMessageTypeEnum.getByName(text);
+		this.speed = speed;
     }
 
     public RoboReference<?> getSource(){
@@ -58,6 +62,10 @@ public class LegoPlatformMessage {
 
     public LegoPlatformMessageTypeEnum getType(){
         return type;
+    }
+
+    public int getSpeed() {
+        return speed;
     }
 
     /*

@@ -23,7 +23,7 @@ package com.robo4j.hw.lego.provider;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public interface IProvider<Output, Input1, Input2>  {
+public interface IProvider<Output, DevicePort, DeviceType>  {
 
-	Output create(final Input1 type, final Input2 input2);
+	Output create(final DevicePort type, final DeviceType deviceType);
 }

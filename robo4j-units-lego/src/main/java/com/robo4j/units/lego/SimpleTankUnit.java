@@ -44,9 +44,17 @@ import java.util.concurrent.Future;
  * @author Miro Wengner (@miragemiko)
  */
 public class SimpleTankUnit extends AbstractMotorUnit<LegoPlatformMessage> implements RoboReference<LegoPlatformMessage> {
+
+	public static final String PROPERTY_SPEED = "speed";
+	public static final String PROPERTY_LEFT_MOTOR_PORT = "leftMotorPort";
+	public static final String PROPERTY_LEFT_MOTOR_TYPE = "leftMotorType";
+	public static final String PROPERTY_RIGHT_MOTOR_PORT = "rightMotorPort";
+	public static final String PROPERTY_RIGHT_MOTOR_TYPE = "rightMotorType";
 	/* test visible */
 	protected volatile ILegoMotor rightMotor;
 	protected volatile ILegoMotor leftMotor;
+	private volatile int speed;
+
 
 	public SimpleTankUnit(RoboContext context, String id) {
 		super(LegoPlatformMessage.class, context, id);
@@ -80,19 +88,24 @@ public class SimpleTankUnit extends AbstractMotorUnit<LegoPlatformMessage> imple
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
-		String leftMotorPort = configuration.getString("leftMotorPort", AnalogPortEnum.B.getType());
-		Character leftMotorType = configuration.getCharacter("leftMotorType", MotorTypeEnum.NXT.getType());
-		String rightMotorPort = configuration.getString("rightMotorPort", AnalogPortEnum.C.getType());
-		Character rightMotorType = configuration.getCharacter("rightMotorType", MotorTypeEnum.NXT.getType());
+		speed = configuration.getInteger(PROPERTY_SPEED, LegoPlatformMessage.DEFAULT_SPEED);
+		String leftMotorPort = configuration.getString(PROPERTY_LEFT_MOTOR_PORT, AnalogPortEnum.B.getType());
+		Character leftMotorType = configuration.getCharacter(PROPERTY_LEFT_MOTOR_TYPE, MotorTypeEnum.NXT.getType());
+		String rightMotorPort = configuration.getString(PROPERTY_RIGHT_MOTOR_PORT, AnalogPortEnum.C.getType());
+		Character rightMotorType = configuration.getCharacter(PROPERTY_RIGHT_MOTOR_TYPE, MotorTypeEnum.NXT.getType());
 
 		MotorProvider motorProvider = new MotorProvider();
 		rightMotor = new MotorWrapper<>(motorProvider, AnalogPortEnum.getByType(rightMotorPort),
 				MotorTypeEnum.getByType(rightMotorType));
+		rightMotor.setSpeed(speed);
 		leftMotor = new MotorWrapper<>(motorProvider, AnalogPortEnum.getByType(leftMotorPort),
 				MotorTypeEnum.getByType(leftMotorType));
+		leftMotor.setSpeed(speed);
 
 		setState(LifecycleState.INITIALIZED);
 	}
+
+
 
 	// Private Methods
 	private void processPlatformMessage(LegoPlatformMessage message) {
@@ -112,9 +125,19 @@ public class SimpleTankUnit extends AbstractMotorUnit<LegoPlatformMessage> imple
 		case RIGHT:
 			executeTurn(rightMotor, leftMotor);
 			break;
+		case SPEED:
+			checkUpdateSpeed(message);
 		default:
 			SimpleLoggingUtil.error(getClass(), message.getType() + " not supported!");
 			throw new LegoUnitException("PLATFORM COMMAND: " + message);
+		}
+	}
+
+	private void checkUpdateSpeed(LegoPlatformMessage message) {
+		if(message.getSpeed() != speed){
+			speed = message.getSpeed();
+			rightMotor.setSpeed(speed);
+			leftMotor.setSpeed(speed);
 		}
 	}
 

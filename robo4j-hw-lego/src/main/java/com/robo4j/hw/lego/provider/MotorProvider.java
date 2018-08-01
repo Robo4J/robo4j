@@ -37,9 +37,6 @@ import lejos.robotics.RegulatedMotor;
  */
 public final class MotorProvider implements IProvider<RegulatedMotor, AnalogPortEnum, MotorTypeEnum> {
 
-	//TODO: FIXME (miro) -> new handling of the default speed
-	private static final int DEFAULT_SPEED = 300;
-
 	@Override
 	public RegulatedMotor create(final AnalogPortEnum port, final MotorTypeEnum type) {
 		final RegulatedMotor result;
@@ -56,9 +53,7 @@ public final class MotorProvider implements IProvider<RegulatedMotor, AnalogPort
 		default:
 			throw new LegoException("Lego engine not supported: " + port + " type: " + type);
 		}
-		result.setSpeed(DEFAULT_SPEED);
 		return result;
 	}
-
 
 }

@@ -36,7 +36,8 @@ public enum LegoPlatformMessageTypeEnum implements LegoEnum {
     MOVE        (1, "move"),
     BACK        (2, "back"),
     LEFT        (3, "left"),
-    RIGHT       (4, "right")
+    RIGHT       (4, "right"),
+	SPEED		(5, "speed")
     ;
     //@formatter:on
 

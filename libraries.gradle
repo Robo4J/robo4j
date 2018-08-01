@@ -3,7 +3,7 @@ ext {
 //    note::it's necessary to specify local maven repository
 //    mavenRepository = "/home/pi/.m2"
     robo4jJavaVersion = 1.8
-    roboGradleVersion = "4.7"
+    roboGradleVersion = "4.9"
     hibernateVersion = "5.2.10.Final"
     hibernateJpaVersion = "1.0.0.Final"
     flywayVersion = "4.2.0"
