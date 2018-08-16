@@ -18,6 +18,7 @@ package com.robo4j.units.rpi;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Registry for I2C devices. Useful for sharing hardware between units.
@@ -34,6 +35,17 @@ public class I2CRegistry {
 
 	public static void registerI2CDevice(Object device, I2CEndPoint endPoint) {
 		devices.put(endPoint, device);
+	}
+
+	public static <T> T createAndRegisterIfAbsent(int bus, int address, Supplier<T> supplier) {
+		I2CEndPoint endPoint = new I2CEndPoint(bus, address);
+		@SuppressWarnings("unchecked")
+		T pwmDevice = (T) I2CRegistry.getI2CDeviceByEndPoint(endPoint);
+		if (pwmDevice == null) {
+			pwmDevice = supplier.get();
+			registerI2CDevice(pwmDevice, endPoint);
+		}
+		return pwmDevice;
 	}
 
 }

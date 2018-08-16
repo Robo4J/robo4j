@@ -16,6 +16,8 @@
  */
 package com.robo4j.units.rpi.pwm;
 
+import java.io.IOException;
+
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
 import com.robo4j.ConfigurationException;
@@ -24,11 +26,8 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.i2c.pwm.HBridgeMC33926Device;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.units.rpi.I2CEndPoint;
 import com.robo4j.units.rpi.I2CRegistry;
 import com.robo4j.units.rpi.I2CRoboUnit;
-
-import java.io.IOException;
 
 /**
  * Motor unit associated with the {@link HBridgeMC33926Device} driver.
@@ -48,20 +47,20 @@ public class MC33926HBridgeUnit extends I2CRoboUnit<Float> {
 	public static final String CONFIGURATION_KEY_NAME = "name";
 
 	/**
-	 * The key used to configure the gpio RaspiPin to use for "IN1". Use the name,
-	 * such as GPIO_01.
+	 * The key used to configure the gpio RaspiPin to use for "IN1". Use the
+	 * name, such as GPIO_01.
 	 */
 	public static final String CONFIGURATION_KEY_GPIO_IN_1 = "in1";
 
 	/**
-	 * The key used to configure the gpio pin to use for "IN2". Use the name, such
-	 * as GPIO_02.
+	 * The key used to configure the gpio pin to use for "IN2". Use the name,
+	 * such as GPIO_02.
 	 */
 	public static final String CONFIGURATION_KEY_GPIO_IN_2 = "in2";
 
 	/**
-	 * The key used to invert the direction of the motor. The value if the key is
-	 * not present defaults to false.
+	 * The key used to invert the direction of the motor. The value if the key
+	 * is not present defaults to false.
 	 */
 	public static final String CONFIGURATION_KEY_INVERT = "invert";
 
@@ -84,8 +83,9 @@ public class MC33926HBridgeUnit extends I2CRoboUnit<Float> {
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		super.onInitialization(configuration);
-		Object pwmDevice = I2CRegistry.getI2CDeviceByEndPoint(new I2CEndPoint(getBus(), getAddress()));
-		PWMPCA9685Device pcaDevice = PCA9685Utils.initPwmDevice(pwmDevice, getBus(), getAddress());
+
+		PWMPCA9685Device pcaDevice = I2CRegistry.createAndRegisterIfAbsent(getBus(), getAddress(),
+				() -> PWMPCA9685Device.createDevice(getBus(), getAddress()));
 
 		int channel = configuration.getInteger(CONFIGURATION_KEY_CHANNEL, -1);
 		if (channel == -1) {
@@ -106,8 +106,8 @@ public class MC33926HBridgeUnit extends I2CRoboUnit<Float> {
 
 		boolean invert = configuration.getBoolean(CONFIGURATION_KEY_INVERT, false);
 
-		engine = new HBridgeMC33926Device(configuration.getString(CONFIGURATION_KEY_NAME, "MC33926"),
-				pcaDevice.getChannel(channel), in1, in2, invert);
+		engine = new HBridgeMC33926Device(configuration.getString(CONFIGURATION_KEY_NAME, "MC33926"), pcaDevice.getChannel(channel), in1,
+				in2, invert);
 	}
 
 	@Override

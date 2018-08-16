@@ -16,10 +16,10 @@
  */
 package com.robo4j.hw.rpi.i2c.pwm;
 
+import java.io.IOException;
+
 import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
-
-import java.io.IOException;
 
 /**
  * Abstraction for talking to a PCA9685 PWM/Servo driver. For example an
@@ -32,6 +32,7 @@ import java.io.IOException;
 @SuppressWarnings("unused")
 public class PWMPCA9685Device extends AbstractI2CDevice {
 	private static final int DEFAULT_I2C_ADDRESS = 0x40;
+	private static final int DEFAULT_FREQUENCY = 50;
 
 	private static final double PRESCALE_FACTOR = 25000000.0 / 4096.0;
 
@@ -70,8 +71,8 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 	}
 
 	/**
-	 * Creates a software interface to an Adafruit 16 channel I2C PWM driver board
-	 * (PCA9685).
+	 * Creates a software interface to an Adafruit 16 channel I2C PWM driver
+	 * board (PCA9685).
 	 * 
 	 * @param bus
 	 *            the I2C bus to use.
@@ -168,11 +169,11 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 		 * Configures the PWM pulse for the PWMChannel.
 		 * 
 		 * @param on
-		 *            when to go from low to high [0, 4095]. 0 means at the very start
-		 *            of the pulse, 4095 at the very end.
+		 *            when to go from low to high [0, 4095]. 0 means at the very
+		 *            start of the pulse, 4095 at the very end.
 		 * @param off
-		 *            when to go from high to low [0, 4095]. 0 means at the very start
-		 *            of the pulse, 4095 at the very end.
+		 *            when to go from high to low [0, 4095]. 0 means at the very
+		 *            start of the pulse, 4095 at the very end.
 		 * 
 		 * @throws IOException
 		 *             exception
@@ -216,5 +217,30 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 		mode1 = mode1 & ~SLEEP;
 		writeByte(MODE1, (byte) mode1);
 		sleep(50);
+	}
+
+	/**
+	 * Creates a {@link PWMPCA9685Device}, or returns null if unsuccessful.
+	 * Meant to be used in lambdas.
+	 * 
+	 * @param bus
+	 *            the bus
+	 * @param address
+	 *            the address
+	 * @return the device if it all worked out, null if it failed.
+	 */
+	public static PWMPCA9685Device createDevice(int bus, int address) {
+		return createDevice(bus, address, DEFAULT_FREQUENCY);
+	}
+
+	public static PWMPCA9685Device createDevice(int bus, int address, int frequency) {
+		try {
+			PWMPCA9685Device result = new PWMPCA9685Device(bus, address);
+			result.setPWMFrequency(frequency);
+			return result;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
