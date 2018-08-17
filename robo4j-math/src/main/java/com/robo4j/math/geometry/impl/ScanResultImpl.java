@@ -135,7 +135,7 @@ public class ScanResultImpl implements ScanResult2D {
 	 *            angle in radians.
 	 */
 	public void addPoint(float range, float angle) {
-		addPoint(new Point2f(range, angle));
+		addPoint(Point2f.fromPolar(range, angle));
 	}
 
 	public void addResult(ScanResultImpl result) {

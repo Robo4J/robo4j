@@ -16,15 +16,14 @@
  */
 package com.robo4j.math.features;
 
-import com.robo4j.math.geometry.CurvaturePoint2f;
-import com.robo4j.math.geometry.Line2f;
-import com.robo4j.math.geometry.Point2f;
-import com.robo4j.math.jfr.FeatureExtractionEvent;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import com.robo4j.math.geometry.CurvaturePoint2f;
+import com.robo4j.math.geometry.Line2f;
+import com.robo4j.math.geometry.Point2f;
 
 /**
  * Simple and fast feature extraction from lists of Point2f.
@@ -136,14 +135,8 @@ public class FeatureExtraction {
 		return alphas;
 	}
 
-	@SuppressWarnings("deprecation")
 	public static FeatureSet getFeatures(List<Point2f> sample, float angularResolution) {
-		FeatureExtractionEvent event = new FeatureExtractionEvent(sample.size(), angularResolution);
-		event.begin();
-		FeatureSet result = extractFeatures(sample, angularResolution);
-		event.end();
-		event.commit();
-		return result;
+		return extractFeatures(sample, angularResolution);
 	}
 
 	private static FeatureSet extractFeatures(List<Point2f> sample, float angularResolution) {
@@ -289,9 +282,9 @@ public class FeatureExtraction {
 	}
 
 	public static final void main(String[] args) {
-		Point2f b = new Point2f(18, 18);
-		Point2f center = new Point2f(19, 19);
-		Point2f f = new Point2f(20, 20);
+		Point2f b = Point2f.fromPolar(18, 18);
+		Point2f center = Point2f.fromPolar(19, 19);
+		Point2f f = Point2f.fromPolar(20, 20);
 		float radians = calculateVectorAngle(b, center, f);
 
 		System.out.println("Vec angle: " + Math.toDegrees(radians) + " radians: " + radians);

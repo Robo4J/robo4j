@@ -61,7 +61,7 @@ public class Raycast {
 				resultAlpha = alpha;
 			}
 		}
-		return new Point2f(resultRange, resultAlpha);
+		return Point2f.fromPolar(resultRange, resultAlpha);
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class Raycast {
 				resultAlpha = alpha;
 			}
 		}
-		return new Point2f(resultRange, resultAlpha);
+		return Point2f.fromPolar(resultRange, resultAlpha);
 	}
 	
 	/**
