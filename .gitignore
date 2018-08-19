@@ -3,6 +3,7 @@ licence.idea
 !/licence.idea
 /.gradle/
 /build/
+bin/
 *.bak
 .idea
 /.DS_Store
