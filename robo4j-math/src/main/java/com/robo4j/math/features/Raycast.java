@@ -106,29 +106,40 @@ public class Raycast {
 	 *            the points known to be corners.
 	 * @param rayAlpha
 	 *            the angle to emit the ray at.
-	 * @param noGoRadius
+	 * @param defaultNoGoRadius
 	 *            the radius around a known point to avoid.
 	 * @return the distance at which the ray hit something.
 	 */
-	public static float raycastSingle(List<Point2f> points, List<CurvaturePoint2f> corners, float rayAlpha, float noGoRadius) {
+	public static float raycastSingle(List<Point2f> points, List<CurvaturePoint2f> corners, float rayAlpha, float defaultNoGoRadius) {
 		float minIntersectionRange = Float.MAX_VALUE;
+		float currentNoGoRadius = defaultNoGoRadius;
 		for (Point2f p : points) {
-			int cornerIndex = corners.indexOf(p);
-			if (cornerIndex >= 0) {
-				p = corners.get(cornerIndex);
-				noGoRadius = calculateNoGoRadius(p, noGoRadius);
+			CurvaturePoint2f cornerPoint = getMatchingCornerPoint(corners, p);
+			if (cornerPoint != null) {
+				currentNoGoRadius = calculateNoGoRadius(cornerPoint, defaultNoGoRadius);
+			} else {
+				currentNoGoRadius = defaultNoGoRadius;
 			}
 			float tangentDistance = calculateTangentDistance(rayAlpha, p);
 			// Fast rejection
-			if (Math.abs(tangentDistance) >= noGoRadius) {
+			if (Math.abs(tangentDistance) >= currentNoGoRadius) {
 				continue;
 			}
-			float intersectionRange = calculateIntersectionRange(rayAlpha, noGoRadius, tangentDistance, p);
+			float intersectionRange = calculateIntersectionRange(rayAlpha, currentNoGoRadius, tangentDistance, p);
 			if (!Float.isNaN(intersectionRange)) {
 				minIntersectionRange = Math.min(minIntersectionRange, intersectionRange);
 			}
 		}
 		return minIntersectionRange;
+	}
+
+	private static CurvaturePoint2f getMatchingCornerPoint(List<CurvaturePoint2f> corners, Point2f p) {
+		for (CurvaturePoint2f cp : corners) {
+			if (cp.getX() == p.getX() && cp.getY() == p.getY()) {
+				return cp;
+			}
+		}
+		return null;
 	}
 
 	public static Point2f raycastAtAngle(List<Point2f> points, float startAngle, float endAngle, float step, float noGoRadius,
@@ -173,16 +184,14 @@ public class Raycast {
 
 	/**
 	 * Avoid corners a bit more than other points...
+	 * 
+	 * @param corners
 	 */
-	private static float calculateNoGoRadius(Point2f p, float noGoRadius) {
-		if (p instanceof CurvaturePoint2f) {
-			CurvaturePoint2f cp = (CurvaturePoint2f) p;
-			if (cp.getCurvature() < 0) {
-				return noGoRadius;
-			} else {
-				return (float) (Math.sin(Math.PI - cp.getCurvature()) * noGoRadius * 1.5) + noGoRadius;
-			}
+	private static float calculateNoGoRadius(CurvaturePoint2f point, float noGoRadius) {
+		if (point.getCurvature() < 0) {
+			return noGoRadius;
+		} else {
+			return (float) (Math.sin(Math.PI - point.getCurvature()) * noGoRadius * 1.5) + noGoRadius;
 		}
-		return noGoRadius;
 	}
 }

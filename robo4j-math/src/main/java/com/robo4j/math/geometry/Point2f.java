@@ -26,18 +26,15 @@ public class Point2f {
 	/**
 	 * Range in meters
 	 */
-	private float range;
+	private final float range;
 
 	/**
 	 * Angle in radians
 	 */
-	private float angle;
+	private final float angle;
 
-	private float x;
-	private float y;
-
-	Point2f() {
-	}
+	private final float x;
+	private final float y;
 
 	/**
 	 * Constructor.
@@ -47,11 +44,11 @@ public class Point2f {
 	 * @param angle
 	 *            in radians
 	 */
-	Point2f(float range, float angle) {
+	Point2f(float range, float angle, float x, float y) {
 		this.range = range;
 		this.angle = angle;
-		this.x = (float) Math.sin(angle) * range;
-		this.y = (float) Math.cos(angle) * range;
+		this.x = x;
+		this.y = y;
 	}
 
 	/**
@@ -71,14 +68,14 @@ public class Point2f {
 	/**
 	 * @return X value, in meters.
 	 */
-	public double getX() {
+	public float getX() {
 		return x;
 	}
 
 	/**
 	 * @return Y value, in meters.
 	 */
-	public double getY() {
+	public float getY() {
 		return y;
 	}
 
@@ -146,7 +143,9 @@ public class Point2f {
 	 * @return the resulting point.
 	 */
 	public static Point2f fromPolar(float range, float angle) {
-		return new Point2f(range, angle);
+		float x = (float) Math.sin(angle) * range;
+		float y = (float) Math.cos(angle) * range;
+		return new Point2f(range, angle, x, y);
 	}
 
 	/**
@@ -159,11 +158,8 @@ public class Point2f {
 	 * @return the resulting point.
 	 */
 	public static Point2f fromCartesian(float x, float y) {
-		Point2f point = new Point2f();
-		point.range = (float) Math.sqrt(x * x + y * y);
-		point.angle = (float) Math.atan(x / y);
-		point.x = x;
-		point.y = y;
-		return point;
+		float range = (float) Math.sqrt(x * x + y * y);
+		float angle = (float) Math.atan(x / y);
+		return new Point2f(range, angle, x, y);
 	}
 }

@@ -16,6 +16,12 @@
  */
 package com.robo4j.units.rpi.lidarlite;
 
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
+
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
@@ -30,29 +36,15 @@ import com.robo4j.math.jfr.ScanEvent;
 import com.robo4j.units.rpi.I2CRoboUnit;
 import com.robo4j.units.rpi.pwm.PCA9685ServoUnit;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
-
 /**
  * This unit controls a servo to do laser range sweep.
  * 
- * &lt;p&gt;
- * Configuration:
- * &lt;/p&gt;
- * &lt;li&gt;
- * &lt;ul&gt;
- * pan: the servo to use for panning the laser. Defaults to
- * "laserscanner.servo". Set to "null" to not use a servo for panning.
- * &lt;/ul&gt;
- * &lt;ul&gt;
- * servoRange: the range in degrees that send 1.0 (full) to a servo will result
- * in. This must be measured by testing your hardware. Changing configuration on
- * your servo will change this too.
- * &lt;/ul&gt;
- * &lt;/li&gt;
+ * &lt;p&gt; Configuration: &lt;/p&gt; &lt;li&gt; &lt;ul&gt; pan: the servo to
+ * use for panning the laser. Defaults to "laserscanner.servo". Set to "null" to
+ * not use a servo for panning. &lt;/ul&gt; &lt;ul&gt; servoRange: the range in
+ * degrees that send 1.0 (full) to a servo will result in. This must be measured
+ * by testing your hardware. Changing configuration on your servo will change
+ * this too. &lt;/ul&gt; &lt;/li&gt;
  * 
  * FIXME(Marcus/Mar 10, 2017): Only supports the pan servo for now.
  * 
@@ -60,19 +52,35 @@ import java.util.function.Predicate;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class LaserScanner extends I2CRoboUnit<ScanRequest> {
-	private final static Predicate<Point2f> POINT_FILTER = new PointFilter();
+	/**
+	 * Since the lidar lite will sometimes give some abnormal readings with very
+	 * short range, we need to be able to filter out readings. Set this
+	 * depending on your hardware and needs.
+	 */
+	private final static float DEFAULT_FILTER_MIN_RANGE = 0.08f;
+	private Predicate<Point2f> pointFilter;
 	private String pan;
 	private LidarLiteDevice lidar;
 	private float servoRange;
 	private float angularSpeed;
 	private float minimumAcquisitionTime;
 	private float trim;
-	
-	private static class PointFilter implements Predicate<Point2f> {
+
+	/**
+	 * Filter for filtering out mis-reads. Anything closer than minRange will be
+	 * filtered out.
+	 */
+	private static class MinRangePointFilter implements Predicate<Point2f> {
+		private final float minRange;
+
+		private MinRangePointFilter(float minRange) {
+			this.minRange = minRange;
+		}
+
 		@Override
 		public boolean test(Point2f t) {
-			return t.getRange() >= 0.08;
-		}		
+			return t.getRange() >= minRange;
+		}
 	}
 
 	private final static class ScanJob implements Runnable {
@@ -106,7 +114,8 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		 * @param recipient
 		 */
 		public ScanJob(boolean lowToHigh, float minimumServoMovementTime, float minimumAcquisitionTime, float trim, ScanRequest request,
-				RoboReference<Float> servo, float servoRange, LidarLiteDevice lidar, RoboReference<ScanResult2D> recipient) {
+				RoboReference<Float> servo, float servoRange, LidarLiteDevice lidar, RoboReference<ScanResult2D> recipient,
+				Predicate<Point2f> pointFilter) {
 			this.lowToHigh = lowToHigh;
 			this.trim = trim;
 			this.request = request;
@@ -118,7 +127,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 			this.numberOfScans = calculateNumberOfScans() + 1;
 			this.delayMicros = calculateDelay(minimumAcquisitionTime, minimumServoMovementTime);
 			this.currentAngle = lowToHigh ? request.getStartAngle() : request.getStartAngle() + request.getRange();
-			this.scanResult = new ScanResultImpl(100, request.getStep(), POINT_FILTER);
+			this.scanResult = new ScanResultImpl(100, request.getStep(), pointFilter);
 			scanEvent = new ScanEvent(scanResult.getScanID(), getScanInfo());
 			scanEvent.setScanLeftRight(lowToHigh);
 			JfrUtils.begin(scanEvent);
@@ -165,7 +174,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 				// Laser was actually shooting at the previous angle, before
 				// moving - recalculate for that angle
 				float lastAngle = currentAngle + (lowToHigh ? -request.getStep() - trim : request.getStep() + trim);
-				scanResult.addPoint(readDistance, (float) Math.toRadians(lastAngle));
+				scanResult.addPoint(Point2f.fromPolar(readDistance, (float) Math.toRadians(lastAngle)));
 				servo.sendMessage(getNormalizedAngle());
 				lidar.acquireRange();
 			} catch (IOException e) {
@@ -201,8 +210,8 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		private long calculateDelay(float minimumAcquisitionTime, float minimumServoMovementTime) {
 			float delayPerStep = minimumServoMovementTime * 1000 / calculateNumberOfScans();
 			// If we have a slow servo, we will need to wait for the servo to
-			// move. If we have a slow acquisition,
-			// we will need to the laser before continuing
+			// move. If we have a slow acquisition, we will need to wait for the
+			// laser before continuing
 			float actualDelay = Math.max(delayPerStep, minimumAcquisitionTime);
 			return Math.round(actualDelay * 1000.0d);
 		}
@@ -217,12 +226,14 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		private final RoboReference<ScanResult2D> recipient;
 		private final LidarLiteDevice lidar;
 		private final float angle;
+		private final Predicate<Point2f> filter;
 		private volatile boolean firstRun = true;
 
-		public ScanFixedAngleJob(RoboReference<ScanResult2D> recipient, LidarLiteDevice lidar, float angle) {
+		public ScanFixedAngleJob(RoboReference<ScanResult2D> recipient, LidarLiteDevice lidar, float angle, Predicate<Point2f> filter) {
 			this.recipient = recipient;
 			this.lidar = lidar;
 			this.angle = angle;
+			this.filter = filter;
 		}
 
 		@Override
@@ -232,7 +243,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 					firstRun = false;
 					lidar.acquireRange();
 				} else {
-					ScanResultImpl scan = new ScanResultImpl(1, 0f, POINT_FILTER);
+					ScanResultImpl scan = new ScanResultImpl(1, 0f, filter);
 					scan.addPoint(lidar.readDistance(), (float) Math.toRadians(angle));
 					recipient.sendMessage(scan);
 				}
@@ -250,6 +261,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		super.onInitialization(configuration);
 		pan = configuration.getString("servo", "laserscanner.servo");
+
 		// Using degrees for convenience
 		servoRange = (float) configuration.getFloat("servoRange", 45.0f);
 
@@ -261,6 +273,10 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 
 		// Trim to align left to right and right to left scans (in degrees)
 		trim = configuration.getFloat("trim", 0.0f);
+
+		// Set the default minimal range to filter out
+		float minFilterRange = configuration.getFloat("minFilterRange", DEFAULT_FILTER_MIN_RANGE);
+		pointFilter = new MinRangePointFilter(minFilterRange);
 
 		try {
 			lidar = new LidarLiteDevice(getBus(), getAddress());
@@ -282,7 +298,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 
 	private void scheduleFixPanScan(ScanRequest message, RoboReference<Float> servo) {
 		servo.sendMessage(message.getStartAngle() / servoRange);
-		ScanFixedAngleJob fixedAngleJob = new ScanFixedAngleJob(message.getReceiver(), lidar, message.getStartAngle());
+		ScanFixedAngleJob fixedAngleJob = new ScanFixedAngleJob(message.getReceiver(), lidar, message.getStartAngle(), pointFilter);
 		// FIXME(Marcus/Sep 5, 2017): We should try to calculate this - we are
 		// now assuming that it will take little time to move the servo to the
 		// "new" position, however, the fact is that the new position will
@@ -305,8 +321,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 		}
 		float minimumServoMovementTime = message.getRange() / angularSpeed;
 		ScanJob job = new ScanJob(lowToHigh, minimumServoMovementTime, minimumAcquisitionTime, trim, message, servo, servoRange, lidar,
-				message.getReceiver());
-
+				message.getReceiver(), pointFilter);
 		schedule(job);
 	}
 

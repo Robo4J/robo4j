@@ -183,7 +183,7 @@ public class FeatureExtraction {
 				}
 
 				if (Math.abs(totalPhi) > CORNER_THRESHOLD) {
-					corners.add(new CurvaturePoint2f(Point2fs.get(maxIndex), totalPhi));
+					corners.add(CurvaturePoint2f.fromPoint(Point2fs.get(maxIndex), totalPhi));
 				}
 			}
 		}
@@ -214,7 +214,7 @@ public class FeatureExtraction {
 					Point2f f = Point2fs.get(maxIndex + 3);
 					float cornerAlpha = calculateVectorAngle(b, p, f);
 					if (cornerAlpha > CORNER_THRESHOLD) {
-						corners.add(new CurvaturePoint2f(p, cornerAlpha));
+						corners.add(CurvaturePoint2f.fromPoint(p, cornerAlpha));
 					}
 				}
 			}
