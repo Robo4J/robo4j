@@ -124,7 +124,7 @@ public class Raycast {
 				continue;
 			}
 			float intersectionRange = calculateIntersectionRange(rayAlpha, noGoRadius, tangentDistance, p);
-			if (intersectionRange != Float.NaN) {
+			if (!Float.isNaN(intersectionRange)) {
 				minIntersectionRange = Math.min(minIntersectionRange, intersectionRange);
 			}
 		}
