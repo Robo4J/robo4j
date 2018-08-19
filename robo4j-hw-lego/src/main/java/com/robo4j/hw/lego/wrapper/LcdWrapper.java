@@ -20,10 +20,9 @@
 package com.robo4j.hw.lego.wrapper;
 
 import com.robo4j.hw.lego.ILcd;
-
+import com.robo4j.hw.lego.enums.LcdFontEnum;
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;
-import lejos.hardware.lcd.Font;
 import lejos.hardware.lcd.GraphicsLCD;
 
 /**
@@ -31,13 +30,11 @@ import lejos.hardware.lcd.GraphicsLCD;
  * @author Miro Wengner (@miragemiko)
  */
 public class LcdWrapper<LcdType extends GraphicsLCD> implements ILcd {
-    private static final String SYSTEM_NAME = "Robo4J.IO";
-    private static final String ROBOT_NAME = "Robot : Number42";
-    private static final int INCREMENT = 10;
-    private int startPosition = 50;
+    public static final int SMALL_FONT_INCREMENT = 10;
+    public static final String ROBO4J_LOGO = "Robo4j.IO";
+    public static final String ROBO4J_ROBOT_NAME = "Number42";
+    private int startPosition = 0;
 
-
-    //TODO : miro -> provide different types of LCDs
     private LcdType lcd;
 
     @SuppressWarnings("unchecked")
@@ -45,28 +42,33 @@ public class LcdWrapper<LcdType extends GraphicsLCD> implements ILcd {
         lcd = (LcdType)BrickFinder.getDefault().getGraphicsLCD();
     }
 
-    //TODO: miro -> make it more generic to setup
     @Override
-    public void initiate() {
+    public void initRobo4j(String title, String robotName) {
         lcd.clear();
-        lcd.setFont(Font.getLargeFont());
-        lcd.drawString(SYSTEM_NAME, 1, 15, GraphicsLCD.LEFT);
+        startPosition = 50;
+        lcd.setFont(LcdFontEnum.LARGE.getFont());
+        lcd.drawString(title, 1, 15, GraphicsLCD.LEFT);
         Button.LEDPattern(1);
-        lcd.setFont(Font.getSmallFont());
-        lcd.drawString(ROBOT_NAME, 2, startPosition, GraphicsLCD.LEFT);
+        lcd.setFont(LcdFontEnum.SMALL.getFont());
+        lcd.drawString(robotName, 2, startPosition, GraphicsLCD.LEFT);
     }
 
     @Override
-    public void printText(int line, String text) {
+    public void clear() {
+        lcd.clear();
+    }
+
+    @Override
+    public void printText(int line, int increment, String text) {
         if (line > 1) {
-            int position = startPosition + (line - 1) * INCREMENT;
+            int position = startPosition + (line - 1) * increment;
             lcd.drawString(text, 2, position, GraphicsLCD.LEFT);
         }
     }
 
     @Override
     public void printText(String text) {
-        startPosition = startPosition + INCREMENT;
+        startPosition = startPosition + SMALL_FONT_INCREMENT;
         lcd.drawString(text, 2, startPosition, GraphicsLCD.LEFT);
     }
 }

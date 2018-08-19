@@ -37,7 +37,7 @@ import java.util.Random;
  */
 public class InfraPlatformController extends RoboUnit<InfraSensorMessage> {
 
-    public static final String TARGET = "target";
+    public static final String PROPERTY_TARGET = "target";
     private static final float DISTANCE_MIN = 40f;
     private static final float DISTANCE_OPTIMAL = 50f;
     private static final float DISTANCE_MAX = 100f;
@@ -55,9 +55,9 @@ public class InfraPlatformController extends RoboUnit<InfraSensorMessage> {
 
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
-        target = configuration.getString(TARGET, null);
+        target = configuration.getString(PROPERTY_TARGET, null);
         if (target == null) {
-            throw ConfigurationException.createMissingConfigNameException("target");
+            throw ConfigurationException.createMissingConfigNameException(PROPERTY_TARGET);
         }
     }
 

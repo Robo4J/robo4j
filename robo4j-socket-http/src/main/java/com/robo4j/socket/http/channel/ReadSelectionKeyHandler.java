@@ -77,7 +77,7 @@ public class ReadSelectionKeyHandler implements SelectionKeyHandler {
 			throw new SocketException("extract robo response", e);
 		}
 	}
-//
+
 	private void registerSelectionKey(SocketChannel channel) {
 		try {
 			channel.register(key.selector(), SelectionKey.OP_WRITE);
