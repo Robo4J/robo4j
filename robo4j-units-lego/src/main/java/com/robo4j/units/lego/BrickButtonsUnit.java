@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
  * @author Miro Wengner (@miragemiko)
  */
 public class BrickButtonsUnit extends RoboUnit<String> {
+	public static final String PROPERTY_TARGET = "target";
 	private static final int COLOR_GREEN = 1;
 	private String target;
 	private List<ButtonTypeEnum> availablePlateButtons = Arrays.asList(ButtonTypeEnum.LEFT, ButtonTypeEnum.RIGHT,
@@ -66,13 +67,13 @@ public class BrickButtonsUnit extends RoboUnit<String> {
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		setState(LifecycleState.UNINITIALIZED);
-		target = configuration.getString("target", null);
+		target = configuration.getString(PROPERTY_TARGET, null);
 		if (target == null) {
 			throw ConfigurationException.createMissingConfigNameException("target");
 		}
 
 		//@formatter:off
-        /* initiate button plate */
+        /* initRobo4j button plate */
         buttons = availablePlateButtons.stream()
                 .map(lb -> {
                     String bPropName = configuration.getString(BrickUtils.getButton(lb.getName()), null);

@@ -27,9 +27,11 @@ package com.robo4j.hw.lego;
  */
 public interface ILcd {
 
-    void initiate();
+    void initRobo4j(String title, String robotName);
 
-    void printText(int line, String text);
+    void clear();
+
+    void printText(int line, int increment, String text);
 
     void printText(String text);
 

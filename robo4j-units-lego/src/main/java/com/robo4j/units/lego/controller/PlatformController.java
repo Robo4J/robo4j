@@ -32,6 +32,7 @@ import com.robo4j.units.lego.platform.LegoPlatformMessage;
  */
 public class PlatformController extends RoboUnit<LegoPlatformMessageTypeEnum> {
 
+    public static final String PROPERTY_TARGET = "target";
     private String target;
 
     public PlatformController(RoboContext context, String id) {
@@ -45,9 +46,9 @@ public class PlatformController extends RoboUnit<LegoPlatformMessageTypeEnum> {
 
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
-        target = configuration.getString("target", null);
+        target = configuration.getString(PROPERTY_TARGET, null);
         if (target == null) {
-            throw ConfigurationException.createMissingConfigNameException("target");
+            throw ConfigurationException.createMissingConfigNameException(PROPERTY_TARGET);
         }
     }
 
