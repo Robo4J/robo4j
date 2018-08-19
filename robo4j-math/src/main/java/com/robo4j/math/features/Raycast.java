@@ -16,6 +16,7 @@
  */
 package com.robo4j.math.features;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.robo4j.math.geometry.CurvaturePoint2f;
@@ -80,15 +81,16 @@ public class Raycast {
 	 * 
 	 * @return the points where the rays hit.
 	 */
-	public static Point2f[] raycastFull(List<Point2f> points, float noGoRadius, float raycastStepAngle, FeatureSet features) {
-		Point2f[] rays = new Point2f[points.size()];
+	public static List<Point2f> raycastFull(List<Point2f> points, float noGoRadius, float raycastStepAngle, FeatureSet features) {
 		float startAlpha = points.get(0).getAngle();
 		float endAlpha = points.get(points.size() - 1).getAngle();
 
-		int index = 0;
+		float approximateNumberOfRays = (endAlpha - startAlpha) / raycastStepAngle;
+		List<Point2f> rays = new ArrayList<Point2f>((int) Math.ceil(approximateNumberOfRays));
+
 		for (float alpha = startAlpha; alpha <= endAlpha; alpha += raycastStepAngle) {
 			float range = raycastSingle(points, features.getCorners(), alpha, noGoRadius);
-			rays[index++] = Point2f.fromPolar(range, alpha);
+			rays.add(Point2f.fromPolar(range, alpha));
 		}
 		return rays;
 	}
@@ -163,7 +165,7 @@ public class Raycast {
 	 */
 	private static float calculateTangentDistance(float rayAlpha, Point2f p) {
 		float deltaAlpha = Math.abs(p.getAngle() - rayAlpha);
-		if (deltaAlpha >= 90.0) {
+		if (deltaAlpha >= Math.PI / 2) {
 			return Float.MAX_VALUE;
 		}
 		return (float) (p.getRange() * Math.atan(deltaAlpha));
