@@ -22,6 +22,10 @@ import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.units.PathHttpMethod;
 import com.robo4j.util.Utf8Constant;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+
 import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
 
 /**
@@ -33,6 +37,7 @@ public class HttpRequestDenominator implements HttpDenominator {
 	private final StringBuilder sb = new StringBuilder();
 	private final PathHttpMethod pathHttpMethod;
 	private final HttpVersion version;
+	private final Map<String, Set<String>> attributes;
 
 	/**
 	 * default request with default path
@@ -45,7 +50,10 @@ public class HttpRequestDenominator implements HttpDenominator {
 	public HttpRequestDenominator(HttpMethod method, HttpVersion version) {
 		this.pathHttpMethod = new PathHttpMethod(UTF8_SOLIDUS, method);
 		this.version = version;
+		this.attributes = Collections.emptyMap();
 	}
+
+
 
 	/**
 	 *
@@ -59,10 +67,32 @@ public class HttpRequestDenominator implements HttpDenominator {
 	public HttpRequestDenominator(HttpMethod method, String path, HttpVersion version) {
 		this.pathHttpMethod = new PathHttpMethod(path, method);
 		this.version = version;
+		this.attributes = Collections.emptyMap();
+	}
+
+	/**
+	 *
+	 * @param method
+	 *            http method
+	 * @param path
+	 *            server path
+	 * @param version
+	 *            http version
+	 * @param attributes
+	 * 			  request attributes
+	 */
+	public HttpRequestDenominator(HttpMethod method, String path, HttpVersion version, Map<String, Set<String>> attributes) {
+		this.pathHttpMethod = new PathHttpMethod(path, method);;
+		this.version = version;
+		this.attributes = attributes;
 	}
 
 	public PathHttpMethod getPathHttpMethod() {
 		return pathHttpMethod;
+	}
+
+	public Map<String, Set<String>> getAttributes() {
+		return attributes;
 	}
 
 	@Override

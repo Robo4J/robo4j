@@ -35,9 +35,12 @@ import com.robo4j.util.Utf8Constant;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Utils for the path operation
@@ -46,6 +49,13 @@ import java.util.stream.Collectors;
  * @author Miro Wengner (@miragemiko)
  */
 public final class HttpPathUtils {
+
+	public static final String ATTRIBUTES_PATH_VALUE = "attributes";
+	public static final String DELIMITER_ATTRIBUTE_KEY_VALUE = "=";
+	public static final String DELIMITER_ATTRIBUTES = ",";
+	public static final String DELIMITER_PATH_ATTRIBUTES = "?";
+	public static final String REGEX_ATTRIBUTE = "\\?";
+	public static final String REGEX_ATTRIBUTE_CONCAT = "&";
 
 	public static String toPath(String first, String... rest) {
 		final StringBuilder sb = new StringBuilder();
@@ -112,6 +122,14 @@ public final class HttpPathUtils {
                 .map(HttpPathUtils::toClientPathConfig)
 				.collect(Collectors.toMap(e -> new PathHttpMethod(e.getPath(), e.getMethod()), e -> e));
 		clientContext.addPaths(resultPaths);
+	}
+
+	public static Map<String, Set<String>> extractAttributesByPath(String path){
+		return Stream.of(path.split(REGEX_ATTRIBUTE)[1].split(REGEX_ATTRIBUTE_CONCAT))
+				.map(e -> e.split(DELIMITER_ATTRIBUTE_KEY_VALUE))
+				.collect(Collectors.toMap(e -> e[0], e -> e.length > 1 && e[1] != null ?
+						Stream.of(e[1].split(DELIMITER_ATTRIBUTES)).collect(Collectors.toSet())
+						: Collections.emptySet()));
 	}
 
 }

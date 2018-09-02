@@ -18,7 +18,9 @@
 package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.dto.ClassGetSetDTO;
 import com.robo4j.socket.http.dto.ClientPathDTO;
+import com.robo4j.socket.http.dto.ResponseAttributeDTO;
 import com.robo4j.socket.http.units.test.PropertyListBuilder;
 import com.robo4j.util.StringConstants;
 import org.junit.Assert;
@@ -26,7 +28,13 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static com.robo4j.socket.http.util.HttpPathUtils.ATTRIBUTES_PATH_VALUE;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -122,6 +130,32 @@ public class HttpPathUtilTests {
 			Assert.assertTrue(pathMethod.getRoboUnit().isEmpty() ?
 					pathMethod.getRoboUnit().equals(StringConstants.EMPTY) : pathMethod.getRoboUnit().equals("imageController"));
 		});
+	}
+
+	@Test
+	public void parseGetRequestWithAttributes(){
+		String path = "/units/controller?attributes=number,counter";
+		Map<String, Set<String>> expectedMap = new HashMap<>();
+		Set<String> expectedAttributesValues = new HashSet<>();
+		String attributeName = "attributes";
+		expectedAttributesValues.add("number");
+		expectedAttributesValues.add("counter");
+		expectedMap.put(ATTRIBUTES_PATH_VALUE, expectedAttributesValues);
+
+		HttpPathUtils.extractAttributesByPath(path);
+		Map<String, Set<String>> attributeMap = HttpPathUtils.extractAttributesByPath(path);
+		Assert.assertArrayEquals(attributeMap.get(attributeName).toArray(), expectedMap.get(attributeName).toArray());
+	}
+
+	@Test
+	public void createJsonArrayByList(){
+
+		ResponseAttributeDTO attributeDTO = new ResponseAttributeDTO("number", "42");
+
+		Map<String, ClassGetSetDTO> descriptorMap = ReflectUtils.getFieldsTypeMap(ResponseAttributeDTO.class);
+
+		System.out.println("result: " + JsonUtil.toJson(descriptorMap, attributeDTO));
+
 	}
 
 	private ClientPathDTO createPathMethodDTO(String... args) {

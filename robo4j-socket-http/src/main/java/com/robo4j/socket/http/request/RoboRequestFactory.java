@@ -78,6 +78,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 		}
 	}
 
+	//FIXME correct available methods according to the configuration
 	@Override
 	public Object processGet(ServerPathConfig pathConfig) {
 		final SocketDecoder<?, ?> decoder = codecRegistry.getDecoder(pathConfig.getRoboUnit().getMessageType());

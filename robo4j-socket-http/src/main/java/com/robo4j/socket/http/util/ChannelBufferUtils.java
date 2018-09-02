@@ -200,8 +200,14 @@ public class ChannelBufferUtils {
 		final String version = tokens[HttpMessageUtils.VERSION_POSITION];
 		final Map<String, String> headerParams = getHeaderParametersByArray(paramArray);
 
-		final HttpRequestDenominator denominator = new HttpRequestDenominator(method, path,
-				HttpVersion.getByValue(version));
+		final HttpRequestDenominator denominator;
+		if(path.contains(HttpPathUtils.DELIMITER_PATH_ATTRIBUTES)){
+			denominator = new HttpRequestDenominator(method, path.split(HttpPathUtils.REGEX_ATTRIBUTE)[0], HttpVersion.getByValue(version),
+					HttpPathUtils.extractAttributesByPath(path));
+		} else {
+			denominator = new HttpRequestDenominator(method, path,
+					HttpVersion.getByValue(version));
+		}
 		HttpDecoratedRequest result = new HttpDecoratedRequest(headerParams, denominator);
 
 		if (headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)) {

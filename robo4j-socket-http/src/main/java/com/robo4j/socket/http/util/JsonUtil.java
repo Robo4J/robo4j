@@ -18,9 +18,11 @@
 package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.HttpException;
+import com.robo4j.socket.http.dto.ClassGetSetDTO;
 import com.robo4j.socket.http.dto.ClientPathDTO;
 import com.robo4j.socket.http.json.JsonDocument;
 import com.robo4j.socket.http.json.JsonReader;
+import com.robo4j.socket.http.json.JsonTypeAdapter;
 import com.robo4j.util.Utf8Constant;
 
 import java.io.UnsupportedEncodingException;
@@ -29,6 +31,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -204,6 +207,37 @@ public final class JsonUtil {
 		return JsonElementStringBuilder.Builder().add(Utf8Constant.UTF8_SQUARE_BRACKET_LEFT)
 				.add(list.stream().map(ReflectUtils::createJson).collect(Collectors.joining(Utf8Constant.UTF8_COMMA)))
 				.add(Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT).build();
+	}
+
+	public static <T> String toJson(Map<String, ClassGetSetDTO> descriptorMap, T obj){
+		final JsonElementStringBuilder builder = JsonElementStringBuilder.Builder()
+				.add(Utf8Constant.UTF8_CURLY_BRACKET_LEFT);
+		builder.add(descriptorMap.entrySet().stream()
+				.map(entry -> {
+					StringBuilder sb = new StringBuilder();
+					try {
+						Object val = entry.getValue().getGetMethod().invoke(obj);
+						if(val == null){
+							return null;
+						} else {
+							TypeMapper typeMapper = TypeMapper.getBySource(val.getClass());
+							JsonTypeAdapter adapter = typeMapper == null ?
+									ReflectUtils.getJsonTypeAdapter(val.getClass()) : typeMapper.getAdapter();
+							return sb.append(Utf8Constant.UTF8_QUOTATION_MARK)
+									.append(entry.getKey())
+									.append(Utf8Constant.UTF8_QUOTATION_MARK)
+									.append(Utf8Constant.UTF8_COLON)
+									.append(adapter.adapt(val))
+									.toString();
+						}
+					} catch (Exception e){
+						throw new RoboReflectException("adapter: " + descriptorMap + " sb: " + sb.toString(), e);
+					}
+				})
+				.filter(Objects::nonNull)
+				.collect(Collectors.joining(Utf8Constant.UTF8_COMMA)));
+		builder.add(Utf8Constant.UTF8_CURLY_BRACKET_RIGHT);
+		return builder.build();
 	}
 
 	private static JsonDocument toJsonDocument(String json) {
