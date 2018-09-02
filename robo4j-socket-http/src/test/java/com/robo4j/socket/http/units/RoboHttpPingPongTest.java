@@ -55,12 +55,12 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONF
 public class RoboHttpPingPongTest {
 
 	public static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
+	public static final String HOST_SYSTEM = "0.0.0.0";
 	private static final int TIMEOUT = 10;
 	private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
 	private static final String ID_HTTP_CLIENT = "http_client";
 	private static final String ID_HTTP_SERVER = "http_server";
 	private static final String CONTROLLER_PING_PONG = "controller";
-	private static final String HOST_SYSTEM = "0.0.0.0";
 	private static final int PORT = 8042;
 	private static final int MESSAGES = 50;
 	private static final String REQUEST_CONSUMER = "request_consumer";

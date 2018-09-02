@@ -71,7 +71,7 @@ public class RoboHttpClientWithResponseTests {
 		producerSystem.shutdown();
 		consumerSystem.shutdown();
 
-		Assert.assertTrue(consumerTotalNumber == MAX_NUMBER);
+		Assert.assertEquals(MAX_NUMBER, consumerTotalNumber);
 		Assert.assertTrue(consumerMessageList.contains(ROBO_SYSTEM_DESC));
 	}
 
