@@ -1,7 +1,6 @@
 package com.robo4j.socket.http.util;
 
 import com.robo4j.LifecycleState;
-import com.robo4j.socket.http.dto.PathAttributeDTO;
 import com.robo4j.socket.http.dto.ResponseUnitDTO;
 import org.junit.Assert;
 import org.junit.Test;
@@ -67,46 +66,6 @@ public class JsonUtilTests {
 
 		Assert.assertNotNull(result);
 		Assert.assertEquals(result, expectedJson);
-
-	}
-
-	@Test
-	public void objectMapToJsonTest() {
-		String expectedJson = "{\"key1\":2,\"key2\":3}";
-		Map<String, Object> testMap = new HashMap<>();
-		testMap.put("key1", 2);
-		testMap.put("key2", 3);
-
-		String result = JsonUtil.toJsonByMapObject(testMap);
-		System.out.println("result: " + result);
-
-		Assert.assertNotNull(result);
-		Assert.assertEquals(result, expectedJson);
-	}
-
-	// FIXME
-	@Test(expected = RoboReflectException.class)
-	public void mapObjectToJsonTest() {
-
-		Map<String, Object> testMap = new HashMap<>();
-		testMap.put("name", "test map");
-		// testMap.put("attributes", Arrays.asList("number", "text"));
-
-		String result = ReflectUtils.createJson(testMap);
-		System.out.println("result: " + result);
-
-	}
-
-	// FIXME
-	@Test
-	public void mapObjectToJsonAttributesTest() {
-
-		Map<String, Object> testMap = new HashMap<>();
-		testMap.put("name", "test map");
-		testMap.put("attributes", Arrays.asList(new PathAttributeDTO("number", "java.lang.Integer"),
-				new PathAttributeDTO("text", "java.lang.String")));
-		String result = JsonUtil.toJsonByMapObject(testMap);
-		System.out.println("result: " + result);
 
 	}
 }

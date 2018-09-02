@@ -182,21 +182,6 @@ public final class JsonUtil {
 		return builder.add(Utf8Constant.UTF8_CURLY_BRACKET_RIGHT).build();
 	}
 
-	public static String toJsonByMapObject(Map<String, Object> map) {
-		final JsonElementStringBuilder builder = JsonElementStringBuilder.Builder()
-				.add(Utf8Constant.UTF8_CURLY_BRACKET_LEFT);
-		if (!map.isEmpty()) {
-			builder.add(map.entrySet().stream()
-					.map(entry -> new StringBuilder().append(UTF8_QUOTATION_MARK)
-							.append(entry.getKey())
-							.append(UTF8_QUOTATION_MARK).append(Utf8Constant.UTF8_COLON)
-							.append(entry.getValue()))
-					.collect(Collectors.joining(Utf8Constant.UTF8_COMMA)));
-		}
-
-		return builder.add(Utf8Constant.UTF8_CURLY_BRACKET_RIGHT).build();
-	}
-
 	/**
 	 *
 	 * @param list
@@ -211,33 +196,27 @@ public final class JsonUtil {
 				.add(Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT).build();
 	}
 
-	public static <T> String toJson(Map<String, ClassGetSetDTO> descriptorMap, T obj){
+	public static <T> String toJson(Map<String, ClassGetSetDTO> descriptorMap, T obj) {
 		final JsonElementStringBuilder builder = JsonElementStringBuilder.Builder()
 				.add(Utf8Constant.UTF8_CURLY_BRACKET_LEFT);
-		builder.add(descriptorMap.entrySet().stream()
-				.map(entry -> {
-					StringBuilder sb = new StringBuilder();
-					try {
-						Object val = entry.getValue().getGetMethod().invoke(obj);
-						if(val == null){
-							return null;
-						} else {
-							TypeMapper typeMapper = TypeMapper.getBySource(val.getClass());
-							JsonTypeAdapter adapter = typeMapper == null ?
-									ReflectUtils.getJsonTypeAdapter(val.getClass()) : typeMapper.getAdapter();
-							return sb.append(Utf8Constant.UTF8_QUOTATION_MARK)
-									.append(entry.getKey())
-									.append(Utf8Constant.UTF8_QUOTATION_MARK)
-									.append(Utf8Constant.UTF8_COLON)
-									.append(adapter.adapt(val))
-									.toString();
-						}
-					} catch (Exception e){
-						throw new RoboReflectException("adapter: " + descriptorMap + " sb: " + sb.toString(), e);
-					}
-				})
-				.filter(Objects::nonNull)
-				.collect(Collectors.joining(Utf8Constant.UTF8_COMMA)));
+		builder.add(descriptorMap.entrySet().stream().map(entry -> {
+			StringBuilder sb = new StringBuilder();
+			try {
+				Object val = entry.getValue().getGetMethod().invoke(obj);
+				if (val == null) {
+					return null;
+				} else {
+					TypeMapper typeMapper = TypeMapper.getBySource(val.getClass());
+					JsonTypeAdapter adapter = typeMapper == null ? ReflectUtils.getJsonTypeAdapter(val.getClass())
+							: typeMapper.getAdapter();
+					return sb.append(Utf8Constant.UTF8_QUOTATION_MARK).append(entry.getKey())
+							.append(Utf8Constant.UTF8_QUOTATION_MARK).append(Utf8Constant.UTF8_COLON)
+							.append(adapter.adapt(val)).toString();
+				}
+			} catch (Exception e) {
+				throw new RoboReflectException("adapter: " + descriptorMap + " sb: " + sb.toString(), e);
+			}
+		}).filter(Objects::nonNull).collect(Collectors.joining(Utf8Constant.UTF8_COMMA)));
 		builder.add(Utf8Constant.UTF8_CURLY_BRACKET_RIGHT);
 		return builder.build();
 	}

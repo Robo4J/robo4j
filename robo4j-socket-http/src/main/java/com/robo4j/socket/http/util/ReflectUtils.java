@@ -4,9 +4,11 @@ import com.robo4j.socket.http.dto.ClassGetSetDTO;
 import com.robo4j.socket.http.json.JsonDocument;
 import com.robo4j.socket.http.json.JsonGenericTypeAdapter;
 import com.robo4j.socket.http.json.JsonTypeAdapter;
+import com.robo4j.util.StringConstants;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -99,10 +101,27 @@ public final class ReflectUtils {
 		return null;
 	}
 
+
+	private static Class<?> correctedGetClass(Class<?> clazz, Object obj){
+		if(clazz == null){
+			if(obj instanceof Collection){
+				Object rep = ((Collection) obj).iterator().next();
+				return rep.getClass();
+			} else {
+				Object rep = ((Map) obj).values().iterator().next();
+				return rep.getClass();
+			}
+		} else {
+			return  clazz.isEnum() ? Enum.class : clazz;
+		}
+	}
+
 	private static String getJsonValue(ClassGetSetDTO getterDTO, Object obj) {
 		try {
-			Object value = getterDTO.getGetMethod().invoke(obj);
-			Class<?> clazz = getterDTO.getValueClass().isEnum() ? Enum.class : getterDTO.getValueClass();
+			Object value = getterDTO.getCollection() != null && getterDTO.getValueClass() == null &&
+					getterDTO.getCollection().equals(TypeCollection.MAP) ?
+					obj : getterDTO.getGetMethod().invoke(obj);
+			Class<?> clazz = correctedGetClass(getterDTO.getValueClass(), obj);
 			TypeMapper typeMapper = TypeMapper.getBySource(clazz);
 			if(value == null){
 				return null;
@@ -167,7 +186,8 @@ public final class ReflectUtils {
 												Class<?> mapValueClazz = classGetSetDTO.getValueClass();
 												return adjustRoboClassCast(mapValueClazz, e.getValue());
 											}
-											return e.getValue();}));
+											return e.getValue();
+										}));
 						//@formatter:on
 
 					}
@@ -234,13 +254,41 @@ public final class ReflectUtils {
 	}
 
 	public static String createJson(Object obj) {
-		Map<String, ClassGetSetDTO> map = getFieldsTypeMap(obj.getClass());
+		final Map<String, ClassGetSetDTO> map = getFieldsTypeMap(obj.getClass());
+		String preKey = map.keySet().isEmpty() ? null : map.keySet().iterator().next();
+		if(map.size() == 1 && preKey != null && preKey.equals(StringConstants.EMPTY)){
+			ClassGetSetDTO descriptor = map.values().iterator().next();
+			switch (descriptor.getCollection()){
+				case MAP:
+					return new StringBuilder()
+							.append(map.entrySet().stream()
+									.map(entry -> new MapEntryDTO(entry.getKey(), ReflectUtils.getJsonValue(entry.getValue(), obj)))
+									.filter(entry -> Objects.nonNull(entry.getValue()))
+									.map(entry -> JsonElementStringBuilder.Builder()
+											.add(entry.getValue())
+											.build())
+									.collect(Collectors.joining(UTF8_COMMA)))
+							.toString();
+				case ARRAY:
+				case LIST:
+					return new StringBuilder()
+							.append(map.entrySet().stream()
+									.map(entry -> new MapEntryDTO(entry.getKey(), ReflectUtils.getJsonValue(entry.getValue(), obj)))
+									.filter(entry -> Objects.nonNull(entry.getValue()))
+									.map(entry -> JsonElementStringBuilder.Builder()
+											.add(entry.getValue())
+											.build())
+									.collect(Collectors.joining(UTF8_COMMA)))
+							.toString();
+			}
+		}
 		return createJson(map, obj);
 	}
 
 	public static String createJson(Map<String, ClassGetSetDTO> descriptorMap, Object obj) {
 		//@formatter:off
-		return new StringBuilder(UTF8_CURLY_BRACKET_LEFT)
+		return new StringBuilder()
+				.append(UTF8_CURLY_BRACKET_LEFT)
 				.append(descriptorMap.entrySet().stream()
 						.map(entry -> new MapEntryDTO(entry.getKey(), ReflectUtils.getJsonValue(entry.getValue(), obj)))
 						.filter(entry -> Objects.nonNull(entry.getValue()))
@@ -264,29 +312,67 @@ public final class ReflectUtils {
 		}
 	}
 
+	private static int isClassCollection(Class<?> c) {
+
+		if(Collection.class.isAssignableFrom(c)){
+			return 1;
+		} else if(Map.class.isAssignableFrom(c)){
+			return 2;
+		} else {
+			return 0;
+		}
+	}
+
+
 	private static Map<String, ClassGetSetDTO> getClazzDescriptionDTO(Class<?> clazz) {
 		return Stream.of(clazz.getDeclaredFields()).map(field -> {
 			try {
-				String adjustedName = adjustFirstLetterUpperCase(field.getName());
-				String getMethodName = getGetterNameByType(field.getType(), adjustedName);
-				String setMethodName = METHOD_SET.concat(adjustedName);
-				Method getMethod = clazz.getDeclaredMethod(getMethodName);
-				Method setMethod = clazz.getDeclaredMethod(setMethodName, field.getType());
 
-				if (field.getType().isAssignableFrom(Map.class) ) {
-					Class<?> mapValueClazz = ReflectUtils
-							.extractMapValueClassSignature(field.getGenericType().getTypeName());
-					return new ClassGetSetDTO(field.getName(), mapValueClazz, TypeCollection.MAP, getMethod, setMethod);
-				} else if (field.getType().isAssignableFrom(List.class)) {
-					Class<?> listValueClazz = extractListClassSignature(field.getGenericType().getTypeName());
-					return new ClassGetSetDTO(field.getName(), listValueClazz, TypeCollection.LIST, getMethod,
-							setMethod);
-				} else if(field.getType().isArray()){
-					Class<?> arrayClass = extractArrayClassSignature(field.getType().getName());
-					return new ClassGetSetDTO(field.getName(), arrayClass, TypeCollection.ARRAY, getMethod,
-							setMethod);
+				int structureClass = isClassCollection(clazz);
+				if(structureClass == 0){
+					String adjustedName = adjustFirstLetterUpperCase(field.getName());
+					String getMethodName = getGetterNameByType(field.getType(), adjustedName);
+					String setMethodName = METHOD_SET.concat(adjustedName);
+					Method getMethod = clazz.getDeclaredMethod(getMethodName);
+					Method setMethod = clazz.getDeclaredMethod(setMethodName, field.getType());
+
+					if (field.getType().isAssignableFrom(Map.class) ) {
+						Class<?> mapValueClazz = ReflectUtils
+								.extractMapValueClassSignature(field.getGenericType().getTypeName());
+						return new ClassGetSetDTO(field.getName(), mapValueClazz, TypeCollection.MAP, getMethod, setMethod);
+					} else if (field.getType().isAssignableFrom(List.class)) {
+						Class<?> listValueClazz = extractListClassSignature(field.getGenericType().getTypeName());
+						return new ClassGetSetDTO(field.getName(), listValueClazz, TypeCollection.LIST, getMethod,
+								setMethod);
+					} else if(field.getType().isArray()){
+						Class<?> arrayClass = extractArrayClassSignature(field.getType().getName());
+						return new ClassGetSetDTO(field.getName(), arrayClass, TypeCollection.ARRAY, getMethod,
+								setMethod);
+					}
+					return new ClassGetSetDTO(field.getName(), field.getType(), getMethod, setMethod);
+				} else {
+
+					switch (structureClass){
+						case 1:
+							Method getMethodList = Stream.of(Collection.class.getMethods())
+									.filter(m -> m.getName().equals("toArray"))
+									.filter(m -> m.getParameters().length == 0)
+									.findFirst().orElseThrow(IllegalStateException::new);
+							Method setMethodList = Stream.of(Collection.class.getMethods()).filter(m -> m.getName().equals("add"))
+									.findFirst().orElseThrow(IllegalStateException::new);
+							return new ClassGetSetDTO("", null,  TypeCollection.ARRAY, getMethodList, setMethodList);
+						case 2:
+							Method getMethodMap = Stream.of(Map.class.getMethods()).filter(m -> m.getName().equals("entrySet"))
+									.findFirst().orElseThrow(IllegalStateException::new);
+							Method setMethodMap = Stream.of(Map.class.getMethods()).filter(m -> m.getName().equals("put"))
+									.findFirst().orElseThrow(IllegalStateException::new);
+							return new ClassGetSetDTO("", null, TypeCollection.MAP, getMethodMap, setMethodMap);
+						default:
+							throw new IllegalArgumentException("not allowed:" + structureClass);
+					}
+
 				}
-				return new ClassGetSetDTO(field.getName(), field.getType(), getMethod, setMethod);
+
 
 			} catch (Exception e) {
 				throw new RoboReflectException("class configuration", e);
