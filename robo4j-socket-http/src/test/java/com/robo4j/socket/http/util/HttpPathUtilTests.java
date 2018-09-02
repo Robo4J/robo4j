@@ -20,7 +20,7 @@ package com.robo4j.socket.http.util;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.dto.ClassGetSetDTO;
 import com.robo4j.socket.http.dto.ClientPathDTO;
-import com.robo4j.socket.http.dto.ResponseAttributeDTO;
+import com.robo4j.socket.http.dto.PathAttributeDTO;
 import com.robo4j.socket.http.units.test.PropertyListBuilder;
 import com.robo4j.util.StringConstants;
 import org.junit.Assert;
@@ -150,9 +150,9 @@ public class HttpPathUtilTests {
 	@Test
 	public void createJsonArrayByList(){
 
-		ResponseAttributeDTO attributeDTO = new ResponseAttributeDTO("number", "42");
+		PathAttributeDTO attributeDTO = new PathAttributeDTO("number", "42");
 
-		Map<String, ClassGetSetDTO> descriptorMap = ReflectUtils.getFieldsTypeMap(ResponseAttributeDTO.class);
+		Map<String, ClassGetSetDTO> descriptorMap = ReflectUtils.getFieldsTypeMap(PathAttributeDTO.class);
 
 		System.out.println("result: " + JsonUtil.toJson(descriptorMap, attributeDTO));
 

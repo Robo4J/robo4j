@@ -273,7 +273,7 @@ public final class ReflectUtils {
 				Method getMethod = clazz.getDeclaredMethod(getMethodName);
 				Method setMethod = clazz.getDeclaredMethod(setMethodName, field.getType());
 
-				if (field.getType().isAssignableFrom(Map.class)) {
+				if (field.getType().isAssignableFrom(Map.class) ) {
 					Class<?> mapValueClazz = ReflectUtils
 							.extractMapValueClassSignature(field.getGenericType().getTypeName());
 					return new ClassGetSetDTO(field.getName(), mapValueClazz, TypeCollection.MAP, getMethod, setMethod);

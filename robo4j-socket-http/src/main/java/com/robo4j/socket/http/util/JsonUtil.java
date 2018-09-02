@@ -182,13 +182,15 @@ public final class JsonUtil {
 		return builder.add(Utf8Constant.UTF8_CURLY_BRACKET_RIGHT).build();
 	}
 
-	public static String toJsonMapObject(Map<String, Object> map) {
+	public static String toJsonByMapObject(Map<String, Object> map) {
 		final JsonElementStringBuilder builder = JsonElementStringBuilder.Builder()
 				.add(Utf8Constant.UTF8_CURLY_BRACKET_LEFT);
 		if (!map.isEmpty()) {
 			builder.add(map.entrySet().stream()
-					.map(entry -> new StringBuilder().append(UTF8_QUOTATION_MARK).append(entry.getKey())
-							.append(UTF8_QUOTATION_MARK).append(Utf8Constant.UTF8_COLON).append(entry.getValue()))
+					.map(entry -> new StringBuilder().append(UTF8_QUOTATION_MARK)
+							.append(entry.getKey())
+							.append(UTF8_QUOTATION_MARK).append(Utf8Constant.UTF8_COLON)
+							.append(entry.getValue()))
 					.collect(Collectors.joining(Utf8Constant.UTF8_COMMA)));
 		}
 

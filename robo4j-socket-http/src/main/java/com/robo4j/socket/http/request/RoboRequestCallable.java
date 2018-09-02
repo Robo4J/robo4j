@@ -22,7 +22,8 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.dto.ClassGetSetDTO;
-import com.robo4j.socket.http.dto.ResponseAttributeDTO;
+import com.robo4j.socket.http.dto.PathAttributeDTO;
+import com.robo4j.socket.http.dto.PathAttributeListDTO;
 import com.robo4j.socket.http.enums.StatusCode;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.message.HttpRequestDenominator;
@@ -38,7 +39,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
 
@@ -64,7 +64,7 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
 	}
 
 	@Override
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public HttpResponseProcess call() throws Exception {
 
 		final HttpResponseProcessBuilder resultBuilder = HttpResponseProcessBuilder.Builder();
@@ -90,21 +90,24 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
 							.get(HttpPathUtils.ATTRIBUTES_PATH_VALUE);
 					if (requestAttributes == null) {
 						unitDescription = factory.processGet(pathConfig);
-					} else if (requestAttributes.isEmpty()){
-						RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().getId());
-						ResponseAttributeDTO attributeDescriptor = new ResponseAttributeDTO();
-						attributeDescriptor.setName(HttpPathUtils.ATTRIBUTES_PATH_VALUE);
-						attributeDescriptor.setValue(unit.getKnownAttributes().stream().map(AttributeDescriptor::getAttributeName).collect(Collectors.toList()).toString());
-						Map<String, ClassGetSetDTO> responseAttributeDescriptorMap = ReflectUtils
-								.getFieldsTypeMap(ResponseAttributeDTO.class);
-						unitDescription = JsonUtil.toJson(responseAttributeDescriptorMap, attributeDescriptor);
-					} else  {
+					} else if (requestAttributes.isEmpty()) {
 						RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().getId());
 
-						List<ResponseAttributeDTO> attributes = new ArrayList<>();
+						PathAttributeListDTO pathAttributes = new PathAttributeListDTO();
+						unit.getKnownAttributes().forEach(a -> {
+							PathAttributeDTO attributeDescriptor = new PathAttributeDTO();
+							attributeDescriptor.setName(a.getAttributeName());
+							attributeDescriptor.setValue(a.getAttributeType().getCanonicalName());
+							pathAttributes.addAttribute(attributeDescriptor);
+						});
+						unitDescription = ReflectUtils.createJson(pathAttributes);
+					} else {
+						RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().getId());
+
+						List<PathAttributeDTO> attributes = new ArrayList<>();
 						for (AttributeDescriptor attr : unit.getKnownAttributes()) {
 							if (requestAttributes.contains(attr.getAttributeName())) {
-								ResponseAttributeDTO attribute = new ResponseAttributeDTO();
+								PathAttributeDTO attribute = new PathAttributeDTO();
 								String valueString = String.valueOf(unit.getAttribute(attr).get());
 								attribute.setValue(valueString);
 								attribute.setName(attr.getAttributeName());
@@ -113,7 +116,7 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
 						}
 						if (attributes.size() == 1) {
 							Map<String, ClassGetSetDTO> responseAttributeDescriptorMap = ReflectUtils
-									.getFieldsTypeMap(ResponseAttributeDTO.class);
+									.getFieldsTypeMap(PathAttributeDTO.class);
 							unitDescription = JsonUtil.toJson(responseAttributeDescriptorMap, attributes.get(0));
 						} else {
 							unitDescription = JsonUtil.toJsonArray(attributes);

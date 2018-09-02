@@ -1,5 +1,7 @@
 package com.robo4j.socket.http.util;
 
+import com.robo4j.socket.http.dto.PathAttributeDTO;
+import com.robo4j.socket.http.dto.PathAttributeListDTO;
 import com.robo4j.socket.http.units.test.enums.TestCommandEnum;
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,5 +45,17 @@ public class ReflectUtilTests {
         Assert.assertTrue(result.equals(expectedJson));
 
 
+    }
+
+    @Test
+    public void pathAttributesListToJsonTest(){
+        final String expectedJson = "{\"attributes\":[{\"name\":\"name\",\"value\":\"java.lang.String\"},{\"name\":\"values\",\"value\":\"java.util.HashMap\"}]}";
+        PathAttributeListDTO attributes = new PathAttributeListDTO();
+        attributes.addAttribute(new PathAttributeDTO("name", "java.lang.String"));
+        attributes.addAttribute(new PathAttributeDTO("values", "java.util.HashMap"));
+
+        String result = ReflectUtils.createJson(attributes);
+        System.out.println("result:"+result);
+        Assert.assertEquals(expectedJson, result);
     }
 }

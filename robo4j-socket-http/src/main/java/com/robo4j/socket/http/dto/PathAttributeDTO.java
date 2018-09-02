@@ -20,19 +20,19 @@ package com.robo4j.socket.http.dto;
 import java.util.Objects;
 
 /**
- * ResponseAttributeDTO holds attribute value of Unit
+ * PathAttributeDTO holds attribute value of Unit
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class ResponseAttributeDTO {
+public class PathAttributeDTO {
     private String name;
     private String value;
 
-    public ResponseAttributeDTO() {
+    public PathAttributeDTO() {
     }
 
-    public ResponseAttributeDTO(String name, String value) {
+    public PathAttributeDTO(String name, String value) {
         this.name = name;
         this.value = value;
     }
@@ -57,7 +57,7 @@ public class ResponseAttributeDTO {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ResponseAttributeDTO that = (ResponseAttributeDTO) o;
+        PathAttributeDTO that = (PathAttributeDTO) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(value, that.value);
     }
@@ -69,7 +69,7 @@ public class ResponseAttributeDTO {
 
     @Override
     public String toString() {
-        return "ResponseAttributeDTO{" +
+        return "PathAttributeDTO{" +
                 "name='" + name + '\'' +
                 ", value=" + value +
                 '}';
