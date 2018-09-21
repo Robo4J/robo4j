@@ -37,6 +37,7 @@ public final class ConfigurationBuilder {
 	 *            the name under which to store the value.
 	 * @param b
 	 *            the Boolean to store.
+	 * @return the builder
 	 */
 	public ConfigurationBuilder addBoolean(String name, Boolean b) {
 		inProgress.setBoolean(name, b);
@@ -50,6 +51,7 @@ public final class ConfigurationBuilder {
 	 *            the name under which to store the value.
 	 * @param d
 	 *            the Double to store.
+	 * @return the builder
 	 */
 	public ConfigurationBuilder addDouble(String name, Double d) {
 		inProgress.setDouble(name, d);
@@ -63,6 +65,7 @@ public final class ConfigurationBuilder {
 	 *            the name under which to store the value.
 	 * @param f
 	 *            the Float to store.
+	 * @return the builder
 	 */
 	public ConfigurationBuilder addFloat(String name, Float f) {
 		inProgress.setFloat(name, f);
@@ -76,6 +79,7 @@ public final class ConfigurationBuilder {
 	 *            the name under which to store the value.
 	 * @param i
 	 *            the Integer to store.
+	 * @return the builder
 	 */
 	public ConfigurationBuilder addInteger(String name, Integer i) {
 		inProgress.setInteger(name, i);
@@ -89,6 +93,7 @@ public final class ConfigurationBuilder {
 	 *            the name under which to store the value.
 	 * @param l
 	 *            the Long to store.
+	 * @return the builder
 	 */
 	public ConfigurationBuilder addLong(String name, Long l) {
 		inProgress.setLong(name, l);
@@ -102,6 +107,7 @@ public final class ConfigurationBuilder {
 	 *            the name under which to store the value.
 	 * @param c
 	 *            the Character to store.
+	 * @return the builder
 	 */
 	public ConfigurationBuilder addCharacter(String name, Character c) {
 		inProgress.setCharacter(name, c);
@@ -115,17 +121,33 @@ public final class ConfigurationBuilder {
 	 *            the name under which to store the value.
 	 * @param s
 	 *            the String to store.
+	 * @return the builder
 	 */
 	public ConfigurationBuilder addString(String name, String s) {
 		inProgress.setString(name, s);
 		return this;
 	}
 
+	/**
+	 * Adds a builder as a child to this builder. When the builder is built, the
+	 * result from the added builders will be added as a child configurations.
+	 * 
+	 * @param name
+	 *            the name under which to add the configuration
+	 * @param builder
+	 *            the builder to add
+	 * @return the builder
+	 */
 	public ConfigurationBuilder addBuilder(String name, ConfigurationBuilder builder) {
 		children.put(name, builder);
 		return this;
 	}
 
+	/**
+	 * Builds the configuration.
+	 * 
+	 * @return the configuration
+	 */
 	public Configuration build() {
 		for (Entry<String, ConfigurationBuilder> entry : children.entrySet()) {
 			inProgress.addChildConfiguration(entry.getKey(), entry.getValue().build());
