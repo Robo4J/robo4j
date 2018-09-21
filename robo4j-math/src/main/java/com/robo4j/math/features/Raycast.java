@@ -31,7 +31,9 @@ import com.robo4j.math.geometry.Point2f;
 public class Raycast {
 
 	/**
-	 * Finds the farthest point that should be reachable.
+	 * Finds the farthest point reachable in a straight line that can be reached
+	 * without the vehicle having to adjust course (to avoid touching
+	 * something).
 	 * 
 	 * @param points
 	 *            the points to search.
