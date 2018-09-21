@@ -26,10 +26,9 @@ import java.util.Map.Entry;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class ConfigurationBuilder {
-	private DefaultConfiguration inProgress = new DefaultConfiguration();
-
-	private Map<String, ConfigurationBuilder> children = new HashMap<>();
+public final class ConfigurationBuilder {
+	private final DefaultConfiguration inProgress = new DefaultConfiguration();
+	private final Map<String, ConfigurationBuilder> children = new HashMap<>();
 
 	/**
 	 * Stores the Boolean value b under the specified name.
