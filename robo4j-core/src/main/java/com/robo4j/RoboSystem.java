@@ -59,11 +59,11 @@ import java.util.stream.Collectors;
  * @author Miroslav Wengner (@miragemiko)
  */
 final class RoboSystem implements RoboContext {
+	public static final String KEY_SCHEDULER_POOL_SIZE = "poolSizeScheduler";
+	public static final String KEY_WORKER_POOL_SIZE = "poolSizeWorker";
+	public static final String KEY_BLOCKING_POOL_SIZE = "poolSizeBlocking";
 	private static final String NAME_BLOCKING_POOL = "Robo4J Blocking Pool";
 	private static final String NAME_WORKER_POOL = "Robo4J Worker Pool";
-	private static final String KEY_SCHEDULER_POOL_SIZE = "poolSizeScheduler";
-	private static final String KEY_WORKER_POOL_SIZE = "poolSizeWorker";
-	private static final String KEY_BLOCKING_POOL_SIZE = "poolSizeBlocking";
 
 	private static final int DEFAULT_BLOCKING_POOL_SIZE = 4;
 	private static final int DEFAULT_WORKING_POOL_SIZE = 2;
@@ -269,7 +269,7 @@ final class RoboSystem implements RoboContext {
 	 */
 	RoboSystem(Configuration config) {
 		this(UUID.randomUUID().toString(), config);
-	}
+	}	
 
 	/**
 	 * Convenience constructor.

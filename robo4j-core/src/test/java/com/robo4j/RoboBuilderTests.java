@@ -16,6 +16,7 @@
  */
 package com.robo4j;
 
+import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,8 +47,7 @@ public class RoboBuilderTests {
 		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 
 		/* descriptor is similar for both units */
-		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class,
-				"getNumberOfSentMessages");
+		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class, "getNumberOfSentMessages");
 
 		RoboReference<String> producer = system.getReference("producer");
 		Assert.assertNotNull(producer);
@@ -55,8 +55,8 @@ public class RoboBuilderTests {
 			producer.sendMessage("sendRandomMessage");
 		}
 		RoboReference<String> consumer = system.getReference("consumer");
-		CountDownLatch countDownLatchConsumer = consumer
-				.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get(TIMEOUT, TimeUnit.MINUTES);
+		CountDownLatch countDownLatchConsumer = consumer.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get(TIMEOUT,
+				TimeUnit.MINUTES);
 		countDownLatchConsumer.await(TIMEOUT, TimeUnit.MINUTES);
 
 		Assert.assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
@@ -66,9 +66,8 @@ public class RoboBuilderTests {
 		system.shutdown();
 	}
 
-//	@Test
-	public void testSeparateSystemUnitsSystemConfig()
-			throws RoboBuilderException, InterruptedException, ExecutionException {
+	// @Test
+	public void testSeparateSystemUnitsSystemConfig() throws RoboBuilderException, InterruptedException, ExecutionException {
 		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRoboSystemOnly.xml"));
 		// NOTE(Marcus/Aug 19, 2017): We have the system settings and the units
 		// in the same file.
@@ -80,8 +79,7 @@ public class RoboBuilderTests {
 		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 
 		/* descriptor is similar for both units */
-		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class,
-				"getNumberOfSentMessages");
+		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class, "getNumberOfSentMessages");
 
 		RoboReference<String> producer = system.getReference("producer");
 		Assert.assertNotNull(producer);
@@ -103,12 +101,11 @@ public class RoboBuilderTests {
 	}
 
 	@Test
-	public void testParsingFileWithSystemConfig()
-			throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
-		RoboBuilder builder = new RoboBuilder(
-				Thread.currentThread().getContextClassLoader().getResourceAsStream("testsystem.xml"));
+	public void testParsingFileWithSystemConfig() throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
+		RoboBuilder builder = new RoboBuilder(Thread.currentThread().getContextClassLoader().getResourceAsStream("testsystem.xml"));
 		// NOTE(Marcus/Aug 19, 2017): We have the system settings and the units
-		// in the same file, therefore we pass the same file to the unit configuration.
+		// in the same file, therefore we pass the same file to the unit
+		// configuration.
 		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("testsystem.xml"));
 		RoboContext system = builder.build();
 		Assert.assertEquals("mySystem", system.getId());
@@ -117,8 +114,7 @@ public class RoboBuilderTests {
 		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 
 		/* descriptor is similar for both units */
-		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class,
-				"getNumberOfSentMessages");
+		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class, "getNumberOfSentMessages");
 
 		RoboReference<String> producer = system.getReference("producer");
 		Assert.assertNotNull(producer);
@@ -131,8 +127,8 @@ public class RoboBuilderTests {
 		Assert.assertNotNull(consumer);
 
 		// We need to fix these tests so that we can get a callback.
-		CountDownLatch countDownLatchConsumer = consumer
-				.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get(TIMEOUT, TimeUnit.MINUTES);
+		CountDownLatch countDownLatchConsumer = consumer.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get(TIMEOUT,
+				TimeUnit.MINUTES);
 		countDownLatchConsumer.await(TIMEOUT, TimeUnit.MINUTES);
 
 		synchronized (consumer.getAttribute(descriptor)) {
@@ -168,4 +164,51 @@ public class RoboBuilderTests {
 		Assert.assertNotNull(reference);
 	}
 
+	@Test
+	public void testProgrammaticConfiguration() throws RoboBuilderException, ConfigurationException, InterruptedException, ExecutionException, TimeoutException {
+		ConfigurationBuilder systemConfigBuilder = new ConfigurationBuilder().addInteger(RoboSystem.KEY_SCHEDULER_POOL_SIZE, 11)
+				.addInteger(RoboSystem.KEY_WORKER_POOL_SIZE, 5).addInteger(RoboSystem.KEY_BLOCKING_POOL_SIZE, 13);
+		RoboBuilder builder = new RoboBuilder("mySystem", systemConfigBuilder.build());
+		
+		StringProducer producerUnit = new StringProducer(builder.getContext(), "producer");
+		producerUnit.initialize(new ConfigurationBuilder().addString("target","consumer").build());
+		
+		StringConsumer consumerUnit = new StringConsumer(builder.getContext(), "consumer");
+		consumerUnit.initialize(new ConfigurationBuilder().addInteger("totalNumberMessages", 10).build());
+		
+		builder.add(producerUnit);
+		builder.add(consumerUnit);
+		
+		RoboContext system = builder.build();
+		Assert.assertEquals("mySystem", system.getId());
+		Assert.assertEquals(system.getState(), LifecycleState.INITIALIZED);
+		system.start();
+		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
+
+		/* descriptor is similar for both units */
+		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class, "getNumberOfSentMessages");
+
+		RoboReference<String> producer = system.getReference("producer");
+		Assert.assertNotNull(producer);
+		for (int i = 0; i < MESSAGES; i++) {
+			producer.sendMessage("sendRandomMessage");
+		}
+		Assert.assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
+
+		RoboReference<String> consumer = system.getReference("consumer");
+		Assert.assertNotNull(consumer);
+
+		// We need to fix these tests so that we can get a callback.
+		CountDownLatch countDownLatchConsumer = consumer.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get(TIMEOUT,
+				TimeUnit.MINUTES);
+		countDownLatchConsumer.await(TIMEOUT, TimeUnit.MINUTES);
+
+		synchronized (consumer.getAttribute(descriptor)) {
+			int receivedMessages = consumer.getAttribute(descriptor).get();
+			Assert.assertEquals(MESSAGES, receivedMessages);
+		}
+
+		system.stop();
+		system.shutdown();
+	}
 }

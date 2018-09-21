@@ -265,6 +265,18 @@ public final class RoboBuilder {
 	}
 
 	/**
+	 * Use this builder constructor to configure the system.
+	 * 
+	 * @param uid
+	 *            a manually configured unique identifier for the system
+	 * @param systemConfig
+	 *            initial system configuration
+	 */
+	public RoboBuilder(String uid, Configuration systemConfig) {
+		system = new RoboSystem(uid, systemConfig);
+	}
+
+	/**
 	 * Use this builder constructor to configure the RoboSystem.
 	 * 
 	 * @param systemConfig
