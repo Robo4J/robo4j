@@ -33,11 +33,9 @@ public enum  LcdFontEnum {
     SMALL   (3, Font.getSmallFont()),;
     //@formatter:on
 
-    private final int id;
     private final Font font;
 
     LcdFontEnum(int id, Font font) {
-        this.id = id;
         this.font = font;
     }
 

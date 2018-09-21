@@ -100,7 +100,6 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 	 *            string message
 	 * @return processed object
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public Object processPost(final RoboReference<?> unitReference, final String message) {
 		final SocketDecoder<Object, ?> decoder = codecRegistry.getDecoder(unitReference.getMessageType());

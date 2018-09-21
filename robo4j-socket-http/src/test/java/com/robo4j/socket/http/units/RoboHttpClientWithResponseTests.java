@@ -40,7 +40,7 @@ public class RoboHttpClientWithResponseTests {
 	private static final int MAX_NUMBER = 100;
 	private static final String ROBO_SYSTEM_DESC = "[{\"id\":\"stringConsumer\",\"state\":\"STARTED\"},{\"id\":\"httpServer\",\"state\":\"STARTED\"}]";
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings("unchecked")
 	@Test
 	public void simpleRoboSystemGetRequestTest() throws Exception {
 

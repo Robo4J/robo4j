@@ -60,6 +60,6 @@ public class CameraCodecTests {
 
 	@Test
 	public void cameraConfigCodecDifferentTypeValuesTest() {
-        String properOrderJson = "{\"height\":800,\"width\":600,\"brightness\":80,\"sharpness\":56,\"timeout\":2,\"timelapse\":100, \"active\": true}";
+		// TBD
 	}
 }

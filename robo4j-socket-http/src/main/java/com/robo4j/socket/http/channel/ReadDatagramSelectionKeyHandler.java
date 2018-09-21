@@ -28,8 +28,6 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_REGISTRY;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ReadDatagramSelectionKeyHandler implements SelectionKeyHandler {
-
-	private final RoboContext context;
 	private final ServerContext serverContext;
 	private final Map<SelectionKey, DatagramResponseProcess> outBuffers;
 	private final SelectionKey key;
@@ -37,7 +35,6 @@ public class ReadDatagramSelectionKeyHandler implements SelectionKeyHandler {
 
 	public ReadDatagramSelectionKeyHandler(RoboContext context, ServerContext serverContext,
                                            Map<SelectionKey, DatagramResponseProcess> outBuffers, SelectionKey key) {
-		this.context = context;
 		this.serverContext = serverContext;
 		this.outBuffers = outBuffers;
 		this.key = key;

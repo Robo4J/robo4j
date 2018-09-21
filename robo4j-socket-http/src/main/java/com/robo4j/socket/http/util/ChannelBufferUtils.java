@@ -17,6 +17,22 @@
 
 package com.robo4j.socket.http.util;
 
+import static com.robo4j.socket.http.util.HttpConstant.HTTP_NEW_LINE;
+import static com.robo4j.socket.http.util.HttpMessageUtils.HTTP_HEADER_BODY_DELIMITER;
+import static com.robo4j.socket.http.util.HttpMessageUtils.HTTP_HEADER_SEP;
+import static com.robo4j.socket.http.util.HttpMessageUtils.POSITION_BODY;
+import static com.robo4j.socket.http.util.HttpMessageUtils.POSITION_HEADER;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.ByteChannel;
+import java.nio.channels.DatagramChannel;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
@@ -29,23 +45,6 @@ import com.robo4j.socket.http.message.HttpDecoratedResponse;
 import com.robo4j.socket.http.message.HttpRequestDenominator;
 import com.robo4j.socket.http.message.HttpResponseDenominator;
 import com.robo4j.util.StringConstants;
-
-import java.io.IOException;
-import java.net.SocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.ByteChannel;
-import java.nio.channels.DatagramChannel;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.robo4j.socket.http.util.HttpConstant.HTTP_NEW_LINE;
-import static com.robo4j.socket.http.util.HttpMessageUtils.HTTP_HEADER_BODY_DELIMITER;
-import static com.robo4j.socket.http.util.HttpMessageUtils.HTTP_HEADER_SEP;
-import static com.robo4j.socket.http.util.HttpMessageUtils.POSITION_BODY;
-import static com.robo4j.socket.http.util.HttpMessageUtils.POSITION_HEADER;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -61,7 +60,8 @@ public class ChannelBufferUtils {
 	public static final byte[] END_WINDOW = { CHAR_NEW_LINE, CHAR_NEW_LINE };
 	private static final int BUFFER_MARK_END = -1;
 
-	// FIXME: 2/18/18 (miro) every unit client, server should have it's own buffer
+	// FIXME: 2/18/18 (miro) every unit client, server should have it's own
+	// buffer
 	private static final ByteBuffer requestBuffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
 	private static final ByteBuffer responseBuffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
 	public static final int RESPONSE_JSON_GROUP = 2;
@@ -110,8 +110,7 @@ public class ChannelBufferUtils {
 
 		} else {
 
-			return new HttpDecoratedResponse(new HashMap<>(),
-					new HttpResponseDenominator(StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1));
+			return new HttpDecoratedResponse(new HashMap<>(), new HttpResponseDenominator(StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1));
 		}
 	}
 
@@ -143,18 +142,15 @@ public class ChannelBufferUtils {
 			requestBuffer.clear();
 			return result;
 		} else {
-			return new HttpDecoratedRequest(new HashMap<>(),
-					new HttpRequestDenominator(HttpMethod.GET, HttpVersion.HTTP_1_1));
+			return new HttpDecoratedRequest(new HashMap<>(), new HttpRequestDenominator(HttpMethod.GET, HttpVersion.HTTP_1_1));
 		}
 	}
 
-	public static DatagramDecoratedRequest getDatagramDecoratedRequestByChannel(int type, DatagramChannel channel,
-			ByteBuffer buffer) throws IOException {
-		final StringBuilder sbBasic = new StringBuilder();
+	public static DatagramDecoratedRequest getDatagramDecoratedRequestByChannel(int type, DatagramChannel channel, ByteBuffer buffer)
+			throws IOException {
 		buffer.clear();
-		SocketAddress client = channel.receive(buffer);
+		channel.receive(buffer);
 		buffer.flip();
-
 		return new DatagramDecoratedRequest(new DatagramDenominator(type, StringConstants.EMPTY));
 	}
 
@@ -201,12 +197,11 @@ public class ChannelBufferUtils {
 		final Map<String, String> headerParams = getHeaderParametersByArray(paramArray);
 
 		final HttpRequestDenominator denominator;
-		if(path.contains(HttpPathUtils.DELIMITER_PATH_ATTRIBUTES)){
+		if (path.contains(HttpPathUtils.DELIMITER_PATH_ATTRIBUTES)) {
 			denominator = new HttpRequestDenominator(method, path.split(HttpPathUtils.REGEX_ATTRIBUTE)[0], HttpVersion.getByValue(version),
 					HttpPathUtils.extractAttributesByPath(path));
 		} else {
-			denominator = new HttpRequestDenominator(method, path,
-					HttpVersion.getByValue(version));
+			denominator = new HttpRequestDenominator(method, path, HttpVersion.getByValue(version));
 		}
 		HttpDecoratedRequest result = new HttpDecoratedRequest(headerParams, denominator);
 
@@ -233,18 +228,17 @@ public class ChannelBufferUtils {
 		HttpResponseDenominator denominator = new HttpResponseDenominator(statusCode, HttpVersion.getByValue(version));
 		HttpDecoratedResponse result = new HttpDecoratedResponse(headerParams, denominator);
 		if (headerAndBody.length > 1) {
-			if(headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)){
+			if (headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)) {
 				result.setLength(calculateMessageSize(headerAndBody[POSITION_HEADER].length(), headerParams));
 			} else {
 				result.setLength(headerAndBody[POSITION_BODY].length());
 			}
 			Matcher matcher = RESPONSE_SPRING_PATTERN.matcher(headerAndBody[POSITION_BODY]);
-			if(matcher.find()){
-//				result.addMessage(headerAndBody[POSITION_BODY]);
+			if (matcher.find()) {
+				// result.addMessage(headerAndBody[POSITION_BODY]);
 				result.addMessage(matcher.group(RESPONSE_JSON_GROUP));
 			}
 		}
-
 
 		return result;
 	}
@@ -262,8 +256,7 @@ public class ChannelBufferUtils {
 	}
 
 	private static Integer calculateMessageSize(int headerValue, Map<String, String> headerParams) {
-		return headerValue + HTTP_HEADER_BODY_DELIMITER.length()
-				+ Integer.valueOf(headerParams.get(HttpHeaderFieldNames.CONTENT_LENGTH));
+		return headerValue + HTTP_HEADER_BODY_DELIMITER.length() + Integer.valueOf(headerParams.get(HttpHeaderFieldNames.CONTENT_LENGTH));
 	}
 
 	private static void addToStringBuilder(StringBuilder sb, ByteBuffer buffer, int size) {

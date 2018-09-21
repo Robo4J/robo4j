@@ -50,9 +50,8 @@ public class JsonReader {
 
 	private static final Set<Character> WHITE_SPACE_SET = new HashSet<>(
 			Arrays.asList(SPACE, NEW_LINE_MAC, NEW_LINE_UNIX, NEW_SPACE, NEW_TAB));
-	private static final Set<Character> NUMBER_SET = new HashSet<>(
-			Arrays.asList(CHARACTER_MINUS, CHARACTER_0, CHARACTER_1, CHARACTER_2, CHARACTER_3, CHARACTER_4, CHARACTER_5,
-					CHARACTER_6,CHARACTER_7, CHARACTER_8, CHARACTER_9, DOT));
+	private static final Set<Character> NUMBER_SET = new HashSet<>(Arrays.asList(CHARACTER_MINUS, CHARACTER_0, CHARACTER_1, CHARACTER_2,
+			CHARACTER_3, CHARACTER_4, CHARACTER_5, CHARACTER_6, CHARACTER_7, CHARACTER_8, CHARACTER_9, DOT));
 
 	private final char[] jsonChars;
 	private ReadType currentRead;
@@ -122,8 +121,7 @@ public class JsonReader {
 				// moving elements
 				putCurrentKeyValue(currentKey, currentValue);
 				if (stack.size() > 0) {
-					document = stack.peek().getDocument().getType().equals(JsonDocument.Type.ARRAY)
-							? getLastStackElement(true)
+					document = stack.peek().getDocument().getType().equals(JsonDocument.Type.ARRAY) ? getLastStackElement(true)
 							: getLastStackElement(false);
 				} else {
 					currentRead = ReadType.END_VALUE;
@@ -154,6 +152,7 @@ public class JsonReader {
 				break;
 			case ERROR:
 				throw new RoboReflectException("not valid json");
+			default:
 			}
 
 			index++;
@@ -321,6 +320,7 @@ public class JsonReader {
 		case START_ARRAY:
 			currentRead = ReadType.START_ARRAY_ELEMENT;
 			return new JsonDocument(JsonDocument.Type.ARRAY);
+		default:
 		}
 		throw new RoboReflectException("new document: " + readType);
 	}
@@ -373,7 +373,7 @@ public class JsonReader {
 		StringBuilder sb = new StringBuilder();
 		char readChar = jsonChars[++index];
 		currentRead = endType;
-		if(readChar == QUOTATION_MARK){
+		if (readChar == QUOTATION_MARK) {
 			return StringConstants.EMPTY;
 		}
 		do {

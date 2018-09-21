@@ -39,7 +39,6 @@ public class RoboDatagramClientTest {
     private static final int MAX_NUMBER = 42;
     private static final int DEFAULT_TIMEOUT = 5;
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	public void datagramClientServerTest() throws Exception {
 

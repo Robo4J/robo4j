@@ -105,10 +105,10 @@ public final class ReflectUtils {
 	private static Class<?> correctedGetClass(Class<?> clazz, Object obj){
 		if(clazz == null){
 			if(obj instanceof Collection){
-				Object rep = ((Collection) obj).iterator().next();
+				Object rep = ((Collection<?>) obj).iterator().next();
 				return rep.getClass();
 			} else {
-				Object rep = ((Map) obj).values().iterator().next();
+				Object rep = ((Map<?,?>) obj).values().iterator().next();
 				return rep.getClass();
 			}
 		} else {

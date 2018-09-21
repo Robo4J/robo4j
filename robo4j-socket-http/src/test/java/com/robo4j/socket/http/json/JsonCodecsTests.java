@@ -180,7 +180,6 @@ public class JsonCodecsTests {
 		personMap.put("person1", testPerson1);
 		personMap.put("person2", testPerson2);
 
-		NSBWithSimpleCollectionsTypesMessage obj = collectionsTypesMessageCodec.decode(testJson);
 		long start = System.nanoTime();
 		NSBWithSimpleCollectionsTypesMessage obj1 = collectionsTypesMessageCodec.decode(testJson);
 		TimeUtils.printTimeDiffNano("decodeFromJson", start);
@@ -212,7 +211,7 @@ public class JsonCodecsTests {
 		TimeUtils.printTimeDiffNano("cameraJson0", start);
 
 		start = System.nanoTime();
-		CameraMessage codecCameraMessage0 = cameraMessageCodec.decode(cameraJson0);
+		cameraMessageCodec.decode(cameraJson0);
 		TimeUtils.printTimeDiffNano("decodeCameraMessage0", start);
 
 		start = System.nanoTime();

@@ -39,8 +39,6 @@ public class SonicPlatformController extends RoboUnit<SonicSensorMessage> {
 
     public static final String TARGET = "target";
     public static final String TARGET_GRIPPER = "targetGripper";
-    private static final float OMEGA = 0.833f;  // rad/second
-    private static final float LARGE_MOTOR_RADIUS = 1f;
     private static final float DISTANCE_MIN = 0.4f;
     private static final float DISTANCE_OPTIMAL = 0.9f;
     private static final float DISTANCE_MAX = 2.5f;

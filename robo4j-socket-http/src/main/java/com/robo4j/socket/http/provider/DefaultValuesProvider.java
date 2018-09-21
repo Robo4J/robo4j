@@ -35,7 +35,6 @@ import static com.robo4j.util.Utf8Constant.UTF8_SPACE;
 public final class DefaultValuesProvider {
     public static final String ROBO4J_CLIENT = "Robo4J-HttpClient";
 
-    @SuppressWarnings("unchecked")
     public static final Map<String, String> BASIC_HEADER_MAP = new PropertyMapBuilder<String, String>()
             .put(HttpHeaderFieldNames.CACHE_CONTROL, HttpHeaderFieldValues.NO_CACHE)
             .put(HttpHeaderFieldNames.USER_AGENT, ROBO4J_CLIENT)
@@ -45,7 +44,4 @@ public final class DefaultValuesProvider {
             .put(HttpHeaderFieldNames.ACCEPT_LANGUAGE, "en-US,en;q=0.8")
             .put(HttpHeaderFieldNames.CONTENT_TYPE, "text/html;".concat(UTF8_SPACE).concat("charset=utf-8"))
             .create();
-
-
-
 }

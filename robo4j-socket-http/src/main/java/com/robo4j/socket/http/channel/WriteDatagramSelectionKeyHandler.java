@@ -13,16 +13,11 @@ import java.util.Map;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class WriteDatagramSelectionKeyHandler implements SelectionKeyHandler {
-
-	private final RoboContext context;
-	private final ServerContext serverContext;
 	private final Map<SelectionKey, DatagramResponseProcess> outBuffers;
 	private final SelectionKey key;
 
 	public WriteDatagramSelectionKeyHandler(RoboContext context, ServerContext serverContext,
 			Map<SelectionKey, DatagramResponseProcess> outBuffers, SelectionKey key) {
-		this.context = context;
-		this.serverContext = serverContext;
 		this.outBuffers = outBuffers;
 		this.key = key;
 	}

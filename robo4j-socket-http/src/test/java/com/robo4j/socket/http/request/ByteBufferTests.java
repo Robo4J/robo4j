@@ -80,7 +80,6 @@ public class ByteBufferTests {
 
         String bodyMessage = "this is test message";
         String host = "0.0.0.0";
-        Integer port = 8080;
         String clientPath = "/test";
 
         HttpDenominator denominator = new HttpRequestDenominator(HttpMethod.POST, clientPath, HttpVersion.HTTP_1_1);
