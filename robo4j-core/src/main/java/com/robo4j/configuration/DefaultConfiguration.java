@@ -176,4 +176,11 @@ class DefaultConfiguration implements Configuration {
 	public String toString() {
 		return "Settings: " + settings.toString() + " Configurations: " + configurations.toString();
 	}
+	
+	/*
+	 * Package local, to be used by the builder.
+	 */
+	void addChildConfiguration(String name, Configuration config) {
+		configurations.put(name, config);
+	}
 }
