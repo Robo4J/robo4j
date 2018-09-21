@@ -384,37 +384,6 @@ project("robo4j-units-rpi-http") {
     }
 }
 
-project("robo4j-spring") {
-    description = "Robo4J Spring support"
-
-    dependencies {
-        compile(project(":robo4j-core"))
-        testCompile "junit:junit:${junitVersion}@jar"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
-    }
-
-    sourceSets {
-        main {
-            java {
-                srcDirs = ['src/main/java']
-            }
-            resources {
-                srcDirs = ['src/main/resources']
-            }
-        }
-
-        test {
-            java {
-                srcDirs = ['src/test/java']
-            }
-            resources {
-                srcDirs = ['src/test/resources']
-            }
-        }
-    }
-}
-
-
 task wrapper(type: Wrapper) {
     gradleVersion = "${roboGradleVersion}"
 }
