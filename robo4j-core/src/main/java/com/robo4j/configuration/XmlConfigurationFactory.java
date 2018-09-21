@@ -53,21 +53,22 @@ public class XmlConfigurationFactory {
 	private static final String ELEMENT_ROOT = "com.robo4j.root";
 	private static final String ELEMENT_VALUE = "value";
 
-	private static final Deque<Configuration> configStack = new ArrayDeque<>();
+	private static final Deque<ConfigurationBuilder> configStack = new ArrayDeque<>();
 
 	/*
 	 * Internal XML Handler class for parsing the XML.
 	 */
 	private static class ConfigurationHandler extends DefaultHandler {
-		private Configuration currentConfig;
+		private ConfigurationBuilder rootBuilder = new ConfigurationBuilder();
+		private ConfigurationBuilder currentBuilder;
 		private String lastElement = StringConstants.EMPTY;
 
 		private String currentValue = StringConstants.EMPTY;
 		private String currentType;
 		private String currentName;
 
-		ConfigurationHandler(DefaultConfiguration config) {
-			currentConfig = config;
+		ConfigurationHandler() {
+			currentBuilder = rootBuilder;
 		}
 
 		@Override
@@ -75,8 +76,10 @@ public class XmlConfigurationFactory {
 			if (qName.equals(ELEMENT_CONFIG)) {
 				String value = attributes.getValue(ATTRIBUTE_NAME);
 				if (!value.equals(ELEMENT_ROOT)) {
-					configStack.push(currentConfig);
-					currentConfig = currentConfig.createChildConfiguration(value);
+					configStack.push(currentBuilder);
+					ConfigurationBuilder tmpBuilder = new ConfigurationBuilder();
+					currentBuilder.addBuilder(value, tmpBuilder);
+					currentBuilder = tmpBuilder;
 				}
 			} else if (qName.equals(ELEMENT_VALUE)) {
 				currentName = attributes.getValue(ATTRIBUTE_NAME);
@@ -89,37 +92,37 @@ public class XmlConfigurationFactory {
 		public void endElement(String uri, String localName, String qName) throws SAXException {
 			switch (qName) {
 			case ELEMENT_VALUE:
-				writeValue(currentConfig, currentValue.trim(), currentType, currentName);
+				writeValue(currentBuilder, currentValue.trim(), currentType, currentName);
 				currentValue = StringConstants.EMPTY;
 				break;
 			case ELEMENT_CONFIG:
 				if (!configStack.isEmpty()) { // Closing of the last config...
-					currentConfig = configStack.pop();
+					currentBuilder = configStack.pop();
 				}
 				break;
 			}
 			lastElement = StringConstants.EMPTY;
 		}
 
-		private static void writeValue(Configuration currentConfig, String currentValue, String currentType, String currentName) {
+		private static void writeValue(ConfigurationBuilder aConfigBuilder, String currentValue, String currentType, String currentName) {
 			switch (currentType) {
 			case TYPE_STRING:
-				currentConfig.setString(currentName, currentValue);
+				aConfigBuilder.addString(currentName, currentValue);
 				break;
 			case TYPE_INT:
-				currentConfig.setInteger(currentName, Integer.decode(currentValue));
+				aConfigBuilder.addInteger(currentName, Integer.decode(currentValue));
 				break;
 			case TYPE_FLOAT:
-				currentConfig.setFloat(currentName, Float.parseFloat(currentValue));
+				aConfigBuilder.addFloat(currentName, Float.parseFloat(currentValue));
 				break;
 			case TYPE_LONG:
-				currentConfig.setLong(currentName, Long.decode(currentValue));
+				aConfigBuilder.addLong(currentName, Long.decode(currentValue));
 				break;
 			case TYPE_DOUBLE:
-				currentConfig.setDouble(currentName, Double.parseDouble(currentValue));
+				aConfigBuilder.addDouble(currentName, Double.parseDouble(currentValue));
 				break;
 			case TYPE_BOOLEAN:
-				currentConfig.setBoolean(currentName, Boolean.parseBoolean(currentValue));
+				aConfigBuilder.addBoolean(currentName, Boolean.parseBoolean(currentValue));
 				break;
 
 			}
@@ -137,6 +140,10 @@ public class XmlConfigurationFactory {
 				break;
 			}
 		}
+		
+		public ConfigurationBuilder getBuilder() {
+			return rootBuilder;
+		}
 
 	}
 
@@ -150,15 +157,15 @@ public class XmlConfigurationFactory {
 	 *             if there was a problem reading the configuration.
 	 */
 	public static Configuration fromXml(String xml) throws ConfigurationFactoryException {
-		DefaultConfiguration config = new DefaultConfiguration();
 		SAXParser saxParser;
 		try {
 			saxParser = SAXParserFactory.newInstance().newSAXParser();
-			saxParser.parse(new ByteArrayInputStream(xml.getBytes(ENCODING)), new ConfigurationHandler(config));
+			 ConfigurationHandler handler = new ConfigurationHandler();
+			saxParser.parse(new ByteArrayInputStream(xml.getBytes(ENCODING)), handler);
+			return handler.getBuilder().build();
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			throw new ConfigurationFactoryException("Could not parse the configuration", e);
 		}
-		return config;
 	}
 
 	/**

@@ -17,11 +17,20 @@
 
 package com.robo4j.socket.http.units;
 
+import static com.robo4j.socket.http.units.RoboHttpPingPongTest.HOST_SYSTEM;
+import static com.robo4j.socket.http.units.RoboHttpPingPongTest.PACKAGE_CODECS;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
@@ -31,14 +40,6 @@ import com.robo4j.socket.http.units.test.HttpTwoAttributesGetController;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
 import com.robo4j.util.SystemUtil;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import static com.robo4j.socket.http.units.RoboHttpPingPongTest.HOST_SYSTEM;
-import static com.robo4j.socket.http.units.RoboHttpPingPongTest.PACKAGE_CODECS;
-import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
-import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
-import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
 
 /**
  * RoboHttpUnitGetTest should test Http get requests
@@ -48,113 +49,90 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONF
  */
 public class RoboHttpUnitGetTest {
 
+	public static final int SERVER_PORT = 8061;
+	public static final String UNIT_ID_HTTP_CLIENT = "http_client";
 
-    public static final int SERVER_PORT = 8061;
-    public static final String UNIT_ID_HTTP_CLIENT = "http_client";
+	@Test
+	@Ignore
+	public void oneKnownAttributeTest() throws Exception {
+		final HttpPathConfigJsonBuilder pathBuilder = HttpPathConfigJsonBuilder.Builder().addPath("controller", HttpMethod.GET);
 
-    @Test
-    @Ignore
-    public void oneKnownAttributeTest() throws Exception{
+		Configuration systemConfiguration = new ConfigurationBuilder().addInteger("poolSizeScheduler", 4).addInteger("poolSizeWorker", 2)
+				.addInteger("poolSizeBlocking", 3).build();
+		RoboBuilder builder = new RoboBuilder(systemConfiguration);
 
-        Configuration systemConfiguration = ConfigurationFactory.createEmptyConfiguration();
-        systemConfiguration.setInteger("poolSizeScheduler", 4);
-        systemConfiguration.setInteger("poolSizeWorker", 2);
-        systemConfiguration.setInteger("poolSizeBlocking", 3);
-        RoboBuilder builder = new RoboBuilder(systemConfiguration);
+		Configuration config = new ConfigurationBuilder().addInteger(PROPERTY_SOCKET_PORT, SERVER_PORT)
+				.addString("packages", PACKAGE_CODECS).addString(PROPERTY_UNIT_PATHS_CONFIG, pathBuilder.build()).build();
+		builder.add(HttpServerUnit.class, config, "http_server");
 
-        Configuration config = ConfigurationFactory.createEmptyConfiguration();
-        config.setInteger(PROPERTY_SOCKET_PORT, SERVER_PORT);
-        config.setString("packages", PACKAGE_CODECS);
+		config = new ConfigurationBuilder().addInteger(StringConsumer.PROP_TOTAL_NUMBER_MESSAGES, 1).build();
+		builder.add(StringConsumer.class, config, "request_consumer");
 
-        final HttpPathConfigJsonBuilder pathBuilder = HttpPathConfigJsonBuilder.Builder()
-                .addPath("controller",
-                HttpMethod.GET);
-        config.setString(PROPERTY_UNIT_PATHS_CONFIG, pathBuilder.build());
-        builder.add(HttpServerUnit.class, config, "http_server");
+		config = new ConfigurationBuilder().addString("target", "request_consumer").build();
+		builder.add(HttpOneAttributeGetController.class, config, "controller");
 
-        config = ConfigurationFactory.createEmptyConfiguration();
-        config.setInteger(StringConsumer.PROP_TOTAL_NUMBER_MESSAGES, 1);
-        builder.add(StringConsumer.class, config, "request_consumer");
+		RoboContext system = builder.build();
 
-        config = ConfigurationFactory.createEmptyConfiguration();
-        config.setString("target", "request_consumer");
-        builder.add(HttpOneAttributeGetController.class, config, "controller");
+		system.start();
+		System.out.println("systemPong: State after start:");
+		System.out.println(SystemUtil.printStateReport(system));
+		System.out.println("Press Key...");
+		System.in.read();
+		system.shutdown();
 
-        RoboContext system = builder.build();
+	}
 
-        system.start();
-        System.out.println("systemPong: State after start:");
-        System.out.println(SystemUtil.printStateReport(system));
-        System.out.println("Press Key...");
-        System.in.read();
-        system.shutdown();
+	@Test
+	@Ignore
+	public void twoKnownAttributesTest() throws Exception {
+		RoboContext systemGetProvider = twoAttributesSystem();
+		RoboContext systemGetAccessor = attributeRequestSystem();
 
-    }
+		systemGetProvider.start();
+		System.out.println("systemGetProvider: State after start:");
+		System.out.println(SystemUtil.printStateReport(systemGetProvider));
+		systemGetAccessor.start();
+		System.out.println("systemGetAccessor: State after start:");
+		System.out.println(SystemUtil.printStateReport(systemGetAccessor));
 
-    @Test
-    @Ignore
-    public void twoKnownAttributesTest() throws Exception {
-        RoboContext systemGetProvider = twoAttributesSystem();
-        RoboContext systemGetAccessor = attributeRequestSystem();
+		RoboReference<HttpDecoratedRequest> httpClient = systemGetAccessor.getReference(UNIT_ID_HTTP_CLIENT);
 
-        systemGetProvider.start();
-        System.out.println("systemGetProvider: State after start:");
-        System.out.println(SystemUtil.printStateReport(systemGetProvider));
-        systemGetAccessor.start();
-        System.out.println("systemGetAccessor: State after start:");
-        System.out.println(SystemUtil.printStateReport(systemGetAccessor));
+		HttpRequestDenominator denominator = new HttpRequestDenominator(HttpMethod.GET, "/units/controller?attributes=number",
+				HttpVersion.HTTP_1_1);
+		HttpDecoratedRequest request = new HttpDecoratedRequest(denominator);
+		request.addCallback(StringConsumer.NAME);
+		httpClient.sendMessage(request);
 
+		System.out.println("Press Key...");
+		System.in.read();
+		systemGetProvider.shutdown();
+	}
 
-        RoboReference<HttpDecoratedRequest> httpClient = systemGetAccessor.getReference(UNIT_ID_HTTP_CLIENT);
+	public RoboContext attributeRequestSystem() throws Exception {
+		RoboBuilder builder = new RoboBuilder();
 
-        HttpRequestDenominator denominator = new HttpRequestDenominator(HttpMethod.GET, "/units/controller?attributes=number",
-                HttpVersion.HTTP_1_1);
-        HttpDecoratedRequest request = new HttpDecoratedRequest(denominator);
-        request.addCallback(StringConsumer.NAME);
-        httpClient.sendMessage(request);
+		Configuration config = new ConfigurationBuilder().addString(PROPERTY_HOST, HOST_SYSTEM)
+				.addInteger(PROPERTY_SOCKET_PORT, SERVER_PORT).build();
+		builder.add(HttpClientUnit.class, config, UNIT_ID_HTTP_CLIENT);
+		builder.add(StringConsumer.class, StringConsumer.NAME);
+		return builder.build();
+	}
 
+	private RoboContext twoAttributesSystem() throws Exception {
+		Configuration systemConfiguration = new ConfigurationBuilder().addInteger("poolSizeScheduler", 4).addInteger("poolSizeWorker", 2)
+				.addInteger("poolSizeBlocking", 3).build();
+		RoboBuilder builder = new RoboBuilder(systemConfiguration);
 
-        System.out.println("Press Key...");
-        System.in.read();
-        systemGetProvider.shutdown();
-    }
+		final HttpPathConfigJsonBuilder pathBuilder = HttpPathConfigJsonBuilder.Builder().addPath("controller", HttpMethod.GET);
+		Configuration config = new ConfigurationBuilder().addInteger(PROPERTY_SOCKET_PORT, SERVER_PORT)
+				.addString("packages", PACKAGE_CODECS).addString(PROPERTY_UNIT_PATHS_CONFIG, pathBuilder.build()).build();
+		builder.add(HttpServerUnit.class, config, "http_server");
 
-    public RoboContext attributeRequestSystem() throws Exception {
-        RoboBuilder builder = new RoboBuilder();
+		config = new ConfigurationBuilder().addInteger(StringConsumer.PROP_TOTAL_NUMBER_MESSAGES, 1).build();
+		builder.add(StringConsumer.class, config, "request_consumer");
 
-        Configuration config = ConfigurationFactory.createEmptyConfiguration();
-        config.setString(PROPERTY_HOST, HOST_SYSTEM);
-        config.setInteger(PROPERTY_SOCKET_PORT, SERVER_PORT);
-        builder.add(HttpClientUnit.class, config, UNIT_ID_HTTP_CLIENT);
-        builder.add(StringConsumer.class, StringConsumer.NAME);
-        return builder.build();
-    }
-
-
-    private RoboContext twoAttributesSystem() throws Exception {
-        Configuration systemConfiguration = ConfigurationFactory.createEmptyConfiguration();
-        systemConfiguration.setInteger("poolSizeScheduler", 4);
-        systemConfiguration.setInteger("poolSizeWorker", 2);
-        systemConfiguration.setInteger("poolSizeBlocking", 3);
-        RoboBuilder builder = new RoboBuilder(systemConfiguration);
-
-        Configuration config = ConfigurationFactory.createEmptyConfiguration();
-        config.setInteger(PROPERTY_SOCKET_PORT, SERVER_PORT);
-        config.setString("packages", PACKAGE_CODECS);
-
-        final HttpPathConfigJsonBuilder pathBuilder = HttpPathConfigJsonBuilder.Builder()
-                .addPath("controller",
-                        HttpMethod.GET);
-        config.setString(PROPERTY_UNIT_PATHS_CONFIG, pathBuilder.build());
-        builder.add(HttpServerUnit.class, config, "http_server");
-
-        config = ConfigurationFactory.createEmptyConfiguration();
-        config.setInteger(StringConsumer.PROP_TOTAL_NUMBER_MESSAGES, 1);
-        builder.add(StringConsumer.class, config, "request_consumer");
-
-        config = ConfigurationFactory.createEmptyConfiguration();
-        config.setString("target", "request_consumer");
-        builder.add(HttpTwoAttributesGetController.class, config, "controller");
-        return builder.build();
-    }
+		config = new ConfigurationBuilder().addString("target", "request_consumer").build();
+		builder.add(HttpTwoAttributesGetController.class, config, "controller");
+		return builder.build();
+	}
 }

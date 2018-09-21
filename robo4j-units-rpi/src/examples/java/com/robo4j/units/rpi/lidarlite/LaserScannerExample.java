@@ -16,18 +16,18 @@
  */
 package com.robo4j.units.rpi.lidarlite;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.units.rpi.pwm.ServoUnitExample;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  * Runs the laser scanner, printing the max range and min range found on stdout.
@@ -44,26 +44,25 @@ public class LaserScannerExample {
 		float step = 1.0f;
 		InputStream settings;
 
-		switch (args.length){
-			case 1:
-				settings = Files.newInputStream(Paths.get(args[0]));
-				break;
-			case 3:
-				startAngle = Float.parseFloat(args[0]);
-				range = Float.parseFloat(args[1]);
-				step = Float.parseFloat(args[2]);
-			default:
-				settings = ServoUnitExample.class.getClassLoader().getResourceAsStream("lidarexample.xml");
+		switch (args.length) {
+		case 1:
+			settings = Files.newInputStream(Paths.get(args[0]));
+			break;
+		case 3:
+			startAngle = Float.parseFloat(args[0]);
+			range = Float.parseFloat(args[1]);
+			step = Float.parseFloat(args[2]);
+		default:
+			settings = ServoUnitExample.class.getClassLoader().getResourceAsStream("lidarexample.xml");
 		}
 
-
-		Configuration controllerConfiguration = ConfigurationFactory.createEmptyConfiguration();
-		controllerConfiguration.setFloat(LaserScannerTestController.CONFIG_KEY_START_ANGLE, startAngle);
-		controllerConfiguration.setFloat(LaserScannerTestController.CONFIG_KEY_RANGE, range);
-		controllerConfiguration.setFloat(LaserScannerTestController.CONFIG_KEY_STEP, step);
+		Configuration controllerConfiguration = new ConfigurationBuilder()
+				.addFloat(LaserScannerTestController.CONFIG_KEY_START_ANGLE, startAngle)
+				.addFloat(LaserScannerTestController.CONFIG_KEY_RANGE, range).addFloat(LaserScannerTestController.CONFIG_KEY_STEP, step)
+				.build();
 
 		System.out.println(String.format("Running scans with startAngle=%2.1f, range=%2.1f and step=%2.1f", startAngle, range, step));
-		
+
 		RoboBuilder builder = new RoboBuilder();
 		if (settings == null) {
 			System.out.println("Could not find the settings for the LaserScannerExample!");

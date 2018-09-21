@@ -19,9 +19,6 @@ package com.robo4j.configuration;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
-
 /**
  * Testing supported variables types potentially used for roboUnit configuration
  * 
@@ -31,15 +28,10 @@ import com.robo4j.configuration.ConfigurationFactory;
 public class ConfigurationTest {
 	@Test
 	public void testBasicConfiguration() {
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setInteger("MyInt", 1);
-		config.setLong("MyLong", 2L);
-		config.setFloat("MyFloat", 1.0f);
-		config.setDouble("MyDouble", 2.0);
-		config.setString("MyString", "toodiloo");
-		config.setCharacter("MyCharacter", 'C');
-		config.setBoolean("MyBoolean", true);
-
+		ConfigurationBuilder configBuilder = new ConfigurationBuilder().addInteger("MyInt", 1).addLong("MyLong", 2L)
+				.addFloat("MyFloat", 1.0f).addDouble("MyDouble", 2.0).addString("MyString", "toodiloo").addCharacter("MyCharacter", 'C')
+				.addBoolean("MyBoolean", true);
+		Configuration config = configBuilder.build();
 		Assert.assertEquals(1, (int) config.getInteger("MyInt", -1));
 		Assert.assertEquals(2L, (long) config.getLong("MyLong", -1L));
 		Assert.assertEquals(1.0f, config.getFloat("MyFloat", -1f), 0.000000001f);
@@ -51,11 +43,10 @@ public class ConfigurationTest {
 
 	@Test
 	public void testSubConfigurations() {
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		Configuration child = config.createChildConfiguration("sub");
-		child.setString("c", "child");
 		// Children have their own namespace
-		config.setDouble("sub", 2.0);
+		ConfigurationBuilder configBuilder = new ConfigurationBuilder()
+				.addBuilder("sub", new ConfigurationBuilder().addString("c", "child")).addDouble("sub", 2.0);
+		Configuration config = configBuilder.build();
 		Assert.assertEquals(2.0, config.getDouble("sub", null), 0.000000001f);
 		Assert.assertEquals("child", config.getChildConfiguration("sub").getString("c", null));
 	}

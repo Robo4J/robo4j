@@ -17,26 +17,6 @@
 
 package com.robo4j.db.sql;
 
-import com.robo4j.DefaultAttributeDescriptor;
-import com.robo4j.RoboBuilder;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboReference;
-import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
-import com.robo4j.db.sql.dto.ERoboDbContract;
-import com.robo4j.db.sql.model.ERoboEntity;
-import com.robo4j.db.sql.model.ERoboPoint;
-import com.robo4j.db.sql.model.ERoboUnit;
-import com.robo4j.db.sql.support.RoboRequestType;
-import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.util.SystemUtil;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,6 +25,26 @@ import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import com.robo4j.DefaultAttributeDescriptor;
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationBuilder;
+import com.robo4j.db.sql.dto.ERoboDbContract;
+import com.robo4j.db.sql.model.ERoboEntity;
+import com.robo4j.db.sql.model.ERoboPoint;
+import com.robo4j.db.sql.model.ERoboUnit;
+import com.robo4j.db.sql.support.RoboRequestType;
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.util.SystemUtil;
 
 /**
  * SQL database focused tests
@@ -88,8 +88,8 @@ public class SQLDataSourceUnitTests {
 
 		Thread.sleep(WAIT_TIME);
 		final RoboReference<SQLSimpleReceiverUnit> receiverUnit = system.getReference(DB_SIMPLE_RECEIVER);
-		Future<ERoboDbContract> responseFuture = receiverUnit.getAttribute(
-				DefaultAttributeDescriptor.create(ERoboDbContract.class, SQLSimpleReceiverUnit.ATTRIBUTE_SQL_RESPONSE));
+		Future<ERoboDbContract> responseFuture = receiverUnit
+				.getAttribute(DefaultAttributeDescriptor.create(ERoboDbContract.class, SQLSimpleReceiverUnit.ATTRIBUTE_SQL_RESPONSE));
 		ERoboDbContract response = responseFuture.get();
 
 		Map<Class<?>, Object> responseMap = response.getData();
@@ -115,8 +115,8 @@ public class SQLDataSourceUnitTests {
 
 		Thread.sleep(WAIT_TIME);
 		final RoboReference<SQLSimpleReceiverUnit> receiverUnit = system.getReference(DB_SIMPLE_RECEIVER);
-		Future<ERoboDbContract> responseFuture = receiverUnit.getAttribute(
-				DefaultAttributeDescriptor.create(ERoboDbContract.class, SQLSimpleReceiverUnit.ATTRIBUTE_SQL_RESPONSE));
+		Future<ERoboDbContract> responseFuture = receiverUnit
+				.getAttribute(DefaultAttributeDescriptor.create(ERoboDbContract.class, SQLSimpleReceiverUnit.ATTRIBUTE_SQL_RESPONSE));
 		ERoboDbContract response = responseFuture.get();
 
 		Map<Class<?>, Object> responseMap = response.getData();
@@ -143,8 +143,8 @@ public class SQLDataSourceUnitTests {
 
 		Thread.sleep(WAIT_TIME);
 		final RoboReference<SQLSimpleReceiverUnit> receiverUnit = system.getReference(DB_SIMPLE_RECEIVER);
-		Future<ERoboDbContract> responseFuture = receiverUnit.getAttribute(
-				DefaultAttributeDescriptor.create(ERoboDbContract.class, SQLSimpleReceiverUnit.ATTRIBUTE_SQL_RESPONSE));
+		Future<ERoboDbContract> responseFuture = receiverUnit
+				.getAttribute(DefaultAttributeDescriptor.create(ERoboDbContract.class, SQLSimpleReceiverUnit.ATTRIBUTE_SQL_RESPONSE));
 		ERoboDbContract response = responseFuture.get();
 
 		Map<Class<?>, Object> responseMap = response.getData();
@@ -158,8 +158,8 @@ public class SQLDataSourceUnitTests {
 		sqlDataSourceUnit.sendMessage(saveRequest);
 		Thread.sleep(WAIT_TIME);
 
-		responseFuture = receiverUnit.getAttribute(
-				DefaultAttributeDescriptor.create(ERoboDbContract.class, SQLSimpleReceiverUnit.ATTRIBUTE_SQL_RESPONSE));
+		responseFuture = receiverUnit
+				.getAttribute(DefaultAttributeDescriptor.create(ERoboDbContract.class, SQLSimpleReceiverUnit.ATTRIBUTE_SQL_RESPONSE));
 		response = responseFuture.get();
 		responseMap = response.getData();
 		responseUnitList = (List<ERoboUnit>) responseMap.get(ERoboUnit.class);
@@ -188,8 +188,8 @@ public class SQLDataSourceUnitTests {
 
 		Thread.sleep(WAIT_TIME);
 		final RoboReference<SQLSimpleReceiverUnit> receiverUnit = system.getReference(DB_SIMPLE_RECEIVER);
-		Future<ERoboDbContract> responseFuture = receiverUnit.getAttribute(
-				DefaultAttributeDescriptor.create(ERoboDbContract.class, SQLSimpleReceiverUnit.ATTRIBUTE_SQL_RESPONSE));
+		Future<ERoboDbContract> responseFuture = receiverUnit
+				.getAttribute(DefaultAttributeDescriptor.create(ERoboDbContract.class, SQLSimpleReceiverUnit.ATTRIBUTE_SQL_RESPONSE));
 		ERoboDbContract response = responseFuture.get();
 
 		Map<Class<?>, Object> responseMap = response.getData();
@@ -204,8 +204,8 @@ public class SQLDataSourceUnitTests {
 			sqlDataSourceUnit.sendMessage(saveRequest);
 		}
 		Thread.sleep(WAIT_TIME);
-		responseFuture = receiverUnit.getAttribute(
-				DefaultAttributeDescriptor.create(ERoboDbContract.class, SQLSimpleReceiverUnit.ATTRIBUTE_SQL_RESPONSE));
+		responseFuture = receiverUnit
+				.getAttribute(DefaultAttributeDescriptor.create(ERoboDbContract.class, SQLSimpleReceiverUnit.ATTRIBUTE_SQL_RESPONSE));
 		response = responseFuture.get();
 		responseMap = response.getData();
 		responseUnitList = (List<ERoboUnit>) responseMap.get(ERoboUnit.class);
@@ -243,14 +243,9 @@ public class SQLDataSourceUnitTests {
 		try {
 
 			RoboBuilder builder = new RoboBuilder();
-			Configuration config = ConfigurationFactory.createEmptyConfiguration();
-
-			config.setString("sourceType", "h2");
-			config.setString("packages", "com.robo4j.db.sql.model");
-			config.setInteger("limit", limit);
-			config.setString("sorted", sorted);
-			config.setString("receiver", DB_SIMPLE_RECEIVER);
-			config.setString("targetUnit", UNIT_SYSTEM_2_NAME);
+			Configuration config = new ConfigurationBuilder().addString("sourceType", "h2").addString("packages", "com.robo4j.db.sql.model")
+					.addInteger("limit", limit).addString("sorted", sorted).addString("receiver", DB_SIMPLE_RECEIVER)
+					.addString("targetUnit", UNIT_SYSTEM_2_NAME).build();
 
 			builder.add(SQLDataSourceUnit.class, config, DB_SQL_UNIT);
 			builder.add(SQLSimpleReceiverUnit.class, DB_SIMPLE_RECEIVER);

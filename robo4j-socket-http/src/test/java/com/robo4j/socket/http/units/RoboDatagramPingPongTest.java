@@ -4,6 +4,7 @@ import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.socket.http.message.DatagramDecoratedRequest;
 import com.robo4j.socket.http.message.DatagramDenominator;
@@ -49,13 +50,11 @@ public class RoboDatagramPingPongTest {
 		System.out.println(SystemUtil.printStateReport(pingSystem));
 
 		RoboReference<String> pongStringConsumerReference = pongSystem.getReference(StringConsumer.NAME);
-		CountDownLatch countDownLatch = pongStringConsumerReference
-				.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
+		CountDownLatch countDownLatch = pongStringConsumerReference.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
 
 		RoboReference<DatagramDecoratedRequest> udpClient = pingSystem.getReference(UDP_CLIENT);
 		for (int i = 0; i < TOTAL_NUMBER; i++) {
-			DatagramDenominator denominator = new DatagramDenominator(DatagramBodyType.JSON.getType(),
-					"/units/stringConsumer");
+			DatagramDenominator denominator = new DatagramDenominator(DatagramBodyType.JSON.getType(), "/units/stringConsumer");
 			DatagramDecoratedRequest request = new DatagramDecoratedRequest(denominator);
 			String message = "{\"message\": \"Hello i:" + i + "\"}";
 			request.addMessage(message.getBytes());
@@ -63,8 +62,7 @@ public class RoboDatagramPingPongTest {
 		}
 
 		countDownLatch.await(TIMEOUT, TIME_UNIT);
-		final int pongConsumerTotalNumber = pongStringConsumerReference
-				.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
+		final int pongConsumerTotalNumber = pongStringConsumerReference.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
 		pingSystem.shutdown();
 		pongSystem.shutdown();
 
@@ -80,12 +78,9 @@ public class RoboDatagramPingPongTest {
 	private RoboContext configurePingSystem() throws Exception {
 		RoboBuilder builder = new RoboBuilder();
 
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString(PROPERTY_CODEC_PACKAGES, PACKAGE_CODECS);
-		config.setString(PROPERTY_HOST, "localhost");
-		config.setInteger(PROPERTY_SOCKET_PORT, RoboHttpUtils.DEFAULT_UDP_PORT);
-		config.setString(PROPERTY_UNIT_PATHS_CONFIG,
-				"[{\"roboUnit\":\"stringConsumer\",\"callbacks\": [\"stringConsumer\"]}]");
+		Configuration config = new ConfigurationBuilder().addString(PROPERTY_CODEC_PACKAGES, PACKAGE_CODECS)
+				.addString(PROPERTY_HOST, "localhost").addInteger(PROPERTY_SOCKET_PORT, RoboHttpUtils.DEFAULT_UDP_PORT)
+				.addString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"stringConsumer\",\"callbacks\": [\"stringConsumer\"]}]").build();
 		builder.add(DatagramClientUnit.class, config, UDP_CLIENT);
 
 		config = ConfigurationFactory.createEmptyConfiguration();
@@ -104,13 +99,11 @@ public class RoboDatagramPingPongTest {
 	 */
 	private RoboContext configurePongSystem(int totalNumberOfMessage) throws Exception {
 		RoboBuilder builder = new RoboBuilder();
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString(PROPERTY_CODEC_PACKAGES, PACKAGE_CODECS);
-		config.setString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"stringConsumer\",\"filters\":[]}]");
+		Configuration config = new ConfigurationBuilder().addString(PROPERTY_CODEC_PACKAGES, PACKAGE_CODECS)
+				.addString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"stringConsumer\",\"filters\":[]}]").build();
 		builder.add(DatagramServerUnit.class, config, UDP_SERVER);
 
-		config = ConfigurationFactory.createEmptyConfiguration();
-		config.setInteger(StringConsumer.PROP_TOTAL_NUMBER_MESSAGES, totalNumberOfMessage);
+		config = new ConfigurationBuilder().addInteger(StringConsumer.PROP_TOTAL_NUMBER_MESSAGES, totalNumberOfMessage).build();
 		builder.add(StringConsumer.class, config, StringConsumer.NAME);
 
 		return builder.build();

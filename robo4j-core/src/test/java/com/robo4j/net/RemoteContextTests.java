@@ -16,6 +16,14 @@
  */
 package com.robo4j.net;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
@@ -24,15 +32,8 @@ import com.robo4j.RoboReference;
 import com.robo4j.StringConsumer;
 import com.robo4j.StringProducerRemote;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.util.SystemUtil;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Note that on Mac OS X, it seems the easiest way to get this test to run is to
@@ -268,8 +269,7 @@ public class RemoteContextTests {
 
 	private RoboContext buildReceiverSystem() throws RoboBuilderException, ConfigurationException {
 		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteReceiver.xml"));
-		Configuration configuration = ConfigurationFactory.createEmptyConfiguration();
-		configuration.setInteger("totalNumberMessages", 1);
+		Configuration configuration = new ConfigurationBuilder().addInteger("totalNumberMessages", 1).build();
 		AckingStringConsumer ackConsumer = new AckingStringConsumer(builder.getContext(), ACK_CONSUMER);
 		ackConsumer.initialize(configuration);
 
@@ -281,8 +281,7 @@ public class RemoteContextTests {
 
 	private RoboContext buildReceiverSystemStringConsumer() throws RoboBuilderException, ConfigurationException {
 		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteReceiver.xml"));
-		Configuration configuration = ConfigurationFactory.createEmptyConfiguration();
-		configuration.setInteger("totalNumberMessages", 1);
+		Configuration configuration = new ConfigurationBuilder().addInteger("totalNumberMessages", 1).build();
 		StringConsumer stringConsumer = new StringConsumer(builder.getContext(), UNIT_STRING_CONSUMER);
 		stringConsumer.initialize(configuration);
 
@@ -304,10 +303,8 @@ public class RemoteContextTests {
 	}
 
 	private Configuration getEmitterConfiguration(String targetContext, String target) {
-		Configuration configuration = ConfigurationFactory.createEmptyConfiguration();
-		configuration.setString("target", target);
-		configuration.setString("targetContext", targetContext);
-		configuration.setInteger("totalNumberMessages", 1);
+		Configuration configuration = new ConfigurationBuilder().addString("target", target).addString("targetContext", targetContext)
+				.addInteger("totalNumberMessages", 1).build();
 		return configuration;
 	}
 

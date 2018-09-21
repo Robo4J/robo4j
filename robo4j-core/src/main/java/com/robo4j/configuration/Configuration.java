@@ -27,16 +27,6 @@ import java.util.Set;
  */
 public interface Configuration extends Serializable {
 	/**
-	 * Creates a child configuration under this configuration, with the
-	 * specified name.
-	 * 
-	 * @param name
-	 *            the name of the child configuration.
-	 * @return the child configuration which was created.
-	 */
-	Configuration createChildConfiguration(String name);
-
-	/**
 	 * Returns the child configuration with the specified name.
 	 * 
 	 * @param name
@@ -165,74 +155,4 @@ public interface Configuration extends Serializable {
 	 *         such value could be found.
 	 */
 	Object getValue(String name, Object defaultValue);
-
-	/**
-	 * Stores the Boolean value b under the specified name.
-	 * 
-	 * @param name
-	 *            the name under which to store the value.
-	 * @param b
-	 *            the Boolean to store.
-	 */
-	void setBoolean(String name, Boolean b);
-
-	/**
-	 * Stores the Double value d under the specified name.
-	 * 
-	 * @param name
-	 *            the name under which to store the value.
-	 * @param d
-	 *            the Double to store.
-	 */
-	void setDouble(String name, Double d);
-
-	/**
-	 * Stores the Float value f under the specified name.
-	 * 
-	 * @param name
-	 *            the name under which to store the value.
-	 * @param f
-	 *            the Float to store.
-	 */
-	void setFloat(String name, Float f);
-
-	/**
-	 * Stores the Integer value i under the specified name.
-	 * 
-	 * @param name
-	 *            the name under which to store the value.
-	 * @param i
-	 *            the Integer to store.
-	 */
-	void setInteger(String name, Integer i);
-
-	/**
-	 * Stores the Long value l under the specified name.
-	 * 
-	 * @param name
-	 *            the name under which to store the value.
-	 * @param l
-	 *            the Long to store.
-	 */
-	void setLong(String name, Long l);
-
-	/**
-	 * Stores the Character value c under the specified name.
-	 * 
-	 * @param name
-	 *            the name under which to store the value.
-	 * @param c
-	 *            the Character to store.
-	 */
-	void setCharacter(String name, Character c);
-
-	/**
-	 * Stores the String value s under the specified name.
-	 * 
-	 * @param name
-	 *            the name under which to store the value.
-	 * @param s
-	 *            the String to store.
-	 */
-	void setString(String name, String s);
 }

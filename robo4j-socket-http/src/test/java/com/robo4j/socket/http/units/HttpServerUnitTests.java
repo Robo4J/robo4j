@@ -1,19 +1,20 @@
 package com.robo4j.socket.http.units;
 
+import static com.robo4j.socket.http.units.RoboHttpPingPongTest.PACKAGE_CODECS;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_PACKAGES;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.util.SystemUtil;
-import org.junit.Assert;
-import org.junit.Test;
-
-import static com.robo4j.socket.http.units.RoboHttpPingPongTest.PACKAGE_CODECS;
-import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_PACKAGES;
-import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -25,12 +26,9 @@ public class HttpServerUnitTests {
 
 	@Test(expected = RoboBuilderException.class)
 	public void httpServerUnitNoCodecsPackageTest() throws Exception {
-
 		RoboBuilder builder = new RoboBuilder();
 
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setInteger(PROPERTY_SOCKET_PORT, PORT);
-
+		Configuration config = new ConfigurationBuilder().addInteger(PROPERTY_SOCKET_PORT, PORT).build();
 		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
 		RoboContext system = builder.build();
 
@@ -49,10 +47,8 @@ public class HttpServerUnitTests {
 	public void httpServerUnitNoPathTest() throws Exception {
 		RoboBuilder builder = new RoboBuilder();
 
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setInteger(PROPERTY_SOCKET_PORT, PORT);
-		config.setString(PROPERTY_CODEC_PACKAGES, PACKAGE_CODECS);
-
+		Configuration config = new ConfigurationBuilder().addInteger(PROPERTY_SOCKET_PORT, PORT)
+				.addString(PROPERTY_CODEC_PACKAGES, PACKAGE_CODECS).build();
 		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
 		RoboContext system = builder.build();
 

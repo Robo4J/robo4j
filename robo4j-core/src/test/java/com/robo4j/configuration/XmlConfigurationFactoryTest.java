@@ -16,16 +16,12 @@
  */
 package com.robo4j.configuration;
 
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
-import com.robo4j.configuration.ConfigurationFactoryException;
-import com.robo4j.configuration.XmlConfigurationFactory;
 import com.robo4j.util.IOUtil;
-
-import java.io.IOException;
 
 /**
  * XML Tests for the configuration.
@@ -36,16 +32,8 @@ import java.io.IOException;
 public class XmlConfigurationFactoryTest {
 	@Test
 	public void testSerializeToString() throws ConfigurationFactoryException {
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString("firstString", "S1");
-		config.setString("secondString", "S2");
-		config.setBoolean("boolean", true);
-		Configuration child1 = config.createChildConfiguration("child1");
-		child1.setInteger("int", 1);
-		child1.setFloat("float", 1.0f);
-		Configuration child2 = config.createChildConfiguration("child2");
-		child2.setInteger("int", 2);
-		child2.setFloat("float", 2.0f);
+		ConfigurationBuilder configBuilder = new ConfigurationBuilder().addString("firstString", "S1").addString("secondString", "S2").addBoolean("boolean", true).addBuilder("child1", new ConfigurationBuilder().addInteger("int", 1).addFloat("float", 1.0f)).addBuilder("child2", new ConfigurationBuilder().addInteger("int", 2).addFloat("float", 2.0f));
+		Configuration config = configBuilder.build();
 		String xml = XmlConfigurationFactory.toXml(config);
 		System.out.println(xml);
 		Assert.assertNotNull(xml);
@@ -58,7 +46,8 @@ public class XmlConfigurationFactoryTest {
 
 	@Test
 	public void testReadResource() throws IOException, ConfigurationFactoryException {
-		String configXml = IOUtil.readStringFromUTF8Stream(XmlConfigurationFactoryTest.class.getClassLoader().getResourceAsStream("configurationtest.xml"));
+		String configXml = IOUtil
+				.readStringFromUTF8Stream(XmlConfigurationFactoryTest.class.getClassLoader().getResourceAsStream("configurationtest.xml"));
 		Configuration config = XmlConfigurationFactory.fromXml(configXml);
 		Assert.assertNotNull(config.getChildConfiguration("multipliers"));
 		Assert.assertNotNull(config.getChildConfiguration("offsets"));

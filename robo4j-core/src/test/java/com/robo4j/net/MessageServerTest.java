@@ -19,6 +19,7 @@ package com.robo4j.net;
 
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.configuration.ConfigurationFactory;
 import org.junit.Assert;
 import org.junit.Test;
@@ -47,9 +48,8 @@ public class MessageServerTest {
 		final List<String> messages = new ArrayList<>();
 		final CountDownLatch messageLatch = new CountDownLatch(3);
 
-		Configuration serverConfig = ConfigurationFactory.createEmptyConfiguration();
-		serverConfig.setString(PROPERTY_SERVER_NAME, "Server Name");
-		serverConfig.setString(MessageServer.KEY_HOST_NAME, "localhost");
+		Configuration serverConfig = new ConfigurationBuilder().addString(PROPERTY_SERVER_NAME, "Server Name")
+				.addString(MessageServer.KEY_HOST_NAME, "localhost").build();
 		MessageServer server = new MessageServer((uuid, id, message) -> {
 			System.out.println("Got uuid: " + uuid + " id:" + id + " message:" + message);
 			messages.add(String.valueOf(message));
@@ -106,9 +106,8 @@ public class MessageServerTest {
 		final List<Object> messages = new ArrayList<>(messagesNumber);
 		final CountDownLatch messageLatch = new CountDownLatch(messagesNumber);
 
-		Configuration serverConfig = ConfigurationFactory.createEmptyConfiguration();
-		serverConfig.setString(PROPERTY_SERVER_NAME, "Server Name");
-		serverConfig.setString(MessageServer.KEY_HOST_NAME, "localhost");
+		Configuration serverConfig = new ConfigurationBuilder().addString(PROPERTY_SERVER_NAME, "Server Name")
+				.addString(MessageServer.KEY_HOST_NAME, "localhost").build();
 		MessageServer server = new MessageServer((uuid, id, message) -> {
 			System.out.println("Got uuid: " + uuid + " got id:" + id + " message:" + message);
 			messages.add(message);
@@ -196,11 +195,8 @@ public class MessageServerTest {
 	}
 
 	public static RoboContext createTestContext() {
-		RoboTestContext testContext = new RoboTestContext("TestContext",
-				ConfigurationFactory.createEmptyConfiguration());
-		Configuration configuration = ConfigurationFactory.createEmptyConfiguration();
-		configuration.setString("name", "Test");
-		configuration.setString("description", "Lalalala");
+		RoboTestContext testContext = new RoboTestContext("TestContext", ConfigurationFactory.createEmptyConfiguration());
+		Configuration configuration = new ConfigurationBuilder().addString("name", "Test").addString("description", "Lalalala").build();
 		testContext.addRef(new RoboTestReference("test", configuration));
 		return testContext;
 	}

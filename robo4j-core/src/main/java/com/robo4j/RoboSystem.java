@@ -16,19 +16,6 @@
  */
 package com.robo4j;
 
-import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
-import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.net.ContextEmitter;
-import com.robo4j.net.MessageCallback;
-import com.robo4j.net.MessageServer;
-import com.robo4j.net.ReferenceDesciptor;
-import com.robo4j.net.RoboContextDescriptor;
-import com.robo4j.scheduler.DefaultScheduler;
-import com.robo4j.scheduler.RoboThreadFactory;
-import com.robo4j.scheduler.Scheduler;
-import com.robo4j.util.SystemUtil;
-
 import java.io.IOException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
@@ -49,6 +36,19 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+
+import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationBuilder;
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.net.ContextEmitter;
+import com.robo4j.net.MessageCallback;
+import com.robo4j.net.MessageServer;
+import com.robo4j.net.ReferenceDesciptor;
+import com.robo4j.net.RoboContextDescriptor;
+import com.robo4j.scheduler.DefaultScheduler;
+import com.robo4j.scheduler.RoboThreadFactory;
+import com.robo4j.scheduler.Scheduler;
+import com.robo4j.util.SystemUtil;
 
 /**
  * This is the default implementation for a local {@link RoboContext}. Contains
@@ -151,17 +151,17 @@ final class RoboSystem implements RoboContext {
 		@Override
 		public void sendMessage(T message) {
 			if (MESSAGE_DELIVERY_CRITERIA.contains(getState())) {
-				switch (threadingPolicy){
-					case NORMAL:
+				switch (threadingPolicy) {
+				case NORMAL:
+					deliverOnQueue(message);
+					break;
+				case CRITICAL:
+					synchronized (unit) {
 						deliverOnQueue(message);
-						break;
-					case CRITICAL:
-						synchronized (unit) {
-							deliverOnQueue(message);
-						}
-						break;
-					default:
-						throw new IllegalStateException(String.format("not supported policy: %s", threadingPolicy));
+					}
+					break;
+				default:
+					throw new IllegalStateException(String.format("not supported policy: %s", threadingPolicy));
 				}
 			}
 		}
@@ -170,7 +170,7 @@ final class RoboSystem implements RoboContext {
 		public String toString() {
 			return "LocalReference id: " + unit.getId() + " (system: " + uid + ")";
 		}
-		
+
 		private void deliverOnQueue(T message) {
 			switch (deliveryPolicy) {
 			case SYSTEM:
@@ -269,7 +269,7 @@ final class RoboSystem implements RoboContext {
 	 */
 	RoboSystem(Configuration config) {
 		this(UUID.randomUUID().toString(), config);
-	}	
+	}
 
 	/**
 	 * Convenience constructor.
@@ -341,8 +341,7 @@ final class RoboSystem implements RoboContext {
 		});
 		final ContextEmitter emitter = initEmitter(emitterConfiguration, getListeningURI(messageServer));
 		if (emitter != null) {
-			emitterFuture = getScheduler().scheduleAtFixedRate(emitter::emit, 0, emitter.getHeartBeatInterval(),
-					TimeUnit.MILLISECONDS);
+			emitterFuture = getScheduler().scheduleAtFixedRate(emitter::emit, 0, emitter.getHeartBeatInterval(), TimeUnit.MILLISECONDS);
 		}
 	}
 
@@ -453,7 +452,7 @@ final class RoboSystem implements RoboContext {
 		}
 		return reference;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "RoboSystem id: " + uid + " unit count: " + units.size();
@@ -482,11 +481,8 @@ final class RoboSystem implements RoboContext {
 	}
 
 	private static Configuration createConfiguration(int schedulerPoolSize, int workerPoolSize, int blockingPoolSize) {
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setInteger(KEY_SCHEDULER_POOL_SIZE, schedulerPoolSize);
-		config.setInteger(KEY_WORKER_POOL_SIZE, workerPoolSize);
-		config.setInteger(KEY_BLOCKING_POOL_SIZE, blockingPoolSize);
-		return config;
+		return new ConfigurationBuilder().addInteger(KEY_SCHEDULER_POOL_SIZE, schedulerPoolSize)
+				.addInteger(KEY_WORKER_POOL_SIZE, workerPoolSize).addInteger(KEY_BLOCKING_POOL_SIZE, blockingPoolSize).build();
 	}
 
 	private MessageServer initServer(Configuration serverConfiguration) {

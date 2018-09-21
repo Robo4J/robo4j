@@ -19,10 +19,8 @@ package com.robo4j;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.robo4j.LifecycleState;
-import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.configuration.ConfigurationBuilder;
 
 /**
  * Test(s) for the RoboUnits.
@@ -37,8 +35,7 @@ public class RoboUnitTests {
 		RoboSystem system = new RoboSystem();
 		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
 		StringProducer producer = new StringProducer(system, "producer");
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString("target", "consumer");
+		Configuration config = new ConfigurationBuilder().addString("target", "consumer").build();
 		producer.initialize(config);
 		StringConsumer consumer = new StringConsumer(system, "consumer");
 		system.addUnits(producer, consumer);

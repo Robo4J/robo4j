@@ -19,11 +19,11 @@ package com.robo4j.units;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-import com.robo4j.AttributeDescriptor;
-import com.robo4j.DefaultAttributeDescriptor;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.IntegerConsumer;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboBuilder;
@@ -31,7 +31,7 @@ import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.configuration.ConfigurationBuilder;
 
 /**
  * Test for the CounterUnit.
@@ -52,7 +52,8 @@ public class CounterUnitTests {
 
 	@Test
 	public void test() throws RoboBuilderException, InterruptedException, ExecutionException {
-		// FIXME(Marcus/Aug 20, 2017): We really should get rid of the sleeps here and use waits with timeouts... 
+		// FIXME(Marcus/Aug 20, 2017): We really should get rid of the sleeps
+		// here and use waits with timeouts...
 		RoboBuilder builder = new RoboBuilder();
 		builder.add(IntegerConsumer.class, ID_CONSUMER);
 		builder.add(CounterUnit.class, getCounterConfiguration(ID_CONSUMER, 1000), ID_COUNTER);
@@ -78,9 +79,8 @@ public class CounterUnitTests {
 	}
 
 	private Configuration getCounterConfiguration(String target, int interval) {
-		Configuration configuration = ConfigurationFactory.createEmptyConfiguration();
-		configuration.setString(CounterUnit.KEY_TARGET, target);
-		configuration.setInteger(CounterUnit.KEY_INTERVAL, interval);
+		Configuration configuration = new ConfigurationBuilder().addString(CounterUnit.KEY_TARGET, target)
+				.addInteger(CounterUnit.KEY_INTERVAL, interval).build();
 		return configuration;
 	}
 

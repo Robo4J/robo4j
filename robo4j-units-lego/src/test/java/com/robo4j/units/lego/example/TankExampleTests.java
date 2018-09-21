@@ -17,17 +17,18 @@
 
 package com.robo4j.units.lego.example;
 
+import org.junit.Test;
+
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
+import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.units.HttpServerUnit;
 import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.units.lego.LcdTestUnit;
 import com.robo4j.units.lego.SimpleTankTestUnit;
-import org.junit.Test;
 
 /**
  * Simple Tanks examples tests
@@ -49,25 +50,17 @@ public class TankExampleTests {
 	public void legoTankExampleTest() throws Exception {
 		RoboBuilder builder = new RoboBuilder();
 
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-
-		config.setString("target", ID_UNIT_CONTROLLER);
-		config.setInteger("port", PORT);
-		config.setString("packages", "com.robo4j.units.lego.example.codec");
-		config.setString(RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG,
-				HttpPathConfigJsonBuilder.Builder().addPath(ID_UNIT_CONTROLLER, HttpMethod.GET).build());
+		Configuration config = new ConfigurationBuilder().addString("target", ID_UNIT_CONTROLLER).addInteger("port", PORT)
+				.addString("packages", "com.robo4j.units.lego.example.codec").addString(RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG,
+						HttpPathConfigJsonBuilder.Builder().addPath(ID_UNIT_CONTROLLER, HttpMethod.GET).build())
+				.build();
 		builder.add(HttpServerUnit.class, config, ID_HTTP);
 
-		config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString("target", ID_PLATFORM);
-		builder.add(TankExampleController.class, config, ID_UNIT_CONTROLLER);
+		builder.add(TankExampleController.class, new ConfigurationBuilder().addString("target", ID_PLATFORM).build(), ID_UNIT_CONTROLLER);
 
 		/* platform is listening to the bus */
-		config = ConfigurationFactory.createEmptyConfiguration();
-		config.setString("leftMotorPort", "B");
-		config.setCharacter("leftMotorType", 'N');
-		config.setString("rightMotorPort", "C");
-		config.setCharacter("rightMotorType", 'N');
+		config = new ConfigurationBuilder().addString("leftMotorPort", "B").addCharacter("leftMotorType", 'N')
+				.addString("rightMotorPort", "C").addCharacter("rightMotorType", 'N').build();
 		builder.add(SimpleTankTestUnit.class, config, ID_PLATFORM);
 
 		/* lcd is listening to the bus */

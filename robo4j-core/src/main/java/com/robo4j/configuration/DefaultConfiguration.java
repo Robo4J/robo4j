@@ -36,13 +36,6 @@ class DefaultConfiguration implements Configuration {
 	private final Map<String, Configuration> configurations = new HashMap<>();
 
 	@Override
-	public Configuration createChildConfiguration(String name) {
-		DefaultConfiguration config = new DefaultConfiguration();
-		configurations.put(name, config);
-		return config;
-	}
-
-	@Override
 	public Configuration getChildConfiguration(String name) {
 		return configurations.get(name);
 	}
@@ -62,7 +55,6 @@ class DefaultConfiguration implements Configuration {
 		return (String) getVal(name, defaultValue);
 	}
 
-	@Override
 	public void setString(String name, String s) {
 		settings.put(name, s);
 	}
@@ -70,31 +62,6 @@ class DefaultConfiguration implements Configuration {
 	@Override
 	public Character getCharacter(String name, Character defaultValue) {
 		return (Character) getVal(name, defaultValue);
-	}
-
-	@Override
-	public void setCharacter(String name, Character s) {
-		settings.put(name, s);
-	}
-
-	@Override
-	public void setLong(String name, Long l) {
-		settings.put(name, l);
-	}
-
-	@Override
-	public void setDouble(String name, Double d) {
-		settings.put(name, d);
-	}
-
-	@Override
-	public void setInteger(String name, Integer i) {
-		settings.put(name, i);
-	}
-
-	@Override
-	public void setFloat(String name, Float f) {
-		settings.put(name, f);
 	}
 
 	@Override
@@ -126,11 +93,37 @@ class DefaultConfiguration implements Configuration {
 	public Boolean getBoolean(String name, Boolean defaultValue) {
 		return (Boolean) getVal(name, defaultValue);
 	}
-
-	@Override
+	
+	public Configuration createChildConfiguration(String name) {
+		DefaultConfiguration config = new DefaultConfiguration();
+		configurations.put(name, config);
+		return config;
+	}
+	
 	public void setBoolean(String name, Boolean b) {
 		settings.put(name, b);
 	}
+	
+	public void setCharacter(String name, Character s) {
+		settings.put(name, s);
+	}
+
+	public void setLong(String name, Long l) {
+		settings.put(name, l);
+	}
+
+	public void setDouble(String name, Double d) {
+		settings.put(name, d);
+	}
+
+	public void setInteger(String name, Integer i) {
+		settings.put(name, i);
+	}
+
+	public void setFloat(String name, Float f) {
+		settings.put(name, f);
+	}
+
 
 	private Object getVal(String name, Object defaultValue) {
 		Object val = settings.get(name);
