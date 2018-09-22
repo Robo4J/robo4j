@@ -43,7 +43,7 @@ Robo4J is released under [General Public License][] v3.
 [Robo4j.io]: http://www.robo4j.io
 [miragemiko blog]: http://www.miroslavkopecky.com
 [marcus blog]: http://hirt.se/blog/
-[General Public License]: http://www.gnu.org/licenses/gpl-3.0-standalone.html0
+[General Public License]: http://www.gnu.org/licenses/gpl-3.0-standalone.html
 [@robo4j]: https://twitter.com/robo4j
 [@miragemiko]: https://twitter.com/miragemiko
 [@hirt]: https://twitter.com/hirt
