@@ -10,6 +10,5 @@ include 'robo4j-hw-rpi'
 include 'robo4j-units-rpi'
 include 'robo4j-units-rpi-http'
 include 'robo4j-db-sql'
-include 'robo4j-spring'
 
 
