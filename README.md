@@ -30,6 +30,8 @@ To install the build bundles and make them available to downstream dependencies,
 > **Note:** If you are not using Robo4J as the standard user (pi) on a Raspberry Pi, you will have to specify the path to the local maven repository in the file _**libraries.gradle**_, variable: _mavenRepository_
 > **Note:** Robo4J currently requires JDK 8. Ensure that you build and run with JDK 8.
 
+Build status: [![Build Status](https://travis-ci.org/Robo4J/robo4j.svg?branch=master)](https://travis-ci.org/Robo4J/robo4j)
+
 ## Requirements
 [Git][] and [Java JDK 8][]
 
