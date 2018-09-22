@@ -5,7 +5,8 @@ Robo4J provides an easy way of getting started with building custom hardware and
 * [Robo4j.io][] provides a library of hardware abstractions for RaspberryPi and Lego EV3 out of the box
 * [Robo4j.io][] provides a library of easily configurable units that allows hardware to be made available and configured through XML
 * [Robo4j.io][] provides a threading model controlled by annotations
-* [Robo4j.io][] version: alpha-0.4
+
+The current [Robo4j.io][] version is alpha-0.4
 
 ## Documentation
 See current [Robo4j documentation][].
