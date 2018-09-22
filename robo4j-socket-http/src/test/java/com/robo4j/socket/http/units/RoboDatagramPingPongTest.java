@@ -11,7 +11,7 @@ import com.robo4j.socket.http.message.DatagramDenominator;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.DatagramBodyType;
 import com.robo4j.socket.http.util.RoboHttpUtils;
-import com.robo4j.util.SystemUtil;
+import com.robo4j.util.RoboSystemUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -45,9 +45,9 @@ public class RoboDatagramPingPongTest {
 		pongSystem.start();
 		pingSystem.start();
 		System.out.println("UDP pongSystem: State after start:");
-		System.out.println(SystemUtil.printStateReport(pongSystem));
+		System.out.println(RoboSystemUtil.printStateReport(pongSystem));
 		System.out.println("UDP pingSystem: State after start:");
-		System.out.println(SystemUtil.printStateReport(pingSystem));
+		System.out.println(RoboSystemUtil.printStateReport(pingSystem));
 
 		RoboReference<String> pongStringConsumerReference = pongSystem.getReference(StringConsumer.NAME);
 		CountDownLatch countDownLatch = pongStringConsumerReference.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
@@ -67,9 +67,9 @@ public class RoboDatagramPingPongTest {
 		pongSystem.shutdown();
 
 		System.out.println("UDP pongSystem: State after shutdown:");
-		System.out.println(SystemUtil.printStateReport(pongSystem));
+		System.out.println(RoboSystemUtil.printStateReport(pongSystem));
 		System.out.println("UDP pingSystem: State after shutdown:");
-		System.out.println(SystemUtil.printStateReport(pingSystem));
+		System.out.println(RoboSystemUtil.printStateReport(pingSystem));
 
 		Assert.assertTrue(TOTAL_NUMBER == pongConsumerTotalNumber);
 

@@ -21,7 +21,7 @@ import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.hw.lego.util.EscapeButtonUtil;
-import com.robo4j.util.SystemUtil;
+import com.robo4j.util.RoboSystemUtil;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -53,7 +53,7 @@ public class InfraPushTankPlatformExample {
 
         builder.add(settings);
         RoboContext system = builder.build();
-        System.out.println(SystemUtil.printStateReport(system));
+        System.out.println(RoboSystemUtil.printStateReport(system));
 
 
         system.start();

@@ -17,7 +17,7 @@
 package com.robo4j;
 
 import com.robo4j.configuration.ConfigurationBuilder;
-import com.robo4j.util.SystemUtil;
+import com.robo4j.util.RoboSystemUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,7 +39,7 @@ public class RoboBuilderTests {
 	@Test
 	public void testParsingFile() throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
 		RoboBuilder builder = new RoboBuilder();
-		builder.add(SystemUtil.getInputStreamByResourceName("test.xml"));
+		builder.add(RoboSystemUtil.getInputStreamByResourceName("test.xml"));
 		RoboContext system = builder.build();
 
 		Assert.assertEquals(system.getState(), LifecycleState.INITIALIZED);
@@ -68,7 +68,7 @@ public class RoboBuilderTests {
 
 	// @Test
 	public void testSeparateSystemUnitsSystemConfig() throws RoboBuilderException, InterruptedException, ExecutionException {
-		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRoboSystemOnly.xml"));
+		RoboBuilder builder = new RoboBuilder(RoboSystemUtil.getInputStreamByResourceName("testRoboSystemOnly.xml"));
 		// NOTE(Marcus/Aug 19, 2017): We have the system settings and the units
 		// in the same file.
 		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("testRoboUnitsOnly.xml"));
@@ -166,8 +166,8 @@ public class RoboBuilderTests {
 
 	@Test
 	public void testProgrammaticConfiguration() throws RoboBuilderException, ConfigurationException, InterruptedException, ExecutionException, TimeoutException {
-		ConfigurationBuilder systemConfigBuilder = new ConfigurationBuilder().addInteger(RoboSystem.KEY_SCHEDULER_POOL_SIZE, 11)
-				.addInteger(RoboSystem.KEY_WORKER_POOL_SIZE, 5).addInteger(RoboSystem.KEY_BLOCKING_POOL_SIZE, 13);
+		ConfigurationBuilder systemConfigBuilder = new ConfigurationBuilder().addInteger(RoboSystemUtil.KEY_SCHEDULER_POOL_SIZE, 11)
+				.addInteger(RoboSystemUtil.KEY_WORKER_POOL_SIZE, 5).addInteger(RoboSystemUtil.KEY_BLOCKING_POOL_SIZE, 13);
 		RoboBuilder builder = new RoboBuilder("mySystem", systemConfigBuilder.build());
 		
 		StringProducer producerUnit = new StringProducer(builder.getContext(), "producer");

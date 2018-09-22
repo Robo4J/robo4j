@@ -31,11 +31,17 @@ import java.util.List;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class SystemUtil {
+public final class RoboSystemUtil {
+	public static final String KEY_SCHEDULER_POOL_SIZE = "poolSizeScheduler";
+	public static final String KEY_WORKER_POOL_SIZE = "poolSizeWorker";
+	public static final String KEY_BLOCKING_POOL_SIZE = "poolSizeBlocking";
+	public static final String KEY_CONFIGURATION_SERVER = "com.robo4j.messageServer";
+	public static final String KEY_CONFIGURATION_EMITTER = "com.robo4j.discovery";
+	public static final String KEY_CONFIGURATION_EMITTER_METADATA = "com.robo4j.discovery.metadata";
 	private static final String BREAK = "\n";
 	private static final String SLASH = "/";
 
-	private SystemUtil() {
+	private RoboSystemUtil() {
 		// no instances
 	}
 
@@ -101,7 +107,7 @@ public final class SystemUtil {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
-			SimpleLoggingUtil.info(SystemUtil.class, "Sleep was interrupted.", e);
+			SimpleLoggingUtil.info(RoboSystemUtil.class, "Sleep was interrupted.", e);
 		}
 	}
 

@@ -39,7 +39,7 @@ import com.robo4j.socket.http.units.test.HttpOneAttributeGetController;
 import com.robo4j.socket.http.units.test.HttpTwoAttributesGetController;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
-import com.robo4j.util.SystemUtil;
+import com.robo4j.util.RoboSystemUtil;
 
 /**
  * RoboHttpUnitGetTest should test Http get requests
@@ -75,7 +75,7 @@ public class RoboHttpUnitGetTest {
 
 		system.start();
 		System.out.println("systemPong: State after start:");
-		System.out.println(SystemUtil.printStateReport(system));
+		System.out.println(RoboSystemUtil.printStateReport(system));
 		System.out.println("Press Key...");
 		System.in.read();
 		system.shutdown();
@@ -90,10 +90,10 @@ public class RoboHttpUnitGetTest {
 
 		systemGetProvider.start();
 		System.out.println("systemGetProvider: State after start:");
-		System.out.println(SystemUtil.printStateReport(systemGetProvider));
+		System.out.println(RoboSystemUtil.printStateReport(systemGetProvider));
 		systemGetAccessor.start();
 		System.out.println("systemGetAccessor: State after start:");
-		System.out.println(SystemUtil.printStateReport(systemGetAccessor));
+		System.out.println(RoboSystemUtil.printStateReport(systemGetAccessor));
 
 		RoboReference<HttpDecoratedRequest> httpClient = systemGetAccessor.getReference(UNIT_ID_HTTP_CLIENT);
 
