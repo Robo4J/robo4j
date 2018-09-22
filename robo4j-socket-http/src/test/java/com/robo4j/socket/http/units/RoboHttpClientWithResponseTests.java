@@ -20,7 +20,7 @@ package com.robo4j.socket.http.units;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.socket.http.units.test.StringConsumer;
-import com.robo4j.util.SystemUtil;
+import com.robo4j.util.RoboSystemUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -51,10 +51,10 @@ public class RoboHttpClientWithResponseTests {
 		producerSystem.start();
 
 		System.out.println("consumer: State after start:");
-		System.out.println(SystemUtil.printStateReport(consumerSystem));
+		System.out.println(RoboSystemUtil.printStateReport(consumerSystem));
 
 		System.out.println("producer: State after start:");
-		System.out.println(SystemUtil.printStateReport(producerSystem));
+		System.out.println(RoboSystemUtil.printStateReport(producerSystem));
 
 		RoboReference<Integer> decoratedProducer = producerSystem.getReference("decoratedProducer");
 		decoratedProducer.sendMessage(MAX_NUMBER);

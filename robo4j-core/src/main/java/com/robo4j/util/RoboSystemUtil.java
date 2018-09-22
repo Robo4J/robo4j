@@ -31,11 +31,11 @@ import java.util.List;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class SystemUtil {
+public final class RoboSystemUtil {
 	private static final String BREAK = "\n";
 	private static final String SLASH = "/";
 
-	private SystemUtil() {
+	private RoboSystemUtil() {
 		// no instances
 	}
 
@@ -101,7 +101,7 @@ public final class SystemUtil {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
-			SimpleLoggingUtil.info(SystemUtil.class, "Sleep was interrupted.", e);
+			SimpleLoggingUtil.info(RoboSystemUtil.class, "Sleep was interrupted.", e);
 		}
 	}
 

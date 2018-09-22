@@ -10,7 +10,7 @@ import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.units.rpi.pwm.ServoUnitExample;
-import com.robo4j.util.SystemUtil;
+import com.robo4j.util.RoboSystemUtil;
 
 /**
  * Small example for driving around a roboclaw controlled robot.
@@ -36,11 +36,11 @@ public class RoboClawUnitExample {
 		builder.add(settings);
 		RoboContext ctx = builder.build();
 		System.out.println("State before start:");
-		System.out.println(SystemUtil.printStateReport(ctx));
+		System.out.println(RoboSystemUtil.printStateReport(ctx));
 		ctx.start();
 
 		System.out.println("State after start:");
-		System.out.println(SystemUtil.printStateReport(ctx));
+		System.out.println(RoboSystemUtil.printStateReport(ctx));
 
 		String lastCommand = "";
 		Scanner scanner = new Scanner(System.in);

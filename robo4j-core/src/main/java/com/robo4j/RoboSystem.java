@@ -16,6 +16,19 @@
  */
 package com.robo4j;
 
+import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationBuilder;
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.net.ContextEmitter;
+import com.robo4j.net.MessageCallback;
+import com.robo4j.net.MessageServer;
+import com.robo4j.net.ReferenceDesciptor;
+import com.robo4j.net.RoboContextDescriptor;
+import com.robo4j.scheduler.DefaultScheduler;
+import com.robo4j.scheduler.RoboThreadFactory;
+import com.robo4j.scheduler.Scheduler;
+import com.robo4j.util.RoboSystemUtil;
+
 import java.io.IOException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
@@ -37,19 +50,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationBuilder;
-import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.net.ContextEmitter;
-import com.robo4j.net.MessageCallback;
-import com.robo4j.net.MessageServer;
-import com.robo4j.net.ReferenceDesciptor;
-import com.robo4j.net.RoboContextDescriptor;
-import com.robo4j.scheduler.DefaultScheduler;
-import com.robo4j.scheduler.RoboThreadFactory;
-import com.robo4j.scheduler.Scheduler;
-import com.robo4j.util.SystemUtil;
-
 /**
  * This is the default implementation for a local {@link RoboContext}. Contains
  * RoboUnits, a lookup service for references to RoboUnits, and a system level
@@ -59,44 +59,13 @@ import com.robo4j.util.SystemUtil;
  * @author Miroslav Wengner (@miragemiko)
  */
 final class RoboSystem implements RoboContext {
-	/**
-	 * Configuration key for the maximum thread size for the scheduler thread
-	 * pool.
-	 */
-	public static final String KEY_SCHEDULER_POOL_SIZE = "poolSizeScheduler";
-
-	/**
-	 * Configuration key for the maximum thread size for the worker thread pool.
-	 */
-	public static final String KEY_WORKER_POOL_SIZE = "poolSizeWorker";
-
-	/**
-	 * Configuration key for the maximum thread size for the worker thread pool.
-	 */
-	public static final String KEY_BLOCKING_POOL_SIZE = "poolSizeBlocking";
-
-	/**
-	 * Configuration key for the child configuration for the message server.
-	 */
-	public static final String KEY_CONFIGURATION_SERVER = "com.robo4j.messageServer";
-
-	/**
-	 * Configuration key for the child configuration for the auto discovery.
-	 */
-	public static final String KEY_CONFIGURATION_EMITTER = "com.robo4j.discovery";
-
-	/**
-	 * Configuration key for the auto discovery metadata service.
-	 */
-	public static final String KEY_CONFIGURATION_EMITTER_METADATA = "com.robo4j.discovery.metadata";
-
 	private static final String NAME_BLOCKING_POOL = "Robo4J Blocking Pool";
 	private static final String NAME_WORKER_POOL = "Robo4J Worker Pool";
-
 	private static final int DEFAULT_BLOCKING_POOL_SIZE = 4;
-	private static final int DEFAULT_WORKING_POOL_SIZE = 2;
+	private static final int DEFAULT_WORKER_POOL_SIZE = 2;
 	private static final int DEFAULT_SCHEDULER_POOL_SIZE = 2;
 	private static final int KEEP_ALIVE_TIME = 10;
+
 	private static final EnumSet<LifecycleState> MESSAGE_DELIVERY_CRITERIA = EnumSet.of(LifecycleState.STARTED, LifecycleState.STOPPED,
 			LifecycleState.STOPPING);
 
@@ -268,7 +237,7 @@ final class RoboSystem implements RoboContext {
 	 * Constructor.
 	 */
 	RoboSystem(String uid) {
-		this(uid, DEFAULT_SCHEDULER_POOL_SIZE, DEFAULT_WORKING_POOL_SIZE, DEFAULT_BLOCKING_POOL_SIZE);
+		this(uid, DEFAULT_SCHEDULER_POOL_SIZE, DEFAULT_WORKER_POOL_SIZE, DEFAULT_BLOCKING_POOL_SIZE);
 	}
 
 	/**
@@ -277,16 +246,16 @@ final class RoboSystem implements RoboContext {
 	RoboSystem(String uid, Configuration configuration) {
 		this.uid = uid;
 		this.configuration = configuration;
-		int schedulerPoolSize = configuration.getInteger(KEY_SCHEDULER_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE);
-		int workerPoolSize = configuration.getInteger(KEY_WORKER_POOL_SIZE, DEFAULT_WORKING_POOL_SIZE);
-		int blockingPoolSize = configuration.getInteger(KEY_BLOCKING_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE);
+		int schedulerPoolSize = configuration.getInteger(RoboBuilder.KEY_SCHEDULER_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE);
+		int workerPoolSize = configuration.getInteger(RoboBuilder.KEY_WORKER_POOL_SIZE, DEFAULT_WORKER_POOL_SIZE);
+		int blockingPoolSize = configuration.getInteger(RoboBuilder.KEY_BLOCKING_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE);
 		workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
 				new RoboThreadFactory(new ThreadGroup(NAME_WORKER_POOL), NAME_WORKER_POOL, true));
 		blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, blockingQueue,
 				new RoboThreadFactory(new ThreadGroup(NAME_BLOCKING_POOL), NAME_BLOCKING_POOL, true));
 		systemScheduler = new DefaultScheduler(this, schedulerPoolSize);
-		messageServer = initServer(configuration.getChildConfiguration(KEY_CONFIGURATION_SERVER));
-		emitterConfiguration = configuration.getChildConfiguration(KEY_CONFIGURATION_EMITTER);
+		messageServer = initServer(configuration.getChildConfiguration(RoboBuilder.KEY_CONFIGURATION_SERVER));
+		emitterConfiguration = configuration.getChildConfiguration(RoboBuilder.KEY_CONFIGURATION_EMITTER);
 	}
 
 	/**
@@ -506,8 +475,8 @@ final class RoboSystem implements RoboContext {
 	}
 
 	private static Configuration createConfiguration(int schedulerPoolSize, int workerPoolSize, int blockingPoolSize) {
-		return new ConfigurationBuilder().addInteger(KEY_SCHEDULER_POOL_SIZE, schedulerPoolSize)
-				.addInteger(KEY_WORKER_POOL_SIZE, workerPoolSize).addInteger(KEY_BLOCKING_POOL_SIZE, blockingPoolSize).build();
+		return new ConfigurationBuilder().addInteger(RoboBuilder.KEY_SCHEDULER_POOL_SIZE, schedulerPoolSize)
+				.addInteger(RoboBuilder.KEY_WORKER_POOL_SIZE, workerPoolSize).addInteger(RoboBuilder.KEY_BLOCKING_POOL_SIZE, blockingPoolSize).build();
 	}
 
 	private MessageServer initServer(Configuration serverConfiguration) {
@@ -543,7 +512,7 @@ final class RoboSystem implements RoboContext {
 	private RoboContextDescriptor createDescriptor(URI uri, Configuration emitterConfiguration) {
 		int heartbeatInterval = emitterConfiguration.getInteger(ContextEmitter.KEY_HEARTBEAT_INTERVAL,
 				ContextEmitter.DEFAULT_HEARTBEAT_INTERVAL);
-		Map<String, String> metadata = toStringMap(emitterConfiguration.getChildConfiguration(KEY_CONFIGURATION_EMITTER_METADATA));
+		Map<String, String> metadata = toStringMap(emitterConfiguration.getChildConfiguration(RoboBuilder.KEY_CONFIGURATION_EMITTER_METADATA));
 		metadata.put(RoboContextDescriptor.KEY_URI, uri.toString());
 		return new RoboContextDescriptor(getId(), heartbeatInterval, metadata);
 	}
@@ -563,7 +532,7 @@ final class RoboSystem implements RoboContext {
 				if (uri != null) {
 					return uri;
 				}
-				SystemUtil.sleep(100);
+				RoboSystemUtil.sleep(100);
 			}
 		}
 		return null;

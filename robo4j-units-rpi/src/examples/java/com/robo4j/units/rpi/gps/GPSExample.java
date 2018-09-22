@@ -24,7 +24,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.hw.rpi.serial.gps.GPSEvent;
 import com.robo4j.units.rpi.gps.GPSRequest.Operation;
-import com.robo4j.util.SystemUtil;
+import com.robo4j.util.RoboSystemUtil;
 
 /**
  * Runs the gyro continuously.
@@ -43,11 +43,11 @@ public class GPSExample {
 		RoboContext ctx = builder.build();
 
 		System.out.println("State before start:");
-		System.out.println(SystemUtil.printStateReport(ctx));
+		System.out.println(RoboSystemUtil.printStateReport(ctx));
 		ctx.start();
 
 		System.out.println("State after start:");
-		System.out.println(SystemUtil.printStateReport(ctx));
+		System.out.println(RoboSystemUtil.printStateReport(ctx));
 
 		RoboReference<GPSRequest> gps = ctx.getReference(ID_GPS);
 		RoboReference<GPSEvent> processor = ctx.getReference(ID_PROCESSOR);
