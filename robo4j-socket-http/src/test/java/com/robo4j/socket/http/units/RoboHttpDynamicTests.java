@@ -45,7 +45,7 @@ import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import com.robo4j.socket.http.units.test.SocketMessageDecoratedProducerUnit;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
-import com.robo4j.util.RoboSystemUtil;
+import com.robo4j.util.SystemUtil;
 
 /**
  *
@@ -85,10 +85,10 @@ public class RoboHttpDynamicTests {
 		RoboContext clientSystem = getClientRoboSystem();
 
 		System.out.println("Client system state after start:");
-		System.out.println(RoboSystemUtil.printStateReport(clientSystem));
+		System.out.println(SystemUtil.printStateReport(clientSystem));
 
 		System.out.println("Main system state after start:");
-		System.out.println(RoboSystemUtil.printStateReport(mainSystem));
+		System.out.println(SystemUtil.printStateReport(mainSystem));
 
 		/* client system sending a messages to the main system */
 		RoboReference<Object> decoratedProducer = clientSystem.getReference(DECORATED_PRODUCER);
@@ -125,7 +125,7 @@ public class RoboHttpDynamicTests {
 		RoboContext pingSystemContext = pingSystemBuilder.build();
 		pingSystemContext.start();
 		System.out.println("PingSystem state after start:");
-		System.out.println(RoboSystemUtil.printStateReport(pingSystemContext));
+		System.out.println(SystemUtil.printStateReport(pingSystemContext));
 
 		RoboReference<HttpDecoratedRequest> httpClient = pingSystemContext.getReference(ID_CLIENT_UNIT);
 
@@ -139,7 +139,7 @@ public class RoboHttpDynamicTests {
 		Thread.sleep(1000);
 		pingSystemContext.stop();
 		System.out.println("PingSystem state after stop:");
-		System.out.println(RoboSystemUtil.printStateReport(pingSystemContext));
+		System.out.println(SystemUtil.printStateReport(pingSystemContext));
 
 	}
 
@@ -167,7 +167,7 @@ public class RoboHttpDynamicTests {
 		Assert.assertEquals(result.getState(), LifecycleState.INITIALIZED);
 
 		result.start();
-		System.out.println(RoboSystemUtil.printSocketEndPoint(result.getReference(ID_HTTP_SERVER), result.getReference(ID_TARGET_UNIT)));
+		System.out.println(SystemUtil.printSocketEndPoint(result.getReference(ID_HTTP_SERVER), result.getReference(ID_TARGET_UNIT)));
 		return result;
 	}
 

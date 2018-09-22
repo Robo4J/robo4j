@@ -23,7 +23,7 @@ import org.junit.Test;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
-import com.robo4j.util.RoboSystemUtil;
+import com.robo4j.util.SystemUtil;
 
 /**
  * RemoteSystemBuilderTest building remote system configuration by
@@ -43,7 +43,7 @@ public class RemoteSystemBuilderTest {
 	public void builderRemoteSystemTest() throws RoboBuilderException {
 
 		final RoboBuilder xmlBuilder = new RoboBuilder(
-				RoboSystemUtil.getInputStreamByResourceName("testRemoteMessageReceiverAckSystem.xml"));
+				SystemUtil.getInputStreamByResourceName("testRemoteMessageReceiverAckSystem.xml"));
 		final RoboContext xmlContext = xmlBuilder.build();
 
 		//@formatter:off

@@ -14,7 +14,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
-import com.robo4j.util.RoboSystemUtil;
+import com.robo4j.util.SystemUtil;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -34,11 +34,11 @@ public class HttpServerUnitTests {
 
 		system.start();
 		System.out.println("system: State after start:");
-		System.out.println(RoboSystemUtil.printStateReport(system));
+		System.out.println(SystemUtil.printStateReport(system));
 		RoboReference<HttpServerUnit> systemReference = system.getReference(ID_HTTP_SERVER);
 		system.shutdown();
 		System.out.println("system: State after shutdown:");
-		System.out.println(RoboSystemUtil.printStateReport(system));
+		System.out.println(SystemUtil.printStateReport(system));
 		Assert.assertTrue(systemReference.getState().equals(LifecycleState.SHUTDOWN));
 
 	}
@@ -54,11 +54,11 @@ public class HttpServerUnitTests {
 
 		system.start();
 		System.out.println("system: State after start:");
-		System.out.println(RoboSystemUtil.printStateReport(system));
+		System.out.println(SystemUtil.printStateReport(system));
 		RoboReference<HttpServerUnit> systemReference = system.getReference(ID_HTTP_SERVER);
 		system.shutdown();
 		System.out.println("system: State after shutdown:");
-		System.out.println(RoboSystemUtil.printStateReport(system));
+		System.out.println(SystemUtil.printStateReport(system));
 		Assert.assertTrue(systemReference.getState().equals(LifecycleState.SHUTDOWN));
 	}
 

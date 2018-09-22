@@ -22,7 +22,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.units.rpi.gyro.GyroRequest.GyroAction;
-import com.robo4j.util.RoboSystemUtil;
+import com.robo4j.util.SystemUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,11 +48,11 @@ public class GyroExample {
 		RoboContext ctx = builder.build();
 
 		System.out.println("State before start:");
-		System.out.println(RoboSystemUtil.printStateReport(ctx));
+		System.out.println(SystemUtil.printStateReport(ctx));
 		ctx.start();
 
 		System.out.println("State after start:");
-		System.out.println(RoboSystemUtil.printStateReport(ctx));
+		System.out.println(SystemUtil.printStateReport(ctx));
 
 		RoboReference<GyroRequest> gyro = ctx.getReference("gyro");
 		RoboReference<GyroEvent> processor = ctx.getReference(ID_PROCESSOR);

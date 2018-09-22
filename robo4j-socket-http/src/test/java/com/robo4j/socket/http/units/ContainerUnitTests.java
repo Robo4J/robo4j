@@ -23,7 +23,7 @@ import com.robo4j.RoboReference;
 import com.robo4j.socket.http.units.test.ServiceContainerUnit;
 import com.robo4j.socket.http.units.test.service.NumberService;
 import com.robo4j.socket.http.units.test.service.NumberServiceImpl;
-import com.robo4j.util.RoboSystemUtil;
+import com.robo4j.util.SystemUtil;
 import org.junit.Test;
 
 /**
@@ -53,7 +53,7 @@ public class ContainerUnitTests {
 
         Thread.sleep(1000);
         System.out.println("system: State after start:");
-        System.out.println(RoboSystemUtil.printStateReport(system));
+        System.out.println(SystemUtil.printStateReport(system));
         system.shutdown();
         System.out.println("DONE");
 

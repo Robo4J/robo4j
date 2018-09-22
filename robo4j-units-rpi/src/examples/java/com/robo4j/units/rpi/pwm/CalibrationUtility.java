@@ -25,7 +25,7 @@ import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.util.RoboSystemUtil;
+import com.robo4j.util.SystemUtil;
 
 /**
  * Small calibration utility to help fine tune a servo.
@@ -50,11 +50,11 @@ public class CalibrationUtility {
 		builder.add(settings);
 		RoboContext ctx = builder.build();
 		System.out.println("State before start:");
-		System.out.println(RoboSystemUtil.printStateReport(ctx));
+		System.out.println(SystemUtil.printStateReport(ctx));
 		ctx.start();
 
 		System.out.println("State after start:");
-		System.out.println(RoboSystemUtil.printStateReport(ctx));
+		System.out.println(SystemUtil.printStateReport(ctx));
 
 		String lastCommand;
 		Scanner scanner = new Scanner(System.in);

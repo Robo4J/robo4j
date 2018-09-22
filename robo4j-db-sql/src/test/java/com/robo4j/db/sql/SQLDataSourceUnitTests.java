@@ -44,7 +44,7 @@ import com.robo4j.db.sql.model.ERoboPoint;
 import com.robo4j.db.sql.model.ERoboUnit;
 import com.robo4j.db.sql.support.RoboRequestType;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.util.RoboSystemUtil;
+import com.robo4j.util.SystemUtil;
 
 /**
  * SQL database focused tests
@@ -73,7 +73,7 @@ public class SQLDataSourceUnitTests {
 	public void clean() throws Exception {
 		system.shutdown();
 		System.out.println("SQL System: State after shutdown:");
-		System.out.println(RoboSystemUtil.printStateReport(system));
+		System.out.println(SystemUtil.printStateReport(system));
 		Thread.sleep(WAIT_TIME);
 	}
 
@@ -253,12 +253,12 @@ public class SQLDataSourceUnitTests {
 			RoboContext system = builder.build();
 
 			System.out.println("systemPong: State before start:");
-			System.out.println(RoboSystemUtil.printStateReport(system));
+			System.out.println(SystemUtil.printStateReport(system));
 
 			system.start();
 
 			System.out.println("systemPong: State after start:");
-			System.out.println(RoboSystemUtil.printStateReport(system));
+			System.out.println(SystemUtil.printStateReport(system));
 
 			ERoboUnit ERoboUnit1 = new ERoboUnit();
 			ERoboUnit1.setUid(UNIT_SYSTEM_1_NAME);

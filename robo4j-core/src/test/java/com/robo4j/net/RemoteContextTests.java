@@ -25,7 +25,7 @@ import com.robo4j.StringConsumer;
 import com.robo4j.StringProducerRemote;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
-import com.robo4j.util.RoboSystemUtil;
+import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public class RemoteContextTests {
 
 	@Test
 	public void testDiscoveryOfDiscoveryEnabledRoboContext() throws RoboBuilderException, IOException {
-		RoboBuilder builder = new RoboBuilder(RoboSystemUtil.getInputStreamByResourceName("testDiscoverableSystem.xml"));
+		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testDiscoverableSystem.xml"));
 		RoboContext ctx = builder.build();
 		ctx.start();
 
@@ -60,7 +60,7 @@ public class RemoteContextTests {
 
 		service.start();
 		for (int i = 0; i < NUMBER_ITERATIONS && (service.getDescriptor("6") == null); i++) {
-			RoboSystemUtil.sleep(200);
+			SystemUtil.sleep(200);
 		}
 
 		Assert.assertTrue(service.getDiscoveredContexts().size() > 0);
@@ -72,7 +72,7 @@ public class RemoteContextTests {
 
 	@Test
 	public void testMessageToDiscoveredContext() throws RoboBuilderException, IOException, ConfigurationException {
-		RoboBuilder builder = new RoboBuilder(RoboSystemUtil.getInputStreamByResourceName("testRemoteMessageReceiverSystem.xml"));
+		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteMessageReceiverSystem.xml"));
 		StringConsumer consumer = new StringConsumer(builder.getContext(), ACK_CONSUMER);
 		builder.add(consumer);
 		RoboContext receiverCtx = builder.build();
@@ -89,7 +89,7 @@ public class RemoteContextTests {
 		service.start();
 
 		for (int i = 0; i < NUMBER_ITERATIONS && (service.getDescriptor("7") == null); i++) {
-			RoboSystemUtil.sleep(200);
+			SystemUtil.sleep(200);
 		}
 		Assert.assertTrue(service.getDiscoveredContexts().size() > 0);
 		RoboContextDescriptor descriptor = service.getDescriptor("7");
@@ -106,7 +106,7 @@ public class RemoteContextTests {
 
 		remoteStringProducer.sendMessage("sendRandomMessage");
 		for (int i = 0; i < NUMBER_ITERATIONS && consumer.getReceivedMessages().size() == 0; i++) {
-			RoboSystemUtil.sleep(200);
+			SystemUtil.sleep(200);
 		}
 
 		Assert.assertTrue(consumer.getReceivedMessages().size() > 0);
@@ -117,7 +117,7 @@ public class RemoteContextTests {
 
 	@Test
 	public void testMessageIncludingReferenceToDiscoveredContext() throws RoboBuilderException, IOException, ConfigurationException {
-		RoboBuilder builder = new RoboBuilder(RoboSystemUtil.getInputStreamByResourceName("testRemoteMessageReceiverAckSystem.xml"));
+		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteMessageReceiverAckSystem.xml"));
 		AckingStringConsumer consumer = new AckingStringConsumer(builder.getContext(), ACK_CONSUMER);
 		builder.add(consumer);
 		RoboContext receiverCtx = builder.build();
@@ -130,13 +130,13 @@ public class RemoteContextTests {
 		service.start();
 
 		for (int i = 0; i < NUMBER_ITERATIONS && (service.getDescriptor("9") == null); i++) {
-			RoboSystemUtil.sleep(200);
+			SystemUtil.sleep(200);
 		}
 		Assert.assertTrue(service.getDiscoveredContexts().size() > 0);
 		RoboContextDescriptor descriptor = service.getDescriptor("9");
 		Assert.assertNotNull(descriptor);
 
-		builder = new RoboBuilder(RoboSystemUtil.getInputStreamByResourceName("testMessageEmitterSystem_8.xml"));
+		builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testMessageEmitterSystem_8.xml"));
 		RemoteTestMessageProducer remoteTestMessageProducer = new RemoteTestMessageProducer(builder.getContext(), REMOTE_UNIT_EMITTER);
 		remoteTestMessageProducer.initialize(getEmitterConfiguration("9", ACK_CONSUMER));
 		builder.add(remoteTestMessageProducer);
@@ -147,7 +147,7 @@ public class RemoteContextTests {
 
 		remoteTestMessageProducer.sendMessage("sendMessage");
 		for (int i = 0; i < NUMBER_ITERATIONS && consumer.getReceivedMessages().size() == 0; i++) {
-			RoboSystemUtil.sleep(200);
+			SystemUtil.sleep(200);
 		}
 
 		Assert.assertTrue(consumer.getReceivedMessages().size() > 0);
@@ -250,7 +250,7 @@ public class RemoteContextTests {
 	}
 
 	private <T> RoboContext buildConsumerEmitterSystem(Class<T> clazz, String target) throws Exception {
-		RoboBuilder builder = new RoboBuilder(RoboSystemUtil.getInputStreamByResourceName("testMessageEmitterSystem_8.xml"));
+		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testMessageEmitterSystem_8.xml"));
 
 		if (clazz.equals(String.class)) {
 			StringProducerRemote<T> remoteTestMessageProducer = new StringProducerRemote<>(clazz, builder.getContext(),
@@ -267,7 +267,7 @@ public class RemoteContextTests {
 	}
 
 	private RoboContext buildReceiverSystem() throws RoboBuilderException, ConfigurationException {
-		RoboBuilder builder = new RoboBuilder(RoboSystemUtil.getInputStreamByResourceName("testRemoteReceiver.xml"));
+		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteReceiver.xml"));
 		Configuration configuration = new ConfigurationBuilder().addInteger("totalNumberMessages", 1).build();
 		AckingStringConsumer ackConsumer = new AckingStringConsumer(builder.getContext(), ACK_CONSUMER);
 		ackConsumer.initialize(configuration);
@@ -279,7 +279,7 @@ public class RemoteContextTests {
 	}
 
 	private RoboContext buildReceiverSystemStringConsumer() throws RoboBuilderException, ConfigurationException {
-		RoboBuilder builder = new RoboBuilder(RoboSystemUtil.getInputStreamByResourceName("testRemoteReceiver.xml"));
+		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteReceiver.xml"));
 		Configuration configuration = new ConfigurationBuilder().addInteger("totalNumberMessages", 1).build();
 		StringConsumer stringConsumer = new StringConsumer(builder.getContext(), UNIT_STRING_CONSUMER);
 		stringConsumer.initialize(configuration);

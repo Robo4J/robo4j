@@ -27,7 +27,7 @@ import com.robo4j.net.RoboContextDescriptor;
 import com.robo4j.scheduler.DefaultScheduler;
 import com.robo4j.scheduler.RoboThreadFactory;
 import com.robo4j.scheduler.Scheduler;
-import com.robo4j.util.RoboSystemUtil;
+import com.robo4j.util.SystemUtil;
 
 import java.io.IOException;
 import java.io.ObjectStreamException;
@@ -532,7 +532,7 @@ final class RoboSystem implements RoboContext {
 				if (uri != null) {
 					return uri;
 				}
-				RoboSystemUtil.sleep(100);
+				SystemUtil.sleep(100);
 			}
 		}
 		return null;

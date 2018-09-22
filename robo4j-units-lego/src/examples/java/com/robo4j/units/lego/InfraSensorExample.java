@@ -21,7 +21,7 @@ import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.hw.lego.util.EscapeButtonUtil;
-import com.robo4j.util.RoboSystemUtil;
+import com.robo4j.util.SystemUtil;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -50,7 +50,7 @@ public class InfraSensorExample {
 		builder.add(settings);
 		RoboContext system = builder.build();
 		System.out.println("State before start:");
-		System.out.println(RoboSystemUtil.printStateReport(system));
+		System.out.println(SystemUtil.printStateReport(system));
 
 		system.start();
 

@@ -39,7 +39,7 @@ import com.robo4j.socket.http.units.test.HttpCommandTestController;
 import com.robo4j.socket.http.units.test.SocketMessageDecoratedProducerUnit;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
-import com.robo4j.util.RoboSystemUtil;
+import com.robo4j.util.SystemUtil;
 
 /**
  * Ping Pong test from outside/foreign unit is send signal. The signal has been
@@ -73,7 +73,7 @@ public class RoboHttpPingPongTest {
 		RoboContext system = configurePongSystem(0);
 		system.start();
 		System.out.println("systemPong: State after start:");
-		System.out.println(RoboSystemUtil.printStateReport(system));
+		System.out.println(SystemUtil.printStateReport(system));
 		System.out.println("Press Key...");
 		System.in.read();
 		system.shutdown();
@@ -88,11 +88,11 @@ public class RoboHttpPingPongTest {
 
 		systemPong.start();
 		System.out.println("systemPong: State after start:");
-		System.out.println(RoboSystemUtil.printStateReport(systemPong));
+		System.out.println(SystemUtil.printStateReport(systemPong));
 
 		systemPing.start();
 		System.out.println("systemPing: State after start:");
-		System.out.println(RoboSystemUtil.printStateReport(systemPing));
+		System.out.println(SystemUtil.printStateReport(systemPing));
 
 		System.out.println("systemPing: send messages");
 		RoboReference<Object> decoratedProducer = systemPing.getReference(DECORATED_PRODUCER);

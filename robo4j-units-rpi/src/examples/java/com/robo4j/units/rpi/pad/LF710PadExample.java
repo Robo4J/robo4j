@@ -23,7 +23,7 @@ import java.io.InputStream;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
-import com.robo4j.util.RoboSystemUtil;
+import com.robo4j.util.SystemUtil;
 
 /**
  * Logitech F710 Pad Example
@@ -44,11 +44,11 @@ public class LF710PadExample {
 		RoboContext ctx = builder.build();
 
 		System.out.println("State before start:");
-		System.out.println(RoboSystemUtil.printStateReport(ctx));
+		System.out.println(SystemUtil.printStateReport(ctx));
 		ctx.start();
 
 		System.out.println("State after start:");
-		System.out.println(RoboSystemUtil.printStateReport(ctx));
+		System.out.println(SystemUtil.printStateReport(ctx));
 
 		System.out.println("Press enter to quit!");
 		System.in.read();
