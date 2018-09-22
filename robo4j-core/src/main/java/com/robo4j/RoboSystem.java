@@ -59,9 +59,37 @@ import com.robo4j.util.SystemUtil;
  * @author Miroslav Wengner (@miragemiko)
  */
 final class RoboSystem implements RoboContext {
+	/**
+	 * Configuration key for the maximum thread size for the scheduler thread
+	 * pool.
+	 */
 	public static final String KEY_SCHEDULER_POOL_SIZE = "poolSizeScheduler";
+
+	/**
+	 * Configuration key for the maximum thread size for the worker thread pool.
+	 */
 	public static final String KEY_WORKER_POOL_SIZE = "poolSizeWorker";
+
+	/**
+	 * Configuration key for the maximum thread size for the worker thread pool.
+	 */
 	public static final String KEY_BLOCKING_POOL_SIZE = "poolSizeBlocking";
+
+	/**
+	 * Configuration key for the child configuration for the message server.
+	 */
+	public static final String KEY_CONFIGURATION_SERVER = "com.robo4j.messageServer";
+
+	/**
+	 * Configuration key for the child configuration for the auto discovery.
+	 */
+	public static final String KEY_CONFIGURATION_EMITTER = "com.robo4j.discovery";
+
+	/**
+	 * Configuration key for the auto discovery metadata service.
+	 */
+	public static final String KEY_CONFIGURATION_EMITTER_METADATA = "com.robo4j.discovery.metadata";
+
 	private static final String NAME_BLOCKING_POOL = "Robo4J Blocking Pool";
 	private static final String NAME_WORKER_POOL = "Robo4J Worker Pool";
 
@@ -71,9 +99,6 @@ final class RoboSystem implements RoboContext {
 	private static final int KEEP_ALIVE_TIME = 10;
 	private static final EnumSet<LifecycleState> MESSAGE_DELIVERY_CRITERIA = EnumSet.of(LifecycleState.STARTED, LifecycleState.STOPPED,
 			LifecycleState.STOPPING);
-	private static final String KEY_CONFIGURATION_SERVER = "com.robo4j.messageServer";
-	private static final String KEY_CONFIGURATION_EMITTER = "com.robo4j.discovery";
-	private static final String KEY_CONFIGURATION_EMITTER_METADATA = "com.robo4j.discovery.metadata";
 
 	private final AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
 	private final Map<String, RoboUnit<?>> units = new HashMap<>();
