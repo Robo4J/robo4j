@@ -29,6 +29,12 @@ subprojects {
 
     group 'com.robo4j'
     version "${robo4jVersion}"
+
+    tasks.withType(Test){
+        testLogging {
+            events "started", "passed", "skipped", "failed"
+        }
+    }
 }
 
 
