@@ -79,8 +79,7 @@ public class RemoteContextTests {
 		receiverCtx.start();
 
 		// Note that all this cludging about with local lookup service
-		// implementations
-		// etc would normally not be needed.
+		// implementations etc would normally not be needed.
 		// This is just to isolate this test from other tests.
 		final LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();
 		final LookupService service = LookupServiceTests.getLookupService(localLookup);
@@ -159,14 +158,11 @@ public class RemoteContextTests {
 	@Test
 	@SuppressWarnings("unchecked")
 	public void testMessageToDiscoveredContextAndReferenceToDiscoveredContext() throws Exception {
-
-		// consumer system
 		RoboContext receiverSystem = buildReceiverSystem();
 		RoboReference<TestMessageType> ackConsumer = receiverSystem.getReference(ACK_CONSUMER);
 
 		// Note that all this cludging about with local lookup service
-		// implementations
-		// etc would normally not be needed.
+		// implementations etc would normally not be needed.
 		// This is just to isolate this test from other tests.
 		final LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();
 		final LookupService service = LookupServiceTests.getLookupService(localLookup);
@@ -200,13 +196,11 @@ public class RemoteContextTests {
 		producerCountDownLatch.await();
 		Integer producerAcknowledge = remoteTestMessageProducer.getAttribute(RemoteTestMessageProducer.DESCRIPTOR_ACKNOWLEDGE).get();
 		Assert.assertTrue(producerAcknowledge > 0);
-
 	}
 
 	@Ignore
 	@Test
 	public void startRemoteReceiver() throws Exception {
-		// consumer system
 		buildReceiverSystemStringConsumer();
 
 		final LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();
@@ -221,8 +215,7 @@ public class RemoteContextTests {
 	@Test
 	public void startRemoteSender() throws Exception {
 		// Note that all this cludging about with local lookup service
-		// implementations
-		// etc would normally not be needed.
+		// implementations etc would normally not be needed.
 		// This is just to isolate this test from other tests.
 		final LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();
 		final LookupService service = LookupServiceTests.getLookupService(localLookup);
@@ -266,6 +259,11 @@ public class RemoteContextTests {
 		return builder.build();
 	}
 
+	/*
+	 * Builds a system ready to receive TestMessageType messages, which contains
+	 * a reference to which the String message "acknowledge" will be sent when a
+	 * message is received.
+	 */
 	private RoboContext buildReceiverSystem() throws RoboBuilderException, ConfigurationException {
 		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteReceiver.xml"));
 		Configuration configuration = new ConfigurationBuilder().addInteger("totalNumberMessages", 1).build();
@@ -278,6 +276,9 @@ public class RemoteContextTests {
 		return receiverSystem;
 	}
 
+	/*
+	 * Builds a system ready to receive strings.
+	 */
 	private RoboContext buildReceiverSystemStringConsumer() throws RoboBuilderException, ConfigurationException {
 		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteReceiver.xml"));
 		Configuration configuration = new ConfigurationBuilder().addInteger("totalNumberMessages", 1).build();
