@@ -171,12 +171,12 @@ public class RemoteContextTests {
 		service.start();
 
 		// context has been discovered
-		RoboContextDescriptor descriptor = getRoboContextDescriptor(service, CONTEXT_ID_REMOTE_RECEIVER);
+		RoboContextDescriptor contextDescriptor = getRoboContextDescriptor(service, CONTEXT_ID_REMOTE_RECEIVER);
 		Assert.assertTrue(service.getDiscoveredContexts().size() > 0);
-		Assert.assertNotNull(descriptor);
+		Assert.assertNotNull(contextDescriptor);
 
 		// build the producer system
-		RoboContext producerEmitterSystem = buildEmitterSystem(TestMessageType.class, ACK_CONSUMER);
+		RoboContext producerEmitterSystem = buildEmitterSystem(TestMessageType.class, ACK_CONSUMER, REMOTE_UNIT_EMITTER);
 		localLookup.addContext(producerEmitterSystem);
 		producerEmitterSystem.start();
 
@@ -228,7 +228,7 @@ public class RemoteContextTests {
 		Assert.assertNotNull(descriptor);
 
 		// build the producer system
-		RoboContext producerEmitterSystem = buildEmitterSystem(String.class, UNIT_STRING_CONSUMER);
+		RoboContext producerEmitterSystem = buildEmitterSystem(String.class, UNIT_STRING_CONSUMER, REMOTE_UNIT_EMITTER);
 		localLookup.addContext(producerEmitterSystem);
 
 		producerEmitterSystem.start();
@@ -241,17 +241,17 @@ public class RemoteContextTests {
 		System.in.read();
 	}
 
-	private <T> RoboContext buildEmitterSystem(Class<T> clazz, String target) throws Exception {
+	private <T> RoboContext buildEmitterSystem(Class<T> clazz, String target, String unitName) throws Exception {
 		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testMessageEmitterSystem_8.xml"));
 
 		if (clazz.equals(String.class)) {
 			StringProducerRemote<T> remoteTestMessageProducer = new StringProducerRemote<>(clazz, builder.getContext(),
-					REMOTE_UNIT_EMITTER);
+					unitName);
 			remoteTestMessageProducer.initialize(getEmitterConfiguration(REMOTE_CONTEXT_RECEIVER, target));
 			builder.add(remoteTestMessageProducer);
 		}
 		if (clazz.equals(TestMessageType.class)) {
-			RemoteTestMessageProducer remoteTestMessageProducer = new RemoteTestMessageProducer(builder.getContext(), REMOTE_UNIT_EMITTER);
+			RemoteTestMessageProducer remoteTestMessageProducer = new RemoteTestMessageProducer(builder.getContext(), unitName);
 			remoteTestMessageProducer.initialize(getEmitterConfiguration(REMOTE_CONTEXT_RECEIVER, target));
 			builder.add(remoteTestMessageProducer);
 		}
@@ -265,7 +265,7 @@ public class RemoteContextTests {
 	 */
 	private RoboContext buildReceiverSystem(String name) throws RoboBuilderException, ConfigurationException {
 		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRemoteReceiver.xml"));
-		Configuration configuration = new ConfigurationBuilder().addInteger("totalNumberMessages", 1).build();
+		Configuration configuration = new ConfigurationBuilder().addInteger(AckingStringConsumer.ATTR_TOTAL_NUMBER_MESSAGES, 1).build();
 		builder.add(AckingStringConsumer.class, configuration, name);
 		RoboContext receiverSystem = builder.build();
 		receiverSystem.start();

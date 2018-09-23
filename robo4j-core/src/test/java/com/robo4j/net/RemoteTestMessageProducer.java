@@ -34,13 +34,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class RemoteTestMessageProducer extends RoboUnit<String> {
 
-    public static final String PROP_COUNT_DOWN_LATCH = "countDownLatch";
+    public static final String ATTR_TOTAL_MESSAGES = "getNumberOfSentMessages";
+    public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
     public static final String PROP_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
-    public static final String PROP_ACKNOWLEDGE = "acknowledge";
+    public static final String ATTR_ACKNOWLEDGE = "acknowledge";
     public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
-            .create(CountDownLatch.class, PROP_COUNT_DOWN_LATCH);
+            .create(CountDownLatch.class, ATTR_COUNT_DOWN_LATCH);
     public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_ACKNOWLEDGE = DefaultAttributeDescriptor
-            .create(Integer.class, PROP_ACKNOWLEDGE);
+            .create(Integer.class, ATTR_ACKNOWLEDGE);
     /* default sent messages */
     private static final int DEFAULT = 0;
     private AtomicInteger totalCounter;
@@ -90,7 +91,7 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
                 case "sendMessage":
                     sendRandomMessage();
                     break;
-                case PROP_ACKNOWLEDGE:
+                case ATTR_ACKNOWLEDGE:
                 	ackCounter.incrementAndGet();
                 	break;
                 default:
@@ -102,14 +103,14 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-        if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
+        if (attribute.getAttributeName().equals(ATTR_TOTAL_MESSAGES) && attribute.getAttributeType() == Integer.class) {
             return (R) (Integer) totalCounter.get();
         }
-        if (attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH)
+        if (attribute.getAttributeName().equals(ATTR_COUNT_DOWN_LATCH)
                 && attribute.getAttributeType() == CountDownLatch.class) {
             return (R) countDownLatch;
         }
-        if (attribute.getAttributeName().equals(PROP_ACKNOWLEDGE) && attribute.getAttributeType() == Integer.class){
+        if (attribute.getAttributeName().equals(ATTR_ACKNOWLEDGE) && attribute.getAttributeType() == Integer.class){
             return (R) Integer.valueOf(ackCounter.get());
         }
         return null;

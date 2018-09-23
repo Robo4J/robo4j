@@ -37,18 +37,20 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class AckingStringConsumer extends RoboUnit<TestMessageType> {
 	private static final int DEFAULT = 0;
-	public static final String PROP_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
-	public static final String PROP_GET_RECEIVED_MESSAGES = "getReceivedMessages";
-	public static final String PROP_COUNT_DOWN_LATCH = "countDownLatch";
-	public static final String PROP_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
+	public static final String ATTR_TOTAL_RECEIVED_MESSAGES = "getNumberOfReceived";
+	public static final String ATTR_RECEIVED_MESSAGES = "getReceivedMessages";
+	public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
+	public static final String ATTR_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
 	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
-			.create(CountDownLatch.class, PROP_COUNT_DOWN_LATCH);
+			.create(CountDownLatch.class, ATTR_COUNT_DOWN_LATCH);
 	@SuppressWarnings("rawtypes")
 	public static final DefaultAttributeDescriptor<List> DESCRIPTOR_MESSAGES = DefaultAttributeDescriptor
-			.create(List.class, PROP_GET_RECEIVED_MESSAGES);
-	private AtomicInteger counter;
-	private List<TestMessageType> receivedMessages = Collections.synchronizedList(new ArrayList<>());
+			.create(List.class, ATTR_RECEIVED_MESSAGES);
+	public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_TOTAL_RECEIVED_MESSAGES = DefaultAttributeDescriptor
+			.create(Integer.class, ATTR_TOTAL_RECEIVED_MESSAGES);
+	private volatile AtomicInteger counter;
 	private CountDownLatch countDownLatch;
+	private List<TestMessageType> receivedMessages = Collections.synchronizedList(new ArrayList<>());
 
 	/**
 	 * @param context
@@ -65,7 +67,6 @@ public class AckingStringConsumer extends RoboUnit<TestMessageType> {
 
 	@Override
 	public void onMessage(TestMessageType message) {
-		System.out.println(getClass().getSimpleName() + " onMessage: " + message);
 		counter.incrementAndGet();
 		receivedMessages.add(message);
 		RoboReference<String> ackRef = message.getReference();
@@ -77,7 +78,7 @@ public class AckingStringConsumer extends RoboUnit<TestMessageType> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		int totalNumber = configuration.getInteger(PROP_TOTAL_NUMBER_MESSAGES, 0);
+		int totalNumber = configuration.getInteger(ATTR_TOTAL_NUMBER_MESSAGES, 0);
 		if (totalNumber > 0) {
 			countDownLatch = new CountDownLatch(totalNumber);
 		}
@@ -86,13 +87,13 @@ public class AckingStringConsumer extends RoboUnit<TestMessageType> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals(PROP_GET_NUMBER_OF_SENT_MESSAGES) && attribute.getAttributeType() == Integer.class) {
+		if (attribute.getAttributeName().equals(ATTR_TOTAL_RECEIVED_MESSAGES) && attribute.getAttributeType() == Integer.class) {
 			return (R) (Integer) counter.get();
 		}
-		if (attribute.getAttributeName().equals(PROP_GET_RECEIVED_MESSAGES) && attribute.getAttributeType() == List.class) {
+		if (attribute.getAttributeName().equals(ATTR_RECEIVED_MESSAGES) && attribute.getAttributeType() == List.class) {
 			return (R) receivedMessages;
 		}
-		if (attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH)
+		if (attribute.getAttributeName().equals(ATTR_COUNT_DOWN_LATCH)
 				&& attribute.getAttributeType() == CountDownLatch.class) {
 			return (R) countDownLatch;
 		}
