@@ -20,7 +20,7 @@ The following will build all components:
 ```bash
 ./gradlew jar
 ```
-The individual bundles will be available under robo4j/<component>/build/libs.
+The individual bundles will be available under robo4j/&lt;component&gt;/build/libs.
 To install the bundles and make them available to downstream dependencies, run the following:
 
 ```bash
