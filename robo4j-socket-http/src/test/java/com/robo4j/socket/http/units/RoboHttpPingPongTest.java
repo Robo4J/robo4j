@@ -17,18 +17,6 @@
 
 package com.robo4j.socket.http.units;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
-import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
-import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_TARGET;
-import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
@@ -40,6 +28,17 @@ import com.robo4j.socket.http.units.test.SocketMessageDecoratedProducerUnit;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
 import com.robo4j.util.SystemUtil;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_TARGET;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
 
 /**
  * Ping Pong test from outside/foreign unit is send signal. The signal has been
@@ -56,7 +55,7 @@ import com.robo4j.util.SystemUtil;
 public class RoboHttpPingPongTest {
 
 	public static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
-	public static final String HOST_SYSTEM = "0.0.0.0";
+	public static final String HOST_SYSTEM = "localhost";
 	private static final int TIMEOUT = 10;
 	private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
 	private static final String ID_HTTP_CLIENT = "http_client";

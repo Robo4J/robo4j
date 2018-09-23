@@ -79,7 +79,7 @@ public class ByteBufferTests {
     public void byteBufferFromRequestTest() {
 
         String bodyMessage = "this is test message";
-        String host = "0.0.0.0";
+        String host = "localhost";
         String clientPath = "/test";
 
         HttpDenominator denominator = new HttpRequestDenominator(HttpMethod.POST, clientPath, HttpVersion.HTTP_1_1);
