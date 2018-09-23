@@ -43,11 +43,11 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
             .create(Integer.class, PROP_ACKNOWLEDGE);
     /* default sent messages */
     private static final int DEFAULT = 0;
-    private AtomicInteger totalCounter;
-    private AtomicInteger ackCounter;
+    private volatile AtomicInteger totalCounter;
+    private volatile AtomicInteger ackCounter;
+    private volatile CountDownLatch countDownLatch;
     private String target;
-	private String targetContext;
-	private CountDownLatch countDownLatch;
+    private String targetContext;
 
     /**
      * @param context
