@@ -18,6 +18,7 @@ package com.robo4j;
 
 import com.robo4j.configuration.Configuration;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -25,8 +26,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class StringProducer extends RoboUnit<String> {
+
+    public static final String ATTR_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
+    public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
+    public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_TOTAL_MESSAGES = DefaultAttributeDescriptor
+            .create(Integer.class, ATTR_GET_NUMBER_OF_SENT_MESSAGES);
+    public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
+            .create(CountDownLatch.class, ATTR_COUNT_DOWN_LATCH);
     /* default sent messages */
     private static final int DEFAULT = 0;
+    public static final String PROPERTY_SEND_RANDOM_MESSAGE = "sendRandomMessage";
     private AtomicInteger counter;
     private String target;
 
@@ -57,7 +66,7 @@ public class StringProducer extends RoboUnit<String> {
             String[] input = message.split("::");
             String messageType = input[0];
             switch (messageType) {
-                case "sendRandomMessage":
+                case PROPERTY_SEND_RANDOM_MESSAGE:
                     sendRandomMessage();
                     break;
                 default:
@@ -70,7 +79,7 @@ public class StringProducer extends RoboUnit<String> {
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-        if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
+        if (attribute.getAttributeName().equals(ATTR_GET_NUMBER_OF_SENT_MESSAGES) && attribute.getAttributeType() == Integer.class) {
             return (R) (Integer) counter.get();
         }
         return null;
