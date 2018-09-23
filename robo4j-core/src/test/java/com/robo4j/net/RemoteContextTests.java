@@ -193,6 +193,8 @@ public class RemoteContextTests {
 		CountDownLatch producerCountDownLatch = remoteTestMessageProducer
 				.getAttribute(RemoteTestMessageProducer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
 		producerCountDownLatch.await();
+		CountDownLatch producerAckLatch = remoteTestMessageProducer.getAttribute(RemoteTestMessageProducer.DESCRIPTOR_ACK_LATCH).get();
+		producerAckLatch.await();
 		Integer producerAcknowledge = remoteTestMessageProducer.getAttribute(RemoteTestMessageProducer.DESCRIPTOR_ACKNOWLEDGE).get();
 		Assert.assertTrue(producerAcknowledge > 0);
 	}
