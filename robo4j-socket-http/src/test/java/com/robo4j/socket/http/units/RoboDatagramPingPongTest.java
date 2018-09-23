@@ -29,8 +29,8 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONF
  */
 public class RoboDatagramPingPongTest {
 
-	private static final int TIMEOUT = 10;
-	private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
+	private static final int TIMEOUT = 20;
+	private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
 	private static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
 	private static final String UDP_CLIENT = "udp_client";
 	private static final String UDP_SERVER = "udp_server";
