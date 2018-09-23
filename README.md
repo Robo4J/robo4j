@@ -15,13 +15,13 @@ See current [Robo4j documentation][].
 ## Building from Source
 The Robo4j framework uses [Gradle][] for building.
 
-The following will build all projects:
+The following will build all components:
 
 ```bash
 ./gradlew jar
 ```
-The individual bundles will be available under robo4j/<project>/build/libs.
-To install the build bundles and make them available to downstream dependencies, run the following:
+The individual bundles will be available under robo4j/<component>/build/libs.
+To install the bundles and make them available to downstream dependencies, run the following:
 
 ```bash
 ./gradlew install
