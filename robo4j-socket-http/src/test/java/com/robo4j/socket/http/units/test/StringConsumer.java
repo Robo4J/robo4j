@@ -50,7 +50,7 @@ public class StringConsumer extends RoboUnit<String> {
 			.create(List.class, PROP_GET_RECEIVED_MESSAGES);
 
 	private static final int DEFAULT = 0;
-	private AtomicInteger counter;
+	private volatile AtomicInteger counter;
 	private List<String> receivedMessages = new ArrayList<>();
 	private CountDownLatch countDownLatch;
 

@@ -2,7 +2,7 @@
     <roboUnit id="httpClient">
         <class>com.robo4j.socket.http.units.HttpClientUnit</class>
         <config name="com.robo4j.root">
-            <value name="host" type="String">localhost</value>
+            <value name="host" type="String">0.0.0.0</value>
             <value name="port" type="int">9050</value>
         </config>
     </roboUnit>
@@ -16,7 +16,7 @@
     <roboUnit id="stringConsumer">
         <class>com.robo4j.socket.http.units.test.StringConsumer</class>
         <config name="com.robo4j.root">
-            <value name="totalNumberMessages" type="int">100</value>
+            <value name="totalNumberMessages" type="int">20</value>
         </config>
     </roboUnit>
 </robo4j>

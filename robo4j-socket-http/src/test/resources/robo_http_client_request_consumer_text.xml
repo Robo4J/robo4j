@@ -10,7 +10,7 @@
     <roboUnit id="stringConsumer">
         <class>com.robo4j.socket.http.units.test.StringConsumer</class>
         <config name="com.robo4j.root">
-            <value name="totalNumberMessages" type="int">100</value>
+            <value name="totalNumberMessages" type="int">20</value>
         </config>
     </roboUnit>
 </robo4j>

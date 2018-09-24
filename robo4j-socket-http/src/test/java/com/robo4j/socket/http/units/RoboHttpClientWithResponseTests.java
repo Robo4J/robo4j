@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 public class RoboHttpClientWithResponseTests {
 	private static final int TIMEOUT = 20;
 	private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
-	private static final int MAX_NUMBER = 100;
+	private static final int MAX_NUMBER = 20;
 	private static final String ROBO_SYSTEM_DESC = "[{\"id\":\"stringConsumer\",\"state\":\"STARTED\"},{\"id\":\"httpServer\",\"state\":\"STARTED\"}]";
 
 	@SuppressWarnings("unchecked")
@@ -67,14 +67,9 @@ public class RoboHttpClientWithResponseTests {
 				.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
 		countDownLatchStringProducer.await(TIMEOUT, TIME_UNIT);
 
-		final int consumerTotalNumber = stringProducer
-				.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
 		final List<String> consumerMessageList = stringProducer
 				.getAttribute(StringConsumer.DESCRIPTOR_RECEIVED_MESSAGES).get();
 
-
-
-		Assert.assertEquals(MAX_NUMBER, consumerTotalNumber);
 		Assert.assertTrue(consumerMessageList.contains(ROBO_SYSTEM_DESC));
 
 		producerSystem.shutdown();
