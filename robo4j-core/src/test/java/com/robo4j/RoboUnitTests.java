@@ -32,21 +32,23 @@ public class RoboUnitTests {
 
 	@Test
 	public void testSystem() throws Exception {
+		int totalMessages = 10;
 		RoboSystem system = new RoboSystem();
 		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
 		StringProducer producer = new StringProducer(system, "producer");
-		Configuration config = new ConfigurationBuilder().addString("target", "consumer").build();
+		Configuration config = new ConfigurationBuilder().addString(StringProducer.PROP_TARGET, "consumer")
+				.addInteger(StringProducer.PROP_TOTAL_MESSAGES, totalMessages).build();
 		producer.initialize(config);
 		StringConsumer consumer = new StringConsumer(system, "consumer");
 		system.addUnits(producer, consumer);
 		system.start();
 		Assert.assertEquals(system.getState(), LifecycleState.STARTED);
 		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < totalMessages; i++) {
 			producer.sendRandomMessage();
 		}
 		system.shutdown();
-		Assert.assertEquals(10, consumer.getReceivedMessages().size());
+		Assert.assertEquals(totalMessages, consumer.getReceivedMessages().size());
 	}
 
 	@Test

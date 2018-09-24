@@ -34,7 +34,7 @@ public class StringConsumer extends RoboUnit<String> {
 	public static final String ATTR_TOTAL_SENT_MESSAGES = "getNumberOfSentMessages";
 	public static final String ATTR_GET_RECEIVED_MESSAGES = "getReceivedMessages";
 	public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
-	public static final String ATTR_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
+	public static final String PROP_TOTAL_MESSAGES = "totalNumberMessages";
 	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
 			.create(CountDownLatch.class, ATTR_COUNT_DOWN_LATCH);
 	public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_TOTAL_MESSAGES = DefaultAttributeDescriptor
@@ -68,7 +68,7 @@ public class StringConsumer extends RoboUnit<String> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		int totalNumber = configuration.getInteger(ATTR_TOTAL_NUMBER_MESSAGES, 0);
+		int totalNumber = configuration.getInteger(PROP_TOTAL_MESSAGES, 0);
 		if (totalNumber > 0) {
 			countDownLatch = new CountDownLatch(totalNumber);
 		}

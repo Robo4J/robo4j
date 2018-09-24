@@ -36,8 +36,12 @@ public class StringProducer extends RoboUnit<String> {
     /* default sent messages */
     private static final int DEFAULT = 0;
     public static final String PROPERTY_SEND_RANDOM_MESSAGE = "sendRandomMessage";
+    public static final String PROP_TOTAL_MESSAGES = "totalMessages";
+    public static final String PROP_TARGET = "target";
+    private CountDownLatch latch;
     private AtomicInteger counter;
     private String target;
+
 
     /**
      * @param context
@@ -49,11 +53,16 @@ public class StringProducer extends RoboUnit<String> {
 
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
-        target = configuration.getString("target", null);
+        target = configuration.getString(PROP_TARGET, null);
         if (target == null) {
             throw ConfigurationException.createMissingConfigNameException("target");
         }
+        Integer totalMessages = configuration.getInteger(PROP_TOTAL_MESSAGES, null);
+        if(totalMessages == null){
+            throw ConfigurationException.createMissingConfigNameException(PROP_TOTAL_MESSAGES);
+        }
         counter = new AtomicInteger(DEFAULT);
+        latch = new CountDownLatch(totalMessages);
 
     }
 
@@ -68,6 +77,7 @@ public class StringProducer extends RoboUnit<String> {
             switch (messageType) {
                 case PROPERTY_SEND_RANDOM_MESSAGE:
                     sendRandomMessage();
+                    latch.countDown();
                     break;
                 default:
                     System.out.println("don't understand message: " + message);
@@ -81,6 +91,9 @@ public class StringProducer extends RoboUnit<String> {
     public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
         if (attribute.getAttributeName().equals(ATTR_GET_NUMBER_OF_SENT_MESSAGES) && attribute.getAttributeType() == Integer.class) {
             return (R) (Integer) counter.get();
+        }
+        if(attribute.getAttributeName().equals(ATTR_COUNT_DOWN_LATCH) && attribute.getAttributeType() == CountDownLatch.class){
+            return (R) latch;
         }
         return null;
     }

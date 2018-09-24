@@ -4,6 +4,7 @@
 		<class>com.robo4j.StringProducer</class>
 		<config name="com.robo4j.root">
 			<value name="target" type="String">consumer</value>
+			<value name="totalMessages" type="int">10</value>
 		</config>
 	</roboUnit>
 
