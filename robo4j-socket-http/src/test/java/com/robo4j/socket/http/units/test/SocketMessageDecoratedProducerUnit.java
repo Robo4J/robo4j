@@ -19,6 +19,7 @@ package com.robo4j.socket.http.units.test;
 
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.ConfigurationException;
+import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
@@ -40,8 +41,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import static com.robo4j.socket.http.units.test.StringConsumer.PROP_COUNT_DOWN_LATCH;
-import static com.robo4j.socket.http.units.test.StringConsumer.PROP_GET_NUMBER_OF_SENT_MESSAGES;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_TARGET;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
 
@@ -52,9 +51,14 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONF
  * @author Miro Wengner (@miragemiko)
  */
 public class SocketMessageDecoratedProducerUnit extends RoboUnit<Integer> {
-	private static final int DEFAULT = 0;
-	public static final String PROPERTY_COMMUNICATION_TYPE = "communicationType";
 
+	public static final String PROP_COMMUNICATION_TYPE = "communicationType";
+	public static final String ATTR_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
+	public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
+	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
+			.create(CountDownLatch.class, ATTR_COUNT_DOWN_LATCH);
+
+	private static final int DEFAULT = 0;
 	private final ClientContext clientContext = new ClientContext();
 	private AtomicInteger counter;
 	private String target;
@@ -75,7 +79,7 @@ public class SocketMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 				configuration.getString(PROPERTY_UNIT_PATHS_CONFIG, null));
 		HttpPathUtils.updateHttpClientContextPaths(clientContext, paths);
 		counter = new AtomicInteger(DEFAULT);
-		type = CommunicationType.valueOf(configuration.getString(PROPERTY_COMMUNICATION_TYPE, CommunicationType.HTTP.toString()).toUpperCase());
+		type = CommunicationType.valueOf(configuration.getString(PROP_COMMUNICATION_TYPE, CommunicationType.HTTP.toString()).toUpperCase());
 	}
 
 	/**
@@ -133,11 +137,11 @@ public class SocketMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals(PROP_GET_NUMBER_OF_SENT_MESSAGES)
+		if (attribute.getAttributeName().equals(ATTR_GET_NUMBER_OF_SENT_MESSAGES)
 				&& attribute.getAttributeType() == Integer.class) {
 			return (R) (Integer) counter.get();
 		}
-		if (attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH)
+		if (attribute.getAttributeName().equals(ATTR_COUNT_DOWN_LATCH)
 				&& attribute.getAttributeType() == CountDownLatch.class) {
 			return (R) countDownLatch;
 		}

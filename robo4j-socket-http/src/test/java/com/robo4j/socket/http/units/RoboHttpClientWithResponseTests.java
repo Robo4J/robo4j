@@ -19,6 +19,7 @@ package com.robo4j.socket.http.units;
 
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
+import com.robo4j.socket.http.units.test.SocketMessageDecoratedProducerUnit;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
@@ -35,8 +36,8 @@ import java.util.concurrent.TimeUnit;
  * @author Miro Wengner (@miragemiko)
  */
 public class RoboHttpClientWithResponseTests {
-	private static final int TIMEOUT = 10;
-	private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
+	private static final int TIMEOUT = 20;
+	private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
 	private static final int MAX_NUMBER = 100;
 	private static final String ROBO_SYSTEM_DESC = "[{\"id\":\"stringConsumer\",\"state\":\"STARTED\"},{\"id\":\"httpServer\",\"state\":\"STARTED\"}]";
 
@@ -58,6 +59,8 @@ public class RoboHttpClientWithResponseTests {
 
 		RoboReference<Integer> decoratedProducer = producerSystem.getReference("decoratedProducer");
 		decoratedProducer.sendMessage(MAX_NUMBER);
+		CountDownLatch latch = decoratedProducer.getAttribute(SocketMessageDecoratedProducerUnit.DESCRIPTOR_COUNT_DOWN_LATCH).get();
+		latch.await(TIMEOUT, TIME_UNIT);
 
 		RoboReference<String> stringConsumerProducer = producerSystem.getReference(StringConsumer.NAME);
 		CountDownLatch countDownLatchStringProducer = stringConsumerProducer
