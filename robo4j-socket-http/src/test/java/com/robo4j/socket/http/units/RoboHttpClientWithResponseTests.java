@@ -62,20 +62,23 @@ public class RoboHttpClientWithResponseTests {
 		CountDownLatch latch = decoratedProducer.getAttribute(SocketMessageDecoratedProducerUnit.DESCRIPTOR_COUNT_DOWN_LATCH).get();
 		latch.await(TIMEOUT, TIME_UNIT);
 
-		RoboReference<String> stringConsumerProducer = producerSystem.getReference(StringConsumer.NAME);
-		CountDownLatch countDownLatchStringProducer = stringConsumerProducer
+		RoboReference<String> stringProducer = producerSystem.getReference(StringConsumer.NAME);
+		CountDownLatch countDownLatchStringProducer = stringProducer
 				.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
-
 		countDownLatchStringProducer.await(TIMEOUT, TIME_UNIT);
-		final int consumerTotalNumber = stringConsumerProducer
+
+		final int consumerTotalNumber = stringProducer
 				.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
-		List<String> consumerMessageList = stringConsumerProducer
+		final List<String> consumerMessageList = stringProducer
 				.getAttribute(StringConsumer.DESCRIPTOR_RECEIVED_MESSAGES).get();
-		producerSystem.shutdown();
-		consumerSystem.shutdown();
+
+
 
 		Assert.assertEquals(MAX_NUMBER, consumerTotalNumber);
 		Assert.assertTrue(consumerMessageList.contains(ROBO_SYSTEM_DESC));
+
+		producerSystem.shutdown();
+		consumerSystem.shutdown();
 	}
 
 }
