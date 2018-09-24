@@ -24,7 +24,6 @@ import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,7 +51,7 @@ public class StringConsumer extends RoboUnit<String> {
 
 	private static final int DEFAULT = 0;
 	private volatile AtomicInteger counter;
-	private List<String> receivedMessages = Collections.synchronizedList(new ArrayList<>());
+	private List<String> receivedMessages = new ArrayList<>();
 	private CountDownLatch countDownLatch;
 
 	/**
