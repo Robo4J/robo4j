@@ -42,8 +42,8 @@ public class RoboDatagramClientTest {
 	@Test
 	public void datagramClientServerTest() throws Exception {
 
-		RoboContext producerSystem = RoboContextUtils.loadSimpleByXml("robo_datagram_client_request_producer_text.xml");
-		RoboContext consumerSystem = RoboContextUtils.loadSimpleByXml("robo_datagram_client_request_consumer_text.xml");
+		RoboContext producerSystem = RoboContextUtils.loadRoboContextByXml("robo_datagram_client_request_producer_text.xml");
+		RoboContext consumerSystem = RoboContextUtils.loadRoboContextByXml("robo_datagram_client_request_consumer_text.xml");
 
 		consumerSystem.start();
 		producerSystem.start();

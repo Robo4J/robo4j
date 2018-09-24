@@ -122,7 +122,7 @@ public class RoboBuilderTests {
 		for (int i = 0; i < MESSAGES; i++) {
 			producer.sendMessage("sendRandomMessage");
 		}
-		Assert.assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
+		Assert.assertEquals(MESSAGES, (int) producer.getAttribute(StringProducer.DESCRIPTOR_TOTAL_MESSAGES).get());
 
 		RoboReference<String> consumer = system.getReference("consumer");
 		Assert.assertNotNull(consumer);
@@ -132,10 +132,9 @@ public class RoboBuilderTests {
 				TimeUnit.MINUTES);
 		countDownLatchConsumer.await(TIMEOUT, TimeUnit.MINUTES);
 
-		synchronized (consumer.getAttribute(descriptor)) {
-			int receivedMessages = consumer.getAttribute(descriptor).get();
-			Assert.assertEquals(MESSAGES, receivedMessages);
-		}
+		int receivedMessages = consumer.getAttribute(StringConsumer.DESCRIPTOR_TOTAL_MESSAGES).get();
+		Assert.assertEquals(MESSAGES, receivedMessages);
+
 
 		system.stop();
 		system.shutdown();

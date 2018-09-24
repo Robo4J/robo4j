@@ -44,8 +44,8 @@ public class RoboHttpClientWithResponseTests {
 	@Test
 	public void simpleRoboSystemGetRequestTest() throws Exception {
 
-		RoboContext producerSystem = RoboContextUtils.loadSimpleByXml("robo_http_client_request_producer_text.xml");
-		RoboContext consumerSystem = RoboContextUtils.loadSimpleByXml("robo_http_client_request_consumer_text.xml");
+		RoboContext producerSystem = RoboContextUtils.loadRoboContextByXml("robo_http_client_request_producer_text.xml");
+		RoboContext consumerSystem = RoboContextUtils.loadRoboContextByXml("robo_http_client_request_consumer_text.xml");
 
 		consumerSystem.start();
 		producerSystem.start();

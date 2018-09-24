@@ -18,6 +18,7 @@
 package com.robo4j.socket.http.units;
 
 import com.robo4j.RoboBuilder;
+import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
 
 import java.io.InputStream;
@@ -31,12 +32,22 @@ import java.util.Objects;
  */
 public final class RoboContextUtils {
 
-	public static RoboContext loadSimpleByXml(String xmlFilename) throws Exception {
+	public static RoboContext loadRoboContextByXml(String xmlFilename) throws RoboBuilderException {
 		Objects.requireNonNull(xmlFilename, "not allowed");
-		RoboBuilder builderProducer = new RoboBuilder();
-		InputStream contextInputStream = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream(xmlFilename);
-		builderProducer.add(contextInputStream);
-		return builderProducer.build();
+		RoboBuilder builder = new RoboBuilder();
+		InputStream contextIS = RoboContextUtils.class.getClassLoader().getResourceAsStream(xmlFilename);
+		builder.add(contextIS);
+		return builder.build();
+	}
+
+	public static RoboContext loadRoboContextBySystemAndContextXml(String... xmlFilename) throws RoboBuilderException {
+		if (xmlFilename == null || xmlFilename.length == 0 || xmlFilename.length > 2) {
+			throw new IllegalArgumentException("usage: systemConf.xml contextConf.xml");
+		}
+		InputStream systemIS = RoboContextUtils.class.getClassLoader().getResourceAsStream(xmlFilename[0]);
+		InputStream contextIS = RoboContextUtils.class.getClassLoader().getResourceAsStream(xmlFilename[1]);
+		RoboBuilder builder = new RoboBuilder(systemIS);
+		builder.add(contextIS);
+		return builder.build();
 	}
 }
