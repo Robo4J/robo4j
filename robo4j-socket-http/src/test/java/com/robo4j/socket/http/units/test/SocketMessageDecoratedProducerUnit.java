@@ -55,15 +55,19 @@ public class SocketMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	public static final String PROP_COMMUNICATION_TYPE = "communicationType";
 	public static final String ATTR_TOTAL_SENT_MESSAGES = "getNumberOfSentMessages";
 	public static final String ATTR_MESSAGES_LATCH = "messagesLatch";
+	public static final String ATTR_SETUP_LATCH = "setupLatch";
 	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_MESSAGES_LATCH = DefaultAttributeDescriptor
 			.create(CountDownLatch.class, ATTR_MESSAGES_LATCH);
+	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_SETUP_LATCH = DefaultAttributeDescriptor
+			.create(CountDownLatch.class, ATTR_SETUP_LATCH);
 
 	private static final int DEFAULT = 0;
 	private final ClientContext clientContext = new ClientContext();
+	private volatile CountDownLatch setupLatch = new CountDownLatch(1);
+	private volatile CountDownLatch messagesLatch;
 	private AtomicInteger counter;
 	private String target;
 	private String message;
-	private CountDownLatch messagesLatch;
 	private CommunicationType type;
 
 	public SocketMessageDecoratedProducerUnit(RoboContext context, String id) {
@@ -91,6 +95,7 @@ public class SocketMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	@Override
 	public void onMessage(Integer number) {
 		messagesLatch = new CountDownLatch(number);
+		setupLatch.countDown();
 		clientContext.getPathConfigs().forEach(pathConfig -> {
 			IntStream.range(DEFAULT, number).forEach(i -> {
 				switch (type){
@@ -144,6 +149,10 @@ public class SocketMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 		if (attribute.getAttributeName().equals(ATTR_MESSAGES_LATCH)
 				&& attribute.getAttributeType() == CountDownLatch.class) {
 			return (R) messagesLatch;
+		}
+		if (attribute.getAttributeName().equals(ATTR_SETUP_LATCH)
+				&& attribute.getAttributeType() == CountDownLatch.class) {
+			return (R) setupLatch;
 		}
 		return null;
 	}

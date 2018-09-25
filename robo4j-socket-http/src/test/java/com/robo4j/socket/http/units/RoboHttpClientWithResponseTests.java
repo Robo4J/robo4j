@@ -58,7 +58,9 @@ public class RoboHttpClientWithResponseTests {
 		System.out.println(SystemUtil.printStateReport(producerSystem));
 
 		RoboReference<Integer> decoratedProducer = producerSystem.getReference("decoratedProducer");
+		CountDownLatch producerSetupLatch = decoratedProducer.getAttribute(SocketMessageDecoratedProducerUnit.DESCRIPTOR_SETUP_LATCH).get();
 		decoratedProducer.sendMessage(MAX_NUMBER);
+		producerSetupLatch.await(TIMEOUT, TIME_UNIT);
 		CountDownLatch producerLatch = decoratedProducer.getAttribute(SocketMessageDecoratedProducerUnit.DESCRIPTOR_MESSAGES_LATCH).get();
 		producerLatch.await(TIMEOUT, TIME_UNIT);
 
