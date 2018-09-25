@@ -24,6 +24,7 @@ import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,7 +40,7 @@ public class StringConsumer extends RoboUnit<String> {
 	public static final String NAME = "stringConsumer";
 	public static final String ATTR_MESSAGES_TOTAL = "getNumberOfSentMessages";
 	public static final String ATTR_RECEIVED_MESSAGES = "getReceivedMessages";
-	public static final String ATTR_MESSAGES_LATCH = "countDownLatch";
+	public static final String ATTR_MESSAGES_LATCH = "messagesLatch";
 	public static final String PROP_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
 
 	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_MESSAGES_LATCH = DefaultAttributeDescriptor
@@ -51,8 +52,8 @@ public class StringConsumer extends RoboUnit<String> {
 
 	private static final int DEFAULT = 0;
 	private volatile AtomicInteger counter;
-	private List<String> receivedMessages = new ArrayList<>();
-	private CountDownLatch countDownLatch;
+	private List<String> receivedMessages = Collections.synchronizedList(new ArrayList<>());
+	private CountDownLatch messagesLatch;
 
 	/**
 	 * @param context
@@ -67,17 +68,17 @@ public class StringConsumer extends RoboUnit<String> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		int totalNumber = configuration.getInteger(PROP_TOTAL_NUMBER_MESSAGES, 0);
 		if (totalNumber > 0) {
-			countDownLatch = new CountDownLatch(totalNumber);
+			messagesLatch = new CountDownLatch(totalNumber);
 		}
 	}
 
 	@Override
 	public void onMessage(String message) {
 		counter.incrementAndGet();
-		if (countDownLatch != null) {
-			countDownLatch.countDown();
-		}
 		receivedMessages.add(message);
+		if (messagesLatch != null) {
+			messagesLatch.countDown();
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -93,7 +94,7 @@ public class StringConsumer extends RoboUnit<String> {
 		}
 		if (attribute.getAttributeName().equals(ATTR_MESSAGES_LATCH)
 				&& attribute.getAttributeType() == CountDownLatch.class) {
-			return (R) countDownLatch;
+			return (R) messagesLatch;
 		}
 		return null;
 	}

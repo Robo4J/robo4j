@@ -48,6 +48,8 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
             .create(Integer.class, ATTR_ACK);
     /* default sent messages */
     private static final int DEFAULT = 0;
+    public static final String PROP_TARGET = "target";
+    public static final String PROP_TARGET_CONTEXT = "targetContext";
     private volatile AtomicInteger ackCounter;
     private volatile AtomicInteger totalCounter;
     private CountDownLatch countDownLatch;
@@ -66,13 +68,13 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
 
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
-        target = configuration.getString("target", null);
+        target = configuration.getString(PROP_TARGET, null);
         if (target == null) {
-            throw ConfigurationException.createMissingConfigNameException("target");
+            throw ConfigurationException.createMissingConfigNameException(PROP_TARGET);
         }
-        targetContext = configuration.getString("targetContext", null);
+        targetContext = configuration.getString(PROP_TARGET_CONTEXT, null);
         if (targetContext == null) {
-            throw ConfigurationException.createMissingConfigNameException("targetContext");        	
+            throw ConfigurationException.createMissingConfigNameException(PROP_TARGET_CONTEXT);
         }
         totalCounter = new AtomicInteger(DEFAULT);
         ackCounter = new AtomicInteger(DEFAULT);
