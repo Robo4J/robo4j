@@ -44,8 +44,10 @@ public class RoboHttpClientWithResponseTests {
 	@Test
 	public void simpleRoboSystemGetRequestTest() throws Exception {
 
-		RoboContext producerSystem = RoboContextUtils.loadRoboContextByXml("robo_http_client_request_producer_text.xml");
-		RoboContext consumerSystem = RoboContextUtils.loadRoboContextByXml("robo_http_client_request_consumer_text.xml");
+		RoboContext producerSystem = RoboContextUtils
+				.loadRoboContextByXml("robo_http_client_request_producer_text.xml");
+		RoboContext consumerSystem = RoboContextUtils
+				.loadRoboContextByXml("robo_http_client_request_consumer_text.xml");
 
 		consumerSystem.start();
 		producerSystem.start();
@@ -57,10 +59,12 @@ public class RoboHttpClientWithResponseTests {
 		System.out.println(SystemUtil.printStateReport(producerSystem));
 
 		RoboReference<Integer> decoratedProducer = producerSystem.getReference("decoratedProducer");
-		CountDownLatch producerSetupLatch = decoratedProducer.getAttribute(SocketMessageDecoratedProducerUnit.DESCRIPTOR_SETUP_LATCH).get();
+		CountDownLatch producerSetupLatch = decoratedProducer
+				.getAttribute(SocketMessageDecoratedProducerUnit.DESCRIPTOR_SETUP_LATCH).get();
 		decoratedProducer.sendMessage(MAX_NUMBER);
 		producerSetupLatch.await(TIMEOUT, TIME_UNIT);
-		CountDownLatch producerLatch = decoratedProducer.getAttribute(SocketMessageDecoratedProducerUnit.DESCRIPTOR_MESSAGES_LATCH).get();
+		CountDownLatch producerLatch = decoratedProducer
+				.getAttribute(SocketMessageDecoratedProducerUnit.DESCRIPTOR_MESSAGES_LATCH).get();
 		producerLatch.await(TIMEOUT, TIME_UNIT);
 
 		final RoboReference<String> producerStringConsumer = producerSystem.getReference(StringConsumer.NAME);
@@ -68,10 +72,8 @@ public class RoboHttpClientWithResponseTests {
 				.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_LATCH).get();
 		messagesLatchStringConsumer.await(TIMEOUT, TIME_UNIT);
 
-
-		final Integer totalNumber = producerStringConsumer
-				.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_TOTAL).get();
-		Assert.assertEquals(MAX_NUMBER, totalNumber );
+		final Integer totalNumber = producerStringConsumer.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_TOTAL).get();
+		Assert.assertEquals(MAX_NUMBER, totalNumber);
 
 		producerSystem.shutdown();
 		consumerSystem.shutdown();
