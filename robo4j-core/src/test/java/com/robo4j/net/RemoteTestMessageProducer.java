@@ -38,13 +38,14 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
     public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
     public static final String ATTR_ACK_LATCH = "ackLatch";
     public static final String PROP_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
-    public static final String ATTR_ACKNOWLEDGE = "acknowledge";
+    public static final String ATTR_ACK = "acknowledge";
+    public static final String ATTR_SEND_MESSAGE = "sendMessage";
     public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
             .create(CountDownLatch.class, ATTR_COUNT_DOWN_LATCH);
     public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_ACK_LATCH = DefaultAttributeDescriptor
-            .create(CountDownLatch.class, ATTR_COUNT_DOWN_LATCH);
-    public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_ACKNOWLEDGE = DefaultAttributeDescriptor
-            .create(Integer.class, ATTR_ACKNOWLEDGE);
+            .create(CountDownLatch.class, ATTR_ACK_LATCH);
+    public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_TOTAL_ACK = DefaultAttributeDescriptor
+            .create(Integer.class, ATTR_ACK);
     /* default sent messages */
     private static final int DEFAULT = 0;
     private volatile AtomicInteger ackCounter;
@@ -90,14 +91,14 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
             String[] input = message.split("::");
             String messageType = input[0];
             switch (messageType) {
-                case "sendMessage":
+                case ATTR_SEND_MESSAGE:
                     totalCounter.incrementAndGet();
                     if(countDownLatch != null){
                         countDownLatch.countDown();
                     }
                     sendRandomMessage();
                     break;
-                case ATTR_ACKNOWLEDGE:
+                case ATTR_ACK:
                 	ackCounter.incrementAndGet();
                 	if(ackLatch != null){
                         ackLatch.countDown();
@@ -123,7 +124,7 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
                 && attribute.getAttributeType() == CountDownLatch.class) {
             return (R) ackLatch;
         }
-        if (attribute.getAttributeName().equals(ATTR_ACKNOWLEDGE) && attribute.getAttributeType() == Integer.class){
+        if (attribute.getAttributeName().equals(ATTR_ACK) && attribute.getAttributeType() == Integer.class){
             return (R) Integer.valueOf(ackCounter.get());
         }
         return null;

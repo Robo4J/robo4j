@@ -25,7 +25,6 @@ import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,18 +38,19 @@ public class AckingStringConsumer extends RoboUnit<TestMessageType> {
 	private static final int DEFAULT = 0;
 	public static final String ATTR_TOTAL_RECEIVED_MESSAGES = "getNumberOfReceived";
 	public static final String ATTR_RECEIVED_MESSAGES = "getReceivedMessages";
-	public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
+	public static final String ATTR_ACK_LATCH = "acknowledgeLatch";
 	public static final String ATTR_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
-	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
-			.create(CountDownLatch.class, ATTR_COUNT_DOWN_LATCH);
+	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_ACK_LATCH = DefaultAttributeDescriptor
+			.create(CountDownLatch.class, ATTR_ACK_LATCH);
 	@SuppressWarnings("rawtypes")
 	public static final DefaultAttributeDescriptor<List> DESCRIPTOR_MESSAGES = DefaultAttributeDescriptor
 			.create(List.class, ATTR_RECEIVED_MESSAGES);
 	public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_TOTAL_RECEIVED_MESSAGES = DefaultAttributeDescriptor
 			.create(Integer.class, ATTR_TOTAL_RECEIVED_MESSAGES);
+	public static final String ATTR_ACKNOWLEDGE = "acknowledge";
 	private volatile AtomicInteger counter;
-	private CountDownLatch countDownLatch;
-	private List<TestMessageType> receivedMessages = Collections.synchronizedList(new ArrayList<>());
+	private CountDownLatch acknowledgeLatch;
+	private List<TestMessageType> receivedMessages = new ArrayList<>();
 
 	/**
 	 * @param context
@@ -70,9 +70,9 @@ public class AckingStringConsumer extends RoboUnit<TestMessageType> {
 		counter.incrementAndGet();
 		receivedMessages.add(message);
 		RoboReference<String> ackRef = message.getReference();
-		ackRef.sendMessage("acknowledge");
-		if(countDownLatch != null){
-			countDownLatch.countDown();
+		ackRef.sendMessage(ATTR_ACKNOWLEDGE);
+		if (acknowledgeLatch != null) {
+			acknowledgeLatch.countDown();
 		}
 	}
 
@@ -80,22 +80,23 @@ public class AckingStringConsumer extends RoboUnit<TestMessageType> {
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		int totalNumber = configuration.getInteger(ATTR_TOTAL_NUMBER_MESSAGES, 0);
 		if (totalNumber > 0) {
-			countDownLatch = new CountDownLatch(totalNumber);
+			acknowledgeLatch = new CountDownLatch(totalNumber);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals(ATTR_TOTAL_RECEIVED_MESSAGES) && attribute.getAttributeType() == Integer.class) {
+		if (attribute.getAttributeName().equals(ATTR_TOTAL_RECEIVED_MESSAGES)
+				&& attribute.getAttributeType() == Integer.class) {
 			return (R) (Integer) counter.get();
 		}
 		if (attribute.getAttributeName().equals(ATTR_RECEIVED_MESSAGES) && attribute.getAttributeType() == List.class) {
 			return (R) receivedMessages;
 		}
-		if (attribute.getAttributeName().equals(ATTR_COUNT_DOWN_LATCH)
+		if (attribute.getAttributeName().equals(ATTR_ACK_LATCH)
 				&& attribute.getAttributeType() == CountDownLatch.class) {
-			return (R) countDownLatch;
+			return (R) acknowledgeLatch;
 		}
 		return null;
 	}
