@@ -72,6 +72,7 @@ public class RoboHttpClientWithResponseTests {
 		while (producerStringConsumer
 				.getAttribute(StringConsumer.DESCRIPTOR_RECEIVED_MESSAGES).get().isEmpty()){
 			//busy wait
+			Thread.sleep(100);
 		}
 		final List<String> consumerMessageList = producerStringConsumer
 				.getAttribute(StringConsumer.DESCRIPTOR_RECEIVED_MESSAGES).get();
