@@ -86,7 +86,7 @@ public class StringConsumer extends RoboUnit<String> {
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
 		if (attribute.getAttributeName().equals(ATTR_MESSAGES_TOTAL)
 				&& attribute.getAttributeType() == Integer.class) {
-			return (R) (Integer) counter.get();
+			return (R) Integer.valueOf(counter.get());
 		}
 		if (attribute.getAttributeName().equals(ATTR_RECEIVED_MESSAGES)
 				&& attribute.getAttributeType() == List.class) {

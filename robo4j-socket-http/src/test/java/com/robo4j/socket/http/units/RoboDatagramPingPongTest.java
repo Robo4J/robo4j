@@ -50,7 +50,7 @@ public class RoboDatagramPingPongTest {
 		System.out.println(SystemUtil.printStateReport(pingSystem));
 
 		RoboReference<String> pongStringConsumerReference = pongSystem.getReference(StringConsumer.NAME);
-		CountDownLatch countDownLatch = pongStringConsumerReference.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_LATCH).get();
+		CountDownLatch totalMessageLatch = pongStringConsumerReference.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_LATCH).get();
 
 		RoboReference<DatagramDecoratedRequest> udpClient = pingSystem.getReference(UDP_CLIENT);
 		for (int i = 0; i < TOTAL_NUMBER; i++) {
@@ -61,15 +61,16 @@ public class RoboDatagramPingPongTest {
 			udpClient.sendMessage(request);
 		}
 
-		countDownLatch.await(TIMEOUT, TIME_UNIT);
+		totalMessageLatch.await(TIMEOUT, TIME_UNIT);
 		final int pongConsumerTotalNumber = pongStringConsumerReference.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_TOTAL).get();
-		pingSystem.shutdown();
-		pongSystem.shutdown();
+
 
 		System.out.println("UDP pongSystem: State after shutdown:");
 		System.out.println(SystemUtil.printStateReport(pongSystem));
 		System.out.println("UDP pingSystem: State after shutdown:");
 		System.out.println(SystemUtil.printStateReport(pingSystem));
+		pingSystem.shutdown();
+		pongSystem.shutdown();
 
 		Assert.assertTrue(TOTAL_NUMBER == pongConsumerTotalNumber);
 
