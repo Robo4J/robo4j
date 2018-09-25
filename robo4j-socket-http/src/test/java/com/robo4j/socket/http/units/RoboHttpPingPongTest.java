@@ -98,7 +98,7 @@ public class RoboHttpPingPongTest {
 		decoratedProducer.sendMessage(MESSAGES);
 
 		RoboReference<String> pongConsumer = systemPong.getReference(REQUEST_CONSUMER);
-		CountDownLatch attributeFuture = pongConsumer.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
+		CountDownLatch attributeFuture = pongConsumer.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_LATCH).get();
 
 		attributeFuture.await(TIMEOUT, TIME_UNIT);
 		System.out.println("systemPing : Going Down!");
@@ -107,7 +107,7 @@ public class RoboHttpPingPongTest {
 
 		System.out.println("systemPong : Going Down!");
 
-		final int number = pongConsumer.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get();
+		final int number = pongConsumer.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_TOTAL).get();
 		systemPong.stop();
 		Assert.assertEquals(number, MESSAGES);
 		System.out.println("PingPong is down!");

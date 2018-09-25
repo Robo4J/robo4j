@@ -59,15 +59,15 @@ public class RoboHttpClientWithResponseTests {
 
 		RoboReference<Integer> decoratedProducer = producerSystem.getReference("decoratedProducer");
 		decoratedProducer.sendMessage(MAX_NUMBER);
-		CountDownLatch latch = decoratedProducer.getAttribute(SocketMessageDecoratedProducerUnit.DESCRIPTOR_COUNT_DOWN_LATCH).get();
-		latch.await(TIMEOUT, TIME_UNIT);
+		CountDownLatch producerLatch = decoratedProducer.getAttribute(SocketMessageDecoratedProducerUnit.DESCRIPTOR_MESSAGES_LATCH).get();
+		producerLatch.await(TIMEOUT, TIME_UNIT);
 
-		RoboReference<String> stringProducer = producerSystem.getReference(StringConsumer.NAME);
-		CountDownLatch countDownLatchStringProducer = stringProducer
-				.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
-		countDownLatchStringProducer.await(TIMEOUT, TIME_UNIT);
+		final RoboReference<String> producerStringConsumer = producerSystem.getReference(StringConsumer.NAME);
+		final CountDownLatch messagesLatchStringConsumer = producerStringConsumer
+				.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_LATCH).get();
+		messagesLatchStringConsumer.await(TIMEOUT, TIME_UNIT);
 
-		final List<String> consumerMessageList = stringProducer
+		final List<String> consumerMessageList = producerStringConsumer
 				.getAttribute(StringConsumer.DESCRIPTOR_RECEIVED_MESSAGES).get();
 
 		Assert.assertTrue(consumerMessageList.contains(ROBO_SYSTEM_DESC));

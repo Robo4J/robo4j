@@ -37,17 +37,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 @SuppressWarnings("rawtypes")
 public class StringConsumer extends RoboUnit<String> {
 	public static final String NAME = "stringConsumer";
-	public static final String PROP_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
-	public static final String PROP_GET_RECEIVED_MESSAGES = "getReceivedMessages";
-	public static final String PROP_COUNT_DOWN_LATCH = "countDownLatch";
+	public static final String ATTR_MESSAGES_TOTAL = "getNumberOfSentMessages";
+	public static final String ATTR_RECEIVED_MESSAGES = "getReceivedMessages";
+	public static final String ATTR_MESSAGES_LATCH = "countDownLatch";
 	public static final String PROP_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
 
-	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
-			.create(CountDownLatch.class, PROP_COUNT_DOWN_LATCH);
-	public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_MESSAGES_NUMBER_TOTAL = DefaultAttributeDescriptor
-			.create(Integer.class, PROP_GET_NUMBER_OF_SENT_MESSAGES);
+	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_MESSAGES_LATCH = DefaultAttributeDescriptor
+			.create(CountDownLatch.class, ATTR_MESSAGES_LATCH);
+	public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_MESSAGES_TOTAL = DefaultAttributeDescriptor
+			.create(Integer.class, ATTR_MESSAGES_TOTAL);
 	public static final DefaultAttributeDescriptor<List> DESCRIPTOR_RECEIVED_MESSAGES = DefaultAttributeDescriptor
-			.create(List.class, PROP_GET_RECEIVED_MESSAGES);
+			.create(List.class, ATTR_RECEIVED_MESSAGES);
 
 	private static final int DEFAULT = 0;
 	private volatile AtomicInteger counter;
@@ -74,25 +74,24 @@ public class StringConsumer extends RoboUnit<String> {
 	@Override
 	public void onMessage(String message) {
 		counter.incrementAndGet();
-		System.out.println(getClass().getSimpleName() + ":message:" + message);
-		receivedMessages.add(message);
 		if (countDownLatch != null) {
 			countDownLatch.countDown();
 		}
+		receivedMessages.add(message);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals(PROP_GET_NUMBER_OF_SENT_MESSAGES)
+		if (attribute.getAttributeName().equals(ATTR_MESSAGES_TOTAL)
 				&& attribute.getAttributeType() == Integer.class) {
 			return (R) (Integer) counter.get();
 		}
-		if (attribute.getAttributeName().equals(PROP_GET_RECEIVED_MESSAGES)
+		if (attribute.getAttributeName().equals(ATTR_RECEIVED_MESSAGES)
 				&& attribute.getAttributeType() == List.class) {
 			return (R) receivedMessages;
 		}
-		if (attribute.getAttributeName().equals(PROP_COUNT_DOWN_LATCH)
+		if (attribute.getAttributeName().equals(ATTR_MESSAGES_LATCH)
 				&& attribute.getAttributeType() == CountDownLatch.class) {
 			return (R) countDownLatch;
 		}

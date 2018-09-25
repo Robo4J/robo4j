@@ -53,17 +53,17 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONF
 public class SocketMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 
 	public static final String PROP_COMMUNICATION_TYPE = "communicationType";
-	public static final String ATTR_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
-	public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
-	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
-			.create(CountDownLatch.class, ATTR_COUNT_DOWN_LATCH);
+	public static final String ATTR_TOTAL_SENT_MESSAGES = "getNumberOfSentMessages";
+	public static final String ATTR_MESSAGES_LATCH = "messagesLatch";
+	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_MESSAGES_LATCH = DefaultAttributeDescriptor
+			.create(CountDownLatch.class, ATTR_MESSAGES_LATCH);
 
 	private static final int DEFAULT = 0;
 	private final ClientContext clientContext = new ClientContext();
 	private AtomicInteger counter;
 	private String target;
 	private String message;
-	private CountDownLatch countDownLatch;
+	private CountDownLatch messagesLatch;
 	private CommunicationType type;
 
 	public SocketMessageDecoratedProducerUnit(RoboContext context, String id) {
@@ -90,7 +90,7 @@ public class SocketMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	 */
 	@Override
 	public void onMessage(Integer number) {
-		countDownLatch = new CountDownLatch(number);
+		messagesLatch = new CountDownLatch(number);
 		clientContext.getPathConfigs().forEach(pathConfig -> {
 			IntStream.range(DEFAULT, number).forEach(i -> {
 				switch (type){
@@ -103,7 +103,7 @@ public class SocketMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 					default:
 						throw new IllegalStateException("not allowed");
 				}
-				countDownLatch.countDown();
+				messagesLatch.countDown();
 			});
 			System.out.println(getClass().getSimpleName() + "messages: " + number);
 		});
@@ -137,13 +137,13 @@ public class SocketMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals(ATTR_GET_NUMBER_OF_SENT_MESSAGES)
+		if (attribute.getAttributeName().equals(ATTR_TOTAL_SENT_MESSAGES)
 				&& attribute.getAttributeType() == Integer.class) {
 			return (R) (Integer) counter.get();
 		}
-		if (attribute.getAttributeName().equals(ATTR_COUNT_DOWN_LATCH)
+		if (attribute.getAttributeName().equals(ATTR_MESSAGES_LATCH)
 				&& attribute.getAttributeType() == CountDownLatch.class) {
-			return (R) countDownLatch;
+			return (R) messagesLatch;
 		}
 		return null;
 	}

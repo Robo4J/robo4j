@@ -59,11 +59,11 @@ public class RoboDatagramClientTest {
 
         RoboReference<String> stringConsumerProducer = consumerSystem.getReference(StringConsumer.NAME);
         CountDownLatch countDownLatchStringProducer = stringConsumerProducer
-                .getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get(DEFAULT_TIMEOUT, TimeUnit.MINUTES);
+                .getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_LATCH).get(DEFAULT_TIMEOUT, TimeUnit.MINUTES);
 
         countDownLatchStringProducer.await(TIMEOUT, TIME_UNIT);
         final int consumerTotalNumber = stringConsumerProducer
-                .getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_NUMBER_TOTAL).get(DEFAULT_TIMEOUT, TimeUnit.MINUTES);
+                .getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_TOTAL).get(DEFAULT_TIMEOUT, TimeUnit.MINUTES);
 
         producerSystem.shutdown();
         consumerSystem.shutdown();
