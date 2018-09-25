@@ -67,12 +67,10 @@ public class RoboHttpClientWithResponseTests {
 				.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_LATCH).get();
 		messagesLatchStringConsumer.await(TIMEOUT, TIME_UNIT);
 
-		synchronized (StringConsumer.class){
-			final List<String> consumerMessageList = producerStringConsumer
-					.getAttribute(StringConsumer.DESCRIPTOR_RECEIVED_MESSAGES).get();
 
-			Assert.assertTrue(consumerMessageList.contains(ROBO_SYSTEM_DESC));
-		}
+		final List<String> consumerMessageList = producerStringConsumer
+				.getAttribute(StringConsumer.DESCRIPTOR_RECEIVED_MESSAGES).get();
+		Assert.assertTrue(consumerMessageList.contains(ROBO_SYSTEM_DESC));
 
 		producerSystem.shutdown();
 		consumerSystem.shutdown();

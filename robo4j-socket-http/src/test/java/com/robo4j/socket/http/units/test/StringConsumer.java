@@ -52,7 +52,7 @@ public class StringConsumer extends RoboUnit<String> {
 
 	private static final int DEFAULT = 0;
 	private volatile AtomicInteger counter;
-	private List<String> receivedMessages = Collections.synchronizedList(new ArrayList<>());
+	private List<String> receivedMessages = new ArrayList<>();
 	private CountDownLatch messagesLatch;
 
 	/**
@@ -90,7 +90,7 @@ public class StringConsumer extends RoboUnit<String> {
 		}
 		if (attribute.getAttributeName().equals(ATTR_RECEIVED_MESSAGES)
 				&& attribute.getAttributeType() == List.class) {
-			return (R) receivedMessages;
+			return (R) Collections.synchronizedList(receivedMessages);
 		}
 		if (attribute.getAttributeName().equals(ATTR_MESSAGES_LATCH)
 				&& attribute.getAttributeType() == CountDownLatch.class) {
