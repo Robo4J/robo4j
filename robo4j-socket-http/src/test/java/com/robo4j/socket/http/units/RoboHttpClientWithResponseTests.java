@@ -23,6 +23,7 @@ import com.robo4j.socket.http.units.test.SocketMessageDecoratedProducerUnit;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
@@ -34,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+
 public class RoboHttpClientWithResponseTests {
 	private static final int TIMEOUT = 20;
 	private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
@@ -42,6 +44,7 @@ public class RoboHttpClientWithResponseTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
+	@Ignore
 	public void simpleRoboSystemGetRequestTest() throws Exception {
 
 		RoboContext producerSystem = RoboContextUtils
