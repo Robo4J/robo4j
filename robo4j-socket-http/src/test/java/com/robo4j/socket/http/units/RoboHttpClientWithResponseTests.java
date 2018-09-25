@@ -25,7 +25,6 @@ import com.robo4j.util.SystemUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -38,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 public class RoboHttpClientWithResponseTests {
 	private static final int TIMEOUT = 20;
 	private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
-	private static final int MAX_NUMBER = 20;
+	private static final Integer MAX_NUMBER = 20;
 	private static final String ROBO_SYSTEM_DESC = "[{\"id\":\"stringConsumer\",\"state\":\"STARTED\"},{\"id\":\"httpServer\",\"state\":\"STARTED\"}]";
 
 	@SuppressWarnings("unchecked")
@@ -69,14 +68,10 @@ public class RoboHttpClientWithResponseTests {
 				.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_LATCH).get();
 		messagesLatchStringConsumer.await(TIMEOUT, TIME_UNIT);
 
-		while (producerStringConsumer
-				.getAttribute(StringConsumer.DESCRIPTOR_RECEIVED_MESSAGES).get().isEmpty()){
-			//busy wait
-			Thread.sleep(100);
-		}
-		final List<String> consumerMessageList = producerStringConsumer
-				.getAttribute(StringConsumer.DESCRIPTOR_RECEIVED_MESSAGES).get();
-		Assert.assertTrue(consumerMessageList.contains(ROBO_SYSTEM_DESC));
+
+		final Integer totalNumber = producerStringConsumer
+				.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_TOTAL).get();
+		Assert.assertEquals(MAX_NUMBER, totalNumber );
 
 		producerSystem.shutdown();
 		consumerSystem.shutdown();
