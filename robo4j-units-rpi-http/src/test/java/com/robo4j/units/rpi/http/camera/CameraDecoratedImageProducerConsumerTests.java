@@ -64,10 +64,10 @@ public class CameraDecoratedImageProducerConsumerTests {
 
         RoboReference<Boolean> imageProducer = producerSystem.getReference("imageController");
         RoboReference<CameraMessage> imageConsumer = consumerSystem.getReference("imageProcessor");
+        //TODO proper latch
 
         Integer numberOfImages = imageProducer.getAttribute(ATTRIBUTE_NUMBER_OF_IMAGES).get();
-        while (imageConsumer.getAttribute(ATTRIBUTE_COUNTER).get() < numberOfImages) {
-        }
+
         RoboHttpUtils.printMeasuredTime(getClass(), "duration", startTime);
         System.out.println("sendImages: " + numberOfImages);
         producerSystem.shutdown();
