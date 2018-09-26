@@ -62,7 +62,7 @@ public class CameraDecoratedImageProducerConsumerTests {
 		imagesLatchProducer.await(5, TimeUnit.MINUTES);
 		Integer totalImagesProducer = imageProducer.getAttribute(CameraImageProducerDesTestUnit.DESCRIPTOR_TOTAL_IMAGES)
 				.get();
-		
+
 		RoboReference<CameraMessage> imageConsumer = consumerSystem.getReference("imageProcessor");
 		CountDownLatch imagesLatchConsumer = imageConsumer
 				.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_IMAGES_LATCH).get();
