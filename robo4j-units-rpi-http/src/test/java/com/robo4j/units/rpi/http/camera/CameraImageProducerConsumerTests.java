@@ -35,7 +35,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class CameraImageProducerConsumerTests {
 
-
 	@Test
 	public void cameraImageProdConTest() throws Exception {
 
@@ -59,15 +58,20 @@ public class CameraImageProducerConsumerTests {
 		producerSystem.start();
 
 		RoboReference<Boolean> imageProducer = producerSystem.getReference("imageController");
-		Integer totalImagesProducer = imageProducer.getAttribute(CameraImageProducerDesTestUnit.DESCRIPTOR_TOTAL_IMAGES).get();
+		Integer totalImagesProducer = imageProducer.getAttribute(CameraImageProducerDesTestUnit.DESCRIPTOR_TOTAL_IMAGES)
+				.get();
+		CountDownLatch imageProducerLatch = imageProducer
+				.getAttribute(CameraImageProducerDesTestUnit.DESCRIPTOR_GENERATED_IMAGES_LATCH).get();
 
 		RoboReference<CameraMessage> imageConsumer = consumerSystem.getReference("imageProcessor");
-		CountDownLatch imageConsumerLatch = imageConsumer.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_IMAGES_LATCH).get();
+		CountDownLatch imageConsumerLatch = imageConsumer
+				.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_IMAGES_LATCH).get();
 
-
+		imageProducerLatch.await(10, TimeUnit.SECONDS);
 		imageConsumerLatch.await(10, TimeUnit.SECONDS);
 
-        Integer receivedImagesConsumer = imageConsumer.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_RECEIVED_IMAGES).get();
+		Integer receivedImagesConsumer = imageConsumer
+				.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_RECEIVED_IMAGES).get();
 		Assert.assertEquals(totalImagesProducer, receivedImagesConsumer);
 
 		RoboHttpUtils.printMeasuredTime(getClass(), "duration", startTime);
