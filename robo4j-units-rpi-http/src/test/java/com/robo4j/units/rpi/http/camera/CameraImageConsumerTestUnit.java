@@ -74,7 +74,7 @@ public class CameraImageConsumerTestUnit extends RoboUnit<CameraMessage> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
+	protected synchronized <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
 		if (descriptor.getAttributeType() == Integer.class
 				&& descriptor.getAttributeName().equals(ATTR_RECEIVED_IMAGES)) {
 			return (R) Integer.valueOf(counter.get());
