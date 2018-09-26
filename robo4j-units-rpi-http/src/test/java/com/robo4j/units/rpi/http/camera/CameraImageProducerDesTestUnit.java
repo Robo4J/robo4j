@@ -57,7 +57,7 @@ public class CameraImageProducerDesTestUnit extends RoboUnit<Boolean> {
 	protected String httpTarget;
 	protected String fileName;
 	private volatile AtomicInteger counter = new AtomicInteger(0);
-	private volatile CountDownLatch generatedImagesLatch;
+	protected volatile CountDownLatch generatedImagesLatch;
 	private Integer numberOfImages;
 
 	public CameraImageProducerDesTestUnit(RoboContext context, String id) {
@@ -94,7 +94,7 @@ public class CameraImageProducerDesTestUnit extends RoboUnit<Boolean> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
+	protected synchronized <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
 		if (descriptor.getAttributeType() == Integer.class) {
 			if (descriptor.getAttributeName().equals(ATTR_TOTAL_IMAGES)) {
 				return (R) numberOfImages;

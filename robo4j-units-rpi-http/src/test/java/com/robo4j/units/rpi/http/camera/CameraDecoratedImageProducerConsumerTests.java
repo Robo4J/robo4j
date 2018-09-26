@@ -59,13 +59,14 @@ public class CameraDecoratedImageProducerConsumerTests {
 		RoboReference<Boolean> imageProducer = producerSystem.getReference("imageController");
 		CountDownLatch imagesLatchProducer = imageProducer
 				.getAttribute(CameraImageProducerDesTestUnit.DESCRIPTOR_GENERATED_IMAGES_LATCH).get();
-		imagesLatchProducer.await(10, TimeUnit.SECONDS);
+		imagesLatchProducer.await(5, TimeUnit.MINUTES);
 		Integer totalImagesProducer = imageProducer.getAttribute(CameraImageProducerDesTestUnit.DESCRIPTOR_TOTAL_IMAGES)
 				.get();
+		
 		RoboReference<CameraMessage> imageConsumer = consumerSystem.getReference("imageProcessor");
 		CountDownLatch imagesLatchConsumer = imageConsumer
 				.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_IMAGES_LATCH).get();
-		imagesLatchConsumer.await(10, TimeUnit.SECONDS);
+		imagesLatchConsumer.await(5, TimeUnit.MINUTES);
 		Integer totalImagesConsumer = imageConsumer.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_RECEIVED_IMAGES)
 				.get();
 		RoboHttpUtils.printMeasuredTime(getClass(), "duration", startTime);

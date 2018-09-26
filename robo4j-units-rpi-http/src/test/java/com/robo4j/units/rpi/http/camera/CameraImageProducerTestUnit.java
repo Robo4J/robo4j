@@ -26,7 +26,7 @@ public class CameraImageProducerTestUnit extends CameraImageProducerDesTestUnit 
                 .setEncoding(IMAGE_ENCODING)
                 .setContent(image).build();
         getContext().getReference(target).sendMessage(imageDTO);
-
+        generatedImagesLatch.countDown();
         progress.set(false);
 
     }

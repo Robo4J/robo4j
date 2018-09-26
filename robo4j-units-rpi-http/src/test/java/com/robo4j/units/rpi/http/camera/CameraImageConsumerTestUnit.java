@@ -43,7 +43,7 @@ public class CameraImageConsumerTestUnit extends RoboUnit<CameraMessage> {
 	public static final AttributeDescriptor<Integer> DESCRIPTOR_RECEIVED_IMAGES = new DefaultAttributeDescriptor<>(
 			Integer.class, ATTR_RECEIVED_IMAGES);
 
-	private final AtomicInteger counter = new AtomicInteger(0);
+	private volatile AtomicInteger counter = new AtomicInteger(0);
 	private CountDownLatch countDownLatch;
 
 	public CameraImageConsumerTestUnit(RoboContext context, String id) {

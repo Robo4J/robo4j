@@ -67,8 +67,11 @@ public class CameraImageProducerConsumerTests {
 		CountDownLatch imageConsumerLatch = imageConsumer
 				.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_IMAGES_LATCH).get();
 
-		imageProducerLatch.await(10, TimeUnit.SECONDS);
-		imageConsumerLatch.await(10, TimeUnit.SECONDS);
+        System.out.println("LATCH");
+		imageProducerLatch.await(5, TimeUnit.MINUTES);
+        System.out.println("ONE");
+		imageConsumerLatch.await(5, TimeUnit.MINUTES);
+        System.out.println("TWO");
 
 		Integer receivedImagesConsumer = imageConsumer
 				.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_RECEIVED_IMAGES).get();
