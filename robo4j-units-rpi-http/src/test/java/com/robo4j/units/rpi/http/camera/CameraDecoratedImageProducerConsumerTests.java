@@ -39,14 +39,14 @@ public class CameraDecoratedImageProducerConsumerTests {
 	public void decoratorProducerConsumerTest() throws Exception {
 
 		RoboBuilder builderProducer = new RoboBuilder(
-				Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemTest.xml"));
+				Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemProducer.xml"));
 		InputStream clientConfigInputStream = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("robo_camera_producer_decorated_test.xml");
 		builderProducer.add(clientConfigInputStream);
 		RoboContext producerSystem = builderProducer.build();
 
 		RoboBuilder builderConsumer = new RoboBuilder(
-				Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemTest.xml"));
+				Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemProducer.xml"));
 		InputStream serverConfigInputStream = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("robo_camera_consumer_decorated_test.xml");
 		builderConsumer.add(serverConfigInputStream);
