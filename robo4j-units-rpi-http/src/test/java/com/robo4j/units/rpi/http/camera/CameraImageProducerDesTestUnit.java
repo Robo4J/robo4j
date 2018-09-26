@@ -19,6 +19,7 @@ package com.robo4j.units.rpi.http.camera;
 
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.ConfigurationException;
+import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
@@ -31,6 +32,7 @@ import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.util.StreamUtils;
 
 import java.util.EnumSet;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -40,15 +42,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class CameraImageProducerDesTestUnit extends RoboUnit<Boolean> {
 
+
 	public static final String ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME = "numberOfSentImages";
-	public static final String ATTRIBUTE_NUMBER_OF_IMAGES_NAME = "numberOfImages";
-	static final String IMAGE_ENCODING = "jpg";
+	public static final String ATTR_TOTAL_IMAGES = "numberOfImages";
+	public static final String ATTR_GENERATED_IMAGES_LATCH = "generatedImagesLatch";
+	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_GENERATED_IMAGES_LATCH = DefaultAttributeDescriptor
+			.create(CountDownLatch.class, ATTR_GENERATED_IMAGES_LATCH);
+	public static final AttributeDescriptor<Integer> DESCRIPTOR_TOTAL_IMAGES = new DefaultAttributeDescriptor<>(Integer.class,
+			CameraImageProducerDesTestUnit.ATTR_TOTAL_IMAGES);
+	protected static final String IMAGE_ENCODING = "jpg";
 
 	protected final AtomicBoolean progress = new AtomicBoolean(false);
-	private final AtomicInteger counter = new AtomicInteger(0);
 	protected String target;
 	protected String httpTarget;
 	protected String fileName;
+	private volatile AtomicInteger counter = new AtomicInteger(0);
+	private volatile CountDownLatch generatedImagesLatch;
 	private Integer numberOfImages;
 
 	public CameraImageProducerDesTestUnit(RoboContext context, String id) {
@@ -60,7 +69,8 @@ public class CameraImageProducerDesTestUnit extends RoboUnit<Boolean> {
 		target = configuration.getString("target", null);
 		httpTarget = configuration.getString("httpTarget", null);
 		fileName = configuration.getString("fileName", null);
-		numberOfImages = configuration.getInteger("numberOfImages", null);
+		numberOfImages = configuration.getInteger(ATTR_TOTAL_IMAGES, null);
+		generatedImagesLatch = new CountDownLatch(numberOfImages);
 	}
 
 	@Override
@@ -86,13 +96,20 @@ public class CameraImageProducerDesTestUnit extends RoboUnit<Boolean> {
 	@Override
 	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
 		if (descriptor.getAttributeType() == Integer.class) {
-			if (descriptor.getAttributeName().equals(ATTRIBUTE_NUMBER_OF_IMAGES_NAME)) {
+			if (descriptor.getAttributeName().equals(ATTR_TOTAL_IMAGES)) {
 				return (R) numberOfImages;
 			} else if (descriptor.getAttributeName().equals(ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME)) {
 				return (R) Integer.valueOf(counter.get());
 			}
 		}
+		if(descriptor.getAttributeName().equals(ATTR_GENERATED_IMAGES_LATCH) && descriptor.getAttributeType() == CountDownLatch.class ){
+			return (R) generatedImagesLatch;
+		}
 		return super.onGetAttribute(descriptor);
+	}
+
+	protected void countDonwSentImage(){
+
 	}
 
 	protected void createImage(int imageNumber) {
@@ -103,6 +120,7 @@ public class CameraImageProducerDesTestUnit extends RoboUnit<Boolean> {
 		final ClientMessageWrapper resultMessage = new ClientMessageWrapper(
 				HttpPathUtils.toPath(SystemPath.UNITS.getPath(), httpTarget), CameraMessage.class, cameraMessage);
 		getContext().getReference(target).sendMessage(resultMessage);
+		generatedImagesLatch.countDown();
 		progress.set(false);
 	}
 }

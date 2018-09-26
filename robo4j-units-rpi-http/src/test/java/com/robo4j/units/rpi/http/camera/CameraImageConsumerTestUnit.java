@@ -34,12 +34,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Miro Wengner (@miragemiko)
  */
 public class CameraImageConsumerTestUnit extends RoboUnit<CameraMessage> {
-	public static final String PROP_COUNT_DOWN_LATCH = "countDownLatch";
-	public static final String ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME = "numberOfReceivedImages";
+	public static final String ATTR_IMAGES_LATCH = "countDownLatch";
+	public static final String ATTR_RECEIVED_IMAGES = "numberOfReceivedImages";
 	public static final String PROP_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
 
-	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
-			.create(CountDownLatch.class, PROP_COUNT_DOWN_LATCH);
+	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_IMAGES_LATCH = DefaultAttributeDescriptor
+			.create(CountDownLatch.class, ATTR_IMAGES_LATCH);
+	public static final AttributeDescriptor<Integer> DESCRIPTOR_RECEIVED_IMAGES = new DefaultAttributeDescriptor<>(
+			Integer.class, ATTR_RECEIVED_IMAGES);
 
 	private final AtomicInteger counter = new AtomicInteger(0);
 	private CountDownLatch countDownLatch;
@@ -74,10 +76,10 @@ public class CameraImageConsumerTestUnit extends RoboUnit<CameraMessage> {
 	@Override
 	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
 		if (descriptor.getAttributeType() == Integer.class
-				&& descriptor.getAttributeName().equals(ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME)) {
+				&& descriptor.getAttributeName().equals(ATTR_RECEIVED_IMAGES)) {
 			return (R) Integer.valueOf(counter.get());
 		}
-		if (descriptor.getAttributeName().equals(PROP_COUNT_DOWN_LATCH)
+		if (descriptor.getAttributeName().equals(ATTR_IMAGES_LATCH)
 				&& descriptor.getAttributeType() == CountDownLatch.class) {
 			return (R) countDownLatch;
 		}

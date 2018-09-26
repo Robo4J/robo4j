@@ -18,6 +18,9 @@
 <robo4j>
     <roboUnit id="imageProcessor">
         <class>com.robo4j.units.rpi.http.camera.CameraImageConsumerTestUnit</class>
+        <config name="com.robo4j.root">
+            <value name="totalNumberMessages" type="int">42</value>
+        </config>
     </roboUnit>
     <roboUnit id="httpServer">
         <class>com.robo4j.socket.http.units.HttpServerUnit</class>

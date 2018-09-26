@@ -17,8 +17,6 @@
 
 package com.robo4j.units.rpi.http.camera;
 
-import com.robo4j.AttributeDescriptor;
-import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
@@ -36,10 +34,7 @@ import java.util.concurrent.TimeUnit;
  * @author Miro Wengner (@miragemiko)
  */
 public class CameraImageProducerConsumerTests {
-	AttributeDescriptor<Integer> ATTRIBUTE_NUMBER_OF_IMAGES = new DefaultAttributeDescriptor<>(Integer.class,
-			CameraImageProducerDesTestUnit.ATTRIBUTE_NUMBER_OF_IMAGES_NAME);
-	AttributeDescriptor<Integer> ATTRIBUTE_COUNTER = new DefaultAttributeDescriptor<>(Integer.class,
-			CameraImageConsumerTestUnit.ATTRIBUTE_NUMBER_OF_RECEIVED_IMAGES_NAME);
+
 
 	@Test
 	public void cameraImageProdConTest() throws Exception {
@@ -64,23 +59,22 @@ public class CameraImageProducerConsumerTests {
 		producerSystem.start();
 
 		RoboReference<Boolean> imageProducer = producerSystem.getReference("imageController");
+		Integer totalImagesProducer = imageProducer.getAttribute(CameraImageProducerDesTestUnit.DESCRIPTOR_TOTAL_IMAGES).get();
+
 		RoboReference<CameraMessage> imageConsumer = consumerSystem.getReference("imageProcessor");
-		CountDownLatch imageConsumerLatch = imageConsumer.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_COUNT_DOWN_LATCH).get();
+		CountDownLatch imageConsumerLatch = imageConsumer.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_IMAGES_LATCH).get();
 
 
-		Integer numberOfImages = imageProducer.getAttribute(ATTRIBUTE_NUMBER_OF_IMAGES).get();
+		imageConsumerLatch.await(10, TimeUnit.SECONDS);
 
-		imageConsumerLatch.await(1, TimeUnit.MINUTES);
-
-        int imageConsumerReceivedNumber = imageConsumer.getAttribute(ATTRIBUTE_COUNTER).get();
-
+        Integer receivedImagesConsumer = imageConsumer.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_RECEIVED_IMAGES).get();
+		Assert.assertEquals(totalImagesProducer, receivedImagesConsumer);
 
 		RoboHttpUtils.printMeasuredTime(getClass(), "duration", startTime);
-		System.out.println("sendImages: " + numberOfImages);
+		System.out.println("receivedImagesConsumer: " + receivedImagesConsumer);
 		producerSystem.shutdown();
 		consumerSystem.shutdown();
 
-        Assert.assertTrue(imageConsumerReceivedNumber == numberOfImages);
 		System.out.println("Press any key to End...");
 
 	}

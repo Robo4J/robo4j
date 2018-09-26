@@ -23,7 +23,7 @@ public class CameraImageProducerTestUnit extends CameraImageProducerDesTestUnit 
         final ImageDTO imageDTO = ImageDTOBuilder.Build()
                 .setWidth(800)
                 .setHeight(600)
-                .setEncoding("jpg")
+                .setEncoding(IMAGE_ENCODING)
                 .setContent(image).build();
         getContext().getReference(target).sendMessage(imageDTO);
 
