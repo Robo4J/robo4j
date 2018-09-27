@@ -18,7 +18,6 @@ allprojects {
     }
 
     sourceCompatibility = "${robo4jJavaVersion}"
-    targetCompatibility = "${robo4jJavaVersion}"
 }
 
 subprojects {
@@ -390,7 +389,7 @@ project("robo4j-units-rpi-http") {
     }
 }
 
-task wrapper(type: Wrapper) {
+wrapper {
     gradleVersion = "${roboGradleVersion}"
 }
 
