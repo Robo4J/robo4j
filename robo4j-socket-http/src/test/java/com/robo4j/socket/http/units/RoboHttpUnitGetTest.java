@@ -60,7 +60,7 @@ public class RoboHttpUnitGetTest {
 
 		//@formatter:off
 		Configuration systemConfiguration = new ConfigurationBuilder()
-				.addInteger("poolSizeScheduler", 10)
+				.addInteger("poolSizeScheduler", 3)
 				.addInteger("poolSizeWorker", 2)
 				.addInteger("poolSizeBlocking", 2)
 				.build();
