@@ -61,9 +61,9 @@ public class HttpContextTests {
 
 
 		RoboBuilder builderProducer = new RoboBuilder();
-		InputStream clientConfigInputStream = Thread.currentThread().getContextClassLoader()
+		InputStream contextIS = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("robo_client_context.xml");
-		builderProducer.add(clientConfigInputStream);
+		builderProducer.add(contextIS);
 
 		List<ClientPathDTO> paths = Collections
 				.singletonList(new ClientPathDTO(StringConstants.EMPTY, HttpMethod.GET, Collections.singletonList(StringConsumer.NAME)));

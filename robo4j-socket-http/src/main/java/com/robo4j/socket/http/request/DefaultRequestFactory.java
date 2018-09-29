@@ -16,7 +16,6 @@
  */
 package com.robo4j.socket.http.request;
 
-import com.robo4j.AttributeDescriptor;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.socket.http.units.ServerPathConfig;
@@ -29,9 +28,9 @@ public interface DefaultRequestFactory<ResponseType> {
 
 	ResponseType processGet(RoboContext context);
 
-	ResponseType processGet(RoboReference<?> desiredReference, AttributeDescriptor<?> attributeDescriptor);
-
 	ResponseType processGet(ServerPathConfig pathConfig);
+
+	ResponseType processServerGet(ServerPathConfig pathConfig);
 
 	ResponseType processPost(RoboReference<?> unitReference, String message);
 }

@@ -19,24 +19,23 @@
 
 package com.robo4j.socket.http.request;
 
-import com.robo4j.AttributeDescriptor;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.dto.ResponseAttributeDTO;
 import com.robo4j.socket.http.dto.ResponseDecoderUnitDTO;
 import com.robo4j.socket.http.dto.ResponseUnitDTO;
 import com.robo4j.socket.http.units.CodecRegistry;
-import com.robo4j.socket.http.units.SocketDecoder;
 import com.robo4j.socket.http.units.ServerPathConfig;
-import com.robo4j.socket.http.util.HttpConstant;
+import com.robo4j.socket.http.units.SocketDecoder;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.ReflectUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /**
@@ -53,12 +52,21 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 		this.codecRegistry = codecRegistry;
 	}
 
+	/**
+	 * Generic robo context overview. It returns all units registered into the context including system id.
+	 * The 1st position is reserved for the system
+	 *
+	 * @param context
+	 *            robo context
+	 * @return descripton of desired context
+	 */
 	@Override
 	public Object processGet(RoboContext context) {
 		if (!context.getUnits().isEmpty()) {
 
 			final List<ResponseUnitDTO> unitList = context.getUnits().stream()
 					.map(u -> new ResponseUnitDTO(u.getId(), u.getState())).collect(Collectors.toList());
+			unitList.add(0, new ResponseUnitDTO(context.getId(), context.getState()));
 			return JsonUtil.toJsonArray(unitList);
 		} else {
 			SimpleLoggingUtil.error(getClass(), "internal error: no units available");
@@ -66,26 +74,46 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 		return null;
 	}
 
+	// FIXME correct available methods according to the configuration
 	@Override
-	public Object processGet(RoboReference<?> desiredReference, AttributeDescriptor<?> attributeDescriptor) {
-		Future<?> future = desiredReference.getAttribute(attributeDescriptor);
-		try {
-			Object result = future.get();
-			return result != null ? result : new byte[HttpConstant.DEFAULT_VALUE_0];
-		} catch (InterruptedException | ExecutionException e) {
-			SimpleLoggingUtil.error(getClass(), "problem", e);
-			return new byte[HttpConstant.DEFAULT_VALUE_0];
+	@SuppressWarnings("unchecked")
+	public Object processGet(ServerPathConfig pathConfig) {
+		final RoboReference<?> unitRef = pathConfig.getRoboUnit();
+		final SocketDecoder<?, ?> decoder = codecRegistry.getDecoder(unitRef.getMessageType());
+
+		if(unitRef.getMessageType().equals(Object.class) || decoder == null){
+			 List<ResponseAttributeDTO> attrList = unitRef.getKnownAttributes().stream()
+					 .map(d -> {
+						 try {
+							 Object val = unitRef.getAttribute(d).get();
+							 ResponseAttributeDTO attributeDTO = new ResponseAttributeDTO();
+							 attributeDTO.setId(d.getAttributeName());
+							 attributeDTO.setType(d.getAttributeType().getTypeName());
+							 attributeDTO.setValue(String.valueOf(val));
+							 return attributeDTO;
+						 } catch (InterruptedException | ExecutionException e) {
+							 SimpleLoggingUtil.error(getClass(), e.getMessage());
+							 return null;
+						 }
+					 })
+					 .filter(Objects::nonNull)
+					 .collect(Collectors.toList());
+			 return JsonUtil.toJsonArray(attrList);
+
+		} else {
+			final ResponseDecoderUnitDTO result = new ResponseDecoderUnitDTO();
+			result.setId(unitRef.getId());
+			result.setCodec(decoder.getDecodedClass().getName());
+			result.setMethods(GET_POST_METHODS);
+			return ReflectUtils.createJson(result);
 		}
+
+
 	}
 
-	//FIXME correct available methods according to the configuration
 	@Override
-	public Object processGet(ServerPathConfig pathConfig) {
-		final SocketDecoder<?, ?> decoder = codecRegistry.getDecoder(pathConfig.getRoboUnit().getMessageType());
+	public Object processServerGet(ServerPathConfig pathConfig) {
 		final ResponseDecoderUnitDTO result = new ResponseDecoderUnitDTO();
-		result.setId(pathConfig.getRoboUnit().getId());
-		result.setCodec(decoder.getDecodedClass().getName());
-		result.setMethods(GET_POST_METHODS);
 		return ReflectUtils.createJson(result);
 	}
 

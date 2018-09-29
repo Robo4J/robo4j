@@ -89,7 +89,7 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
 					final Set<String> requestAttributes = denominator.getAttributes()
 							.get(HttpPathUtils.ATTRIBUTES_PATH_VALUE);
 					if (requestAttributes == null) {
-						unitDescription = factory.processGet(pathConfig);
+							unitDescription = factory.processGet(pathConfig);
 					} else if (requestAttributes.isEmpty()) {
 						RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().getId());
 
