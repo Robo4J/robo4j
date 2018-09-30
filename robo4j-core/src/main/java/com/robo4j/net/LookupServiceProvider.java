@@ -31,8 +31,8 @@ public final class LookupServiceProvider {
 	public static final String DEFAULT_MULTICAST_ADDRESS = "238.12.15.254";
 	public static final int DEFAULT_PORT = 0x0FFE;
 	private static final float DEFAULT_HEARTBEATS_BEFORE_REMOVAL = 3.5f;
-	private static final AtomicReference<LookupService> DEFAULT_SERVICE = new AtomicReference<LookupService>(createDefaultService());
 	private static final LocalLookupServiceImpl LOCAL_CONTEXTS = new LocalLookupServiceImpl();
+	private static final AtomicReference<LookupService> DEFAULT_SERVICE = new AtomicReference<LookupService>(createDefaultService());
 
 	/**
 	 * @return the default lookup service.
