@@ -103,7 +103,7 @@ class LookupServiceImpl implements LookupService {
 		private RoboContextDescriptorEntry parse(DatagramPacket packet) {
 			RoboContextDescriptorEntry entry = new RoboContextDescriptorEntry();
 			SocketAddress address = packet.getSocketAddress();
-			if (address != null && address instanceof InetSocketAddress) {
+			if (address instanceof InetSocketAddress) {
 				entry.address = ((InetSocketAddress) address).getAddress();
 			}
 			entry.descriptor = HearbeatMessageCodec.decode(packet.getData());

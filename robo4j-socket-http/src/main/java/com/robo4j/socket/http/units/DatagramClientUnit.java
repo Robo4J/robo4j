@@ -6,7 +6,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.socket.http.channel.OutboundDatagramSocketChannelHandler;
-import com.robo4j.socket.http.dto.ClientPathDTO;
+import com.robo4j.socket.http.dto.HttpPathMethodDTO;
 import com.robo4j.socket.http.message.DatagramDecoratedRequest;
 import com.robo4j.socket.http.util.CodeRegistryUtils;
 import com.robo4j.socket.http.util.DatagramPathUtils;
@@ -46,7 +46,7 @@ public class DatagramClientUnit extends RoboUnit<DatagramDecoratedRequest> {
 
 		String packages = configuration.getString(PROPERTY_CODEC_PACKAGES, null);
 
-		final List<ClientPathDTO> paths = JsonUtil.readPathConfig(ClientPathDTO.class,
+		final List<HttpPathMethodDTO> paths = JsonUtil.readPathConfig(HttpPathMethodDTO.class,
 				configuration.getString(PROPERTY_UNIT_PATHS_CONFIG, null));
 
 		// FIXME: 2/25/18 (miro) should be moved

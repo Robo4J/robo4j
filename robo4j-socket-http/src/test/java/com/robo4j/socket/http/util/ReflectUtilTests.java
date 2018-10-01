@@ -1,13 +1,17 @@
 package com.robo4j.socket.http.util;
 
+import com.robo4j.socket.http.HttpMethod;
+import com.robo4j.socket.http.dto.HttpPathMethodDTO;
 import com.robo4j.socket.http.dto.PathAttributeDTO;
 import com.robo4j.socket.http.dto.PathAttributeListDTO;
+import com.robo4j.socket.http.dto.ResponseAttributeListDTO;
 import com.robo4j.socket.http.units.test.enums.TestCommandEnum;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +63,19 @@ public class ReflectUtilTests {
 		String result = ReflectUtils.createJson(attributes);
 		System.out.println("result:" + result);
 		Assert.assertEquals(expectedJson, result);
+	}
+
+	@Test
+	public void serverAttributesResponse(){
+		ResponseAttributeListDTO tmpAttr = new ResponseAttributeListDTO();
+
+		tmpAttr.setType("Type");
+		tmpAttr.setId("ID");
+		//String roboUnit, HttpMethod method, List<String> callbacks
+		tmpAttr.addValue(new HttpPathMethodDTO("testUnit", HttpMethod.GET, Collections.singletonList("test")));
+		String result = ReflectUtils.createJson(tmpAttr);
+		System.out.println("result:" + result);
+
 	}
 
 	@Test

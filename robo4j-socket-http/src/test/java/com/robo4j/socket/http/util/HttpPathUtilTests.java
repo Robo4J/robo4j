@@ -19,7 +19,7 @@ package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.dto.ClassGetSetDTO;
-import com.robo4j.socket.http.dto.ClientPathDTO;
+import com.robo4j.socket.http.dto.HttpPathMethodDTO;
 import com.robo4j.socket.http.dto.PathAttributeDTO;
 import com.robo4j.socket.http.units.test.PropertyListBuilder;
 import com.robo4j.util.StringConstants;
@@ -56,7 +56,7 @@ public class HttpPathUtilTests {
 				"{\"roboUnit\":\"cameraController\",\"method\":\"POST\",\"callbacks\":[\"callbackPOSTController\"]}," +
 				"{\"roboUnit\":\"cameraController\",\"method\":\"GET\",\"callbacks\":[\"callbackGETController\"]}," +
 				"{\"roboUnit\":\"emptyController\",\"method\":\"GET\"}]";
-		List<ClientPathDTO> pathMethodList = PropertyListBuilder.Builder()
+		List<HttpPathMethodDTO> pathMethodList = PropertyListBuilder.Builder()
 				.add(createPathMethodDTO("imageController", "POST","callbackPOSTController"))
 				.add(createPathMethodDTO("imageController", "GET","callbackGETController"))
 				.add(createPathMethodDTO("cameraController", "POST","callbackPOSTController"))
@@ -82,8 +82,8 @@ public class HttpPathUtilTests {
 				"{\"roboUnit\":\"cameraController\",\"method\":\"GET\",\"callbacks\":[\"callbackGETController\"]}," +
 				"{\"roboUnit\":\"emptyController\",\"method\":\"GET\"}]";
 
-		ClientPathDTO duplicate = new ClientPathDTO("cameraController", HttpMethod.POST, Collections.singletonList("callbackPOSTController"));
-		List<ClientPathDTO> result = JsonUtil.toListFromJsonArray(ClientPathDTO.class, jsonArray);
+		HttpPathMethodDTO duplicate = new HttpPathMethodDTO("cameraController", HttpMethod.POST, Collections.singletonList("callbackPOSTController"));
+		List<HttpPathMethodDTO> result = JsonUtil.toListFromJsonArray(HttpPathMethodDTO.class, jsonArray);
 
 		System.out.println("result: " + result);
 
@@ -105,7 +105,7 @@ public class HttpPathUtilTests {
 		);
 
 		jsonList.forEach(json -> {
-			ClientPathDTO pathMethod = JsonUtil.getPathMethodByJson(json);
+			HttpPathMethodDTO pathMethod = JsonUtil.getPathMethodByJson(json);
 			Assert.assertNotNull(json, pathMethod);
 			Assert.assertTrue(json, pathMethod.getRoboUnit().equals("imageController"));
 			Assert.assertTrue(json, pathMethod.getMethod().equals(HttpMethod.POST));
@@ -123,7 +123,7 @@ public class HttpPathUtilTests {
 		);
 
 		jsonList.forEach(json -> {
-			ClientPathDTO pathMethod = JsonUtil.getPathMethodByJson(json);
+			HttpPathMethodDTO pathMethod = JsonUtil.getPathMethodByJson(json);
 			System.out.println("pathMethod: " + pathMethod);
 			Assert.assertNotNull(json, pathMethod);
 			Assert.assertNotNull(pathMethod.getRoboUnit());
@@ -158,9 +158,9 @@ public class HttpPathUtilTests {
 
 	}
 
-	private ClientPathDTO createPathMethodDTO(String... args) {
+	private HttpPathMethodDTO createPathMethodDTO(String... args) {
 		List<String> properties = args.length > 2 ? Collections.singletonList(args[2]) : null;
-		return new ClientPathDTO(args[0], HttpMethod.getByName(args[1]), properties);
+		return new HttpPathMethodDTO(args[0], HttpMethod.getByName(args[1]), properties);
 	}
 
 }

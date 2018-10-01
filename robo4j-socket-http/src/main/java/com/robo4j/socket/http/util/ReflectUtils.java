@@ -434,7 +434,11 @@ public final class ReflectUtils {
 		if(result != null){
 			return result;
 		}
-		result = new JsonGenericTypeAdapter<>(clazz);
+		if(clazz.isEnum()){
+			result = TypeMapper.ENUM.getAdapter();
+		} else {
+			result = new JsonGenericTypeAdapter<>(clazz);
+		}
 		clazzAdapter.put(clazz, result);
 		return result;
 

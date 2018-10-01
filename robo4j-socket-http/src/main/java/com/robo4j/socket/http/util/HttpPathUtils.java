@@ -20,8 +20,7 @@ package com.robo4j.socket.http.util;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.socket.http.HttpMethod;
-import com.robo4j.socket.http.dto.ClientPathDTO;
-import com.robo4j.socket.http.dto.ServerUnitPathDTO;
+import com.robo4j.socket.http.dto.HttpPathMethodDTO;
 import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.socket.http.json.JsonDocument;
 import com.robo4j.socket.http.json.JsonReader;
@@ -75,8 +74,8 @@ public final class HttpPathUtils {
 	 *            configuration json
 	 * @return return server path dto with method and possible properties
 	 */
-	public static ServerUnitPathDTO readServerPathDTO(String configurationJson) {
-		Class<ServerUnitPathDTO> clazz = ServerUnitPathDTO.class;
+	public static HttpPathMethodDTO readServerPathDTO(String configurationJson) {
+		Class<HttpPathMethodDTO> clazz = HttpPathMethodDTO.class;
 		JsonReader jsonReader = new JsonReader(configurationJson);
 		JsonDocument document = jsonReader.read();
 		return ReflectUtils.createInstanceByClazzAndDescriptorAndJsonDocument(clazz, document);
@@ -91,12 +90,12 @@ public final class HttpPathUtils {
 	 *            roboReference related to the path
 	 * @return server unit path config
 	 */
-	public static ServerPathConfig toServerPathConfig(ServerUnitPathDTO dto, RoboReference<Object> reference) {
+	public static ServerPathConfig toHttpPathConfig(HttpPathMethodDTO dto, RoboReference<Object> reference) {
 		final String unitPath = toPath(SystemPath.UNITS.getPath(), dto.getRoboUnit());
-		return new ServerPathConfig(unitPath, reference, dto.getMethod(), dto.getFilters());
+		return new ServerPathConfig(unitPath, reference, dto.getMethod(), dto.getCallbacks());
 	}
 
-	public static ClientPathConfig toClientPathConfig(ClientPathDTO dto) {
+	public static ClientPathConfig toClientPathConfig(HttpPathMethodDTO dto) {
 		final String unitPath = dto.getRoboUnit().equals(StringConstants.EMPTY) ? Utf8Constant.UTF8_SOLIDUS
 				: toPath(SystemPath.UNITS.getPath(), dto.getRoboUnit());
 		final List<String> callbacks = dto.getCallbacks() == null ? new ArrayList<>() : dto.getCallbacks();
@@ -104,32 +103,31 @@ public final class HttpPathUtils {
 	}
 
 	public static void updateHttpServerContextPaths(final RoboContext context, final ServerContext serverContext,
-			final Collection<ServerUnitPathDTO> paths) {
+			final Collection<HttpPathMethodDTO> paths) {
 		final Map<PathHttpMethod, ServerPathConfig> resultPaths = paths.stream().map(e -> {
 			RoboReference<Object> reference = context.getReference(e.getRoboUnit());
-			return HttpPathUtils.toServerPathConfig(e, reference);
+			return HttpPathUtils.toHttpPathConfig(e, reference);
 		}).collect(Collectors.toMap(e -> new PathHttpMethod(e.getPath(), e.getMethod()), e -> e));
 
-
-		resultPaths.put(new PathHttpMethod(Utf8Constant.UTF8_SOLIDUS,HttpMethod.GET),
+		resultPaths.put(new PathHttpMethod(Utf8Constant.UTF8_SOLIDUS, HttpMethod.GET),
 				new ServerPathConfig(Utf8Constant.UTF8_SOLIDUS, null, HttpMethod.GET));
 		serverContext.addPaths(resultPaths);
 	}
 
 	public static void updateHttpClientContextPaths(final ClientContext clientContext,
-			final Collection<ClientPathDTO> paths) {
-		final Map<PathHttpMethod, ClientPathConfig> resultPaths = paths.stream()
-                .map(HttpPathUtils::toClientPathConfig)
+			final Collection<HttpPathMethodDTO> paths) {
+		final Map<PathHttpMethod, ClientPathConfig> resultPaths = paths.stream().map(HttpPathUtils::toClientPathConfig)
 				.collect(Collectors.toMap(e -> new PathHttpMethod(e.getPath(), e.getMethod()), e -> e));
 		clientContext.addPaths(resultPaths);
 	}
 
-	public static Map<String, Set<String>> extractAttributesByPath(String path){
+	public static Map<String, Set<String>> extractAttributesByPath(String path) {
 		return Stream.of(path.split(REGEX_ATTRIBUTE)[1].split(REGEX_ATTRIBUTE_CONCAT))
 				.map(e -> e.split(DELIMITER_ATTRIBUTE_KEY_VALUE))
-				.collect(Collectors.toMap(e -> e[0], e -> e.length > 1 && e[1] != null ?
-						Stream.of(e[1].split(DELIMITER_ATTRIBUTES)).collect(Collectors.toSet())
-						: Collections.emptySet()));
+				.collect(Collectors.toMap(e -> e[0],
+						e -> e.length > 1 && e[1] != null
+								? Stream.of(e[1].split(DELIMITER_ATTRIBUTES)).collect(Collectors.toSet())
+								: Collections.emptySet()));
 	}
 
 }

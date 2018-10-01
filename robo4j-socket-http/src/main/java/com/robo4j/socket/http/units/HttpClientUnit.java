@@ -34,6 +34,8 @@ import java.nio.channels.SocketChannel;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.robo4j.socket.http.util.RoboHttpUtils.HTTP_PROPERTY_PROTOCOL;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY;
@@ -54,10 +56,11 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 
 	private static final EnumSet<StatusCode> PROCESS_RESPONSES_STATUSES = EnumSet.of(StatusCode.OK,
 			StatusCode.ACCEPTED);
+	private volatile String host;
+	private volatile Integer port;
 	private Integer bufferCapacity;
 	private ProtocolType protocol;
-	private String host;
-	private Integer port;
+	private Lock lock = new ReentrantLock();
 
 	public HttpClientUnit(RoboContext context, String id) {
 		super(HttpDecoratedRequest.class, context, id);
@@ -78,6 +81,10 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 	@Override
 	public void onMessage(HttpDecoratedRequest message) {
 		final HttpDecoratedRequest request = adjustRequest(message);
+		if (message.getDenominator() == null) {
+			SimpleLoggingUtil.info(getClass(), String.format("recofigured host: %s, port: %d", message.getHost(), message.getPort()));
+			return;
+		}
 		final InetSocketAddress address = new InetSocketAddress(request.getHost(), request.getPort());
 		try (SocketChannel channel = SocketChannel.open(address)) {
 			if (bufferCapacity != null) {
@@ -110,6 +117,17 @@ public class HttpClientUnit extends RoboUnit<HttpDecoratedRequest> {
 	}
 
 	private HttpDecoratedRequest adjustRequest(HttpDecoratedRequest request) {
+		lock.lock();
+		try {
+			if(request.getHost() != null && !request.getHost().isEmpty()){
+				host = request.getHost();
+			}
+			if(request.getPort() != null){
+				port = request.getPort();
+			}
+		}finally {
+			lock.unlock();
+		}
 		request.setHost(host);
 		request.setPort(port);
 		request.addHostHeader();

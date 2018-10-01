@@ -21,7 +21,7 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.socket.http.dto.ClientPathDTO;
+import com.robo4j.socket.http.dto.HttpPathMethodDTO;
 import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.RoboHttpUtils;
@@ -53,7 +53,7 @@ public abstract class AbstractClientCodecUnit extends RoboUnit<ClientMessageWrap
 		target = configuration.getString(PROPERTY_TARGET, null);
 		Objects.requireNonNull(target, "empty target");
 
-		final List<ClientPathDTO> paths = JsonUtil.readPathConfig(ClientPathDTO.class,
+		final List<HttpPathMethodDTO> paths = JsonUtil.readPathConfig(HttpPathMethodDTO.class,
 				configuration.getString(PROPERTY_UNIT_PATHS_CONFIG, null));
 		if (paths.isEmpty()) {
 			throw ConfigurationException.createMissingConfigNameException(PROPERTY_UNIT_PATHS_CONFIG);

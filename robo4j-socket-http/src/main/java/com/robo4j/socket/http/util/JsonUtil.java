@@ -19,7 +19,9 @@ package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.HttpException;
 import com.robo4j.socket.http.dto.ClassGetSetDTO;
-import com.robo4j.socket.http.dto.ClientPathDTO;
+import com.robo4j.socket.http.dto.HttpPathMethodDTO;
+import com.robo4j.socket.http.dto.ResponseAttributeDTO;
+import com.robo4j.socket.http.dto.ResponseAttributeListDTO;
 import com.robo4j.socket.http.json.JsonDocument;
 import com.robo4j.socket.http.json.JsonReader;
 import com.robo4j.socket.http.json.JsonTypeAdapter;
@@ -122,18 +124,18 @@ public final class JsonUtil {
 	}
 
 	/**
-	 * Converting json {"imageProcessor":["POST","callBack"]} to ClientPathDTO
+	 * Converting json {"imageProcessor":["POST","callBack"]} to HttpPathMethodDTO
 	 *
 	 * @param json
 	 *            - string
 	 * @return List of elements
 	 */
-	public static ClientPathDTO getPathMethodByJson(String json) {
+	public static HttpPathMethodDTO getPathMethodByJson(String json) {
 		final JsonDocument document = toJsonDocument(json);
-		return ReflectUtils.createInstanceByClazzAndDescriptorAndJsonDocument(ClientPathDTO.class, document);
+		return ReflectUtils.createInstanceByClazzAndDescriptorAndJsonDocument(HttpPathMethodDTO.class, document);
 	}
 
-	public static String getJsonByPathMethodList(List<ClientPathDTO> pathMethodList) {
+	public static String getJsonByPathMethodList(List<HttpPathMethodDTO> pathMethodList) {
 		final JsonElementStringBuilder builder = JsonElementStringBuilder.Builder()
 				.add(Utf8Constant.UTF8_SQUARE_BRACKET_LEFT);
 		if (!pathMethodList.isEmpty()) {
@@ -193,6 +195,29 @@ public final class JsonUtil {
 	public static <T> String toJsonArray(List<T> list) {
 		return JsonElementStringBuilder.Builder().add(Utf8Constant.UTF8_SQUARE_BRACKET_LEFT)
 				.add(list.stream().map(ReflectUtils::createJson).collect(Collectors.joining(Utf8Constant.UTF8_COMMA)))
+				.add(Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT).build();
+	}
+
+	public static <T> String toJsonArrayServer(List<T> list) {
+		return JsonElementStringBuilder.Builder().add(Utf8Constant.UTF8_SQUARE_BRACKET_LEFT)
+				.add(list.stream().map(e -> {
+					if(e instanceof ResponseAttributeDTO){
+						ResponseAttributeDTO ra = (ResponseAttributeDTO)e;
+						switch (ra.getType()){
+							case "java.util.ArrayList":
+								List<HttpPathMethodDTO> tmpList = JsonUtil.readPathConfig(HttpPathMethodDTO.class, ra.getValue());
+								ResponseAttributeListDTO tmpAttr = new ResponseAttributeListDTO();
+								tmpAttr.setId(ra.getId());
+								tmpAttr.setType(ra.getType());
+								tmpAttr.setValue(tmpList);
+								return ReflectUtils.createJson(tmpAttr);
+							default:
+								return ReflectUtils.createJson(e);
+						}
+					} else {
+						return ReflectUtils.createJson(e);
+					}
+				}).collect(Collectors.joining(Utf8Constant.UTF8_COMMA)))
 				.add(Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT).build();
 	}
 

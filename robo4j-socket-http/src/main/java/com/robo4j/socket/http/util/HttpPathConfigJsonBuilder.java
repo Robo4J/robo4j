@@ -1,9 +1,8 @@
 package com.robo4j.socket.http.util;
 
-
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.dto.ClassGetSetDTO;
-import com.robo4j.socket.http.dto.ServerUnitPathDTO;
+import com.robo4j.socket.http.dto.HttpPathMethodDTO;
 import com.robo4j.util.Utf8Constant;
 
 import java.util.LinkedList;
@@ -19,33 +18,33 @@ import java.util.stream.Collectors;
  */
 public final class HttpPathConfigJsonBuilder {
 
-    private final Map<String, ClassGetSetDTO> descriptorMap;
-    private final List<ServerUnitPathDTO> paths = new LinkedList<>();
+	private final Map<String, ClassGetSetDTO> descriptorMap;
+	private final List<HttpPathMethodDTO> paths = new LinkedList<>();
 
-    private HttpPathConfigJsonBuilder() {
-        descriptorMap = ReflectUtils.getFieldsTypeMap(ServerUnitPathDTO.class);
-    }
+	private HttpPathConfigJsonBuilder() {
+		descriptorMap = ReflectUtils.getFieldsTypeMap(HttpPathMethodDTO.class);
+	}
 
-    public static HttpPathConfigJsonBuilder Builder(){
-        return new HttpPathConfigJsonBuilder();
-    }
+	public static HttpPathConfigJsonBuilder Builder() {
+		return new HttpPathConfigJsonBuilder();
+	}
 
-    public HttpPathConfigJsonBuilder addPath(String roboUnit, HttpMethod method){
-        ServerUnitPathDTO document = new ServerUnitPathDTO(roboUnit, method);
-        paths.add(document);
-        return this;
-    }
+	public HttpPathConfigJsonBuilder addPath(String roboUnit, HttpMethod method) {
+		HttpPathMethodDTO document = new HttpPathMethodDTO(roboUnit, method);
+		paths.add(document);
+		return this;
+	}
 
-    public HttpPathConfigJsonBuilder addPath(String roboUnit, HttpMethod method, List<String> filters){
-        ServerUnitPathDTO document = new ServerUnitPathDTO(roboUnit, method, filters);
-        paths.add(document);
-        return this;
-    }
+	public HttpPathConfigJsonBuilder addPath(String roboUnit, HttpMethod method, List<String> filters) {
+		HttpPathMethodDTO document = new HttpPathMethodDTO(roboUnit, method, filters);
+		paths.add(document);
+		return this;
+	}
 
-    public String build(){
-        return new StringBuilder().append(Utf8Constant.UTF8_SQUARE_BRACKET_LEFT)
-                .append(paths.stream().map(e -> ReflectUtils.createJson(descriptorMap, e)).collect(Collectors.joining(Utf8Constant.UTF8_COMMA)))
-                .append(Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT)
-                .toString();
-    }
+	public String build() {
+		return new StringBuilder().append(Utf8Constant.UTF8_SQUARE_BRACKET_LEFT)
+				.append(paths.stream().map(e -> ReflectUtils.createJson(descriptorMap, e))
+						.collect(Collectors.joining(Utf8Constant.UTF8_COMMA)))
+				.append(Utf8Constant.UTF8_SQUARE_BRACKET_RIGHT).toString();
+	}
 }

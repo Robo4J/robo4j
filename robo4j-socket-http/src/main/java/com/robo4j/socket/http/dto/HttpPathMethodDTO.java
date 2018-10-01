@@ -19,6 +19,7 @@ package com.robo4j.socket.http.dto;
 
 import com.robo4j.socket.http.HttpMethod;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,17 +27,22 @@ import java.util.Objects;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class ClientPathDTO {
+public class HttpPathMethodDTO {
 
 	private String roboUnit;
 	private HttpMethod method;
-	private List<String> callbacks;
+	private List<String> callbacks = new ArrayList<>();
 
-	public ClientPathDTO(){
+	public HttpPathMethodDTO(){
 
 	}
 
-	public ClientPathDTO(String roboUnit, HttpMethod method, List<String> callbacks) {
+	public HttpPathMethodDTO(String roboUnit, HttpMethod method) {
+		this.roboUnit = roboUnit;
+		this.method = method;
+	}
+
+	public HttpPathMethodDTO(String roboUnit, HttpMethod method, List<String> callbacks) {
 		this.roboUnit = roboUnit;
 		this.method = method;
 		this.callbacks = callbacks;
@@ -66,11 +72,15 @@ public class ClientPathDTO {
 		this.callbacks = callbacks;
 	}
 
+	public void addCallbacks(String callback) {
+		this.callbacks.add(callback);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		ClientPathDTO that = (ClientPathDTO) o;
+		HttpPathMethodDTO that = (HttpPathMethodDTO) o;
 		return Objects.equals(roboUnit, that.roboUnit) &&
 				method == that.method &&
 				Objects.equals(callbacks, that.callbacks);
@@ -84,7 +94,10 @@ public class ClientPathDTO {
 
 	@Override
 	public String toString() {
-		return "ClientPathDTO{" + "roboUnit='" + roboUnit + '\'' + ", method=" + method + ", callbacks="
-				+ callbacks + '}';
+		return "HttpPathMethodDTO{" +
+				"roboUnit='" + roboUnit + '\'' +
+				", method=" + method +
+				", callbacks=" + callbacks +
+				'}';
 	}
 }

@@ -53,7 +53,7 @@ public class RoboHttpUnitGetTest {
 
 
 	@Test
-	@Ignore
+//	@Ignore
 	public void systemWithHttpServerOnlyTest() throws Exception {
 		final String httpServerUnitName = "http_server";
 		final HttpPathConfigJsonBuilder pathBuilder = HttpPathConfigJsonBuilder.Builder().addPath(httpServerUnitName, HttpMethod.GET);

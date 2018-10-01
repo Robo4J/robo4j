@@ -27,6 +27,7 @@ import com.robo4j.socket.http.dto.ResponseAttributeDTO;
 import com.robo4j.socket.http.dto.ResponseDecoderUnitDTO;
 import com.robo4j.socket.http.dto.ResponseUnitDTO;
 import com.robo4j.socket.http.units.CodecRegistry;
+import com.robo4j.socket.http.units.HttpServerUnit;
 import com.robo4j.socket.http.units.ServerPathConfig;
 import com.robo4j.socket.http.units.SocketDecoder;
 import com.robo4j.socket.http.util.JsonUtil;
@@ -90,7 +91,13 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 							 attributeDTO.setId(d.getAttributeName());
 							 attributeDTO.setType(d.getAttributeType().getTypeName());
 							 attributeDTO.setValue(String.valueOf(val));
+
+							 if(d.getAttributeName().equals(HttpServerUnit.ATTR_PATHS)){
+								 attributeDTO.setType("java.util.ArrayList");
+							 }
 							 return attributeDTO;
+
+
 						 } catch (InterruptedException | ExecutionException e) {
 							 SimpleLoggingUtil.error(getClass(), e.getMessage());
 							 return null;
@@ -98,7 +105,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 					 })
 					 .filter(Objects::nonNull)
 					 .collect(Collectors.toList());
-			 return JsonUtil.toJsonArray(attrList);
+			 return JsonUtil.toJsonArrayServer(attrList);
 
 		} else {
 			final ResponseDecoderUnitDTO result = new ResponseDecoderUnitDTO();

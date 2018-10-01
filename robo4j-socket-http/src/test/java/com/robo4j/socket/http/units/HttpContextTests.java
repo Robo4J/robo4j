@@ -2,7 +2,7 @@ package com.robo4j.socket.http.units;
 
 import com.robo4j.RoboBuilder;
 import com.robo4j.socket.http.HttpMethod;
-import com.robo4j.socket.http.dto.ClientPathDTO;
+import com.robo4j.socket.http.dto.HttpPathMethodDTO;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.util.StringConstants;
@@ -65,8 +65,8 @@ public class HttpContextTests {
 				.getResourceAsStream("robo_client_context.xml");
 		builderProducer.add(contextIS);
 
-		List<ClientPathDTO> paths = Collections
-				.singletonList(new ClientPathDTO(StringConstants.EMPTY, HttpMethod.GET, Collections.singletonList(StringConsumer.NAME)));
+		List<HttpPathMethodDTO> paths = Collections
+				.singletonList(new HttpPathMethodDTO(StringConstants.EMPTY, HttpMethod.GET, Collections.singletonList(StringConsumer.NAME)));
 
 		ClientContext context = new ClientContext();
 		HttpPathUtils.updateHttpClientContextPaths(context, paths);

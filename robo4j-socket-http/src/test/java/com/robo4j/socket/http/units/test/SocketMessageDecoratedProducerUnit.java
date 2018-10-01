@@ -24,7 +24,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.socket.http.HttpVersion;
-import com.robo4j.socket.http.dto.ClientPathDTO;
+import com.robo4j.socket.http.dto.HttpPathMethodDTO;
 import com.robo4j.socket.http.message.DatagramDecoratedRequest;
 import com.robo4j.socket.http.message.DatagramDenominator;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
@@ -79,7 +79,7 @@ public class SocketMessageDecoratedProducerUnit extends RoboUnit<Integer> {
 		target = configuration.getString(PROPERTY_TARGET, null);
 		message = configuration.getString("message", null);
 
-		List<ClientPathDTO> paths = JsonUtil.readPathConfig(ClientPathDTO.class,
+		List<HttpPathMethodDTO> paths = JsonUtil.readPathConfig(HttpPathMethodDTO.class,
 				configuration.getString(PROPERTY_UNIT_PATHS_CONFIG, null));
 		HttpPathUtils.updateHttpClientContextPaths(clientContext, paths);
 		counter = new AtomicInteger(DEFAULT);

@@ -17,8 +17,8 @@ public class HttpPathConfigJsonBuilderTests {
     @Test
     public void simpleConfigurationTest(){
 
-        String expectedJson = "[{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\",\"filters\":[\"filter1\",\"filter2\"]}," +
-                "{\"roboUnit\":\"roboUnit2\",\"method\":\"POST\"},{\"roboUnit\":\"roboUnit3\",\"method\":\"GET\",\"filters\":[]}]";
+        String expectedJson = "[{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\",\"callbacks\":[\"filter1\",\"filter2\"]}," +
+                "{\"roboUnit\":\"roboUnit2\",\"method\":\"POST\",\"callbacks\":[]},{\"roboUnit\":\"roboUnit3\",\"method\":\"GET\",\"callbacks\":[]}]";
 
         HttpPathConfigJsonBuilder builder = HttpPathConfigJsonBuilder.Builder()
                 .addPath("roboUnit1", HttpMethod.GET, Arrays.asList("filter1", "filter2"))

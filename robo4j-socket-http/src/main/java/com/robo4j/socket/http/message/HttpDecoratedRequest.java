@@ -39,6 +39,11 @@ public final class HttpDecoratedRequest extends AbstractHttpDecoratedMessage {
 	private String host;
 	private Integer port;
 
+	public HttpDecoratedRequest(){
+		super();
+		denominator = null;
+	}
+
 	public HttpDecoratedRequest(HttpRequestDenominator denominator){
 		super(denominator.getVersion());
 		this.denominator = denominator;

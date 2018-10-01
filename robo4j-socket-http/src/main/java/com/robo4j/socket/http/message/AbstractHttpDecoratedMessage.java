@@ -40,6 +40,10 @@ public abstract class AbstractHttpDecoratedMessage implements HttpMessage {
 	private String message;
 	private List<String> callbacks = new ArrayList<>();
 
+	AbstractHttpDecoratedMessage(){
+		version = null;
+	}
+
 	AbstractHttpDecoratedMessage(String version) {
 		this.version = version;
 	}

@@ -18,7 +18,7 @@
 package com.robo4j.socket.http.channel;
 
 import com.robo4j.socket.http.SocketException;
-import com.robo4j.socket.http.dto.ClientPathDTO;
+import com.robo4j.socket.http.dto.HttpPathMethodDTO;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.message.HttpDecoratedResponse;
 import com.robo4j.socket.http.util.ChannelBufferUtils;
@@ -49,7 +49,7 @@ public class OutboundHttpSocketChannelHandler implements ChannelHandler, AutoClo
 	@Override
 	public void start() {
 		// FIXME: 1/24/18 (miro) -> client context
-		final ClientPathDTO pathMethod = new ClientPathDTO(message.getPathMethod().getPath(), message.getPathMethod().getMethod(),
+		final HttpPathMethodDTO pathMethod = new HttpPathMethodDTO(message.getPathMethod().getPath(), message.getPathMethod().getMethod(),
 				message.getCallbacks());
 
 		//@formatter:off
@@ -82,7 +82,7 @@ public class OutboundHttpSocketChannelHandler implements ChannelHandler, AutoClo
 		return decoratedResponse;
 	}
 
-	private HttpDecoratedResponse getDecoratedResponse(ByteChannel byteChannel, ClientPathDTO pathMethod) {
+	private HttpDecoratedResponse getDecoratedResponse(ByteChannel byteChannel, HttpPathMethodDTO pathMethod) {
 		try {
 			final HttpDecoratedResponse result = ChannelBufferUtils.getHttpDecoratedResponseByChannel(byteChannel);
 			result.addCallbacks(pathMethod.getCallbacks());

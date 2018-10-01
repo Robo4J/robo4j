@@ -28,7 +28,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.socket.http.channel.InboundHttpSocketChannelHandler;
-import com.robo4j.socket.http.dto.ServerUnitPathDTO;
+import com.robo4j.socket.http.dto.HttpPathMethodDTO;
 import com.robo4j.socket.http.util.CodeRegistryUtils;
 import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.JsonUtil;
@@ -69,7 +69,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 
 	private final ServerContext serverContext = new ServerContext();
 	private InboundHttpSocketChannelHandler handler;
-	private List<ServerUnitPathDTO> paths;
+	private List<HttpPathMethodDTO> paths;
 	private String serverAddress;
 	private Integer serverPort;
 
@@ -83,8 +83,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 		serverAddress = configuration.getString(ATTR_ADDRESS, "0.0.0.0");
 		int bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, INIT_BUFFER_CAPACITY);
 
-		paths = JsonUtil.readPathConfig(ServerUnitPathDTO.class,
-				configuration.getString(PROPERTY_UNIT_PATHS_CONFIG, null));
+		paths = JsonUtil.readPathConfig(HttpPathMethodDTO.class, configuration.getString(PROPERTY_UNIT_PATHS_CONFIG, null));
 
 		serverContext.putProperty(PROPERTY_BUFFER_CAPACITY, bufferCapacity);
 		serverContext.putProperty(PROPERTY_SOCKET_PORT, serverPort);
