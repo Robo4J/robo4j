@@ -19,6 +19,7 @@ package com.robo4j;
 
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.scheduler.RoboThreadFactory;
+import com.robo4j.util.SystemUtil;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
@@ -67,7 +68,6 @@ public final class RoboApplication {
 		try {
 			Thread daemon = new Thread(() -> {
 					try {
-						SimpleLoggingUtil.info(RoboApplication.class, "Press any Key...");
 						int val = System.in.read();
 						appLatch.countDown();
 					} catch (IOException e) {
@@ -79,6 +79,8 @@ public final class RoboApplication {
 			daemon.setDaemon(true);
 			daemon.start();
 			context.start();
+			SimpleLoggingUtil.info(RoboApplication.class, SystemUtil.printStateReport(context));
+			SimpleLoggingUtil.info(RoboApplication.class, "Press any Key...");
 			appLatch.await();
 			SimpleLoggingUtil.info(RoboApplication.class,"Going down...");
 			context.shutdown();
