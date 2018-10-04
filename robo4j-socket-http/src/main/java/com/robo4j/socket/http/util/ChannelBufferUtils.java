@@ -17,22 +17,6 @@
 
 package com.robo4j.socket.http.util;
 
-import static com.robo4j.socket.http.util.HttpConstant.HTTP_NEW_LINE;
-import static com.robo4j.socket.http.util.HttpMessageUtils.HTTP_HEADER_BODY_DELIMITER;
-import static com.robo4j.socket.http.util.HttpMessageUtils.HTTP_HEADER_SEP;
-import static com.robo4j.socket.http.util.HttpMessageUtils.POSITION_BODY;
-import static com.robo4j.socket.http.util.HttpMessageUtils.POSITION_HEADER;
-
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ByteChannel;
-import java.nio.channels.DatagramChannel;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.robo4j.socket.http.HttpHeaderFieldNames;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
@@ -46,6 +30,22 @@ import com.robo4j.socket.http.message.HttpRequestDenominator;
 import com.robo4j.socket.http.message.HttpResponseDenominator;
 import com.robo4j.util.StringConstants;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.ByteChannel;
+import java.nio.channels.DatagramChannel;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.robo4j.socket.http.util.HttpConstant.HTTP_NEW_LINE;
+import static com.robo4j.socket.http.util.HttpMessageUtils.HTTP_HEADER_BODY_DELIMITER;
+import static com.robo4j.socket.http.util.HttpMessageUtils.HTTP_HEADER_SEP;
+import static com.robo4j.socket.http.util.HttpMessageUtils.POSITION_BODY;
+import static com.robo4j.socket.http.util.HttpMessageUtils.POSITION_HEADER;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -58,12 +58,10 @@ public class ChannelBufferUtils {
 	public static final byte CHAR_NEW_LINE = 0x0A;
 	public static final byte CHAR_RETURN = 0x0D;
 	public static final byte[] END_WINDOW = { CHAR_NEW_LINE, CHAR_NEW_LINE };
-	private static final int BUFFER_MARK_END = -1;
+	public static final int BUFFER_MARK_END = -1;
 
-	// FIXME: 2/18/18 (miro) every unit client, server should have it's own
-	// buffer
+
 	private static final ByteBuffer requestBuffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
-	private static final ByteBuffer responseBuffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
 	public static final int RESPONSE_JSON_GROUP = 2;
 
 	public static ByteBuffer copy(ByteBuffer source, int start, int end) {
@@ -81,71 +79,6 @@ public class ChannelBufferUtils {
 		return result;
 	}
 
-	public static HttpDecoratedResponse getHttpDecoratedResponseByChannel(ByteChannel channel) throws IOException {
-		final StringBuilder sbBasic = new StringBuilder();
-		int readBytes = channel.read(responseBuffer);
-		if (readBytes != BUFFER_MARK_END) {
-			responseBuffer.flip();
-			addToStringBuilder(sbBasic, responseBuffer, readBytes);
-			final StringBuilder sbAdditional = new StringBuilder();
-			final HttpDecoratedResponse result = extractDecoratedResponseByStringMessage(sbBasic.toString());
-
-			int totalReadBytes = readBytes;
-
-			if (result.getLength() != 0) {
-				while (totalReadBytes < result.getLength()) {
-					readBytes = channel.read(responseBuffer);
-					responseBuffer.flip();
-					addToStringBuilder(sbAdditional, responseBuffer, readBytes);
-
-					totalReadBytes += readBytes;
-					responseBuffer.clear();
-				}
-				if (sbAdditional.length() > 0) {
-					result.addMessage(sbAdditional.toString());
-				}
-			}
-			responseBuffer.clear();
-			return result;
-
-		} else {
-
-			return new HttpDecoratedResponse(new HashMap<>(), new HttpResponseDenominator(StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1));
-		}
-	}
-
-	public static HttpDecoratedRequest getHttpDecoratedRequestByChannel(ByteChannel channel) {
-		final StringBuilder sbBasic = new StringBuilder();
-		int readBytes = readBytesByChannel(channel);
-		if (readBytes != BUFFER_MARK_END) {
-
-			requestBuffer.flip();
-			addToStringBuilder(sbBasic, requestBuffer, readBytes);
-			final StringBuilder sbAdditional = new StringBuilder();
-			final HttpDecoratedRequest result = extractDecoratedRequestByStringMessage(sbBasic.toString());
-
-			int totalReadBytes = readBytes;
-
-			if (result.getLength() != 0) {
-				while (totalReadBytes < result.getLength()) {
-					readBytes = readBytesByChannel(channel);
-					requestBuffer.flip();
-					addToStringBuilder(sbAdditional, requestBuffer, readBytes);
-
-					totalReadBytes += readBytes;
-					requestBuffer.clear();
-				}
-				if (sbAdditional.length() > 0) {
-					result.addMessage(sbAdditional.toString());
-				}
-			}
-			requestBuffer.clear();
-			return result;
-		} else {
-			return new HttpDecoratedRequest(new HashMap<>(), new HttpRequestDenominator(HttpMethod.GET, HttpVersion.HTTP_1_1));
-		}
-	}
-
 	public static DatagramDecoratedRequest getDatagramDecoratedRequestByChannel(int type, DatagramChannel channel, ByteBuffer buffer)
 			throws IOException {
 		buffer.clear();
@@ -154,7 +87,7 @@ public class ChannelBufferUtils {
 		return new DatagramDecoratedRequest(new DatagramDenominator(type, StringConstants.EMPTY));
 	}
 
-	private static int readBytesByChannel(ByteChannel channel) {
+	public static int readBytesByChannel(ByteChannel channel) {
 		try {
 			return channel.read(requestBuffer);
 		} catch (Exception e) {
@@ -243,7 +176,7 @@ public class ChannelBufferUtils {
 		return result;
 	}
 
-	private static Map<String, String> getHeaderParametersByArray(String[] paramArray) {
+	public static Map<String, String> getHeaderParametersByArray(String[] paramArray) {
 		final Map<String, String> result = new HashMap<>();
 		for (int i = 0; i < paramArray.length; i++) {
 			final String[] array = paramArray[i].split(HttpMessageUtils.getHttpSeparator(HTTP_HEADER_SEP));
@@ -255,11 +188,11 @@ public class ChannelBufferUtils {
 		return result;
 	}
 
-	private static Integer calculateMessageSize(int headerValue, Map<String, String> headerParams) {
+	public static Integer calculateMessageSize(int headerValue, Map<String, String> headerParams) {
 		return headerValue + HTTP_HEADER_BODY_DELIMITER.length() + Integer.valueOf(headerParams.get(HttpHeaderFieldNames.CONTENT_LENGTH));
 	}
 
-	private static void addToStringBuilder(StringBuilder sb, ByteBuffer buffer, int size) {
+	public static void addToStringBuilder(StringBuilder sb, ByteBuffer buffer, int size) {
 		byte[] array = new byte[size];
 		for (int i = 0; i < size; i++) {
 			array[i] = buffer.get(i);

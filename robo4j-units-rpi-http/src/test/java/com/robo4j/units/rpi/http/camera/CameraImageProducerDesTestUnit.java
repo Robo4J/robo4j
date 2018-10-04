@@ -24,6 +24,7 @@ import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
+import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.socket.http.units.ClientMessageWrapper;
@@ -76,6 +77,7 @@ public class CameraImageProducerDesTestUnit extends RoboUnit<Boolean> {
 	@Override
 	public void onMessage(Boolean message) {
 		if (message) {
+			SimpleLoggingUtil.debug(getClass(), "message: " + message);
 			createImage(counter.get());
 		}
 	}

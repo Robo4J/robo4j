@@ -25,7 +25,7 @@ import com.robo4j.socket.http.request.RoboRequestCallable;
 import com.robo4j.socket.http.request.RoboRequestFactory;
 import com.robo4j.socket.http.units.CodecRegistry;
 import com.robo4j.socket.http.units.ServerContext;
-import com.robo4j.socket.http.util.ChannelBufferUtils;
+import com.robo4j.socket.http.util.ChannelRequestBuffer;
 
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -47,6 +47,7 @@ public class ReadSelectionKeyHandler implements SelectionKeyHandler {
 	private final CodecRegistry codecRegistry;
 	private final Map<SelectionKey, HttpResponseProcess> outBuffers;
 	private final SelectionKey key;
+	private final ChannelRequestBuffer channelRequestBuffer = new ChannelRequestBuffer();
 
 	public ReadSelectionKeyHandler(RoboContext context, ServerContext serverContext, CodecRegistry codecRegistry,
 								   Map<SelectionKey, HttpResponseProcess> outBuffers, SelectionKey key) {
@@ -60,7 +61,7 @@ public class ReadSelectionKeyHandler implements SelectionKeyHandler {
 	@Override
 	public SelectionKey handle() {
 		SocketChannel channel = (SocketChannel) key.channel();
-		final HttpDecoratedRequest decoratedRequest = ChannelBufferUtils.getHttpDecoratedRequestByChannel(channel);
+		final HttpDecoratedRequest decoratedRequest = channelRequestBuffer.getHttpDecoratedRequestByChannel(channel);
 		final RoboRequestFactory factory = new RoboRequestFactory(codecRegistry);
 		final RoboRequestCallable callable = new RoboRequestCallable(context, serverContext, decoratedRequest, factory);
 		final Future<HttpResponseProcess> futureResult = context.getScheduler().submit(callable);

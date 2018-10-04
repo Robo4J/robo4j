@@ -55,6 +55,7 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONF
 @BlockingTrait
 public class HttpServerUnit extends RoboUnit<Object> {
 
+	public static final String NAME = "httpServer";
 	public static final String ATTR_ADDRESS = "address";
 	public static final String ATTR_PORT = "serverPort";
 	public static final String ATTR_PATHS = "paths";
