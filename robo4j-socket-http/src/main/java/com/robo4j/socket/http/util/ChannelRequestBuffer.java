@@ -22,6 +22,7 @@ import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.message.HttpRequestDenominator;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.util.HashMap;
@@ -34,40 +35,26 @@ import java.util.HashMap;
  */
 public class ChannelRequestBuffer {
 
-    private  final ByteBuffer requestBuffer = ByteBuffer.allocateDirect(ChannelBufferUtils.INIT_BUFFER_CAPACITY);
+	private ByteBuffer requestBuffer;
 
-    public ChannelRequestBuffer() {
-    }
+	public ChannelRequestBuffer() {
+		requestBuffer = ByteBuffer.allocateDirect(ChannelBufferUtils.INIT_BUFFER_CAPACITY);
+	}
 
-    public HttpDecoratedRequest getHttpDecoratedRequestByChannel(ByteChannel channel) {
-        final StringBuilder sbBasic = new StringBuilder();
-        int readBytes = ChannelBufferUtils.readBytesByChannel(channel);
-        if (readBytes != ChannelBufferUtils.BUFFER_MARK_END) {
-
-            requestBuffer.flip();
-            ChannelBufferUtils.addToStringBuilder(sbBasic, requestBuffer, readBytes);
-            final StringBuilder sbAdditional = new StringBuilder();
-            final HttpDecoratedRequest result = ChannelBufferUtils.extractDecoratedRequestByStringMessage(sbBasic.toString());
-
-            int totalReadBytes = readBytes;
-
-            if (result.getLength() != 0) {
-                while (totalReadBytes < result.getLength()) {
-                    readBytes = ChannelBufferUtils.readBytesByChannel(channel);
-                    requestBuffer.flip();
-                    ChannelBufferUtils.addToStringBuilder(sbAdditional, requestBuffer, readBytes);
-
-                    totalReadBytes += readBytes;
-                    requestBuffer.clear();
-                }
-                if (sbAdditional.length() > 0) {
-                    result.addMessage(sbAdditional.toString());
-                }
-            }
-            requestBuffer.clear();
-            return result;
-        } else {
-            return new HttpDecoratedRequest(new HashMap<>(), new HttpRequestDenominator(HttpMethod.GET, HttpVersion.HTTP_1_1));
-        }
-    }
+	public HttpDecoratedRequest getHttpDecoratedRequestByChannel(ByteChannel channel) throws IOException {
+		final StringBuilder sbBasic = new StringBuilder();
+		int readBytes = channel.read(requestBuffer);
+		if (readBytes != ChannelBufferUtils.BUFFER_MARK_END) {
+			requestBuffer.flip();
+			ChannelBufferUtils.addToStringBuilder(sbBasic, requestBuffer, readBytes);
+			final HttpDecoratedRequest result = ChannelBufferUtils
+					.extractDecoratedRequestByStringMessage(sbBasic.toString());
+			ChannelBufferUtils.readChannelBuffer(result, channel, requestBuffer, readBytes);
+			requestBuffer.clear();
+			return result;
+		} else {
+			return new HttpDecoratedRequest(new HashMap<>(),
+					new HttpRequestDenominator(HttpMethod.GET, HttpVersion.HTTP_1_1));
+		}
+	}
 }

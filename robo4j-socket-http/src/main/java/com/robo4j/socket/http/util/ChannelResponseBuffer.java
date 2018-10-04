@@ -46,71 +46,58 @@ import static com.robo4j.socket.http.util.HttpMessageUtils.POSITION_HEADER;
  */
 public class ChannelResponseBuffer {
 
-    private final ByteBuffer responseBuffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
+	private ByteBuffer responseBuffer;
 
-    public ChannelResponseBuffer() {
-    }
+	public ChannelResponseBuffer() {
+		responseBuffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
+	}
 
-    public HttpDecoratedResponse getHttpDecoratedResponseByChannel(ByteChannel channel) throws IOException {
-        final StringBuilder sbBasic = new StringBuilder();
-        int readBytes = channel.read(responseBuffer);
-        if (readBytes != BUFFER_MARK_END) {
-            responseBuffer.flip();
-            ChannelBufferUtils.addToStringBuilder(sbBasic, responseBuffer, readBytes);
-            final StringBuilder sbAdditional = new StringBuilder();
-            final HttpDecoratedResponse result = extractDecoratedResponseByStringMessage(sbBasic.toString());
+	public HttpDecoratedResponse getHttpDecoratedResponseByChannel(ByteChannel channel) throws IOException {
+		final StringBuilder sbBasic = new StringBuilder();
+		int readBytes = channel.read(responseBuffer);
+		if (readBytes != BUFFER_MARK_END) {
+			responseBuffer.flip();
+			ChannelBufferUtils.addToStringBuilder(sbBasic, responseBuffer, readBytes);
+			final HttpDecoratedResponse result = extractDecoratedResponseByStringMessage(sbBasic.toString());
+			ChannelBufferUtils.readChannelBuffer(result, channel, responseBuffer, readBytes);
+			responseBuffer.clear();
+			return result;
 
-            int totalReadBytes = readBytes;
+		} else {
 
-            if (result.getLength() != 0) {
-                while (totalReadBytes < result.getLength()) {
-                    readBytes = channel.read(responseBuffer);
-                    responseBuffer.flip();
-                    ChannelBufferUtils.addToStringBuilder(sbAdditional, responseBuffer, readBytes);
+			return new HttpDecoratedResponse(new HashMap<>(),
+					new HttpResponseDenominator(StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1));
+		}
+	}
 
-                    totalReadBytes += readBytes;
-                    responseBuffer.clear();
-                }
-                if (sbAdditional.length() > 0) {
-                    result.addMessage(sbAdditional.toString());
-                }
-            }
-            responseBuffer.clear();
-            return result;
+	// TODO: 3/5/18 (miro) investigate spring responseBody
+	private HttpDecoratedResponse extractDecoratedResponseByStringMessage(String message) {
+		final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
+		final String[] header = headerAndBody[POSITION_HEADER].split("[" + HTTP_NEW_LINE + "]+");
+		final String firstLine = RoboHttpUtils.correctLine(header[0]);
+		final String[] tokens = firstLine.split(HttpConstant.HTTP_EMPTY_SEP);
+		final String[] paramArray = Arrays.copyOfRange(header, 1, header.length);
 
-        } else {
+		final String version = tokens[0];
+		final StatusCode statusCode = StatusCode.getByCode(Integer.valueOf(tokens[1]));
+		final Map<String, String> headerParams = ChannelBufferUtils.getHeaderParametersByArray(paramArray);
 
-            return new HttpDecoratedResponse(new HashMap<>(), new HttpResponseDenominator(StatusCode.BAD_REQUEST, HttpVersion.HTTP_1_1));
-        }
-    }
+		HttpResponseDenominator denominator = new HttpResponseDenominator(statusCode, HttpVersion.getByValue(version));
+		HttpDecoratedResponse result = new HttpDecoratedResponse(headerParams, denominator);
+		if (headerAndBody.length > 1) {
+			if (headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)) {
+				result.setLength(
+						ChannelBufferUtils.calculateMessageSize(headerAndBody[POSITION_HEADER].length(), headerParams));
+			} else {
+				result.setLength(headerAndBody[POSITION_BODY].length());
+			}
+			Matcher matcher = ChannelBufferUtils.RESPONSE_SPRING_PATTERN.matcher(headerAndBody[POSITION_BODY]);
+			if (matcher.find()) {
+				// result.addMessage(headerAndBody[POSITION_BODY]);
+				result.addMessage(matcher.group(ChannelBufferUtils.RESPONSE_JSON_GROUP));
+			}
+		}
 
-    // TODO: 3/5/18 (miro) investigate spring responseBody
-    private HttpDecoratedResponse extractDecoratedResponseByStringMessage(String message) {
-        final String[] headerAndBody = message.split(HTTP_HEADER_BODY_DELIMITER);
-        final String[] header = headerAndBody[POSITION_HEADER].split("[" + HTTP_NEW_LINE + "]+");
-        final String firstLine = RoboHttpUtils.correctLine(header[0]);
-        final String[] tokens = firstLine.split(HttpConstant.HTTP_EMPTY_SEP);
-        final String[] paramArray = Arrays.copyOfRange(header, 1, header.length);
-
-        final String version = tokens[0];
-        final StatusCode statusCode = StatusCode.getByCode(Integer.valueOf(tokens[1]));
-        final Map<String, String> headerParams = ChannelBufferUtils.getHeaderParametersByArray(paramArray);
-
-        HttpResponseDenominator denominator = new HttpResponseDenominator(statusCode, HttpVersion.getByValue(version));
-        HttpDecoratedResponse result = new HttpDecoratedResponse(headerParams, denominator);
-        if (headerAndBody.length > 1) {
-            if (headerParams.containsKey(HttpHeaderFieldNames.CONTENT_LENGTH)) {
-                result.setLength(ChannelBufferUtils.calculateMessageSize(headerAndBody[POSITION_HEADER].length(), headerParams));
-            } else {
-                result.setLength(headerAndBody[POSITION_BODY].length());
-            }
-            Matcher matcher = ChannelBufferUtils.RESPONSE_SPRING_PATTERN.matcher(headerAndBody[POSITION_BODY]);
-            if (matcher.find()) {
-                // result.addMessage(headerAndBody[POSITION_BODY]);
-                result.addMessage(matcher.group(ChannelBufferUtils.RESPONSE_JSON_GROUP));
-            }
-        }
-
-        return result;
-    }
+		return result;
+	}
 }

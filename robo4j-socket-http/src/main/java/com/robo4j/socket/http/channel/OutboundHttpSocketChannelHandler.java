@@ -29,6 +29,8 @@ import com.robo4j.socket.http.util.HttpMessageBuilder;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
@@ -42,6 +44,7 @@ public class OutboundHttpSocketChannelHandler implements ChannelHandler, AutoClo
 	private HttpDecoratedRequest message;
 	private HttpDecoratedResponse decoratedResponse;
 	private ChannelResponseBuffer channelResponseBuffer = new ChannelResponseBuffer();
+	private Lock lock = new ReentrantLock();
 
 	public OutboundHttpSocketChannelHandler(ByteChannel byteChannel, HttpDecoratedRequest message) {
 		this.byteChannel = byteChannel;
@@ -85,12 +88,15 @@ public class OutboundHttpSocketChannelHandler implements ChannelHandler, AutoClo
 	}
 
 	private HttpDecoratedResponse getDecoratedResponse(ByteChannel byteChannel, HttpPathMethodDTO pathMethod) {
+		lock.lock();
 		try {
 			final HttpDecoratedResponse result = channelResponseBuffer.getHttpDecoratedResponseByChannel(byteChannel);
 			result.addCallbacks(pathMethod.getCallbacks());
 			return result;
 		} catch (IOException e) {
 			throw new SocketException("message body write problem", e);
+		} finally {
+			lock.unlock();
 		}
 	}
 
