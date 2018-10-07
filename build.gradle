@@ -151,8 +151,7 @@ project("robo4j-hw-rpi") {
     task fatJar(type: Jar) {
         manifest {
             attributes 'Implementation-Title': baseName,
-                    'Implementation-Version': version,
-                    'Main-Class': 'com.robo4j.hw.rpi.i2c.adafruitled.GraphBarTest'
+                    'Implementation-Version': version
         }
         //baseName = project.name + '-all'
         baseName = 'robo4j-hw-rpi'

@@ -28,6 +28,7 @@ import com.robo4j.hw.rpi.pad.LF710Message;
 import com.robo4j.hw.rpi.pad.LF710Pad;
 import com.robo4j.hw.rpi.pad.PadInputResponseListener;
 import com.robo4j.hw.rpi.pad.RoboControlPad;
+import com.robo4j.logging.SimpleLoggingUtil;
 
 import java.nio.file.Paths;
 
@@ -74,7 +75,7 @@ public class LF710PadUnit extends RoboUnit<Object>{
         listener = (LF710Message response) -> {
             if(getState() == LifecycleState.STARTED){
                 if(targetRef == null){
-                    System.out.println("PAD pressed: " + response);
+                    SimpleLoggingUtil.info(getClass(), "PAD pressed: " + response);
                 } else {
                     targetRef.sendMessage(response);
                 }

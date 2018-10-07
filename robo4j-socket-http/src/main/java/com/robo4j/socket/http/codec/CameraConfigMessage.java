@@ -1,5 +1,6 @@
 package com.robo4j.socket.http.codec;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -8,7 +9,7 @@ import java.util.Objects;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class CameraConfigMessage {
+public class CameraConfigMessage implements Serializable {
 
 	private Integer height;
 	private Integer width;
@@ -20,8 +21,8 @@ public class CameraConfigMessage {
 	public CameraConfigMessage() {
 	}
 
-	public CameraConfigMessage(Integer height, Integer width, Integer brightness, Integer sharpness,
-							   Integer timeout, Integer timelapse) {
+	public CameraConfigMessage(Integer height, Integer width, Integer brightness, Integer sharpness, Integer timeout,
+			Integer timelapse) {
 		this.height = height;
 		this.width = width;
 		this.brightness = brightness;
@@ -80,15 +81,14 @@ public class CameraConfigMessage {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 		CameraConfigMessage message = (CameraConfigMessage) o;
-		return Objects.equals(height, message.height) &&
-				Objects.equals(width, message.width) &&
-				Objects.equals(brightness, message.brightness) &&
-				Objects.equals(sharpness, message.sharpness) &&
-				Objects.equals(timeout, message.timeout) &&
-				Objects.equals(timelapse, message.timelapse);
+		return Objects.equals(height, message.height) && Objects.equals(width, message.width)
+				&& Objects.equals(brightness, message.brightness) && Objects.equals(sharpness, message.sharpness)
+				&& Objects.equals(timeout, message.timeout) && Objects.equals(timelapse, message.timelapse);
 	}
 
 	@Override
@@ -99,13 +99,7 @@ public class CameraConfigMessage {
 
 	@Override
 	public String toString() {
-		return "CameraConfigMessage{" +
-				"height=" + height +
-				", width=" + width +
-				", brightness=" + brightness +
-				", sharpness=" + sharpness +
-				", timeout=" + timeout +
-				", timelapse=" + timelapse +
-				'}';
+		return "CameraConfigMessage{" + "height=" + height + ", width=" + width + ", brightness=" + brightness
+				+ ", sharpness=" + sharpness + ", timeout=" + timeout + ", timelapse=" + timelapse + '}';
 	}
 }

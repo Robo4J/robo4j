@@ -109,15 +109,6 @@ public class LF710ButtonObserver {
 		this.pad = pad;
 	}
 
-	public void stopButtonMonitor() {
-		isRunning = false;
-		try {
-			observerThread.join(SLEEP_MILLIS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public void addButtonListener(PadInputResponseListener listener) {
 		synchronized (listener) {
 			if (buttonListeners.isEmpty()) {
@@ -141,9 +132,18 @@ public class LF710ButtonObserver {
 	//FIX : schedule threads
 	private Thread startMonitor() {
 		isRunning = true;
-		Thread result = new Thread(new ButtonChecker(pad.source()), "LF710Pad button checker");
+		Thread result = new Thread(new ButtonChecker(pad.source()), "robo4j-rpi-lf710-observer");
 		result.setDaemon(true);
 		result.start();
 		return result;
+	}
+
+	private void stopButtonMonitor() {
+		isRunning = false;
+		try {
+			observerThread.join(SLEEP_MILLIS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }
