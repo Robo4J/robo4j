@@ -17,13 +17,13 @@
 
 package com.robo4j.units.rpi.pad;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
 import com.robo4j.util.SystemUtil;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Logitech F710 Pad Example
@@ -34,24 +34,23 @@ import com.robo4j.util.SystemUtil;
 public class LF710PadExample {
 
 	public static void main(String[] args) throws RoboBuilderException, IOException {
-		RoboBuilder builder = new RoboBuilder();
 		InputStream settings = Thread.currentThread().getContextClassLoader().getResourceAsStream("logitechF710.xml");
 		if (settings == null) {
-			System.out.println("Could not find the settings for the LogitechF710Pad!");
+			System.out.println("Could not find the settings for the Gamepad!");
 			System.exit(2);
 		}
+		RoboBuilder builder = new RoboBuilder();
 		builder.add(settings);
-		RoboContext ctx = builder.build();
+		RoboContext sytem = builder.build();
 
-		System.out.println("State before start:");
-		System.out.println(SystemUtil.printStateReport(ctx));
-		ctx.start();
+		System.out.println("... Gamepad buttons Example ...");
+		sytem.start();
 
-		System.out.println("State after start:");
-		System.out.println(SystemUtil.printStateReport(ctx));
+		System.out.println(SystemUtil.printStateReport(sytem));
 
 		System.out.println("Press enter to quit!");
 		System.in.read();
-		ctx.shutdown();
+		sytem.shutdown();
+		System.out.println("Bye!");
 	}
 }
