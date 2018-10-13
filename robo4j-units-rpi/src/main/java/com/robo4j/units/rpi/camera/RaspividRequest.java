@@ -26,11 +26,18 @@ import java.util.LinkedHashMap;
 public class RaspividRequest extends RaspiRequest<RaspividRequest>{
 
     private static final String RASPIVID_COMMAND = "raspivid";
+    private final RaspividRequestType type;
 
-
-    public RaspividRequest(boolean active) {
+    public RaspividRequest(boolean active, RaspividRequestType type) {
         super(new LinkedHashMap<>(), active);
+        this.type = type;
     }
+
+
+    public RaspividRequestType getType() {
+        return type;
+    }
+
 
     public RaspividRequest put(RpiCameraProperty property, String value){
         parameters.put(property, value);

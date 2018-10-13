@@ -22,6 +22,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.camera.RaspiDevice;
+import com.robo4j.logging.SimpleLoggingUtil;
 
 /**
  * Unit generates the video stream on desired socket
@@ -62,8 +63,21 @@ public class RaspividUnit extends RoboUnit<RaspividRequest> {
 
     @Override
     public void onMessage(RaspividRequest message) {
-        message.put(RpiCameraProperty.OUTPUT, output);
-        processId = String.valueOf(device.executeCommandReturnPID(message.create()));
+        switch (message.getType()){
+            case CONFIG:
+                message.put(RpiCameraProperty.OUTPUT, output);
+                processId = String.valueOf(device.executeCommandReturnPID(message.create()));
+                break;
+            case START:
+                SimpleLoggingUtil.info(getClass(), "not necessary start message: " + message);
+                break;
+            case STOP:
+                stop();
+                break;
+            default:
+                SimpleLoggingUtil.error(getClass(), "message: " + message);
+        }
+
     }
 
     @Override
