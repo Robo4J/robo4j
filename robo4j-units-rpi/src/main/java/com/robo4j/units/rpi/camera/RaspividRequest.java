@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2018, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -20,29 +20,26 @@ package com.robo4j.units.rpi.camera;
 import java.util.LinkedHashMap;
 
 /**
- * Raspistill request to take a picture
- *
  * @author Marcus Hirt (@hirt)
- * @author Miro Wengner (@miragemiko)
+ * @author Miroslav Wengner (@miragemiko)
  */
-public final class RaspistillRequest extends RaspiRequest<RaspistillRequest> {
+public class RaspividRequest extends RaspiRequest<RaspividRequest>{
 
-    private static final String RASPISTILL_COMMAND = "raspistill";
+    private static final String RASPIVID_COMMAND = "raspivid";
 
 
-    public RaspistillRequest(boolean active) {
+    public RaspividRequest(boolean active) {
         super(new LinkedHashMap<>(), active);
     }
 
-    public RaspistillRequest put(RpiCameraProperty property, String value){
+    public RaspividRequest put(RpiCameraProperty property, String value){
         parameters.put(property, value);
         return this;
     }
 
     public String create(){
-        return create(RASPISTILL_COMMAND);
+        return create(RASPIVID_COMMAND);
     }
-
 
     @Override
     public String toString() {
@@ -51,4 +48,5 @@ public final class RaspistillRequest extends RaspiRequest<RaspistillRequest> {
                 ", parameters=" + parameters +
                 '}';
     }
+
 }

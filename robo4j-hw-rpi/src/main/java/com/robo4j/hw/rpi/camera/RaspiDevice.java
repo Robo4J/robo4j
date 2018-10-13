@@ -20,18 +20,19 @@ package com.robo4j.hw.rpi.camera;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 
 /**
- * RaspberryPi Camera over raspstill util
+ * RaspiDevice gives access to the RaspberryPi
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RaspistilDevice {
+public class RaspiDevice {
 
 	private static final int CONTENT_END = -1;
 
-	public RaspistilDevice() {
+	public RaspiDevice() {
 	}
 
 	/**
@@ -40,7 +41,7 @@ public class RaspistilDevice {
 	 *            raspistill command with options
 	 * @return raw image from camera
 	 */
-	public byte[] executeCommand(String command) {
+	public byte[] executeCommandRaspistill(String command) {
 		final Runtime runtime = Runtime.getRuntime();
 		try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 			Process process = runtime.exec(command);
@@ -57,4 +58,44 @@ public class RaspistilDevice {
 			throw new CameraClientException("IMAGE GENERATION", e);
 		}
 	}
+
+	/**
+	 * execute command without any output
+	 *
+	 * @param command generic command
+	 */
+	public long executeCommandReturnPID(String command){
+		final Runtime runtime = Runtime.getRuntime();
+		try {
+			Process process = runtime.exec(command);
+            return getPidOfProcess(process);
+		} catch (IOException e) {
+			throw new CameraClientException("VIDEO GENERATION", e);
+		}
+	}
+
+	public void executeCommand(String command){
+        final Runtime runtime = Runtime.getRuntime();
+        try {
+            Process process = runtime.exec(command);
+        } catch (IOException e) {
+            throw new CameraClientException("COMMAND", e);
+        }
+    }
+
+    private static synchronized long getPidOfProcess(Process p) {
+        long pid = -1;
+
+        try {
+            if (p.getClass().getName().equals("java.lang.UNIXProcess")) {
+                Field f = p.getClass().getDeclaredField("pid");
+                f.setAccessible(true);
+                pid = f.getLong(p);
+                f.setAccessible(false);
+            }
+        } catch (Exception e) {
+            pid = -1;
+        }
+        return pid;
+    }
 }

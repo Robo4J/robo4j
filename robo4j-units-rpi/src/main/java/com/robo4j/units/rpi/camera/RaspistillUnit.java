@@ -23,7 +23,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.hw.rpi.camera.RaspistilDevice;
+import com.robo4j.hw.rpi.camera.RaspiDevice;
 import com.robo4j.logging.SimpleLoggingUtil;
 
 import java.util.EnumSet;
@@ -47,7 +47,7 @@ public class RaspistillUnit extends RoboUnit<RaspistillRequest> {
 	private AtomicBoolean continualMode = new AtomicBoolean(false);
 	private AtomicBoolean cameraProgress = new AtomicBoolean(false);
 
-	private final RaspistilDevice device = new RaspistilDevice();
+	private final RaspiDevice device = new RaspiDevice();
 	private String target;
 
 	public RaspistillUnit(RoboContext context, String id) {
@@ -82,8 +82,7 @@ public class RaspistillUnit extends RoboUnit<RaspistillRequest> {
 
 	private void stopProgress() {
 		continualMode.set(false);
-		while (cameraProgress.get())
-			;
+		while (cameraProgress.get());
 	}
 
 	private void startContinualMode(RaspistillRequest message) {
@@ -100,7 +99,7 @@ public class RaspistillUnit extends RoboUnit<RaspistillRequest> {
 
 	private void createImage(RaspistillRequest message) {
 		try {
-			final byte[] image = device.executeCommand(message.create());
+			final byte[] image = device.executeCommandRaspistill(message.create());
 			final RoboReference<ImageDTO> targetReference = getContext().getReference(target);
 			if (targetReference != null && image.length > 0) {
 				ImageDTO imageDTO = CameraUtil.createImageDTOBydMessageAndBytes(message, image);
