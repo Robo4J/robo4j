@@ -4,7 +4,7 @@
 # Set ROBO4J_HOME and ROBO4J_VERSION to the appropriate values
 #
 export ROBO4J_HOME=/home/pi/git/robo4j
-export ROBO4J_VERSION=0.3
+export ROBO4J_VERSION=0.4
 export PI4J_HOME=/opt/pi4j/lib
 #
 # No changes should be required below
