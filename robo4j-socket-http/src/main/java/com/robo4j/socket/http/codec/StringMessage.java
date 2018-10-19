@@ -1,12 +1,13 @@
 package com.robo4j.socket.http.codec;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class StringMessage {
+public class StringMessage implements Serializable {
 
     private String message;
 

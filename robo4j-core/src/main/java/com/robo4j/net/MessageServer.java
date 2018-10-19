@@ -39,6 +39,7 @@ import java.net.URISyntaxException;
  */
 public class MessageServer {
 	public final static String KEY_HOST_NAME = "hostname";
+	public static final String KEY_PORT = "port";
 
 	private volatile int listeningPort = 0;
 	private volatile String listeningHost;
@@ -142,7 +143,7 @@ public class MessageServer {
 			bindAddress = InetAddress.getByName(host);
 		}
 
-		try (ServerSocket serverSocket = new ServerSocket(configuration.getInteger("port", 0), configuration.getInteger("backlog", 20),
+		try (ServerSocket serverSocket = new ServerSocket(configuration.getInteger(KEY_PORT, 0), configuration.getInteger("backlog", 20),
 				bindAddress)) {
 			listeningHost = serverSocket.getInetAddress().getHostAddress();
 			listeningPort = serverSocket.getLocalPort();

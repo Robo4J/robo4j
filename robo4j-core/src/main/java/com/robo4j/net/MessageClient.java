@@ -128,6 +128,7 @@ public class MessageClient {
 
 	public void connect() throws UnknownHostException, IOException {
 		if (socket == null || socket.isClosed() || !socket.isConnected()) {
+//			socket = new Socket(messageServerURI.getHost(), messageServerURI.getPort());
 			socket = new Socket(messageServerURI.getHost(), messageServerURI.getPort());
 			socket.setKeepAlive(configuration.getBoolean(KEY_KEEP_ALIVE, DEFAULT_KEEP_ALIVE));
 			socket.setSoTimeout(configuration.getInteger(KEY_SO_TIMEOUT, DEFAULT_SO_TIMEOUT));

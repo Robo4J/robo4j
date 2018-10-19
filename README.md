@@ -9,7 +9,7 @@ Robo4J provides an easy way of getting started with building custom hardware and
 The current [Robo4j.io][] version is alpha-0.4
 
 ## Requirements
-[Git][] and [Java JDK 8][]
+[Git][], [Gradle][], [Java JDK 8][]
 
 ## Documentation
 See current [Robo4j documentation][].
@@ -52,4 +52,5 @@ Robo4J is released under [General Public License][] v3.
 [Gradle]: http://gradle.org
 [Java JDK 8]: http://www.oracle.com/technetwork/java/javase/downloads
 [Git]: http://help.github.com/set-up-git-redirect
+[Gradle]: http://www.gradle.org
 [Robo4j documentation]: http://www.robo4j.io/p/documentation.html
