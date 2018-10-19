@@ -37,7 +37,10 @@ import java.util.Random;
  */
 public class InfraPlatformController extends RoboUnit<InfraSensorMessage> {
 
-    public static final String PROPERTY_TARGET = "target";
+    public static final String PROP_TARGET = "target";
+    public static final String PROP_DISTANCE_MIN = "distanceMin";
+    public static final String PROP_DISTANCE_OPTIMAL = "distanceOptimal";
+    public static final String PROP_DISTANCE_MAX = "distanceMax";
     private static final float DISTANCE_MIN = 40f;
     private static final float DISTANCE_OPTIMAL = 50f;
     private static final float DISTANCE_MAX = 100f;
@@ -45,7 +48,9 @@ public class InfraPlatformController extends RoboUnit<InfraSensorMessage> {
 
     private static final EnumSet<LegoPlatformMessageTypeEnum> rotationTypes = EnumSet.of(LegoPlatformMessageTypeEnum.LEFT, LegoPlatformMessageTypeEnum.RIGHT);
 
-
+    private float minDistance;
+    private float optDistance;
+    private float maxDistance;
     private String target;
     private LegoPlatformMessageTypeEnum currentMessage = LegoPlatformMessageTypeEnum.STOP;
 
@@ -55,19 +60,24 @@ public class InfraPlatformController extends RoboUnit<InfraSensorMessage> {
 
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
-        target = configuration.getString(PROPERTY_TARGET, null);
+        target = configuration.getString(PROP_TARGET, null);
         if (target == null) {
-            throw ConfigurationException.createMissingConfigNameException(PROPERTY_TARGET);
+            throw ConfigurationException.createMissingConfigNameException(PROP_TARGET);
         }
+
+        minDistance = configuration.getFloat(PROP_DISTANCE_MIN, DISTANCE_MIN);
+        optDistance = configuration.getFloat(PROP_DISTANCE_OPTIMAL, DISTANCE_OPTIMAL);
+        maxDistance = configuration.getFloat(PROP_DISTANCE_MAX, DISTANCE_MAX);
+
     }
 
     @Override
     public void onMessage(InfraSensorMessage message) {
         final String value = LegoUtils.parseOneElementString(message.getDistance());
-        final float distanceValue = LegoUtils.parseFloatStringWithInfinityDefault(value, DISTANCE_MAX);
-        if(rotationTypes.contains(currentMessage) && distanceValue < DISTANCE_OPTIMAL){
+        final float distanceValue = LegoUtils.parseFloatStringWithInfinityDefault(value, maxDistance);
+        if(rotationTypes.contains(currentMessage) && distanceValue < optDistance){
             SimpleLoggingUtil.debug(getClass(), String.format("%s : adjusting platform distance: %f", getClass(), distanceValue));
-        } else if(distanceValue > DISTANCE_MIN){
+        } else if(distanceValue > minDistance){
             sendPlatformMessage(LegoPlatformMessageTypeEnum.MOVE);
         } else {
             int randomValue = random.nextInt(2) + 3;
