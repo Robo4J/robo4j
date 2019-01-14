@@ -8,10 +8,10 @@ Robo4J provides an easy way of getting started with building custom hardware and
 * [Robo4j.io][] provides a library of configurable units that allows hardware to be enabled and configured through XML
 * [Robo4j.io][] provides a threading model controlled by annotations
 
-The current [Robo4j.io][] version is alpha-0.4
+The current [Robo4j.io][] version is 0.5
 
 ## Requirements
-[Git][], [Gradle][], [Java JDK 8][]
+[Git][], [Gradle][], [Java JDK 11][]
 
 ## Documentation
 See current [Robo4j documentation][].
@@ -33,7 +33,7 @@ To install the bundles and make them available to downstream dependencies, run t
 ```
 
 > **Note:** If you are not using Robo4J as the standard user (pi) on a Raspberry Pi, you will have to specify the path to the local maven repository in the file _**libraries.gradle**_, variable: _mavenRepository_
-> **Note:** Robo4J currently requires JDK 8. Ensure that you build and run with JDK 8.
+> **Note:** Robo4J currently requires OpenJDK 11. Ensure that you build and run with OpenJDK 11.
 
 ## Staying in Touch
 Follow [@robo4j][] or authors: [@miragemiko][], [@hirt][]
@@ -50,7 +50,7 @@ Robo4J is released under [General Public License][] v3.
 [@miragemiko]: https://twitter.com/miragemiko
 [@hirt]: https://twitter.com/hirt
 [Gradle]: http://gradle.org
-[Java JDK 8]: http://www.oracle.com/technetwork/java/javase/downloads
+[Java JDK 11]: http://jdk.java.net/
 [Git]: http://help.github.com/set-up-git-redirect
 [Gradle]: http://www.gradle.org
 [Robo4j documentation]: http://www.robo4j.io/p/documentation.html
