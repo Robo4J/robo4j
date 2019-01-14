@@ -13,6 +13,8 @@ The current [Robo4j.io][] version is 0.5
 ## Requirements
 [Git][], [Gradle][], [Java JDK 11][]
 
+If you are looking for a JDK 11 ARM hard float build for Raspbian, we recommend looking into [Liberica JDK][].
+
 ## Documentation
 See current [Robo4j documentation][].
 > **Note:** Under construction.
@@ -33,11 +35,13 @@ To install the bundles and make them available to downstream dependencies, run t
 ```
 
 > **Note:** If you are not using Robo4J as the standard user (pi) on a Raspberry Pi, you will have to specify the path to the local maven repository in the file _**libraries.gradle**_, variable: _mavenRepository_
+
 > **Note:** Robo4J currently requires OpenJDK 11. Ensure that you build and run with OpenJDK 11.
 
 ## Staying in Touch
-Follow [@robo4j][] or authors: [@miragemiko][], [@hirt][]
-on Twitter. In-depth articles can be found at [Robo4j.io][], [miragemiko blog][] or [marcus blog][]
+Follow [@robo4j][] or authors: [@miragemiko][], [@hirt][] on Twitter. 
+
+In-depth articles can be found at [Robo4j.io][], [miragemiko blog][] or [marcus blog][]
 
 ## License
 Robo4J is released under [General Public License][] v3.
@@ -54,3 +58,4 @@ Robo4J is released under [General Public License][] v3.
 [Git]: http://help.github.com/set-up-git-redirect
 [Gradle]: http://www.gradle.org
 [Robo4j documentation]: http://www.robo4j.io/p/documentation.html
+[Liberica JDK]: https://www.bell-sw.com/java.html
