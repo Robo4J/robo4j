@@ -19,7 +19,7 @@ ext {
     robo4jVersion = "0.5-SNAPSHOT"
 //    note::it's necessary to specify local maven repository
 //    mavenRepository = "/home/pi/.m2"
-    robo4jJavaVersion = 1.8
+    robo4jJavaVersion = "1.8"
     roboGradleVersion = "4.10"
     hibernateVersion = "5.2.10.Final"
     hibernateJpaVersion = "1.0.0.Final"
