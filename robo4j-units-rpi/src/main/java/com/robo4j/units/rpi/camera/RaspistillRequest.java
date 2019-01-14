@@ -26,8 +26,8 @@ import java.util.LinkedHashMap;
  * @author Miro Wengner (@miragemiko)
  */
 public final class RaspistillRequest extends RaspiRequest<RaspistillRequest> {
-
-    private static final String RASPISTILL_COMMAND = "raspistill";
+	private static final long serialVersionUID = 1L;
+	private static final String RASPISTILL_COMMAND = "raspistill";
 
 
     public RaspistillRequest(boolean active) {

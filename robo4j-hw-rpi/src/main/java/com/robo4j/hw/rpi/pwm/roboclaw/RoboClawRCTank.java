@@ -38,7 +38,6 @@ import java.util.logging.Logger;
  */
 public class RoboClawRCTank implements Motor {
 	private final static float EPSILON = 0.05f;
-	private EngineEvent engineEvent = new EngineEvent();
 	private final Servo leftEngine;
 	private final Servo rightEngine;
 	private float speed;
@@ -127,12 +126,11 @@ public class RoboClawRCTank implements Motor {
 		emitEngineEvent();
 	}
 
-	@SuppressWarnings("deprecation")
 	private void emitEngineEvent() {
-		engineEvent.reset();
-		engineEvent.setDirection(direction);
-		engineEvent.setSpeed(speed);
-		engineEvent.commit();
+		EngineEvent event = new EngineEvent();
+		event.setDirection(direction);
+		event.setSpeed(speed);
+		event.commit();
 	}
 
 	private void internalUpdateEngines() {

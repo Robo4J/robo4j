@@ -68,7 +68,7 @@ public final class RoboApplication {
 		try {
 			Thread daemon = new Thread(() -> {
 					try {
-						int val = System.in.read();
+						System.in.read();
 						appLatch.countDown();
 					} catch (IOException e) {
 						e.printStackTrace();

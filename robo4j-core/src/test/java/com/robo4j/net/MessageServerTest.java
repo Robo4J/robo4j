@@ -139,13 +139,13 @@ public class MessageServerTest {
 		}
 		client.connect();
 
-		client.sendMessage("test1", new Byte((byte) 1));
-		client.sendMessage("test2", new Short((short) 2));
-		client.sendMessage("test3", new Character((char) 3));
-		client.sendMessage("test4", new Integer(4));
-		client.sendMessage("test5", new Float(5.0f));
-		client.sendMessage("test6", new Long(6));
-		client.sendMessage("test7", new Double(7));
+		client.sendMessage("test1", Byte.valueOf((byte) 1));
+		client.sendMessage("test2", Short.valueOf((short) 2));
+		client.sendMessage("test3", Character.valueOf((char) 3));
+		client.sendMessage("test4", Integer.valueOf(4));
+		client.sendMessage("test5", Float.valueOf(5.0f));
+		client.sendMessage("test6", Long.valueOf(6));
+		client.sendMessage("test7", Double.valueOf(7));
 		client.sendMessage("test8", new TestMessageType(8, messageText, null));
 		messageLatch.await(24, TimeUnit.HOURS);
 

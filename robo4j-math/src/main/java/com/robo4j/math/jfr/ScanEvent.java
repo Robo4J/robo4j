@@ -16,10 +16,7 @@
  */
 package com.robo4j.math.jfr;
 
-import com.oracle.jrockit.jfr.EventDefinition;
-import com.oracle.jrockit.jfr.EventToken;
-import com.oracle.jrockit.jfr.TimedEvent;
-import com.oracle.jrockit.jfr.ValueDefinition;
+import jdk.jfr.*;
 
 /**
  * The JFR event definition for a full scan event.
@@ -27,40 +24,43 @@ import com.oracle.jrockit.jfr.ValueDefinition;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-@SuppressWarnings("deprecation")
-@EventDefinition(path = "robo4j/overview/scanevent", name = "Scan", description = "An event for a full scan.", stacktrace = false, thread = true) 
-public class ScanEvent extends TimedEvent {
-	public static final String RELATIONAL_KEY_SCAN = "http://se.hirt.tank/scan";
-	
-    @ValueDefinition(name = "ScanLeftRight", description = "False if left->right, true if right->left.") 
-    private boolean scanLeftRight;
 
-    @ValueDefinition(name = "ScanInfo", description = "Textual information about the scan performed.") 
-    private String scanInfo;
-    
-    @ValueDefinition(name = "Scan ID", description = "The numerical identifier, uniquely identifying the scan.", relationKey = RELATIONAL_KEY_SCAN)
-    private int scanID;
+@Name("robo4j.math.Scan")
+@Category({ "Robo4J", "Math", "Scan", "Overview" })
+@Label("FeatureExtraction")
+@Description("An event for a full scan")
+@StackTrace(false)
+public class ScanEvent extends Event {
 
-	private static final EventToken EVENT_TOKEN;
- 
-    static {
-		EVENT_TOKEN = JfrUtils.register(ScanEvent.class);
-    }
-     
-    public ScanEvent(int scanID, String scanMode) {
-    	super(EVENT_TOKEN);
-    	setScanID(scanID);
-    	setScanInfo(scanMode);
-    }
-    
-    public void setScanLeftRight(boolean scanLeftRight) {
-    	this.scanLeftRight = scanLeftRight;
-    }
-    
-    // API does not support is
-    public boolean getScanLeftRight() {
-    	return scanLeftRight;
-    }
+	@Label("Scan Left/Right")
+	@Description("False if left->right, true if right->left")
+	private boolean scanLeftRight;
+
+	@Label("Scan Info")
+	@Description("Textual information about the scan performed")
+	private String scanInfo;
+
+	@Label("Scan ID")
+	@Description("The numerical identifier, uniquely identifying the scan")
+	@ScanId
+	private int scanID;
+
+	static {
+		FlightRecorder.register(ScanEvent.class);
+	}
+
+	public ScanEvent(int scanID, String scanMode) {
+		setScanID(scanID);
+		setScanInfo(scanMode);
+	}
+
+	public void setScanLeftRight(boolean scanLeftRight) {
+		this.scanLeftRight = scanLeftRight;
+	}
+
+	public boolean getScanLeftRight() {
+		return scanLeftRight;
+	}
 
 	public void setScanID(int scanID) {
 		this.scanID = scanID;
@@ -73,7 +73,7 @@ public class ScanEvent extends TimedEvent {
 	public void setScanInfo(String scanMode) {
 		this.scanInfo = scanMode;
 	}
-	
+
 	public String getScanInfo() {
 		return this.scanInfo;
 	}

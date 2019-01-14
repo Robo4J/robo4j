@@ -55,7 +55,7 @@ public class JsonCodecsTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void encodeServerPathDTOMessageNoFilterTest(){
-		String expectedJson = "{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\"}";
+//		String expectedJson = "{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\"}";
 		HttpPathMethodDTO message = new HttpPathMethodDTO();
 		message.setRoboUnit("roboUnit1");
 		message.setMethod(HttpMethod.GET);

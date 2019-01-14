@@ -49,7 +49,6 @@ public class ScanResultImpl implements ScanResult2D {
 	private Point2f farthestPoint;
 	private Point2f closestPoint;
 
-	private final ScanPoint2DEvent scanPointEvent = new ScanPoint2DEvent();
 	private final float angularResolution;
 	private final Predicate<Point2f> pointFilter;
 
@@ -93,12 +92,10 @@ public class ScanResultImpl implements ScanResult2D {
 		updateBoundaries(p);
 	}
 
-	@SuppressWarnings("deprecation")
 	private void emitEvent(Point2f p) {
-		scanPointEvent.reset();
-		scanPointEvent.setPoint(p);
-		scanPointEvent.setScanID(scanID);
-		scanPointEvent.commit();
+		ScanPoint2DEvent event = new ScanPoint2DEvent(p);
+		event.setScanID(scanID);
+		event.commit();
 	}
 
 	private void updateBoundaries(Point2f p) {

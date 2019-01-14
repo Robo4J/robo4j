@@ -77,7 +77,7 @@ public class RaspiDevice {
 	public void executeCommand(String command){
         final Runtime runtime = Runtime.getRuntime();
         try {
-            Process process = runtime.exec(command);
+            runtime.exec(command);
         } catch (IOException e) {
             throw new CameraClientException("COMMAND", e);
         }

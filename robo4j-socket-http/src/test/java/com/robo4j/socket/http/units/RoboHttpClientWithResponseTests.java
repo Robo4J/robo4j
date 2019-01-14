@@ -40,9 +40,8 @@ public class RoboHttpClientWithResponseTests {
 	private static final int TIMEOUT = 20;
 	private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
 	private static final Integer MAX_NUMBER = 20;
-	private static final String ROBO_SYSTEM_DESC = "[{\"id\":\"stringConsumer\",\"state\":\"STARTED\"},{\"id\":\"httpServer\",\"state\":\"STARTED\"}]";
+//	private static final String ROBO_SYSTEM_DESC = "[{\"id\":\"stringConsumer\",\"state\":\"STARTED\"},{\"id\":\"httpServer\",\"state\":\"STARTED\"}]";
 
-	@SuppressWarnings("unchecked")
 	@Test
 	@Ignore
 	public void simpleRoboSystemGetRequestTest() throws Exception {

@@ -16,9 +16,7 @@
  */
 package com.robo4j.math.jfr;
 
-import com.oracle.jrockit.jfr.EventDefinition;
-import com.oracle.jrockit.jfr.InstantEvent;
-import com.oracle.jrockit.jfr.ValueDefinition;
+import jdk.jfr.*;
 import com.robo4j.math.geometry.Point2f;
 
 /**
@@ -30,20 +28,34 @@ import com.robo4j.math.geometry.Point2f;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-@EventDefinition(path = "robo4j/scan/scanpoint2d", name = "Scan Point 2D", description = "An instant event for a scanned point relative to the robot.", stacktrace = false, thread = true)
-@SuppressWarnings("deprecation")
-public class ScanPoint2DEvent extends InstantEvent {
-	@ValueDefinition(name = "X", description = "X value of the point.")
+
+@Name("robo4j.math.ScanPoint2D")
+@Label("Scan Point 2D")
+@Description("An instant event for a scanned point relative to the scanner")
+@StackTrace(false)
+public class ScanPoint2DEvent extends Event {
+	@Label("X")
+	@Description("X value of the point")
 	private float x;
 
-	@ValueDefinition(name = "Y", description = "Y value of the point.")
+	@Label("Y")
+	@Description("Y value of the point")
 	private float y;
 
-	@ValueDefinition(name = "Scan ID", description = "The scan with which the point is associated.", relationKey = ScanEvent.RELATIONAL_KEY_SCAN)
+	@Label("Scan ID")
+	@Description("The scan with which the point is associated")
+	@ScanId
 	private int scanID;
 
 	static {
-		JfrUtils.register(ScanPoint2DEvent.class);
+		FlightRecorder.register(ScanPoint2DEvent.class);
+	}
+
+	public ScanPoint2DEvent() {
+	}
+	
+	public ScanPoint2DEvent(Point2f p) {
+		setPoint(p);
 	}
 
 	public float getX() {

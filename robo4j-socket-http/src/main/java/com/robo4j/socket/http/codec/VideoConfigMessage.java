@@ -30,8 +30,8 @@ import java.util.Objects;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class VideoConfigMessage implements Serializable {
-
-    private VideoMessageType type;
+	private static final long serialVersionUID = 1L;
+	private VideoMessageType type;
     private Integer height;
     private Integer width;
     private Integer rotation;

@@ -24,8 +24,9 @@ package com.robo4j;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboApplicationException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
-    public RoboApplicationException(String message, Throwable cause) {
+	public RoboApplicationException(String message, Throwable cause) {
         super(message, cause);
     }
 }

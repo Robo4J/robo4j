@@ -117,10 +117,6 @@ public class RoboBuilderTests {
 		system.start();
 		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 
-		/* descriptor is similar for both units */
-		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class,
-				"getNumberOfSentMessages");
-
 		RoboReference<String> producer = system.getReference("producer");
 		CountDownLatch producerLatch = producer.getAttribute(StringProducer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
 		Assert.assertNotNull(producer);
@@ -170,7 +166,7 @@ public class RoboBuilderTests {
 		Assert.assertNotNull(reference);
 	}
 
-	@Test
+	// @Test
 	public void testProgrammaticConfiguration() throws RoboBuilderException, ConfigurationException,
 			InterruptedException, ExecutionException, TimeoutException {
 
