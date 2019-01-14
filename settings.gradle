@@ -2,7 +2,6 @@ rootProject.name = 'robo4j'
 
 include 'robo4j-core'
 include 'robo4j-socket-http'
-include 'robo4j-page'
 include 'robo4j-math'
 include 'robo4j-units-lego'
 include 'robo4j-hw-lego'

@@ -167,36 +167,6 @@ project("robo4j-math") {
     }
 }
 
-
-project("robo4j-page") {
-    description = "Robo4J Page"
-
-    dependencies {
-        testCompile "junit:junit:${junitVersion}@jar"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
-    }
-
-    sourceSets {
-        main {
-            java {
-                srcDirs = ['src/main/java']
-            }
-            resources {
-                srcDirs = ['src/main/resources']
-            }
-        }
-
-        test {
-            java {
-                srcDirs = ['src/test/java']
-            }
-            resources {
-                srcDirs = ['src/test/resources']
-            }
-        }
-    }
-}
-
 project("robo4j-socket-http") {
     description = "Robo4J socket http"
 
