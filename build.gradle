@@ -37,8 +37,7 @@ project("robo4j-core") {
     description = "Robo4J Core"
 
     dependencies {
-        testCompile "junit:junit:${junitVersion}@jar"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
+        testCompile "junit:junit:${junitVersion}"
     }
 
     test {
@@ -172,8 +171,7 @@ project("robo4j-socket-http") {
 
     dependencies {
         compile(project(":robo4j-core"))
-        testCompile "junit:junit:${junitVersion}@jar"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
+        testCompile "junit:junit:${junitVersion}"
     }
 
     sourceSets {
@@ -216,7 +214,6 @@ project("robo4j-units-lego") {
         compile(project(":robo4j-hw-lego"))
         testCompile(project(":robo4j-socket-http"))
         testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 
     sourceSets {
@@ -259,7 +256,6 @@ project("robo4j-units-rpi") {
         compile(project(":robo4j-core"))
         compile(project(":robo4j-hw-rpi"))
         testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 
     sourceSets {
@@ -290,7 +286,6 @@ project("robo4j-units-rpi-http") {
     	compile(project(":robo4j-socket-http"))
         compile(project(":robo4j-units-rpi"))
         testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
     }
 
     sourceSets {
