@@ -5,9 +5,11 @@ addons:
   hosts:
   - localhost
 language: java
-script: gradle clean build
+script: ./gradlew clean build
 jdk: oraclejdk8
 
 branches:
   only:
   - master
+  - openjdk11
+  - master-test

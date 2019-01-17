@@ -79,7 +79,7 @@ public class LookupServiceTests {
 		}
 		Map<String, RoboContextDescriptor> discoveredContexts = service.getDiscoveredContexts();
 		System.out.println(discoveredContexts);
-		Assert.assertTrue(discoveredContexts.size() >= 1);
+		Assert.assertEquals(1, discoveredContexts.size());
 		RoboContext context = service.getContext(descriptor.getId());
 		Assert.assertNotNull(context);
 		ClientRemoteRoboContext remoteContext = (ClientRemoteRoboContext) context;

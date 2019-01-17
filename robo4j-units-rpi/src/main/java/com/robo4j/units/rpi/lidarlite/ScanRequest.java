@@ -71,9 +71,6 @@ public class ScanRequest {
 	 * 
 	 * @param receiver
 	 *            the id of the receiver for the result of the scan.
-	 * @param step
-	 *            how much of the full servo range should be scanned (in
-	 *            radians).
 	 * @param abortRange
 	 *            will abort and send, the possibly incomplete, scan early if a
 	 *            range measurement is shorter than this value.
