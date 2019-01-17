@@ -19,7 +19,7 @@ ext {
 //    note::it's necessary to specify local maven repository
 //    mavenRepository = "/home/pi/.m2"
     robo4jJavaVersion = "1.8"
-    roboGradleVersion = "4.10"
+    roboGradleVersion = "5.1.1"
     hamcrestAllVersion = "1.3"
     junitVersion = "4.12"
     pi4jVersion = "1.2-SNAPSHOT"
