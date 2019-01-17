@@ -1,9 +1,11 @@
 group 'com.robo4j'
 
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'eclipse'
-apply plugin: 'maven'
+plugins {
+    id: 'java'
+    id: 'idea'
+    id: 'eclipse'
+    id: 'maven'
+}
 apply from: 'libraries.gradle'
 
 allprojects {
