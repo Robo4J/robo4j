@@ -23,7 +23,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * VideoConfigMessage configuration message for the {@see RaspividUnit}
+ * VideoConfigMessage configuration message for the RaspividUnit
  * from robo4j-unit-rpi module
  *
  * @author Marcus Hirt (@hirt)
