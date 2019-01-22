@@ -77,6 +77,8 @@ public final class ContextEmitter {
 	 *            the address to emit to.
 	 * @param port
 	 *            the port.
+	 * @param heartBeatInterval
+	 *            the heart beat interval
 	 * @throws SocketException
 	 *             possible exception
 	 */
@@ -89,10 +91,11 @@ public final class ContextEmitter {
 		message = HearbeatMessageCodec.encode(entry);
 	}
 
-	public ContextEmitter(RoboContextDescriptor entry, Configuration emitterConfiguration) throws SocketException, UnknownHostException {
+	public ContextEmitter(RoboContextDescriptor entry, Configuration emitterConfiguration)
+			throws SocketException, UnknownHostException {
 		this(entry,
-				InetAddress
-						.getByName(emitterConfiguration.getString(KEY_MULTICAST_ADDRESS, LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS)),
+				InetAddress.getByName(emitterConfiguration.getString(KEY_MULTICAST_ADDRESS,
+						LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS)),
 				emitterConfiguration.getInteger(KEY_PORT, LookupServiceProvider.DEFAULT_PORT),
 				emitterConfiguration.getInteger(KEY_HEARTBEAT_INTERVAL, DEFAULT_HEARTBEAT_INTERVAL));
 	}
@@ -112,6 +115,7 @@ public final class ContextEmitter {
 	 * Emits a context heartbeat message. Will throw an exception on trouble.
 	 * 
 	 * @throws IOException
+	 *             exception
 	 */
 	public void emitWithException() throws IOException {
 		DatagramPacket packet = new DatagramPacket(message, message.length, multicastAddress, port);

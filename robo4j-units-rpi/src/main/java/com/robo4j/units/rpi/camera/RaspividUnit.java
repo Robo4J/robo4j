@@ -27,7 +27,7 @@ import com.robo4j.logging.SimpleLoggingUtil;
 /**
  * Unit generates the video stream on desired socket
  *
- * @link https://www.raspberrypi.org/app/uploads/2013/07/RaspiCam-Documentation.pdf
+ * https://www.raspberrypi.org/app/uploads/2013/07/RaspiCam-Documentation.pdf
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

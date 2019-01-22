@@ -16,10 +16,10 @@
  */
 package com.robo4j;
 
-import java.util.Collection;
-
 import com.robo4j.configuration.Configuration;
 import com.robo4j.scheduler.Scheduler;
+
+import java.util.Collection;
 
 /**
  * The execution context available for a unit. Contains a simple lookup service,
@@ -56,7 +56,8 @@ public interface RoboContext {
 	 * 
 	 * @param id
 	 *            the unique id of the robo unit for which to get a reference.
-	 * @param <T> RoboReference
+	 * @param <T>
+	 *            RoboReference
 	 * @return the reference to the robo unit.
 	 */
 	<T> RoboReference<T> getReference(String id);
@@ -81,9 +82,11 @@ public interface RoboContext {
 	 * @return the globally unique id for the context.
 	 */
 	String getId();
-	
+
 	/**
 	 * Metadata describing the system.
+	 *
+	 * @return configuration
 	 */
 	Configuration getConfiguration();
 }

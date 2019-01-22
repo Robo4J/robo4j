@@ -62,40 +62,42 @@ public class RaspiDevice {
 	/**
 	 * execute command without any output
 	 *
-	 * @param command generic command
+	 * @param command
+	 *            generic command
+	 * @return id
 	 */
-	public long executeCommandReturnPID(String command){
+	public long executeCommandReturnPID(String command) {
 		final Runtime runtime = Runtime.getRuntime();
 		try {
 			Process process = runtime.exec(command);
-            return getPidOfProcess(process);
+			return getPidOfProcess(process);
 		} catch (IOException e) {
 			throw new CameraClientException("VIDEO GENERATION", e);
 		}
 	}
 
-	public void executeCommand(String command){
-        final Runtime runtime = Runtime.getRuntime();
-        try {
-            runtime.exec(command);
-        } catch (IOException e) {
-            throw new CameraClientException("COMMAND", e);
-        }
-    }
+	public void executeCommand(String command) {
+		final Runtime runtime = Runtime.getRuntime();
+		try {
+			runtime.exec(command);
+		} catch (IOException e) {
+			throw new CameraClientException("COMMAND", e);
+		}
+	}
 
-    private static synchronized long getPidOfProcess(Process p) {
-        long pid = -1;
+	private static synchronized long getPidOfProcess(Process p) {
+		long pid = -1;
 
-        try {
-            if (p.getClass().getName().equals("java.lang.UNIXProcess")) {
-                Field f = p.getClass().getDeclaredField("pid");
-                f.setAccessible(true);
-                pid = f.getLong(p);
-                f.setAccessible(false);
-            }
-        } catch (Exception e) {
-            pid = -1;
-        }
-        return pid;
-    }
+		try {
+			if (p.getClass().getName().equals("java.lang.UNIXProcess")) {
+				Field f = p.getClass().getDeclaredField("pid");
+				f.setAccessible(true);
+				pid = f.getLong(p);
+				f.setAccessible(false);
+			}
+		} catch (Exception e) {
+			pid = -1;
+		}
+		return pid;
+	}
 }
