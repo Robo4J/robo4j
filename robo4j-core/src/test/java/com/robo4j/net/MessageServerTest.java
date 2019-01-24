@@ -21,8 +21,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.configuration.ConfigurationFactory;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,18 +32,22 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class MessageServerTest {
-	public static final String CONST_MYUUID = "myuuid";
-	public static final String PROPERTY_SERVER_NAME = "ServerName";
+	private static final String CONST_MYUUID = "myuuid";
+	private static final String PROPERTY_SERVER_NAME = "ServerName";
 	private volatile Exception exception = null;
 
 	@Test
-	public void testClientServerMessagePassing() throws Exception {
+	void testClientServerMessagePassing() throws Exception {
 		final List<String> messages = new ArrayList<>();
 		final CountDownLatch messageLatch = new CountDownLatch(3);
 
@@ -61,7 +64,7 @@ public class MessageServerTest {
 				server.start();
 			} catch (IOException e) {
 				exception = e;
-				Assert.fail(e.getMessage());
+				fail(e.getMessage());
 			}
 		}, "Server Listener");
 		t.setDaemon(true);
@@ -88,19 +91,19 @@ public class MessageServerTest {
 		}
 
 		messageLatch.await(2, TimeUnit.SECONDS);
-		Assert.assertEquals(testMessage.size(), messages.size());
-		Assert.assertArrayEquals(testMessage.toArray(), messages.toArray());
+		assertEquals(testMessage.size(), messages.size());
+		assertArrayEquals(testMessage.toArray(), messages.toArray());
 	}
 
 	private List<String> getOrderedTestMessage(String... messages) {
 		if (messages == null || messages.length == 0) {
-			Assert.fail("Expected message");
+			fail("Expected message");
 		}
 		return Stream.of(messages).collect(Collectors.toCollection(LinkedList::new));
 	}
 
 	@Test
-	public void testMessageTypes() throws Exception {
+	void testMessageTypes() throws Exception {
 		final String messageText = "Lalala";
 		final int messagesNumber = 8;
 		final List<Object> messages = new ArrayList<>(messagesNumber);
@@ -119,7 +122,7 @@ public class MessageServerTest {
 				server.start();
 			} catch (IOException e) {
 				exception = e;
-				Assert.fail(e.getMessage());
+				fail(e.getMessage());
 			}
 		}, "Server Listener");
 		t.setDaemon(true);
@@ -149,48 +152,48 @@ public class MessageServerTest {
 		client.sendMessage("test8", new TestMessageType(8, messageText, null));
 		messageLatch.await(24, TimeUnit.HOURS);
 
-		Assert.assertEquals(messagesNumber, messages.size());
+		assertEquals(messagesNumber, messages.size());
 		if (messages.get(0) instanceof Byte) {
-			Assert.assertEquals(((Byte) messages.get(0)).byteValue(), 1);
+			assertEquals(((Byte) messages.get(0)).byteValue(), 1);
 		} else {
-			Assert.fail("Expected Byte!");
+			fail("Expected Byte!");
 		}
 		if (messages.get(1) instanceof Short) {
-			Assert.assertEquals(((Short) messages.get(1)).shortValue(), 2);
+			assertEquals(((Short) messages.get(1)).shortValue(), 2);
 		} else {
-			Assert.fail("Expected Short!");
+			fail("Expected Short!");
 		}
 		if (messages.get(2) instanceof Character) {
-			Assert.assertEquals(((Character) messages.get(2)).charValue(), 3);
+			assertEquals(((Character) messages.get(2)).charValue(), 3);
 		} else {
-			Assert.fail("Expected Character!");
+			fail("Expected Character!");
 		}
 		if (messages.get(3) instanceof Integer) {
-			Assert.assertEquals(((Integer) messages.get(3)).intValue(), 4);
+			assertEquals(((Integer) messages.get(3)).intValue(), 4);
 		} else {
-			Assert.fail("Expected Integer!");
+			fail("Expected Integer!");
 		}
 		if (messages.get(4) instanceof Float) {
-			Assert.assertEquals(((Float) messages.get(4)).floatValue(), 5.0f, 0.000001);
+			assertEquals(((Float) messages.get(4)).floatValue(), 5.0f, 0.000001);
 		} else {
-			Assert.fail("Expected Float!");
+			fail("Expected Float!");
 		}
 		if (messages.get(5) instanceof Long) {
-			Assert.assertEquals(((Long) messages.get(5)).longValue(), 6);
+			assertEquals(((Long) messages.get(5)).longValue(), 6);
 		} else {
-			Assert.fail("Expected Long!");
+			fail("Expected Long!");
 		}
 		if (messages.get(6) instanceof Double) {
-			Assert.assertEquals(((Double) messages.get(6)).doubleValue(), 7.0, 0.000001);
+			assertEquals(((Double) messages.get(6)).doubleValue(), 7.0, 0.000001);
 		} else {
-			Assert.fail("Expected Double!");
+			fail("Expected Double!");
 		}
 		if (messages.get(7) instanceof TestMessageType) {
 			TestMessageType message = (TestMessageType) messages.get(7);
-			Assert.assertEquals(message.getNumber(), 8);
-			Assert.assertEquals(message.getText(), messageText);
+			assertEquals(message.getNumber(), 8);
+			assertEquals(message.getText(), messageText);
 		} else {
-			Assert.fail("Expected TestMessageType!");
+			fail("Expected TestMessageType!");
 		}
 	}
 

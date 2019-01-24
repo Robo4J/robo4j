@@ -17,13 +17,13 @@
 
 package com.robo4j.configuration;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
 import com.robo4j.util.SystemUtil;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * RemoteSystemBuilderTest building remote system configuration by
@@ -32,7 +32,7 @@ import com.robo4j.util.SystemUtil;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RemoteSystemBuilderTest {
+class RemoteSystemBuilderTest {
 
     /**
      * Building {@link com.robo4j.RoboSystem} by xml declarative and programmatic approach
@@ -40,7 +40,7 @@ public class RemoteSystemBuilderTest {
      * @throws RoboBuilderException configuration exception
      */
 	@Test
-	public void builderRemoteSystemTest() throws RoboBuilderException {
+	void builderRemoteSystemTest() throws RoboBuilderException {
 
 		final RoboBuilder xmlBuilder = new RoboBuilder(
 				SystemUtil.getInputStreamByResourceName("testRemoteMessageReceiverAckSystem.xml"));
@@ -66,8 +66,8 @@ public class RemoteSystemBuilderTest {
         final RoboContext programmaticContext = new RoboBuilder("9", systemConf).build();
 	    //@formatter:on
 
-		Assert.assertEquals(xmlContext.getConfiguration(), systemConf);
-		Assert.assertEquals(xmlContext.getId(), programmaticContext.getId());
+		assertEquals(xmlContext.getConfiguration(), systemConf);
+		assertEquals(xmlContext.getId(), programmaticContext.getId());
 
 	}
 }

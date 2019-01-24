@@ -20,6 +20,6 @@ ext {
 //    mavenRepository = "/home/pi/.m2"
     robo4jJavaVersion = "1.8"
     roboGradleVersion = "5.1.1"
-    junitVersion = "4.12"
+    junitVersion = "5.3.2"
     pi4jVersion = "1.2-SNAPSHOT"
 }

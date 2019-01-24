@@ -16,12 +16,14 @@
  */
 package com.robo4j.configuration;
 
+import com.robo4j.util.IOUtil;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.robo4j.util.IOUtil;
 
 /**
  * XML Tests for the configuration.
@@ -29,27 +31,27 @@ import com.robo4j.util.IOUtil;
  * @author Marcus Hirt
  * @author Miroslav Wengner (@miragemiko)
  */
-public class XmlConfigurationFactoryTest {
+class XmlConfigurationFactoryTest {
 	@Test
-	public void testSerializeToString() throws ConfigurationFactoryException {
+	void testSerializeToString() throws ConfigurationFactoryException {
 		ConfigurationBuilder configBuilder = new ConfigurationBuilder().addString("firstString", "S1").addString("secondString", "S2").addBoolean("boolean", true).addBuilder("child1", new ConfigurationBuilder().addInteger("int", 1).addFloat("float", 1.0f)).addBuilder("child2", new ConfigurationBuilder().addInteger("int", 2).addFloat("float", 2.0f));
 		Configuration config = configBuilder.build();
 		String xml = XmlConfigurationFactory.toXml(config);
 		System.out.println(xml);
-		Assert.assertNotNull(xml);
+		assertNotNull(xml);
 
 		Configuration fromXml = XmlConfigurationFactory.fromXml(xml);
 		System.out.println(XmlConfigurationFactory.toXml(fromXml));
 
-		Assert.assertEquals(config, fromXml);
+		assertEquals(config, fromXml);
 	}
 
 	@Test
-	public void testReadResource() throws IOException, ConfigurationFactoryException {
+	void testReadResource() throws IOException, ConfigurationFactoryException {
 		String configXml = IOUtil
 				.readStringFromUTF8Stream(XmlConfigurationFactoryTest.class.getClassLoader().getResourceAsStream("configurationtest.xml"));
 		Configuration config = XmlConfigurationFactory.fromXml(configXml);
-		Assert.assertNotNull(config.getChildConfiguration("multipliers"));
-		Assert.assertNotNull(config.getChildConfiguration("offsets"));
+		assertNotNull(config.getChildConfiguration("multipliers"));
+		assertNotNull(config.getChildConfiguration("offsets"));
 	}
 }

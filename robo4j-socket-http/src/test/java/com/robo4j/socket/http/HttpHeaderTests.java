@@ -18,19 +18,20 @@
 package com.robo4j.socket.http;
 
 import com.robo4j.socket.http.enums.StatusCode;
-import com.robo4j.socket.http.provider.DefaultValuesProvider;
 import com.robo4j.socket.http.message.HttpDenominator;
+import com.robo4j.socket.http.message.HttpRequestDenominator;
+import com.robo4j.socket.http.provider.DefaultValuesProvider;
 import com.robo4j.socket.http.util.HttpHeaderBuilder;
 import com.robo4j.socket.http.util.HttpMessageBuilder;
 import com.robo4j.socket.http.util.HttpMessageUtils;
-import com.robo4j.socket.http.message.HttpRequestDenominator;
 import com.robo4j.socket.http.util.RoboHttpUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static com.robo4j.socket.http.HttpHeaderFieldValues.CONNECTION_KEEP_ALIVE;
 import static com.robo4j.socket.http.provider.DefaultValuesProvider.ROBO4J_CLIENT;
 import static com.robo4j.socket.http.util.HttpConstant.HTTP_NEW_LINE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Simple Http Header Oriented tests
@@ -38,29 +39,29 @@ import static com.robo4j.socket.http.util.HttpConstant.HTTP_NEW_LINE;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class HttpHeaderTests {
+class HttpHeaderTests {
 
 	@Test
-	public void createHeaderTest() {
+	void createHeaderTest() {
 		String header = HttpHeaderBuilder.Build().addFirstLine("units/controller")
 				.addAll(DefaultValuesProvider.BASIC_HEADER_MAP).build(HttpMethod.GET, HttpVersion.HTTP_1_1);
 
-		Assert.assertNotNull(header);
-		Assert.assertEquals(header.split(HTTP_NEW_LINE).length, 8);
-		Assert.assertEquals(header.split(HTTP_NEW_LINE)[2],
+		assertNotNull(header);
+		assertEquals(8, header.split(HTTP_NEW_LINE).length);
+		assertEquals(header.split(HTTP_NEW_LINE)[2],
 				createHeaderField(HttpHeaderFieldNames.USER_AGENT, ROBO4J_CLIENT));
-		Assert.assertEquals(header.split(HTTP_NEW_LINE)[3],
+		assertEquals(header.split(HTTP_NEW_LINE)[3],
 				createHeaderField(HttpHeaderFieldNames.CONNECTION, CONNECTION_KEEP_ALIVE));
 	}
 
 	@Test
-	public void characterParser() {
-		Assert.assertTrue("[".equals(HttpMessageUtils.getHttpSeparator(13)));
-		Assert.assertTrue("]".equals(HttpMessageUtils.getHttpSeparator(14)));
+	void characterParser() {
+		assertEquals("[", HttpMessageUtils.getHttpSeparator(13));
+		assertEquals("]",HttpMessageUtils.getHttpSeparator(14));
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		String uid = "1234";
 		String expectedResult = "HTTP/1.1 200 OK" + HTTP_NEW_LINE + "uid: " + uid + HTTP_NEW_LINE;
 		//@formatter:off
@@ -71,11 +72,11 @@ public class HttpHeaderTests {
                 .add(HttpHeaderFieldNames.ROBO_UNIT_UID, uid)
                 .build();
         //@formatter:on
-		Assert.assertTrue(getHeader.equals(expectedResult));
+		assertEquals(expectedResult, getHeader);
 	}
 
 	@Test
-	public void extractHeaderParameter() {
+	void extractHeaderParameter() {
 		String message = "message";
 		HttpDenominator denominator = new HttpRequestDenominator(HttpMethod.POST, HttpVersion.HTTP_1_1);
 		String postRequest = HttpMessageBuilder.Build().setDenominator(denominator)

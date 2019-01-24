@@ -1,21 +1,22 @@
 package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.HttpMethod;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class HttpPathConfigJsonBuilderTests {
+class HttpPathConfigJsonBuilderTests {
 
     @Test
-    public void simpleConfigurationTest(){
+    void simpleConfigurationTest(){
 
         String expectedJson = "[{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\",\"callbacks\":[\"filter1\",\"filter2\"]}," +
                 "{\"roboUnit\":\"roboUnit2\",\"method\":\"POST\",\"callbacks\":[]},{\"roboUnit\":\"roboUnit3\",\"method\":\"GET\",\"callbacks\":[]}]";
@@ -28,7 +29,7 @@ public class HttpPathConfigJsonBuilderTests {
         String resultJson = builder.build();
 
         System.out.println("resultJson: " + resultJson);
-        Assert.assertTrue(expectedJson.equals(resultJson));
+        assertEquals(expectedJson, resultJson);
 
     }
 

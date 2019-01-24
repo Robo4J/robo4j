@@ -16,22 +16,23 @@
  */
 package com.robo4j.hw.rpi.imu.impl;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BNOSerialTests {
+class BNOSerialTests {
 
 	@Test
-	public void testBNOSerialReadRequest() {
+	void testBNOSerialReadRequest() {
 		byte[] readRequest = BNO055SerialDevice.createReadRequest(0x20, 2);
-		Assert.assertEquals(0xAA, 0xFF & readRequest[0]);
-		Assert.assertEquals(0x01, readRequest[1]);
-		Assert.assertEquals(0x20, readRequest[2]);
-		Assert.assertEquals(2, readRequest[3]);
+		assertEquals(0xAA, 0xFF & readRequest[0]);
+		assertEquals(0x01, readRequest[1]);
+		assertEquals(0x20, readRequest[2]);
+		assertEquals(2, readRequest[3]);
 	}
 }

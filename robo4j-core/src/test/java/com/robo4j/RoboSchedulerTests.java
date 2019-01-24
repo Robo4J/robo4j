@@ -16,19 +16,17 @@
  */
 package com.robo4j;
 
+import com.robo4j.scheduler.FinalInvocationListener;
+import com.robo4j.scheduler.Scheduler;
+import org.junit.jupiter.api.Test;
+
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.robo4j.LifecycleState;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboReference;
-import com.robo4j.scheduler.FinalInvocationListener;
-import com.robo4j.scheduler.Scheduler;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Testing scheduling messages.
@@ -36,7 +34,7 @@ import com.robo4j.scheduler.Scheduler;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RoboSchedulerTests {
+class RoboSchedulerTests {
 	private static class SchedulerListener implements FinalInvocationListener {
 		volatile boolean wasFinalCalled;
 
@@ -47,7 +45,7 @@ public class RoboSchedulerTests {
 	}
 
 	@Test
-	public void testScheduler() throws InterruptedException, ExecutionException {
+	void testScheduler() throws InterruptedException, ExecutionException {
 		// FIXME: 20.08.17 (miro,marcus): when notification implemented, correct the test
 		RoboSystem system = new RoboSystem();
 		StringConsumer consumer = new StringConsumer(system, "consumer");
@@ -65,13 +63,13 @@ public class RoboSchedulerTests {
 		}
 
 		Thread.sleep(1000);
-		Assert.assertEquals(3,consumer.getReceivedMessages().size());
-		Assert.assertTrue(listener.wasFinalCalled);
+		assertEquals(3,consumer.getReceivedMessages().size());
+		assertTrue(listener.wasFinalCalled);
 		system.shutdown();
 	}
 
 	@Test
-	public void testSchedulerWithPressureAndMultipleTasks() throws InterruptedException, ExecutionException {
+	void testSchedulerWithPressureAndMultipleTasks() throws InterruptedException, ExecutionException {
 		RoboSystem system = new RoboSystem();
 		StringConsumer consumer = new StringConsumer(system, "consumer");
 		system.addUnits(consumer);
@@ -84,8 +82,8 @@ public class RoboSchedulerTests {
 		get(f1);
 		get(f2);
 
-		Assert.assertEquals(3000, consumer.getReceivedMessages().size());
-		Assert.assertTrue(listener.wasFinalCalled);
+		assertEquals(3000, consumer.getReceivedMessages().size());
+		assertTrue(listener.wasFinalCalled);
 		system.shutdown();
 	}
 

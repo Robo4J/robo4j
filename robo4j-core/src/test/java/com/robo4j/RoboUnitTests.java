@@ -16,11 +16,12 @@
  */
 package com.robo4j;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test(s) for the RoboUnits.
@@ -28,13 +29,13 @@ import com.robo4j.configuration.ConfigurationBuilder;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RoboUnitTests {
+class RoboUnitTests {
 
 	@Test
-	public void testSystem() throws Exception {
+	void testSystem() throws Exception {
 		int totalMessages = 10;
 		RoboSystem system = new RoboSystem();
-		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+		assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
 		StringProducer producer = new StringProducer(system, "producer");
 		Configuration config = new ConfigurationBuilder().addString(StringProducer.PROP_TARGET, "consumer")
 				.addInteger(StringProducer.PROP_TOTAL_MESSAGES, totalMessages).build();
@@ -42,31 +43,31 @@ public class RoboUnitTests {
 		StringConsumer consumer = new StringConsumer(system, "consumer");
 		system.addUnits(producer, consumer);
 		system.start();
-		Assert.assertEquals(system.getState(), LifecycleState.STARTED);
-		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
+		assertEquals(system.getState(), LifecycleState.STARTED);
+		assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 		for (int i = 0; i < totalMessages; i++) {
 			producer.sendRandomMessage();
 		}
 		system.shutdown();
-		Assert.assertEquals(totalMessages, consumer.getReceivedMessages().size());
+		assertEquals(totalMessages, consumer.getReceivedMessages().size());
 	}
 
 	@Test
-	public void testReferences() throws Exception {
+	void testReferences() throws Exception {
 		RoboSystem system = new RoboSystem();
-		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+		assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
 		StringConsumer consumer = new StringConsumer(system, "consumer");
 		system.addUnits(consumer);
-		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+		assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
 		system.setState(LifecycleState.INITIALIZED);
 		system.start();
 
-		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
+		assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 
 		RoboReference<String> ref = system.getReference(consumer.getId());
 		consumer.sendMessage("Lalalala");
 		ref.sendMessage("Lalala");
 		system.shutdown();
-		Assert.assertEquals(2, consumer.getReceivedMessages().size());
+		assertEquals(2, consumer.getReceivedMessages().size());
 	}
 }

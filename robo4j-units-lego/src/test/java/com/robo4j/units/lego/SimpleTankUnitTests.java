@@ -19,9 +19,6 @@
 
 package com.robo4j.units.lego;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
@@ -29,15 +26,18 @@ import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.units.lego.platform.LegoPlatformMessage;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class SimpleTankUnitTests {
+class SimpleTankUnitTests {
 
 	@Test
-	public void simpleTankUnitMockTest() throws Exception {
+	void simpleTankUnitMockTest() throws Exception {
 		RoboBuilder builder = new RoboBuilder();
 
 		Configuration config = ConfigurationFactory.createEmptyConfiguration();
@@ -54,7 +54,7 @@ public class SimpleTankUnitTests {
 		tank.sendMessage(new LegoPlatformMessage("back"));
 		tank.sendMessage(new LegoPlatformMessage("stop"));
 
-		Assert.assertTrue(tank.getAttribute(descriptor).get());
+		assertTrue(tank.getAttribute(descriptor).get());
 
 		context.shutdown();
 	}

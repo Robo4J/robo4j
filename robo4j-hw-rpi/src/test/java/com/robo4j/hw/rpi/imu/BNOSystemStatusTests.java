@@ -16,26 +16,26 @@
  */
 package com.robo4j.hw.rpi.imu;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.robo4j.hw.rpi.imu.BNO055SystemStatus;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BNOSystemStatusTests {
+class BNOSystemStatusTests {
 
 	@Test
-	public void testFlags() {
+	void testFlags() {
 		BNO055SystemStatus status = new BNO055SystemStatus(1);
-		Assert.assertTrue(status.getStatusFlags().length == 1);
-		Assert.assertArrayEquals(createFlags(BNO055SystemStatus.StatusFlag.IDLE), status.getStatusFlags());
+		assertTrue(status.getStatusFlags().length == 1);
+		assertArrayEquals(createFlags(BNO055SystemStatus.StatusFlag.IDLE), status.getStatusFlags());
 		status = new BNO055SystemStatus(65);
-		Assert.assertTrue(status.getStatusFlags().length == 2);
-		Assert.assertArrayEquals(createFlags(BNO055SystemStatus.StatusFlag.IDLE, BNO055SystemStatus.StatusFlag.RUNNING_NO_SENSOR_FUSION), status.getStatusFlags());
+		assertTrue(status.getStatusFlags().length == 2);
+		assertArrayEquals(createFlags(BNO055SystemStatus.StatusFlag.IDLE, BNO055SystemStatus.StatusFlag.RUNNING_NO_SENSOR_FUSION), status.getStatusFlags());
 
 	}
 

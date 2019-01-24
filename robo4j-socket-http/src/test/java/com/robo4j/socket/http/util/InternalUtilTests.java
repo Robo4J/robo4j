@@ -17,19 +17,26 @@
 
 package com.robo4j.socket.http.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class InternalUtilTests {
+class InternalUtilTests {
 
     @Test
-    public void testSeparator(){
+    void testSeparator(){
         String separator = SystemPropertyUtils.get("line.separator", "\n\n");
         System.out.println("Separator: " + Arrays.asList(separator.toCharArray()));
+
+        assertNotNull(separator.toCharArray());
+
     }
+
 }

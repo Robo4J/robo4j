@@ -17,8 +17,9 @@
  */
 package com.robo4j.math.geometry;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Matrix tests.
@@ -26,50 +27,50 @@ import org.junit.Test;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class MatrixTest {
-	public static Integer [] TESTVALUES_3D_INT = new Integer[] {2, 3, 5, 7, 11, 13, 17, 19, 23};
-	public static Float [] TESTVALUES_3D_FLOAT = new Float[] {2.0f, 3.0f, 5.0f, 7.0f, 11.0f, 13.0f, 17.0f, 19.0f, 23.0f};
-	public static Double [] TESTVALUES_3D_DOUBLE = new Double[] {2.0, 3.0, 5.0, 7.0, 11.0, 13.0, 17.0, 19.0, 23.0};
-	public static Integer [] TESTVALUES_4D_INT = new Integer[] {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53};
-	public static Float [] TESTVALUES_4D_FLOAT = new Float[] {2.0f, 3.0f, 5.0f, 7.0f, 11.0f, 13.0f, 17.0f, 19.0f, 23.0f, 29.0f, 31.0f, 37.0f, 41.0f, 43.0f, 47.0f, 53.0f};
-	public static Double [] TESTVALUES_4D_DOUBLE = new Double[] {2.0, 3.0, 5.0, 7.0, 11.0, 13.0, 17.0, 19.0, 23.0, 29.0, 31.0, 37.0, 41.0, 43.0, 47.0, 53.0};
+class MatrixTest {
+	static Integer [] TESTVALUES_3D_INT = new Integer[] {2, 3, 5, 7, 11, 13, 17, 19, 23};
+	static Float [] TESTVALUES_3D_FLOAT = new Float[] {2.0f, 3.0f, 5.0f, 7.0f, 11.0f, 13.0f, 17.0f, 19.0f, 23.0f};
+	static Double [] TESTVALUES_3D_DOUBLE = new Double[] {2.0, 3.0, 5.0, 7.0, 11.0, 13.0, 17.0, 19.0, 23.0};
+	static Integer [] TESTVALUES_4D_INT = new Integer[] {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53};
+	static Float [] TESTVALUES_4D_FLOAT = new Float[] {2.0f, 3.0f, 5.0f, 7.0f, 11.0f, 13.0f, 17.0f, 19.0f, 23.0f, 29.0f, 31.0f, 37.0f, 41.0f, 43.0f, 47.0f, 53.0f};
+	static Double [] TESTVALUES_4D_DOUBLE = new Double[] {2.0, 3.0, 5.0, 7.0, 11.0, 13.0, 17.0, 19.0, 23.0, 29.0, 31.0, 37.0, 41.0, 43.0, 47.0, 53.0};
 	
 	@Test
 	public void testCreation() {
 		Matrix matrix = createMatrix(TESTVALUES_3D_INT);
-		Assert.assertEquals(3, matrix.getRows());
-		Assert.assertEquals(3, matrix.getColumns());
+		assertEquals(3, matrix.getRows());
+		assertEquals(3, matrix.getColumns());
 		validate(matrix, TESTVALUES_3D_INT);
 		
 		matrix = createMatrix(TESTVALUES_3D_FLOAT);
-		Assert.assertEquals(3, matrix.getRows());
-		Assert.assertEquals(3, matrix.getColumns());
+		assertEquals(3, matrix.getRows());
+		assertEquals(3, matrix.getColumns());
 		validate(matrix, TESTVALUES_3D_FLOAT);
 		
 		matrix = createMatrix(TESTVALUES_3D_DOUBLE);
-		Assert.assertEquals(3, matrix.getRows());
-		Assert.assertEquals(3, matrix.getColumns());
+		assertEquals(3, matrix.getRows());
+		assertEquals(3, matrix.getColumns());
 		validate(matrix, TESTVALUES_3D_DOUBLE);
 		
 		// 4D
 		matrix = createMatrix(TESTVALUES_4D_INT);
-		Assert.assertEquals(4, matrix.getRows());
-		Assert.assertEquals(4, matrix.getColumns());
+		assertEquals(4, matrix.getRows());
+		assertEquals(4, matrix.getColumns());
 		validate(matrix, TESTVALUES_4D_INT);
 		
 		matrix = createMatrix(TESTVALUES_4D_FLOAT);
-		Assert.assertEquals(4, matrix.getRows());
-		Assert.assertEquals(4, matrix.getColumns());
+		assertEquals(4, matrix.getRows());
+		assertEquals(4, matrix.getColumns());
 		validate(matrix, TESTVALUES_4D_FLOAT);
 		
 		matrix = createMatrix(TESTVALUES_4D_DOUBLE);
-		Assert.assertEquals(4, matrix.getRows());
-		Assert.assertEquals(4, matrix.getColumns());
+		assertEquals(4, matrix.getRows());
+		assertEquals(4, matrix.getColumns());
 		validate(matrix, TESTVALUES_4D_DOUBLE);
 	}
 	
 	@Test
-	public void testTranspose() {
+	void testTranspose() {
 		Matrix matrix = createMatrix(TESTVALUES_3D_INT);
 		Matrix matrixTransposed = createMatrix(TESTVALUES_3D_INT);
 		matrixTransposed.transpose();
@@ -103,7 +104,7 @@ public class MatrixTest {
 	}
 
 	@Test
-	public void testSysout() {
+	void testSysout() {
 		System.out.println(createMatrix(TESTVALUES_3D_INT));
 		System.out.println(createMatrix(TESTVALUES_3D_FLOAT));
 		System.out.println(createMatrix(TESTVALUES_3D_DOUBLE));
@@ -115,7 +116,7 @@ public class MatrixTest {
 	private void validate(Matrix matrix, Number[] numbers) {
 		for (int i = 0; i < matrix.getRows(); i++) {
 			for (int j = 0; j < matrix.getColumns(); j++) {
-				Assert.assertEquals(numbers[i * matrix.getColumns() + j], matrix.getNumber(i, j));
+				assertEquals(numbers[i * matrix.getColumns() + j], matrix.getNumber(i, j));
 			}
 		}
 	}
@@ -123,7 +124,7 @@ public class MatrixTest {
 	private void validateTranspose(Matrix matrix, Matrix transpose) {		
 		for (int i = 0; i < matrix.getRows(); i++) {
 			for (int j = 0; j < matrix.getColumns(); j++) {
-				Assert.assertEquals(matrix.getNumber(i, j), transpose.getNumber(j, i));
+				assertEquals(matrix.getNumber(i, j), transpose.getNumber(j, i));
 			}
 		}
 	}

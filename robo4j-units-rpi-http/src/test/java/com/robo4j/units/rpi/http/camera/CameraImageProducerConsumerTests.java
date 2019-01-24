@@ -22,21 +22,22 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.util.RoboHttpUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class CameraImageProducerConsumerTests {
+class CameraImageProducerConsumerTests {
 
 	@Test
-	public void cameraImageProdConTest() throws Exception {
+	void cameraImageProdConTest() throws Exception {
 
 		RoboBuilder builderProducer = new RoboBuilder(
 				Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemProducer.xml"));
@@ -79,7 +80,7 @@ public class CameraImageProducerConsumerTests {
 
 		Integer receivedImagesConsumer = imageConsumer
 				.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_RECEIVED_IMAGES).get();
-		Assert.assertEquals(totalImagesProducer, receivedImagesConsumer);
+		assertEquals(totalImagesProducer, receivedImagesConsumer);
 
 		RoboHttpUtils.printMeasuredTime(getClass(), "duration", startTime);
 		System.out.println("receivedImagesConsumer: " + receivedImagesConsumer);

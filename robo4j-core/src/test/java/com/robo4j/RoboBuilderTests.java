@@ -19,13 +19,16 @@ package com.robo4j;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.util.SystemUtil;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test(s) for the builder.
@@ -35,22 +38,22 @@ import java.util.concurrent.TimeoutException;
  */
 public class RoboBuilderTests {
 	private static final int MESSAGES = 10;
-	public static final int TIMEOUT = 100;
+	private static final int TIMEOUT = 100;
 
 	@Test
-	public void testParsingFile()
+	void testParsingFile()
 			throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
 		RoboBuilder builder = new RoboBuilder();
 		builder.add(SystemUtil.getInputStreamByResourceName("test.xml"));
 		RoboContext system = builder.build();
 
-		Assert.assertEquals(system.getState(), LifecycleState.INITIALIZED);
+		assertEquals(system.getState(), LifecycleState.INITIALIZED);
 		system.start();
-		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
+		assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 
 
 		RoboReference<String> producer = system.getReference("producer");
-		Assert.assertNotNull(producer);
+		assertNotNull(producer);
 		for (int i = 0; i < MESSAGES; i++) {
 			producer.sendMessage("sendRandomMessage");
 		}
@@ -59,43 +62,43 @@ public class RoboBuilderTests {
 				.get(TIMEOUT, TimeUnit.MINUTES);
 		countDownLatchConsumer.await(TIMEOUT, TimeUnit.MINUTES);
 
-		Assert.assertEquals(MESSAGES, (int) producer.getAttribute(StringProducer.DESCRIPTOR_TOTAL_MESSAGES).get());
-		Assert.assertEquals(MESSAGES, (int) consumer.getAttribute(StringConsumer.DESCRIPTOR_TOTAL_MESSAGES).get());
+		assertEquals(MESSAGES, (int) producer.getAttribute(StringProducer.DESCRIPTOR_TOTAL_MESSAGES).get());
+		assertEquals(MESSAGES, (int) consumer.getAttribute(StringConsumer.DESCRIPTOR_TOTAL_MESSAGES).get());
 
 		system.stop();
 		system.shutdown();
 	}
 
-	// @Test
-	public void testSeparateSystemUnitsSystemConfig()
+	@Test
+	void testSeparateSystemUnitsSystemConfig()
 			throws RoboBuilderException, InterruptedException, ExecutionException {
 		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRoboSystemOnly.xml"));
 		// NOTE(Marcus/Aug 19, 2017): We have the system settings and the units
 		// in the same file.
 		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("testRoboUnitsOnly.xml"));
 		RoboContext system = builder.build();
-		Assert.assertEquals("mySystem", system.getId());
-		Assert.assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+		assertEquals("mySystem", system.getId());
+		assertEquals(system.getState(), LifecycleState.INITIALIZED);
 		system.start();
-		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
+		assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 
 		/* descriptor is similar for both units */
 		final DefaultAttributeDescriptor<Integer> descriptor = DefaultAttributeDescriptor.create(Integer.class,
 				"getNumberOfSentMessages");
 
 		RoboReference<String> producer = system.getReference("producer");
-		Assert.assertNotNull(producer);
+		assertNotNull(producer);
 		for (int i = 0; i < MESSAGES; i++) {
 			producer.sendMessage("sendRandomMessage");
 		}
-		Assert.assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
+		assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
 
 		RoboReference<String> consumer = system.getReference("consumer");
-		Assert.assertNotNull(consumer);
+		assertNotNull(consumer);
 
 		synchronized (consumer.getAttribute(descriptor)) {
 			int receivedMessages = consumer.getAttribute(descriptor).get();
-			Assert.assertEquals(MESSAGES, receivedMessages);
+			assertEquals(MESSAGES, receivedMessages);
 		}
 
 		system.stop();
@@ -103,7 +106,7 @@ public class RoboBuilderTests {
 	}
 
 	@Test
-	public void testParsingFileWithSystemConfig()
+	void testParsingFileWithSystemConfig()
 			throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
 		RoboBuilder builder = new RoboBuilder(
 				Thread.currentThread().getContextClassLoader().getResourceAsStream("testsystem.xml"));
@@ -112,23 +115,23 @@ public class RoboBuilderTests {
 		// configuration.
 		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("testsystem.xml"));
 		RoboContext system = builder.build();
-		Assert.assertEquals("mySystem", system.getId());
-		Assert.assertEquals(system.getState(), LifecycleState.INITIALIZED);
+		assertEquals("mySystem", system.getId());
+		assertEquals(system.getState(), LifecycleState.INITIALIZED);
 		system.start();
-		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
+		assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 
 		RoboReference<String> producer = system.getReference("producer");
 		CountDownLatch producerLatch = producer.getAttribute(StringProducer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
-		Assert.assertNotNull(producer);
+		assertNotNull(producer);
 		for (int i = 0; i < MESSAGES; i++) {
 			producer.sendMessage("sendRandomMessage");
 		}
 		producerLatch.await(20, TimeUnit.SECONDS);
 		int totalMessages = producer.getAttribute(StringProducer.DESCRIPTOR_TOTAL_MESSAGES).get();
-		Assert.assertEquals(MESSAGES, totalMessages);
+		assertEquals(MESSAGES, totalMessages);
 
 		RoboReference<String> consumer = system.getReference("consumer");
-		Assert.assertNotNull(consumer);
+		assertNotNull(consumer);
 
 		// We need to fix these tests so that we can get a callback.
 		CountDownLatch countDownLatchConsumer = consumer.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH)
@@ -136,14 +139,14 @@ public class RoboBuilderTests {
 		countDownLatchConsumer.await(TIMEOUT, TimeUnit.MINUTES);
 
 		int receivedMessages = consumer.getAttribute(StringConsumer.DESCRIPTOR_TOTAL_MESSAGES).get();
-		Assert.assertEquals(MESSAGES, receivedMessages);
+		assertEquals(MESSAGES, receivedMessages);
 
 		system.stop();
 		system.shutdown();
 	}
 
 	@Test
-	public void testAddingNonUnique() {
+	void testAddingNonUnique() {
 		RoboBuilder builder = new RoboBuilder();
 		boolean gotException = false;
 		try {
@@ -151,11 +154,11 @@ public class RoboBuilderTests {
 		} catch (RoboBuilderException e) {
 			gotException = true;
 		}
-		Assert.assertTrue(gotException);
+		assertTrue(gotException);
 	}
 
 	@Test
-	public void testComplexConfiguration() throws RoboBuilderException {
+	void testComplexConfiguration() throws RoboBuilderException {
 		RoboBuilder builder = new RoboBuilder();
 		builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("testsubconfig.xml"));
 		RoboContext system = builder.build();
@@ -163,11 +166,11 @@ public class RoboBuilderTests {
 		RoboReference<Object> reference = system.getReference("consumer");
 		system.stop();
 		system.shutdown();
-		Assert.assertNotNull(reference);
+		assertNotNull(reference);
 	}
 
-	// @Test
-	public void testProgrammaticConfiguration() throws RoboBuilderException, ConfigurationException,
+	@Test
+	void testProgrammaticConfiguration() throws RoboBuilderException, ConfigurationException,
 			InterruptedException, ExecutionException, TimeoutException {
 
 		final String producerUnitName = "producer";
@@ -188,21 +191,21 @@ public class RoboBuilderTests {
 		builder.add(StringConsumer.class, consumerConf, consumerUnitName);
 		RoboContext system = builder.build();
 
-		Assert.assertEquals("mySystem", system.getId());
-		Assert.assertEquals(system.getState(), LifecycleState.INITIALIZED);
+		assertEquals("mySystem", system.getId());
+		assertEquals(system.getState(), LifecycleState.INITIALIZED);
 		system.start();
-		Assert.assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
+		assertTrue(system.getState() == LifecycleState.STARTING || system.getState() == LifecycleState.STARTED);
 
 		RoboReference<String> producerRef = system.getReference(producerUnitName);
-		Assert.assertNotNull(producerRef);
+		assertNotNull(producerRef);
 		for (int i = 0; i < numberOfMessages; i++) {
 			producerRef.sendMessage(StringProducer.PROPERTY_SEND_RANDOM_MESSAGE);
 		}
 		final int producerTotalSentMessages = producerRef.getAttribute(StringProducer.DESCRIPTOR_TOTAL_MESSAGES).get();
-		Assert.assertEquals(numberOfMessages, producerTotalSentMessages);
+		assertEquals(numberOfMessages, producerTotalSentMessages);
 
 		RoboReference<String> consumer = system.getReference(consumerUnitName);
-		Assert.assertNotNull(consumer);
+		assertNotNull(consumer);
 
 		// We need to fix these tests so that we can get a callback.
 		CountDownLatch countDownLatchConsumer = consumer.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH)
@@ -210,7 +213,7 @@ public class RoboBuilderTests {
 		countDownLatchConsumer.await(TIMEOUT, TimeUnit.MINUTES);
 
 		int receivedMessages = consumer.getAttribute(StringConsumer.DESCRIPTOR_TOTAL_MESSAGES).get();
-		Assert.assertEquals(MESSAGES, receivedMessages);
+		assertEquals(MESSAGES, receivedMessages);
 
 		system.stop();
 		system.shutdown();

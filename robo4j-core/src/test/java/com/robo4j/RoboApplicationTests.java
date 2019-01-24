@@ -17,12 +17,13 @@
 
 package com.robo4j;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * RoboApplicationTests contains tests for {@link RoboApplication}
@@ -30,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RoboApplicationTests {
+class RoboApplicationTests {
 
 	/**
 	 * Build and shutdown the system
@@ -39,7 +40,7 @@ public class RoboApplicationTests {
 	 *             unexpected
 	 */
 	@Test
-	public void roboApplicationLifeCycleTestNoExit() throws RoboBuilderException {
+	void roboApplicationLifeCycleTestNoExit() throws RoboBuilderException {
 		final InputStream contextIS = Thread.currentThread().getContextClassLoader().getResourceAsStream("test.xml");
 		final RoboBuilder builder = new RoboBuilder();
 		builder.add(contextIS);
@@ -48,7 +49,7 @@ public class RoboApplicationTests {
 		final RoboApplication roboApp = new RoboApplication();
 		roboApp.launchNoExit(system, 3, TimeUnit.SECONDS);
 
-		Assert.assertEquals(LifecycleState.SHUTDOWN, system.getState());
+		assertEquals(LifecycleState.SHUTDOWN, system.getState());
 	}
 
 	/**
@@ -57,9 +58,8 @@ public class RoboApplicationTests {
 	 * @throws RoboBuilderException
 	 *             unexpected
 	 */
-	@Ignore
 	@Test
-	public void roboApplicationLifeCycleTestWithExit() throws RoboBuilderException {
+	void roboApplicationLifeCycleTestWithExit() throws RoboBuilderException {
 		final InputStream contextIS = Thread.currentThread().getContextClassLoader().getResourceAsStream("test.xml");
 		final RoboBuilder builder = new RoboBuilder();
 		builder.add(contextIS);
@@ -71,14 +71,14 @@ public class RoboApplicationTests {
 		System.setSecurityManager(new SecurityManager() {
 			@Override
 			public void checkExit(int status) {
-				Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(status));
+				assertEquals(Integer.valueOf(0), Integer.valueOf(status));
 			}
 		});
 	}
 
-	@Ignore
+	@Disabled("individual test")
 	@Test
-    public void roboApplicationLifeCycle() throws RoboBuilderException {
+    void roboApplicationLifeCycle() throws RoboBuilderException {
         final InputStream contextIS = Thread.currentThread().getContextClassLoader().getResourceAsStream("test.xml");
         final RoboBuilder builder = new RoboBuilder();
         builder.add(contextIS);

@@ -16,8 +16,10 @@
  */
 package com.robo4j.math.geometry;
 
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Matrix tests.
@@ -25,18 +27,18 @@ import org.junit.Test;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class QuaternionTest {
-	public final static double ERROR_EPSILON = 0.00000001;
+class QuaternionTest {
+	private final static double ERROR_EPSILON = 0.00000001;
 	
 	@Test
-	public void testConversions() {
+	void testConversions() {
 		Tuple3d euler = new Tuple3d(0, Math.toRadians(90), 0);
 		Tuple4d quaternion = QuaternionUtils.toQuaternion(euler);
-		Assert.assertEquals(0.7071067811865476, quaternion.t, ERROR_EPSILON);
-		Assert.assertEquals(0.7071067811865476, quaternion.x, ERROR_EPSILON);
+		assertEquals(0.7071067811865476, quaternion.t, ERROR_EPSILON);
+		assertEquals(0.7071067811865476, quaternion.x, ERROR_EPSILON);
 		Tuple3d eulerBack = QuaternionUtils.toEuler(quaternion);
-		Assert.assertEquals(euler.x, eulerBack.x, ERROR_EPSILON);
-		Assert.assertEquals(euler.y, eulerBack.y, ERROR_EPSILON);
-		Assert.assertEquals(euler.z, eulerBack.z, ERROR_EPSILON);	
+		assertEquals(euler.x, eulerBack.x, ERROR_EPSILON);
+		assertEquals(euler.y, eulerBack.y, ERROR_EPSILON);
+		assertEquals(euler.z, eulerBack.z, ERROR_EPSILON);
 	}
 }

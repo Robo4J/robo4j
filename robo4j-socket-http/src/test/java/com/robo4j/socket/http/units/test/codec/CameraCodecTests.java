@@ -2,9 +2,10 @@ package com.robo4j.socket.http.units.test.codec;
 
 import com.robo4j.socket.http.codec.CameraConfigMessage;
 import com.robo4j.socket.http.codec.CameraConfigMessageCodec;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Camera Image, Config related tests
@@ -12,17 +13,17 @@ import org.junit.Test;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class CameraCodecTests {
+class CameraCodecTests {
 
 	private CameraConfigMessageCodec codec;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		codec = new CameraConfigMessageCodec();
 	}
 
 	@Test
-	public void cameraConfigCodecTest() {
+	void cameraConfigCodecTest() {
 		String properJson = "{\"height\":800,\"width\":600,\"brightness\":80,\"sharpness\":56,\"timeout\":2,\"timelapse\":100}";
 		String desiredJson = "{\"height\":800 ,\"width\" :600,\"brightness\":80,\"sharpness\":56,\"timeout\":2,\"timelapse\":100}";
 		CameraConfigMessage message = new CameraConfigMessage(800, 600, 80, 56, 2, 100);
@@ -31,12 +32,12 @@ public class CameraCodecTests {
 
 		CameraConfigMessage decodeJson = codec.decode(desiredJson);
 
-		Assert.assertTrue("encode json", encodeJson.equals(properJson));
-		Assert.assertTrue("decode json", decodeJson.equals(message));
+		assertEquals(properJson, encodeJson, "encode json");
+		assertEquals(message, decodeJson, "decode json");
 	}
 
 	@Test
-	public void cameraConfigCodecRandomOrderTest() {
+	void cameraConfigCodecRandomOrderTest() {
 		String properOrderJson = "{\"height\":800,\"width\":600,\"brightness\":80,\"sharpness\":56,\"timeout\":2,\"timelapse\":100}";
 		String inputOrderJson = "{\"height\":800 , \"width\":600,\"brightness\":80,\"sharpness\" : 56,\"timeout\" :2,\"timelapse\": 100}";
 		CameraConfigMessage message = new CameraConfigMessage(800, 600, 80, 56, 2, 100);
@@ -45,21 +46,8 @@ public class CameraCodecTests {
 
 		CameraConfigMessage decodeJson = codec.decode(inputOrderJson);
 
-		Assert.assertTrue("encode json", encodeJson.equals(properOrderJson));
-		Assert.assertTrue("decode json", decodeJson.equals(message));
+		assertEquals(properOrderJson, encodeJson, "encode json");
+		assertEquals(message, decodeJson, "decode json");
 	}
 
-	@Test
-	public void cameraConfigCodecNotFullTest() {
-		String properOrderJson = "{\"height\":800,\"width\":600,\"brightness\":80,\"sharpness\":56,\"timeout\":2,\"timelapse\":100}";
-
-		CameraConfigMessage configMessage = codec.decode(properOrderJson);
-
-		System.out.println("configMessage:" + configMessage);
-	}
-
-	@Test
-	public void cameraConfigCodecDifferentTypeValuesTest() {
-		// TBD
-	}
 }

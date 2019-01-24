@@ -17,20 +17,21 @@
 
 package com.robo4j.hw.rpi.pad;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class LF710PadUtilsTests {
+class LF710PadUtilsTests {
 
     @Test
-    public void testPercentageValues(){
-        Assert.assertTrue(LF710PadUtils.axesMiniStickToPercentage(0) == 0);
-        Assert.assertTrue(LF710PadUtils.axesMiniStickToPercentage(32767) == 100);
-        Assert.assertTrue(LF710PadUtils.axesMiniStickToValue(100) == 32767);
-        Assert.assertTrue(LF710PadUtils.axesMiniStickToValue(0) == 0);
+    void testPercentageValues(){
+        assertTrue(LF710PadUtils.axesMiniStickToPercentage(0) == 0);
+        assertTrue(LF710PadUtils.axesMiniStickToPercentage(32767) == 100);
+        assertTrue(LF710PadUtils.axesMiniStickToValue(100) == 32767);
+        assertTrue(LF710PadUtils.axesMiniStickToValue(0) == 0);
     }
 }
