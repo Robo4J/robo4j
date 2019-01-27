@@ -26,13 +26,16 @@ import com.robo4j.StringProducerRemote;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.util.SystemUtil;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Note that on Mac OS X, it seems the easiest way to get this test to run is to
@@ -42,16 +45,16 @@ import java.util.concurrent.CountDownLatch;
  * @author Miroslav Wengner (@miragemiko)
  */
 
-public class RemoteContextTests {
+class RemoteContextTests {
 	private static final String ACK_CONSUMER = "ackConsumer";
 	private static final String REMOTE_UNIT_EMITTER = "remoteEmitter";
 	private static final int NUMBER_ITERATIONS = 10;
 	private static final String REMOTE_CONTEXT_RECEIVER = "remoteReceiver";
-	public static final String UNIT_STRING_CONSUMER = "stringConsumer";
-	public static final String CONTEXT_ID_REMOTE_RECEIVER = "remoteReceiver";
+	private static final String UNIT_STRING_CONSUMER = "stringConsumer";
+	private static final String CONTEXT_ID_REMOTE_RECEIVER = "remoteReceiver";
 
 	@Test
-	public void testDiscoveryOfDiscoveryEnabledRoboContext() throws RoboBuilderException, IOException {
+	void testDiscoveryOfDiscoveryEnabledRoboContext() throws RoboBuilderException, IOException {
 		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testDiscoverableSystem.xml"));
 		RoboContext ctx = builder.build();
 		ctx.start();
@@ -63,15 +66,15 @@ public class RemoteContextTests {
 			SystemUtil.sleep(200);
 		}
 
-		Assert.assertTrue(service.getDiscoveredContexts().size() > 0);
+		assertTrue(service.getDiscoveredContexts().size() > 0);
 		RoboContextDescriptor descriptor = service.getDescriptor("6");
-		Assert.assertEquals(descriptor.getMetadata().get("name"), "Caprica");
-		Assert.assertEquals(descriptor.getMetadata().get("class"), "Cylon");
+		assertEquals(descriptor.getMetadata().get("name"), "Caprica");
+		assertEquals(descriptor.getMetadata().get("class"), "Cylon");
 		ctx.shutdown();
 	}
 
 	@Test
-	public void testMessageToDiscoveredContext() throws RoboBuilderException, IOException, ConfigurationException {
+	void testMessageToDiscoveredContext() throws RoboBuilderException, IOException, ConfigurationException {
 		RoboBuilder builder = new RoboBuilder(
 				SystemUtil.getInputStreamByResourceName("testRemoteMessageReceiverSystem.xml"));
 		StringConsumer consumer = new StringConsumer(builder.getContext(), ACK_CONSUMER);
@@ -91,9 +94,9 @@ public class RemoteContextTests {
 		for (int i = 0; i < NUMBER_ITERATIONS && (service.getDescriptor("7") == null); i++) {
 			SystemUtil.sleep(200);
 		}
-		Assert.assertTrue(service.getDiscoveredContexts().size() > 0);
+		assertTrue(service.getDiscoveredContexts().size() > 0);
 		RoboContextDescriptor descriptor = service.getDescriptor("7");
-		Assert.assertNotNull(descriptor);
+		assertNotNull(descriptor);
 
 		builder = new RoboBuilder(
 				RemoteContextTests.class.getClassLoader().getResourceAsStream("testMessageEmitterSystem_10.xml"));
@@ -110,14 +113,14 @@ public class RemoteContextTests {
 			SystemUtil.sleep(200);
 		}
 
-		Assert.assertTrue(consumer.getReceivedMessages().size() > 0);
+		assertTrue(consumer.getReceivedMessages().size() > 0);
 		System.out.println("Got messages: " + consumer.getReceivedMessages());
 		emitterContext.shutdown();
 		receiverCtx.shutdown();
 	}
 
 	@Test
-	public void testMessageIncludingReferenceToDiscoveredContext()
+	void testMessageIncludingReferenceToDiscoveredContext()
 			throws RoboBuilderException, IOException, ConfigurationException {
 		RoboBuilder builder = new RoboBuilder(
 				SystemUtil.getInputStreamByResourceName("testRemoteMessageReceiverAckSystem.xml"));
@@ -135,9 +138,9 @@ public class RemoteContextTests {
 		for (int i = 0; i < NUMBER_ITERATIONS && (service.getDescriptor("9") == null); i++) {
 			SystemUtil.sleep(200);
 		}
-		Assert.assertTrue(service.getDiscoveredContexts().size() > 0);
+		assertTrue(service.getDiscoveredContexts().size() > 0);
 		RoboContextDescriptor descriptor = service.getDescriptor("9");
-		Assert.assertNotNull(descriptor);
+		assertNotNull(descriptor);
 
 		builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testMessageEmitterSystem_8.xml"));
 		RemoteTestMessageProducer remoteTestMessageProducer = new RemoteTestMessageProducer(builder.getContext(),
@@ -154,15 +157,15 @@ public class RemoteContextTests {
 			SystemUtil.sleep(200);
 		}
 
-		Assert.assertTrue(consumer.getReceivedMessages().size() > 0);
+		assertTrue(consumer.getReceivedMessages().size() > 0);
 		System.out.println("Got messages: " + consumer.getReceivedMessages());
 
-		Assert.assertTrue(remoteTestMessageProducer.getAckCount() > 0);
+		assertTrue(remoteTestMessageProducer.getAckCount() > 0);
 	}
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testMessageToDiscoveredContextAndReferenceToDiscoveredContext() throws Exception {
+	void testMessageToDiscoveredContextAndReferenceToDiscoveredContext() throws Exception {
 		RoboContext receiverSystem = buildRemoteReceiverContext(ACK_CONSUMER);
 		receiverSystem.start();
 		RoboReference<TestMessageType> ackConsumer = receiverSystem.getReference(ACK_CONSUMER);
@@ -178,8 +181,8 @@ public class RemoteContextTests {
 
 		// context has been discovered
 		RoboContextDescriptor contextDescriptor = getRoboContextDescriptor(service, CONTEXT_ID_REMOTE_RECEIVER);
-		Assert.assertTrue(service.getDiscoveredContexts().size() > 0);
-		Assert.assertNotNull(contextDescriptor);
+		assertTrue(service.getDiscoveredContexts().size() > 0);
+		assertNotNull(contextDescriptor);
 
 		// build the producer system
 		RoboContext producerEmitterSystem = buildEmitterContext(TestMessageType.class, ACK_CONSUMER,
@@ -195,7 +198,7 @@ public class RemoteContextTests {
 
 		List<TestMessageType> receivedMessages = (List<TestMessageType>) ackConsumer
 				.getAttribute(AckingStringConsumer.DESCRIPTOR_MESSAGES).get();
-		Assert.assertTrue(receivedMessages.size() > 0);
+		assertTrue(receivedMessages.size() > 0);
 
 		CountDownLatch producerCountDownLatch = remoteTestMessageProducer
 				.getAttribute(RemoteTestMessageProducer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
@@ -205,12 +208,12 @@ public class RemoteContextTests {
 		producerAckLatch.await();
 		Integer producerAcknowledge = remoteTestMessageProducer
 				.getAttribute(RemoteTestMessageProducer.DESCRIPTOR_TOTAL_ACK).get();
-		Assert.assertTrue(producerAcknowledge > 0);
+		assertTrue(producerAcknowledge > 0);
 	}
 
-	@Ignore
+	@Disabled("for individual testing")
 	@Test
-	public void startRemoteReceiver() throws Exception {
+	void startRemoteReceiver() throws Exception {
 		buildReceiverSystemStringConsumer();
 
 		final LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();
@@ -221,9 +224,9 @@ public class RemoteContextTests {
 		System.in.read();
 	}
 
-	@Ignore
+	@Disabled("for individual testing")
 	@Test
-	public void startRemoteSender() throws Exception {
+	void startRemoteSender() throws Exception {
 		// Note that all this cludging about with local lookup service
 		// implementations etc would normally not be needed.
 		// This is just to isolate this test from other tests.
@@ -235,8 +238,8 @@ public class RemoteContextTests {
 
 		// context has been discovered
 		RoboContextDescriptor descriptor = getRoboContextDescriptor(service, CONTEXT_ID_REMOTE_RECEIVER);
-		Assert.assertTrue(service.getDiscoveredContexts().size() > 0);
-		Assert.assertNotNull(descriptor);
+		assertTrue(service.getDiscoveredContexts().size() > 0);
+		assertNotNull(descriptor);
 
 		// build the producer system
 		RoboContext producerEmitterSystem = buildEmitterContext(String.class, UNIT_STRING_CONSUMER,

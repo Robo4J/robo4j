@@ -16,10 +16,7 @@
  */
 package com.robo4j.math.jfr;
 
-import com.oracle.jrockit.jfr.EventDefinition;
-import com.oracle.jrockit.jfr.EventToken;
-import com.oracle.jrockit.jfr.TimedEvent;
-
+import jdk.jfr.*;
 /**
  * The JFR event definition for a feature extraction.
  * This allows us to know how much time such a pass has taken.
@@ -27,19 +24,22 @@ import com.oracle.jrockit.jfr.TimedEvent;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-@SuppressWarnings("deprecation")
-@EventDefinition(path = "robo4j/math/featureextraction", name = "FeatureExtraction", description = "An event for a extracting features from a 2D scan.", stacktrace = false, thread = true) 
-public class FeatureExtractionEvent extends TimedEvent {
-	private static final EventToken EVENT_TOKEN;
+@Name("robo4j.math.FeatureExtraction")
+@Category ({"Robo4J", "Math"})
+@Label("FeatureExtraction")
+@Description("An event for a extracting features from a 2D scan")
+@StackTrace(false) 
+public class FeatureExtractionEvent extends Event {
+	@Label("No of Points")
 	private final int noOfPoints;
+	@Label("Angular Resolution")
 	private final float angularResolution;
  
     static {
-		EVENT_TOKEN = JfrUtils.register(FeatureExtractionEvent.class);
+		FlightRecorder.register(FeatureExtractionEvent.class);
     }
      
     public FeatureExtractionEvent(int noOfPoints, float angularResolution) {
-    	super(EVENT_TOKEN);
 		this.noOfPoints = noOfPoints;
 		this.angularResolution = angularResolution;
     }

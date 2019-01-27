@@ -55,8 +55,6 @@ public final class ChannelBufferUtils {
 	public static final int BUFFER_MARK_END = -1;
 	public static final int RESPONSE_JSON_GROUP = 2;
 
-	private static final ByteBuffer requestBuffer = ByteBuffer.allocateDirect(INIT_BUFFER_CAPACITY);
-
 	/**
 	 *
 	 * @param source

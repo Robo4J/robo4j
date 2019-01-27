@@ -34,9 +34,8 @@ import com.robo4j.socket.http.units.test.SocketMessageDecoratedProducerUnit;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
 import com.robo4j.util.SystemUtil;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -45,6 +44,8 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_TARGET;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  *
@@ -53,7 +54,7 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONF
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class RoboHttpDynamicTests {
+class RoboHttpDynamicTests {
 
 	private static final int TIMEOUT = 10;
 	private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
@@ -73,9 +74,10 @@ public class RoboHttpDynamicTests {
 	 * Values are requested by Attributes
 	 * 
 	 * @throws Exception
+	 *             exception
 	 */
 	@Test
-	public void simpleHttpNonUnitTest() throws Exception {
+	void simpleHttpNonUnitTest() throws Exception {
 
 		/* tested system configuration */
 		RoboContext mainSystem = getServerRoboSystem(MESSAGES_NUMBER);
@@ -106,8 +108,8 @@ public class RoboHttpDynamicTests {
 		mainSystem.shutdown();
 
 		System.out.println("System is Down!");
-		Assert.assertNotNull(mainSystem.getUnits());
-		Assert.assertEquals("wrong received messages", receivedMessages, MESSAGES_NUMBER);
+		assertNotNull(mainSystem.getUnits());
+		assertEquals(MESSAGES_NUMBER, receivedMessages, "wrong received messages");
 	}
 
 	/**
@@ -116,10 +118,10 @@ public class RoboHttpDynamicTests {
 	 * @throws Exception
 	 *             exception
 	 */
-	@Ignore
+	@Disabled("intent to run manual")
 	@Test
-	public void pingExternalSystem() throws Exception {
-		RoboBuilder pingSystemBuilder = getHttpClientRobotBuilder("127.0.0.1", 8080);
+	void pingExternalSystem() throws Exception {
+		RoboBuilder pingSystemBuilder = getHttpClientRobotBuilder("0.0.0.0", 8080);
 
 		pingSystemBuilder.add(StringConsumer.class, StringConsumer.NAME);
 
@@ -164,10 +166,10 @@ public class RoboHttpDynamicTests {
 		builder.add(StringConsumer.class, config, StringConsumer.NAME);
 
 		RoboContext result = builder.build();
-		Assert.assertNotNull(result.getUnits());
-		Assert.assertEquals(result.getUnits().size(), 3);
-		Assert.assertEquals(result.getReference(ID_HTTP_SERVER).getState(), LifecycleState.INITIALIZED);
-		Assert.assertEquals(result.getState(), LifecycleState.INITIALIZED);
+		assertNotNull(result.getUnits());
+		assertEquals(3, result.getUnits().size());
+		assertEquals(LifecycleState.INITIALIZED, result.getReference(ID_HTTP_SERVER).getState());
+		assertEquals(LifecycleState.INITIALIZED, result.getState());
 
 		result.start();
 		System.out.println(SystemUtil.printSocketEndPoint(result.getReference(ID_HTTP_SERVER),

@@ -17,7 +17,8 @@
 
 package com.robo4j.units.lego.example;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
@@ -37,8 +38,7 @@ import com.robo4j.units.lego.SimpleTankTestUnit;
  * @author Miro Wengner (@miragemiko)
  */
 
-// FIXME: 12/8/17 (miro) -> rethink and remove dependency
-public class TankExampleTests {
+class TankExampleTests {
 
 	private static final String ID_LCD = "lcd";
 	private static final String ID_PLATFORM = "platform";
@@ -47,7 +47,8 @@ public class TankExampleTests {
 	private static final int PORT = 8021;
 
 	@Test
-	public void legoTankExampleTest() throws Exception {
+	@Disabled("rethink and remove dependency")
+	void legoTankExampleTest() throws Exception {
 		RoboBuilder builder = new RoboBuilder();
 
 		Configuration config = new ConfigurationBuilder().addString("target", ID_UNIT_CONTROLLER).addInteger("port", PORT)

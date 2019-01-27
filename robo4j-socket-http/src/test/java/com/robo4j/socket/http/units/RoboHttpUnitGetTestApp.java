@@ -31,8 +31,6 @@ import com.robo4j.socket.http.units.test.HttpTwoAttributesGetController;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
 import com.robo4j.util.SystemUtil;
-import org.junit.Ignore;
-import org.junit.Test;
 
 import static com.robo4j.socket.http.units.RoboHttpPingPongTest.HOST_SYSTEM;
 import static com.robo4j.socket.http.units.RoboHttpPingPongTest.PACKAGE_CODECS;
@@ -41,22 +39,26 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
 
 /**
- * RoboHttpUnitGetTest should test Http get requests
+ * RoboHttpUnitGetTestApp should test Http get requests
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RoboHttpUnitGetTest {
+public class RoboHttpUnitGetTestApp {
 
 	private static final int SERVER_PORT = 8061;
 	private static final String UNIT_ID_HTTP_CLIENT = "http_client";
 
-
-	@Test
-//	@Ignore
+	/**
+	 * Run the system with only server unit
+	 * 
+	 * @throws Exception
+	 *             exception
+	 */
 	public void systemWithHttpServerOnlyTest() throws Exception {
 		final String httpServerUnitName = "http_server";
-		final HttpPathConfigJsonBuilder pathBuilder = HttpPathConfigJsonBuilder.Builder().addPath(httpServerUnitName, HttpMethod.GET);
+		final HttpPathConfigJsonBuilder pathBuilder = HttpPathConfigJsonBuilder.Builder().addPath(httpServerUnitName,
+				HttpMethod.GET);
 
 		//@formatter:off
 		Configuration systemConfiguration = new ConfigurationBuilder()
@@ -85,10 +87,15 @@ public class RoboHttpUnitGetTest {
 		system.shutdown();
 	}
 
-	@Test
-	@Ignore
+	/**
+	 * Run the system with known attributes
+	 * 
+	 * @throws Exception
+	 *             exception
+	 */
 	public void oneKnownAttributeTest() throws Exception {
-		final HttpPathConfigJsonBuilder pathBuilder = HttpPathConfigJsonBuilder.Builder().addPath("controller", HttpMethod.GET);
+		final HttpPathConfigJsonBuilder pathBuilder = HttpPathConfigJsonBuilder.Builder().addPath("controller",
+				HttpMethod.GET);
 
 		//@formatter:off
 		Configuration systemConfiguration = new ConfigurationBuilder()
@@ -125,8 +132,12 @@ public class RoboHttpUnitGetTest {
 
 	}
 
-	@Test
-	@Ignore
+	/**
+	 * Run the system with known attributes
+	 * 
+	 * @throws Exception
+	 *             exception
+	 */
 	public void twoKnownAttributesTest() throws Exception {
 		RoboContext systemGetProvider = twoAttributesSystem();
 		RoboContext systemGetAccessor = attributeRequestSystem();
@@ -140,8 +151,8 @@ public class RoboHttpUnitGetTest {
 
 		RoboReference<HttpDecoratedRequest> httpClient = systemGetAccessor.getReference(UNIT_ID_HTTP_CLIENT);
 
-		HttpRequestDenominator denominator = new HttpRequestDenominator(HttpMethod.GET, "/units/controller?attributes=number",
-				HttpVersion.HTTP_1_1);
+		HttpRequestDenominator denominator = new HttpRequestDenominator(HttpMethod.GET,
+				"/units/controller?attributes=number", HttpVersion.HTTP_1_1);
 		HttpDecoratedRequest request = new HttpDecoratedRequest(denominator);
 		request.addCallback(StringConsumer.NAME);
 		httpClient.sendMessage(request);
@@ -151,7 +162,7 @@ public class RoboHttpUnitGetTest {
 		systemGetProvider.shutdown();
 	}
 
-	public RoboContext attributeRequestSystem() throws Exception {
+	private RoboContext attributeRequestSystem() throws Exception {
 		RoboBuilder builder = new RoboBuilder();
 
 		Configuration config = new ConfigurationBuilder().addString(PROPERTY_HOST, HOST_SYSTEM)
@@ -162,13 +173,15 @@ public class RoboHttpUnitGetTest {
 	}
 
 	private RoboContext twoAttributesSystem() throws Exception {
-		Configuration systemConfiguration = new ConfigurationBuilder().addInteger("poolSizeScheduler", 4).addInteger("poolSizeWorker", 2)
-				.addInteger("poolSizeBlocking", 3).build();
+		Configuration systemConfiguration = new ConfigurationBuilder().addInteger("poolSizeScheduler", 4)
+				.addInteger("poolSizeWorker", 2).addInteger("poolSizeBlocking", 3).build();
 		RoboBuilder builder = new RoboBuilder(systemConfiguration);
 
-		final HttpPathConfigJsonBuilder pathBuilder = HttpPathConfigJsonBuilder.Builder().addPath("controller", HttpMethod.GET);
+		final HttpPathConfigJsonBuilder pathBuilder = HttpPathConfigJsonBuilder.Builder().addPath("controller",
+				HttpMethod.GET);
 		Configuration config = new ConfigurationBuilder().addInteger(PROPERTY_SOCKET_PORT, SERVER_PORT)
-				.addString("packages", PACKAGE_CODECS).addString(PROPERTY_UNIT_PATHS_CONFIG, pathBuilder.build()).build();
+				.addString("packages", PACKAGE_CODECS).addString(PROPERTY_UNIT_PATHS_CONFIG, pathBuilder.build())
+				.build();
 		builder.add(HttpServerUnit.class, config, "http_server");
 
 		config = new ConfigurationBuilder().addInteger(StringConsumer.PROP_TOTAL_NUMBER_MESSAGES, 1).build();

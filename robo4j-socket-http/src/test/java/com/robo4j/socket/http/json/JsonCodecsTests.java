@@ -14,9 +14,8 @@ import com.robo4j.socket.http.units.test.codec.NSBWithSimpleCollectionsTypesMess
 import com.robo4j.socket.http.units.test.codec.TestPerson;
 import com.robo4j.socket.http.units.test.enums.TestCommandEnum;
 import com.robo4j.util.StreamUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Base64;
@@ -24,11 +23,16 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class JsonCodecsTests {
+class JsonCodecsTests {
 
 	private static String testJson = "{\"number\":42,\"message\":\"no message\",\"active\":false,"
 			+ "\"array\":[\"one\",\"two\"],\"list\":[\"text1\",\"text2\"],\"map\":{\"key\":\"value\"},"
@@ -43,8 +47,8 @@ public class JsonCodecsTests {
 	private CameraMessageCodec cameraMessageCodec;
 	private HttpPathDTOCodec httpPathDTOCodec;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		collectionsTypesMessageCodec = new NSBWithSimpleCollectionsTypesMessageCodec();
 		enumTypesMessageCodec = new NSBETypesTestMessageCodec();
 		collectionEnumTypesMessageCodec = new NSBETypesAndCollectionTestMessageCodec();
@@ -54,8 +58,8 @@ public class JsonCodecsTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void encodeServerPathDTOMessageNoFilterTest(){
-		String expectedJson = "{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\"}";
+	void encodeServerPathDTOMessageNoFilterTest() {
+		// String expectedJson = "{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\"}";
 		HttpPathMethodDTO message = new HttpPathMethodDTO();
 		message.setRoboUnit("roboUnit1");
 		message.setMethod(HttpMethod.GET);
@@ -67,12 +71,12 @@ public class JsonCodecsTests {
 		System.out.println("resultJson: " + resultJson);
 		System.out.println("decodedMessage: " + decodedMessage);
 
-//		Assert.assertTrue(expectedJson.equals(resultJson));
-		Assert.assertTrue(message.equals(decodedMessage));
+		// Assert.assertTrue(expectedJson.equals(resultJson));
+		assertEquals(message, decodedMessage);
 	}
 
 	@Test
-	public void encodeMessageWithEnumTypeTest(){
+	void encodeMessageWithEnumTypeTest() {
 		String expectedJson = "{\"number\":42,\"message\":\"enum type 1\",\"active\":true,\"command\":\"MOVE\"}";
 		NSBETypesTestMessage message = new NSBETypesTestMessage();
 		message.setNumber(42);
@@ -85,13 +89,13 @@ public class JsonCodecsTests {
 
 		System.out.println("resultJson: " + resultJson);
 		System.out.println("decodedMessage: " + decodedMessage);
-		Assert.assertNotNull(resultJson);
-		Assert.assertTrue(expectedJson.equals(resultJson));
-		Assert.assertTrue(message.equals(decodedMessage));
+		assertNotNull(resultJson);
+		assertEquals(expectedJson, resultJson);
+		assertEquals(message, decodedMessage);
 	}
 
 	@Test
-	public void encodeMessageWithEnumCollectionTypeTest(){
+	void encodeMessageWithEnumCollectionTypeTest() {
 
 		String expectedJson = "{\"number\":42,\"message\":\"enum type 1\",\"active\":true,\"command\":\"MOVE\",\"commands\":[\"MOVE\",\"STOP\",\"BACK\"]}";
 		NSBETypesAndCollectionTestMessage message = new NSBETypesAndCollectionTestMessage();
@@ -106,15 +110,13 @@ public class JsonCodecsTests {
 
 		System.out.println("resultJson: " + resultJson);
 		System.out.println("decodeMessage: " + decodeMessage);
-		Assert.assertNotNull(resultJson);
-		Assert.assertTrue(expectedJson.equals(resultJson));
-		Assert.assertTrue(message.equals(decodeMessage));
+		assertNotNull(resultJson);
+		assertEquals(expectedJson, resultJson);
+		assertEquals(message, decodeMessage);
 	}
 
-
-
 	@Test
-	public void nestedObjectToJson() {
+	void nestedObjectToJson() {
 
 		TestPerson testPerson2 = new TestPerson();
 		testPerson2.setName("name2");
@@ -153,12 +155,12 @@ public class JsonCodecsTests {
 		TimeUtils.printTimeDiffNano("decodeFromJson", start);
 		System.out.println("JSON1: " + json);
 
-		Assert.assertTrue(testJson.equals(json));
+		assertTrue(testJson.equals(json));
 
 	}
 
 	@Test
-	public void nestedJsonToObject() {
+	void nestedJsonToObject() {
 
 		TestPerson testPerson2 = new TestPerson();
 		testPerson2.setName("name2");
@@ -186,18 +188,18 @@ public class JsonCodecsTests {
 		NSBWithSimpleCollectionsTypesMessage obj1 = collectionsTypesMessageCodec.decode(testJson);
 		TimeUtils.printTimeDiffNano("decodeFromJson", start);
 
-		Assert.assertTrue(obj1.getNumber() == 42);
-		Assert.assertTrue(obj1.getMessage().equals("no message"));
-		Assert.assertTrue(!obj1.getActive());
-		Assert.assertTrue(Arrays.equals(obj1.getArray(), new String[] { "one", "two" }));
-		Assert.assertTrue(obj1.getList().containsAll(Arrays.asList("text1", "text2")));
-		Assert.assertTrue(obj1.getPersonMap().equals(personMap));
+		assertEquals(Integer.valueOf(42), obj1.getNumber());
+		assertEquals("no message", obj1.getMessage());
+		assertTrue(!obj1.getActive());
+		assertArrayEquals(new String[] { "one", "two" }, obj1.getArray());
+		assertTrue(obj1.getList().containsAll(Arrays.asList("text1", "text2")));
+		assertEquals(personMap, obj1.getPersonMap());
 
 		System.out.println("Obj: " + obj1);
 	}
 
 	@Test
-	public void cameraCodecJsonCycleTest() {
+	void cameraCodecJsonCycleTest() {
 
 		final byte[] imageBytes = StreamUtils.inputStreamToByteArray(
 				Thread.currentThread().getContextClassLoader().getResourceAsStream("snapshot.png"));
@@ -225,7 +227,7 @@ public class JsonCodecsTests {
 		CameraMessage codecCameraMessage = cameraMessageCodec.decode(cameraJson);
 		TimeUtils.printTimeDiffNano("decodeFromJson", start);
 
-		Assert.assertTrue(cameraMessage.equals(codecCameraMessage));
+		assertEquals(cameraMessage, codecCameraMessage);
 
 	}
 

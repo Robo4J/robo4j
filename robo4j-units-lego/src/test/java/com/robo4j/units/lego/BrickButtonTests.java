@@ -20,10 +20,11 @@
 package com.robo4j.units.lego;
 
 import com.robo4j.units.lego.brick.PlateButtonEnum;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Basics Lego Mindstorm Brick button plate tests
@@ -31,13 +32,13 @@ import java.util.Set;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class BrickButtonTests {
+class BrickButtonTests {
 
     @Test
-    public void basicButtonPlateTest(){
+    void basicButtonPlateTest(){
         Set<String> buttonNames = PlateButtonEnum.getButtonNames();
         System.out.println("buttonNames: " + buttonNames);
-        Assert.assertNotNull(buttonNames);
+        assertNotNull(buttonNames);
 
     }
 

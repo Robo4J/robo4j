@@ -2,8 +2,7 @@ package com.robo4j.socket.http.util;
 
 import com.robo4j.LifecycleState;
 import com.robo4j.socket.http.dto.ResponseUnitDTO;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,16 +10,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 /**
  * json related utils tests
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class JsonUtilTests {
+class JsonUtilTests {
 
 	@Test
-	public void jsonToListTest() {
+	void jsonToListTest() {
 
 		String json = "[{\"id\":\"unit1\",\"state\":\"INITIALIZED\"}," + "{\"id\":\"unit2\",\"state\":\"STARTED\"}, "
 				+ "{\"id\":\"unit3\",\"state\":\"FAILED\"}]";
@@ -30,21 +33,21 @@ public class JsonUtilTests {
 				new ResponseUnitDTO("unit3", LifecycleState.FAILED));
 		List<ResponseUnitDTO> result = JsonUtil.jsonToList(ResponseUnitDTO.class, json);
 
-		Assert.assertNotNull(result);
-		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
+		assertNotNull(result);
+		assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
 
 	@Test
-	public void jsonToListEmptyTest() {
+	void jsonToListEmptyTest() {
 		String json = "[]";
 		List<ResponseUnitDTO> result = JsonUtil.jsonToList(ResponseUnitDTO.class, json);
 
-		Assert.assertNotNull(result);
-		Assert.assertArrayEquals(Collections.emptyList().toArray(), result.toArray());
+		assertNotNull(result);
+		assertArrayEquals(Collections.emptyList().toArray(), result.toArray());
 	}
 
 	@Test
-	public void mapToJsonTest() {
+	void mapToJsonTest() {
 		String expectedJson = "{\"key1\":\"value1\",\"key2\":\"value2\"}";
 		Map<String, String> testMap = new HashMap<>();
 		testMap.put("key1", "value1");
@@ -53,19 +56,18 @@ public class JsonUtilTests {
 		String result = JsonUtil.toJsonMap(testMap);
 		System.out.println("result: " + result);
 
-		Assert.assertNotNull(result);
-		Assert.assertEquals(result, expectedJson);
+		assertNotNull(result);
+		assertEquals(result, expectedJson);
 	}
 
 	@Test
-	public void mapToJsonEmptyTest() {
+	void mapToJsonEmptyTest() {
 		String expectedJson = "{}";
 
 		String result = JsonUtil.toJsonMap(new HashMap<>());
 		System.out.println("result: " + result);
 
-		Assert.assertNotNull(result);
-		Assert.assertEquals(result, expectedJson);
-
+		assertNotNull(result);
+		assertEquals(result, expectedJson);
 	}
 }

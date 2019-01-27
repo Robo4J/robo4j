@@ -10,7 +10,7 @@ import java.util.Objects;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class CameraConfigMessage implements Serializable {
-
+	private static final long serialVersionUID = 1L;
 	private Integer height;
 	private Integer width;
 	private Integer brightness;

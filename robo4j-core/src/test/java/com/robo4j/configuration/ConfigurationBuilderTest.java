@@ -16,8 +16,9 @@
  */
 package com.robo4j.configuration;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Testing supported variables types potentially used for roboUnit configuration
@@ -25,31 +26,31 @@ import org.junit.Test;
  * @author Marcus Hirt
  * @author Miroslav Wengner (@miragemiko)
  */
-public class ConfigurationBuilderTest {
+class ConfigurationBuilderTest {
 	@Test
-	public void testBasicConfiguration() {
+	void testBasicConfiguration() {
 		ConfigurationBuilder builder = new ConfigurationBuilder().addInteger("MyInt", 1).addLong("MyLong", 2L).addFloat("MyFloat", 1.0f)
 				.addDouble("MyDouble", 2.0).addString("MyString", "toodiloo").addCharacter("MyCharacter", 'C')
 				.addBoolean("MyBoolean", true);
 		Configuration config = builder.build();
 
-		Assert.assertEquals(1, (int) config.getInteger("MyInt", -1));
-		Assert.assertEquals(2L, (long) config.getLong("MyLong", -1L));
-		Assert.assertEquals(1.0f, config.getFloat("MyFloat", -1f), 0.000000001f);
-		Assert.assertEquals(2.0, config.getDouble("MyDouble", -1.0), 0.000000001f);
-		Assert.assertEquals("toodiloo", config.getString("MyString", "nope"));
-		Assert.assertEquals(Character.valueOf('C'), config.getCharacter("MyCharacter", 'A'));
-		Assert.assertEquals(true, config.getBoolean("MyBoolean", false));
+		assertEquals(1, (int) config.getInteger("MyInt", -1));
+		assertEquals(2L, (long) config.getLong("MyLong", -1L));
+		assertEquals(1.0f, config.getFloat("MyFloat", -1f), 0.000000001f);
+		assertEquals(2.0, config.getDouble("MyDouble", -1.0), 0.000000001f);
+		assertEquals("toodiloo", config.getString("MyString", "nope"));
+		assertEquals(Character.valueOf('C'), config.getCharacter("MyCharacter", 'A'));
+		assertEquals(true, config.getBoolean("MyBoolean", false));
 	}
 
 	@Test
-	public void testSubConfigurations() {
+	void testSubConfigurations() {
 		// Testing that we can also have the same name for an entry and a sub
 		// tree.
 		ConfigurationBuilder builder = new ConfigurationBuilder().addBuilder("sub", new ConfigurationBuilder().addString("c", "child"))
 				.addDouble("sub", 2.0);
 		Configuration config = builder.build();
-		Assert.assertEquals(2.0, config.getDouble("sub", null), 0.000000001f);
-		Assert.assertEquals("child", config.getChildConfiguration("sub").getString("c", null));
+		assertEquals(2.0, config.getDouble("sub", null), 0.000000001f);
+		assertEquals("child", config.getChildConfiguration("sub").getString("c", null));
 	}
 }

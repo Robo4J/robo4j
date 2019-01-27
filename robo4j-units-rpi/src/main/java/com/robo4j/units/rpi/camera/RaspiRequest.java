@@ -29,8 +29,8 @@ import static com.robo4j.util.Utf8Constant.UTF8_SPACE;
  * @author Miroslav Wengner (@miragemiko)
  */
 public abstract class RaspiRequest<T> implements Serializable {
-
-    protected final Map<RpiCameraProperty, String> parameters;
+	private static final long serialVersionUID = 1L;
+	protected final Map<RpiCameraProperty, String> parameters;
     private final boolean active;
 
     public RaspiRequest(Map<RpiCameraProperty, String> parameters, boolean active) {

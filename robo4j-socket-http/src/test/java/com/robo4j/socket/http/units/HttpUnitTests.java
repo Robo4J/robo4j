@@ -24,12 +24,16 @@ import com.robo4j.socket.http.units.test.codec.TestArrayEncoder;
 import com.robo4j.socket.http.units.test.enums.TestCommandEnum;
 import com.robo4j.socket.http.util.HttpUnitHelper;
 import com.robo4j.util.StreamUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.Base64;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -41,24 +45,24 @@ import java.util.Base64;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class HttpUnitTests {
+class HttpUnitTests {
 	@Test
-	public void testArrayDecoder() {
+	void testArrayDecoder() {
 		TestArrayDecoder arrayDecoder = new TestArrayDecoder();
 		String[] array = arrayDecoder.decode("[]{}}{");
-		Assert.assertArrayEquals(new String[] { "" }, array);
-		Assert.assertArrayEquals(new String[] { "Lalaa", "Lalala" }, arrayDecoder.decode("Lalaa,Lalala"));
+		assertArrayEquals(new String[] { "" }, array);
+		assertArrayEquals(new String[] { "Lalaa", "Lalala" }, arrayDecoder.decode("Lalaa,Lalala"));
 	}
 
 	@Test
-	public void testArrayEncoder() {
+	void testArrayEncoder() {
 		TestArrayEncoder arrayEncoder = new TestArrayEncoder();
 		String json = arrayEncoder.encode(new String[] { "A", "B", "C" });
-		Assert.assertEquals("{array:[A,B,C]}", json);
+		assertEquals("{array:[A,B,C]}", json);
 	}
 
 	@Test
-	public void testSimpleCommandCodecEncoded() {
+	void testSimpleCommandCodecEncoded() {
 		SimpleCommand simpleCommand = new SimpleCommand("move");
 		String jsonString = "{\"value\":\"move\"}";
 		SimpleCommandCodec simpleCommandCodec = new SimpleCommandCodec();
@@ -66,102 +70,102 @@ public class HttpUnitTests {
 
 		String enSimpleCommand = simpleCommandCodec.encode(simpleCommand);
 
-		Assert.assertEquals(enSimpleCommand, jsonString);
-		Assert.assertEquals(simpleCommand.getValue(), decSimpleCommand.getValue());
+		assertEquals(enSimpleCommand, jsonString);
+		assertEquals(simpleCommand.getValue(), decSimpleCommand.getValue());
 	}
 
 	@Test
-	public void testHttpCodecRegistry() {
+	void testHttpCodecRegistry() {
 		CodecRegistry registry = new CodecRegistry("com.robo4j.socket.http.units.test.codec");
 		SocketEncoder<String[], String> encoder = registry.getEncoder(String[].class);
 		SocketDecoder<String, String[]> decoder = registry.getDecoder(String[].class);
-		Assert.assertNotNull(encoder);
-		Assert.assertNotNull(decoder);
+		assertNotNull(encoder);
+		assertNotNull(decoder);
 
 		String[] originalData = new String[] { "A", "B", "C" };
 		String encoded = encoder.encode(originalData);
 		String[] decoded = decoder.decode(encoded);
 
-		Assert.assertArrayEquals(originalData, decoded);
+		assertArrayEquals(originalData, decoded);
 	}
 
 	@Test
-	public void testHttpCodecRegistryCodec() {
+	void testHttpCodecRegistryCodec() {
 		CodecRegistry registry = new CodecRegistry("com.robo4j.socket.http.units.test.codec");
 		SocketEncoder<String, String> encoder = registry.getEncoder(String.class);
 		SocketDecoder<String, String> decoder = registry.getDecoder(String.class);
-		Assert.assertNotNull(encoder);
-		Assert.assertNotNull(decoder);
+		assertNotNull(encoder);
+		assertNotNull(decoder);
 
 		String originalData = "Oh my god, it's full of stars";
 		String encoded = encoder.encode(originalData);
 		String decoded = decoder.decode(encoded);
 
-		Assert.assertEquals(originalData, decoded);
+		assertEquals(originalData, decoded);
 	}
 
 	/**
 	 * Translates Enum to String and otherwise
 	 */
 	@Test
-	public void testHttpTestCommandValueEnumMessage() {
+	void testHttpTestCommandValueEnumMessage() {
 		final String jsonCorruptedString = "{  \"value\" :  \"move\"  }";
 		final String jsonProperString = "{\"value\":\"move\"}";
 		CodecRegistry registry = new CodecRegistry("com.robo4j.socket.http.units.test.codec");
 		SocketEncoder<TestCommandEnum, String> encoder = registry.getEncoder(TestCommandEnum.class);
 		SocketDecoder<String, TestCommandEnum> decoder = registry.getDecoder(TestCommandEnum.class);
-		Assert.assertNotNull(encoder);
-		Assert.assertNotNull(decoder);
+		assertNotNull(encoder);
+		assertNotNull(decoder);
 
 		TestCommandEnum originalData = TestCommandEnum.MOVE;
 		String encoded = encoder.encode(TestCommandEnum.MOVE);
 
 		TestCommandEnum decoded = decoder.decode(jsonCorruptedString);
 
-		Assert.assertEquals(originalData, decoded);
-		Assert.assertEquals(encoded, jsonProperString);
+		assertEquals(originalData, decoded);
+		assertEquals(encoded, jsonProperString);
 	}
 
 	@Test
-	public void testHttpTestCommandValueCorrectEnumMessage() {
+	void testHttpTestCommandValueCorrectEnumMessage() {
 		final String jsonProperString = "{\"value\":\"move\"}";
 		CodecRegistry registry = new CodecRegistry("com.robo4j.socket.http.units.test.codec");
 		SocketEncoder<TestCommandEnum, String> encoder = registry.getEncoder(TestCommandEnum.class);
 		SocketDecoder<String, TestCommandEnum> decoder = registry.getDecoder(TestCommandEnum.class);
-		Assert.assertNotNull(encoder);
-		Assert.assertNotNull(decoder);
+		assertNotNull(encoder);
+		assertNotNull(decoder);
 
 		TestCommandEnum originalData = TestCommandEnum.MOVE;
 		String encoded = encoder.encode(TestCommandEnum.MOVE);
 
 		TestCommandEnum decoded = decoder.decode(jsonProperString);
 
-		Assert.assertEquals(originalData, decoded);
-		Assert.assertEquals(encoded, jsonProperString);
+		assertEquals(originalData, decoded);
+		assertEquals(encoded, jsonProperString);
 	}
 
 	@Test
-	public void testHttpCameraMessage() {
+	void testHttpCameraMessage() {
 		final String jsonCammeraMessageCorrupted = "{ \"type\"  :  \"jpg\" ,  \"value\"   :  \"description\"  ,\"image\":\"12345\"}";
 		final String jsonCammeraMessage = "{\"type\":\"jpg\",\"value\":\"description\",\"image\":\"12345\"}";
 		CodecRegistry registry = new CodecRegistry("com.robo4j.socket.http.codec");
 		SocketEncoder<CameraMessage, String> encoder = registry.getEncoder(CameraMessage.class);
 		SocketDecoder<String, CameraMessage> decoder = registry.getDecoder(CameraMessage.class);
-		Assert.assertNotNull(encoder);
-		Assert.assertNotNull(decoder);
+		assertNotNull(encoder);
+		assertNotNull(decoder);
 
 		CameraMessage cameraMessage = new CameraMessage("jpg", "description", "12345");
 		String encoded = encoder.encode(cameraMessage);
 		CameraMessage decoded = decoder.decode(jsonCammeraMessageCorrupted);
 
-		Assert.assertEquals(jsonCammeraMessage, encoded);
-		Assert.assertEquals(cameraMessage.getType(), decoded.getType());
-		Assert.assertEquals(cameraMessage.getValue(), decoded.getValue());
+		assertEquals(jsonCammeraMessage, encoded);
+		assertEquals(cameraMessage.getType(), decoded.getType());
+		assertEquals(cameraMessage.getValue(), decoded.getValue());
 
 	}
 
 	@Test
-	public void testHttpCameraMessageImage() throws Exception {
+	void testHttpCameraMessageImage() throws Exception {
 
 		final InputStream imageData = new BufferedInputStream(
 				Thread.currentThread().getContextClassLoader().getResourceAsStream("snapshot.png"));
@@ -176,8 +180,8 @@ public class HttpUnitTests {
 		CodecRegistry registry = new CodecRegistry("com.robo4j.socket.http.codec");
 		SocketEncoder<CameraMessage, String> encoder = registry.getEncoder(CameraMessage.class);
 		SocketDecoder<String, CameraMessage> decoder = registry.getDecoder(CameraMessage.class);
-		Assert.assertNotNull(encoder);
-		Assert.assertNotNull(decoder);
+		assertNotNull(encoder);
+		assertNotNull(decoder);
 
 		CameraMessage cameraMessage = new CameraMessage("jpg", "description", encodedImage);
 		String encoded = encoder.encode(cameraMessage);
@@ -185,14 +189,14 @@ public class HttpUnitTests {
 
 		final byte[] imageDecoded = Base64.getDecoder().decode(decoded.getImage());
 
-		Assert.assertEquals(jsonCameraMessage, encoded);
-		Assert.assertEquals(cameraMessage.getType(), decoded.getType());
-		Assert.assertEquals(cameraMessage.getValue(), decoded.getValue());
-		Assert.assertEquals(imageArray.length, imageDecoded.length);
+		assertEquals(jsonCameraMessage, encoded);
+		assertEquals(cameraMessage.getType(), decoded.getType());
+		assertEquals(cameraMessage.getValue(), decoded.getValue());
+		assertEquals(imageArray.length, imageDecoded.length);
 	}
 
 	@Test
-	public void testHttpCameraRealMessageImage() throws Exception {
+	void testHttpCameraRealMessageImage() throws Exception {
 
 		String encodedImage = HttpUnitHelper.getExampleCamera();
 
@@ -203,8 +207,8 @@ public class HttpUnitTests {
 		CodecRegistry registry = new CodecRegistry("com.robo4j.socket.http.codec");
 		SocketEncoder<CameraMessage, String> encoder = registry.getEncoder(CameraMessage.class);
 		SocketDecoder<String, CameraMessage> decoder = registry.getDecoder(CameraMessage.class);
-		Assert.assertNotNull(encoder);
-		Assert.assertNotNull(decoder);
+		assertNotNull(encoder);
+		assertNotNull(decoder);
 
 		CameraMessage cameraMessage = new CameraMessage("jpg", "description", encodedImage);
 		String encoded = encoder.encode(cameraMessage);
@@ -212,11 +216,11 @@ public class HttpUnitTests {
 
 		final byte[] imageDecoded = Base64.getDecoder().decode(decoded.getImage());
 
-		Assert.assertEquals(jsonCammeraMessage, encoded);
-		Assert.assertEquals(cameraMessage.getType(), decoded.getType());
-		Assert.assertEquals(cameraMessage.getValue(), decoded.getValue());
-		Assert.assertNotNull(imageDecoded);
-		Assert.assertTrue(imageDecoded.length > 0);
+		assertEquals(jsonCammeraMessage, encoded);
+		assertEquals(cameraMessage.getType(), decoded.getType());
+		assertEquals(cameraMessage.getValue(), decoded.getValue());
+		assertNotNull(imageDecoded);
+		assertTrue(imageDecoded.length > 0);
 	}
 
 }

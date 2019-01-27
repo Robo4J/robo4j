@@ -16,30 +16,20 @@
  */
 package com.robo4j.math.jfr;
 
-import java.net.URI;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import com.oracle.jrockit.jfr.DurationEvent;
-import com.oracle.jrockit.jfr.EventToken;
-import com.oracle.jrockit.jfr.InstantEvent;
-import com.oracle.jrockit.jfr.InvalidEventDefinitionException;
-import com.oracle.jrockit.jfr.InvalidValueException;
-import com.oracle.jrockit.jfr.Producer;
+import jdk.jfr.Event;
 
 /**
- * Toolkit with helper methods for JDK7 and 8.
+ * Toolkit with helper methods for JDK11.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-@SuppressWarnings({ "deprecation" })
 public class JfrUtils {
-	public static final Producer PRODUCER;
 	private final static ThreadPoolExecutor EXECUTOR = new ThreadPoolExecutor(1, 1, 2, TimeUnit.SECONDS, new LinkedBlockingQueue<>(50),
 			new ThreadFactory() {
 				@Override
@@ -50,34 +40,8 @@ public class JfrUtils {
 				}
 			});
 
-	// Register the producer and keep the reference around
-	static {
-		URI producerURI = URI.create("http://robo4j.org/");
-		PRODUCER = new Producer("Robo4J", "Events produced by the Robo4J framework.", producerURI);
-		PRODUCER.register();
-	}
-
 	private JfrUtils() {
 		throw new UnsupportedOperationException("Toolkit! Do not instantiate!");
-	}
-
-	/**
-	 * Helper method to register an event class with the JUnit producer.
-	 * 
-	 * @param clazz
-	 *            the event class to register.
-	 * @return the token associated with the event class.
-	 */
-	public static EventToken register(Class<? extends InstantEvent> clazz) {
-		try {
-			EventToken token = PRODUCER.addEvent(clazz);
-			Logger.getLogger(JfrUtils.class.getName()).log(Level.FINE, "Registered EventType " + clazz.getName());
-			return token;
-		} catch (InvalidEventDefinitionException | InvalidValueException e) {
-			Logger.getLogger(JfrUtils.class.getName()).log(Level.SEVERE, "Failed to register the event class " + clazz.getName()
-					+ ". Event will not be available. Please check your configuration.", e);
-		}
-		return null;
 	}
 
 	/**
@@ -86,7 +50,7 @@ public class JfrUtils {
 	 * 
 	 * @param event the event to begin.
 	 */
-	public static void begin(DurationEvent event) {
+	public static void begin(Event event) {
 		EXECUTOR.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -101,7 +65,7 @@ public class JfrUtils {
 	 * 
 	 * @param event the event to end.
 	 */
-	public static void end(DurationEvent event) {
+	public static void end(Event event) {
 		EXECUTOR.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -116,7 +80,7 @@ public class JfrUtils {
 	 * 
 	 * @param event the event to commit.
 	 */
-	public static void commit(DurationEvent event) {
+	public static void commit(Event event) {
 		EXECUTOR.execute(new Runnable() {
 			@Override
 			public void run() {

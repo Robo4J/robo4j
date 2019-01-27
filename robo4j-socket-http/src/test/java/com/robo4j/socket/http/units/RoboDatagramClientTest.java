@@ -21,11 +21,12 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.util.SystemUtil;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Testing Datagram client/server decorated messages
@@ -33,14 +34,14 @@ import java.util.concurrent.TimeUnit;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RoboDatagramClientTest {
+class RoboDatagramClientTest {
     private static final int TIMEOUT = 10;
     private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
     private static final int MAX_NUMBER = 42;
     private static final int DEFAULT_TIMEOUT = 5;
 
 	@Test
-	public void datagramClientServerTest() throws Exception {
+	void datagramClientServerTest() throws Exception {
 
 		RoboContext producerSystem = RoboContextUtils.loadRoboContextByXml("robo_datagram_client_request_producer_text.xml");
 		RoboContext consumerSystem = RoboContextUtils.loadRoboContextByXml("robo_datagram_client_request_consumer_text.xml");
@@ -68,7 +69,7 @@ public class RoboDatagramClientTest {
         producerSystem.shutdown();
         consumerSystem.shutdown();
 
-        Assert.assertTrue(consumerTotalNumber == MAX_NUMBER);
+        assertNotNull(consumerTotalNumber);
 
 	}
 

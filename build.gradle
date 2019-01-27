@@ -18,6 +18,7 @@ allprojects {
 
     if (ossrhAvailable) {
         repositories {
+            mavenLocal()
             mavenCentral()
             maven {
                 def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
@@ -70,20 +71,23 @@ subprojects {
         }
     }
 
-    tasks.withType(Test) {
+    test {
+        useJUnitPlatform()
         testLogging {
-            events "passed", "skipped", "failed"
+            events 'passed', 'skipped', 'failed'
             exceptionFormat "full"
         }
+    }
+    
+    dependencies {
+        testCompile "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+        testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+        testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
     }
 }
 
 project("robo4j-core") {
     description = "Robo4J Core"
-
-    dependencies {
-        testImplementation "junit:junit:${junitVersion}"
-    }
 
     test {
         systemProperty "java.net.preferIPv4Stack", "true"
@@ -170,7 +174,6 @@ project("robo4j-hw-lego") {
     dependencies {
         compile fileTree(dir: 'libs', include: 'ev3classes-9.1.jar')
         implementation(project(":robo4j-math"))
-        testCompile "junit:junit:${junitVersion}"
     }
 
     sourceSets {
@@ -276,7 +279,6 @@ project("robo4j-hw-rpi") {
     dependencies {
         compile(project(":robo4j-math"))
         compile "com.pi4j:pi4j-core:${pi4jVersion}"
-        testImplementation "junit:junit:${junitVersion}"
     }
 
     sourceSets {
@@ -367,10 +369,6 @@ project("robo4j-hw-rpi") {
 project("robo4j-math") {
     description = "Robo4J Math"
 
-    dependencies {
-        testImplementation "junit:junit:${junitVersion}"
-    }
-
     if(ossrhAvailable) {
         apply plugin: 'signing'
         signing  {
@@ -451,7 +449,6 @@ project("robo4j-socket-http") {
 
     dependencies {
         implementation(project(":robo4j-core"))
-        testImplementation "junit:junit:${junitVersion}"
     }
 
     if(ossrhAvailable) {
@@ -546,7 +543,6 @@ project("robo4j-units-lego") {
         implementation(project(":robo4j-core"))
         implementation(project(":robo4j-hw-lego"))
         testImplementation(project(":robo4j-socket-http"))
-        testImplementation "junit:junit:${junitVersion}"
     }
 
     sourceSets {
@@ -652,7 +648,6 @@ project("robo4j-units-rpi") {
     dependencies {
         compile(project(":robo4j-hw-rpi"))
         implementation(project(":robo4j-core"))
-        testImplementation "junit:junit:${junitVersion}"
     }
 
     sourceSets {
@@ -747,7 +742,6 @@ project("robo4j-units-rpi-http") {
         implementation(project(":robo4j-core"))
         implementation(project(":robo4j-socket-http"))
         implementation(project(":robo4j-units-rpi"))
-        testImplementation "junit:junit:${junitVersion}"
     }
 
     if(ossrhAvailable) {

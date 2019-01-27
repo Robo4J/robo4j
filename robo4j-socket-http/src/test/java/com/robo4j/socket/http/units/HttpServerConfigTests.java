@@ -5,12 +5,18 @@ import com.robo4j.socket.http.dto.HttpPathMethodDTO;
 import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.util.StringConstants;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * test for Http Server Unit configuration
@@ -18,66 +24,73 @@ import java.util.List;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class HttpServerConfigTests {
+class HttpServerConfigTests {
 
-	@Test(expected = NullPointerException.class)
-	public void serverConfigurationNullTest() {
-		HttpPathMethodDTO serverUnitPathDTO = HttpPathUtils.readServerPathDTO(null);
-		Assert.assertNull(serverUnitPathDTO);
-	}
+	@Test
+	void serverConfigurationNullTest() {
 
-	@Test(expected = ArrayIndexOutOfBoundsException.class)
-	public void serverConfigurationEmptyTest() {
-		HttpPathMethodDTO serverUnitPathDTO = HttpPathUtils.readServerPathDTO(StringConstants.EMPTY);
-		Assert.assertNull(serverUnitPathDTO);
+		Throwable exception = assertThrows(NullPointerException.class, () -> {
+			HttpPathMethodDTO serverUnitPathDTO = HttpPathUtils.readServerPathDTO(null);
+			assertNull(serverUnitPathDTO);
+		});
+
+		assertNull(exception.getMessage());
 	}
 
 	@Test
-	public void serverConfigurationWithoutPropertiesDTOTest() {
+	void serverConfigurationEmptyTest() {
+		Throwable exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> {
+			HttpPathUtils.readServerPathDTO(StringConstants.EMPTY);
+		});
+
+		assertEquals("Index 0 out of bounds for length 0", exception.getMessage());
+	}
+
+	@Test
+	void serverConfigurationWithoutPropertiesDTOTest() {
 
 		String configurationJson = "{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\"}";
 		HttpPathMethodDTO serverUnitPathDTO = HttpPathUtils.readServerPathDTO(configurationJson);
 
 		System.out.println("serverUnitPathDTO: " + serverUnitPathDTO);
-		Assert.assertTrue(serverUnitPathDTO.getRoboUnit().equals("roboUnit1"));
-		Assert.assertTrue(serverUnitPathDTO.getMethod().equals(HttpMethod.GET));
-		Assert.assertTrue(serverUnitPathDTO.getCallbacks().isEmpty());
+		assertEquals("roboUnit1", serverUnitPathDTO.getRoboUnit());
+		assertEquals(HttpMethod.GET, serverUnitPathDTO.getMethod());
+		assertTrue(serverUnitPathDTO.getCallbacks().isEmpty());
 
 	}
 
 	@Test
-	public void serverConfigurationWithPropertiesParsingDTOTest() {
+	void serverConfigurationWithPropertiesParsingDTOTest() {
 
 		String configurationJson = "{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\",\"callbacks\":[\"filter1\",\"filter2\"]}";
 		HttpPathMethodDTO serverUnitPathDTO = HttpPathUtils.readServerPathDTO(configurationJson);
 
-		Assert.assertTrue(serverUnitPathDTO.getRoboUnit().equals("roboUnit1"));
-		Assert.assertTrue(serverUnitPathDTO.getMethod().equals(HttpMethod.GET));
-		Assert.assertTrue(Arrays.equals(serverUnitPathDTO.getCallbacks().toArray(),
-				Arrays.asList("filter1", "filter2").toArray()));
+		assertEquals("roboUnit1", serverUnitPathDTO.getRoboUnit());
+		assertEquals(HttpMethod.GET, serverUnitPathDTO.getMethod());
+		assertArrayEquals(Arrays.asList("filter1", "filter2").toArray(), serverUnitPathDTO.getCallbacks().toArray());
 
 		System.out.println("serverUnitPathDTO: " + serverUnitPathDTO);
 
 	}
 
 	@Test
-	public void serverConfigurationNullPathTest() {
+	void serverConfigurationNullPathTest() {
 		List<HttpPathMethodDTO> paths = JsonUtil.readPathConfig(HttpPathMethodDTO.class, null);
-		Assert.assertNotNull(paths);
-		Assert.assertTrue(paths.isEmpty());
+		assertNotNull(paths);
+		assertTrue(paths.isEmpty());
 
 	}
 
 	@Test
-	public void serverConfigurationEmptyPathTest() {
+	void serverConfigurationEmptyPathTest() {
 		List<HttpPathMethodDTO> paths = JsonUtil.readPathConfig(HttpPathMethodDTO.class, StringConstants.EMPTY);
-		Assert.assertNotNull(paths);
-		Assert.assertTrue(paths.isEmpty());
+		assertNotNull(paths);
+		assertTrue(paths.isEmpty());
 
 	}
 
 	@Test
-	public void serverConfigurationWithMultiplePathsWithoutPropertiesTest() {
+	void serverConfigurationWithMultiplePathsWithoutPropertiesTest() {
 		String configurationJson = "[{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\"},"
 				+ "{\"roboUnit\":\"roboUnit2\",\"method\":\"POST\"}]";
 
@@ -86,12 +99,12 @@ public class HttpServerConfigTests {
 
 		List<HttpPathMethodDTO> paths = JsonUtil.readPathConfig(HttpPathMethodDTO.class, configurationJson);
 
-		Assert.assertTrue(paths.size() == expectedPathList.size());
-		Assert.assertTrue(Arrays.equals(paths.toArray(), expectedPathList.toArray()));
+		assertEquals(expectedPathList.size(), paths.size());
+		assertArrayEquals(expectedPathList.toArray(), paths.toArray());
 	}
 
 	@Test
-	public void serverConfigurationWithMultiplePathsWithPropertiesTest() {
+	void serverConfigurationWithMultiplePathsWithPropertiesTest() {
 		String configurationJson = "[{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\" , \"callbacks\":[\"filter1\",\"filter2\"]},"
 				+ "{\"roboUnit\":\"roboUnit2\",\"method\":\"POST\"}, {\"roboUnit\":\"roboUnit3\",\"method\":\"GET\",\"callbacks\":[]}]";
 
@@ -103,9 +116,9 @@ public class HttpServerConfigTests {
 		List<HttpPathMethodDTO> paths = JsonUtil.readPathConfig(HttpPathMethodDTO.class, configurationJson);
 		System.out.println("paths: " + paths);
 
-		Assert.assertNotNull(paths);
-		Assert.assertTrue(paths.size() == expectedPathList.size());
-		Assert.assertTrue(Arrays.equals(paths.toArray(), expectedPathList.toArray()));
+		assertNotNull(paths);
+		assertEquals(expectedPathList.size(), paths.size());
+		assertArrayEquals(expectedPathList.toArray(), paths.toArray());
 	}
 
 }

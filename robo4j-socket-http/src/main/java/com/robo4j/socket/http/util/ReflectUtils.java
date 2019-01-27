@@ -44,6 +44,7 @@ public final class ReflectUtils {
 
 	private static final Map<Class<?>, Map<String, ClassGetSetDTO>> clazzDescriptorMap = new HashMap<>();
 	private static final Map<Class<?>, JsonTypeAdapter> clazzAdapter = new HashMap<>();
+	private static final String FIELD_SERIAL_VERSION_UID = "serialversionuid";
 
 
 	@SuppressWarnings("unchecked")
@@ -325,9 +326,10 @@ public final class ReflectUtils {
 
 
 	private static Map<String, ClassGetSetDTO> getClazzDescriptionDTO(Class<?> clazz) {
-		return Stream.of(clazz.getDeclaredFields()).map(field -> {
+		return Stream.of(clazz.getDeclaredFields())
+				.filter(field -> !field.getName().toLowerCase().contains(FIELD_SERIAL_VERSION_UID))
+				.map(field -> {
 			try {
-
 				int structureClass = isClassCollection(clazz);
 				if(structureClass == 0){
 					String adjustedName = adjustFirstLetterUpperCase(field.getName());

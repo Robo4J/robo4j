@@ -23,8 +23,7 @@ import com.robo4j.socket.http.dto.HttpPathMethodDTO;
 import com.robo4j.socket.http.dto.PathAttributeDTO;
 import com.robo4j.socket.http.units.test.PropertyListBuilder;
 import com.robo4j.util.StringConstants;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,6 +34,10 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.robo4j.socket.http.util.HttpPathUtils.ATTRIBUTES_PATH_VALUE;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -68,12 +71,12 @@ public class HttpPathUtilTests {
 
 		System.out.println("result: " + result);
 
-		Assert.assertNotNull(result);
-		Assert.assertTrue(expectedResult.equals(result));
+		assertNotNull(result);
+		assertEquals(expectedResult, result);
 	}
 
 	@Test
-	public void parseJsonArrayPathMethodToList(){
+	void parseJsonArrayPathMethodToList(){
 		final int observedElement = 2;
 		final String jsonArray = "[{\"roboUnit\":\"imageController\", \"method\":\"POST\",\"callbacks\":[\"callbackPOSTController\"]}," +
 				"{\"roboUnit\":\"imageController\",\"method\":\"GET\",\"callbacks\":[\"callbackGETController\"]}," +
@@ -87,17 +90,17 @@ public class HttpPathUtilTests {
 
 		System.out.println("result: " + result);
 
-		Assert.assertNotNull(result);
-		Assert.assertTrue(result.size() == 6);
-		Assert.assertTrue(result.get(observedElement).getRoboUnit().equals("cameraController"));
-		Assert.assertTrue(result.get(observedElement).getMethod().equals(HttpMethod.POST));
-		Assert.assertTrue(result.get(observedElement).getCallbacks().contains("callbackPOSTController"));
-		Assert.assertTrue(result.contains(duplicate));
+		assertNotNull(result);
+		assertEquals(6, result.size());
+		assertEquals("cameraController", result.get(observedElement).getRoboUnit());
+		assertEquals(HttpMethod.POST, result.get(observedElement).getMethod());
+		assertTrue(result.get(observedElement).getCallbacks().contains("callbackPOSTController"));
+		assertTrue(result.contains(duplicate));
 
 	}
 
 	@Test
-	public void parseJsonPathMethod(){
+	void parseJsonPathMethod(){
 		List<String> jsonList = Arrays.asList(
 				"{\"roboUnit\":\"imageController\", \"method\":\"POST\", \"callbacks\":[\"callbackPOSTController\"]}",
 				"{\"roboUnit\":\"imageController\", \"method\" : \"POST\", \"callbacks\" : [ \"callbackPOSTController\" ]}",
@@ -106,15 +109,15 @@ public class HttpPathUtilTests {
 
 		jsonList.forEach(json -> {
 			HttpPathMethodDTO pathMethod = JsonUtil.getPathMethodByJson(json);
-			Assert.assertNotNull(json, pathMethod);
-			Assert.assertTrue(json, pathMethod.getRoboUnit().equals("imageController"));
-			Assert.assertTrue(json, pathMethod.getMethod().equals(HttpMethod.POST));
-			Assert.assertTrue(json, pathMethod.getCallbacks().contains("callbackPOSTController"));
+			assertNotNull(pathMethod, json);
+			assertEquals("imageController", pathMethod.getRoboUnit(), json);
+			assertEquals(HttpMethod.POST, pathMethod.getMethod(), json);
+			assertTrue(pathMethod.getCallbacks().contains("callbackPOSTController"), json);
 		});
 	}
 
 	@Test
-	public void parseFullPathMethod() {
+	void parseFullPathMethod() {
 		List<String> jsonList = Arrays.asList(
 				"{\"roboUnit\":\"\", \"method\":\"POST\", \"callbacks\":[\"callbackPOSTController\"]}",
 				"{\"roboUnit\":\"imageController\", \"method\":\"POST\",\"callbacks\":[\"callbackPOSTController\"]}",
@@ -125,15 +128,15 @@ public class HttpPathUtilTests {
 		jsonList.forEach(json -> {
 			HttpPathMethodDTO pathMethod = JsonUtil.getPathMethodByJson(json);
 			System.out.println("pathMethod: " + pathMethod);
-			Assert.assertNotNull(json, pathMethod);
-			Assert.assertNotNull(pathMethod.getRoboUnit());
-			Assert.assertTrue(pathMethod.getRoboUnit().isEmpty() ?
+			assertNotNull(pathMethod, json);
+			assertNotNull(pathMethod.getRoboUnit(), json);
+			assertTrue(pathMethod.getRoboUnit().isEmpty() ?
 					pathMethod.getRoboUnit().equals(StringConstants.EMPTY) : pathMethod.getRoboUnit().equals("imageController"));
 		});
 	}
 
 	@Test
-	public void parseGetRequestWithAttributes(){
+	void parseGetRequestWithAttributes(){
 		String path = "/units/controller?attributes=number,counter";
 		Map<String, Set<String>> expectedMap = new HashMap<>();
 		Set<String> expectedAttributesValues = new HashSet<>();
@@ -144,11 +147,11 @@ public class HttpPathUtilTests {
 
 		HttpPathUtils.extractAttributesByPath(path);
 		Map<String, Set<String>> attributeMap = HttpPathUtils.extractAttributesByPath(path);
-		Assert.assertArrayEquals(attributeMap.get(attributeName).toArray(), expectedMap.get(attributeName).toArray());
+		assertArrayEquals(attributeMap.get(attributeName).toArray(), expectedMap.get(attributeName).toArray());
 	}
 
 	@Test
-	public void createJsonArrayByList(){
+	void createJsonArrayByList(){
 
 		PathAttributeDTO attributeDTO = new PathAttributeDTO("number", "42");
 

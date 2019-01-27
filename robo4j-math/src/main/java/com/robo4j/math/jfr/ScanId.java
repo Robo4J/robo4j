@@ -8,31 +8,29 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.imu.impl;
-
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+package com.robo4j.math.jfr;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import jdk.jfr.Description;
+import jdk.jfr.Name;
+import jdk.jfr.Relational;
 /**
- *
- * @author Marcus Hirt (@hirt)
- * @author Miroslav Wengner (@miragemiko)
- */
-class BNOSerialTests {
+ * This annotation defines a relation for future events that are related through the
+ * same scan id.
+*/
 
-	@Test
-	void testBNOSerialReadRequest() {
-		byte[] readRequest = BNO055SerialDevice.createReadRequest(0x20, 2);
-		assertEquals(0xAA, 0xFF & readRequest[0]);
-		assertEquals(0x01, readRequest[1]);
-		assertEquals(0x20, readRequest[2]);
-		assertEquals(2, readRequest[3]);
-	}
+@Relational
+@Name("robo4j.math.ScanId")
+@Retention(RUNTIME)
+@Target(FIELD)
+@Description("Binds together scans with the id")
+public @interface ScanId {
 }

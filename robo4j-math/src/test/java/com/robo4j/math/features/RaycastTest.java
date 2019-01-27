@@ -2,19 +2,22 @@ package com.robo4j.math.features;
 
 import com.robo4j.math.geometry.Point2f;
 import com.robo4j.math.geometry.impl.ScanResultImpl;
-import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.function.Predicate;
 
-public class RaycastTest {
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+class RaycastTest {
 
 	private static final float DELTA = 0.000001f;
 	private final static Point2f ORIGO = Point2f.fromPolar(0f, 0f);
 
-	// FIXME: 08.09.17 we enable it when it works :)
-	@Ignore
-	public void testMisbehavingData() {
+	@Disabled("08.09.17 we enable it when it works :)")
+	@Test
+	void testMisbehavingData() {
 		ScanResultImpl scan = new ScanResultImpl(1.0f, new Predicate<Point2f>() {
 			@Override
 			public boolean test(Point2f t) {
@@ -84,13 +87,13 @@ public class RaycastTest {
 		scan.addPoint(Point2f.fromPolar(3.1f, -23.5f));
 
 		FeatureSet features = FeatureExtraction.getFeatures(scan.getPoints(), 1.0f);
-		Assert.assertNotNull(features);
+		assertNotNull(features);
 		// FIXME: Remove the next two lines when the test is properly fixed.
-		Assert.assertNotEquals(DELTA, 0);
-		Assert.assertNotNull(ORIGO);
+		assertNotEquals(DELTA, 0);
+		assertNotNull(ORIGO);
 		Point2f promisingPoint = Raycast.raycastFarthestPoint(scan.getPoints(), 0.4f, 0.3f, features);
-		Assert.assertNotNull(promisingPoint);
-		// Assert.assertNotEquals(ORIGO.getX(), promisingPoint.getX(), DELTA);
-		// Assert.assertNotEquals(ORIGO.getY(), promisingPoint.getY(), DELTA);
+		assertNotNull(promisingPoint);
+		// assertNotEquals(ORIGO.getX(), promisingPoint.getX(), DELTA);
+		// assertNotEquals(ORIGO.getY(), promisingPoint.getY(), DELTA);
 	}
 }

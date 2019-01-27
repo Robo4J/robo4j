@@ -22,47 +22,44 @@ import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.ProtocolType;
 import com.robo4j.socket.http.message.HttpRequestDenominator;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static com.robo4j.socket.http.provider.DefaultValuesProvider.BASIC_HEADER_MAP;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class HttpMessageBuilderTests {
+class HttpMessageBuilderTests {
 
 	@Test
-	public void getRequestTest() {
+	void getRequestTest() {
 		HttpMessageBuilder getMessageBuilder = getDefaultMessageBuilderByMethod(HttpMethod.GET);
 
 		final String getMessage = getMessageBuilder.build();
-		Assert.assertNotNull(getMessage);
-		Assert.assertTrue(getMessage.contains("GET / HTTP/1.1"));
-		Assert.assertTrue(getMessage.contains("host: localhost"));
+		assertNotNull(getMessage);
+		assertTrue(getMessage.contains("GET / HTTP/1.1"));
+		assertTrue(getMessage.contains("host: localhost"));
 		System.out.println("toMessage: " + getMessage);
 	}
 
 	@Test
-	public void postRequestTest() {
+	void postRequestTest() {
 		String message = "magic";
 		HttpMessageBuilder postMessageBuilder = getDefaultMessageBuilderByMethod(HttpMethod.POST);
 		postMessageBuilder.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()));
 
 		final String postRequest = postMessageBuilder.build(message);
 
-		Assert.assertNotNull(postRequest);
-		Assert.assertTrue(postRequest.contains("POST / HTTP/1.1"));
-		Assert.assertTrue(postRequest.contains("host: localhost"));
-		Assert.assertTrue(postRequest.contains("content-length: 5"));
-		Assert.assertTrue(postRequest.contains(message));
+		assertNotNull(postRequest);
+		assertTrue(postRequest.contains("POST / HTTP/1.1"));
+		assertTrue(postRequest.contains("host: localhost"));
+		assertTrue(postRequest.contains("content-length: 5"));
+		assertTrue(postRequest.contains(message));
 	}
 
-	@Test
-	public void acceptedResponseTest() {
-
-	}
 
 	private HttpMessageBuilder getDefaultMessageBuilderByMethod(HttpMethod method) {
 		HttpRequestDenominator getDenominator = new HttpRequestDenominator(method, HttpVersion.HTTP_1_1);

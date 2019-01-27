@@ -68,6 +68,8 @@ public class CurvaturePoint2f extends Point2f {
 	 *            the range.
 	 * @param angle
 	 *            the angle.
+	 * @param curvature
+	 *            the curvature
 	 * @return the resulting point.
 	 */
 	public static CurvaturePoint2f fromPolar(float range, float angle, float curvature) {
@@ -81,6 +83,8 @@ public class CurvaturePoint2f extends Point2f {
 	 *            the x value.
 	 * @param y
 	 *            the y value.
+	 * @param curvature
+	 *            the curvature
 	 * @return the resulting point.
 	 */
 	public static CurvaturePoint2f fromCartesian(float x, float y, float curvature) {

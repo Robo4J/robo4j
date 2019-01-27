@@ -18,8 +18,7 @@
 package com.robo4j.net;
 
 import com.robo4j.RoboContext;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -28,6 +27,9 @@ import java.util.Map;
 
 import static com.robo4j.net.LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS;
 import static com.robo4j.net.LookupServiceProvider.DEFAULT_PORT;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 
 /**
  * Note that on Mac OS X, it seems the easiest way to get this test to run is to
@@ -37,7 +39,7 @@ import static com.robo4j.net.LookupServiceProvider.DEFAULT_PORT;
  * @author Miroslav Wengner (@miragemiko)
  */
 
-public class LookupServiceTests {
+class LookupServiceTests {
 	private static final float ALLOWED_HEARTBEAT_MISSES = 22f;
 
 	static LookupService getLookupService(LocalLookupServiceImpl localLookupService){
@@ -50,7 +52,7 @@ public class LookupServiceTests {
 	}
 
 	@Test
-	public void testEncodeDecode() throws IOException {
+	void testEncodeDecode() throws IOException {
 		Map<String, String> metadata = new HashMap<>();
 		String id = "MyID";
 		int heartBeatInterval = 1234;
@@ -60,13 +62,13 @@ public class LookupServiceTests {
 		byte[] encodedDescriptor = HearbeatMessageCodec.encode(descriptor);
 		RoboContextDescriptor decodedDescriptor = HearbeatMessageCodec.decode(encodedDescriptor);
 
-		Assert.assertEquals(descriptor.getId(), decodedDescriptor.getId());
-		Assert.assertEquals(descriptor.getHeartBeatInterval(), decodedDescriptor.getHeartBeatInterval());
-		Assert.assertEquals(descriptor.getMetadata(), decodedDescriptor.getMetadata());
+		assertEquals(descriptor.getId(), decodedDescriptor.getId());
+		assertEquals(descriptor.getHeartBeatInterval(), decodedDescriptor.getHeartBeatInterval());
+		assertEquals(descriptor.getMetadata(), decodedDescriptor.getMetadata());
 	}
 
 	@Test
-	public void testLookup() throws IOException, InterruptedException {
+	void testLookup() throws IOException, InterruptedException {
 		final LookupService service = getLookupService(new LocalLookupServiceImpl());
 		service.start();
 		RoboContextDescriptor descriptor = createRoboContextDescriptor();
@@ -79,11 +81,11 @@ public class LookupServiceTests {
 		}
 		Map<String, RoboContextDescriptor> discoveredContexts = service.getDiscoveredContexts();
 		System.out.println(discoveredContexts);
-		Assert.assertEquals(1, discoveredContexts.size());
+		assertEquals(1, discoveredContexts.size());
 		RoboContext context = service.getContext(descriptor.getId());
-		Assert.assertNotNull(context);
+		assertNotNull(context);
 		ClientRemoteRoboContext remoteContext = (ClientRemoteRoboContext) context;
-		Assert.assertNotNull(remoteContext.getAddress());
+		assertNotNull(remoteContext.getAddress());
 		System.out.println("Address: " + remoteContext.getAddress());
 	}
 

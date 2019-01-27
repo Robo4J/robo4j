@@ -22,12 +22,12 @@ import com.robo4j.RoboReference;
 import com.robo4j.socket.http.units.test.SocketMessageDecoratedProducerUnit;
 import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.util.SystemUtil;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * testing http method GET with response
@@ -36,16 +36,15 @@ import java.util.concurrent.TimeUnit;
  * @author Miro Wengner (@miragemiko)
  */
 
-public class RoboHttpClientWithResponseTests {
+class RoboHttpClientWithResponseTests {
 	private static final int TIMEOUT = 20;
 	private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
 	private static final Integer MAX_NUMBER = 20;
-	private static final String ROBO_SYSTEM_DESC = "[{\"id\":\"stringConsumer\",\"state\":\"STARTED\"},{\"id\":\"httpServer\",\"state\":\"STARTED\"}]";
+	// private static final String ROBO_SYSTEM_DESC =
+	// "[{\"id\":\"stringConsumer\",\"state\":\"STARTED\"},{\"id\":\"httpServer\",\"state\":\"STARTED\"}]";
 
-	@SuppressWarnings("unchecked")
 	@Test
-	@Ignore
-	public void simpleRoboSystemGetRequestTest() throws Exception {
+	void simpleRoboSystemGetRequestTest() throws Exception {
 
 		RoboContext producerSystem = RoboContextUtils
 				.loadRoboContextByXml("robo_http_client_request_producer_text.xml");
@@ -76,7 +75,7 @@ public class RoboHttpClientWithResponseTests {
 		messagesLatchStringConsumer.await(TIMEOUT, TIME_UNIT);
 
 		final Integer totalNumber = producerStringConsumer.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_TOTAL).get();
-		Assert.assertEquals(MAX_NUMBER, totalNumber);
+		assertEquals(MAX_NUMBER, totalNumber);
 
 		producerSystem.shutdown();
 		consumerSystem.shutdown();

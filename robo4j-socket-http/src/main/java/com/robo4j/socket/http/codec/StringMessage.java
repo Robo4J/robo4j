@@ -8,8 +8,8 @@ import java.util.Objects;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class StringMessage implements Serializable {
-
-    private String message;
+	private static final long serialVersionUID = 1L;
+	private String message;
 
     public StringMessage() {
     }

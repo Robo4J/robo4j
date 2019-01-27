@@ -1,21 +1,25 @@
 package com.robo4j.hw.rpi.pwm.roboclaw;
 
-import com.oracle.jrockit.jfr.*;
-import com.robo4j.math.jfr.JfrUtils;
+import jdk.jfr.*;
 
-@EventDefinition(path = "coffe/engine/input", name = "Engines", description = "An event for engine changes.", stacktrace = false, thread = true) 
-@SuppressWarnings("deprecation")
-public class EngineEvent extends InstantEvent {
+@Name("coffe.engine.EngineChange")
+@Label("Engine Change")
+@Category("Coff-E")
+@Description("An event for engine changes")
+@StackTrace(false)
+public class EngineEvent extends Event {
 
-    @ValueDefinition(name = "direction", description = "The steering direction (degrees[-180, 180]).") 
-    private float direction;
+	@Label("Direction")
+	@Description("The steering direction (degrees[-180, 180])")
+	private float direction;
 
-    @ValueDefinition(name = "speed", description = "The speed [0,1].") 
-    private float speed;
-    
-    static {
-		JfrUtils.register(EngineEvent.class);
-    }
+	@Label("Speed")
+	@Description("The speed [0,1]")
+	private float speed;
+
+	static {
+		FlightRecorder.register(EngineEvent.class);
+	}
 
 	public float getDirection() {
 		return direction;
@@ -32,5 +36,4 @@ public class EngineEvent extends InstantEvent {
 	public void setSpeed(float speed) {
 		this.speed = speed;
 	}
-     
 }

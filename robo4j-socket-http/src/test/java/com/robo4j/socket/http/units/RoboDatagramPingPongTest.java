@@ -12,8 +12,7 @@ import com.robo4j.socket.http.units.test.StringConsumer;
 import com.robo4j.socket.http.util.DatagramBodyType;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import com.robo4j.util.SystemUtil;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -22,12 +21,14 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_PACKAGES;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RoboDatagramPingPongTest {
+class RoboDatagramPingPongTest {
 
 	private static final int TIMEOUT = 20;
 	private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
@@ -38,7 +39,7 @@ public class RoboDatagramPingPongTest {
 	private static final int TOTAL_NUMBER = 122;
 
 	@Test
-	public void datagramPingPongTest() throws Exception {
+	void datagramPingPongTest() throws Exception {
 		RoboContext pongSystem = configurePongSystem(TOTAL_NUMBER);
 		RoboContext pingSystem = configurePingSystem();
 
@@ -72,7 +73,7 @@ public class RoboDatagramPingPongTest {
 		pingSystem.shutdown();
 		pongSystem.shutdown();
 
-		Assert.assertTrue(TOTAL_NUMBER == pongConsumerTotalNumber);
+		assertEquals(TOTAL_NUMBER , pongConsumerTotalNumber);
 
 	}
 
