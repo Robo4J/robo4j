@@ -92,20 +92,20 @@ public class RoboBuilderTests {
 			producer.sendMessage("sendRandomMessage");
 		}
 
-		/* make sure messages has been sent */
-		CountDownLatch countDownLatchProducer = producer.getAttribute(StringProducer.DESCRIPTOR_COUNT_DOWN_LATCH)
-				.get(TIMEOUT, TimeUnit.MINUTES);
-		countDownLatchProducer.await(TIMEOUT, TimeUnit.MINUTES);
 
 		assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
 
 		RoboReference<String> consumer = system.getReference("consumer");
 		assertNotNull(consumer);
 
-		synchronized (consumer.getAttribute(descriptor)) {
-			int receivedMessages = consumer.getAttribute(descriptor).get();
-			assertEquals(MESSAGES, receivedMessages);
-		}
+
+		/* wait until message are received */
+		CountDownLatch countDownLatchConsumer = consumer.getAttribute(StringProducer.DESCRIPTOR_COUNT_DOWN_LATCH)
+				.get(TIMEOUT, TimeUnit.MINUTES);
+		countDownLatchConsumer.await(TIMEOUT, TimeUnit.MINUTES);
+
+		assertEquals(MESSAGES, (int) producer.getAttribute(StringProducer.DESCRIPTOR_TOTAL_MESSAGES).get());
+		assertEquals(MESSAGES, (int) consumer.getAttribute(StringConsumer.DESCRIPTOR_TOTAL_MESSAGES).get());
 
 		system.stop();
 		system.shutdown();
