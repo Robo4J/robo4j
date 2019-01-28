@@ -12,3 +12,4 @@ branches:
   only:
   - master
   - openjdk11
+  - 20190128_openjdk11_tests
