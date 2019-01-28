@@ -54,7 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class RoboHttpPingPongTest {
 
 	public static final String PACKAGE_CODECS = "com.robo4j.socket.http.units.test.codec";
-	public static final String HOST_SYSTEM = "0.0.0.0";
+	public static final String HOST_SYSTEM = "127.0.0.1";
 	private static final int TIMEOUT = 10;
 	private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
 	private static final String ID_HTTP_CLIENT = "http_client";

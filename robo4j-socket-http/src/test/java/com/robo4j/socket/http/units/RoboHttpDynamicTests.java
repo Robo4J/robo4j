@@ -121,7 +121,7 @@ class RoboHttpDynamicTests {
 	@Disabled("intent to run manual")
 	@Test
 	void pingExternalSystem() throws Exception {
-		RoboBuilder pingSystemBuilder = getHttpClientRobotBuilder("0.0.0.0", 8080);
+		RoboBuilder pingSystemBuilder = getHttpClientRobotBuilder("127.0.0.1", 8080);
 
 		pingSystemBuilder.add(StringConsumer.class, StringConsumer.NAME);
 

@@ -81,7 +81,7 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 		serverPort = configuration.getInteger(PROPERTY_SOCKET_PORT, RoboHttpUtils.DEFAULT_PORT);
-		serverAddress = configuration.getString(ATTR_ADDRESS, "0.0.0.0");
+		serverAddress = configuration.getString(ATTR_ADDRESS, "127.0.0.1");
 		int bufferCapacity = configuration.getInteger(PROPERTY_BUFFER_CAPACITY, INIT_BUFFER_CAPACITY);
 
 		paths = JsonUtil.readPathConfig(HttpPathMethodDTO.class, configuration.getString(PROPERTY_UNIT_PATHS_CONFIG, null));
