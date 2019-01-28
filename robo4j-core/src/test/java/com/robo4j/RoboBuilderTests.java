@@ -71,7 +71,7 @@ public class RoboBuilderTests {
 
 	@Test
 	void testSeparateSystemUnitsSystemConfig()
-			throws RoboBuilderException, InterruptedException, ExecutionException {
+			throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
 		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRoboSystemOnly.xml"));
 		// NOTE(Marcus/Aug 19, 2017): We have the system settings and the units
 		// in the same file.
@@ -91,6 +91,12 @@ public class RoboBuilderTests {
 		for (int i = 0; i < MESSAGES; i++) {
 			producer.sendMessage("sendRandomMessage");
 		}
+
+		/* make sure messages has been sent */
+		CountDownLatch countDownLatchProducer = producer.getAttribute(StringProducer.DESCRIPTOR_COUNT_DOWN_LATCH)
+				.get(TIMEOUT, TimeUnit.MINUTES);
+		countDownLatchProducer.await(TIMEOUT, TimeUnit.MINUTES);
+
 		assertEquals(MESSAGES, (int) producer.getAttribute(descriptor).get());
 
 		RoboReference<String> consumer = system.getReference("consumer");
