@@ -12,3 +12,4 @@ branches:
   only:
   - master
   - openjdk11
+  - master_tests_update
