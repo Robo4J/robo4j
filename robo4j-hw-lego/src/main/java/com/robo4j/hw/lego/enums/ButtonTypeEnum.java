@@ -17,8 +17,8 @@
 package com.robo4j.hw.lego.enums;
 
 import com.robo4j.hw.lego.ILegoHardware;
+import com.robo4j.hw.lego.wrapper.KeyWrapper;
 import lejos.hardware.Button;
-import lejos.hardware.Key;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,24 +30,24 @@ import java.util.stream.Stream;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public enum ButtonTypeEnum implements ILegoHardware<Key> {
+public enum ButtonTypeEnum implements ILegoHardware<KeyWrapper> {
 
     //@formatter:off
 	//          name        type
-	ENTER		("enter",   Button.ENTER),
-    LEFT		("left",    Button.LEFT),
-    RIGHT		("right",   Button.RIGHT),
-    ESCAPE	    ("escape",  Button.ESCAPE),
-    UP          ("up",      Button.UP),
-    DOWN        ("down",    Button.DOWN)
+	ENTER		("enter",   new KeyWrapper(Button.ENTER)),
+    LEFT		("left",    new KeyWrapper(Button.LEFT)),
+    RIGHT		("right",   new KeyWrapper(Button.RIGHT)),
+    ESCAPE	    ("escape",  new KeyWrapper(Button.ESCAPE)),
+    UP          ("up",      new KeyWrapper(Button.UP)),
+    DOWN        ("down",    new KeyWrapper(Button.DOWN))
 	;
 	//@formatter:on
 
     private static Map<String, ButtonTypeEnum> internMapByName;
     private String name;
-    private Key key;
+    private KeyWrapper key;
 
-    ButtonTypeEnum(String name, Key key) {
+    ButtonTypeEnum(String name, KeyWrapper key) {
         this.name = name;
         this.key = key;
     }
@@ -65,7 +65,7 @@ public enum ButtonTypeEnum implements ILegoHardware<Key> {
     }
 
     @Override
-    public Key getType() {
+    public KeyWrapper getType() {
         return key;
     }
 

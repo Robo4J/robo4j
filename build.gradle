@@ -50,7 +50,7 @@ config {
             developerConnection = 'scm:git@github.com:Robo4J/robo4j.git'
             url = 'scm:git@github.com:Robo4J/robo4j.git'
         }
-        
+
         people {
             person {
                 id = 'thegreystone'
@@ -85,7 +85,7 @@ config {
             }
         }
     }
-    
+
     license {
         licenses {
             license {
@@ -103,7 +103,6 @@ config {
 
 allprojects {
     repositories {
-        mavenLocal()
         jcenter()
         maven { url mavenSnapshotRepositoryUrl }
     }
@@ -159,7 +158,7 @@ project("robo4j-hw-lego") {
     }
 
     dependencies {
-        implementation fileTree(dir: "$rootDir/libs", include: 'ev3classes-9.1.jar')
+        implementation fileTree(dir: 'libs', include: 'ev3classes-9.1.jar')
         implementation(project(":robo4j-math"))
     }
 
@@ -205,23 +204,6 @@ project("robo4j-socket-http") {
     }
 }
 
-project("robo4j-units-rpi") {
-    config {
-        info {
-            name = 'Robo4j Raspberry Pi Units'
-            description = 'Robo4j Raspberry Pi Units'
-        }
-    }
-
-    dependencies {
-        implementation(project(":robo4j-hw-rpi"))
-        implementation(project(":robo4j-core"))
-    }
-
-    configureExampleSources(project)
-    configureShadow(project)
-}
-
 project("robo4j-units-lego") {
     config {
         info {
@@ -234,6 +216,22 @@ project("robo4j-units-lego") {
         implementation(project(":robo4j-core"))
         implementation(project(":robo4j-hw-lego"))
         testImplementation(project(":robo4j-socket-http"))
+    }
+
+    configureExampleSources(project)
+}
+
+project("robo4j-units-rpi") {
+    config {
+        info {
+            name = 'Robo4j Raspberry Pi Units'
+            description = 'Robo4j Raspberry Pi Units'
+        }
+    }
+
+    dependencies {
+        compile(project(":robo4j-hw-rpi"))
+        implementation(project(":robo4j-core"))
     }
 
     configureExampleSources(project)

@@ -24,10 +24,10 @@ import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.lego.enums.ButtonTypeEnum;
 import com.robo4j.hw.lego.util.BrickUtils;
-import com.robo4j.units.lego.brick.ButtonListener;
-import com.robo4j.units.lego.enums.PlateButtonEnum;
+import com.robo4j.hw.lego.util.ButtonUtil;
 import com.robo4j.units.lego.brick.PlateButtonI;
 import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
+import com.robo4j.units.lego.enums.PlateButtonEnum;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 public class BrickButtonsUnit extends RoboUnit<String> {
 	public static final String PROPERTY_TARGET = "target";
 	private static final int COLOR_GREEN = 1;
+	private static final int OFF = 0;
 	private String target;
 	private List<ButtonTypeEnum> availablePlateButtons = Arrays.asList(ButtonTypeEnum.LEFT, ButtonTypeEnum.RIGHT,
 			ButtonTypeEnum.UP, ButtonTypeEnum.DOWN, ButtonTypeEnum.ENTER);
@@ -87,8 +88,12 @@ public class BrickButtonsUnit extends RoboUnit<String> {
 	public void start() {
 		setState(LifecycleState.STARTING);
 		final RoboReference<LegoPlatformMessageTypeEnum> targetRef = getContext().getReference(target);
-		buttons.forEach(
-				(key, value) -> value.getType().addKeyListener(new ButtonListener(targetRef, key, COLOR_GREEN)));
+		buttons.forEach((key, value) -> value.getType().addKeyListener((k) -> {
+			ButtonUtil.setLEDPattern(COLOR_GREEN);
+			targetRef.sendMessage(key.getMessage());
+		}, (k) -> {
+			ButtonUtil.setLEDPattern(OFF);
+		}));
 		setState(LifecycleState.STARTED);
 	}
 
