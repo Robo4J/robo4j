@@ -2,21 +2,20 @@ plugins {
     id 'idea'
     id 'eclipse'
     id 'org.kordamp.gradle.project'      version '0.12.0'
-    id 'com.github.johnrengelman.shadow' version '4.0.4' apply false
 }
 
 ext.ossrhUsername = project.findProperty('ossrhUsername') ?: ''
 ext.ossrhPassword = project.findProperty('ossrhPassword') ?: ''
 
 def configureShadow(Project p) {
-    p.apply plugin: 'com.github.johnrengelman.shadow'
-
-    p.tasks.shadowJar {
-        baseName = p.name
-        classifier = ''
-    }
-
-    p.tasks.jar.finalizedBy p.tasks.shadowJar
+//    p.apply plugin: 'com.github.johnrengelman.shadow'
+//
+//    p.tasks.shadowJar {
+//        baseName = p.name
+//        classifier = ''
+//    }
+//
+//    p.tasks.jar.finalizedBy p.tasks.shadowJar
 }
 
 def configureExampleSources(Project p) {
@@ -158,7 +157,7 @@ project("robo4j-hw-lego") {
     }
 
     dependencies {
-        implementation fileTree(dir: 'libs', include: 'ev3classes-9.1.jar')
+        implementation fileTree(dir: "${rootDir}/libs", include: 'ev3classes-9.1.jar')
         implementation(project(":robo4j-math"))
     }
 
@@ -213,6 +212,7 @@ project("robo4j-units-lego") {
     }
 
     dependencies {
+        implementation fileTree(dir: "${rootDir}/libs", include: 'ev3classes-9.1.jar')
         implementation(project(":robo4j-core"))
         implementation(project(":robo4j-hw-lego"))
         testImplementation(project(":robo4j-socket-http"))
@@ -230,8 +230,10 @@ project("robo4j-units-rpi") {
     }
 
     dependencies {
-        compile(project(":robo4j-hw-rpi"))
+        implementation(project(":robo4j-hw-rpi"))
         implementation(project(":robo4j-core"))
+        implementation(project(":robo4j-math"))
+        implementation "com.pi4j:pi4j-core:${pi4jVersion}"
     }
 
     configureExampleSources(project)
