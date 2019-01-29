@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2014, 2018, Marcus Hirt, Miroslav Wengner
- * 
+ * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,12 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
- 
-ext {
-//    note::it's necessary to specify local maven repository
-//    mavenRepository = "/home/pi/.m2"
-    robo4jJavaVersion = "11"
-    roboGradleVersion = "5.1.1"
-    junitVersion = "5.3.2"
-    pi4jVersion = "1.2-SNAPSHOT"
+
+package com.robo4j.hw.lego.enums;
+
+/**
+ * LegoKey maps to Key
+ *
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
+public class LegoKey {
 }

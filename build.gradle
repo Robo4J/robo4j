@@ -1,830 +1,116 @@
 plugins {
-    id 'java'
     id 'idea'
     id 'eclipse'
-    id 'maven'
+    id 'org.kordamp.gradle.project'      version '0.12.0'
+    id 'com.github.johnrengelman.shadow' version '4.0.4' apply false
 }
 
-apply from: 'libraries.gradle'
+ext.ossrhUsername = project.findProperty('ossrhUsername') ?: ''
+ext.ossrhPassword = project.findProperty('ossrhPassword') ?: ''
 
-group 'com.robo4j'
+def configureShadow(Project p) {
+    p.apply plugin: 'com.github.johnrengelman.shadow'
 
-allprojects {
+    p.tasks.shadowJar {
+        baseName = p.name
+        classifier = ''
+    }
 
-    def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-    ext.ossrhUsername = project.findProperty('ossrhUsername') ?: ''
-    ext.ossrhPassword = project.findProperty('ossrhPassword') ?: ''
-    ext.ossrhAvailable = ossrhUsername?.trim() && ossrhPassword?.trim();
+    p.tasks.jar.finalizedBy p.tasks.shadowJar
+}
 
-    if (ossrhAvailable) {
+def configureExampleSources(Project p) {
+    p.sourceSets {
+        main {
+            java {
+                srcDirs += 'src/examples/java'
+            }
+            resources {
+                srcDirs += 'src/examples/resources'
+            }
+        }
+    }
+}
+
+config {
+    release = (rootProject.findProperty('release') ?: false).toBoolean()
+
+    info {
+        name = 'Robo4J'
+        description = 'Robo4J'
+        vendor = 'Robo4J'
+        inceptionYear = '2014'
+
+        links {
+            website = 'http://www.robo4j.io'
+        }
+
+        scm {
+            connection = 'scm:git@github.com:Robo4J/robo4j.git'
+            developerConnection = 'scm:git@github.com:Robo4J/robo4j.git'
+            url = 'scm:git@github.com:Robo4J/robo4j.git'
+        }
+        
+        people {
+            person {
+                id = 'thegreystone'
+                name = 'Marcus Hirt'
+                email = 'marcus@robo4j.io'
+                roles = ['developer', 'author']
+            }
+            person {
+                id = 'mirage22'
+                name = 'Miroslav Wengner'
+                email = 'miro@robo4j.io'
+                roles = ['developer', 'author']
+            }
+        }
+
         repositories {
-            mavenLocal()
-            mavenCentral()
-            maven {
-                def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            repository {
+                name = 'mavenRelease'
+                url = mavenReleaseRepositoryUrl
                 credentials {
-                    username ossrhUsername
-                    password ossrhPassword
+                    username = ossrhUsername
+                    password = ossrhPassword
                 }
             }
-            jcenter()
-            maven { url snapshotsRepoUrl }
+            repository {
+                name = 'mavenSnapshot'
+                url = mavenSnapshotRepositoryUrl
+                credentials {
+                    username = ossrhUsername
+                    password = ossrhPassword
+                }
+            }
         }
-    } else {
-        repositories {
-            mavenLocal()
-            mavenCentral()
-            jcenter()
-            maven { url snapshotsRepoUrl }
+    }
+    
+    license {
+        licenses {
+            license {
+                id = 'GPL-3.0'
+            }
         }
+    }
+
+    publishing {
+        signing = true
+        releasesRepository = 'mavenRelease'
+        snapshotsRepository = 'mavenSnapshot'
+    }
+}
+
+allprojects {
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven { url mavenSnapshotRepositoryUrl }
     }
 }
 
 subprojects {
-    group 'com.robo4j'
-
     apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
-    apply plugin: 'maven'
-
-    sourceCompatibility = "${robo4jJavaVersion}"
-
-    sourceSets {
-        main {
-            java {
-                srcDirs = ['src/main/java']
-            }
-            resources {
-                srcDirs = ['src/main/resources']
-            }
-        }
-
-        test {
-            java {
-                srcDirs = ['src/test/java']
-            }
-            resources {
-                srcDirs = ['src/test/resources']
-            }
-        }
-    }
-
-    test {
-        useJUnitPlatform()
-        testLogging {
-            events 'passed', 'skipped', 'failed'
-            exceptionFormat "full"
-        }
-    }
-    
-    dependencies {
-        testCompile "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
-        testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-        testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
-    }
-}
-
-project("robo4j-core") {
-    description = "Robo4J Core"
-
-    test {
-        systemProperty "java.net.preferIPv4Stack", "true"
-    }
-
-    if(ossrhAvailable) {
-        apply plugin: 'signing'
-        signing  {
-            sign configurations.archives
-        }
-
-        task javadocJar(type: Jar, overwrite: true) {
-            classifier = 'javadoc'
-            from javadoc
-        }
-
-        task sourcesJar(type: Jar, overwrite: true) {
-            classifier = 'sources'
-            from sourceSets.main.allSource
-        }
-
-        artifacts {
-            archives javadocJar, sourcesJar
-        }
-
-        archivesBaseName = "$project.name"
-
-        uploadArchives {
-            repositories {
-                mavenDeployer {
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    pom.project {
-                        name "Robo4J Core"
-                        packaging 'jar'
-                        description "Robo4J Core library"
-                        url 'http://www.robo4j.io'
-
-                        scm {
-                            connection 'scm:git@github.com:Robo4J/robo4j.git'
-                            developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                            url 'scm:git@github.com:Robo4J/robo4j.git'
-                        }
-
-                        licenses {
-                            license {
-                                name 'GNU General Public License, Version 3.0'
-                                url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'thegreystone'
-                                name 'Marcus Hirt'
-                                email 'marcus@robo4j.io'
-                            }
-
-                            developer {
-                                id 'mirage22'
-                                name 'Miroslav Wengner'
-                                email 'miro@robo4j.io'
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-project("robo4j-hw-lego") {
-    description = "Robo4J Lego Hardware"
-
-    dependencies {
-        compile fileTree(dir: 'libs', include: 'ev3classes-9.1.jar')
-        implementation(project(":robo4j-math"))
-    }
-
-    sourceSets {
-        main {
-            java {
-                srcDirs += 'src/examples/java'
-            }
-            resources {
-                srcDirs += 'src/examples/resources'
-            }
-        }
-    }
-
-    if(ossrhAvailable) {
-        apply plugin: 'signing'
-        signing  {
-            sign configurations.archives
-        }
-
-        task javadocJar(type: Jar, overwrite: true) {
-            classifier = 'javadoc'
-            from javadoc
-        }
-
-        task sourcesJar(type: Jar, overwrite: true) {
-            classifier = 'sources'
-            from sourceSets.main.allSource
-        }
-
-        artifacts {
-            archives javadocJar, sourcesJar
-        }
-
-        archivesBaseName = "$project.name"
-
-        uploadArchives {
-            repositories {
-                mavenDeployer {
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    pom.project {
-                        name "Robo4J Hardware Lego"
-                        packaging 'jar'
-                        description "Robo4J Lego Hardware library"
-                        url 'http://www.robo4j.io'
-
-                        scm {
-                            connection 'scm:git@github.com:Robo4J/robo4j.git'
-                            developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                            url 'scm:git@github.com:Robo4J/robo4j.git'
-                        }
-
-                        licenses {
-                            license {
-                                name 'GNU General Public License, Version 3.0'
-                                url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'thegreystone'
-                                name 'Marcus Hirt'
-                                email 'marcus@robo4j.io'
-                            }
-
-                            developer {
-                                id 'mirage22'
-                                name 'Miroslav Wengner'
-                                email 'miro@robo4j.io'
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-project("robo4j-hw-rpi") {
-    description = "Robo4J RaspberryPi Hardware"
-
-    //create a single Jar with all dependencies
-    task fatJar(type: Jar) {
-        manifest {
-            attributes 'Implementation-Title': baseName,
-                    'Implementation-Version': "${version}"
-        }
-        //baseName = project.name + '-all'
-        baseName = 'robo4j-hw-rpi'
-        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-        with jar
-    }
-
-    dependencies {
-        compile(project(":robo4j-math"))
-        compile "com.pi4j:pi4j-core:${pi4jVersion}"
-    }
-
-    sourceSets {
-        main {
-            java {
-                srcDirs += 'src/examples/java'
-            }
-            resources {
-                srcDirs += 'src/examples/resources'
-            }
-        }
-    }
-
-    if(ossrhAvailable) {
-        apply plugin: 'signing'
-        signing  {
-            sign configurations.archives
-        }
-
-        task javadocJar(type: Jar, overwrite: true) {
-            classifier = 'javadoc'
-            from javadoc
-        }
-
-        task sourcesJar(type: Jar, overwrite: true) {
-            classifier = 'sources'
-            from sourceSets.main.allSource
-        }
-
-        artifacts {
-            archives javadocJar, sourcesJar
-        }
-
-        archivesBaseName = "$project.name"
-
-        uploadArchives {
-            repositories {
-                mavenDeployer {
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    pom.project {
-                        name "Robo4J Hardware RaspberryPi"
-                        packaging 'jar'
-                        description "Robo4J RaspberryPi Hardware library"
-                        url 'http://www.robo4j.io'
-
-                        scm {
-                            connection 'scm:git@github.com:Robo4J/robo4j.git'
-                            developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                            url 'scm:git@github.com:Robo4J/robo4j.git'
-                        }
-
-                        licenses {
-                            license {
-                                name 'GNU General Public License, Version 3.0'
-                                url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'thegreystone'
-                                name 'Marcus Hirt'
-                                email 'marcus@robo4j.io'
-                            }
-
-                            developer {
-                                id 'mirage22'
-                                name 'Miroslav Wengner'
-                                email 'miro@robo4j.io'
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-project("robo4j-math") {
-    description = "Robo4J Math"
-
-    if(ossrhAvailable) {
-        apply plugin: 'signing'
-        signing  {
-            sign configurations.archives
-        }
-
-        task javadocJar(type: Jar, overwrite: true) {
-            classifier = 'javadoc'
-            from javadoc
-        }
-
-        task sourcesJar(type: Jar, overwrite: true) {
-            classifier = 'sources'
-            from sourceSets.main.allSource
-        }
-
-        artifacts {
-            archives javadocJar, sourcesJar
-        }
-
-        archivesBaseName = "$project.name"
-
-        uploadArchives {
-            repositories {
-                mavenDeployer {
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    pom.project {
-                        name "Robo4J Math"
-                        packaging 'jar'
-                        description "Robo4J Math library"
-                        url 'http://www.robo4j.io'
-
-                        scm {
-                            connection 'scm:git@github.com:Robo4J/robo4j.git'
-                            developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                            url 'scm:git@github.com:Robo4J/robo4j.git'
-                        }
-
-                        licenses {
-                            license {
-                                name 'GNU General Public License, Version 3.0'
-                                url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'thegreystone'
-                                name 'Marcus Hirt'
-                                email 'marcus@robo4j.io'
-                            }
-
-                            developer {
-                                id 'mirage22'
-                                name 'Miroslav Wengner'
-                                email 'miro@robo4j.io'
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-project("robo4j-socket-http") {
-    description = "Robo4J socket http"
-
-    dependencies {
-        implementation(project(":robo4j-core"))
-    }
-
-    if(ossrhAvailable) {
-        apply plugin: 'signing'
-        signing  {
-            sign configurations.archives
-        }
-
-        task javadocJar(type: Jar, overwrite: true) {
-            classifier = 'javadoc'
-            from javadoc
-        }
-
-        task sourcesJar(type: Jar, overwrite: true) {
-            classifier = 'sources'
-            from sourceSets.main.allSource
-        }
-
-        artifacts {
-            archives javadocJar, sourcesJar
-        }
-
-        archivesBaseName = "$project.name"
-
-        uploadArchives {
-            repositories {
-                mavenDeployer {
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    pom.project {
-                        name "Robo4J Socket Http"
-                        packaging 'jar'
-                        description "Robo4J Socket http library"
-                        url 'http://www.robo4j.io'
-
-                        scm {
-                            connection 'scm:git@github.com:Robo4J/robo4j.git'
-                            developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                            url 'scm:git@github.com:Robo4J/robo4j.git'
-                        }
-
-                        licenses {
-                            license {
-                                name 'GNU General Public License, Version 3.0'
-                                url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'thegreystone'
-                                name 'Marcus Hirt'
-                                email 'marcus@robo4j.io'
-                            }
-
-                            developer {
-                                id 'mirage22'
-                                name 'Miroslav Wengner'
-                                email 'miro@robo4j.io'
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-project("robo4j-units-lego") {
-    description = "Robo4J Lego Abstractions"
-
-    //create a single Jar with all dependencies
-    task fatJar(type: Jar) {
-        manifest {
-            attributes 'Implementation-Title': 'robo4j-units-lego',
-                    'Implementation-Version': "${version}"
-        }
-        baseName = "$project.name"
-        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-        with jar
-    }
-
-    dependencies {
-        implementation(project(":robo4j-core"))
-        implementation(project(":robo4j-hw-lego"))
-        testImplementation(project(":robo4j-socket-http"))
-    }
-
-    sourceSets {
-        main {
-            java {
-                srcDirs += 'src/examples/java'
-            }
-            resources {
-                srcDirs += 'src/examples/resources'
-            }
-        }
-    }
-
-    if(ossrhAvailable) {
-        apply plugin: 'signing'
-        signing  {
-            sign configurations.archives
-        }
-
-        task javadocJar(type: Jar, overwrite: true) {
-            classifier = 'javadoc'
-            from javadoc
-        }
-
-        task sourcesJar(type: Jar, overwrite: true) {
-            classifier = 'sources'
-            from sourceSets.main.allSource
-        }
-
-        artifacts {
-            archives javadocJar, sourcesJar
-        }
-
-        archivesBaseName = "$project.name"
-
-        uploadArchives {
-            repositories {
-                mavenDeployer {
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    pom.project {
-                        name "Robo4J Lego Abstractions"
-                        packaging 'jar'
-                        description "Robo4J Lego Abstractions library"
-                        url 'http://www.robo4j.io'
-
-                        scm {
-                            connection 'scm:git@github.com:Robo4J/robo4j.git'
-                            developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                            url 'scm:git@github.com:Robo4J/robo4j.git'
-                        }
-
-                        licenses {
-                            license {
-                                name 'GNU General Public License, Version 3.0'
-                                url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'thegreystone'
-                                name 'Marcus Hirt'
-                                email 'marcus@robo4j.io'
-                            }
-
-                            developer {
-                                id 'mirage22'
-                                name 'Miroslav Wengner'
-                                email 'miro@robo4j.io'
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-project("robo4j-units-rpi") {
-    description = "Robo4J Raspberry Pi Units"
-
-    //create a single Jar with all dependencies
-    task fatJar(type: Jar) {
-        manifest {
-            attributes 'Implementation-Title': "$project.name",
-                    'Implementation-Version': "${version}"
-        }
-        //baseName = project.name + '-all'
-        baseName = '"$project.name'
-        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-        with jar
-    }
-
-    dependencies {
-        compile(project(":robo4j-hw-rpi"))
-        implementation(project(":robo4j-core"))
-    }
-
-    sourceSets {
-        main {
-            java {
-                srcDirs += 'src/examples/java'
-            }
-            resources {
-                srcDirs += 'src/examples/resources'
-            }
-        }
-    }
-
-    if(ossrhAvailable) {
-        apply plugin: 'signing'
-        signing  {
-            sign configurations.archives
-        }
-
-        task javadocJar(type: Jar, overwrite: true) {
-            classifier = 'javadoc'
-            from javadoc
-        }
-
-        task sourcesJar(type: Jar, overwrite: true) {
-            classifier = 'sources'
-            from sourceSets.main.allSource
-        }
-
-        artifacts {
-            archives javadocJar, sourcesJar
-        }
-
-        archivesBaseName = "$project.name"
-
-        uploadArchives {
-            repositories {
-                mavenDeployer {
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    pom.project {
-                        name "Robo4J RaspberryPi Abstractions"
-                        packaging 'jar'
-                        description "Robo4J RaspberryPi Abstractions library"
-                        url 'http://www.robo4j.io'
-
-                        scm {
-                            connection 'scm:git@github.com:Robo4J/robo4j.git'
-                            developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                            url 'scm:git@github.com:Robo4J/robo4j.git'
-                        }
-
-                        licenses {
-                            license {
-                                name 'GNU General Public License, Version 3.0'
-                                url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'thegreystone'
-                                name 'Marcus Hirt'
-                                email 'marcus@robo4j.io'
-                            }
-
-                            developer {
-                                id 'mirage22'
-                                name 'Miroslav Wengner'
-                                email 'miro@robo4j.io'
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-project("robo4j-units-rpi-http") {
-    description = "Robo4J Codecs for rpi units"
-
-    dependencies {
-        implementation(project(":robo4j-core"))
-        implementation(project(":robo4j-socket-http"))
-        implementation(project(":robo4j-units-rpi"))
-    }
-
-    if(ossrhAvailable) {
-        apply plugin: 'signing'
-        signing  {
-            sign configurations.archives
-        }
-
-        task javadocJar(type: Jar, overwrite: true) {
-            classifier = 'javadoc'
-            from javadoc
-        }
-
-        task sourcesJar(type: Jar, overwrite: true) {
-            classifier = 'sources'
-            from sourceSets.main.allSource
-        }
-
-        artifacts {
-            archives javadocJar, sourcesJar
-        }
-
-        archivesBaseName = "$project.name"
-
-        uploadArchives {
-            repositories {
-                mavenDeployer {
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    pom.project {
-                        name "Robo4J RaspberryPi/Socket-Http Abstractions"
-                        packaging 'jar'
-                        description "Robo4J RaspberryPi/Socket-Http Abstractions library"
-                        url 'http://www.robo4j.io'
-
-                        scm {
-                            connection 'scm:git@github.com:Robo4J/robo4j.git'
-                            developerConnection 'scm:git@github.com:Robo4J/robo4j.git'
-                            url 'scm:git@github.com:Robo4J/robo4j.git'
-                        }
-
-                        licenses {
-                            license {
-                                name 'GNU General Public License, Version 3.0'
-                                url 'http://www.gnu.org/licenses/gpl-3.0.txt'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'thegreystone'
-                                name 'Marcus Hirt'
-                                email 'marcus@robo4j.io'
-                            }
-
-                            developer {
-                                id 'mirage22'
-                                name 'Miroslav Wengner'
-                                email 'miro@robo4j.io'
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-wrapper {
-    gradleVersion = "${roboGradleVersion}"
-}
-
-/* global settings */
-configure(allprojects) { project ->
-    group = "com.robo4j"
 
     compileJava.options*.compilerArgs = [
             "-Xlint:unchecked", "-Xlint:rawtypes",
@@ -833,5 +119,138 @@ configure(allprojects) { project ->
     compileTestJava.options*.compilerArgs = [
             "-Xlint:deprecation", "-Xlint:unchecked", "-Xlint:rawtypes",
     ]
+
+    sourceCompatibility = "${robo4jJavaVersion}"
+
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events 'passed', 'skipped', 'failed'
+            exceptionFormat "full"
+        }
+    }
+
+    dependencies {
+        testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+        testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+        testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
+    }
 }
 
+project("robo4j-core") {
+    config {
+        info {
+            name = 'Robo4j Core'
+            description = 'Robo4j Core'
+        }
+    }
+
+    test {
+        systemProperty "java.net.preferIPv4Stack", "true"
+    }
+}
+
+project("robo4j-hw-lego") {
+    config {
+        info {
+            name = 'Robo4j Lego Hardware'
+            description = 'Robo4j Lego Hardware'
+        }
+    }
+
+    dependencies {
+        implementation fileTree(dir: "$rootDir/libs", include: 'ev3classes-9.1.jar')
+        implementation(project(":robo4j-math"))
+    }
+
+    configureShadow(project)
+}
+
+project("robo4j-hw-rpi") {
+    config {
+        info {
+            name = 'Robo4j RaspberryPi Hardware'
+            description = 'Robo4j RaspberryPi Hardware'
+        }
+    }
+
+    dependencies {
+        implementation(project(":robo4j-math"))
+        implementation "com.pi4j:pi4j-core:${pi4jVersion}"
+    }
+
+    configureExampleSources(project)
+    configureShadow(project)
+}
+
+project("robo4j-math") {
+    config {
+        info {
+            name = 'Robo4j Math'
+            description = 'Robo4j Math'
+        }
+    }
+}
+
+project("robo4j-socket-http") {
+    config {
+        info {
+            name = 'Robo4j socket http'
+            description = 'Robo4j socket http'
+        }
+    }
+
+    dependencies {
+        implementation(project(":robo4j-core"))
+    }
+}
+
+project("robo4j-units-rpi") {
+    config {
+        info {
+            name = 'Robo4j Raspberry Pi Units'
+            description = 'Robo4j Raspberry Pi Units'
+        }
+    }
+
+    dependencies {
+        implementation(project(":robo4j-hw-rpi"))
+        implementation(project(":robo4j-core"))
+    }
+
+    configureExampleSources(project)
+    configureShadow(project)
+}
+
+project("robo4j-units-lego") {
+    config {
+        info {
+            name = 'Robo4j Lego Abstractions'
+            description = 'Robo4j Lego Abstractions'
+        }
+    }
+
+    dependencies {
+        implementation(project(":robo4j-core"))
+        implementation(project(":robo4j-hw-lego"))
+        testImplementation(project(":robo4j-socket-http"))
+    }
+
+    configureExampleSources(project)
+    configureShadow(project)
+}
+
+project("robo4j-units-rpi-http") {
+    config {
+        info {
+            name = 'Robo4j Codecs for rpi units'
+            description = 'Robo4j Codecs for rpi units'
+        }
+    }
+
+    dependencies {
+        implementation(project(":robo4j-core"))
+        implementation(project(":robo4j-socket-http"))
+        implementation(project(":robo4j-units-rpi"))
+    }
+}
