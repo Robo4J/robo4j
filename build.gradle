@@ -2,6 +2,7 @@ plugins {
     id 'idea'
     id 'eclipse'
     id 'org.kordamp.gradle.project'      version '0.12.0'
+    id 'com.github.johnrengelman.shadow' version '4.0.4' apply false
 }
 
 ext.ossrhUsername = project.findProperty('ossrhUsername') ?: ''
