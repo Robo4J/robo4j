@@ -220,6 +220,7 @@ project("robo4j-units-lego") {
     }
 
     configureExampleSources(project)
+    configureShadow(project)
 }
 
 project("robo4j-units-rpi") {
