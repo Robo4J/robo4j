@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ * Copyright (c) 2014-2019, Marcus Hirt, Miroslav Wengner
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,6 +19,7 @@ package com.robo4j.socket.http.units;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.reflect.ReflectionScan;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -86,14 +87,14 @@ public final class CodecRegistry {
 				if (loadedClass.isAnnotationPresent(HttpProducer.class)) {
 					addInstance(loadedClass);
 				}
-			} catch (InstantiationException | ClassNotFoundException | IllegalAccessException e) {
+			} catch (InstantiationException | ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 				SimpleLoggingUtil.error(getClass(), "Failed to load encoder/decoder", e);
 			}
 		}
 	}
 
-	private void addInstance(Class<?> loadedClass) throws InstantiationException, IllegalAccessException {
-		Object instance = loadedClass.newInstance();
+	private void addInstance(Class<?> loadedClass) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		Object instance = loadedClass.getDeclaredConstructor().newInstance();
 		if (instance instanceof SocketEncoder) {
 			SocketEncoder<?, ?> encoder = (SocketEncoder<?, ?>) instance;
 			encoders.put(encoder.getEncodedClass(), encoder);

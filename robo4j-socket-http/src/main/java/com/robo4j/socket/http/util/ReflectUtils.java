@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2014-2019, Marcus Hirt, Miroslav Wengner
+ *
+ * Robo4J is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Robo4J is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.robo4j.socket.http.util;
 
 import com.robo4j.socket.http.dto.ClassGetSetDTO;
@@ -45,12 +61,13 @@ public final class ReflectUtils {
 	private static final Map<Class<?>, Map<String, ClassGetSetDTO>> clazzDescriptorMap = new HashMap<>();
 	private static final Map<Class<?>, JsonTypeAdapter> clazzAdapter = new HashMap<>();
 	private static final String FIELD_SERIAL_VERSION_UID = "serialversionuid";
+	private static final String FIELD_JACOCO = "jacoco";
 
 
 	@SuppressWarnings("unchecked")
 	public static <T> T createInstanceByClazzAndDescriptorAndJsonDocument(Class<T> clazz, JsonDocument jsonDocument) {
 		try {
-			Object instance = clazz.newInstance();
+			Object instance = clazz.getDeclaredConstructor().newInstance();
 
 			getFieldsTypeMap(clazz).entrySet().stream().filter(e -> Objects.nonNull(jsonDocument.getKey(e.getKey())))
 					.forEach(e -> {
@@ -207,7 +224,7 @@ public final class ReflectUtils {
 			return (T) adjustRoboClassCast(clazz, value);
 		} else {
 			try {
-				Object instance = clazz.newInstance();
+				Object instance = clazz.getDeclaredConstructor().newInstance();
 				Map<String, ClassGetSetDTO> fieldNameMethods = getFieldsTypeMap(clazz);
 
 				JsonDocument document = (JsonDocument) value;
@@ -328,6 +345,7 @@ public final class ReflectUtils {
 	private static Map<String, ClassGetSetDTO> getClazzDescriptionDTO(Class<?> clazz) {
 		return Stream.of(clazz.getDeclaredFields())
 				.filter(field -> !field.getName().toLowerCase().contains(FIELD_SERIAL_VERSION_UID))
+				.filter(field -> !field.getName().toLowerCase().contains(FIELD_JACOCO))
 				.map(field -> {
 			try {
 				int structureClass = isClassCollection(clazz);

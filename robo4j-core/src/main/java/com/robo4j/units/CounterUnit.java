@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ * Copyright (c) 2014-2019, Marcus Hirt, Miroslav Wengner
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -8,17 +8,13 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.robo4j.units;
-
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.ConfigurationException;
@@ -27,6 +23,10 @@ import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.logging.SimpleLoggingUtil;
+
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A simple unit which will count upwards from zero. Useful, for example, as a
