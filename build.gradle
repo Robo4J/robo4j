@@ -89,6 +89,7 @@ config {
     license {
         licenses {
             license {
+            	enabled = false
                 id = 'GPL-3.0'
             }
         }
