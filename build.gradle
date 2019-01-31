@@ -8,14 +8,14 @@ ext.ossrhUsername = project.findProperty('ossrhUsername') ?: ''
 ext.ossrhPassword = project.findProperty('ossrhPassword') ?: ''
 
 def configureShadow(Project p) {
-//    p.apply plugin: 'com.github.johnrengelman.shadow'
-//
-//    p.tasks.shadowJar {
-//        baseName = p.name
-//        classifier = ''
-//    }
-//
-//    p.tasks.jar.finalizedBy p.tasks.shadowJar
+    p.apply plugin: 'com.github.johnrengelman.shadow'
+
+    p.tasks.shadowJar {
+        baseName = p.name
+        classifier = ''
+    }
+
+    p.tasks.jar.finalizedBy p.tasks.shadowJar
 }
 
 def configureExampleSources(Project p) {
