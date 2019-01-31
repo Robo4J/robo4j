@@ -67,7 +67,7 @@ public final class ReflectUtils {
 	@SuppressWarnings("unchecked")
 	public static <T> T createInstanceByClazzAndDescriptorAndJsonDocument(Class<T> clazz, JsonDocument jsonDocument) {
 		try {
-			Object instance = clazz.newInstance();
+			Object instance = clazz.getDeclaredConstructor().newInstance();
 
 			getFieldsTypeMap(clazz).entrySet().stream().filter(e -> Objects.nonNull(jsonDocument.getKey(e.getKey())))
 					.forEach(e -> {
@@ -224,7 +224,7 @@ public final class ReflectUtils {
 			return (T) adjustRoboClassCast(clazz, value);
 		} else {
 			try {
-				Object instance = clazz.newInstance();
+				Object instance = clazz.getDeclaredConstructor().newInstance();
 				Map<String, ClassGetSetDTO> fieldNameMethods = getFieldsTypeMap(clazz);
 
 				JsonDocument document = (JsonDocument) value;

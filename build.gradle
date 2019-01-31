@@ -112,7 +112,7 @@ subprojects {
     apply plugin: 'java-library'
 
     compileJava.options*.compilerArgs = [
-            "-Xlint:unchecked", "-Xlint:rawtypes",
+            "-Xlint:unchecked", "-Xlint:rawtypes", "-Xlint:deprecation"
     ]
 
     compileTestJava.options*.compilerArgs = [
