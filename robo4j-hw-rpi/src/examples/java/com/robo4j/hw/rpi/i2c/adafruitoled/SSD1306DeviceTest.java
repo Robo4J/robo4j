@@ -34,15 +34,32 @@ import com.robo4j.hw.rpi.i2c.adafruitoled.SSD1306Device.OLEDVariant;
 /**
  * Example which prints Hello World and draws a little. It also shows the image
  * in a JFrame, so that it is easy to know what to expect.
+ * <p>
+ * Takes one argument, the number of lines of your specific device (32 or 64).
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class SSD1306DeviceTest {
-	public static void main(String[] args) throws IOException {
-		final SSD1306Device oled = new SSD1306Device(OLEDVariant.Type128x32,
-				RaspiPin.GPIO_25);
+	private static final String DEFAULT_LINES = "32";
 
+	/**
+	 * Start the example with either 32 or 64 as argument to select the number
+	 * of lines. Will default to 32.
+	 */
+	public static void main(String[] args) throws IOException {
+		String lines = DEFAULT_LINES;
+		if (args.length > 0) {
+			lines = args[0];
+		}
+
+		OLEDVariant variant = lines.equals(DEFAULT_LINES) ? OLEDVariant.Type128x32 : OLEDVariant.Type128x64;
+		final SSD1306Device oled = new SSD1306Device(variant, RaspiPin.GPIO_25);
+
+		System.out.println("Running OLED device example for " + variant);
+		System.out.println("If the number of lines do not match your device,"); 
+		System.out.println("please add the number of lines as the first argument!");
+		
 		String text = args.length > 0 ? Stream.of(args).collect(Collectors.joining(" ")) : "Hello World!";
 		Graphics2D gc = oled.getGraphicsContext();
 		gc.setColor(Color.white);
@@ -63,7 +80,7 @@ public class SSD1306DeviceTest {
 					oled.setEnabled(false);
 				} catch (IOException e1) {
 					e1.printStackTrace();
-				//TODO: is it possible ?
+					// TODO: is it possible ?
 				} finally {
 					System.exit(0);
 				}
