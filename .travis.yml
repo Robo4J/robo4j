@@ -11,3 +11,4 @@ jdk: openjdk11
 branches:
   only:
   - master
+  - feature/20190218_master_spring_autoconfigure
