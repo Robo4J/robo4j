@@ -16,5 +16,11 @@
   -->
 
 <robo4j>
-
+    <roboUnit id="consumer">
+        <class>com.robo4j.spring.configuration.robo4j.StringConsumer</class>
+        <config name="com.robo4j.root">
+            <value name="springUnitName" type="String">springReceiver</value>
+            <value name="messageNumber" type="int">100</value>
+        </config>
+    </roboUnit>
 </robo4j>

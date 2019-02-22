@@ -17,8 +17,14 @@
 
 package com.robo4j.spring.configuration;
 
-import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
+import com.robo4j.spring.configuration.robo4j.StringConsumer;
+import com.robo4j.spring.configuration.service.SimpleScheduler;
+import com.robo4j.spring.configuration.service.SpringReceiverService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,9 +33,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -37,35 +43,40 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-@ContextConfiguration(classes = { AbstractRobo4jSpringTest.Initializer.class })
-class Robo4jAutoConfigurationTests {
+@ContextConfiguration(classes = { SpringReceiverService.class, AbstractRobo4jSpringTest.Initializer.class,
+		SimpleScheduler.class })
+class Robo4JSpringUnitsTests {
+
+	private static final Log log = LogFactory.getLog(Robo4JSpringUnitsTests.class);
 
 	@Autowired
 	private RoboContext roboContext;
 
+	@Autowired
+	private SpringReceiverService receiverService;
+
 	@BeforeEach
 	void setUp() {
+		roboContext.start();
+	}
+
+	@AfterEach
+	void stop() {
 		roboContext.stop();
 	}
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Test
-	void statRoboContextTest() {
-		roboContext.start();
-		assertEquals(LifecycleState.STARTED, roboContext.getState());
-	}
+	void test() throws Exception {
 
-	@Test
-	void stopRoboContextTest() {
-		roboContext.start();
-		roboContext.stop();
-		assertEquals(LifecycleState.STOPPED, roboContext.getState());
-	}
+		final String robo4jConsumerUnitName = "consumer";
+		CountDownLatch latch = roboContext.getReference(robo4jConsumerUnitName)
+				.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
+		latch.await(20, TimeUnit.SECONDS);
 
-	@Test
-	void unitRoboContextTest() {
-		roboContext.start();
-		assertNotNull(roboContext.getUnits());
-		assertTrue(!roboContext.getUnits().isEmpty());
-	}
+		List<String> robo4jConsumerMessage = (List<String>) roboContext.getReference(robo4jConsumerUnitName)
+				.getAttribute(StringConsumer.DESCRIPTOR_TOTAL_MESSAGES).get();
+		Assertions.assertEquals(robo4jConsumerMessage, receiverService.getMessages());
 
+	}
 }

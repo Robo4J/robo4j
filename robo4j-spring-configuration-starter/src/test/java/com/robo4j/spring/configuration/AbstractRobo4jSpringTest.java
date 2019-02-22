@@ -22,6 +22,7 @@ import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * AbstractRobo4jSpringTest
@@ -31,6 +32,7 @@ import org.springframework.context.annotation.Configuration;
  */
 public abstract class AbstractRobo4jSpringTest {
 
+    @EnableScheduling
     @Configuration
     @EnableAutoConfiguration
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
