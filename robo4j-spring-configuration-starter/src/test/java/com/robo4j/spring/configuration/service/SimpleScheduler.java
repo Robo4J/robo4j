@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
 import com.robo4j.RoboContext;
 
 /**
+ * SimpleScheduler
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */

@@ -21,8 +21,6 @@ import com.robo4j.RoboContext;
 import com.robo4j.spring.configuration.robo4j.StringConsumer;
 import com.robo4j.spring.configuration.service.SimpleScheduler;
 import com.robo4j.spring.configuration.service.SpringReceiverService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +36,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Robo4JSpringUnitsTests testing communication between spring and robo4j ecosystems
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
@@ -46,8 +46,6 @@ import java.util.concurrent.TimeUnit;
 @ContextConfiguration(classes = { SpringReceiverService.class, AbstractRobo4jSpringTest.Initializer.class,
 		SimpleScheduler.class })
 class Robo4JSpringUnitsTests {
-
-	private static final Log log = LogFactory.getLog(Robo4JSpringUnitsTests.class);
 
 	@Autowired
 	private RoboContext roboContext;
@@ -67,16 +65,14 @@ class Robo4JSpringUnitsTests {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Test
-	void test() throws Exception {
+	void robo4jUnitAndSpringServiceDataExchangeTestt() throws Exception {
 
-		final String robo4jConsumerUnitName = "consumer";
-		CountDownLatch latch = roboContext.getReference(robo4jConsumerUnitName)
+		final CountDownLatch latch = roboContext.getReference(StringConsumer.NAME)
 				.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
 		latch.await(20, TimeUnit.SECONDS);
 
-		List<String> robo4jConsumerMessage = (List<String>) roboContext.getReference(robo4jConsumerUnitName)
+		List<String> robo4jConsumerMessage = (List<String>) roboContext.getReference(StringConsumer.NAME)
 				.getAttribute(StringConsumer.DESCRIPTOR_TOTAL_MESSAGES).get();
 		Assertions.assertEquals(robo4jConsumerMessage, receiverService.getMessages());
-
 	}
 }
