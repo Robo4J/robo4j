@@ -20,6 +20,7 @@ package com.robo4j.spring.configuration;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
+import com.robo4j.util.SystemUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,9 +50,8 @@ public class Robo4jAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean(RoboContext.class)
 	public RoboContext roboContext() {
-		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		final InputStream systemIs = classLoader.getResourceAsStream(robo4jSystemConfig);
-		final InputStream contextIs = classLoader.getResourceAsStream(robo4jContextConfig);
+		final InputStream systemIs = SystemUtil.getInputStreamByResourceName(robo4jSystemConfig);
+		final InputStream contextIs = SystemUtil.getInputStreamByResourceName(robo4jContextConfig);
 
 		if (contextIs == null) {
 			throw new IllegalStateException("Robo4J context configuration is required!");

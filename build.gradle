@@ -273,6 +273,10 @@ project("robo4j-spring-configuration-starter") {
         testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
     }
 
+    test {
+        systemProperty "java.net.preferIPv4Stack", "true"
+    }
+
     configureExampleSources(project)
     configureShadow(project)
 }

@@ -21,6 +21,8 @@ import com.robo4j.RoboContext;
 import com.robo4j.spring.configuration.robo4j.StringConsumer;
 import com.robo4j.spring.configuration.service.SimpleScheduler;
 import com.robo4j.spring.configuration.service.SpringReceiverService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,6 +49,7 @@ import java.util.concurrent.TimeUnit;
 		SimpleScheduler.class })
 class Robo4JSpringUnitsTests {
 
+	private static final Log log = LogFactory.getLog(Robo4JSpringUnitsTests.class);
 	@Autowired
 	private RoboContext roboContext;
 
@@ -63,9 +66,13 @@ class Robo4JSpringUnitsTests {
 		roboContext.stop();
 	}
 
+	/**
+	 * Spring app scheduler emmit messages, messages are send to the Robo4J unit
+	 * @throws Exception exception
+	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Test
-	void robo4jUnitAndSpringServiceDataExchangeTestt() throws Exception {
+	void robo4jUnitAndSpringServiceDataExchangeTest() throws Exception {
 
 		final CountDownLatch latch = roboContext.getReference(StringConsumer.NAME)
 				.getAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
@@ -73,6 +80,9 @@ class Robo4JSpringUnitsTests {
 
 		List<String> robo4jConsumerMessage = (List<String>) roboContext.getReference(StringConsumer.NAME)
 				.getAttribute(StringConsumer.DESCRIPTOR_TOTAL_MESSAGES).get();
+
+		log.info("Robo4j received message: " + robo4jConsumerMessage);
+		log.info("Spring received message: " + receiverService.getMessages());
 		Assertions.assertEquals(robo4jConsumerMessage, receiverService.getMessages());
 	}
 }

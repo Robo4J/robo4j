@@ -16,11 +16,11 @@
   -->
 
 <robo4j>
-    <roboUnit id="consumer">
-        <class>com.robo4j.spring.configuration.robo4j.StringConsumer</class>
+    <roboSystem id="remoteSystem">
         <config name="com.robo4j.root">
-            <value name="messagesNumber" type="int">100</value>
-            <value name="springUnitName" type="String">springReceiver</value>
+            <value name="poolSizeScheduler" type="int">2</value>
+            <value name="poolSizeWorker" type="int">2</value>
+            <value name="poolSizeBlocking" type="int">2</value>
         </config>
-    </roboUnit>
+    </roboSystem>
 </robo4j>

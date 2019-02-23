@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
+ * SpringReceiverService get messages from instantiated robo4j context
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
