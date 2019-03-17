@@ -120,7 +120,7 @@ subprojects {
             "-Xlint:deprecation", "-Xlint:unchecked", "-Xlint:rawtypes",
     ]
 
-    sourceCompatibility = "${robo4jJavaVersion}"
+    sourceCompatibility = "${javaVersion}"
 
     test {
         useJUnitPlatform()
