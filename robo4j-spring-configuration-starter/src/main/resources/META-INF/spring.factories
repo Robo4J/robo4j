@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.robo4j.spring.configuration.Robo4jAutoConfiguration

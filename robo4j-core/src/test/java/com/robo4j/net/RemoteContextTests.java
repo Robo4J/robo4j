@@ -54,7 +54,7 @@ class RemoteContextTests {
 	private static final String CONTEXT_ID_REMOTE_RECEIVER = "remoteReceiver";
 
 	@Test
-	void testDiscoveryOfDiscoveryEnabledRoboContext() throws RoboBuilderException, IOException {
+	void discoveryOfDiscoveryEnabledRoboContextTest() throws RoboBuilderException, IOException {
 		RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testDiscoverableSystem.xml"));
 		RoboContext ctx = builder.build();
 		ctx.start();
@@ -74,7 +74,7 @@ class RemoteContextTests {
 	}
 
 	@Test
-	void testMessageToDiscoveredContext() throws RoboBuilderException, IOException, ConfigurationException {
+	void messageToDiscoveredContextTest() throws RoboBuilderException, IOException, ConfigurationException {
 		RoboBuilder builder = new RoboBuilder(
 				SystemUtil.getInputStreamByResourceName("testRemoteMessageReceiverSystem.xml"));
 		StringConsumer consumer = new StringConsumer(builder.getContext(), ACK_CONSUMER);
@@ -120,7 +120,7 @@ class RemoteContextTests {
 	}
 
 	@Test
-	void testMessageIncludingReferenceToDiscoveredContext()
+	void messageIncludingReferenceToDiscoveredContextTest()
 			throws RoboBuilderException, IOException, ConfigurationException {
 		RoboBuilder builder = new RoboBuilder(
 				SystemUtil.getInputStreamByResourceName("testRemoteMessageReceiverAckSystem.xml"));
@@ -165,7 +165,7 @@ class RemoteContextTests {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	void testMessageToDiscoveredContextAndReferenceToDiscoveredContext() throws Exception {
+	void messageToDiscoveredContextAndReferenceToDiscoveredContextTest() throws Exception {
 		RoboContext receiverSystem = buildRemoteReceiverContext(ACK_CONSUMER);
 		receiverSystem.start();
 		RoboReference<TestMessageType> ackConsumer = receiverSystem.getReference(ACK_CONSUMER);
@@ -213,7 +213,7 @@ class RemoteContextTests {
 
 	@Disabled("for individual testing")
 	@Test
-	void startRemoteReceiver() throws Exception {
+	void startRemoteReceiverTest() throws Exception {
 		buildReceiverSystemStringConsumer();
 
 		final LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();
@@ -226,7 +226,7 @@ class RemoteContextTests {
 
 	@Disabled("for individual testing")
 	@Test
-	void startRemoteSender() throws Exception {
+	void startRemoteSenderTest() throws Exception {
 		// Note that all this cludging about with local lookup service
 		// implementations etc would normally not be needed.
 		// This is just to isolate this test from other tests.

@@ -257,3 +257,26 @@ project("robo4j-units-rpi-http") {
         implementation(project(":robo4j-units-rpi"))
     }
 }
+
+project("robo4j-spring-configuration-starter") {
+    config {
+        info {
+            name = 'Robo4j Spring Configuration Starter'
+            description = 'Robo4j Spring Configuration Starter'
+        }
+    }
+
+    dependencies {
+        implementation(project(":robo4j-core"))
+        implementation "org.springframework:spring-core:${springCoreVersion}"
+        implementation "org.springframework.boot:spring-boot-autoconfigure:${springBootVersion}"
+        testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+    }
+
+    test {
+        systemProperty "java.net.preferIPv4Stack", "true"
+    }
+
+    configureExampleSources(project)
+    configureShadow(project)
+}
