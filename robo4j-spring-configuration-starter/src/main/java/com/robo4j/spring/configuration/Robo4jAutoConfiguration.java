@@ -58,12 +58,14 @@ public class Robo4jAutoConfiguration {
 		}
 
 		if (systemIs == null) {
-			log.warn("Robo4J is initiated with default thread pools!");
+			log.warn("Robo4J is uses the default thread pools!");
 		}
 
 		log.info("Robo4J context will be initiated");
 		try {
-			return initBuilder(systemIs).add(contextIs).build();
+			RoboContext context = initBuilder(systemIs).add(contextIs).build();
+			context.start();
+			return context;
 		} catch (RoboBuilderException e) {
 			log.error(e);
 			throw new IllegalStateException(e);

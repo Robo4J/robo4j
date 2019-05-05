@@ -21,10 +21,14 @@ import com.robo4j.scheduler.RoboThreadFactory;
 import com.robo4j.util.SystemUtil;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static com.robo4j.util.SystemUtil.BREAK;
+import static com.robo4j.util.SystemUtil.DELIMITER_HORIZONTAL;
 
 /**
  * RoboApplication used for launchWithExit the application from the command line
@@ -33,6 +37,7 @@ import java.util.concurrent.TimeUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class RoboApplication {
+
 
 	private static final class ShutdownThread extends Thread {
 
@@ -51,6 +56,7 @@ public final class RoboApplication {
 	private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1,
 			new RoboThreadFactory(new ThreadGroup("Robo4J-Launcher"), "Robo4J-App-", false));
 	private static final CountDownLatch appLatch = new CountDownLatch(1);
+
 
 	public RoboApplication() {
 	}
@@ -78,6 +84,9 @@ public final class RoboApplication {
 			daemon.setDaemon(true);
 			daemon.start();
 			context.start();
+
+			String logo = getBanner(Thread.currentThread().getContextClassLoader());
+			SimpleLoggingUtil.info(getClass(), logo);
 			SimpleLoggingUtil.info(RoboApplication.class, SystemUtil.printStateReport(context));
 			SimpleLoggingUtil.info(RoboApplication.class, "Press any Key...");
 			appLatch.await();
@@ -98,6 +107,20 @@ public final class RoboApplication {
 	public void launchNoExit(RoboContext context, long delay, TimeUnit timeUnit) {
 		executor.schedule(appLatch::countDown, delay, timeUnit);
 		launch(context);
+	}
+
+	private String getBanner(ClassLoader classLoader){
+		final InputStream is = classLoader.getResourceAsStream("banner.txt");
+		final byte[] logoBytes;
+		try {
+			logoBytes = is == null ? new byte[0] : is.readAllBytes();
+		} catch (IOException e) {
+			throw new IllegalStateException("not allowed");
+		}
+
+		return new StringBuilder().append(BREAK).append(DELIMITER_HORIZONTAL)
+				.append(new String(logoBytes)).append(BREAK).append(DELIMITER_HORIZONTAL)
+				.toString();
 	}
 
 }
