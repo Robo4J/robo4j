@@ -13,7 +13,7 @@ The current [Robo4j.io][] version is 0.5
 ## Requirements
 [Git][], [Gradle][], [Java JDK 11][]
 
-If you are looking for a JDK 11 ARM hard float build for Raspbian, we recommend looking into [Liberica JDK][].
+If you are looking for a JDK 11 ARM hard float build for Raspbian, we recommend looking into [Liberica JDK][] or [Azul Zulu Embedded][].
 
 ## Documentation
 See current [Robo4j documentation][].
@@ -59,3 +59,4 @@ Robo4J is released under [General Public License][] v3.
 [Gradle]: http://www.gradle.org
 [Robo4j documentation]: http://www.robo4j.io/p/documentation.html
 [Liberica JDK]: https://www.bell-sw.com/java.html
+[Azul Zulu Embedded]: https://www.azul.com/downloads/zulu-embedded/
