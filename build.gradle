@@ -105,7 +105,9 @@ config {
 allprojects {
     repositories {
         jcenter()
-        maven { url mavenSnapshotRepositoryUrl }
+        maven {
+            url mavenSnapshotRepositoryUrl
+        }
     }
 }
 
