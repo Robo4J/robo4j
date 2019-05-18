@@ -39,13 +39,14 @@ public abstract class AbstractI2CDevice {
 	 * 
 	 * @param bus
 	 *            the I2C bus to use.
+	 * 
 	 * @param address
 	 *            the address to use.
 	 * 
 	 * @see I2CBus
 	 * 
 	 * @throws IOException
-	 *             if there was communication problem
+	 *             if there was communication problem.
 	 */
 	public AbstractI2CDevice(int bus, int address) throws IOException {
 		this.bus = bus;
@@ -75,10 +76,46 @@ public abstract class AbstractI2CDevice {
 		return address;
 	}
 
+	/**
+	 * Writes the bytes directly to the I2C device.
+	 * 
+	 * @param address
+	 *            the address local to the i2c device.
+	 * 
+	 * @param b
+	 *            the byte to write.
+	 * 
+	 * @throws IOException
+	 *             if there was communication problem
+	 */
 	protected void writeByte(int address, byte b) throws IOException {
 		i2cDevice.write(address, b);
 	}
 
+	/**
+	 * Writes the bytes directly to the I2C device.
+	 * 
+	 * @param buffer
+	 *            the bytes to write.
+	 * 
+	 * @throws IOException
+	 *             if there was communication problem
+	 */
+	protected void writeBytes(byte[] buffer) throws IOException {
+		i2cDevice.write(buffer);
+	}
+
+	/**
+	 * Reads the byte at the device local address.
+	 * 
+	 * @param address
+	 *            the address local to the i2c device.
+	 * 
+	 * @return the byte at the address.
+	 * 
+	 * @throws IOException
+	 *             if there was communication problem
+	 */
 	protected int readByte(int address) throws IOException {
 		return i2cDevice.read(address);
 	}
@@ -101,15 +138,20 @@ public abstract class AbstractI2CDevice {
 	}
 
 	/**
-	 * Read 2 bytes unsigned.
+	 * Read 2 bytes as an unsigned int from the specified address.
 	 *
 	 * @param address
-	 *            bus address
-	 * @return reading
+	 *            address local to the i2c device.
+	 * 
+	 * @return the 2 bytes as an unsigned integer.
+	 * 
 	 * @throws IOException
-	 *             exception
+	 *             if there was communication problem
 	 */
 	protected int readU2(int address) throws IOException {
+		// Some profiling is in order to figure out if it is faster to do this
+		// by allocating an array and using the read method taking an array
+		// instead. TODO: Check Pi4j implementation - may become two reads.
 		int hi = i2cDevice.read(address);
 		int lo = i2cDevice.read(address + 1);
 		return (hi << 8) + lo & 0xff;
@@ -118,7 +160,8 @@ public abstract class AbstractI2CDevice {
 	/**
 	 * Reads 2 bytes unsigned directly from the i2cDevice.
 	 *
-	 * @return reading
+	 * @return the 2 bytes read as an unsigned int.
+	 * 
 	 * @throws IOException
 	 *             exception
 	 */

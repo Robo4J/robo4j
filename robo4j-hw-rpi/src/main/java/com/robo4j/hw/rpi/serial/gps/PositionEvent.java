@@ -27,7 +27,6 @@ import java.util.TimeZone;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-@SuppressWarnings(value = "rawtypes")
 public final class PositionEvent<R> extends GPSEvent {
 	private Date time;
 	private FixQuality fixQuality;
@@ -152,12 +151,6 @@ public final class PositionEvent<R> extends GPSEvent {
 	 */
 	public float getMaxError() {
 		return hdop * GPS.UNAIDED_POSITION_ACCURACY;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public R visit(GPSVisitor visitor) {
-		return (R)visitor.visit(this);
 	}
 
 	@Override
