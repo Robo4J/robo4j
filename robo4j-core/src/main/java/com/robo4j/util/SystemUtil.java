@@ -32,7 +32,8 @@ import java.util.List;
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class SystemUtil {
-	private static final String BREAK = "\n";
+	public static final String BREAK = "\n";
+	public static final String DELIMITER_HORIZONTAL = "================================================";
 	private static final String SLASH = "/";
 
 	private SystemUtil() {
@@ -52,7 +53,7 @@ public final class SystemUtil {
 		references.sort(ID_COMPARATOR);
 		// formatter:off
 		builder.append("RoboSystem state ").append(ctx.getState().getLocalizedName()).append(BREAK)
-				.append("================================================").append(BREAK);
+				.append(DELIMITER_HORIZONTAL).append(BREAK);
 		for (RoboReference<?> reference : references) {
 			builder.append(
 					String.format("    %-25s   %13s", reference.getId(), reference.getState().getLocalizedName()))
@@ -69,7 +70,7 @@ public final class SystemUtil {
 		//@formatter:off
 		sb.append("RoboSystem end-points:")
 				.append(BREAK)
-				.append("================================================")
+				.append(DELIMITER_HORIZONTAL)
 				.append(BREAK);
 		sb.append("http://<IP>")
 				.append(port)
@@ -85,7 +86,7 @@ public final class SystemUtil {
 				.append("POST: uses messages of type ")
 				.append(codecUnit.getMessageType().getSimpleName())
 				.append(BREAK);
-				sb.append("==============================================")
+				sb.append(DELIMITER_HORIZONTAL)
 		.append(BREAK);
 		//@formatter:on
 		return sb.toString();

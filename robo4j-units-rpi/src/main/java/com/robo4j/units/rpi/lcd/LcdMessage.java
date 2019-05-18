@@ -19,18 +19,20 @@ package com.robo4j.units.rpi.lcd;
 import com.robo4j.RoboReference;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
 
+import java.io.Serializable;
+
 /**
  * Message class that can be used to send messages to {@link AdafruitLcdUnit}s.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class LcdMessage {
-    public static LcdMessage MESSAGE_CLEAR = new LcdMessage(LcdMessageType.CLEAR, null, null, null);
-    public static LcdMessage MESSAGE_STOP = new LcdMessage(LcdMessageType.STOP, null, null, null);
-    public static LcdMessage MESSAGE_TURN_ON = new LcdMessage(LcdMessageType.DISPLAY_ENABLE, null, null, "true");
-    public static LcdMessage MESSAGE_TURN_OFF = new LcdMessage(LcdMessageType.DISPLAY_ENABLE, null, null, "false");
-	
+public class LcdMessage implements Serializable {
+	public static LcdMessage MESSAGE_CLEAR = new LcdMessage(LcdMessageType.CLEAR, null, null, null);
+	public static LcdMessage MESSAGE_STOP = new LcdMessage(LcdMessageType.STOP, null, null, null);
+	public static LcdMessage MESSAGE_TURN_ON = new LcdMessage(LcdMessageType.DISPLAY_ENABLE, null, null, "true");
+	public static LcdMessage MESSAGE_TURN_OFF = new LcdMessage(LcdMessageType.DISPLAY_ENABLE, null, null, "false");
+
 	private final RoboReference<?> source;
 	private final Color color;
 	private final String text;

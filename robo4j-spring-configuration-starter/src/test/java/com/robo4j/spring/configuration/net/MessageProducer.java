@@ -45,13 +45,13 @@ public class MessageProducer extends RoboUnit<String> {
 	public static final String ATTR_REMOTE_TARGET_CONTEXT = "remoteTargetContext";
 	public static final String ATTR_MESSAGE_LIST = "messageList";
     public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
-	@SuppressWarnings("rawtypes")
+    public static final String ATTR_REMOTE_TARGET_UNIT = "remoteTargetUnit";
+    @SuppressWarnings("rawtypes")
     public static final DefaultAttributeDescriptor<List> DESCRIPTOR_MESSAGE_LIST = DefaultAttributeDescriptor
             .create(List.class, ATTR_MESSAGE_LIST);
     public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
             .create(CountDownLatch.class, ATTR_COUNT_DOWN_LATCH);
     private static final long EXECUTION_DELAY = 2L;
-    public static final String ATTR_REMOTE_TARGET_UNIT = "remoteTargetUnit";
     private CountDownLatch messagesLatch;
     private AtomicInteger messageCounter = new AtomicInteger(0);
     private List<String> messageList = new LinkedList<>();
