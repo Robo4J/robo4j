@@ -237,15 +237,19 @@ public class SSD1306Device extends AbstractI2CDevice {
 	private byte[] toByteArray() {
 		int byteCount = 0;
 		byte[] bytes = new byte[oledType.getHeight() * oledType.getWidth() / 8];
-		for (int x = 0; x < oledType.getWidth(); x++) {
-			int next = 0;
-			for (int y = 0; y < oledType.getHeight(); y++) {
-				if (image.getRGB(x, y) != Color.black.getRGB()) {
-					next |= (1 << y);
+		for (int y = 0; y < oledType.getHeight();) {
+			for (int x = 0; x < oledType.getWidth(); x++) {
+				int next = 0;
+				int step = 0;
+				for (; step < 8 && y + step < oledType.getHeight(); step++) {
+					if (image.getRGB(x, y + step) != Color.black.getRGB()) {
+						next |= (1 << step);
+					}
 				}
+				bytes[byteCount] = (byte) next;
+				byteCount++;
 			}
-			bytes[byteCount] = (byte) next;
-			byteCount++;
+			y += 8;
 		}
 		return bytes;
 	}
