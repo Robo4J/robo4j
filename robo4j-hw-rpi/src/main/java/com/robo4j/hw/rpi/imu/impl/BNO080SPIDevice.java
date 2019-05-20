@@ -33,7 +33,7 @@ import java.util.Map;
 
 /**
  * Abstraction for a BNO080 absolute orientation device.
- * 
+ *
  * Channel 0: the SHTP command channel Channel 1: executable Channel 2: sensor
  * hub control channel Channel 3: input sensor reports (non-wake, not gyroRV)
  * Channel 4: wake input sensor reports (for sensors configured as wake up
@@ -224,9 +224,14 @@ public class BNO080SPIDevice {
 		shtpHeader[2] = channelNumber;
 		shtpHeader[3] = sequenceNumber;
 
+//		for(int i=0; i< SHTP_HEADER_SIZE;i++){
+//			System.out.println("HEADER"+i+":"+ Integer.toOctalString(shtpHeader[i]));
+//		}
+//
+
 		// Calculate the number of data bytes in this packet
 		int dataLength = (packetMSB << 8 | packetLSB) & 0xFFFF;
-		dataLength &= ~(1 << 15); // Clear the MSbit.
+		dataLength &= ~(1 << 15) & 0xFFFF; // Clear the MSbit.
 		// This bit indicates if this package is a continuation of the last. Ignore it
 		// for now.
 		if (dataLength == 0) {
