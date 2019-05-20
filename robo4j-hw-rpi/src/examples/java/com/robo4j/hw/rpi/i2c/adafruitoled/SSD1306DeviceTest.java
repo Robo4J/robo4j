@@ -29,6 +29,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import com.pi4j.io.gpio.RaspiPin;
+import com.pi4j.io.gpio.Pin;
 import com.robo4j.hw.rpi.i2c.adafruitoled.SSD1306Device.OLEDVariant;
 
 /**
@@ -42,6 +43,7 @@ import com.robo4j.hw.rpi.i2c.adafruitoled.SSD1306Device.OLEDVariant;
  */
 public class SSD1306DeviceTest {
 	private static final String DEFAULT_LINES = "32";
+	private static final Pin RESET_PIN = RaspiPin.GPIO_25;
 
 	/**
 	 * Start the example with either 32 or 64 as argument to select the number
@@ -54,9 +56,9 @@ public class SSD1306DeviceTest {
 		}
 
 		OLEDVariant variant = lines.equals(DEFAULT_LINES) ? OLEDVariant.Type128x32 : OLEDVariant.Type128x64;
-		final SSD1306Device oled = new SSD1306Device(variant, RaspiPin.GPIO_25);
+		final SSD1306Device oled = new SSD1306Device(variant, RESET_PIN);
 
-		System.out.println("Running OLED device example for " + variant);
+		System.out.println("Running OLED device example for " + variant + " with reset pin " + RESET_PIN + ".");
 		System.out.println("If the number of lines do not match your device,"); 
 		System.out.println("please add the number of lines as the first argument!");
 		
@@ -89,6 +91,11 @@ public class SSD1306DeviceTest {
 		frame.setSize(256, 256);
 		frame.getContentPane().add(new JLabel(new ImageIcon(oled.getImage())));
 		frame.setVisible(true);
+		System.out.println("Press enter to quit!");
+		System.in.read();
+		oled.setEnabled(false);
+		frame.setVisible(false);
+		frame.dispose();
 	}
 
 }
