@@ -36,11 +36,12 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 	private static final int READ_BUFFER_SIZE = 256;
 
 	public SparkFunXA1110Device() throws IOException {
-		super(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS);
+		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS);
 	}
 
 	public SparkFunXA1110Device(int bus, int address) throws IOException {
 		super(bus, address);
+		init();
 	}
 
 	public String createMtkPacket(int packetType, String dataField) {
@@ -106,14 +107,24 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 		}
 	}
 
+	private void init() throws IOException {
+		System.out.println("Initializing device");
+		i2cDevice.write(0);
+		
+		int read = i2cDevice.read();
+		System.out.println("Init read: " + read);
+	}
+
 	public static void main(String[] args) throws IOException, InterruptedException {
 		SparkFunXA1110Device device = new SparkFunXA1110Device();
 		Thread t = new Thread(() -> {
 			while (true) {
 				StringBuilder builder = new StringBuilder();
 				try {
+					System.out.println("Reading i2c bus to builder");
 					device.readGpsData(builder);
 					String gpsData = builder.toString();
+					System.out.println("Got data: " + gpsData);
 					gpsData = gpsData.replace("$", "$\n");
 					System.out.print(gpsData);
 					Thread.sleep(500);
@@ -124,7 +135,7 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 		});
 		t.setDaemon(true);
 		System.out.println("Starting reading from GPS. Press enter to quit!");
-		System.in.read();
 		t.start();
+		System.in.read();
 	}
 }
