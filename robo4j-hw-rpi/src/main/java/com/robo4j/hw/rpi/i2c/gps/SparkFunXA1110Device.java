@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,7 +28,7 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 /**
  * Abstraction to read the Titan X1 as delivered in SparFuns XA1110 break-out
  * board.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
@@ -54,8 +54,8 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 		MTK_DEBUG("MDBG", "MTK Debug Information", 16),
 		TIME_DATE("ZDA", "Time and Date", 17),
 		CHANNEL("MCHN", "Channel Status", 18);
-		
-		//@formatter:on		 
+		//@formatter:on
+
 		String nmeaCode;
 		String description;
 		int parameterIndex;
@@ -199,7 +199,7 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 	// I'll assume it's ASCII, didn't find any documentation.
 	private static final Charset CHARSET = Charset.forName("ASCII");
 	private static final int DEFAULT_I2C_ADDRESS = 0x10;
-	private static final int READ_BUFFER_SIZE = 256;
+	private static final int READ_BUFFER_SIZE = 64;
 
 	public SparkFunXA1110Device() throws IOException {
 		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS);
@@ -266,10 +266,10 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 
 	/**
 	 * Reads all the GPS data that could be found into the StringBuilder.
-	 * 
+	 *
 	 * @param builder
 	 *            the Builder to read data into.
-	 * 
+	 *
 	 * @throws IOException
 	 *             if there was a communication problem.
 	 */
@@ -277,7 +277,13 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 		byte[] buffer = new byte[READ_BUFFER_SIZE];
 		int bytesRead = 0;
 		while ((bytesRead = i2cDevice.read(buffer, 0, buffer.length)) > 0) {
-			builder.append(new String(buffer, 0, bytesRead, CHARSET));
+//			System.out.println("Read bytes=" + bytesRead);
+			String readStr = new String(buffer, 0, bytesRead, CHARSET).trim();
+			if (readStr.isEmpty()) {
+				break;
+			}
+//			System.out.println(readStr);
+			builder.append(readStr);
 		}
 	}
 
@@ -287,7 +293,7 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 
 		int read = i2cDevice.read();
 		System.out.println("Init read: " + read);
-		
+
 		sendMtkPacket(createNmeaSentencesAndFrequenciesMtkPacket(new NmeaSetting(NmeaSentenceType.GEOPOS, 1),
 				new NmeaSetting(NmeaSentenceType.COURSE_AND_SPEED, 1)));
 
@@ -299,13 +305,14 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 			while (true) {
 				StringBuilder builder = new StringBuilder();
 				try {
-					System.out.println("Reading i2c bus to builder");
+					System.out.println("=== Reading GPS-data from i2c bus to builder ===");
 					device.readGpsData(builder);
 					String gpsData = builder.toString();
-					System.out.println("Got data: " + gpsData);
-					gpsData = gpsData.replace("$", "$\n");
+					System.out.println("Got data of length " + gpsData.length());
+					gpsData = gpsData.replace("$", "\n$");
 					System.out.print(gpsData);
-					Thread.sleep(500);
+					System.out.println("\n===<end>===");
+					Thread.sleep(1000);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
