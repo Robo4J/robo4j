@@ -17,9 +17,7 @@
 package com.robo4j.hw.rpi.serial.gps;
 
 /**
- * Abstract super class for event classes.
- * implements {@link GPSVisitable} interface to simplify reacting on
- * GPS specific event
+ * Abstract super class for GPS event classes.
  *
  * @see PositionEvent
  * @see VelocityEvent
@@ -27,8 +25,7 @@ package com.robo4j.hw.rpi.serial.gps;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-@SuppressWarnings(value = {"rawtypes"})
-public abstract class GPSEvent implements GPSVisitable {
+public abstract class GPSEvent {
 	public static final float INVALID_VALUE = Float.NaN;
 
 	private final GPS source;
