@@ -19,7 +19,9 @@ package com.robo4j.hw.rpi.imu.impl;
 
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
+import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
+import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.spi.SpiChannel;
@@ -28,8 +30,6 @@ import com.pi4j.io.spi.SpiMode;
 import com.pi4j.io.spi.impl.SpiDeviceImpl;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Abstraction for a BNO080 absolute orientation device.
@@ -123,14 +123,13 @@ public class BNO080SPIDevice {
 	private int imuINTPin = 8;
 	private int imuRSTPin = 7;
 	private GpioController gpio;
+	private GpioPinDigitalInput intGpio;
 	private GpioPinDigitalOutput wakeGpio;
 	private GpioPinDigitalOutput rstGpio;
 	private GpioPinDigitalOutput csGpio;
 	private int[] shtpData = new int[MAX_PACKET_SIZE];
 	private int[] sequenceNumber = new int[CHANNEL_COUNT];
 	private int[] shtpHeader = new int[SHTP_HEADER_SIZE]; // Each packet has a header of 4 bytes
-
-	private Map<Integer, GpioPinDigitalOutput> gpioUsed = new HashMap<>();
 
 	public BNO080SPIDevice() throws IOException, InterruptedException {
 
@@ -140,17 +139,17 @@ public class BNO080SPIDevice {
 		System.out.println("INIT");
 		spiDevice = new SpiDeviceImpl(SpiChannel.CS0, DEFAULT_SPI_SPEED, SpiMode.MODE_3);
 		gpio = GpioFactory.getInstance();
+
+
 		csGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_26, "CS", PinState.HIGH); // Deselect BNO080
 
 		// Configure the BNO080 for SPI communication
-		rstGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_19, "WAK", PinState.HIGH); // Before boot up the PS0/WAK
+		wakeGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_19, "WAK", PinState.HIGH); // Before boot up the PS0/WAK
 																							// pin must be high to enter
 																							// SPI mode
-		wakeGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_13, "RST", PinState.LOW); // Reset BNO080
+		rstGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_13, "RST", PinState.LOW); // Reset BNO080
+		intGpio = gpio.provisionDigitalInputPin(RaspiPin.GPIO_06, "INT", PinPullResistance.PULL_UP);
 
-		gpioUsed.put(13, wakeGpio);
-		gpioUsed.put(19, rstGpio);
-		gpioUsed.put(26, csGpio);
 
 		Thread.sleep(2); // Min length not specified in datasheet?
 		rstGpio.setState(PinState.HIGH); // Bring out of reset
@@ -161,25 +160,20 @@ public class BNO080SPIDevice {
 	 * Blocking wait for BNO080 to assert (pull low) the INT pin indicating it's
 	 * ready for comm. Can take more than 104ms after a hardware reset
 	 */
-	private boolean waitForSPI() throws InterruptedException {
+	private boolean waitForSPI() throws IOException, InterruptedException {
 		for (int i = 0; i < 125; i++) {
-			GpioPinDigitalOutput outputPin = gpioUsed.containsKey(i) ? gpioUsed.get(i) : initDigitalOutputPint(i);
 
-			if (outputPin.getState().equals(PinState.LOW)) {
+			if (spiDevice.write((byte)0)[0] == PinState.LOW.getValue() ) {
 				return true;
 			} else {
 				System.out.println("SPI Wait");
 			}
 			Thread.sleep(1);
 		}
+		System.out.println("SPI INIT timeout");
 		return false;
 	}
 
-	private GpioPinDigitalOutput initDigitalOutputPint(int pin){
-		GpioPinDigitalOutput output = gpio.provisionDigitalOutputPin(RaspiPin.getPinByAddress(pin));
-		gpioUsed.put(pin, output);
-		return output;
-	}
 	/**
 	 * Send command to reset IC Read all advertisement packets from sensor The
 	 * sensor has been seen to reset twice if we attempt too much too quickly. This
@@ -205,8 +199,8 @@ public class BNO080SPIDevice {
 		// if (digitalRead(_int) == HIGH)
 
 		// Old way
-		if (!waitForSPI()) {
-			System.out.println("receive packet wrong");
+		if(spiDevice.write((byte)0)[0] == PinState.HIGH.getValue()){
+			System.out.println("receive packet data are not available");
 			return false;
 		}
 
@@ -231,7 +225,7 @@ public class BNO080SPIDevice {
 
 		// Calculate the number of data bytes in this packet
 		int dataLength = (packetMSB << 8 | packetLSB) & 0xFFFF;
-		dataLength &= ~(1 << 15) & 0xFFFF; // Clear the MSbit.
+		dataLength &= ~(1 << 15) & 0xFF; // Clear the MSbit.
 		// This bit indicates if this package is a continuation of the last. Ignore it
 		// for now.
 		if (dataLength == 0) {
@@ -260,6 +254,9 @@ public class BNO080SPIDevice {
 			System.out.println("sendPacket something wrong");
 			return false;
 		}
+
+		//BNO080 has max CLK of 3MHz, MSB first,
+		//The BNO080 uses CPOL = 1 and CPHA = 1. This is mode3
 		csGpio.setState(PinState.LOW);
 		spiDevice.write((byte) (packetLength & 0xFF)); // Packet length LSB
 		spiDevice.write((byte) (packetLength >> 8)); // Packet length MSB
@@ -278,6 +275,12 @@ public class BNO080SPIDevice {
 
 	public void action() throws InterruptedException, IOException {
 		init();
+
+		System.out.println("ACTION");
+		boolean state = waitForSPI();
+		System.out.println("ACTION SPI STATE: " + state);
+
+		//Turn on SPI Hardware
 		boolean beginState = begin();
 		System.out.println("action begin: " + beginState);
 
@@ -320,10 +323,6 @@ public class BNO080SPIDevice {
 
 	private boolean begin() throws InterruptedException, IOException {
 
-		System.out.println("BEGIN");
-		boolean state = waitForSPI();
-		System.out.println("BEGIN SPI STATE: " + state);
-
 		// Begin by resetting the IMU
 		softReset();
 
@@ -334,12 +333,13 @@ public class BNO080SPIDevice {
 
 		// Now we wait for response
 		if (receivePacket()) {
-			if (shtpData[0] == SHTP_REPORT_PRODUCT_ID_RESPONSE) {
+			if ((shtpData[0] & 0xFF) == SHTP_REPORT_PRODUCT_ID_RESPONSE) {
 				System.out.println("Begin good");
 				return true;
 			}
 		}
 
+		System.out.println("begin: something went wrong");
 		return false;
 	}
 
