@@ -18,6 +18,9 @@ package com.robo4j.hw.rpi.i2c.gps;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
@@ -30,6 +33,40 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
  * @author Miro Wengner (@miragemiko)
  */
 public class SparkFunXA1110Device extends AbstractI2CDevice {
+	public enum NmeaSentenceType {
+		//@formatter:off
+		GEOPOS("GLL", "Geographic Position - Latitude longitude", 0),
+		RECOMMENDED_MIN_SPEC("RMC", "Recomended Minimum Specific GNSS Sentence", 1),
+		COURSE_AND_SPEED("VTG", "Course Over Ground and Ground Speed", 2),
+		FIX_DATA("GGA", "Fix Data", 3),
+		DOPS_SAT("GSA", "DOPS and Active Satelites", 4),
+		SATS_IN_VIEW("GSV", "Satellites in View", 5),
+		RANGE_RESIDUALS("GRS", "Range Residuals", 6),
+		PSEUDO_RANGE_ERRORS("GST", "Pseudo Range Error Statistics", 7),
+		TIME("PLT", "Time", 8),
+		POSITION("PLP", "Position (Lat, Long)", 9),
+		SAT_DATA("PLS", "Sattelite Data", 10),
+		MISC("PLI", "Additional Information", 11),
+		HDS_TIME("PLH", "HDS Time Information", 12),
+		ALMANAC("MALM", "Almanac Information", 13),
+		EPHMERIS("MEPH", "Ephmeris Information", 14),
+		DIFFERENTIAL("MDGP", "Differential Correction Information", 15),
+		MTK_DEBUG("MDBG", "MTK Debug Information", 16),
+		TIME_DATE("ZDA", "Time and Date", 17),
+		CHANNEL("MCHN", "Channel Status", 18);
+		
+		//@formatter:on		 
+		String nmeaCode;
+		String description;
+		int parameterIndex;
+
+		NmeaSentenceType(String nmeaCode, String description, int parameterIndex) {
+			this.nmeaCode = nmeaCode;
+			this.description = description;
+			this.parameterIndex = parameterIndex;
+		}
+	}
+
 	public enum PacketType {
 		//@formatter:off
 		TEST(0),
@@ -128,7 +165,7 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 		public int getCode() {
 			return code;
 		}
-		
+
 		public String getCodeString() {
 			String codeString = "";
 			if (code < 100) {
@@ -139,6 +176,23 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 			}
 			codeString += code;
 			return codeString;
+		}
+	}
+
+	public static class NmeaSetting {
+		private final NmeaSentenceType type;
+		private final int period;
+
+		/**
+		 * @param type
+		 *            the type of sentence to output.
+		 * @param period
+		 *            how often to output the sentence. 1 means every period, 2
+		 *            means every other etc.
+		 */
+		public NmeaSetting(NmeaSentenceType type, int period) {
+			this.type = type;
+			this.period = period;
 		}
 	}
 
@@ -156,6 +210,25 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 		init();
 	}
 
+	static String createNmeaSentencesAndFrequenciesMtkPacket(NmeaSetting ... nmeaSettings) {
+		return createMtkPacket(PacketType.NMEA_SENTENCES_AND_FREQUENCES, createDataField(nmeaSettings));
+	}
+
+	private static String createDataField(NmeaSetting... nmeaSettings) {
+		Map<Integer, NmeaSetting> map = Arrays.stream(nmeaSettings)
+				.collect(Collectors.toMap(setting -> setting.type.parameterIndex, setting -> setting));
+		String dataField = "";
+		for (int i = 0; i < 19; i++) {
+			NmeaSetting setting = map.get(i);
+			int period = 0;
+			if (setting != null) {
+				period = setting.period;
+			}
+			dataField += "," + period;
+		}
+		return dataField;
+	}
+
 	public static String createMtkPacket(PacketType packetType, String dataField) {
 		String packet = "PMTK";
 		packet += packetType.getCodeString();
@@ -165,7 +238,7 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 		}
 		packet = "$" + packet + '*' + calcCRCforMTK(packet);
 
-		packet += '\r'; 
+		packet += '\r';
 		packet += '\n';
 
 		return packet;
@@ -214,6 +287,10 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 
 		int read = i2cDevice.read();
 		System.out.println("Init read: " + read);
+		
+		sendMtkPacket(createNmeaSentencesAndFrequenciesMtkPacket(new NmeaSetting(NmeaSentenceType.GEOPOS, 1),
+				new NmeaSetting(NmeaSentenceType.COURSE_AND_SPEED, 1)));
+
 	}
 
 	public static void main(String[] args) throws IOException, InterruptedException {
