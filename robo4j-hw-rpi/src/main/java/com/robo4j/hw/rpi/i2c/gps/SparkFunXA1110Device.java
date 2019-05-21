@@ -30,6 +30,118 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
  * @author Miro Wengner (@miragemiko)
  */
 public class SparkFunXA1110Device extends AbstractI2CDevice {
+	public enum PacketType {
+		//@formatter:off
+		TEST(0),
+		ACK(1),
+		SYS_MSG(10),
+		SYS_MSG_TEXT(11),
+		HOT_START(101),
+		WARM_START(102),
+		COLD_START(103),
+		FULL_COLD_START(104),
+		CLEAR_EPO(127),
+		STANDBY_MODE(161),
+		LOCUS_QUERY_STATUS(183),
+		LOCUS_ERASE(184),
+		LOCUS_START_STOP(185),
+		LOCUS_SNAPSHOT_LOG(186),
+		LOCUS_CONFIGURATION(187),
+		POWER_SAVE_PERIODIC_EXTENSION(223),
+		POWER_SAVE_PERIODIC(225),
+		DATA_TYPE_OF_DATA_PORT(250),
+		NMEA_BAUD_RATE(251),
+		NMEA_OUTPUT_MODE(253),
+		SYNC_1PPS_WITH_NMEA(255),
+		TIMING_PRODUCT(256),
+		FAST_TTFF_HIGH_ACCURACY(257),
+		GLP_MODE(262),
+		NMEA_DECIMAL_PRECISION(265),
+		ONE_PPS_CONFIG(285),
+		AIC_MODE(286),
+		DEBUG_MODE(299),
+		DGPS_MODE(301),
+		MINIMUM_SAT_CNR_THRESHOLD(306),
+		DR_COUNTER(308),
+		SAT_ELEVATION_THRESHOLD(311),
+		SBAS_ENABLED(313),
+		NMEA_SENTENCES_AND_FREQUENCES(314),
+		HIGH_HORIZONTAL_ACCURACY_THRESHOLD(328),
+		DATUM_MODE(330),
+		DATUM_ADVANCE(331),
+		QZSS_NMEA(351),
+		QZSS_MODE(352),
+		SEARCH_MODE(353),
+		QUERT_SEARCH_MODE(355),
+		HDOP_THRESHOLD(356),
+		QUERY_HDOP_THRESHOLD(357),
+		HIGH_SENSITIVITY(385),
+		STATIC_NAVIGATION_THRESHOLD(386),
+		FIX_CONTROL(400),
+		QUERY_DGPS_MODE(401),
+		MINIMUM_SAT_SNR_THRESHOLD(406),
+		QUERY_ESTIMATED_FIX_COUNTER(408),
+		QUERY_SAT_ELEVATION_THRESHOLD(411),
+		QUERY_SBAS_STATUS(413),
+		QUERY_NMEA_OUTPUT(414),
+		QUERY_HORIZONTAL_ACCURACU_THRESHOLD(428),
+		QUERY_DEFAULT_DATUM_MODE(430),
+		QUERY_RTC_TIME(435),
+		QUERY_HIGH_SENSITIVITY(436),
+		FIX_CONTROL_ACK(500),
+		DGPS_MODE_ACK(501),
+		MINIMUM_SAT_SNR_THRESHOLD_ACK(506),
+		SAT_ELEVATION_THRESHOLD_ACK(511),
+		SBAS_ACK(513),
+		NMEA_OUTPUT_ACK(514),
+		HORIZONTAL_ACCURACY_THRESHOLD_ACK(528),
+		DATUM_ACK(530),
+		RTC_TIME_ACK(535),
+		QUERY_DATA_PORT(602),
+		QUERY_FW_RELEASE_VERSION(605),
+		QUERY_EPO_INFORMATION(607),
+		QUERY_LOCUS_DATA(622),
+		QUERY_AVAILABLE_EPHEMERIS_OF_SAT(660),
+		QUERY_AVAILALE_ALMANCE_OF_SAT(661),
+		QUERY_UTC_CORRECTION_DATA(667),
+		QUERY_GPS_EPHEMERIS_DATA(668),
+		QUERY_BEIDOU_EPHEMERIS_DATA(669),
+		QUERY_GPS_IONOSPHERIC(670),
+		DATA_PORT_ACK(702),
+		FW_RELEASE_VERSION_ACK(705),
+		EPO_INFORMATION_ACK(707),
+		ENTRY_GPS_EPO_DATA(721),
+		ENTRY_UTC(740),
+		ENTRY_POS(741),
+		JAMMING_SCAN_TEST(837),
+		JAMMING_DETECTION_TEST(838),
+		EASY_MODE(869),
+		NAVIGATION_MODE(886);
+		//@formatter:on
+
+		private int code;
+
+		PacketType(int code) {
+			this.code = code;
+		}
+
+		public int getCode() {
+			return code;
+		}
+		
+		public String getCodeString() {
+			String codeString = "";
+			if (code < 100) {
+				codeString += "0";
+			}
+			if (code < 10) {
+				codeString += "0";
+			}
+			codeString += code;
+			return codeString;
+		}
+	}
+
 	// I'll assume it's ASCII, didn't find any documentation.
 	private static final Charset CHARSET = Charset.forName("ASCII");
 	private static final int DEFAULT_I2C_ADDRESS = 0x10;
@@ -44,37 +156,26 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 		init();
 	}
 
-	public String createMtkPacket(int packetType, String dataField) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("$PMTK");
-
-		if (packetType < 100) {
-			builder.append("0");
-		}
-		if (packetType < 10) {
-			builder.append("0");
-		}
-		builder.append(packetType);
+	public static String createMtkPacket(PacketType packetType, String dataField) {
+		String packet = "PMTK";
+		packet += packetType.getCodeString();
 
 		if (dataField != null && dataField.length() > 0) {
-			builder.append(dataField);
+			packet += dataField;
 		}
-		builder.append("*");
+		packet = "$" + packet + '*' + calcCRCforMTK(packet);
 
-		builder.append(calcCRCforMTK(builder.toString())); // Attach CRC
+		packet += '\r'; 
+		packet += '\n';
 
-		// Attach ending bytes
-		builder.append('\r'); // Carriage return
-		builder.append('\n'); // Line feed
-
-		return builder.toString();
+		return packet;
 	}
 
 	public void sendMtkPacket(String mtkPacket) throws IOException {
 		writeBytes(mtkPacket.getBytes(CHARSET));
 	}
 
-	private String calcCRCforMTK(String string) {
+	private static String calcCRCforMTK(String string) {
 		int crc = 0;
 		byte[] sentence = string.getBytes(CHARSET);
 
@@ -110,7 +211,7 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 	private void init() throws IOException {
 		System.out.println("Initializing device");
 		i2cDevice.write((byte) 0);
-		
+
 		int read = i2cDevice.read();
 		System.out.println("Init read: " + read);
 	}
