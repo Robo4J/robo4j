@@ -28,6 +28,7 @@ import com.pi4j.io.spi.SpiChannel;
 import com.pi4j.io.spi.SpiDevice;
 import com.pi4j.io.spi.SpiMode;
 import com.pi4j.io.spi.impl.SpiDeviceImpl;
+import com.pi4j.wiringpi.Gpio;
 
 import java.io.IOException;
 
@@ -41,6 +42,8 @@ import java.io.IOException;
  *
  *
  * https://github.com/sparkfun/SparkFun_BNO080_Arduino_Library/blob/master/src/SparkFun_BNO080_Arduino_Library.cpp
+ *
+ * RPi/Pi4j pins https://pi4j.com/1.2/pins/model-3b-rev1.html
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -141,14 +144,14 @@ public class BNO080SPIDevice {
 		gpio = GpioFactory.getInstance();
 
 
-		csGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_26, "CS", PinState.HIGH); // Deselect BNO080
+		csGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_25, "CS", PinState.HIGH); // Deselect BNO080
 
 		// Configure the BNO080 for SPI communication
-		wakeGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_19, "WAK", PinState.HIGH); // Before boot up the PS0/WAK
+		wakeGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_00, "WAK", PinState.HIGH); // Before boot up the PS0/WAK
 																							// pin must be high to enter
 																							// SPI mode
-		rstGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_13, "RST", PinState.LOW); // Reset BNO080
-		intGpio = gpio.provisionDigitalInputPin(RaspiPin.GPIO_06, "INT", PinPullResistance.PULL_UP);
+		rstGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_02, "RST", PinState.LOW); // Reset BNO080
+		intGpio = gpio.provisionDigitalInputPin(RaspiPin.GPIO_03, "INT", PinPullResistance.PULL_UP);
 
 
 		Thread.sleep(2); // Min length not specified in datasheet?
@@ -163,7 +166,7 @@ public class BNO080SPIDevice {
 	private boolean waitForSPI() throws IOException, InterruptedException {
 		for (int i = 0; i < 125; i++) {
 
-			if (spiDevice.write((byte)0)[0] == PinState.LOW.getValue() ) {
+			if (Gpio.digitalRead(intGpio.getPin().getAddress()) == Gpio.LOW) {
 				return true;
 			} else {
 				System.out.println("SPI Wait");
@@ -184,11 +187,11 @@ public class BNO080SPIDevice {
 
 		// Attempt to start communication with sensor
 		sendPacket(CHANNEL_EXECUTABLE, 1);
-		Thread.sleep(50);
+		Thread.sleep(150);
 
 		while (receivePacket())
 			;
-		Thread.sleep(50);
+		Thread.sleep(150);
 		while (receivePacket())
 			;
 
@@ -198,8 +201,8 @@ public class BNO080SPIDevice {
 		// we dont have INT
 		// if (digitalRead(_int) == HIGH)
 
-		// Old way
-		if(spiDevice.write((byte)0)[0] == PinState.HIGH.getValue()){
+		Thread.sleep(200);
+		if(Gpio.digitalRead(intGpio.getPin().getAddress()) == Gpio.HIGH){
 			System.out.println("receive packet data are not available");
 			return false;
 		}
@@ -207,6 +210,7 @@ public class BNO080SPIDevice {
 		// Get first four bytes to find out how much data we need to read
 		csGpio.setState(PinState.LOW);
 
+		Thread.sleep(200);
 		// Get the first four bytes, aka the packet header
 		int packetLSB = spiDevice.write((byte) 0)[0];
 		int packetMSB = spiDevice.write((byte) 0)[0];
@@ -242,6 +246,10 @@ public class BNO080SPIDevice {
 			}
 		}
 		csGpio.setState(PinState.HIGH); // Release BNO080
+		System.out.println("receivedPacket not empty: " + dataLength);
+		for(int i=0; i<dataLength;i++){
+			System.out.println("receivedPacket DATA: " + shtpData[i]);
+		}
 		return true; // we are done
 
 	}
@@ -258,15 +266,17 @@ public class BNO080SPIDevice {
 		//BNO080 has max CLK of 3MHz, MSB first,
 		//The BNO080 uses CPOL = 1 and CPHA = 1. This is mode3
 		csGpio.setState(PinState.LOW);
-		spiDevice.write((byte) (packetLength & 0xFF)); // Packet length LSB
-		spiDevice.write((byte) (packetLength >> 8)); // Packet length MSB
-		spiDevice.write((byte) channelNumber); // Channel Number
+		byte[] lsb = spiDevice.write((byte) (packetLength & 0xFF)); // Packet length LSB
+		byte[] msb = spiDevice.write((byte) (packetLength >> 8)); // Packet length MSB
+		byte[] chn = spiDevice.write((byte) channelNumber); // Channel Number
 		// Send the sequence number, increments with each packet sent, different counter
 		// for each channel
-		spiDevice.write((byte) (sequenceNumber[channelNumber]++));
+		System.out.println(String.format("sendPacket: %s, %s, %s, %s", Integer.toUnsignedString(lsb[0]),
+				Integer.toUnsignedString(msb[0]),Integer.toUnsignedString(msb[0]),Integer.toUnsignedString(chn[0])));
+		byte[] sn = spiDevice.write((byte) (sequenceNumber[channelNumber]++));
 		for (int i = 0; i < dataLength; i++) {
-			byte[] writeOut = spiDevice.write((byte) (shtpData[i] & 0xFF));
-			System.out.println("sendPacket writeOut size: " + writeOut.length + "," + new String(writeOut) );
+			byte[] writeOut = spiDevice.write((byte) (shtpData[i]));
+			System.out.println("sendPacket writeOut size: " + writeOut.length + ", data:" + Integer.toUnsignedString(writeOut[0]) );
 			shtpData[i] = writeOut[0];
 		}
 		csGpio.setState(PinState.HIGH);
@@ -333,7 +343,7 @@ public class BNO080SPIDevice {
 
 		// Now we wait for response
 		if (receivePacket()) {
-			if ((shtpData[0] & 0xFF) == SHTP_REPORT_PRODUCT_ID_RESPONSE) {
+			if ((shtpData[0]) == SHTP_REPORT_PRODUCT_ID_RESPONSE) {
 				System.out.println("Begin good");
 				return true;
 			}
