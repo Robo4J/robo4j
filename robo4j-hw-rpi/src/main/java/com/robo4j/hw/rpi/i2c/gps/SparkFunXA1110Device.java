@@ -289,11 +289,6 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 
 	private void init() throws IOException {
 		System.out.println("Initializing device");
-		i2cDevice.write((byte) 0);
-
-		int read = i2cDevice.read();
-		System.out.println("Init read: " + read);
-
 		sendMtkPacket(createNmeaSentencesAndFrequenciesMtkPacket(new NmeaSetting(NmeaSentenceType.GEOPOS, 1),
 				new NmeaSetting(NmeaSentenceType.COURSE_AND_SPEED, 1)));
 
