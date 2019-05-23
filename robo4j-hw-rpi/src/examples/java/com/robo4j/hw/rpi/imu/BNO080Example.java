@@ -28,7 +28,12 @@ public class BNO080Example {
     public static void main(String[] args) throws Exception {
         System.out.println("BNO080 Example");
         BNO080SPIDevice device = new BNO080SPIDevice();
-        device.action();
+        device.beginSPI();
+        device.enableRotationVector(50);
+
+
+
+
         System.out.println("DONE");
 
     }
