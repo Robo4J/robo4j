@@ -165,16 +165,13 @@ public class BNO080SPIDevice {
 
 	}
 
-	public void beginSPI() throws InterruptedException, IOException {
+	public boolean beginSPI() throws InterruptedException, IOException {
 		boolean configured = configureSPI();
 		System.out.println("beginSPI configured: " + configured);
 
-//		 boolean state = waitForSPI();
-//		 System.out.println("beginSPI state: " + state);
+		 boolean state = waitForSPI();
+		 System.out.println("beginSPI state: " + state);
 
-		// Turn on SPI Hardware
-		 boolean beginState = begin();
-		 System.out.println("action begin: " + beginState);
 
 		/*
 		 * At system startup, the hub must send its full advertisement message (see 5.2
@@ -203,14 +200,15 @@ public class BNO080SPIDevice {
 		if (receivePacket()) {
 			if ((shtpData[0] & 0xFF) == SHTP_REPORT_PRODUCT_ID_RESPONSE) {
 				System.out.println("beginSPI RECEIVED SHTP_REPORT_PRODUCT_ID_RESPONSE");
+				return true;
 			} else {
 				System.out.println("beginSPI: shtpData[0]:" + shtpData[0]);
 				System.out.println("beginSPI: shtpHeader[0]:" + shtpHeader[0]);
 			}
-
+		} else {
+			System.out.println("beginSPI: have not received packet");
 		}
-
-		shtpHeader[0] = SHTP_REPORT_COMMAND_REQUEST;
+		return false;
 
 	}
 
@@ -240,6 +238,35 @@ public class BNO080SPIDevice {
 			}
 
 		}
+	}
+
+	/**
+	 * Configure SPI
+	 *
+	 * @throws IOException
+	 *             exception
+	 * @throws InterruptedException
+	 *             exception
+	 */
+	private boolean configureSPI() throws IOException, InterruptedException {
+		System.out.println("configure");
+		spiDevice = new SpiDeviceImpl(SpiChannel.CS0, DEFAULT_SPI_SPEED, SpiMode.MODE_3);
+		gpio = GpioFactory.getInstance();
+
+		csGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_25, "CS", PinState.HIGH); // Deselect BNO080
+
+		// Configure the BNO080 for SPI communication
+		wakeGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_00, "WAKE", PinState.HIGH); // Before boot up the
+		// PS0/WAK
+		// pin must be high to enter
+		// SPI mode
+		rstGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_02, "RST", PinState.LOW); // Reset BNO080
+		intGpio = gpio.provisionDigitalInputPin(RaspiPin.GPIO_03, "INT", PinPullResistance.PULL_UP);
+
+		Thread.sleep(2); // Min length not specified in datasheet?
+		rstGpio.setState(PinState.HIGH); // Bring out of reset
+		System.out.println("configureSPI: DONE");
+		return true;
 	}
 
 	private float getQuatI(){
@@ -441,35 +468,6 @@ public class BNO080SPIDevice {
 
 		// Transmit packet on channel 2, 17 bytes
 		sendPacket(CHANNEL_CONTROL, 17, "setFeatureCommand");
-	}
-
-	/**
-	 * Configure SPI
-	 *
-	 * @throws IOException
-	 *             exception
-	 * @throws InterruptedException
-	 *             exception
-	 */
-	private boolean configureSPI() throws IOException, InterruptedException {
-		System.out.println("configure");
-		spiDevice = new SpiDeviceImpl(SpiChannel.CS0, DEFAULT_SPI_SPEED, SpiMode.MODE_3);
-		gpio = GpioFactory.getInstance();
-
-		csGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_25, "CS", PinState.HIGH); // Deselect BNO080
-
-		// Configure the BNO080 for SPI communication
-		wakeGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_00, "WAKE", PinState.HIGH); // Before boot up the
-																							// PS0/WAK
-																							// pin must be high to enter
-																							// SPI mode
-		rstGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_02, "RST", PinState.LOW); // Reset BNO080
-		intGpio = gpio.provisionDigitalInputPin(RaspiPin.GPIO_03, "INT", PinPullResistance.PULL_UP);
-
-		Thread.sleep(2); // Min length not specified in datasheet?
-		rstGpio.setState(PinState.HIGH); // Bring out of reset
-		System.out.println("configureSPI: DONE");
-		return true;
 	}
 
 	private boolean begin() throws InterruptedException, IOException {

@@ -28,13 +28,15 @@ public class BNO080Example {
     public static void main(String[] args) throws Exception {
         System.out.println("BNO080 Example");
         BNO080SPIDevice device = new BNO080SPIDevice();
-        device.beginSPI();
-        device.enableRotationVector(50);
+        if(!device.beginSPI()){
+            System.out.println("BNO080 over SPI not detected. Are you sure you have all 6 connections? Freezing...");
+        } else {
+            device.enableRotationVector(50);
+            System.out.println("Rotation vector enabled");
+            System.out.println("Output in form i, j, k, real, accuracy");
 
-
-
-
-        System.out.println("DONE");
+            System.out.println("DONE");
+        }
 
     }
 }
