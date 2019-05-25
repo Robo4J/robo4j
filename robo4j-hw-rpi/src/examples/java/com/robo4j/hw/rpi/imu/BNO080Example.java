@@ -20,6 +20,9 @@ package com.robo4j.hw.rpi.imu;
 import com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice;
 
 /**
+ * SparkFun BNO080 QWIIC VR IMU
+ * RotationVector example
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
@@ -28,15 +31,18 @@ public class BNO080Example {
     public static void main(String[] args) throws Exception {
         System.out.println("BNO080 Example");
         BNO080SPIDevice device = new BNO080SPIDevice();
-        if(!device.beginSPI()){
-            System.out.println("BNO080 over SPI not detected. Are you sure you have all 6 connections? Freezing...");
+        if(device.configureSpiPins()){
+            if(!device.beginSPI()){
+                System.out.println("BNO080 over SPI not detected. Are you sure you have all 6 connections? Freezing...");
+            } else {
+                device.enableRotationVector(50);
+                System.out.println("Rotation vector enabled");
+                System.out.println("Output in form i, j, k, real, accuracy");
+                device.startRotationVector(100);
+                System.out.println("DONE");
+            }
         } else {
-            device.enableRotationVector(50);
-            System.out.println("Rotation vector enabled");
-            System.out.println("Output in form i, j, k, real, accuracy");
-
-            System.out.println("DONE");
+            System.out.println("BNO080 not configured");
         }
-
     }
 }
