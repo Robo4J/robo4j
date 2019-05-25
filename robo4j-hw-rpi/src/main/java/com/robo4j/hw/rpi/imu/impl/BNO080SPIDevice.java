@@ -32,18 +32,17 @@ import com.pi4j.io.spi.impl.SpiDeviceImpl;
 import com.pi4j.wiringpi.Gpio;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Abstraction for a BNO080 absolute orientation device.
  *
  * <p>
- * Channel 0: the SHTP command channel
- * Channel 1: executable
- * Channel 2: sensor hub control channel
- * Channel 3: input sensor reports (non-wake, not gyroRV)
- * Channel 4: wake input sensor reports (for sensors configured as wake upsensors)
- * Channel 5: gyro rotation vector
+ * Channel 0: the SHTP command channel Channel 1: executable Channel 2: sensor
+ * hub control channel Channel 3: input sensor reports (non-wake, not gyroRV)
+ * Channel 4: wake input sensor reports (for sensors configured as wake
+ * upsensors) Channel 5: gyro rotation vector
  * </p>
  *
  * https://github.com/sparkfun/SparkFun_BNO080_Arduino_Library/blob/master/src/SparkFun_BNO080_Arduino_Library.cpp
@@ -139,7 +138,7 @@ public class BNO080SPIDevice {
 	private GpioPinDigitalInput intGpio;
 	private GpioPinDigitalOutput wakeGpio;
 	private GpioPinDigitalOutput rstGpio;
-	private GpioPinDigitalOutput csGpio;
+	private GpioPinDigitalOutput csGpio; // select slave SS = chip select CS
 	private int[] shtpData = new int[MAX_PACKET_SIZE];
 	private int[] sequenceNumber = new int[CHANNEL_COUNT];
 	private int[] shtpHeader = new int[SHTP_HEADER_SIZE]; // Each packet has a header of 4 bytes
@@ -203,6 +202,7 @@ public class BNO080SPIDevice {
 	 */
 	private boolean configureSpiPins(Pin wake, Pin cs, Pin rst, Pin inter) throws IOException, InterruptedException {
 		System.out.println(String.format("configurePins: wak=%s, cs=%s, rst=%s, inter=%s", wake, cs, rst, inter));
+
 		csGpio = gpio.provisionDigitalOutputPin(cs, "CS", PinState.HIGH); // Deselect BNO080
 		// Configure the BNO080 for SPI communication
 		wakeGpio = gpio.provisionDigitalOutputPin(wake, "WAKE", PinState.HIGH); // Before boot up the
@@ -213,7 +213,7 @@ public class BNO080SPIDevice {
 		intGpio = gpio.provisionDigitalInputPin(inter, "INT", PinPullResistance.PULL_UP);
 
 		TimeUnit.MILLISECONDS.sleep(2); // Min length not specified in datasheet?
-		setGpioDigitalPinOut(rstGpio, PinState.HIGH); // Bring out of reset
+		rstGpio.setState(PinState.HIGH); // Bring out of reset
 
 		return true;
 	}
@@ -239,14 +239,14 @@ public class BNO080SPIDevice {
 		receivePacket();
 
 		// Check communication with device
-		shtpData[0] = SHTP_REPORT_PRODUCT_ID_RESPONSE; // Request the product ID and reset info
+		shtpData[0] = SHTP_REPORT_PRODUCT_ID_REQUEST; // Request the product ID and reset info
 		shtpData[1] = 0; // Reserved
 
 		// Transmit packet on channel 2, 2 bytes
-		sendPacket(CHANNEL_CONTROL, 2, "beginSPI: sendpacket");
+		sendPacket(CHANNEL_CONTROL, 2, "beginSPI:CHANNEL_CONTROL:SHTP_REPORT_PRODUCT_ID_REQUEST");
 		// Now we wait for response
 		if (receivePacket()) {
-			if ((shtpData[0] & 0xFF) == SHTP_REPORT_PRODUCT_ID_RESPONSE) {
+			if ((0xFF & shtpData[0]) == SHTP_REPORT_PRODUCT_ID_RESPONSE) {
 				System.out.println("beginSPI RECEIVED SHTP_REPORT_PRODUCT_ID_RESPONSE");
 				return true;
 			} else {
@@ -264,7 +264,7 @@ public class BNO080SPIDevice {
 		setFeatureCommand(SENSOR_REPORTID_ROTATION_VECTOR, timeBetweenReports);
 	}
 
-	public void startRotationVector(int readings) throws IOException, InterruptedException{
+	public void startRotationVector(int readings) throws IOException, InterruptedException {
 		long measurements = 0;
 		for (int i = 1; i < readings; i++) {
 			TimeUnit.MILLISECONDS.sleep(10);
@@ -484,31 +484,6 @@ public class BNO080SPIDevice {
 		sendPacket(CHANNEL_CONTROL, 17, "setFeatureCommand");
 	}
 
-	private boolean begin() throws InterruptedException, IOException {
-
-		// Begin by resetting the IMU
-		softReset("begin");
-
-		shtpData[0] = SHTP_REPORT_PRODUCT_ID_REQUEST; // Request the product ID and reset info
-		shtpData[1] = 0; // Reserved
-
-		sendPacket(CHANNEL_CONTROL, 2, "begin: CHANNEL_CONTROL");
-
-		// Now we wait for response
-		if (receivePacket()) {
-			if ((shtpData[0] & 0xFF) == SHTP_REPORT_PRODUCT_ID_RESPONSE) {
-				System.out.println("begin:  good");
-				return true;
-			} else {
-				System.out.println("begin: shtpData[0]:" + shtpData[0]);
-				System.out.println("begin: shtpHeader[0]:" + shtpHeader[0]);
-			}
-		}
-
-		System.out.println("begin: something went wrong");
-		return false;
-	}
-
 	/**
 	 * Blocking wait for BNO080 to assert (pull low) the INT pin indicating it's
 	 * ready for comm. Can take more than 104ms after a hardware reset
@@ -518,38 +493,15 @@ public class BNO080SPIDevice {
 		for (int i = 0; i < 125; i++) {
 
 			if (Gpio.digitalRead(intGpio.getPin().getAddress()) == Gpio.LOW) {
-				System.out.println("waitForSPI counter: " + counter);
+				System.out.println("waitForSPI: DONE: counter: " + counter);
 				return true;
 			} else {
 				counter++;
 			}
 			Thread.sleep(1);
 		}
-		System.out.println("waitForSPI counter: " + counter);
+		System.out.println("waitForSPI: ERROR counter: " + counter);
 		return false;
-	}
-
-	/**
-	 * Send command to reset IC Read all advertisement packets from sensor The
-	 * sensor has been seen to reset twice if we attempt too much too quickly. This
-	 * seems to work reliably.
-	 */
-	private void softReset(String message) throws InterruptedException, IOException {
-		int delay = 50;
-		shtpData[0] = 1; // Reset
-		System.out.println(String.format("softReset START: from: %s delay: %d", message, delay));
-
-		// Attempt to start communication with sensor
-		sendPacket(CHANNEL_EXECUTABLE, 1, String.format("CHANNEL_EXECUTABLE from: %s delay: %d", message, delay));
-		TimeUnit.MILLISECONDS.sleep(delay);
-
-		while (receivePacket())
-			;
-		TimeUnit.MILLISECONDS.sleep(delay);
-		while (receivePacket())
-			;
-
-		System.out.println("softReset DONE");
 	}
 
 	private void printArray(String message, int[] array) {
@@ -560,69 +512,84 @@ public class BNO080SPIDevice {
 		System.out.print("\n");
 	}
 
+	private void printArray(String message, byte[] array) {
+		System.out.print("printArray: " + message);
+		for (int i = 0; i < array.length; i++) {
+			System.out.print(" " + (array[i] & 0xFF) + ",");
+		}
+		System.out.print("\n");
+	}
+
 	private boolean sendPacket(byte channelNumber, int dataLength, String message)
 			throws InterruptedException, IOException {
-		System.out.println("sendPacket channelNumber:" + channelNumber + ", message: " + message);
+		System.out.println(String.format("sendPacket from: %s channelNumber: %d", message, channelNumber));
 		int packetLength = dataLength + SHTP_HEADER_SIZE;
-		System.out.println("sendPacket packetLength: " + packetLength);
 
 		// Wait for BNO080 to indicate it is available for communication
 		if (!waitForSPI()) {
-			System.out.println("sendPacket something wrong");
+			System.out.println("sendPacket SPI not available for communication");
 			return false;
 		}
 
 		// BNO080 has max CLK of 3MHz, MSB first,
 		// The BNO080 uses CPOL = 1 and CPHA = 1. This is mode3
-		setGpioDigitalPinOut(csGpio, PinState.LOW);
-		byte[] lsb = spiDevice.write((byte) (packetLength & 0xFF)); // Packet length LSB
-		byte[] msb = spiDevice.write((byte) (packetLength >> 8)); // Packet length MSB
-		byte[] chn = spiDevice.write(channelNumber); // Channel Number
-		// Send the sequence number, increments with each packet sent, different counter
-		// for each channel
+		byte[] spiHeader = createSpiHeader(packetLength, channelNumber);
+		csGpio.setState(PinState.LOW);
+		printArray("sendPacket spiHeader: ", spiHeader);
+		byte[] writenHeader = spiDevice.write(spiHeader);
+		printArray("sendPacket writenHeader: ", writenHeader);
 
-		int dataLengthHeader = calculateNumberOfBytesInPacket(msb[0], lsb[0]);
-		System.out.println("sendPacket: dataLengthHeader=" + dataLengthHeader);
-
-		byte[] sn = spiDevice.write((byte) (sequenceNumber[channelNumber]++));
+		byte[] writenBytes = new byte[dataLength];
 		for (int i = 0; i < dataLength; i++) {
-			byte[] writenBytes = spiDevice.write((byte) (shtpData[i]));
+			byte writenByte = spiDevice.write((byte) (shtpData[i]))[0];
+			writenBytes[i] = writenByte;
 			shtpData[i] = 0;
 		}
-		System.out.println(String.format("sendPacket: %s, %s, %s, %s", Integer.toUnsignedString(lsb[0]),
-				Integer.toUnsignedString(msb[0]), Integer.toUnsignedString(chn[0]), Integer.toUnsignedString(sn[0])));
-		setGpioDigitalPinOut(csGpio, PinState.HIGH);
+
+		int responseHeaderBytes = calculateNumberOfBytesInPacket(writenBytes[1], writenBytes[0]);
+		System.out.println("sendPacket: responseHeaderBytes= " + responseHeaderBytes);
+		csGpio.setState(PinState.HIGH);
 		return true;
+	}
+
+	private byte[] createSpiHeader(int packetLength, int channelNumber) {
+		byte[] header = new byte[SHTP_HEADER_SIZE];
+		header[0] = (byte) (packetLength & 0xFF); // LSB
+		header[1] = (byte) (packetLength >> 8); // MSB
+		header[2] = (byte) channelNumber; // Channel Number
+		// Send the sequence number, increments with each packet sent, different counter
+		// for each channel
+		header[3] = (byte) (++sequenceNumber[channelNumber]); // Sequence Number
+		System.out.println(
+				"SEQUENCE NUMBER: " + Arrays.asList(Arrays.stream(sequenceNumber).boxed().toArray(Integer[]::new)));
+		return header;
 	}
 
 	private boolean receivePacket() throws IOException, InterruptedException {
 		// we dont have INT
 		// if (digitalRead(_int) == HIGH)
-		// int delay = 35; // best 55
-		// TimeUnit.NANOSECONDS.sleep(delay);
+		int delay = 35; // best 55
+		TimeUnit.NANOSECONDS.sleep(delay);
 		if (Gpio.digitalRead(intGpio.getPin().getAddress()) == Gpio.HIGH) {
-			System.out.println("receivePacket: data are not available");
+			System.out.println("receivePacket: INTERRUPT: data are not available");
 			return false;
 		}
 
 		// Get first four bytes to find out how much data we need to read
-		setGpioDigitalPinOut(csGpio, PinState.LOW);
+		csGpio.setState(PinState.LOW);
 
 		// Get the first four bytes, aka the packet header
-		int packetLSB = spiDevice.write((byte) 0)[0];
-		TimeUnit.NANOSECONDS.sleep(35);
-		int packetMSB = spiDevice.write((byte) 0)[0];
-		TimeUnit.NANOSECONDS.sleep(35);
-		int channelNumber = spiDevice.write((byte) 0)[0];
-		TimeUnit.NANOSECONDS.sleep(35);
-		int sequenceNumber = spiDevice.write((byte) 0)[0]; // Not sure if we need to store this or not
-		TimeUnit.NANOSECONDS.sleep(35);
+		int packetLSB = spiDevice.write((byte) 0xFF)[0];
+		int packetMSB = spiDevice.write((byte) 0xFF)[0];
+		int channelNumber = spiDevice.write((byte) 0xFF)[0];
+		int sequenceNumber = spiDevice.write((byte) 0xFF)[0]; // Not sure if we need to store this or not
 
+		// Store the header info
 		shtpHeader[0] = packetLSB;
 		shtpHeader[1] = packetMSB;
 		shtpHeader[2] = channelNumber;
 		shtpHeader[3] = sequenceNumber;
-		// printArray("receivePacket shtpHeader: ", shtpHeader);
+		printArray("receivePacket shtpHeader: ", shtpHeader);
 
 		// Calculate the number of data bytes in this packet
 		// int dataLength = (packetMSB << 8 | packetLSB) & 0xFFFF;
@@ -644,7 +611,7 @@ public class BNO080SPIDevice {
 				shtpData[i] = incoming & 0xFF;
 			}
 		}
-		setGpioDigitalPinOut(csGpio, PinState.HIGH); // Release BNO080
+		csGpio.setState(PinState.HIGH); // Release BNO080
 
 		if (dataLength > MAX_PACKET_SIZE) {
 			System.out.println("receivedPacket dataLength Bigger: " + dataLength + ", set: " + MAX_PACKET_SIZE);
@@ -667,14 +634,8 @@ public class BNO080SPIDevice {
 
 	private int calculateNumberOfBytesInPacket(int packetMSB, int packetLSB) {
 		// Calculate the number of data bytes in this packet
-		int dataLength = ((packetMSB & 0xFFFF) << 8 | packetLSB) & 0xFFFF;
+		int dataLength = ((packetMSB & 0xFF) << 8 | packetLSB) & 0xFFFF;
 		dataLength &= ~(1 << 15) & 0xFF; // Clear the MSbit.
 		return dataLength;
 	}
-
-	private void setGpioDigitalPinOut(GpioPinDigitalOutput pin, PinState state) throws InterruptedException {
-		pin.setState(state);
-		TimeUnit.NANOSECONDS.sleep(35); // CS to MISO out
-	}
-
 }
