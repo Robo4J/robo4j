@@ -135,10 +135,6 @@ public class BNO080SPIDevice {
 	private static int magnetometer_Q1 = 4;
 
 	private SpiDevice spiDevice;
-	private int imuCSPin = 10;
-	private int imuWAKPin = 9;
-	private int imuINTPin = 8;
-	private int imuRSTPin = 7;
 	private GpioController gpio;
 	private GpioPinDigitalInput intGpio;
 	private GpioPinDigitalOutput wakeGpio;
