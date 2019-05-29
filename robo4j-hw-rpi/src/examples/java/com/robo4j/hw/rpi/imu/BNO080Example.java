@@ -38,8 +38,8 @@ public class BNO080Example {
                 device.enableRotationVector(50);
                 System.out.println("Rotation vector enabled");
                 System.out.println("Output in form i, j, k, real, accuracy");
-                device.startRotationVector(100);
-                System.out.println("DONE");
+                device.startRotationVector(2);
+                System.out.println("BNO080 DONE");
             }
         } else {
             System.out.println("BNO080 not configured");
