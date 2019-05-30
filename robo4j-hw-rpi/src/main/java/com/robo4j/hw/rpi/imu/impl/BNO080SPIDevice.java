@@ -61,8 +61,8 @@ public class BNO080SPIDevice {
 			this.body = new int[size];
 		}
 
-		void addHeader(int... header){
-			if(header.length != this.header.length){
+		void addHeader(int... header) {
+			if (header.length != this.header.length) {
 				System.out.println("ShtpPacket: wrong header");
 			} else {
 				this.header[0] = header[0];
@@ -73,7 +73,7 @@ public class BNO080SPIDevice {
 
 		}
 
-		void addBody(int pos, int element){
+		void addBody(int pos, int element) {
 			body[pos] = element;
 		}
 
@@ -85,12 +85,12 @@ public class BNO080SPIDevice {
 			return body;
 		}
 
-		boolean dataAvailable(){
+		boolean dataAvailable() {
 			return body.length > 0;
 		}
 	}
 
-	private static final class PacketBodyBuilder{
+	private static final class PacketBodyBuilder {
 		private byte[] body;
 		private final AtomicInteger counter = new AtomicInteger();
 
@@ -98,12 +98,12 @@ public class BNO080SPIDevice {
 			body = new byte[size];
 		}
 
-		PacketBodyBuilder addElement(int value){
+		PacketBodyBuilder addElement(int value) {
 			this.body[counter.getAndIncrement()] = (byte) value;
 			return this;
 		}
 
-		byte[] build(){
+		byte[] build() {
 			return body;
 		}
 	}
@@ -293,7 +293,7 @@ public class BNO080SPIDevice {
 
 		// Check communication with device
 		// bytes: Request the product ID and reset info, Reserved
-		byte[] reportRequestPacket = {(byte)SHTP_REPORT_PRODUCT_ID_REQUEST, 0};
+		byte[] reportRequestPacket = { (byte) SHTP_REPORT_PRODUCT_ID_REQUEST, 0 };
 		// Transmit packet on channel 2, 2 bytes
 		sendPacket(CHANNEL_CONTROL, reportRequestPacket, "beginSPI:CHANNEL_CONTROL:SHTP_REPORT_PRODUCT_ID_REQUEST");
 		// Now we wait for response
@@ -302,7 +302,7 @@ public class BNO080SPIDevice {
 		if (shtpPacket.dataAvailable()) {
 			int[] receivedBody = shtpPacket.getBody();
 			if (receivedBody[0] == SHTP_REPORT_PRODUCT_ID_RESPONSE) {
-				printShtpPacketBody(receivedBody);
+				printShtpPacketPart("body", receivedBody);
 				return true;
 			} else {
 				System.out.println("beginSPI: received not valid response ");
@@ -315,14 +315,17 @@ public class BNO080SPIDevice {
 	}
 
 	public void enableRotationVector(int timeBetweenReports) throws InterruptedException, IOException {
-		setFeatureCommand(SENSOR_REPORTID_ROTATION_VECTOR, timeBetweenReports);
+		setFeatureCommand(SENSOR_REPORTID_ROTATION_VECTOR, timeBetweenReports, 0);
+	}
+
+	public void enableLinearAccelerometer(int timeBetweenReports) throws InterruptedException, IOException {
+		setFeatureCommand(SENSOR_REPORTID_LINEAR_ACCELERATION, timeBetweenReports, 0);
 	}
 
 	public void startRotationVector(int readings) throws IOException, InterruptedException {
 		long measurements = 0;
 		for (int i = 1; i < readings; i++) {
-			TimeUnit.MILLISECONDS.sleep(10);
-
+			System.out.println("startRotationVector measurements: " + measurements + ", readings: " + readings);
 			ShtpPacket packet = dataAvailable();
 			if (packet.dataAvailable()) {
 
@@ -341,7 +344,6 @@ public class BNO080SPIDevice {
 				System.out.print(String.format("enableRotationVector measurement: %s,", measurements));
 				System.out.println();
 			}
-
 		}
 	}
 
@@ -381,21 +383,37 @@ public class BNO080SPIDevice {
 		return qFloat;
 	}
 
+	/**
+	 * Updates the latest variables if possible
+	 * 
+	 * @return false if new readings are not available
+	 * @throws IOException
+	 *             exception
+	 * @throws InterruptedException
+	 *             exception
+	 */
 	private ShtpPacket dataAvailable() throws IOException, InterruptedException {
+		// int counter = 0;
+		// while (intGpio.getState().equals(PinState.HIGH) && counter < 255) {
+		// counter++;
+		// }
+		// if (counter == 255) {
+		// return new ShtpPacket(0);
+		// }
 
-		/*
-		 * If we have an interrupt pin connection available, check if data is available.
-		 * If int pin is NULL, then we'll rely on receivePacket() to timeout See issue
-		 * 13: https://github.com/sparkfun/SparkFun_BNO080_Arduino_Library/issues/13
-		 */
+		// if(intGpio.getState().equals(PinState.HIGH)){
+		// return new ShtpPacket(0);
+		// }
 
+		// TimeUnit.MILLISECONDS.sleep(2);
 		ShtpPacket receivePacket = receivePacket();
 		if (receivePacket.dataAvailable()) {
 			// Check to see if this packet is a sensor reporting its data to us
-			if (receivePacket.getHeader()[2] == CHANNEL_REPORTS && receivePacket.getBody()[0] == SHTP_REPORT_BASE_TIMESTAMP) {
-				parseInputReport(receivePacket); // This will update the rawAccelX, etc variables depending on which feature
-									// report is found
-				return receivePacket ;
+			if (receivePacket.getHeader()[2] == CHANNEL_REPORTS
+					&& receivePacket.getBody()[0] == SHTP_REPORT_BASE_TIMESTAMP) {
+				parseInputReport(receivePacket); // This will update the rawAccelX, etc variables depending on which
+													// feature report is found
+				return receivePacket;
 			} else {
 				parseCommandReport(receivePacket); // This will update responses to commands, calibrationStatus, etc.
 				return receivePacket;
@@ -406,15 +424,30 @@ public class BNO080SPIDevice {
 	}
 
 	/**
-	 * Unit responds with packet that contains the following: shtpHeader[0:3]:
-	 * First, a 4 byte header shtpData[0]: The Report ID shtpData[1]: Sequence
-	 * number (See 6.5.18.2) shtpData[2]: Command shtpData[3]: Command Sequence
-	 * Number shtpData[4]: Response Sequence Number shtpData[5 + 0]: R0 shtpData[5 +
-	 * 1]: R1 shtpData[5 + 2]: R2 shtpData[5 + 3]: R3 shtpData[5 + 4]: R4 shtpData[5
-	 * + 5]: R5 shtpData[5 + 6]: R6 shtpData[5 + 7]: R7 shtpData[5 + 8]: R8
+	 * Unit responds with packet that contains the following
 	 */
+	// shtpHeader[0:3]: First, a 4 byte header
+	// shtpData[0]: The Report ID
+	// shtpData[1]: Sequence number (See 6.5.18.2)
+	// shtpData[2]: Command
+	// shtpData[3]: Command Sequence Number
+	// shtpData[4]: Response Sequence Number
+	// shtpData[5 + 0]: R0
+	// shtpData[5 + 1]: R1
+	// shtpData[5 + 2]: R2
+	// shtpData[5 + 3]: R3
+	// shtpData[5 + 4]: R4
+	// shtpData[5 + 5]: R5
+	// shtpData[5 + 6]: R6
+	// shtpData[5 + 7]: R7
+	// shtpData[5 + 8]: R8
 	private void parseCommandReport(ShtpPacket packet) {
 		int[] shtpData = packet.getBody();
+		System.out.println("parseCommandReport: header");
+		printShtpPacketPart("header", packet.getHeader());
+		System.out.println("parseCommandReport: body");
+		printShtpPacketPart("body", packet.getBody());
+		System.out.println("parseCommandReport: end");
 		if ((shtpData[0] & 0xFF) == SHTP_REPORT_COMMAND_RESPONSE) {
 			// The BNO080 responds with this report to command requests. It's up to use to
 			// remember which command we issued.
@@ -518,29 +551,46 @@ public class BNO080SPIDevice {
 
 	}
 
-	private void setFeatureCommand(int reportId, int timeBetweenReports) throws InterruptedException, IOException {
+	/**
+	 * Given a sensor's report ID, this tells the BNO080 to begin reporting the
+	 * values Also sets the specific config word. Useful for personal activity
+	 * classifier
+	 *
+	 *
+	 * @param reportId
+	 *            - report id uint8_t
+	 * @param timeBetweenReports
+	 *            - time between reports uint16_t
+	 * @param sc
+	 *            - contains specific config (uint32_t)
+	 * @throws InterruptedException
+	 *             exception
+	 * @throws IOException
+	 *             exception
+	 */
+	private void setFeatureCommand(int reportId, int timeBetweenReports, int specificConfig)
+			throws InterruptedException, IOException {
 
-		int specificConfig = 0;
-		int microsBetweenReports = (int) (timeBetweenReports * 1000L);
+		long microsBetweenReports = timeBetweenReports * 1000L;
 
-		byte[] packetBody = new PacketBodyBuilder(17)
-				.addElement(SHTP_REPORT_SET_FEATURE_COMMAND)		// Set feature command. Reference page 55
-				.addElement(reportId)								// Feature Report ID. 0x01 = Accelerometer, 0x05 = Rotation vector
-				.addElement(0)										// Feature flags
-				.addElement(0)										// Change sensitivity (LSB)
-				.addElement(0)										// Change sensitivity (MSB)
-				.addElement((microsBetweenReports >> 0) & 0xFF)		// Report interval (LSB) in microseconds. 0x7A120 = 500ms
-				.addElement((microsBetweenReports >> 8) & 0xFF)		// Report interval
-				.addElement((microsBetweenReports >> 16) & 0xFF)	// Report interval
-				.addElement((microsBetweenReports >> 24) & 0xFF)	// Report interval (MSB)
-				.addElement(0)										// Batch Interval (LSB)
-				.addElement(0)										// Batch Interval
-				.addElement(0)										// Batch Interval
-				.addElement(0)										// Batch Interval (MSB)
-				.addElement((specificConfig >> 0) & 0xFF)			// Sensor-specific config (LSB)
-				.addElement((specificConfig >> 8) & 0xFF)			// Sensor-specific config
-				.addElement((specificConfig >> 16) & 0xFF)			// Sensor-specific config
-				.addElement((specificConfig >> 24) & 0xFF)			// Sensor-specific config (MSB)
+		byte[] packetBody = new PacketBodyBuilder(17).addElement(SHTP_REPORT_SET_FEATURE_COMMAND) // Set feature
+																									// command.
+				.addElement(reportId) // Feature Report ID. 0x01 = Accelerometer, 0x05 = Rotation vector
+				.addElement(0) // Feature flags
+				.addElement(0) // Change sensitivity (LSB)
+				.addElement(0) // Change sensitivity (MSB)
+				.addElement((int) (microsBetweenReports & 0xFF)) // Report interval (LSB) in microseconds. 0x7A120=500ms
+				.addElement((int) (microsBetweenReports >> 8) & 0xFF) // Report interval
+				.addElement((int) (microsBetweenReports >> 16) & 0xFF) // Report interval
+				.addElement((int) (microsBetweenReports >> 24) & 0xFF) // Report interval (MSB)
+				.addElement(0) // Batch Interval (LSB)
+				.addElement(0) // Batch Interval
+				.addElement(0) // Batch Interval
+				.addElement(0) // Batch Interval (MSB)
+				.addElement(specificConfig & 0xFF) // Sensor-specific config (LSB)
+				.addElement((specificConfig >> 8) & 0xFF) // Sensor-specific config
+				.addElement((specificConfig >> 16) & 0xFF) // Sensor-specific config
+				.addElement((specificConfig >> 24) & 0xFF) // Sensor-specific config (MSB)
 				.build();
 
 		// Transmit packet on channel 2, 17 bytes
@@ -576,7 +626,7 @@ public class BNO080SPIDevice {
 	private void printArray(String message, byte[] array) {
 		System.out.print("printArray: " + message);
 		for (int i = 0; i < array.length; i++) {
-			System.out.print(" " + (array[i] & 0xFF) + ",");
+			System.out.print(" " + Integer.toHexString(array[i] & 0xFF) + ",");
 		}
 		System.out.print("\n");
 	}
@@ -584,7 +634,7 @@ public class BNO080SPIDevice {
 	private boolean sendPacket(byte channelNumber, byte[] data, String message)
 			throws InterruptedException, IOException {
 		System.out.println(String.format("sendPacket from: %s channelNumber: %d", message, channelNumber));
-		int packetLength = (data.length + SHTP_HEADER_SIZE) & 0xFF; 			// Add four bytes for the header
+		int packetLength = (data.length + SHTP_HEADER_SIZE) & 0xFF; // Add four bytes for the header
 
 		// Wait for BNO080 to indicate it is available for communication
 		if (!waitForSPI()) {
@@ -598,37 +648,38 @@ public class BNO080SPIDevice {
 		byte[] spiHeader = createSpiHeader(packetLength, channelNumber);
 		spiDevice.write(spiHeader);
 
-//		byte[] bodyBytes = new byte[dataLength];
-//		for (int i = 0; i < dataLength; i++) {
-//			bodyBytes[i] = (byte) (shtpData[i]);
-//		}
-		byte[] writenBytes = spiDevice.write(data);
-		printArray("sendPacket writenBytes: ", writenBytes);
+		// byte[] bodyBytes = new byte[dataLength];
+		// for (int i = 0; i < dataLength; i++) {
+		// bodyBytes[i] = (byte) (shtpData[i]);
+		// }
+		printArray("sendPacket data: ", data);
+		spiDevice.write(data);
 		csGpio.setState(PinState.HIGH);
 		return true;
 	}
 
 	private byte[] createSpiHeader(int packetLength, byte channelNumber) {
 		byte[] header = new byte[SHTP_HEADER_SIZE];
-		header[0] = (byte) (packetLength & 0xFF); 	// LSB
-		header[1] = (byte) (packetLength >> 8); 	// MSB
-		header[2] = channelNumber; 					// Channel Number
+		header[0] = (byte) (packetLength & 0xFF); // LSB
+		header[1] = (byte) (packetLength >> 8); // MSB
+		header[2] = channelNumber; // Channel Number
 		// Send the sequence number, increments with each packet sent, different counter
 		// for each channel
 		header[3] = (byte) (sequenceNumber[channelNumber]++); // Sequence Numbera
 		return header;
 	}
 
-	private void printShtpPacketBody(int[] data){
-		switch (data[0]){
-			case SHTP_REPORT_PRODUCT_ID_RESPONSE:
-				System.out.println("printShtpPacketBody: SHTP_REPORT_PRODUCT_ID_RESPONSE: " + Integer.toHexString(data[0]));
-				break;
-			default:
-				System.out.println("printShtpPacketBody: not implemented: " + Integer.toHexString(data[0]));
+	private void printShtpPacketPart(String prefix, int[] data) {
+		switch (data[0]) {
+		case SHTP_REPORT_PRODUCT_ID_RESPONSE:
+			System.out.println("printShtpPacketPart:" + prefix + ":SHTP_REPORT_PRODUCT_ID_RESPONSE: "
+					+ Integer.toHexString(data[0]));
+			break;
+		default:
+			System.out.println("printShtpPacketPart:" + prefix + ":not implemented: " + Integer.toHexString(data[0]));
 		}
 		for (int i = 0; i < data.length; i++) {
-			System.out.println("printShtpPacketBody body[" + i + "]:" + Integer.toHexString(data[i]));
+			System.out.println("printShtpPacketPart" + prefix + "::[" + i + "]:" + Integer.toHexString(data[i]));
 		}
 
 	}
@@ -659,9 +710,9 @@ public class BNO080SPIDevice {
 		int sequenceNumber = spiDevice.write((byte) 0xFF)[0]; // Not sure if we need to store this or not
 
 		// Calculate the number of data bytes in this packet
-//		 int dataLength = (packetMSB << 8 | packetLSB);
-//		 dataLength &= ~(1 << 15); 												// Clear the MSbit.
-//		 int dataLength = ((packetMSB & 0xFFFF) << 8) | packetLSB ;
+		// int dataLength = (packetMSB << 8 | packetLSB);
+		// dataLength &= ~(1 << 15); // Clear the MSbit.
+		// int dataLength = ((packetMSB & 0xFFFF) << 8) | packetLSB ;
 		int dataLength = calculateNumberOfBytesInPacket(packetMSB, packetLSB);
 		// This bit indicates if this package is a continuation of the last. Ignore it
 		// for now.
@@ -683,11 +734,15 @@ public class BNO080SPIDevice {
 			}
 		}
 
-		for (int i = 0; i < dataLength; i++) {
-			spiDevice.write((byte) 0xFF);
-			counter++;
+		/*
+		 * looks like we need to flush the header
+		 */
+		for (int i = 0; i <= SHTP_HEADER_SIZE; i++) {
+			byte flushByte = spiDevice.write((byte) 0xFF)[0];
+			System.out.println("receivedPacket: flush" + Integer.toHexString(flushByte));
 		}
 		csGpio.setState(PinState.HIGH); // Release BNO080
+
 
 		return shtpPacket; // we are done
 
@@ -695,8 +750,8 @@ public class BNO080SPIDevice {
 
 	private int calculateNumberOfBytesInPacket(int packetMSB, int packetLSB) {
 		// Calculate the number of data bytes in this packet
-		int dataLength = ((packetMSB & 0xFF) << 8 | packetLSB) & 0xFFFF;
-		dataLength &= ~(1 << 15) & 0xFF; 									// Clear the MSbit.
+		int dataLength = (0xFFFF & ((packetMSB & 0xFF) << 8) | packetLSB) & 0xFFFF;
+		dataLength &= ~(1 << 15) & 0xFF; // Clear the MSbit.
 		return dataLength;
 	}
 }
