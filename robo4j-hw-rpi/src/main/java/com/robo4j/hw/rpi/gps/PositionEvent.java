@@ -16,8 +16,6 @@
  */
 package com.robo4j.hw.rpi.gps;
 
-import com.robo4j.hw.rpi.serial.gps.Location;
-
 /**
  * Event for the position.
  * 

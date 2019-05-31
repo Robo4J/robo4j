@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import com.robo4j.hw.rpi.gps.GPS;
+import com.robo4j.hw.rpi.gps.Location;
 import com.robo4j.hw.rpi.gps.PositionEvent;
 import com.robo4j.hw.rpi.gps.AbstractGPSEvent;
 
