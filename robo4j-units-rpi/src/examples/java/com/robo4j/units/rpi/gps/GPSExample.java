@@ -22,7 +22,7 @@ import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.hw.rpi.serial.gps.GPSEvent;
+import com.robo4j.hw.rpi.gps.AbstractGPSEvent;
 import com.robo4j.units.rpi.gps.GPSRequest.Operation;
 import com.robo4j.util.SystemUtil;
 
@@ -50,7 +50,7 @@ public class GPSExample {
 		System.out.println(SystemUtil.printStateReport(ctx));
 
 		RoboReference<GPSRequest> gps = ctx.getReference(ID_GPS);
-		RoboReference<GPSEvent> processor = ctx.getReference(ID_PROCESSOR);
+		RoboReference<AbstractGPSEvent> processor = ctx.getReference(ID_PROCESSOR);
 
 		System.out.println("Press enter to start requesting events, then press enter again to stop requesting events!");
 		System.in.read();

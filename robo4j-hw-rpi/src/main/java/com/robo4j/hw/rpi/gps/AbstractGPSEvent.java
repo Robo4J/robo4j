@@ -14,32 +14,31 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.serial.gps;
+package com.robo4j.hw.rpi.gps;
+
+import com.robo4j.hw.rpi.serial.gps.MTK3339PositionEvent;
+import com.robo4j.hw.rpi.serial.gps.MTK3339VelocityEvent;
 
 /**
- * Listener to listen for GPS information.
- * 
- * @see GPS
+ * Abstract super class for GPS event classes.
+ *
+ * @see MTK3339PositionEvent
+ * @see MTK3339VelocityEvent
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public interface GPSListener {
-	/**
-	 * Callback for receiving position updates.
-	 * 
-	 * @param event
-	 *            an event describing the position.
-	 * @see PositionEvent
-	 */
-	void onEvent(PositionEvent<?> event);
+public abstract class AbstractGPSEvent {
+	public static final float INVALID_VALUE = Float.NaN;
 
-	/**
-	 * Callback for receiving velocity updates.
-	 * 
-	 * @param event
-	 *            an event describing the velocity.
-	 * @see VelocityEvent
-	 */
-	void onEvent(VelocityEvent<?> event);
+	private final GPS source;
+
+	public AbstractGPSEvent(GPS source) {
+		this.source = source;
+	}
+
+	public final GPS getSource() {
+		return source;
+	}
+
 }

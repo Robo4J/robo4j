@@ -18,10 +18,10 @@ package com.robo4j.hw.rpi.serial.gps;
 
 import java.io.IOException;
 
-import com.robo4j.hw.rpi.serial.gps.GPS;
-import com.robo4j.hw.rpi.serial.gps.GPSListener;
-import com.robo4j.hw.rpi.serial.gps.PositionEvent;
-import com.robo4j.hw.rpi.serial.gps.VelocityEvent;
+import com.robo4j.hw.rpi.gps.GPS;
+import com.robo4j.hw.rpi.gps.GPSListener;
+import com.robo4j.hw.rpi.gps.PositionEvent;
+import com.robo4j.hw.rpi.gps.VelocityEvent;
 
 /**
  * Listens for GPS event and prints them to stdout as they come.
@@ -29,24 +29,23 @@ import com.robo4j.hw.rpi.serial.gps.VelocityEvent;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-@SuppressWarnings(value = {"rawtypes"})
 public class GPSTest {
 	public static void main(String[] args) throws InterruptedException, IOException {
-		GPS gps = new GPS();
-		gps.addListener(new GPSListener() {
+		GPS mtk3339gps = new MTK3339GPS();
+		mtk3339gps.addListener(new GPSListener() {
 			@Override
-			public void onEvent(PositionEvent event) {
+			public void onPosition(PositionEvent event) {
 				System.out.println(event);
 			}
 
 			@Override
-			public void onEvent(VelocityEvent event) {
+			public void onVelocity(VelocityEvent event) {
 				System.out.println(event);
 			}
 		});
-		gps.startAutoUpdate();
+		mtk3339gps.start();
 		System.out.println("Press enter to quit!");
 		System.in.read();
-		gps.shutdown();
+		mtk3339gps.shutdown();
 	}
 }

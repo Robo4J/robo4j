@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
- *
+ * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
+ * 
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -8,34 +8,37 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.serial.gps;
+package com.robo4j.hw.rpi.gps;
+
+import com.robo4j.hw.rpi.serial.gps.Location;
 
 /**
- * Abstract super class for GPS event classes.
- *
- * @see PositionEvent
- * @see VelocityEvent
+ * Event for the position.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public abstract class GPSEvent {
-	public static final float INVALID_VALUE = Float.NaN;
+public interface PositionEvent extends GPSEvent {
 
-	private final GPS source;
+	/**
+	 * Returns the 2D location on earth.
+	 * 
+	 * @return the 2D location on earth.
+	 * 
+	 * @see Location
+	 */
+	Location getLocation();
 
-	GPSEvent(GPS source) {
-		this.source = source;
-	}
-
-	public final GPS getSource() {
-		return source;
-	}
-
+	/**
+	 * Returns the antenna altitude above/below mean sea level in meters.
+	 * 
+	 * @return the antenna altitude above/below mean sea level in meters.
+	 */
+	float getAltitude();
 }

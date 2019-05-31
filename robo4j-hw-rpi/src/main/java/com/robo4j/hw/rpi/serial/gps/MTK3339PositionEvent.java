@@ -21,13 +21,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import com.robo4j.hw.rpi.gps.GPS;
+import com.robo4j.hw.rpi.gps.PositionEvent;
+import com.robo4j.hw.rpi.gps.AbstractGPSEvent;
+
 /**
  * A GPS event describing position data.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class PositionEvent<R> extends GPSEvent {
+public final class MTK3339PositionEvent extends AbstractGPSEvent implements PositionEvent {
 	private Date time;
 	private FixQuality fixQuality;
 	private Location location;
@@ -61,7 +65,7 @@ public final class PositionEvent<R> extends GPSEvent {
 	 * @param data
 	 *            the raw GPS data.
 	 */
-	public PositionEvent(GPS source, String data) {
+	public MTK3339PositionEvent(GPS source, String data) {
 		super(source);
 		parse(data);
 	}
@@ -143,20 +147,22 @@ public final class PositionEvent<R> extends GPSEvent {
 	public AccuracyCategory getAccuracyCategory() {
 		return accuracyCategory;
 	}
-	
+
 	/**
-	 * Returns an estimate of the max error for the location in this measurement, in meters.
+	 * Returns an estimate of the max error for the location in this
+	 * measurement, in meters.
 	 *
 	 * @return max error estimate
 	 */
 	public float getMaxError() {
-		return hdop * GPS.UNAIDED_POSITION_ACCURACY;
+		return hdop * MTK3339GPS.UNAIDED_POSITION_ACCURACY;
 	}
 
 	@Override
 	public String toString() {
 		return "Coordinates: " + getLocation() + " alt: " + getAltitude() + "m altWGS84: " + getElipsoidAltitude() + "m FixQuality: "
-				+ getFixQuality() + " #sat: " + getNumberOfSatellites() + " max error: " + getMaxError() + "m accuracy category:" + getAccuracyCategory().getName();
+				+ getFixQuality() + " #sat: " + getNumberOfSatellites() + " max error: " + getMaxError() + "m accuracy category:"
+				+ getAccuracyCategory().getName();
 	}
 
 	protected void parse(String data) {

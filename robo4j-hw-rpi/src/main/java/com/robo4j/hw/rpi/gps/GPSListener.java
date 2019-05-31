@@ -14,32 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.units.rpi.gps;
+package com.robo4j.hw.rpi.gps;
 
-import com.robo4j.ConfigurationException;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboUnit;
-import com.robo4j.configuration.Configuration;
-import com.robo4j.hw.rpi.gps.AbstractGPSEvent;
+import com.robo4j.hw.rpi.serial.gps.MTK3339GPS;
+import com.robo4j.hw.rpi.serial.gps.MTK3339PositionEvent;
+import com.robo4j.hw.rpi.serial.gps.MTK3339VelocityEvent;
 
 /**
- * Example recipient for GPS events.
+ * Listener to listen for GPS information.
+ * 
+ * @see MTK3339GPS
  * 
  * @author Marcus Hirt (@hirt)
- * @author Miroslav Wengner (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  */
-public class GPSProcessor extends RoboUnit<AbstractGPSEvent> {
-	public GPSProcessor(RoboContext context, String id) {
-		super(AbstractGPSEvent.class, context, id);
-	}
+public interface GPSListener {
+	/**
+	 * Callback for receiving position updates.
+	 * 
+	 * @param event
+	 *            an event describing the position.
+	 * @see MTK3339PositionEvent
+	 */
+	void onPosition(PositionEvent event);
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-
-	}
-
-	@Override
-	public void onMessage(AbstractGPSEvent result) {
-		System.out.println("GPSEvent: " + result.toString());
-	}
+	/**
+	 * Callback for receiving velocity updates.
+	 * 
+	 * @param event
+	 *            an event describing the velocity.
+	 * @see MTK3339VelocityEvent
+	 */
+	void onVelocity(VelocityEvent event);
 }
