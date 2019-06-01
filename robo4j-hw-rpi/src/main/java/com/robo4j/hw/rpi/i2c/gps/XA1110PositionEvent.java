@@ -30,9 +30,9 @@ import com.robo4j.hw.rpi.gps.PositionEvent;
  * @author Miro Wengner (@miragemiko)
  */
 public class XA1110PositionEvent extends AbstractGPSEvent implements PositionEvent {
-	static final String POSITION_TAG_GPS_PLUS_GLONASS = "$GNGGL";
-	static final String POSITION_TAG_GPS = "$GPGGL";
-	static final String POSITION_TAG_GLONASS = "$GLGGL";
+	static final String POSITION_TAG_GPS_PLUS_GLONASS = "$GNGGA";
+	static final String POSITION_TAG_GPS = "$GPGGA";
+	static final String POSITION_TAG_GLONASS = "$GLGGA";
 
 	static final String[] ACCEPTED_MESSAGES = { POSITION_TAG_GLONASS, POSITION_TAG_GPS, POSITION_TAG_GPS_PLUS_GLONASS };
 

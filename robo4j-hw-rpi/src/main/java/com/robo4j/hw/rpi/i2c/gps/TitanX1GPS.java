@@ -112,14 +112,9 @@ public class TitanX1GPS implements GPS {
 			builder.setLength(0);
 			StringTokenizer st = new StringTokenizer(str, "\n", true);
 			while (st.hasMoreElements()) {
-				String dataLine = st.nextToken();
-				while ("\n".equals(dataLine) && st.hasMoreElements()) {
-					dataLine = st.nextToken();
-				}
-				if (st.hasMoreElements()) {
+				String dataLine = st.nextToken().trim();
+				if (!dataLine.isEmpty()) {
 					consume(dataLine);
-				} else if (!"\n".equals(dataLine)) {
-					builder.append(dataLine);
 				}
 			}
 		}
