@@ -9,6 +9,8 @@ export ROBO4J_VERSION=0.5
 # Using the 2.0 SNAPSHOT until released
 export PI4J_HOME=~/.m2/repository/com/pi4j/pi4j-core/2.0-SNAPSHOT/
 
+# Pre-defined debug flags
+export REMOTE_DEBUG="-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=*:9876,suspend=y"
 #
 # No changes should be required below
 #
@@ -16,3 +18,4 @@ export ROBO4J_PATH=$PI4J_HOME/*:$ROBO4J_HOME/robo4j-math/build/libs/robo4j-math-
 export _JAVA_OPTIONS="--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED"
 echo Robo4J v$ROBO4J_VERSION
 echo ROBO4J_PATH=$ROBO4J_PATH
+echo REMOTE_DEBUG=$REMOTE_DEBUG
