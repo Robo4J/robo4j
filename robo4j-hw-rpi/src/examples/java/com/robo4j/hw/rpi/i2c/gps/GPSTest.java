@@ -25,7 +25,7 @@ import com.robo4j.hw.rpi.gps.VelocityEvent;
 
 /**
  * Listens for GPS event and prints them to stdout as they come.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */

@@ -34,7 +34,7 @@ import com.robo4j.hw.rpi.gps.VelocityEvent;
 
 /**
  * The GPS class for the SparkFun GPS.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
@@ -78,8 +78,9 @@ public class TitanX1GPS implements GPS {
 		synchronized (internalExecutor) {
 			if (scheduledFuture == null) {
 				scheduledFuture = internalExecutor.scheduleAtFixedRate(retriever, 0, READ_INTERVAL, TimeUnit.MILLISECONDS);
+			} else {
+				throw new IllegalStateException("Already running!");
 			}
-			throw new IllegalStateException("Already running!");
 		}
 	}
 
