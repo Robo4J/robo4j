@@ -72,6 +72,11 @@ public final class MTK3339VelocityEvent extends AbstractGPSEvent implements Velo
 	}
 
 	@Override
+	public float getHeading() {
+		return getTrueTrackMadeGood();
+	}
+
+	@Override
 	public String toString() {
 		return String.format("True: %.1f\u00B0 Magnetic: %.1f\u00B0 Speed: %.1f km/h", getTrueTrackMadeGood(), getMagneticTrackMadeGood(),
 				getGroundSpeed());
@@ -93,8 +98,4 @@ public final class MTK3339VelocityEvent extends AbstractGPSEvent implements Velo
 		return Float.parseFloat(string);
 	}
 
-	@Override
-	public float getHeading() {
-		return getTrueTrackMadeGood();
-	}
 }

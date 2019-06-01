@@ -14,39 +14,37 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.gps;
+package com.robo4j.hw.rpi.i2c.gps;
 
-/**
- * Interface for GPSes.
- * 
- * @author Marcus Hirt (@hirt)
- * @author Miro Wengner (@miragemiko)
- */
-public interface GPS {
-	/**
-	 * Adds a new listener to this GPS.
-	 * 
-	 * @param gpsListener
-	 *            the listener to listen for GPS data.
-	 */
-	void addListener(GPSListener gpsListener);
+import java.util.ArrayList;
+import java.util.List;
 
-	/**
-	 * Removes a listener from this GPS.
-	 * 
-	 * @param gpsListener
-	 *            the listener to remove.
-	 */
-	void removeListener(GPSListener gpsListener);
+import com.robo4j.hw.rpi.gps.GPS;
+import com.robo4j.hw.rpi.gps.GPSListener;
 
-	/**
-	 * Starts receiving updates from the GPS.
-	 */
-	void start();
+public class MockGPS implements GPS {
+	List<GPSListener> listeners = new ArrayList<>();
 
-	/**
-	 * Shuts down this GPS.
-	 */
-	void shutdown();
+	@Override
+	public void addListener(GPSListener gpsListener) {
+		listeners.add(gpsListener);
+	}
 
+	@Override
+	public void removeListener(GPSListener gpsListener) {
+		listeners.remove(gpsListener);
+	}
+
+	@Override
+	public void start() {
+	}
+
+	@Override
+	public void shutdown() {
+	}
+
+	@Override
+	public String toString() {
+		return "Mock GPS";
+	}
 }

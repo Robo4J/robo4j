@@ -32,13 +32,13 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class SparkFunXA1110Device extends AbstractI2CDevice {
+class SparkFunXA1110Device extends AbstractI2CDevice {
 	public enum NmeaSentenceType {
 		//@formatter:off
 		GEOPOS("GLL", "Geographic Position - Latitude longitude", 0),
 		RECOMMENDED_MIN_SPEC("RMC", "Recomended Minimum Specific GNSS Sentence", 1),
 		COURSE_AND_SPEED("VTG", "Course Over Ground and Ground Speed", 2),
-		FIX_DATA("GGA", "Fix Data", 3),
+		FIX_DATA("GGA", "Fix Data (also includes location and UTC time)", 3),
 		DOPS_SAT("GSA", "DOPS and Active Satelites", 4),
 		SATS_IN_VIEW("GSV", "Satellites in View", 5),
 		RANGE_RESIDUALS("GRS", "Range Residuals", 6),
@@ -273,23 +273,21 @@ public class SparkFunXA1110Device extends AbstractI2CDevice {
 	 * @throws IOException
 	 *             if there was a communication problem.
 	 */
-	private void readGpsData(StringBuilder builder) throws IOException {
+	void readGpsData(StringBuilder builder) throws IOException {
 		byte[] buffer = new byte[READ_BUFFER_SIZE];
 		int bytesRead = 0;
 		while ((bytesRead = i2cDevice.read(buffer, 0, buffer.length)) > 0) {
-//			System.out.println("Read bytes=" + bytesRead);
 			String readStr = new String(buffer, 0, bytesRead, CHARSET).trim();
 			if (readStr.isEmpty()) {
 				break;
 			}
-//			System.out.println(readStr);
 			builder.append(readStr);
 		}
 	}
 
 	private void init() throws IOException {
 		System.out.println("Initializing device");
-		sendMtkPacket(createNmeaSentencesAndFrequenciesMtkPacket(new NmeaSetting(NmeaSentenceType.GEOPOS, 1),
+		sendMtkPacket(createNmeaSentencesAndFrequenciesMtkPacket(new NmeaSetting(NmeaSentenceType.FIX_DATA, 1),
 				new NmeaSetting(NmeaSentenceType.COURSE_AND_SPEED, 1)));
 
 	}

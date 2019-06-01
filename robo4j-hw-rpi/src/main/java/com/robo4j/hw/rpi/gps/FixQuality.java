@@ -17,36 +17,25 @@
 package com.robo4j.hw.rpi.gps;
 
 /**
- * Interface for GPSes.
+ * Quality of the sat fix.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public interface GPS {
-	/**
-	 * Adds a new listener to this GPS.
-	 * 
-	 * @param gpsListener
-	 *            the listener to listen for GPS data.
-	 */
-	void addListener(GPSListener gpsListener);
+public final class FixQuality {
+	private final int qualityCode;
+	private final String description;
 
-	/**
-	 * Removes a listener from this GPS.
-	 * 
-	 * @param gpsListener
-	 *            the listener to remove.
-	 */
-	void removeListener(GPSListener gpsListener);
+	public FixQuality(int qualityCode, String description) {
+		this.qualityCode = qualityCode;
+		this.description = description;
+	}
 
-	/**
-	 * Starts receiving updates from the GPS.
-	 */
-	void start();
+	public int getQualityCode() {
+		return qualityCode;
+	}
 
-	/**
-	 * Shuts down this GPS.
-	 */
-	void shutdown();
-
+	public String getDescription() {
+		return description;
+	}
 }

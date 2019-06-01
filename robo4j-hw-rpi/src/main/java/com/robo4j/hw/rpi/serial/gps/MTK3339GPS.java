@@ -33,6 +33,7 @@ import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialFactory;
 import com.robo4j.hw.rpi.gps.GPS;
 import com.robo4j.hw.rpi.gps.GPSListener;
+import com.robo4j.hw.rpi.gps.NmeaUtils;
 
 /**
  * Code to talk to the Adafruit "ultimate GPS" over the serial port.
@@ -115,26 +116,12 @@ public class MTK3339GPS implements GPS {
 		initialize();
 	}
 
-	/**
-	 * Adds a new listener to listen for GPS data.
-	 *
-	 * @param gpsListener
-	 *            the new listener to add.
-	 *
-	 * @see GPSListener documentation
-	 */
+	@Override
 	public void addListener(GPSListener gpsListener) {
 		listeners.add(gpsListener);
 	}
 
-	/**
-	 * Removes a previously added listener.
-	 *
-	 * @param gpsListener
-	 *            the listener to remove.
-	 *
-	 * @see GPSListener documentation
-	 */
+	@Override
 	public void removeListener(GPSListener gpsListener) {
 		listeners.remove(gpsListener);
 	}
@@ -193,24 +180,6 @@ public class MTK3339GPS implements GPS {
 		serial.open(serialPort, BAUD_DEFAULT);
 	}
 
-	private static boolean hasValidCheckSum(String data) {
-		if (!data.startsWith("$")) {
-			return false;
-		}
-		int indexOfStar = data.indexOf('*');
-		if (indexOfStar <= 0 || indexOfStar >= data.length()) {
-			return false;
-		}
-		String chk = data.substring(1, indexOfStar);
-		String checksumStr = data.substring(indexOfStar + 1);
-		int valid = Integer.parseInt(checksumStr.trim(), 16);
-		int checksum = 0;
-		for (int i = 0; i < chk.length(); i++) {
-			checksum = checksum ^ chk.charAt(i);
-		}
-		return checksum == valid;
-	}
-
 	private void notifyListeners(MTK3339PositionEvent event) {
 		for (GPSListener listener : listeners) {
 			listener.onPosition(event);
@@ -255,9 +224,9 @@ public class MTK3339GPS implements GPS {
 
 		private void consume(String dataLine) {
 			if (dataLine.startsWith("$")) {
-				if (dataLine.startsWith(POSITION_TAG) && hasValidCheckSum(dataLine)) {
+				if (dataLine.startsWith(POSITION_TAG) && NmeaUtils.hasValidCheckSum(dataLine)) {
 					notifyListeners(new MTK3339PositionEvent(MTK3339GPS.this, dataLine));
-				} else if (dataLine.startsWith(VELOCITY_TAG) && hasValidCheckSum(dataLine)) {
+				} else if (dataLine.startsWith(VELOCITY_TAG) && NmeaUtils.hasValidCheckSum(dataLine)) {
 					notifyListeners(new MTK3339VelocityEvent(MTK3339GPS.this, dataLine));
 				}
 			}

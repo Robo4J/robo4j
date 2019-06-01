@@ -39,4 +39,34 @@ public interface PositionEvent extends GPSEvent {
 	 * @return the antenna altitude above/below mean sea level in meters.
 	 */
 	float getAltitude();
+
+	/**
+	 * Returns the horizontal dilution of precision.
+	 * 
+	 * @see AccuracyCategory
+	 * 
+	 * @return the horizontal dilution of precision.
+	 */
+	float getHorizontalDilutionOfPrecision();
+
+	/**
+	 * Returns the fix quality.
+	 * 
+	 * @return the fix quality.
+	 */
+	FixQuality getFixQuality();
+
+	/**
+	 * Returns the number of satellites used.
+	 * 
+	 * @return the number of satellites used.
+	 */
+	int getNumberOfSatellites();
+
+	/**
+	 * Returns the geoidal separation.
+	 * 
+	 * @return the geoidal separation.
+	 */
+	float getGeoidalSeparation();
 }
