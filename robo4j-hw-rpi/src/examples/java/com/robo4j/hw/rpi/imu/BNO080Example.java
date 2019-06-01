@@ -38,7 +38,7 @@ public class BNO080Example {
                 device.enableRotationVector(50);
                 System.out.println("Rotation vector enabled");
                 System.out.println("Output in form i, j, k, real, accuracy");
-                device.startRotationVector(5);
+                device.startRotationVector(25, 3);
                 System.out.println("BNO080 DONE");
             }
         } else {
