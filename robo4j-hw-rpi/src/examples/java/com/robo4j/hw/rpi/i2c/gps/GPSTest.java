@@ -31,7 +31,7 @@ import com.robo4j.hw.rpi.gps.VelocityEvent;
  */
 public class GPSTest {
 	public static void main(String[] args) throws InterruptedException, IOException {
-		GPS sparkFunGPS = new SparkFunTitanX1GPS();
+		GPS sparkFunGPS = new TitanX1GPS();
 		sparkFunGPS.addListener(new GPSListener() {
 			@Override
 			public void onPosition(PositionEvent event) {

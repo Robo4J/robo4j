@@ -36,11 +36,6 @@ public class XA1110VelocityEvent extends AbstractGPSEvent implements VelocityEve
 	private final float heading;
 	private final float groundSpeed;
 
-	/**
-	 * 
-	 * @param source
-	 * @param nemaEncodedLine
-	 */
 	public XA1110VelocityEvent(GPS source, float heading, float groundSpeed) {
 		super(source);
 		this.heading = heading;

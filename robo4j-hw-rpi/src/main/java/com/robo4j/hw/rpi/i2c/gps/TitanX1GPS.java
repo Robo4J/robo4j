@@ -38,10 +38,10 @@ import com.robo4j.hw.rpi.gps.VelocityEvent;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class SparkFunTitanX1GPS implements GPS {
+public class TitanX1GPS implements GPS {
 	private static final long READ_INTERVAL = 1000;
 
-	private final SparkFunXA1110Device device;
+	private final XA1110Device device;
 	private final List<GPSListener> listeners = new CopyOnWriteArrayList<GPSListener>();
 	private final GPSDataRetriever retriever = new GPSDataRetriever();
 
@@ -55,12 +55,12 @@ public class SparkFunTitanX1GPS implements GPS {
 	// This is the scheduled future controlling the auto updates.
 	private ScheduledFuture<?> scheduledFuture;
 
-	public SparkFunTitanX1GPS() throws IOException {
-		this.device = new SparkFunXA1110Device();
+	public TitanX1GPS() throws IOException {
+		this.device = new XA1110Device();
 	}
 
-	public SparkFunTitanX1GPS(int bus, int address) throws IOException {
-		this.device = new SparkFunXA1110Device(bus, address);
+	public TitanX1GPS(int bus, int address) throws IOException {
+		this.device = new XA1110Device(bus, address);
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class SparkFunTitanX1GPS implements GPS {
 			try {
 				str = readNext(builder);
 			} catch (IllegalStateException | IOException e) {
-				Logger.getLogger(SparkFunTitanX1GPS.class.getName()).log(Level.WARNING, "Error reading line", e);
+				Logger.getLogger(TitanX1GPS.class.getName()).log(Level.WARNING, "Error reading line", e);
 			}
 			builder.setLength(0);
 			StringTokenizer st = new StringTokenizer(str, "\n", true);
@@ -127,9 +127,9 @@ public class SparkFunTitanX1GPS implements GPS {
 			if (dataLine.startsWith("$")) {
 				if (hasValidCheckSum(dataLine)) {
 					if (XA1110PositionEvent.isAcceptedLine(dataLine)) {
-						notifyPosition(XA1110PositionEvent.decode(SparkFunTitanX1GPS.this, dataLine));
+						notifyPosition(XA1110PositionEvent.decode(TitanX1GPS.this, dataLine));
 					} else if (XA1110VelocityEvent.isAcceptedLine(dataLine)) {
-						notifyVelocity(XA1110VelocityEvent.decode(SparkFunTitanX1GPS.this, dataLine));
+						notifyVelocity(XA1110VelocityEvent.decode(TitanX1GPS.this, dataLine));
 					}
 				}
 			}

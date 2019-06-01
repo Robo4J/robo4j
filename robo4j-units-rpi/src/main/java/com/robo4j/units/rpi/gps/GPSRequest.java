@@ -17,16 +17,16 @@
 package com.robo4j.units.rpi.gps;
 
 import com.robo4j.RoboReference;
-import com.robo4j.hw.rpi.gps.AbstractGPSEvent;
+import com.robo4j.hw.rpi.gps.GPSEvent;
 
 /**
- * Used to register interest in {@link AbstractGPSEvent}s.
+ * Used to register interest in {@link GPSEvent}s.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class GPSRequest {
-	private final RoboReference<AbstractGPSEvent> target;
+	private final RoboReference<GPSEvent> target;
 	private final Operation operation;
 
 	public enum Operation {
@@ -53,7 +53,7 @@ public final class GPSRequest {
 	 *            operation
 	 * @see Operation
 	 */
-	public GPSRequest(RoboReference<AbstractGPSEvent> target, Operation operation) {
+	public GPSRequest(RoboReference<GPSEvent> target, Operation operation) {
 		this.target = target;
 		this.operation = operation;
 	}
@@ -63,7 +63,7 @@ public final class GPSRequest {
 	 * 
 	 * @return the target for the operation.
 	 */
-	public RoboReference<AbstractGPSEvent> getTarget() {
+	public RoboReference<GPSEvent> getTarget() {
 		return target;
 	}
 

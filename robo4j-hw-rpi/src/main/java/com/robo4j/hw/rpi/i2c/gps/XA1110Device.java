@@ -32,7 +32,7 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-class SparkFunXA1110Device extends AbstractI2CDevice {
+class XA1110Device extends AbstractI2CDevice {
 	public enum NmeaSentenceType {
 		//@formatter:off
 		GEOPOS("GLL", "Geographic Position - Latitude longitude", 0),
@@ -201,11 +201,11 @@ class SparkFunXA1110Device extends AbstractI2CDevice {
 	private static final int DEFAULT_I2C_ADDRESS = 0x10;
 	private static final int READ_BUFFER_SIZE = 64;
 
-	public SparkFunXA1110Device() throws IOException {
+	public XA1110Device() throws IOException {
 		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS);
 	}
 
-	public SparkFunXA1110Device(int bus, int address) throws IOException {
+	public XA1110Device(int bus, int address) throws IOException {
 		super(bus, address);
 		init();
 	}
@@ -293,7 +293,7 @@ class SparkFunXA1110Device extends AbstractI2CDevice {
 	}
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-		SparkFunXA1110Device device = new SparkFunXA1110Device();
+		XA1110Device device = new XA1110Device();
 		Thread t = new Thread(() -> {
 			while (true) {
 				StringBuilder builder = new StringBuilder();

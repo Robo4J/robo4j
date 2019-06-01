@@ -20,15 +20,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import com.robo4j.hw.rpi.i2c.gps.SparkFunXA1110Device.NmeaSentenceType;
-import com.robo4j.hw.rpi.i2c.gps.SparkFunXA1110Device.NmeaSetting;
+import com.robo4j.hw.rpi.i2c.gps.XA1110Device.NmeaSentenceType;
+import com.robo4j.hw.rpi.i2c.gps.XA1110Device.NmeaSetting;
 
 public class TestGPS {
 
 	@Test
 	public void testCreateMTKCommand() {
 		// Also tests the checksum calculation - example from the documentation.
-		String mtkPacket = SparkFunXA1110Device.createMtkPacket(SparkFunXA1110Device.PacketType.TEST, null);
+		String mtkPacket = XA1110Device.createMtkPacket(XA1110Device.PacketType.TEST, null);
 		assertEquals("$PMTK000*32\r\n", mtkPacket);
 	}
 
@@ -37,7 +37,7 @@ public class TestGPS {
 		// Tests that it is possible to create a command packet for controlling
 		// what Nmea packets to receive and at what frequency. Uses example from
 		// the documentation, but corrected, since it was wrong...
-		String mtkPacket = SparkFunXA1110Device.createNmeaSentencesAndFrequenciesMtkPacket(new NmeaSetting(NmeaSentenceType.GEOPOS, 1),
+		String mtkPacket = XA1110Device.createNmeaSentencesAndFrequenciesMtkPacket(new NmeaSetting(NmeaSentenceType.GEOPOS, 1),
 				new NmeaSetting(NmeaSentenceType.RECOMMENDED_MIN_SPEC, 1), new NmeaSetting(NmeaSentenceType.COURSE_AND_SPEED, 1),
 				new NmeaSetting(NmeaSentenceType.FIX_DATA, 1), new NmeaSetting(NmeaSentenceType.DOPS_SAT, 1),
 				new NmeaSetting(NmeaSentenceType.SATS_IN_VIEW, 5), new NmeaSetting(NmeaSentenceType.MTK_DEBUG, 1),
