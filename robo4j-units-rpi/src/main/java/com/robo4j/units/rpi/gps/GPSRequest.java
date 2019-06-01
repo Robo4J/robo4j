@@ -17,7 +17,7 @@
 package com.robo4j.units.rpi.gps;
 
 import com.robo4j.RoboReference;
-import com.robo4j.hw.rpi.serial.gps.GPSEvent;
+import com.robo4j.hw.rpi.gps.GPSEvent;
 
 /**
  * Used to register interest in {@link GPSEvent}s.

@@ -16,13 +16,16 @@
  */
 package com.robo4j.hw.rpi.serial.gps;
 
+import com.robo4j.hw.rpi.gps.AbstractGPSEvent;
+import com.robo4j.hw.rpi.gps.VelocityEvent;
+
 /**
  * An event describing heading and speed relative to the ground.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class VelocityEvent<R> extends GPSEvent {
+public final class MTK3339VelocityEvent extends AbstractGPSEvent implements VelocityEvent {
 	private float trueTrackMadeGood = Float.NaN;
 	private float magneticTrackMadeGood = Float.NaN;
 	private float groundSpeed = Float.NaN;
@@ -35,7 +38,7 @@ public final class VelocityEvent<R> extends GPSEvent {
 	 * @param data
 	 *            the raw GPS data.
 	 */
-	public VelocityEvent(GPS source, String data) {
+	public MTK3339VelocityEvent(MTK3339GPS source, String data) {
 		super(source);
 		parse(data);
 	}
@@ -69,6 +72,11 @@ public final class VelocityEvent<R> extends GPSEvent {
 	}
 
 	@Override
+	public float getHeading() {
+		return getTrueTrackMadeGood();
+	}
+
+	@Override
 	public String toString() {
 		return String.format("True: %.1f\u00B0 Magnetic: %.1f\u00B0 Speed: %.1f km/h", getTrueTrackMadeGood(), getMagneticTrackMadeGood(),
 				getGroundSpeed());
@@ -89,4 +97,5 @@ public final class VelocityEvent<R> extends GPSEvent {
 		}
 		return Float.parseFloat(string);
 	}
+
 }

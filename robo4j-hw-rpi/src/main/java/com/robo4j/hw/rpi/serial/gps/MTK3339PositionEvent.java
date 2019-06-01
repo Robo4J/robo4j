@@ -21,13 +21,21 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import com.robo4j.hw.rpi.gps.AbstractGPSEvent;
+import com.robo4j.hw.rpi.gps.AccuracyCategory;
+import com.robo4j.hw.rpi.gps.FixQuality;
+import com.robo4j.hw.rpi.gps.GPS;
+import com.robo4j.hw.rpi.gps.Location;
+import com.robo4j.hw.rpi.gps.NmeaUtils;
+import com.robo4j.hw.rpi.gps.PositionEvent;
+
 /**
  * A GPS event describing position data.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public final class PositionEvent<R> extends GPSEvent {
+public final class MTK3339PositionEvent extends AbstractGPSEvent implements PositionEvent {
 	private Date time;
 	private FixQuality fixQuality;
 	private Location location;
@@ -40,11 +48,11 @@ public final class PositionEvent<R> extends GPSEvent {
 	/**
 	 * The quality of the GPS fix.
 	 */
-	public enum FixQuality {
+	public enum FixQualityEnum {
 		INVALID, GPS, DGPS, PPS, RTK, FLOAT_RTK, ESTIMATED, MANUAL, SIMULATION;
 
-		public static FixQuality getFixQuality(int code) {
-			for (FixQuality fq : values()) {
+		public static FixQualityEnum getFixQuality(int code) {
+			for (FixQualityEnum fq : values()) {
 				if (fq.ordinal() == code) {
 					return fq;
 				}
@@ -61,7 +69,7 @@ public final class PositionEvent<R> extends GPSEvent {
 	 * @param data
 	 *            the raw GPS data.
 	 */
-	public PositionEvent(GPS source, String data) {
+	public MTK3339PositionEvent(GPS source, String data) {
 		super(source);
 		parse(data);
 	}
@@ -143,20 +151,27 @@ public final class PositionEvent<R> extends GPSEvent {
 	public AccuracyCategory getAccuracyCategory() {
 		return accuracyCategory;
 	}
-	
+
 	/**
-	 * Returns an estimate of the max error for the location in this measurement, in meters.
+	 * Returns an estimate of the max error for the location in this
+	 * measurement, in meters.
 	 *
 	 * @return max error estimate
 	 */
 	public float getMaxError() {
-		return hdop * GPS.UNAIDED_POSITION_ACCURACY;
+		return hdop * MTK3339GPS.UNAIDED_POSITION_ACCURACY;
+	}
+
+	@Override
+	public float getGeoidalSeparation() {
+		return geoidSeparation;
 	}
 
 	@Override
 	public String toString() {
 		return "Coordinates: " + getLocation() + " alt: " + getAltitude() + "m altWGS84: " + getElipsoidAltitude() + "m FixQuality: "
-				+ getFixQuality() + " #sat: " + getNumberOfSatellites() + " max error: " + getMaxError() + "m accuracy category:" + getAccuracyCategory().getName();
+				+ getFixQuality() + " #sat: " + getNumberOfSatellites() + " max error: " + getMaxError() + "m accuracy category:"
+				+ getAccuracyCategory().getName();
 	}
 
 	protected void parse(String data) {
@@ -168,44 +183,21 @@ public final class PositionEvent<R> extends GPSEvent {
 		} catch (ParseException e) {
 			// log
 		}
-		float latitude = parseCrazyHybridFormat(args[2]);
+		float latitude = NmeaUtils.parseNmeaFormatCoordinate(args[2]);
 		if ("S".equals(args[3])) {
 			latitude *= -1;
 		}
-		float longitude = parseCrazyHybridFormat(args[4]);
+		float longitude = NmeaUtils.parseNmeaFormatCoordinate(args[4]);
 		if ("W".equals(args[5])) {
 			longitude *= -1;
 		}
 		location = new Location(latitude, longitude);
-		numberOfSatellites = getInt(args[7]);
-		hdop = getFloat(args[8]);
+		numberOfSatellites = NmeaUtils.getInt(args[7]);
+		hdop = NmeaUtils.getFloat(args[8]);
 		accuracyCategory = AccuracyCategory.fromDOP(hdop);
-		altitude = getFloat(args[9]);
-		geoidSeparation = getFloat(args[11]);
-		fixQuality = FixQuality.getFixQuality(Integer.parseInt(args[6]));
-	}
-
-	private int getInt(String string) {
-		if (string == null || "".equals(string)) {
-			return -1;
-		}
-		return Integer.parseInt(string);
-	}
-
-	private float getFloat(String string) {
-		if (string == null || "".equals(string)) {
-			return Float.NaN;
-		}
-		return Float.parseFloat(string);
-	}
-
-	private static float parseCrazyHybridFormat(String string) {
-		int index = string.indexOf('.');
-		if (index < 0) {
-			return Float.NaN;
-		}
-		float minutes = Float.parseFloat(string.substring(index - 2));
-		float degrees = Integer.parseInt(string.substring(0, index - 2));
-		return degrees + minutes / 60.0f;
+		altitude = NmeaUtils.getFloat(args[9]);
+		geoidSeparation = NmeaUtils.getFloat(args[11]);
+		FixQualityEnum fixQualityEnum = FixQualityEnum.getFixQuality(Integer.parseInt(args[6]));
+		fixQuality = new FixQuality(fixQualityEnum.ordinal(), fixQualityEnum.toString());
 	}
 }

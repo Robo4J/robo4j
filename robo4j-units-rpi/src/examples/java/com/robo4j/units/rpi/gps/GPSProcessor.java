@@ -20,7 +20,7 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.hw.rpi.serial.gps.GPSEvent;
+import com.robo4j.hw.rpi.gps.AbstractGPSEvent;
 
 /**
  * Example recipient for GPS events.
@@ -28,9 +28,9 @@ import com.robo4j.hw.rpi.serial.gps.GPSEvent;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class GPSProcessor extends RoboUnit<GPSEvent> {
+public class GPSProcessor extends RoboUnit<AbstractGPSEvent> {
 	public GPSProcessor(RoboContext context, String id) {
-		super(GPSEvent.class, context, id);
+		super(AbstractGPSEvent.class, context, id);
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class GPSProcessor extends RoboUnit<GPSEvent> {
 	}
 
 	@Override
-	public void onMessage(GPSEvent result) {
+	public void onMessage(AbstractGPSEvent result) {
 		System.out.println("GPSEvent: " + result.toString());
 	}
 }

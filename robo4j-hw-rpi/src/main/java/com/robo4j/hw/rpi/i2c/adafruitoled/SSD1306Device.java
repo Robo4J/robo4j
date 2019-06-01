@@ -81,21 +81,31 @@ public class SSD1306Device extends AbstractI2CDevice {
 	}
 
 	private enum Commands {
-		DISPLAY_OFF((byte) 0xae), DISPLAY_ON((byte) 0xaf), INVERTED_ON((byte) 0xa7), INVERTED_OFF(
-				(byte) 0xa6), SET_DISPLAY_CLOCK_DIV((byte) 0xd5), CHARGE_PUMP((byte) 0x8d), MEMORY_MODE(
-						(byte) 0x20), SEGMENT_REMAP_0((byte) 0xa0), SEGMENT_REMAP_127((byte) 0xa1), SET_MULTIPLEX_RATIO(
-								(byte) 0xa8), SET_DISPLAY_OFFSET((byte) 0xd3), SET_START_LINE_ZERO(
-										(byte) 0x40), COM_OUTPUT_SCAN_DIR_ASCENDING(
-												(byte) 0xc0), COM_OUTPUT_SCAN_DIR_DESCENDING((byte) 0xc8), SET_COM_PINS(
-														(byte) 0xda), SET_CONTRAST((byte) 0x81), SET_PRE_CHARGE_PERIOD(
-																(byte) 0xd9), SET_VCOM_DESELECT_LEVEL(
-																		(byte) 0xdb), RAM_CONTENT_DISPLAY(
-																				(byte) 0xa4), ENTIRE_DISPLAY_ON(
-																						(byte) 0xa5), DEACTIVATE_SCROLL(
-																								(byte) 0x2e), SET_COLUMN_ADDRESS(
-																										(byte) 0x21), SET_PAGE_ADDRESS(
-																												(byte) 0x22);
-
+		//@formatter:off
+		DISPLAY_OFF((byte) 0xae), 
+		DISPLAY_ON((byte) 0xaf), 
+		INVERTED_ON((byte) 0xa7), 
+		INVERTED_OFF((byte) 0xa6), 
+		SET_DISPLAY_CLOCK_DIV((byte) 0xd5), 
+		CHARGE_PUMP((byte) 0x8d), 
+		MEMORY_MODE((byte) 0x20), 
+		SEGMENT_REMAP_0((byte) 0xa0), 
+		SEGMENT_REMAP_127((byte) 0xa1), 
+		SET_MULTIPLEX_RATIO((byte) 0xa8), 
+		SET_DISPLAY_OFFSET((byte) 0xd3), 
+		SET_START_LINE_ZERO((byte) 0x40), 
+		COM_OUTPUT_SCAN_DIR_ASCENDING((byte) 0xc0), 
+		COM_OUTPUT_SCAN_DIR_DESCENDING((byte) 0xc8), 
+		SET_COM_PINS((byte) 0xda), 
+		SET_CONTRAST((byte) 0x81), 
+		SET_PRE_CHARGE_PERIOD((byte) 0xd9), 
+		SET_VCOM_DESELECT_LEVEL((byte) 0xdb), 
+		RAM_CONTENT_DISPLAY((byte) 0xa4), 
+		ENTIRE_DISPLAY_ON((byte) 0xa5), 
+		DEACTIVATE_SCROLL((byte) 0x2e), 
+		SET_COLUMN_ADDRESS((byte) 0x21), 
+		SET_PAGE_ADDRESS((byte) 0x22);
+		//@formatter:on
 		private byte commandValue;
 
 		Commands(byte commandValue) {
@@ -149,15 +159,14 @@ public class SSD1306Device extends AbstractI2CDevice {
 	 * @param resetPinId
 	 *            the GPIO pin used for reset (depends on your wiring).
 	 * @param useExternalVCC
-	 *            use external VCC to drive the OLED. If false, the internal charge
-	 *            pump will be used to regulate to the necessary voltage. This is
-	 *            most commonly false.
+	 *            use external VCC to drive the OLED. If false, the internal
+	 *            charge pump will be used to regulate to the necessary voltage.
+	 *            This is most commonly false.
 	 * 
 	 * @throws IOException
 	 *             if there was a communication problem.
 	 */
-	public SSD1306Device(int bus, int address, OLEDVariant oledType, Pin resetPinId, boolean useExternalVCC)
-			throws IOException {
+	public SSD1306Device(int bus, int address, OLEDVariant oledType, Pin resetPinId, boolean useExternalVCC) throws IOException {
 		super(bus, address);
 		this.image = new BufferedImage(oledType.getWidth(), oledType.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
 		this.resetPin = gpio.provisionDigitalOutputPin(resetPinId, "reset", PinState.HIGH);
@@ -168,8 +177,8 @@ public class SSD1306Device extends AbstractI2CDevice {
 
 	/**
 	 * @return the graphics context upon which to draw. This being a monochrome
-	 *         display, only the colors {@link Color}.black and {@link Color} .white
-	 *         should be used.
+	 *         display, only the colors {@link Color}.black and {@link Color}
+	 *         .white should be used.
 	 */
 	public Graphics2D getGraphicsContext() {
 		return image.createGraphics();

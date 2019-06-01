@@ -22,7 +22,7 @@ import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.hw.rpi.serial.gps.GPSEvent;
+import com.robo4j.hw.rpi.gps.GPSEvent;
 import com.robo4j.units.rpi.gps.GPSRequest.Operation;
 import com.robo4j.util.SystemUtil;
 
@@ -38,7 +38,7 @@ public class GPSExample {
 
 	public static void main(String[] args) throws RoboBuilderException, IOException {
 		RoboBuilder builder = new RoboBuilder();
-		builder.add(GPSUnit.class, ID_GPS);
+		builder.add(MtkGPSUnit.class, ID_GPS);
 		builder.add(GPSProcessor.class, ID_PROCESSOR);
 		RoboContext ctx = builder.build();
 

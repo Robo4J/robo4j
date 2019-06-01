@@ -16,10 +16,6 @@
  */
 package com.robo4j.hw.rpi.serial.gps;
 
-import com.pi4j.concurrent.ExecutorServiceFactory;
-import com.pi4j.io.serial.Serial;
-import com.pi4j.io.serial.SerialFactory;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -32,6 +28,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.pi4j.concurrent.ExecutorServiceFactory;
+import com.pi4j.io.serial.Serial;
+import com.pi4j.io.serial.SerialFactory;
+import com.robo4j.hw.rpi.gps.GPS;
+import com.robo4j.hw.rpi.gps.GPSListener;
+import com.robo4j.hw.rpi.gps.NmeaUtils;
+
 /**
  * Code to talk to the Adafruit "ultimate GPS" over the serial port.
  * FIXME(Marcus/Dec 5, 2016): Should perhaps be moved to type specific package /
@@ -41,8 +44,7 @@ import java.util.logging.Logger;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-@SuppressWarnings(value = { "rawtypes" })
-public class GPS {
+public class MTK3339GPS implements GPS {
 	/**
 	 * The position accuracy without any
 	 */
@@ -55,9 +57,9 @@ public class GPS {
 
 	/**
 	 * The default serial port is /dev/serial0. Since Raspberry Pi 3 nabbed the
-	 * /dev/ttyAMA0 for the bluetooth, serial0 should be the new logical name to use
-	 * for the rx/tx pins. This is supposedly compatible with the older Raspberry
-	 * Pis as well.
+	 * /dev/ttyAMA0 for the bluetooth, serial0 should be the new logical name to
+	 * use for the rx/tx pins. This is supposedly compatible with the older
+	 * Raspberry Pis as well.
 	 */
 	public static final String DEFAULT_GPS_PORT = "/dev/serial0";
 
@@ -84,13 +86,13 @@ public class GPS {
 	private ScheduledFuture<?> scheduledFuture;
 
 	/**
-	 * Creates a new GPS instance. Will use an internal thread to read data, and the
-	 * default read interval.
+	 * Creates a new GPS instance. Will use an internal thread to read data, and
+	 * the default read interval.
 	 *
 	 * @throws IOException
 	 *             exception
 	 */
-	public GPS() throws IOException {
+	public MTK3339GPS() throws IOException {
 		this(DEFAULT_GPS_PORT, DEFAULT_READ_INTERVAL);
 	}
 
@@ -105,7 +107,7 @@ public class GPS {
 	 * @throws IOException
 	 *             exception
 	 */
-	public GPS(String serialPort, int readInterval) throws IOException {
+	public MTK3339GPS(String serialPort, int readInterval) throws IOException {
 		this.serialPort = serialPort;
 		this.readInterval = readInterval;
 		serial = SerialFactory.createInstance();
@@ -114,33 +116,19 @@ public class GPS {
 		initialize();
 	}
 
-	/**
-	 * Adds a new listener to listen for GPS data.
-	 *
-	 * @param gpsListener
-	 *            the new listener to add.
-	 *
-	 * @see GPSListener documentation
-	 */
+	@Override
 	public void addListener(GPSListener gpsListener) {
 		listeners.add(gpsListener);
 	}
 
-	/**
-	 * Removes a previously added listener.
-	 *
-	 * @param gpsListener
-	 *            the listener to remove.
-	 *
-	 * @see GPSListener documentation
-	 */
+	@Override
 	public void removeListener(GPSListener gpsListener) {
 		listeners.remove(gpsListener);
 	}
 
 	/**
-	 * Shuts down the GPS listener. After the shutdown is completed, no more events
-	 * will be sent to listeners.
+	 * Shuts down the GPS listener. After the shutdown is completed, no more
+	 * events will be sent to listeners.
 	 */
 	public void shutdown() {
 		synchronized (internalExecutor) {
@@ -151,7 +139,8 @@ public class GPS {
 		}
 		try {
 			serial.close();
-			// // FIXME(Marcus/Jul 30, 2017): This is kinda scary to do in a component!
+			// // FIXME(Marcus/Jul 30, 2017): This is kinda scary to do in a
+			// component!
 			serviceFactory.shutdown();
 		} catch (IllegalStateException | IOException e) {
 			// Don't care, we're shutting down.
@@ -168,8 +157,8 @@ public class GPS {
 	}
 
 	/**
-	 * Call this to perform a read of data from the device in the current thread.
-	 * Use this for scheduling reads yourself.
+	 * Call this to perform a read of data from the device in the current
+	 * thread. Use this for scheduling reads yourself.
 	 */
 	public void update() {
 		dataRetriever.update();
@@ -178,11 +167,10 @@ public class GPS {
 	/**
 	 * Call this to start reading automatically, using an internal scheduler.
 	 */
-	public void startAutoUpdate() {
+	public void start() {
 		synchronized (internalExecutor) {
 			if (scheduledFuture == null) {
-				scheduledFuture = internalExecutor.scheduleAtFixedRate(dataRetriever, 0, readInterval,
-						TimeUnit.MILLISECONDS);
+				scheduledFuture = internalExecutor.scheduleAtFixedRate(dataRetriever, 0, readInterval, TimeUnit.MILLISECONDS);
 			}
 			throw new IllegalStateException("Auto update already started!");
 		}
@@ -192,33 +180,15 @@ public class GPS {
 		serial.open(serialPort, BAUD_DEFAULT);
 	}
 
-	private static boolean hasValidCheckSum(String data) {
-		if (!data.startsWith("$")) {
-			return false;
-		}
-		int indexOfStar = data.indexOf('*');
-		if (indexOfStar <= 0 || indexOfStar >= data.length()) {
-			return false;
-		}
-		String chk = data.substring(1, indexOfStar);
-		String checksumStr = data.substring(indexOfStar + 1);
-		int valid = Integer.parseInt(checksumStr.trim(), 16);
-		int checksum = 0;
-		for (int i = 0; i < chk.length(); i++) {
-			checksum = checksum ^ chk.charAt(i);
-		}
-		return checksum == valid;
-	}
-
-	private void notifyListeners(PositionEvent<?> event) {
+	private void notifyListeners(MTK3339PositionEvent event) {
 		for (GPSListener listener : listeners) {
-			listener.onEvent(event);
+			listener.onPosition(event);
 		}
 	}
 
-	private void notifyListeners(VelocityEvent<?> event) {
+	private void notifyListeners(MTK3339VelocityEvent event) {
 		for (GPSListener listener : listeners) {
-			listener.onEvent(event);
+			listener.onVelocity(event);
 		}
 	}
 
@@ -235,7 +205,7 @@ public class GPS {
 			try {
 				str = readNext(builder);
 			} catch (IllegalStateException | IOException e) {
-				Logger.getLogger(GPS.class.getName()).log(Level.WARNING, "Error reading line", e);
+				Logger.getLogger(MTK3339GPS.class.getName()).log(Level.WARNING, "Error reading line", e);
 			}
 			builder.setLength(0);
 			StringTokenizer st = new StringTokenizer(str, "\n", true);
@@ -254,10 +224,10 @@ public class GPS {
 
 		private void consume(String dataLine) {
 			if (dataLine.startsWith("$")) {
-				if (dataLine.startsWith(POSITION_TAG) && hasValidCheckSum(dataLine)) {
-					notifyListeners(new PositionEvent(GPS.this, dataLine));
-				} else if (dataLine.startsWith(VELOCITY_TAG) && hasValidCheckSum(dataLine)) {
-					notifyListeners(new VelocityEvent(GPS.this, dataLine));
+				if (dataLine.startsWith(POSITION_TAG) && NmeaUtils.hasValidCheckSum(dataLine)) {
+					notifyListeners(new MTK3339PositionEvent(MTK3339GPS.this, dataLine));
+				} else if (dataLine.startsWith(VELOCITY_TAG) && NmeaUtils.hasValidCheckSum(dataLine)) {
+					notifyListeners(new MTK3339VelocityEvent(MTK3339GPS.this, dataLine));
 				}
 			}
 		}
