@@ -33,11 +33,11 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.hw.rpi.serial.gps.GPS;
-import com.robo4j.hw.rpi.serial.gps.GPSEvent;
-import com.robo4j.hw.rpi.serial.gps.GPSListener;
-import com.robo4j.hw.rpi.serial.gps.PositionEvent;
-import com.robo4j.hw.rpi.serial.gps.VelocityEvent;
+import com.robo4j.hw.rpi.gps.GPSEvent;
+import com.robo4j.hw.rpi.gps.GPSListener;
+import com.robo4j.hw.rpi.gps.PositionEvent;
+import com.robo4j.hw.rpi.gps.VelocityEvent;
+import com.robo4j.hw.rpi.serial.gps.MTK3339GPS;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.math.geometry.Tuple3f;
 
@@ -47,7 +47,7 @@ import com.robo4j.math.geometry.Tuple3f;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class GPSUnit extends RoboUnit<GPSRequest> {
+public class MtkGPSUnit extends RoboUnit<GPSRequest> {
 	/**
 	 * This key configures the approximate update interval, or how often to
 	 * schedule reads from the serial port.
@@ -74,12 +74,12 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 	/**
 	 * This is the default value for the read interval.
 	 */
-	public static final int DEFAULT_READ_INTERVAL = GPS.DEFAULT_READ_INTERVAL;
+	public static final int DEFAULT_READ_INTERVAL = MTK3339GPS.DEFAULT_READ_INTERVAL;
 
 	/**
 	 * This is the default value for the serial port.
 	 */
-	public static final String DEFAULT_SERIAL_PORT = GPS.DEFAULT_GPS_PORT;
+	public static final String DEFAULT_SERIAL_PORT = MTK3339GPS.DEFAULT_GPS_PORT;
 
 	/**
 	 * This attribute will provide the state of the read interval.
@@ -89,7 +89,7 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 	public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
 			.unmodifiableCollection(Arrays.asList(DefaultAttributeDescriptor.create(Tuple3f.class, ATTRIBUTE_NAME_READ_INTERVAL)));
 
-	private GPS gps;
+	private MTK3339GPS mtk3339gps;
 	private String serialPort;
 	private int readInterval = DEFAULT_READ_INTERVAL;
 	private List<GPSEventListener> listeners = new ArrayList<>();
@@ -97,7 +97,6 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 	// The future, if scheduled with the platform scheduler
 	private volatile ScheduledFuture<?> scheduledFuture;
 
-	@SuppressWarnings("rawtypes")
 	private static class GPSEventListener implements GPSListener {
 		private RoboReference<GPSEvent> target;
 
@@ -106,17 +105,17 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 		}
 
 		@Override
-		public void onEvent(PositionEvent event) {
+		public void onPosition(PositionEvent event) {
 			target.sendMessage(event);
 		}
 
 		@Override
-		public void onEvent(VelocityEvent event) {
+		public void onVelocity(VelocityEvent event) {
 			target.sendMessage(event);
 		}
 	}
 
-	public GPSUnit(RoboContext context, String id) {
+	public MtkGPSUnit(RoboContext context, String id) {
 		super(GPSRequest.class, context, id);
 	}
 
@@ -128,14 +127,15 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 		boolean usePlatformScheduler = PROPERTY_VALUE_PLATFORM_SCHEDULER.equals(scheduler);
 
 		try {
-			gps = new GPS(serialPort, readInterval);
+			mtk3339gps = new MTK3339GPS(serialPort, readInterval);
 		} catch (IOException e) {
 			throw new ConfigurationException("Could not instantiate GPS!", e);
 		}
 		if (usePlatformScheduler) {
-			scheduledFuture = getContext().getScheduler().scheduleAtFixedRate(() -> gps.update(), 10, readInterval, TimeUnit.MILLISECONDS);
+			scheduledFuture = getContext().getScheduler().scheduleAtFixedRate(() -> mtk3339gps.update(), 10, readInterval,
+					TimeUnit.MILLISECONDS);
 		} else {
-			gps.startAutoUpdate();
+			mtk3339gps.start();
 		}
 	}
 
@@ -175,7 +175,7 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 		if (scheduledFuture != null) {
 			scheduledFuture.cancel(false);
 		}
-		gps.shutdown();
+		mtk3339gps.shutdown();
 		super.shutdown();
 	}
 
@@ -185,7 +185,7 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 		for (GPSEventListener listener : copy) {
 			if (targetReference.equals(listener.target)) {
 				listeners.remove(listener);
-				gps.removeListener(listener);
+				mtk3339gps.removeListener(listener);
 				// I guess you could theoretically have several registered to
 				// the same target, so let's keep checking...
 			}
@@ -195,6 +195,6 @@ public class GPSUnit extends RoboUnit<GPSRequest> {
 	private synchronized void register(RoboReference<GPSEvent> targetReference) {
 		GPSEventListener listener = new GPSEventListener(targetReference);
 		listeners.add(listener);
-		gps.addListener(listener);
+		mtk3339gps.addListener(listener);
 	}
 }

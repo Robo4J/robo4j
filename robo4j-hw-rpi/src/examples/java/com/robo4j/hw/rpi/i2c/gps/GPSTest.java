@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.serial.gps;
+package com.robo4j.hw.rpi.i2c.gps;
 
 import java.io.IOException;
 
@@ -25,14 +25,14 @@ import com.robo4j.hw.rpi.gps.VelocityEvent;
 
 /**
  * Listens for GPS event and prints them to stdout as they come.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GPSTest {
 	public static void main(String[] args) throws InterruptedException, IOException {
-		GPS mtk3339gps = new MTK3339GPS();
-		mtk3339gps.addListener(new GPSListener() {
+		GPS sparkFunGPS = new TitanX1GPS();
+		sparkFunGPS.addListener(new GPSListener() {
 			@Override
 			public void onPosition(PositionEvent event) {
 				System.out.println(event);
@@ -43,9 +43,9 @@ public class GPSTest {
 				System.out.println(event);
 			}
 		});
-		mtk3339gps.start();
+		sparkFunGPS.start();
 		System.out.println("Press enter to quit!");
 		System.in.read();
-		mtk3339gps.shutdown();
+		sparkFunGPS.shutdown();
 	}
 }
