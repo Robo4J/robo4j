@@ -35,18 +35,22 @@ public final class NmeaUtils {
 		if (!data.startsWith("$")) {
 			return false;
 		}
-		int indexOfStar = data.indexOf('*');
-		if (indexOfStar <= 0 || indexOfStar >= data.length()) {
+		try {
+			int indexOfStar = data.indexOf('*');
+			if (indexOfStar <= 0 || indexOfStar >= data.length()) {
+				return false;
+			}
+			String chk = data.substring(1, indexOfStar);
+			String checksumStr = data.substring(indexOfStar + 1);
+			int valid = Integer.parseInt(checksumStr.trim(), 16);
+			int checksum = 0;
+			for (int i = 0; i < chk.length(); i++) {
+				checksum = checksum ^ chk.charAt(i);
+			}
+			return checksum == valid;
+		} catch (Exception e) {
 			return false;
 		}
-		String chk = data.substring(1, indexOfStar);
-		String checksumStr = data.substring(indexOfStar + 1);
-		int valid = Integer.parseInt(checksumStr.trim(), 16);
-		int checksum = 0;
-		for (int i = 0; i < chk.length(); i++) {
-			checksum = checksum ^ chk.charAt(i);
-		}
-		return checksum == valid;
 	}
 
 	public static int getInt(String string) {
@@ -73,4 +77,12 @@ public final class NmeaUtils {
 		return degrees + minutes / 60.0f;
 	}
 
+	public static String cleanLine(String dataLine) {
+		// We only attempt to recover the first part, and only if it looks
+		// like it could be an ok string.
+		if (dataLine.startsWith("$")) {
+			return dataLine.substring(0, Math.min(dataLine.indexOf('*') + 3, dataLine.length()));
+		}
+		return dataLine;
+	}
 }

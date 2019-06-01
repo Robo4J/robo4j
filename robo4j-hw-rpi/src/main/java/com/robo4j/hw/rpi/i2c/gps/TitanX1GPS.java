@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 import com.robo4j.hw.rpi.gps.GPS;
 import com.robo4j.hw.rpi.gps.GPSListener;
+import com.robo4j.hw.rpi.gps.NmeaUtils;
 import com.robo4j.hw.rpi.gps.PositionEvent;
 import com.robo4j.hw.rpi.gps.VelocityEvent;
 
@@ -114,14 +115,15 @@ public class TitanX1GPS implements GPS {
 			while (st.hasMoreElements()) {
 				String dataLine = st.nextToken().trim();
 				if (!dataLine.isEmpty()) {
-					consume(dataLine);
+					String line = NmeaUtils.cleanLine(dataLine);
+					consume(line);
 				}
 			}
 		}
 
 		private void consume(String dataLine) {
 			if (dataLine.startsWith("$")) {
-				if (hasValidCheckSum(dataLine)) {
+				if (NmeaUtils.hasValidCheckSum(dataLine)) {
 					if (XA1110PositionEvent.isAcceptedLine(dataLine)) {
 						notifyPosition(XA1110PositionEvent.decode(TitanX1GPS.this, dataLine));
 					} else if (XA1110VelocityEvent.isAcceptedLine(dataLine)) {
@@ -135,24 +137,6 @@ public class TitanX1GPS implements GPS {
 			device.readGpsData(builder);
 			return builder.toString();
 		}
-	}
-
-	private static boolean hasValidCheckSum(String data) {
-		if (!data.startsWith("$")) {
-			return false;
-		}
-		int indexOfStar = data.indexOf('*');
-		if (indexOfStar <= 0 || indexOfStar >= data.length()) {
-			return false;
-		}
-		String chk = data.substring(1, indexOfStar);
-		String checksumStr = data.substring(indexOfStar + 1);
-		int valid = Integer.parseInt(checksumStr.trim(), 16);
-		int checksum = 0;
-		for (int i = 0; i < chk.length(); i++) {
-			checksum = checksum ^ chk.charAt(i);
-		}
-		return checksum == valid;
 	}
 
 	private void notifyPosition(PositionEvent event) {

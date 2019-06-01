@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import com.robo4j.hw.rpi.gps.GPS;
+import com.robo4j.hw.rpi.gps.MockGPS;
 import com.robo4j.hw.rpi.gps.NmeaUtils;
 import com.robo4j.hw.rpi.gps.PositionEvent;
 import com.robo4j.hw.rpi.gps.VelocityEvent;
