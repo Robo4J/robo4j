@@ -17,32 +17,36 @@
 
 package com.robo4j.hw.rpi.imu;
 
+import com.robo4j.hw.rpi.imu.bno.ShtpPacketResponse;
 import com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice;
 
 /**
- * SparkFun BNO080 QWIIC VR IMU
- * RotationVector example
- *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class BNO080Example {
-
     public static void main(String[] args) throws Exception {
+
+
+        BNO80DeviceListener listener = (ShtpPacketResponse response ) -> {
+                BNO080SPIDevice.printArray("HEADER",response.getHeader());
+                BNO080SPIDevice.printArray("BODY",response.getBody());
+        };
+
         System.out.println("BNO080 Example");
         BNO080SPIDevice device = new BNO080SPIDevice();
-        if(device.configureSpiPins()){
-            if(!device.beginSPI()){
-                System.out.println("BNO080 over SPI not detected. Are you sure you have all 6 connections? Freezing...");
-            } else {
-                device.enableRotationVector(50);
-                System.out.println("Rotation vector enabled");
-                System.out.println("Output in form i, j, k, real, accuracy");
-                device.startRotationVector(25, 3);
-                System.out.println("BNO080 DONE");
-            }
-        } else {
-            System.out.println("BNO080 not configured");
+        BNO080SPIDevice.SensorReport sensorReport = BNO080Device.SensorReport.ROTATION_VECTOR;
+        device.addListener(listener);
+//        if(device.start(sensorReport, 50)){
+        if(device.singleStart(sensorReport, 50)){
+            System.out.println("READY TO RECEIVE: " + sensorReport);
         }
+
+//        System.out.println("FLUSH");
+//        device.sendForceSensorFlush(BNO080Device.SensorReport.ROTATION_VECTOR);
+        System.out.println("Press enter to quit!");
+        System.in.read();
+        device.shutdown();
+
     }
 }

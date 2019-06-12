@@ -29,10 +29,22 @@ import com.pi4j.io.spi.SpiChannel;
 import com.pi4j.io.spi.SpiDevice;
 import com.pi4j.io.spi.SpiMode;
 import com.pi4j.io.spi.impl.SpiDeviceImpl;
+import com.robo4j.hw.rpi.imu.BNO080Device;
+import com.robo4j.hw.rpi.imu.BNO80DeviceListener;
+import com.robo4j.hw.rpi.imu.bno.ShtpPacketRequest;
+import com.robo4j.hw.rpi.imu.bno.ShtpPacketResponse;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Abstraction for a BNO080 absolute orientation device.
@@ -51,59 +63,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BNO080SPIDevice {
-
-	private static final class ShtpPacket {
-		private final int[] header = new int[SHTP_HEADER_SIZE];
-		private int[] body;
-
-		ShtpPacket(int size) {
-			this.body = new int[size];
-		}
-
-		void addHeader(int... header) {
-			if (header.length != this.header.length) {
-				System.out.println("ShtpPacket: wrong header");
-			} else {
-				this.header[0] = header[0];
-				this.header[1] = header[1];
-				this.header[2] = header[2];
-				this.header[3] = header[3];
-			}
-
-		}
-
-		void addBody(int pos, int element) {
-			body[pos] = element;
-		}
-
-		int[] getHeader() {
-			return header;
-		}
-
-		int[] getBody() {
-			return body;
-		}
-
-		boolean dataAvailable() {
-			return body.length > 0;
-		}
-	}
+public class BNO080SPIDevice implements BNO080Device {
 
 	private static final class PacketBodyBuilder {
-		private byte[] body;
+		private int[] body;
 		private final AtomicInteger counter = new AtomicInteger();
 
 		PacketBodyBuilder(int size) {
-			body = new byte[size];
+			body = new int[size];
 		}
 
 		PacketBodyBuilder addElement(int value) {
-			this.body[counter.getAndIncrement()] = (byte) value;
+			this.body[counter.getAndIncrement()] = value;
 			return this;
 		}
 
-		byte[] build() {
+		int[] build() {
 			return body;
 		}
 	}
@@ -111,72 +86,25 @@ public class BNO080SPIDevice {
 	public static final SpiMode DEFAULT_SPI_MODE = SpiMode.MODE_3;
 	public static final int DEFAULT_SPI_SPEED = 3000000; // 3MHz maximum SPI speed
 	public static final short CHANNEL_COUNT = 6; // BNO080 supports 6 channels
+	public static final int SHTP_HEADER_SIZE = 4;
 
-	// Registers
-	private static final byte CHANNEL_COMMAND = 0;
-	private static final byte CHANNEL_EXECUTABLE = 1;
-	private static final byte CHANNEL_CONTROL = 2;
-	private static final byte CHANNEL_REPORTS = 3;
-	private static final byte CHANNEL_WAKE_REPORTS = 4;
-	private static final byte CHANNEL_GYRO = 5;
-
-	// All the ways we can configure or talk to the BNO080, figure 34, page 36
-	// reference manual
-	// These are used for low level communication with the sensor, on channel 2
-	private static final int SHTP_REPORT_COMMAND_RESPONSE = 0xF1;
-	private static final int SHTP_REPORT_COMMAND_REQUEST = 0xF2;
-	private static final int SHTP_REPORT_FRS_READ_RESPONSE = 0xF3;
-	private static final int SHTP_REPORT_FRS_READ_REQUEST = 0xF4;
-	private static final int SHTP_REPORT_PRODUCT_ID_RESPONSE = 0xF8;
-	private static final int SHTP_REPORT_PRODUCT_ID_REQUEST = 0xF9;
-	private static final int SHTP_REPORT_BASE_TIMESTAMP = 0xFB;
-	private static final int SHTP_REPORT_SET_FEATURE_COMMAND = 0xFD;
-
-	// All the different sensors and features we can get reports from
-	// These are used when enabling a given sensor
-	private static final int SENSOR_REPORTID_ACCELEROMETER = 0x01;
-	private static final int SENSOR_REPORTID_GYROSCOPE = 0x02;
-	private static final int SENSOR_REPORTID_MAGNETIC_FIELD = 0x03;
-	private static final int SENSOR_REPORTID_LINEAR_ACCELERATION = 0x04;
-	private static final int SENSOR_REPORTID_ROTATION_VECTOR = 0x05;
-	private static final int SENSOR_REPORTID_GRAVITY = 0x06;
-	private static final int SENSOR_REPORTID_GAME_ROTATION_VECTOR = 0x08;
-	private static final int SENSOR_REPORTID_GEOMAGNETIC_ROTATION_VECTOR = 0x09;
-	private static final int SENSOR_REPORTID_TAP_DETECTOR = 0x10;
-	private static final int SENSOR_REPORTID_STEP_COUNTER = 0x11;
-	private static final int SENSOR_REPORTID_STABILITY_CLASSIFIER = 0x13;
-	private static final int SENSOR_REPORTID_PERSONAL_ACTIVITY_CLASSIFIER = 0x1E;
-
-	// Record IDs from figure 29, page 29 reference manual
-	// These are used to begin the metadata for each sensor type
-	private static final int FRS_RECORDID_ACCELEROMETER = 0xE302;
-	private static final int FRS_RECORDID_GYROSCOPE_CALIBRATED = 0xE306;
-	private static final int FRS_RECORDID_MAGNETIC_FIELD_CALIBRATED = 0xE309;
-	private static final int FRS_RECORDID_ROTATION_VECTOR = 0xE30B;
-
-	// Command IDs from section 6.4, page 42
-	// These are used to calibrate, initialize, set orientation, tare etc the sensor
-	private static final int COMMAND_ERRORS = 1;
-	private static final int COMMAND_COUNTER = 2;
-	private static final int COMMAND_TARE = 3;
-	private static final int COMMAND_INITIALIZE = 4;
-	private static final int COMMAND_DCD = 6;
-	private static final int COMMAND_ME_CALIBRATE = 7;
-	private static final int COMMAND_DCD_PERIOD_SAVE = 9;
-	private static final int COMMAND_OSCILLATOR = 10;
-	private static final int COMMAND_CLEAR_DCD = 11;
-
-	private static final int CALIBRATE_ACCEL = 0;
-	private static final int CALIBRATE_GYRO = 1;
-	private static final int CALIBRATE_MAG = 2;
-	private static final int CALIBRATE_PLANAR_ACCEL = 3;
-	private static final int CALIBRATE_ACCEL_GYRO_MAG = 4;
-	private static final int CALIBRATE_STOP = 5;
-
-	private static final int MAX_PACKET_SIZE = 255; // Packets can be up to 32k but we don't have that much RAM.
 	private static final int MAX_METADATA_SIZE = 9; // This is in words. There can be many but we mostly only care about
-													// the first 9 (Qs, range, etc)
-	private static final int SHTP_HEADER_SIZE = 4;
+	// the first 9 (Qs, range, etc)
+	private static final int MAX_PACKET_SIZE = 128 - SHTP_HEADER_SIZE;
+	private static final int READ_INTERVAL = 2000;
+	private static final int AWAIT_TERMINATION = 10;
+
+	private final int[] sequenceByChannel = new int[CHANNEL_COUNT];
+	private final List<BNO80DeviceListener> listeners = new CopyOnWriteArrayList<>();
+	private int commandSequenceNumber = 0;
+
+	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, (r) -> {
+		Thread t = new Thread(r, "BNO080 Internal Executor");
+		t.setDaemon(true);
+		return t;
+	});
+
+	private ScheduledFuture<?> scheduledFuture;
 
 	// These Q values are defined in the datasheet but can also be obtained by
 	// querying the meta data records
@@ -190,10 +118,11 @@ public class BNO080SPIDevice {
 	private SpiDevice spiDevice;
 	private GpioController gpio;
 	private GpioPinDigitalInput intGpio;
+//	private GpioPinDigitalOutput mosiGpio;
+//	private GpioPinDigitalOutput clkGpio;
 	private GpioPinDigitalOutput wakeGpio;
 	private GpioPinDigitalOutput rstGpio;
 	private GpioPinDigitalOutput csGpio; // select slave SS = chip select CS
-	private int[] sequenceByChannel = new int[CHANNEL_COUNT];
 
 	// unit8_t
 	private int stabilityClassifier;
@@ -212,14 +141,234 @@ public class BNO080SPIDevice {
 	// uint32_t
 	private int timeStamp;
 	private long startTime;
+	private AtomicBoolean active = new AtomicBoolean(false);
+
+	private final AtomicLong measurements = new AtomicLong();
 
 	public BNO080SPIDevice() throws IOException, InterruptedException {
-		this(SpiChannel.CS0, DEFAULT_SPI_SPEED, DEFAULT_SPI_MODE);
+		this(SpiChannel.CS1, DEFAULT_SPI_SPEED, DEFAULT_SPI_MODE);
 	}
 
 	public BNO080SPIDevice(SpiChannel spiChannel, int speed, SpiMode mode) throws IOException {
 		spiDevice = new SpiDeviceImpl(spiChannel, speed, mode);
 		gpio = GpioFactory.getInstance();
+	}
+
+	/**
+	 *
+	 */
+	private boolean sendCalibrateCommandAll() throws InterruptedException, IOException {
+		Register register = Register.COMMAND;
+		ShtpPacketRequest packet = prepareShtpPacketRequest(register, 12);
+		packet.addBody(0, ShtpReport.COMMAND_REQUEST.getCode());
+		packet.addBody(0, commandSequenceNumber++);
+		packet.addBody(2, DeviceCommand.ME_CALIBRATE.getId());
+		packet.addBody(3, 1 & 0xFF);
+		packet.addBody(4, 1 & 0xFF);
+		packet.addBody(5, 1 & 0xFF);
+		return sendPacket(register, packet, "sendCalibrateCommand");
+	}
+
+	@Override
+	public boolean start(SensorReport sensorReport, int reportDelay) {
+		CountDownLatch latch = new CountDownLatch(1);
+		executor.execute(() -> {
+			if (!active.get()) {
+				boolean initState = init();
+				if (initState) {
+					enableSensorReport(sensorReport, reportDelay);
+					latch.countDown();
+				}
+				active.set(initState);
+				System.out.println("Start: active= " + initState);
+			}
+		});
+		try {
+			latch.await(2, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		int sleep = 1000;
+		synchronized (executor) {
+			executor.execute(() -> {
+				while (active.get()) {
+					ShtpPacketResponse packet = dataAvailable();
+					if (packet.dataAvailable()) {
+						for (BNO80DeviceListener l : listeners) {
+							l.onResponse(packet);
+						}
+					} else {
+						try {
+							TimeUnit.MILLISECONDS.sleep(sleep);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			});
+		}
+
+		return active.get();
+	}
+
+	@Override
+	public void shutdown() {
+		synchronized (executor) {
+			active.set(false);
+			awaitTermination();
+		}
+	}
+
+	public void addListener(BNO80DeviceListener listener) {
+		listeners.add(listener);
+	}
+
+	public void waitForInterrupt(String message) throws InterruptedException, IOException {
+		if (waitForSPI()) {
+			// Wait for assertion of INT before reading advert message.
+			receivePacket();
+		} else {
+			System.out.println("ERROR waitForInterrupt:" + message);
+		}
+	}
+
+	public void sendProductIdRequest() throws InterruptedException, IOException {
+		// Check communication with device
+		// bytes: Request the product ID and reset info, Reserved
+		ShtpPacketRequest requestPacket = getProductIdRequest();
+
+		// Transmit packet on channel 2, 2 bytes
+		sendPacket(Register.CONTROL, requestPacket, "beginSPI:CHANNEL_CONTROL:SHTP_REPORT_PRODUCT_ID_REQUEST");
+
+	}
+
+	public boolean singleStart(SensorReport sensorReport, int reportDelay) {
+		CountDownLatch latch = new CountDownLatch(1);
+		int sleep = 1000;
+		executor.execute(() -> {
+			if (!active.get()) {
+				boolean initState = init();
+				if (initState) {
+					enableSensorReport(sensorReport, reportDelay);
+					System.out.println("INIT DONE");
+					latch.countDown();
+				}
+				active.set(initState);
+				System.out.println("Start: active= " + initState);
+			}
+
+
+			while (active.get()) {
+				ShtpPacketResponse packet = dataAvailable();
+				// try {
+				// if(sendSensorReportRequest(sensorReport)){
+				// System.out.println("BingSINGLE REPORT DONE");
+				// }
+				// } catch (InterruptedException e) {
+				// e.printStackTrace();
+				// } catch (IOException e) {
+				// e.printStackTrace();
+				// }
+				if (packet.dataAvailable()) {
+					for (BNO80DeviceListener l : listeners) {
+						l.onResponse(packet);
+					}
+				}
+				try {
+					TimeUnit.MILLISECONDS.sleep(sleep);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		return active.get();
+	}
+
+
+	public boolean beginSPI() throws InterruptedException, IOException {
+		boolean state = prepareForSpi();
+		if (state) {
+			sendProductIdRequest();
+			boolean active = true;
+			int counter = 0;
+			while (active){
+				ShtpPacketResponse response = receivePacket();
+				boolean correctResponse = containsResponseCode(response, ShtpReport.PRODUCT_ID_RESPONSE);
+				if(correctResponse){
+					active = false;
+				} else {
+					counter++;
+				}
+				TimeUnit.MILLISECONDS.sleep(1000);
+			}
+			System.out.println("beginSPI counter:" + counter);
+//			return containsResponseCode(response);
+			return true;
+		}
+		return false;
+
+	}
+
+
+
+	private boolean containsResponseCode(ShtpPacketResponse response, ShtpReport expectedReport){
+		if (response.dataAvailable()) {
+			ShtpReport report = ShtpReport.getByCode(response.getBodyFirst());
+			return expectedReport.equals(report);
+		} else {
+			System.out.println("containsResponseCode: No Data");
+		}
+		return false;
+	}
+
+	public boolean sendSensorReportRequest(SensorReport sensorReport) throws InterruptedException, IOException {
+		boolean state = prepareForSpi();
+		if (state) {
+			sendGetFeatureRequest(sensorReport);
+			ShtpPacketResponse response = receivePacket();
+			return containsResponseCode(response);
+		}
+		return false;
+	}
+
+	public boolean sendSensorReportWithTime(SensorReport sensorReport, int interval)
+			throws InterruptedException, IOException {
+		boolean state = prepareForSpi();
+		if (state) {
+			enableSensorReport(sensorReport, interval);
+			ShtpPacketResponse response = receivePacket();
+			return containsResponseCode(response);
+		}
+		return false;
+	}
+
+	public void enableSensorReport(SensorReport report, int timeBetweenReport) {
+		try {
+			sendFeatureCommand(report, timeBetweenReport, 0);
+		} catch (InterruptedException | IOException e) {
+			System.out.println(String.format("enableSensorReport:%s", e.getMessage()));
+		}
+	}
+
+	public void sendForceSensorFlush(SensorReport sensor) throws InterruptedException, IOException {
+		sendReport(ShtpReport.FORCE_SENSOR_FLUSH, sensor);
+	}
+
+	public void sendGetFeatureRequest(SensorReport sensor) throws InterruptedException, IOException {
+		sendReport(ShtpReport.GET_FEATURE_REQUEST, sensor);
+		System.out.println(String.format("sendGetFeatureRequest:%s", sensor));
+	}
+
+	private boolean init() {
+		try {
+			return configureSpiPins() && beginSPI();
+//			return true;
+		} catch (IOException | InterruptedException e) {
+			System.err.println(String.format("init e: %s", e));
+			return false;
+		}
 	}
 
 	/**
@@ -230,7 +379,7 @@ public class BNO080SPIDevice {
 	 * @throws InterruptedException
 	 *             exception
 	 */
-	public boolean configureSpiPins() throws IOException, InterruptedException {
+	private boolean configureSpiPins() throws IOException, InterruptedException {
 		return configureSpiPins(RaspiPin.GPIO_00, RaspiPin.GPIO_25, RaspiPin.GPIO_02, RaspiPin.GPIO_03);
 	}
 
@@ -254,35 +403,102 @@ public class BNO080SPIDevice {
 	 */
 	private boolean configureSpiPins(Pin wake, Pin cs, Pin rst, Pin inter) throws IOException, InterruptedException {
 		System.out.println(String.format("configurePins: wak=%s, cs=%s, rst=%s, inter=%s", wake, cs, rst, inter));
-		intGpio = gpio.provisionDigitalInputPin(inter, "INT", PinPullResistance.PULL_UP);
 		csGpio = gpio.provisionDigitalOutputPin(cs, "CS");
-		wakeGpio = gpio.provisionDigitalOutputPin(wake, "WAKE");
+//		wakeGpio = gpio.provisionDigitalOutputPin(wake, "WAKE");
+		intGpio = gpio.provisionDigitalInputPin(inter, "INT", PinPullResistance.PULL_UP);
 		rstGpio = gpio.provisionDigitalOutputPin(rst, "RST");
+//		mosiGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_12, "MOSI");
+//		clkGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_14, "CLK");
+
 
 		csGpio.setState(PinState.HIGH); // Deselect BNO080
 
 		// Configure the BNO080 for SPI communication
-		wakeGpio.setState(PinState.HIGH); // Before boot up the
+//		wakeGpio.setState(PinState.LOW); // Before boot up the
+//		TimeUnit.MILLISECONDS.sleep(4); // Min length not specified in datasheet?
+//		wakeGpio.setState(PinState.HIGH);
 		rstGpio.setState(PinState.LOW); // Reset BNO080
 		TimeUnit.MILLISECONDS.sleep(2); // Min length not specified in datasheet?
 		rstGpio.setState(PinState.HIGH); // Bring out of reset
 
+//		mosiGpio.setState(PinState.LOW);
+//		clkGpio.setState(PinState.LOW);
+//		csGpio.setState(PinState.HIGH);
+//		System.out.println("SPI Turn on");
+
 		return true;
 	}
 
-	private void waitForInterrupt(String message) throws InterruptedException, IOException {
-		if (waitForSPI()) {
-			// Wait for assertion of INT before reading advert message.
-			receivePacket();
-		} else {
-			System.err.println(message);
+
+	private void awaitTermination() {
+		try {
+			executor.awaitTermination(AWAIT_TERMINATION, TimeUnit.MILLISECONDS);
+			executor.shutdown();
+		} catch (InterruptedException e) {
+			System.err.println(String.format("awaitTermination e: %s", e));
 		}
 	}
 
-	public boolean beginSPI() throws InterruptedException, IOException {
+	private boolean containsResponseCode(ShtpPacketResponse response){
+		if (response.dataAvailable()) {
+			ShtpReport report = ShtpReport.getByCode(response.getBodyFirst());
+			return processShtpReportResponse(report);
+		} else {
+			System.out.println("containsResponseCode: No Data");
+		}
+		return false;
+	}
+
+	/**
+	 * end command to reset IC Read all advertisement packets from sensor The sensor
+	 * has been seen to reset twice if we attempt too much too quickly. This seems
+	 * to work reliably.
+	 */
+	private boolean softReset() throws IOException, InterruptedException {
+		Register register = Register.EXECUTABLE;
+		ShtpPacketRequest request = prepareShtpPacketRequest(register, 1);
+		request.addBody(0, 1);
+
+		sendPacket(register, request, "softReset");
+
+		TimeUnit.MILLISECONDS.sleep(200);
+		int counter=0;
+		while (receivePacket().dataAvailable()){
+			counter++;
+		}
+		System.out.println("softReset FLUSH1=" + counter);
+		TimeUnit.MILLISECONDS.sleep(300);
+		counter=0;
+		while (receivePacket().dataAvailable()){
+			counter++;
+		}
+		System.out.println("softReset FLUSH2 =" + counter);
+		System.out.println("softResetFLUSH");
+
+		counter =0;
+		boolean active = true;
+		while (active && counter < 300){
+			ShtpPacketResponse response = receivePacket();
+			ShtpReport report = ShtpReport.getByCode(response.getBodyFirst());
+			if(report.equals(ShtpReport.COMMAND_RESPONSE)){
+				active = false;
+			}else{
+				counter++;
+			}
+		}
+		System.out.println("softReset FLUSH3 RECEIVED COMMAND =" + counter);
+
+
+		return true;
+	}
+
+
+
+	private boolean prepareForSpi() throws InterruptedException, IOException {
 		// Wait for first assertion of INT before using WAK pin. Can take ~104ms
 		boolean state = waitForSPI();
-		System.out.println("beginSPI state: " + state);
+
+		System.out.println("START1: INT before using WAK pin state: " + state);
 
 		/*
 		 * At system startup, the hub must send its full advertisement message (see 5.2
@@ -290,87 +506,67 @@ public class BNO080SPIDevice {
 		 * complete. When BNO080 first boots it broadcasts big startup packet Read it
 		 * and dump it
 		 */
-		waitForInterrupt("beginSPI: system startup");
+//		 if(state){
+//		 	waitForInterrupt("beginSPI: system startup");
+//		 }
 
 		/*
 		 * The BNO080 will then transmit an unsolicited Initialize Response (see
 		 * 6.4.5.2) Read it and dump it
 		 */
-		waitForInterrupt("beginSPI: BNO080 unsolicited response");
+		if (state) {
+			waitForInterrupt("beginSPI: BNO080 unsolicited response");
+		}
+		return state;
+	}
 
+	private ShtpPacketRequest getProductIdRequest() {
 		// Check communication with device
 		// bytes: Request the product ID and reset info, Reserved
-		byte[] reportRequestPacket = { (byte) SHTP_REPORT_PRODUCT_ID_REQUEST, 0 };
-		// Transmit packet on channel 2, 2 bytes
-		sendPacket(CHANNEL_CONTROL, reportRequestPacket, "beginSPI:CHANNEL_CONTROL:SHTP_REPORT_PRODUCT_ID_REQUEST");
+		ShtpPacketRequest result = prepareShtpPacketRequest(Register.CONTROL, 2);
+		result.addBody(0, ShtpReport.PRODUCT_ID_REQUEST.getCode());
+		result.addBody(1, 0);
+		return result;
+	}
 
-		// Now we wait for response
-		waitForSPI();
-
-		ShtpPacket shtpPacket = receivePacket();
-		if (shtpPacket.dataAvailable()) {
-			int[] receivedBody = shtpPacket.getBody();
-			if (receivedBody[0] == SHTP_REPORT_PRODUCT_ID_RESPONSE) {
-				printShtpPacketPart("beginSPI, body:", receivedBody);
-				return true;
-			} else {
-				System.out.println("beginSPI: received not valid response ");
-			}
-		} else {
-			System.out.println("beginSPI: no packet received");
+	private boolean processShtpReportResponse(ShtpReport report) {
+		switch (report) {
+		case COMMAND_RESPONSE:
+		case FRS_READ_RESPONSE:
+		case PRODUCT_ID_RESPONSE:
+		case BASE_TIMESTAMP:
+		case GET_FEATURE_RESPONSE:
+		case FLUSH_COMPLETED:
+			System.out.println("processShtpReportResponse response: " + report);
+			return true;
+		default:
+			System.out.println("processShtpReportResponse: received not valid response: " + report);
+			return false;
 		}
-		return false;
-
 	}
 
-	public void enableRotationVector(int timeBetweenReports) throws InterruptedException, IOException {
-		setFeatureCommand(SENSOR_REPORTID_ROTATION_VECTOR, timeBetweenReports, 0);
+	private ShtpPacketRequest prepareShtpPacketRequest(Register register, int size) {
+		ShtpPacketRequest packet = new ShtpPacketRequest(size, sequenceByChannel[register.getChannel()]++);
+		packet.createHeader(register);
+		return packet;
 	}
 
-	public void enableLinearAccelerometer(int timeBetweenReports) throws InterruptedException, IOException {
-		setFeatureCommand(SENSOR_REPORTID_LINEAR_ACCELERATION, timeBetweenReports, 0);
-	}
+	private void printRotationVectorData(AtomicLong measurements) {
+		float quatI = getQuatI();
+		float quatJ = getQuatJ();
+		float quatK = getQuatK();
+		float quatReal = getQuatReal();
+		float quatRadianAccuracy = getQuatRadianAccuracy();
 
-	/**
-	 * Rotation vector example
-	 * 
-	 * 
-	 * @param readings
-	 *            number of readings
-	 * @param delay
-	 *            delay in ms
-	 * @throws IOException
-	 *             exception
-	 * @throws InterruptedException
-	 *             exception
-	 */
-	public void startRotationVector(int readings, int delay) throws IOException, InterruptedException {
-		startTime = System.currentTimeMillis();
-		long measurements = 0;
-		for (int i = 0; i < readings; i++) {
-			System.out.println(String.format("startRotationVector measurements: %d, readings: %d ", measurements, i));
-			TimeUnit.MICROSECONDS.sleep(delay);
-			ShtpPacket packet = dataAvailable();
-			if (packet.dataAvailable()) {
+		float frequency = measurements.incrementAndGet() / ((System.currentTimeMillis() - startTime) / 1000f);
 
-				float quatI = getQuatI();
-				float quatJ = getQuatJ();
-				float quatK = getQuatK();
-				float quatReal = getQuatReal();
-				float quatRadianAccuracy = getQuatRadianAccuracy();
-				measurements++;
-
-				float frequency = measurements / ((System.currentTimeMillis() - startTime) / 1000f);
-
-				System.out.print(String.format("enableRotationVector quatI: %.2f,", quatI));
-				System.out.print(String.format("enableRotationVector quatJ: %.2f,", quatJ));
-				System.out.print(String.format("enableRotationVector quatK: %.2f,", quatK));
-				System.out.print(String.format("enableRotationVector quatReal: %.2f,", quatReal));
-				System.out.print(String.format("enableRotationVector quatRadianAccuracy: %.2f,", quatRadianAccuracy));
-				System.out.print(String.format("enableRotationVector measurement: %f Hz", frequency));
-				System.out.println();
-			}
-		}
+		System.out.print(String.format("printRotationVectorData quatI: %.2f,", quatI));
+		System.out.print(String.format("printRotationVectorData quatJ: %.2f,", quatJ));
+		System.out.print(String.format("printRotationVectorData quatK: %.2f,", quatK));
+		System.out.print(String.format("printRotationVectorData quatReal: %.2f,", quatReal));
+		System.out.print(String.format("printRotationVectorData quatRadianAccuracy: %.2f,", quatRadianAccuracy));
+		System.out.print(String.format("printRotationVectorData measurement: %f Hz", frequency));
+		System.out.println();
 	}
 
 	private float getQuatI() {
@@ -418,26 +614,32 @@ public class BNO080SPIDevice {
 	 * @throws InterruptedException
 	 *             exception
 	 */
-	private ShtpPacket dataAvailable() throws IOException, InterruptedException {
+	private ShtpPacketResponse dataAvailable() {
 		if (intGpio.isHigh()) {
-			return new ShtpPacket(0);
+			return new ShtpPacketResponse(0);
 		}
 
-		// TimeUnit.MILLISECONDS.sleep(2);
-		ShtpPacket receivePacket = receivePacket();
+		ShtpPacketResponse receivePacket = null;
+		try {
+			receivePacket = receivePacket();
+		} catch (IOException | InterruptedException e) {
+			System.err.println(String.format("dataAvailable e: %s", e));
+			return new ShtpPacketResponse(0);
+		}
+		ShtpReport report = ShtpReport.getByCode(receivePacket.getBodyFirst());
+		Register register = Register.getByChannel(receivePacket.getHeaderChannel());
 		if (receivePacket.dataAvailable()) {
 			// Check to see if this packet is a sensor reporting its data to us
-			if (receivePacket.getHeader()[2] == CHANNEL_REPORTS
-					&& receivePacket.getBody()[0] == SHTP_REPORT_BASE_TIMESTAMP) {
+			if (Register.REPORTS.equals(register) && ShtpReport.BASE_TIMESTAMP.equals(report)) {
 				parseInputReport(receivePacket); // This will update the rawAccelX, etc variables depending on which
 				return receivePacket;
-			} else if (receivePacket.getHeader()[2] == CHANNEL_CONTROL) {
+			} else if (Register.CONTROL.equals(register)) {
 				parseCommandReport(receivePacket); // This will update responses to commands, calibrationStatus, etc.
 				return receivePacket;
 			}
 		}
 
-		return new ShtpPacket(0);
+		return new ShtpPacketResponse(0);
 	}
 
 	/**
@@ -458,15 +660,16 @@ public class BNO080SPIDevice {
 	// shtpData[5 + 6]: R6
 	// shtpData[5 + 7]: R7
 	// shtpData[5 + 8]: R8
-	private void parseCommandReport(ShtpPacket packet) {
+	private void parseCommandReport(ShtpPacketResponse packet) {
 		int[] shtpData = packet.getBody();
-		if ((shtpData[0] & 0xFF) == SHTP_REPORT_COMMAND_RESPONSE) {
+		ShtpReport report = ShtpReport.getByCode(shtpData[0] & 0xFF);
+		if (report.equals(ShtpReport.COMMAND_RESPONSE)) {
 			System.out.println("parseCommandReport: commandResponse");
 			// The BNO080 responds with this report to command requests. It's up to use to
 			// remember which command we issued.
-			int command = shtpData[2] & 0xFF; // This is the Command byte of the response
-
-			if (command == COMMAND_ME_CALIBRATE) {
+			DeviceCommand command = DeviceCommand.getById(shtpData[2] & 0xFF); // This is the Command byte of the
+																				// response
+			if (DeviceCommand.ME_CALIBRATE.equals(command)) {
 				calibrationStatus = shtpData[5] & 0xFF; // R0 - Status (0 = success, non-zero = fail)
 			}
 		} else {
@@ -477,23 +680,26 @@ public class BNO080SPIDevice {
 	}
 
 	/**
-	 * Unit responds with packet that contains the following: shtpHeader[0:3]:
-	 * First, a 4 byte header shtpData[0:4]: Then a 5 byte timestamp of microsecond
-	 * clicks since reading was taken shtpData[5 + 0]: Then a feature report ID
-	 * (0x01 for Accel, 0x05 for Rotation Vector) shtpData[5 + 1]: Sequence number
-	 * (See 6.5.18.2) shtpData[5 + 2]: Status shtpData[3]: Delay shtpData[4:5]:
-	 * i/accel x/gyro x/etc shtpData[6:7]: j/accel y/gyro y/etc shtpData[8:9]:
-	 * k/accel z/gyro z/etc shtpData[10:11]: real/gyro temp/etc shtpData[12:13]:
-	 * Accuracy estimate
+	 * Unit responds with packet that contains the following:
+	 * //@formatter:off
+	 * shtpHeader[0:3]: First, a 4 byte header
+	 * shtpData[0:4]: Then a 5 byte timestamp of microsecond clicks since reading was taken
+	 * shtpData[5 + 0]: Then a feature report ID (0x01 for Accel, 0x05 for Rotation Vector)
+	 * shtpData[5 + 1]: Sequence number (See 6.5.18.2)
+	 * shtpData[5 + 2]: Status
+	 * shtpData[3]: Delay
+	 * shtpData[4:5]: i/accel x/gyro x/etc
+	 * shtpData[6:7]: j/accel y/gyro y/etc
+	 * shtpData[8:9]: k/accel z/gyro z/etc
+	 * shtpData[10:11]: real/gyro temp/etc
+	 * shtpData[12:13]: Accuracy estimate
+	 * //@formatter:on
 	 */
-	private void parseInputReport(ShtpPacket packet) {
-		// Calculate the number of data bytes in this packet
-
-		int[] shtpHeader = packet.getHeader();
+	private void parseInputReport(ShtpPacketResponse packet) {
 		int[] shtpData = packet.getBody();
 
-		int dataLength = calculateNumberOfBytesInPacket(shtpHeader[1], shtpHeader[0]);
-		dataLength -= SHTP_HEADER_SIZE;
+		// Calculate the number of data bytes in this packet
+		int dataLength = packet.getBodySize();
 
 		timeStamp = (shtpData[4] << (8 * 3)) | (shtpData[3] << (8 * 2)) | (shtpData[2] << (8 * 1))
 				| (shtpData[1] << (8 * 0));
@@ -511,57 +717,119 @@ public class BNO080SPIDevice {
 			data5 = (shtpData[5 + 13] & 0xFFFF) << 8 | shtpData[5 + 12] & 0xFF;
 		}
 
-		if ((shtpData[5] & 0xFF) == SENSOR_REPORTID_ACCELEROMETER) {
+		ShtpReport shtpReport = ShtpReport.getByCode(shtpData[5] & 0xFF);
+		SensorReport sensorReport = SensorReport.getById(shtpData[5] & 0xFF);
+
+		switch (sensorReport) {
+		case ACCELEROMETER:
 			accelAccuracy = status & 0xFFFF;
 			rawAccelX = data1 & 0xFFFF;
 			rawAccelY = data2 & 0xFFFF;
 			rawAccelZ = data3 & 0xFFFF;
-		} else if ((shtpData[5] & 0xFF) == SENSOR_REPORTID_LINEAR_ACCELERATION) {
-			accelLinAccuracy = status & 0xFFFF;
-			rawLinAccelX = data1 & 0xFFFF;
-			rawLinAccelY = data2 & 0xFFFF;
-			rawLinAccelZ = data3 & 0xFFFF;
-		} else if ((shtpData[5] & 0xFF) == SENSOR_REPORTID_GYROSCOPE) {
+			break;
+		case GYROSCOPE:
 			gyroAccuracy = status & 0xFFFF;
 			rawGyroX = data1 & 0xFFFF;
 			rawGyroY = data2 & 0xFFFF;
 			rawGyroZ = data3 & 0xFFFF;
-		} else if (shtpData[5] == SENSOR_REPORTID_MAGNETIC_FIELD) {
+			break;
+		case MAGNETIC_FIELD:
 			magAccuracy = status & 0xFFFF;
 			rawMagX = data1 & 0xFFFF;
 			rawMagY = data2 & 0xFFFF;
 			rawMagZ = data3 & 0xFFFF;
-		} else if ((shtpData[5] & 0xFF) == SENSOR_REPORTID_ROTATION_VECTOR
-				|| (shtpData[5] & 0xFF) == SENSOR_REPORTID_GAME_ROTATION_VECTOR) {
+			break;
+		case LINEAR_ACCELERATION:
+			accelLinAccuracy = status & 0xFFFF;
+			rawLinAccelX = data1 & 0xFFFF;
+			rawLinAccelY = data2 & 0xFFFF;
+			rawLinAccelZ = data3 & 0xFFFF;
+			break;
+		case GRAVITY:
+			break;
+		case ROTATION_VECTOR:
+		case GAME_ROTATION_VECTOR:
 			quatAccuracy = status & 0xFFFF;
 			rawQuatI = data1 & 0xFFFF;
 			rawQuatJ = data2 & 0xFFFF;
 			rawQuatK = data3 & 0xFFFF;
 			rawQuatReal = data4 & 0xFFFF;
 			rawQuatRadianAccuracy = data5 & 0xFFFF; // Only available on rotation vector, not game rot vector
-		} else if ((shtpData[5] & 0xFF) == SENSOR_REPORTID_STEP_COUNTER) {
+			break;
+		case GEOMAGNETIC_ROTATION_VECTOR:
+			break;
+		case TAP_DETECTOR:
+			break;
+		case STEP_COUNTER:
 			stepCount = data3 & 0xFFFF; // Bytes 8/9
-		} else if ((shtpData[5] & 0xFF) == SENSOR_REPORTID_STABILITY_CLASSIFIER) {
+			break;
+		case STABILITY_CLASSIFIER:
 			stabilityClassifier = shtpData[5 + 4] & 0xFF; // Byte 4 only
-		} else if ((shtpData[5] & 0xFF) == SENSOR_REPORTID_PERSONAL_ACTIVITY_CLASSIFIER) {
+			break;
+		case PERSONAL_ACTIVITY_CLASSIFIER:
 			activityClassifier = shtpData[5 + 5] & 0xFF; // Most likely state
 
 			// Load activity classification confidences into the array
 			for (int x = 0; x < 9; x++) // Hardcoded to max of 9. TODO - bring in array size
 				activityConfidences[x] = shtpData[5 + 6 + x] & 0xFF; // 5 bytes of timestamp, byte 6 is first confidence
-																		// byte
-		} else if (shtpData[5] == SHTP_REPORT_COMMAND_RESPONSE) {
-			// The BNO080 responds with this report to command requests. It's up to use to
-			// remember which command we issued.
-			int command = shtpData[5 + 2] & 0xFF; // This is the Command byte of the response
-
-			if (command == COMMAND_ME_CALIBRATE) {
-				calibrationStatus = shtpData[5 + 5] & 0xFF; // R0 - Status (0 = success, non-zero = fail)
+			// byte
+			break;
+		default:
+			// TODO: add command report handling
+			if (ShtpReport.COMMAND_RESPONSE.equals(shtpReport)) {
+				int command = shtpData[5 + 2] & 0xFF; // This is the Command byte of the response
+				DeviceCommand deviceCommand = DeviceCommand.getById(command);
+				parseReportCommandResponse(deviceCommand, shtpData);
+			} else {
+				System.out.println("parseInputReport: This sensor report ID is unhandled");
 			}
-		} else {
-			System.out.println("parseInputReport: This sensor report ID is unhandled");
-		}
+			break;
 
+		}
+	}
+
+	/**
+	 * The BNO080 responds with this report to command requests. It's up to use to
+	 * remember which command we issued
+	 * 
+	 * @param deviceCommand
+	 *            device command in response
+	 */
+	private void parseReportCommandResponse(DeviceCommand deviceCommand, int[] shtpData) {
+		switch (deviceCommand) {
+		case ERRORS:
+			System.out.println("parseInputReport: deviceCommand=" + deviceCommand);
+			break;
+		case COUNTER:
+			System.out.println("parseInputReport: COUNTER deviceCommand=" + deviceCommand);
+			break;
+		case TARE:
+			System.out.println("parseInputReport: TARE deviceCommand=" + deviceCommand);
+			break;
+		case INITIALIZE:
+			System.out.println("parseInputReport: INITIALIZE deviceCommand=" + deviceCommand);
+			break;
+		case DCD:
+			System.out.println("parseInputReport: DCD deviceCommand=" + deviceCommand);
+			break;
+		case ME_CALIBRATE:
+			calibrationStatus = shtpData[5 + 5] & 0xFF; // R0 - Status (0 = success, non-zero = fail)
+			System.out.println("parseInputReport: command response: command= " + deviceCommand + " calibrationStatus= "
+					+ calibrationStatus);
+			break;
+		case DCD_PERIOD_SAVE:
+			System.out.println("parseInputReport: deviceCommand=" + deviceCommand);
+			break;
+		case OSCILLATOR:
+			System.out.println("parseInputReport: deviceCommand=" + deviceCommand);
+			break;
+		case CLEAR_DCD:
+			System.out.println("parseInputReport: deviceCommand=" + deviceCommand);
+			break;
+		default:
+			System.out.println("parseInputReport: not available deviceCommand=" + deviceCommand);
+			break;
+		}
 	}
 
 	/**
@@ -570,56 +838,79 @@ public class BNO080SPIDevice {
 	 * classifier
 	 *
 	 *
-	 * @param reportId
+	 * @param sensorReport
 	 *            - report id uint8_t
 	 * @param timeBetweenReports
 	 *            - time between reports uint16_t
-	 * @param sc
+	 * @param specificConfig
 	 *            - contains specific config (uint32_t)
 	 * @throws InterruptedException
 	 *             exception
 	 * @throws IOException
 	 *             exception
 	 */
-	private void setFeatureCommand(int reportId, int timeBetweenReports, int specificConfig)
+	private void sendFeatureCommand(SensorReport sensorReport, int timeBetweenReports, int specificConfig)
 			throws InterruptedException, IOException {
 
 		long microsBetweenReports = timeBetweenReports * 1000L;
 
-		byte[] packetBody = new PacketBodyBuilder(17).addElement(SHTP_REPORT_SET_FEATURE_COMMAND) // Set feature
-																									// command.
-				.addElement(reportId) // Feature Report ID. 0x01 = Accelerometer, 0x05 = Rotation vector
+		Register register = Register.CONTROL;
+		ShtpPacketRequest packetRequest = prepareShtpPacketRequest(register, 17);
+
+		//@formatter:off
+		int[] packetBody = new PacketBodyBuilder(packetRequest.getBodySize())
+				.addElement(ShtpReport.SET_FEATURE_COMMAND.getCode())
+				.addElement(sensorReport.getId()) 			// Feature Report ID. 0x01 = Accelerometer, 0x05 = Rotation vector
 				.addElement(0) // Feature flags
 				.addElement(0) // Change sensitivity (LSB)
 				.addElement(0) // Change sensitivity (MSB)
-				.addElement((int) (microsBetweenReports & 0xFF)) // Report interval (LSB) in microseconds. 0x7A120=500ms
-				.addElement((int) (microsBetweenReports >> 8) & 0xFF) // Report interval
+				.addElement((int) microsBetweenReports & 0xFF) // Report interval (LSB) in microseconds.
+																		// 0x7A120=500ms
+				.addElement((int) (microsBetweenReports >> 8) & 0xFF)  // Report interval
 				.addElement((int) (microsBetweenReports >> 16) & 0xFF) // Report interval
 				.addElement((int) (microsBetweenReports >> 24) & 0xFF) // Report interval (MSB)
 				.addElement(0) // Batch Interval (LSB)
 				.addElement(0) // Batch Interval
 				.addElement(0) // Batch Interval
 				.addElement(0) // Batch Interval (MSB)
-				.addElement(specificConfig & 0xFF) // Sensor-specific config (LSB)
+				.addElement(specificConfig& 0xFF) // Sensor-specific config (LSB)
 				.addElement((specificConfig >> 8) & 0xFF) // Sensor-specific config
 				.addElement((specificConfig >> 16) & 0xFF) // Sensor-specific config
 				.addElement((specificConfig >> 24) & 0xFF) // Sensor-specific config (MSB)
 				.build();
+		packetRequest.addBody(packetBody);
+		//@formatter:on
 
 		// Transmit packet on channel 2, 17 bytes
-		sendPacket(CHANNEL_CONTROL, packetBody, "setFeatureCommand");
+		sendPacket(register, packetRequest, "sendFeatureCommand");
+	}
+
+	private void sendReport(ShtpReport type, SensorReport sensor) throws InterruptedException, IOException {
+		Register register = Register.CONTROL;
+		ShtpPacketRequest packetRequest = prepareShtpPacketRequest(register, 2);
+
+		//@formatter:off
+		int[] packetBody = new PacketBodyBuilder(packetRequest.getBodySize())
+				.addElement(type.getCode())
+				.addElement(sensor.getId())
+				.build();
+		//@formatter:on
+		packetRequest.addBody(packetBody);
+
+		sendPacket(register, packetRequest, "sendReport");
 	}
 
 	/**
 	 * Blocking wait for BNO080 to assert (pull low) the INT pin indicating it's
 	 * ready for comm. Can take more than 200ms after a hardware reset
 	 */
-	private boolean waitForSPI() throws IOException, InterruptedException {
+	public boolean waitForSPI() throws IOException, InterruptedException {
 		int counter = 0;
-		for (int i = 0; i < MAX_PACKET_SIZE; i++) {
+		for (int i = 0; i < 255; i++) { // Don't got more than 255
 			if (intGpio.isLow()) {
 				return true;
 			} else {
+				System.out.println("SPI Wait: " + counter);
 				counter++;
 			}
 			TimeUnit.MILLISECONDS.sleep(1);
@@ -628,15 +919,7 @@ public class BNO080SPIDevice {
 		return false;
 	}
 
-	private void printArray(String message, int[] array) {
-		System.out.print("printArray: " + message);
-		for (int i = 0; i < array.length; i++) {
-			System.out.print(" " + (array[i] & 0xFF) + ",");
-		}
-		System.out.print("\n");
-	}
-
-	private void printArray(String message, byte[] array) {
+	public static void printArray(String message, int[] array) {
 		System.out.print("printArray: " + message);
 		for (int i = 0; i < array.length; i++) {
 			System.out.print(" " + Integer.toHexString(array[i] & 0xFF) + ",");
@@ -644,10 +927,8 @@ public class BNO080SPIDevice {
 		System.out.print("\n");
 	}
 
-	private boolean sendPacket(byte channelNumber, byte[] data, String message)
+	private boolean sendPacket(Register register, ShtpPacketRequest packet, String message)
 			throws InterruptedException, IOException {
-		System.out.println(String.format("sendPacket from: %s channelNumber: %d", message, channelNumber));
-		int packetLength = (data.length + SHTP_HEADER_SIZE) & 0xFF; // Add four bytes for the header
 
 		// Wait for BNO080 to indicate it is available for communication
 		if (!waitForSPI()) {
@@ -657,40 +938,35 @@ public class BNO080SPIDevice {
 
 		// BNO080 has max CLK of 3MHz, MSB first,
 		// The BNO080 uses CPOL = 1 and CPHA = 1. This is mode3
+		TimeUnit.MILLISECONDS.sleep(2); //Introduced small delay
 		csGpio.setState(PinState.LOW);
-		byte[] spiHeader = createSpiHeader(packetLength, channelNumber);
 
-		for (int i = 0; i < spiHeader.length; i++) {
-			spiDevice.write(spiHeader[i]);
+		for (int i = 0; i < packet.getHeaderSize(); i++) {
+			spiDevice.write(packet.getHeaderByte(i));
 		}
 
-		printArray("sendPacket data: ", data);
-		for (int i = 0; i < data.length; i++) {
-			spiDevice.write(data[i]);
+		for (int i = 0; i < packet.getBodySize(); i++) {
+			spiDevice.write(packet.getBodyByte(i));
 		}
 		csGpio.setState(PinState.HIGH);
+		TimeUnit.MILLISECONDS.sleep(2); //Introduced small delay
+		System.out.println(
+				String.format("sendPacket from: %s register: %s, size: %d", message, register, packet.getBodySize()));
+		printArray("sendPacket HEADER:", packet.getHeader());
+		printArray("sendPacket BODY:", packet.getBody());
 		return true;
 	}
 
-	private byte[] createSpiHeader(int packetLength, byte channelNumber) {
-		byte[] header = new byte[SHTP_HEADER_SIZE];
-		header[0] = (byte) (packetLength & 0xFF); // LSB
-		header[1] = (byte) (packetLength >> 8); // MSB
-		header[2] = (byte) (channelNumber & 0xFF); // Channel Number
-		// Send the sequence number, increments with each packet sent, different counter
-		// for each channel
-		header[3] = (byte) (0xFF & sequenceByChannel[channelNumber]++); // Sequence number
-		return header;
-	}
-
-	private void printShtpPacketPart(String prefix, int[] data) {
-		switch (data[0]) {
-		case SHTP_REPORT_PRODUCT_ID_RESPONSE:
-			System.out.println("printShtpPacketPart:" + prefix + ":SHTP_REPORT_PRODUCT_ID_RESPONSE: "
-					+ Integer.toHexString(data[0]));
+	private void printShtpPacketPart(ShtpReport report, String prefix, int[] data) {
+		switch (report) {
+		case PRODUCT_ID_RESPONSE:
+			System.out.println(String.format("printShtpPacketPart:%s:report=%s:value=%s", prefix, report,
+					Integer.toHexString(data[0])));
 			break;
 		default:
-			System.out.println("printShtpPacketPart:" + prefix + ":not implemented: " + Integer.toHexString(data[0]));
+			System.out.println(String.format("printShtpPacketPart:%s:NO IMPL=%s:value=%s", prefix, report,
+					Integer.toHexString(data[0])));
+
 		}
 		for (int i = 0; i < data.length; i++) {
 			System.out.println("printShtpPacketPart" + prefix + "::[" + i + "]:" + Integer.toHexString(data[i]));
@@ -698,71 +974,78 @@ public class BNO080SPIDevice {
 
 	}
 
-	private ShtpPacket receivePacket() throws IOException, InterruptedException {
-		// we dont have INT
+	private ShtpPacketResponse receivePacket() throws IOException, InterruptedException {
+//		int counter = 0;
+//		while (intGpio.isHigh()){
+//			counter++;
+//		}
+//		System.out.println("INT DONE: counter=" + counter + "int: " + intGpio.isLow());
 		if (intGpio.isHigh()) {
 			System.out.println("receivePacket: INTERRUPT: data are not available");
-			return new ShtpPacket(0);
+			return new ShtpPacketResponse(0);
 		}
 
 		// Get first four bytes to find out how much data we need to read
+		TimeUnit.MILLISECONDS.sleep(2);	//introduced small delay
 		csGpio.setState(PinState.LOW);
 
 		// Get the first four bytes, aka the packet header
-		int packetLSB = spiDevice.write((byte) 0xFF)[0];
-		int packetMSB = spiDevice.write((byte) 0xFF)[0];
-		int channelNumber = spiDevice.write((byte) 0xFF)[0];
-		int sequenceNumber = spiDevice.write((byte) 0xFF)[0]; // Not sure if we need to store this or not
+		int packetLSB = toInt8U(spiDevice.write((byte) 0xFF));
+		int packetMSB = toInt8U(spiDevice.write((byte) 0xFF));
+		int channelNumber = toInt8U(spiDevice.write((byte) 0xFF));
+		int sequenceNumber = toInt8U(spiDevice.write((byte) 0xFF)); // Not sure if we need to store this or not
 
 		// Calculate the number of data bytes in this packet
-		// int dataLength = (packetMSB << 8 | packetLSB);
-		// dataLength &= ~(1 << 15); // Clear the MSbit.
-		// int dataLength = ((packetMSB & 0xFFFF) << 8) | packetLSB ;
 		int dataLength = calculateNumberOfBytesInPacket(packetMSB, packetLSB);
 		// This bit indicates if this package is a continuation of the last. Ignore it
 		// for now.
-		if (dataLength == 0) {
-			return new ShtpPacket(0);
-		}
 		dataLength -= SHTP_HEADER_SIZE;
 		System.out.println("receivedPacket: dataLength=" + dataLength);
+		System.out.println("receivedPacket: dataLength packetLSB=" + packetLSB);
+		System.out.println("receivedPacket: dataLength packetMSB=" + packetMSB);
 		if (dataLength <= 0) {
-			return new ShtpPacket(0);
+			return new ShtpPacketResponse(0);
 		}
 
-		ShtpPacket shtpPacket = new ShtpPacket(dataLength);
-		shtpPacket.addHeader(packetLSB, packetMSB, channelNumber, sequenceNumber);
+		ShtpPacketResponse response = new ShtpPacketResponse(dataLength);
+		response.addHeader(packetLSB, packetMSB, channelNumber, sequenceNumber);
 
 		// Read incoming data into the shtpData array
 		for (int i = 0; i < dataLength; i++) {
 			byte[] inArray = spiDevice.write((byte) 0xFF);
 			byte incoming = inArray[0];
 			if (i < MAX_PACKET_SIZE) {
-				shtpPacket.addBody(i, incoming & 0xFF);
+				response.addBody(i, (Byte.toUnsignedInt(incoming) & 0xFF));
 			}
 		}
 
-		/*
-		 * looks like we need to flush the header
-		 */
-		for (int i = 0; i <= SHTP_HEADER_SIZE; i++) {
-			byte flushByte = spiDevice.write((byte) 0xFF)[0];
-			System.out.println("receivedPacket: flush" + Integer.toHexString(flushByte));
-		}
 		csGpio.setState(PinState.HIGH); // Release BNO080
+		TimeUnit.MILLISECONDS.sleep(2);
+		ShtpReport report = ShtpReport.getByCode(response.getBodyFirst());
 
-		printShtpPacketPart("receivePacketChannelSequenceNumbers", sequenceByChannel);
-		printShtpPacketPart("receivePacketHeader", shtpPacket.getHeader());
-		printShtpPacketPart("receivePacketBody", shtpPacket.getBody());
+		printShtpPacketPart(report, "receivePacketChannel current: SequenceNumbers", sequenceByChannel);
+		printArray("receivePacketHeader", response.getHeader());
+		printArray("receivePacketBody", response.getBody());
 
-		return shtpPacket; // we are done
+		return response; // we are done
 
+	}
+
+	/**
+	 *
+	 * @param array
+	 *            byte array
+	 * @return unsigned 8-bit int
+	 */
+	private int toInt8U(byte[] array) {
+		return array[0] & 0xFF;
 	}
 
 	private int calculateNumberOfBytesInPacket(int packetMSB, int packetLSB) {
 		// Calculate the number of data bytes in this packet
-		int dataLength = (0xFFFF & ((packetMSB & 0xFF) << 8) | packetLSB) & 0xFFFF;
-		dataLength &= ~(1 << 15) & 0xFF; // Clear the MSbit.
+		int dataLength = (0xFFFF & packetMSB << 8 | packetLSB);
+		dataLength &= ~(1 << 15); // Clear the MSbit.
 		return dataLength;
 	}
+
 }
