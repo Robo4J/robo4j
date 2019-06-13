@@ -17,6 +17,8 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitoled;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -24,9 +26,42 @@ package com.robo4j.hw.rpi.i2c.adafruitoled;
 public class BiColor24BargraphExample {
 
 	public static void main(String[] args) throws Exception {
-		System.out.println("...Bi-Color 24 Bargraph... ");
+		System.out.println("...Bi-BiColor 24 Bargraph... ");
 
-		BiColor24BargraphDevice device = new BiColor24BargraphDevice();
-		device.init();
+		BiColor24BarDevice device = new BiColor24BarDevice();
+		device.clearBuffer();
+		device.display();
+
+		for(int i=0; i< device.getMaxBar(); i++){
+			device.addBar(i, BiColor.GREEN);
+			device.display();
+			TimeUnit.MILLISECONDS.sleep(200);
+		}
+
+		for(int i=device.getMaxBar()-1; i >= 0; i--){
+			device.addBar(new BarElement(i));
+			device.display();
+			TimeUnit.MILLISECONDS.sleep(100);
+		}
+
+		int counter = 0;
+		while(counter < 3){
+			for (int i=0; i<12; i++){
+				int colorNumber = (i+counter) % 3 + 1;
+				BarElement element = new BarElement(i, BiColor.getByValue(colorNumber));
+				device.addBar(element);
+				TimeUnit.MILLISECONDS.sleep(200);
+				device.display();
+			}
+			counter++;
+		}
+
+
+
+		System.out.println("...Click to quit...");
+		System.in.read();
+		device.clearBuffer();
+		device.display();
 	}
+
 }
