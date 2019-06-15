@@ -20,6 +20,8 @@ package com.robo4j.hw.rpi.i2c.adafruitoled;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * https://learn.adafruit.com/adafruit-led-backpack/bi-color-24-bargraph
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
@@ -29,7 +31,7 @@ public class BiColor24BargraphExample {
 		System.out.println("...Bi-BiColor 24 Bargraph... ");
 
 		BiColor24BarDevice device = new BiColor24BarDevice();
-		device.clearBuffer();
+		device.clear();
 		device.display();
 
 		for(int i=0; i< device.getMaxBar(); i++){
@@ -39,7 +41,7 @@ public class BiColor24BargraphExample {
 		}
 
 		for(int i=device.getMaxBar()-1; i >= 0; i--){
-			device.addBar(new BarElement(i));
+			device.addBar(new PackElement(i));
 			device.display();
 			TimeUnit.MILLISECONDS.sleep(100);
 		}
@@ -48,7 +50,7 @@ public class BiColor24BargraphExample {
 		while(counter < 3){
 			for (int i=0; i<12; i++){
 				int colorNumber = (i+counter) % 3 + 1;
-				BarElement element = new BarElement(i, BiColor.getByValue(colorNumber));
+				PackElement element = new PackElement(i, BiColor.getByValue(colorNumber));
 				device.addBar(element);
 				TimeUnit.MILLISECONDS.sleep(200);
 				device.display();
@@ -56,11 +58,9 @@ public class BiColor24BargraphExample {
 			counter++;
 		}
 
-
-
 		System.out.println("...Click to quit...");
 		System.in.read();
-		device.clearBuffer();
+		device.clear();
 		device.display();
 	}
 

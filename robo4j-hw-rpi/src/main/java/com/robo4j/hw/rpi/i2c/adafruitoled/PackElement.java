@@ -21,31 +21,31 @@ package com.robo4j.hw.rpi.i2c.adafruitoled;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BarElement {
+public class PackElement {
 
     private final int x;
     private final int y;
     private final BiColor color;
 
-    public BarElement(int x, int y, BiColor color) {
+    public PackElement(int x, int y, BiColor color) {
         this.x = x;
         this.y = y;
         this.color = color;
     }
 
-    public BarElement(int x, int y) {
+    public PackElement(int x, int y) {
         this.x = x;
         this.y = y;
         this.color = BiColor.OFF;
     }
 
-    public BarElement(int x, BiColor color) {
+    public PackElement(int x, BiColor color) {
         this.x = x;
         this.y = 0;
         this.color = color;
     }
 
-    public BarElement(int x){
+    public PackElement(int x){
         this.x = x;
         this.y = 0;
         this.color = BiColor.OFF;
@@ -65,7 +65,7 @@ public class BarElement {
 
     @Override
     public String toString() {
-        return "BarElement{" +
+        return "PackElement{" +
                 "x=" + x +
                 ", y=" + y +
                 ", color=" + color +
