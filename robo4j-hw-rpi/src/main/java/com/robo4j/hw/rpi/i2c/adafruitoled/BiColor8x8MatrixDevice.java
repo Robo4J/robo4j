@@ -29,7 +29,7 @@ import java.io.IOException;
  */
 public class BiColor8x8MatrixDevice extends LEDBackpack {
 
-	private static final int MATRIX_SIZE = 8;
+	private static final short MATRIX_SIZE = 8;
 	private MatrixRotation rotation;
 
 	public BiColor8x8MatrixDevice(int bus, int address, int brightness, MatrixRotation rotation) throws IOException {
@@ -55,16 +55,16 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 		}
 	}
 
-	public void addPixes(PackElement... elements){
-	    if(elements == null){
-            System.out.println("addPixes: not allowed state!");
-        }else {
-	        for(PackElement e: elements){
-	            addPixel(e);
-            }
-        }
+	public void addPixes(PackElement... elements) {
+		if (elements == null) {
+			System.out.println("addPixes: not allowed state!");
+		} else {
+			for (PackElement e : elements) {
+				addPixel(e);
+			}
+		}
 
-    }
+	}
 
 	public void setRotation(MatrixRotation rotation) {
 		this.rotation = rotation;
@@ -88,29 +88,33 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 			break;
 		case TWO:
 			x = (short) element.getX();
-			y = (short) (MATRIX_SIZE - element.getY() - 1);
+			y = flipPosition(element.getY());
 			break;
 		case THREE:
-			x = (short) (MATRIX_SIZE - element.getX() - 1);
+			x = flipPosition(element.getX());
 			y = (short) element.getY();
 			break;
 		case FOUR:
-			x = (short) (MATRIX_SIZE - element.getX() - 1);
-			y = (short) (MATRIX_SIZE - element.getY() - 1);
+			x = flipPosition(element.getX());
+			y = flipPosition(element.getY());
 			break;
-        case FIVE:
-            x = (short) (MATRIX_SIZE - element.getY() - 1);
-            y = (short) (MATRIX_SIZE - element.getX() - 1);
-            break;
+		case FIVE:
+			x = flipPosition(element.getY());
+			y = flipPosition(element.getX());
+			break;
 		default:
-			x = (short) MATRIX_SIZE;
-			y = (short) MATRIX_SIZE;
+			x = MATRIX_SIZE;
+			y = MATRIX_SIZE;
 		}
-		setColorByMatrixToBuffer(x, y, element.getColor());
+		setColorByMatrixToBuffer(MATRIX_SIZE, x, y, element.getColor());
 	}
 
 	private boolean validateElement(int x, int y) {
 		return x >= 0 && x < MATRIX_SIZE && y >= 0 && y < MATRIX_SIZE;
+	}
+
+	private short flipPosition(int v) {
+		return (short) (MATRIX_SIZE - v - 1);
 	}
 
 }
