@@ -43,7 +43,7 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, DEFAULT_BRIGHTNESS, MatrixRotation.ONE);
 	}
 
-	public static int getMatrixSize() {
+	public int getMatrixSize() {
 		return MATRIX_SIZE;
 	}
 

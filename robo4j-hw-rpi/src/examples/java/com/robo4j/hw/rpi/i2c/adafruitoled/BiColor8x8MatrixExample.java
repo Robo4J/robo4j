@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BiColor8x8MatrixEample {
+public class BiColor8x8MatrixExample {
 
 	public static void main(String[] args) throws Exception {
         System.out.println("... BiColor 8x8 Matrix Example...");
