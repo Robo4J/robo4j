@@ -17,7 +17,6 @@
 
 package com.robo4j.hw.rpi.imu.impl;
 
-import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
@@ -29,21 +28,14 @@ import com.pi4j.io.spi.SpiChannel;
 import com.pi4j.io.spi.SpiDevice;
 import com.pi4j.io.spi.SpiMode;
 import com.pi4j.io.spi.impl.SpiDeviceImpl;
-import com.robo4j.hw.rpi.imu.BNO080Device;
 import com.robo4j.hw.rpi.imu.BNO80DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.ShtpPacketRequest;
 import com.robo4j.hw.rpi.imu.bno.ShtpPacketResponse;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -63,47 +55,18 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BNO080SPIDevice implements BNO080Device {
+public class BNO080SPIDevice extends AbstractBNO080Device {
 
-	private static final class PacketBodyBuilder {
-		private int[] body;
-		private final AtomicInteger counter = new AtomicInteger();
-
-		PacketBodyBuilder(int size) {
-			body = new int[size];
-		}
-
-		PacketBodyBuilder addElement(int value) {
-			this.body[counter.getAndIncrement()] = value;
-			return this;
-		}
-
-		int[] build() {
-			return body;
-		}
-	}
 
 	public static final SpiMode DEFAULT_SPI_MODE = SpiMode.MODE_3;
-	public static final int DEFAULT_SPI_SPEED = 800000; // 3MHz maximum SPI speed
+	public static final int DEFAULT_SPI_SPEED = 3000000; // 3MHz maximum SPI speed
 	public static final SpiChannel DEFAULT_SPI_CHANNEL = SpiChannel.CS0;
-	public static final short CHANNEL_COUNT = 6; // BNO080 supports 6 channels
-	public static final int SHTP_HEADER_SIZE = 4;
+
 
 	private static final int MAX_METADATA_SIZE = 9; // This is in words. There can be many but we mostly only care about
 	// the first 9 (Qs, range, etc)
-	private static final int MAX_PACKET_SIZE = 128 - SHTP_HEADER_SIZE;
-	private static final int READ_INTERVAL = 2000;
-	private static final int AWAIT_TERMINATION = 10;
-
-	private final int[] sequenceByChannel = new int[CHANNEL_COUNT];
-	private final List<BNO80DeviceListener> listeners = new CopyOnWriteArrayList<>();
-	private int commandSequenceNumber = 0;
-
-	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, (r) -> {
-		Thread t = new Thread(r, "BNO080 Internal Executor");
-		t.setDaemon(true);
-		return t;
-	});
+	public  static final int MAX_PACKET_SIZE = 128 - SHTP_HEADER_SIZE;
+	private static final int READ_INTERVAL = 1000;
 
 	private ScheduledFuture<?> scheduledFuture;
 
@@ -117,7 +80,6 @@ public class BNO080SPIDevice implements BNO080Device {
 	private static int magnetometer_Q1 = 4;
 
 	private SpiDevice spiDevice;
-	private GpioController gpio;
 	private GpioPinDigitalInput intGpio;
 //	private GpioPinDigitalOutput mosiGpio;
 //	private GpioPinDigitalOutput clkGpio;
@@ -142,7 +104,6 @@ public class BNO080SPIDevice implements BNO080Device {
 	// uint32_t
 	private int timeStamp;
 	private long startTime;
-	private AtomicBoolean active = new AtomicBoolean(false);
 
 	private final AtomicLong measurements = new AtomicLong();
 
@@ -152,7 +113,6 @@ public class BNO080SPIDevice implements BNO080Device {
 
 	public BNO080SPIDevice(SpiChannel spiChannel, int speed, SpiMode mode) throws IOException {
 		spiDevice = new SpiDeviceImpl(spiChannel, speed, mode);
-		gpio = GpioFactory.getInstance();
 	}
 
 	/**
@@ -162,7 +122,7 @@ public class BNO080SPIDevice implements BNO080Device {
 		Register register = Register.COMMAND;
 		ShtpPacketRequest packet = prepareShtpPacketRequest(register, 12);
 		packet.addBody(0, ShtpReport.COMMAND_REQUEST.getCode());
-		packet.addBody(0, commandSequenceNumber++);
+		packet.addBody(0, commandSequenceNumber.getAndIncrement());
 		packet.addBody(2, DeviceCommand.ME_CALIBRATE.getId());
 		packet.addBody(3, 1 & 0xFF);
 		packet.addBody(4, 1 & 0xFF);
@@ -214,17 +174,6 @@ public class BNO080SPIDevice implements BNO080Device {
 		return active.get();
 	}
 
-	@Override
-	public void shutdown() {
-		synchronized (executor) {
-			active.set(false);
-			awaitTermination();
-		}
-	}
-
-	public void addListener(BNO80DeviceListener listener) {
-		listeners.add(listener);
-	}
 
 	public void waitForInterrupt(String message) throws InterruptedException, IOException {
 		if (waitForSPI()) {
@@ -255,17 +204,19 @@ public class BNO080SPIDevice implements BNO080Device {
 				}
 				active.set(initState);
 				System.out.println("Start: active= " + initState);
-			}
 
-			while (active.get()) {
-				ShtpPacketResponse packet = dataAvailable();
-				if (packet.dataAvailable()) {
-					for (BNO80DeviceListener l : listeners) {
-						l.onResponse(packet);
+				while (active.get()) {
+					ShtpPacketResponse packet = dataAvailable();
+					if (packet.dataAvailable()) {
+						for (BNO80DeviceListener l : listeners) {
+							l.onResponse(packet);
+						}
 					}
 				}
 			}
 		});
+
+
 		return active.get();
 	}
 
@@ -274,7 +225,9 @@ public class BNO080SPIDevice implements BNO080Device {
 		boolean state = prepareForSpi();
 		if (state) {
 			System.out.println("beginSPI DONE ");
+
 			sendProductIdRequest();
+			TimeUnit.SECONDS.sleep(2);
 			boolean active = true;
 			int counter = 0;
 			while(active && counter < 20){
@@ -292,17 +245,6 @@ public class BNO080SPIDevice implements BNO080Device {
 
 	}
 
-
-
-	private boolean containsResponseCode(ShtpPacketResponse response, ShtpReport expectedReport){
-		if (response.dataAvailable()) {
-			ShtpReport report = ShtpReport.getByCode(response.getBodyFirst());
-			return expectedReport.equals(report);
-		} else {
-			System.out.println("containsResponseCode: No Data");
-		}
-		return false;
-	}
 
 	public boolean sendSensorReportRequest(SensorReport sensorReport) throws InterruptedException, IOException {
 		boolean state = prepareForSpi();
@@ -384,9 +326,9 @@ public class BNO080SPIDevice implements BNO080Device {
 	private boolean configureSpiPins(Pin wake, Pin cs, Pin rst, Pin inter) throws IOException, InterruptedException {
 		System.out.println(String.format("configurePins: wak=%s, cs=%s, rst=%s, inter=%s", wake, cs, rst, inter));
 //		csGpio = gpio.provisionDigitalOutputPin(cs, "CS");
-		wakeGpio = gpio.provisionDigitalOutputPin(wake, "WAKE");
-		intGpio = gpio.provisionDigitalInputPin(inter, "INT", PinPullResistance.PULL_UP);
-		rstGpio = gpio.provisionDigitalOutputPin(rst, "RST");
+		wakeGpio = GpioFactory.getInstance().provisionDigitalOutputPin(wake);
+		intGpio = GpioFactory.getInstance().provisionDigitalInputPin(inter, PinPullResistance.PULL_UP);
+		rstGpio = GpioFactory.getInstance().provisionDigitalOutputPin(rst);
 //		mosiGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_12, "MOSI");
 //		clkGpio = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_14, "CLK");
 
@@ -396,22 +338,12 @@ public class BNO080SPIDevice implements BNO080Device {
 		// Configure the BNO080 for SPI communication
 		wakeGpio.setState(PinState.HIGH); 		// Before boot up the
 		rstGpio.setState(PinState.LOW); 		// Reset BNO080
-		TimeUnit.MILLISECONDS.sleep(300); // Min length not specified in datasheet?
+		TimeUnit.SECONDS.sleep(2); // Min length not specified in datasheet?
 		rstGpio.setState(PinState.HIGH); 		// Bring out of reset
-		TimeUnit.MILLISECONDS.sleep(1000); // Min length not specified in datasheet?
 
 		return true;
 	}
 
-
-	private void awaitTermination() {
-		try {
-			executor.awaitTermination(AWAIT_TERMINATION, TimeUnit.MILLISECONDS);
-			executor.shutdown();
-		} catch (InterruptedException e) {
-			System.err.println(String.format("awaitTermination e: %s", e));
-		}
-	}
 
 	private boolean containsResponseCode(ShtpPacketResponse response){
 		if (response.dataAvailable()) {
@@ -423,53 +355,11 @@ public class BNO080SPIDevice implements BNO080Device {
 		return false;
 	}
 
-	/**
-	 * end command to reset IC Read all advertisement packets from sensor The sensor
-	 * has been seen to reset twice if we attempt too much too quickly. This seems
-	 * to work reliably.
-	 */
-	private boolean softReset() throws IOException, InterruptedException {
-		Register register = Register.EXECUTABLE;
-		ShtpPacketRequest request = prepareShtpPacketRequest(register, 1);
-		request.addBody(0, 1);
-
-		sendPacket(register, request, "softReset");
-
-		int counter=0;
-		while (receivePacket().dataAvailable()){
-			counter++;
-		}
-		System.out.println("softReset FLUSH1=" + counter);
-		counter=0;
-		while (receivePacket().dataAvailable()){
-			counter++;
-		}
-		System.out.println("softReset FLUSH2 =" + counter);
-		System.out.println("softResetFLUSH");
-
-		counter =0;
-		boolean active = true;
-		while (active && counter < 300){
-			ShtpPacketResponse response = receivePacket();
-			ShtpReport report = ShtpReport.getByCode(response.getBodyFirst());
-			if(report.equals(ShtpReport.COMMAND_RESPONSE)){
-				active = false;
-			}else{
-				counter++;
-			}
-			TimeUnit.MILLISECONDS.sleep(40);
-		}
-		System.out.println("softReset FLUSH3 RECEIVED COMMAND =" + counter);
-
-
-		return true;
-	}
-
-
 
 	private boolean prepareForSpi() throws InterruptedException, IOException {
 		// Wait for first assertion of INT before using WAK pin. Can take ~104ms
-		boolean state = waitForSPI();
+//		boolean state = waitForSPI();
+		boolean state = true;
 
 		System.out.println("START1: INT before using WAK pin state: " + state);
 
@@ -479,50 +369,20 @@ public class BNO080SPIDevice implements BNO080Device {
 		 * complete. When BNO080 first boots it broadcasts big startup packet Read it
 		 * and dump it
 		 */
-		 if(state){
-		 	waitForInterrupt("beginSPI: system startup");
-		 }
+//		 if(state){
+//		 	waitForInterrupt("beginSPI: system startup");
+//		 }
 
 		/*
 		 * The BNO080 will then transmit an unsolicited Initialize Response (see
 		 * 6.4.5.2) Read it and dump it
 		 */
-		if (state) {
-			waitForInterrupt("beginSPI: BNO080 unsolicited response");
-		}
+//		if (state) {
+//			waitForInterrupt("beginSPI: BNO080 unsolicited response");
+//		}
 		return state;
 	}
 
-	private ShtpPacketRequest getProductIdRequest() {
-		// Check communication with device
-		// bytes: Request the product ID and reset info, Reserved
-		ShtpPacketRequest result = prepareShtpPacketRequest(Register.CONTROL, 2);
-		result.addBody(0, ShtpReport.PRODUCT_ID_REQUEST.getCode());
-		result.addBody(1, 0);
-		return result;
-	}
-
-	private boolean processShtpReportResponse(ShtpReport report) {
-		switch (report) {
-		case COMMAND_RESPONSE:
-		case FRS_READ_RESPONSE:
-		case PRODUCT_ID_RESPONSE:
-		case BASE_TIMESTAMP:
-		case GET_FEATURE_RESPONSE:
-		case FLUSH_COMPLETED:
-			System.out.println("processShtpReportResponse response: " + report);
-			return true;
-		default:
-			System.out.println("processShtpReportResponse: received not valid response: " + report);
-			return false;
-		}
-	}
-
-	private ShtpPacketRequest prepareShtpPacketRequest(Register register, int size) {
-		ShtpPacketRequest packet = new ShtpPacketRequest(size, sequenceByChannel[register.getChannel()]++);
-		packet.createHeader(register);
-		return packet;
-	}
 
 	private void printRotationVectorData(AtomicLong measurements) {
 		float quatI = getQuatI();
@@ -588,9 +448,9 @@ public class BNO080SPIDevice implements BNO080Device {
 	 *             exception
 	 */
 	private ShtpPacketResponse dataAvailable() {
-		if (intGpio.isHigh()) {
-			return new ShtpPacketResponse(0);
-		}
+//		if (intGpio.isHigh()) {
+//			return new ShtpPacketResponse(0);
+//		}
 
 		ShtpPacketResponse receivePacket = null;
 		try {
@@ -831,7 +691,7 @@ public class BNO080SPIDevice implements BNO080Device {
 		ShtpPacketRequest packetRequest = prepareShtpPacketRequest(register, 17);
 
 		//@formatter:off
-		int[] packetBody = new PacketBodyBuilder(packetRequest.getBodySize())
+		int[] packetBody = new ShtpPacketBodyBuilder(packetRequest.getBodySize())
 				.addElement(ShtpReport.SET_FEATURE_COMMAND.getCode())
 				.addElement(sensorReport.getId()) 			// Feature Report ID. 0x01 = Accelerometer, 0x05 = Rotation vector
 				.addElement(0) // Feature flags
@@ -863,7 +723,7 @@ public class BNO080SPIDevice implements BNO080Device {
 		ShtpPacketRequest packetRequest = prepareShtpPacketRequest(register, 2);
 
 		//@formatter:off
-		int[] packetBody = new PacketBodyBuilder(packetRequest.getBodySize())
+		int[] packetBody = new ShtpPacketBodyBuilder(packetRequest.getBodySize())
 				.addElement(type.getCode())
 				.addElement(sensor.getId())
 				.build();
@@ -904,10 +764,10 @@ public class BNO080SPIDevice implements BNO080Device {
 			throws InterruptedException, IOException {
 
 		// Wait for BNO080 to indicate it is available for communication
-		if (!waitForSPI()) {
-			System.out.println("sendPacket SPI not available for communication");
-			return false;
-		}
+//		if (!waitForSPI()) {
+//			System.out.println("sendPacket SPI not available for communication");
+//			return false;
+//		}
 
 		// BNO080 has max CLK of 3MHz, MSB first,
 		// The BNO080 uses CPOL = 1 and CPHA = 1. This is mode3
@@ -938,7 +798,7 @@ public class BNO080SPIDevice implements BNO080Device {
 		return true;
 	}
 
-	private void printShtpPacketPart(ShtpReport report, String prefix, int[] data) {
+	public static  void printShtpPacketPart(ShtpReport report, String prefix, int[] data) {
 		switch (report) {
 		case PRODUCT_ID_RESPONSE:
 			System.out.println(String.format("printShtpPacketPart:%s:report=%s:value=%s", prefix, report,
@@ -961,7 +821,7 @@ public class BNO080SPIDevice implements BNO080Device {
 			return new ShtpPacketResponse(0);
 		}
 
-		// Get first four bytes to find out how much data we need to read
+//		 Get first four bytes to find out how much data we need to read
 //		csGpio.setState(PinState.LOW);
 
 
@@ -1006,17 +866,7 @@ public class BNO080SPIDevice implements BNO080Device {
 
 	}
 
-	/**
-	 *
-	 * @param array
-	 *            byte array
-	 * @return unsigned 8-bit int
-	 */
-	private int toInt8U(byte[] array) {
-		return array[0] & 0xFF;
-	}
-
-	private int calculateNumberOfBytesInPacket(int packetMSB, int packetLSB) {
+	static int calculateNumberOfBytesInPacket(int packetMSB, int packetLSB) {
 		// Calculate the number of data bytes in this packet
 		int dataLength = (0xFFFF & packetMSB << 8 | packetLSB);
 		dataLength &= ~(1 << 15); // Clear the MSbit.
