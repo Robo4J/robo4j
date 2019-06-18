@@ -156,8 +156,11 @@ public class BNO080I2CDevice extends AbstractBNO080Device {
 			ShtpPacketResponse response = new ShtpPacketResponse(dataLength);
 			response.addHeader(packetLSB, packetMSB, channelNumber, sequenceNumber);
 
+            System.out.println("response dataLength: " + dataLength);
+            System.out.println("response header: " + response);
+
 			byte[] responseBytes = new byte[dataLength];
-			int readBodySize = i2cDevice.read(responseBytes, SHTP_HEADER_SIZE, dataLength);
+			int readBodySize = i2cDevice.read(responseBytes, 0, dataLength);
 
 			if (readBodySize == dataLength) {
 				for (int i = 0; i < dataLength; i++) {
