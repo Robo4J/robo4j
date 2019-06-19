@@ -67,6 +67,7 @@ public interface BNO080Device {
     enum ShtpReport {
         //@formatter:off
         NONE                    (-1),
+        ADVERTISEMENT           (0x00),
         COMMAND_RESPONSE        (0xF1),
         COMMAND_REQUEST         (0xF2),
         FRS_READ_RESPONSE       (0xF3),

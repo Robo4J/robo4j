@@ -116,15 +116,22 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 		return result;
 	}
 
-    boolean containsResponseCode(ShtpPacketResponse response, ShtpReport expectedReport){
-        if (response.dataAvailable()) {
-            ShtpReport report = ShtpReport.getByCode(response.getBodyFirst());
-            return expectedReport.equals(report);
-        } else {
-            System.out.println("containsResponseCode: No Data");
-        }
-        return false;
-    }
+	ShtpPacketRequest getSoftResetPacket() {
+		Register register = Register.EXECUTABLE;
+		ShtpPacketRequest packet = prepareShtpPacketRequest(register, 1);
+		packet.addBody(0, 1);
+		return packet;
+	}
+
+	boolean containsResponseCode(ShtpPacketResponse response, ShtpReport expectedReport) {
+		if (response.dataAvailable()) {
+			ShtpReport report = ShtpReport.getByCode(response.getBodyFirst());
+			return expectedReport.equals(report);
+		} else {
+			System.out.println("containsResponseCode: No Data");
+		}
+		return false;
+	}
 
 	private void awaitTermination() {
 		try {
@@ -135,18 +142,18 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 		}
 	}
 
-    /**
-     *
-     * @param array
-     *            byte array
-     * @return unsigned 8-bit int
-     */
-    int toInt8U(byte[] array) {
-        return array[0] & 0xFF;
-    }
+	/**
+	 *
+	 * @param array
+	 *            byte array
+	 * @return unsigned 8-bit int
+	 */
+	int toInt8U(byte[] array) {
+		return array[0] & 0xFF;
+	}
 
-    int toInt8U(byte b){
-        return b & 0xFF;
-    }
+	int toInt8U(byte b) {
+		return b & 0xFF;
+	}
 
 }

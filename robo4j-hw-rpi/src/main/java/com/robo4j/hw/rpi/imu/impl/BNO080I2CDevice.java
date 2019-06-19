@@ -66,7 +66,7 @@ public class BNO080I2CDevice extends AbstractBNO080Device {
 		 * Begin by resetting the IMU
 		 */
 		try {
-			softReset();
+			softResetWithFlushAndResponse();
 			ShtpPacketRequest productIdRequest = getProductIdRequest();
 			sendPacket(productIdRequest, "start");
 
@@ -98,11 +98,8 @@ public class BNO080I2CDevice extends AbstractBNO080Device {
 	 * has been seen to reset twice if we attempt too much too quickly. This seems
 	 * to work reliably.
 	 */
-	private boolean softReset() throws IOException, InterruptedException {
-		Register register = Register.EXECUTABLE;
-		ShtpPacketRequest request = prepareShtpPacketRequest(register, 1);
-		request.addBody(0, 1);
-
+	private boolean softResetWithFlushAndResponse() throws IOException, InterruptedException {
+		ShtpPacketRequest request = getSoftResetPacket();
 		sendPacket(request, "softReset");
 
 		int counter = 0;
