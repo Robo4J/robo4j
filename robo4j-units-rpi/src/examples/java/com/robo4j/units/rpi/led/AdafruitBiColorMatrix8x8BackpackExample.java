@@ -22,6 +22,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.hw.rpi.i2c.adafruitoled.BiColor;
 import com.robo4j.hw.rpi.i2c.adafruitoled.PackElement;
+import com.robo4j.util.SystemUtil;
 
 import java.io.InputStream;
 import java.util.concurrent.Executors;
@@ -45,10 +46,12 @@ public class AdafruitBiColorMatrix8x8BackpackExample {
         RoboContext ctx = new RoboBuilder().add(settings).build();
 
         ctx.start();
+        System.out.println("State after start:");
+        System.out.println(SystemUtil.printStateReport(ctx));
         RoboReference<LEDBackpackMessage> barUnit = ctx.getReference("matrix8x8");
         LEDBackpackMessage clearMessage = new LEDBackpackMessage();
         AtomicInteger position = new AtomicInteger();
-        executor.schedule(() -> {
+        executor.scheduleAtFixedRate(() -> {
             if(position.get() < 8){
                 position.set(0);
             }
@@ -58,7 +61,7 @@ public class AdafruitBiColorMatrix8x8BackpackExample {
             LEDBackpackMessage addMessage= new LEDBackpackMessage(LEDBackpackMessageType.DISPLAY);
             addMessage.addElement(element);
 
-        }, 1, TimeUnit.SECONDS);
+        }, 2, 1, TimeUnit.SECONDS);
 
         System.out.println("Press enter to quit\n");
         System.in.read();

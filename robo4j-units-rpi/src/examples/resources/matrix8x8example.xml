@@ -21,7 +21,7 @@
         <class>com.robo4j.units.rpi.led.Adafruit8x8MatrixUnit</class>
         <config name="com.robo4j.root">
             <value name="bus" type="int">1</value>
-            <!-- 0x40 hex -->
+            <!-- 0x70 hex -->
             <value name="address" type="int">0x70</value>
         </config>
     </roboUnit>

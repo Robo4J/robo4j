@@ -49,7 +49,7 @@ public class AdafruitBiColor24BackpackExample {
         RoboReference<LEDBackpackMessage> barUnit = ctx.getReference("24bargraph");
         LEDBackpackMessage clearMessage = new LEDBackpackMessage();
         AtomicInteger position = new AtomicInteger();
-        executor.schedule(() -> {
+        executor.scheduleAtFixedRate(() -> {
             if(position.get() < 24){
                 position.set(0);
             }
@@ -59,7 +59,7 @@ public class AdafruitBiColor24BackpackExample {
             LEDBackpackMessage addMessage= new LEDBackpackMessage(LEDBackpackMessageType.DISPLAY);
             addMessage.addElement(element);
 
-        }, 1, TimeUnit.SECONDS);
+        }, 2, 1, TimeUnit.SECONDS);
 
         System.out.println("Press enter to quit\n");
         System.in.read();
