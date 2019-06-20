@@ -91,7 +91,7 @@ public class BiColor24BarDevice extends LEDBackpack {
 			a = intToShort(a + 4);
 		}
 
-		setColorToBuffer(a, c, element.getColor());
+		setColorToBarBuffer(a, c, element.getColor());
 	}
 
 	private boolean validatePositions(int pos) {

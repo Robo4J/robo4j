@@ -106,7 +106,7 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 			x = MATRIX_SIZE;
 			y = MATRIX_SIZE;
 		}
-		setColorByMatrixToBuffer(MATRIX_SIZE, x, y, element.getColor());
+		setColorByMatrixToBuffer(x, y, element.getColor());
 	}
 
 	private boolean validateElement(int x, int y) {

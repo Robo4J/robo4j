@@ -22,7 +22,7 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import java.io.IOException;
 
 /**
- *
+ * LED Backpack
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -37,7 +37,7 @@ abstract class LEDBackpack extends AbstractI2CDevice {
 	private static final int HT16K33_BLINK_DISPLAY_OFF = 0;
 	private static final int HT16K33_CMD_BRIGHTNESS = 0xE0;
 	private static final int HT16K33_BLINK_OFF = 0x00;
-	static short[] buffer = new short[8]; // uint16_t
+	private final short[] buffer = new short[8]; // uint16_t
 
 	LEDBackpack(int bus, int address) throws IOException {
 		super(bus, address);
@@ -59,26 +59,26 @@ abstract class LEDBackpack extends AbstractI2CDevice {
 		return (short) (value & 0xFFFF);
 	}
 
-	void setColorByMatrixToBuffer(short size, short x, short y, BiColor color) {
+	void setColorByMatrixToBuffer(short x, short y, BiColor color) {
 		switch (color) {
 		case RED:
 			// Turn on red LED.
-			buffer[y] |= _BV(intToShort(x + size));
+			buffer[y] |= _BV(intToShort(x + 8));
 			// Turn off green LED.
 			buffer[y] &= ~_BV(x);
 			break;
 		case YELLOW:
 			// Turn on green and red LED.
-			buffer[y] |= _BV(intToShort(x + size)) | _BV(x);
+			buffer[y] |= _BV(intToShort(x + 8)) | _BV(x);
 			break;
 		case GREEN:
 			// Turn on green LED.
 			buffer[y] |= _BV(x);
 			// Turn off red LED.
-			buffer[y] &= ~_BV(intToShort(x + size));
+			buffer[y] &= ~_BV(intToShort(x + 8));
 			break;
 		case OFF:
-			buffer[y] &= ~_BV(x) & ~_BV(intToShort(x + size));
+			buffer[y] &= ~_BV(x) & ~_BV(intToShort(x + 8));
 			break;
 		default:
 			System.out.println("setColorByMatrixToBuffer: " + color);
@@ -86,7 +86,7 @@ abstract class LEDBackpack extends AbstractI2CDevice {
 		}
 	}
 
-	void setColorToBuffer(short a, short c, BiColor color) {
+	void setColorToBarBuffer(short a, short c, BiColor color) {
 		switch (color) {
 		case RED:
 			// Turn on red LED.
@@ -109,7 +109,7 @@ abstract class LEDBackpack extends AbstractI2CDevice {
 			buffer[c] &= ~_BV(a) & ~_BV(intToShort(a + 8));
 			break;
 		default:
-			System.out.println("setColorToBuffer: " + color);
+			System.out.println("setColorToBarBuffer: " + color);
 			break;
 		}
 	}

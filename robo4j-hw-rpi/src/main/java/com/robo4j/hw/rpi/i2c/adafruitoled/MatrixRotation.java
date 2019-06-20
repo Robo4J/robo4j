@@ -25,21 +25,33 @@ package com.robo4j.hw.rpi.i2c.adafruitoled;
  */
 public enum MatrixRotation {
 	//@formatter:off
-    ONE ("default setup to pins"),
-    TWO ("left rotation to pins"),
-    THREE ("right rotation to pins"),
-    FOUR    ("switch to pins, x vertical"),
-    FIVE    ("switch to pins, y horizotal")
+	NONE		(0, "none"),
+    ONE 		(1,"default setup to pins"),
+    TWO 		(2, "left rotation to pins"),
+    THREE	 	(3,"right rotation to pins"),
+    FOUR    	(4,"switch to pins, x vertical"),
+    FIVE    	(5,"switch to pins, y horizontal")
     ;
     //@formatter:on
 
+	private int id;
 	private final String note;
 
-	MatrixRotation(String note) {
+	MatrixRotation(int id, String note) {
+		this.id = id;
 		this.note = note;
 	}
 
 	public String getNote() {
 		return note;
+	}
+
+	public static MatrixRotation getById(int code) {
+		for (MatrixRotation r : values()) {
+			if (code == r.id) {
+				return r;
+			}
+		}
+		return NONE;
 	}
 }
