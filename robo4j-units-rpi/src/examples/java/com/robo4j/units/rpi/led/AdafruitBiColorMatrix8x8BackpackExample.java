@@ -61,6 +61,7 @@ public class AdafruitBiColorMatrix8x8BackpackExample {
         }, 1, TimeUnit.SECONDS);
 
         System.out.println("Press enter to quit\n");
+        System.in.read();
         executor.shutdown();
         barUnit.sendMessage(clearMessage);
         ctx.shutdown();
