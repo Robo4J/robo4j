@@ -34,7 +34,8 @@ public class BiColor8x8MatrixExample {
         matrix.clear();
         matrix.display();
 
-        for(MatrixRotation rotation: MatrixRotation.values()){
+        MatrixRotation[] rotations = {MatrixRotation.ONE, MatrixRotation.TWO, MatrixRotation.THREE, MatrixRotation.FOUR, MatrixRotation.FIVE};
+        for(MatrixRotation rotation: rotations){
             matrix.setRotation(rotation);
             matrix.addPixel(new PackElement(0,0, BiColor.RED));
             matrix.addPixel(new PackElement(1,0, BiColor.GREEN));

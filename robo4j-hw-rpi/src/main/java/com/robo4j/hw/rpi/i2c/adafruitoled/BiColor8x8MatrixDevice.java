@@ -17,9 +17,8 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitoled;
 
-import com.pi4j.io.i2c.I2CBus;
-
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * https://learn.adafruit.com/adafruit-led-backpack/bi-color-8x8-matrix
@@ -40,7 +39,7 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 	}
 
 	public BiColor8x8MatrixDevice() throws IOException {
-		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, DEFAULT_BRIGHTNESS, MatrixRotation.ONE);
+		this(DEFAULT_I2C_BUS, DEFAULT_I2C_ADDRESS, DEFAULT_BRIGHTNESS, MatrixRotation.ONE);
 	}
 
 	public int getMatrixSize() {
@@ -55,27 +54,28 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 		}
 	}
 
-	public void addPixes(PackElement... elements) {
+	public void addPixels(Collection<PackElement> elements) {
 		if (elements == null) {
-			System.out.println("addPixes: not allowed state!");
+			System.out.println("addPixels: not allowed state!");
+		} else {
+			for (PackElement e : elements) {
+				addPixels(e);
+			}
+		}
+	}
+
+	public void addPixels(PackElement... elements) {
+		if (elements == null || elements.length == 0) {
+			System.out.println("addPixels: not allowed state!");
 		} else {
 			for (PackElement e : elements) {
 				addPixel(e);
 			}
 		}
-
 	}
 
 	public void setRotation(MatrixRotation rotation) {
 		this.rotation = rotation;
-	}
-
-	public void clear() throws IOException {
-		clearBuffer();
-	}
-
-	public void display() throws IOException {
-		writeDisplay();
 	}
 
 	private void setPixel(PackElement element) {

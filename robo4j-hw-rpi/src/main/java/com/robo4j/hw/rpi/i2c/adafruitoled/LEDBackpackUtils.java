@@ -30,6 +30,15 @@ public final class LEDBackpackUtils {
 
 	/**
 	 * Create matrix by defining array of defined bytes array and selected color
+	 * example: byte[] face_smile = {
+	 *                   0b0011_1100,
+	 *                   0b0100_0010,
+	 *             (byte)0b1010_0101,
+	 *             (byte)0b1000_0001,
+	 *             (byte)0b1010_0101,
+	 *             (byte)0b1001_1001,
+	 *             (byte)0b0100_0010,
+	 *             (byte)0b0011_1100};
 	 *
 	 * @param array
 	 *            unsigned byte array represented by 8-bits, represent the matrix of
@@ -55,7 +64,8 @@ public final class LEDBackpackUtils {
 
 	/**
 	 * create a BiColor byte array for given matrix size
-	 *
+	 * example: sequence = "00123300,03000030,30200301,30000003,30300303,30033003,03000030,00333300"
+	 * where number are according to {@link BiColor}
 	 *
 	 * @param sequence
 	 *            sequence of BiColor values

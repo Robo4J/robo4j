@@ -46,7 +46,7 @@ public class BiColor8x8MatrixFaceRotationExample {
 		for (int i = 0; i < face_smile.length; i++) {
 			matrix.clear();
 			matrix.display();
-			matrix.addPixes(
+			matrix.addPixels(
 					LEDBackpackUtils.create2DMatrixByRowArraysAndColor(face_smile, BiColor.getByValue(i % 2 + 1)));
 			matrix.display();
 			matrix.setRotation(MatrixRotation.getById(i % 5 + 1));

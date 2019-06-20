@@ -17,6 +17,7 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitoled;
 
+import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 
 import java.io.IOException;
@@ -27,10 +28,11 @@ import java.io.IOException;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-abstract class LEDBackpack extends AbstractI2CDevice {
+public abstract class LEDBackpack extends AbstractI2CDevice {
 
-	static int DEFAULT_I2C_ADDRESS = 0x70;
-	static int DEFAULT_BRIGHTNESS = 15;
+	public static int DEFAULT_I2C_BUS = I2CBus.BUS_1;
+	public static int DEFAULT_I2C_ADDRESS = 0x70;
+	public static int DEFAULT_BRIGHTNESS = 15;
 	private static final int OSCILLATOR_TURN_ON = 0x21;
 	private static final int HT16K33_BLINK_CMD = 0x80;
 	private static final int HT16K33_BLINK_DISPLAY_ON = 0x01;
@@ -43,16 +45,27 @@ abstract class LEDBackpack extends AbstractI2CDevice {
 		super(bus, address);
 	}
 
+	public void display() {
+		try {
+			writeDisplay();
+		} catch (IOException e) {
+			System.out.println(String.format("error display: %s", e.getMessage()));
+		}
+	}
+
+	public void clear() {
+		try {
+			clearBuffer();
+		} catch (IOException e) {
+			System.out.println(String.format("error clear: %s", e.getMessage()));
+		}
+	}
+
+
 	void initiate(int brightness) throws IOException {
 		i2cDevice.write((byte) (OSCILLATOR_TURN_ON)); // Turn on oscilator
 		i2cDevice.write(blinkRate(HT16K33_BLINK_OFF));
 		i2cDevice.write(setBrightness(brightness));
-	}
-
-	void clearBuffer() throws IOException {
-		for (int i = 0; i < buffer.length; i++) {
-			buffer[i] = 0;
-		}
 	}
 
 	short intToShort(int value) {
@@ -114,13 +127,20 @@ abstract class LEDBackpack extends AbstractI2CDevice {
 		}
 	}
 
-	void writeDisplay() throws IOException {
+	private void writeDisplay() throws IOException {
 		int address = 0;
 		for (int i = 0; i < buffer.length; i++) {
 			i2cDevice.write(address++, (byte) (buffer[i] & 0xFF));
 			i2cDevice.write(address++, (byte) (buffer[i] >> 8));
 		}
 	}
+
+	private void clearBuffer() throws IOException {
+		for (int i = 0; i < buffer.length; i++) {
+			buffer[i] = 0;
+		}
+	}
+
 
 	private short _BV(short i) {
 		return ((short) (1 << i));
