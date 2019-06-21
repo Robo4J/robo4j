@@ -15,7 +15,11 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.i2c.adafruitoled;
+package com.robo4j.hw.rpi.i2c.adafruitbackpack;
+
+import com.robo4j.hw.rpi.i2c.adafruitoled.BiColor;
+import com.robo4j.hw.rpi.i2c.adafruitoled.BiColor24BarDevice;
+import com.robo4j.hw.rpi.i2c.adafruitoled.PackElement;
 
 import java.util.concurrent.TimeUnit;
 

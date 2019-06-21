@@ -15,37 +15,46 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.i2c.adafruitoled;
+package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
-import java.util.Arrays;
-import java.util.List;
+import com.robo4j.hw.rpi.i2c.adafruitoled.BiColor;
+import com.robo4j.hw.rpi.i2c.adafruitoled.BiColor8x8MatrixDevice;
+import com.robo4j.hw.rpi.i2c.adafruitoled.LEDBackpackUtils;
+import com.robo4j.hw.rpi.i2c.adafruitoled.MatrixRotation;
+
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BiColor8x8MatrixFaceExample {
+public class BiColor8x8MatrixFaceRotationExample {
 
-	public static void main(String[] args) throws Exception {
-		System.out.println("... BiColor 8x8 Matrix Face Example...");
+	public static void main(String[] args) throws IOException, InterruptedException {
+		System.out.println("...BiColor 8x8 Matrix Face Rotation Example...");
 
 		BiColor8x8MatrixDevice matrix = new BiColor8x8MatrixDevice();
+		//@formatter:off
+        byte[] faceSmile = {
+                  0b0011_1100,
+                  0b0100_0010,
+            (byte)0b1010_0101,
+            (byte)0b1000_0001,
+            (byte)0b1010_0101,
+            (byte)0b1001_1001,
+            (byte)0b0100_0010,
+            (byte)0b0011_1100};
+        //@formatter:on
 
-		char[] face_smile = "00333300,03000030,30300303,30000003,30300303,30033003,03000030,00333300".toCharArray();
-		char[] face_neutral = "00222200,02000020,20200202,20000002,20222202,20000002,02000020,00222200".toCharArray();
-		char[] face_frown = "00111100,01000010,10100101,10000001,10011001,10100101,01000010,00111100".toCharArray();
-
-		List<char[]> availableFaces = Arrays.asList(face_frown, face_neutral, face_smile);
-
-		for (char[] face : availableFaces) {
+		int color = 1;
+		for (int i = 0; i < faceSmile.length; i++) {
 			matrix.clear();
 			matrix.display();
-			byte[] faceByte = LEDBackpackUtils.createMatrixBiColorArrayByCharSequence(matrix.getMatrixSize(), ',',
-					face);
-			PackElement[] faceElements = LEDBackpackUtils.createMatrixByBiColorByteArray(matrix.getMatrixSize(), faceByte);
-			matrix.addPixels(faceElements);
+			matrix.addPixels(
+					LEDBackpackUtils.create2DMatrixByRowArraysAndColor(faceSmile, BiColor.getByValue(i % 2 + 1)));
 			matrix.display();
+			matrix.setRotation(MatrixRotation.getById(i % 5 + 1));
 			TimeUnit.SECONDS.sleep(1);
 		}
 
@@ -53,6 +62,5 @@ public class BiColor8x8MatrixFaceExample {
 		System.in.read();
 		matrix.clear();
 		matrix.display();
-
 	}
 }
