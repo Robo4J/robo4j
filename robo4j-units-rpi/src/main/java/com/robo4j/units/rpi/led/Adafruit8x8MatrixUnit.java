@@ -56,7 +56,6 @@ public class Adafruit8x8MatrixUnit extends AbstractLEDBackpackUnit<BiColor8x8Mat
         MatrixRotation rotation = MatrixRotation.valueOf(configuration.getString(ATTRIBUTE_ROTATION, DEFAULT_MATRIX_ROTATION).toUpperCase());
         device = getBackpackDevice(LEDBackpackType.BI_COLOR_MATRIX_8x8, bus, address);
         device.setRotation(rotation);
-        System.out.println("init DONE");
     }
 
     @Override

@@ -20,7 +20,6 @@ package com.robo4j.units.rpi.led;
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
-import com.robo4j.hw.rpi.i2c.adafruitoled.BiColor24BarDevice;
 import com.robo4j.hw.rpi.i2c.adafruitoled.LEDBackpack;
 import com.robo4j.hw.rpi.i2c.adafruitoled.LEDBackpackFactory;
 import com.robo4j.hw.rpi.i2c.adafruitoled.LEDBackpackType;
@@ -30,6 +29,8 @@ import com.robo4j.units.rpi.I2CEndPoint;
 import com.robo4j.units.rpi.I2CRegistry;
 
 import java.util.List;
+
+import static com.robo4j.hw.rpi.i2c.adafruitoled.LEDBackpack.DEFAULT_BRIGHTNESS;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -47,7 +48,7 @@ public abstract class AbstractLEDBackpackUnit<T extends LEDBackpack> extends Rob
         Object device = I2CRegistry.getI2CDeviceByEndPoint(endPoint);
         if (device == null) {
             try {
-                device = LEDBackpackFactory.createDevice(bus, address, type, BiColor24BarDevice.DEFAULT_BRIGHTNESS);
+                device = LEDBackpackFactory.createDevice(bus, address, type, DEFAULT_BRIGHTNESS);
                 // Note that we cannot catch hardware specific exceptions here,
                 // since they will be loaded when we run as mocked.
             } catch (Exception e) {

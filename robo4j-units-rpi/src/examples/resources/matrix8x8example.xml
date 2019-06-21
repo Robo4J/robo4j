@@ -17,7 +17,7 @@
 
 -->
 <robo4j>
-    <roboUnit id="matrix8x8">
+    <roboUnit id="matrix">
         <class>com.robo4j.units.rpi.led.Adafruit8x8MatrixUnit</class>
         <config name="com.robo4j.root">
             <value name="bus" type="int">1</value>

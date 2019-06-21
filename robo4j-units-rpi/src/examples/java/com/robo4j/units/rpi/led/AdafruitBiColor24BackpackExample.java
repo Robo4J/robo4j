@@ -21,6 +21,7 @@ import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.hw.rpi.i2c.adafruitoled.BiColor;
+import com.robo4j.hw.rpi.i2c.adafruitoled.BiColor24BarDevice;
 import com.robo4j.hw.rpi.i2c.adafruitoled.PackElement;
 
 import java.io.InputStream;
@@ -46,11 +47,11 @@ public class AdafruitBiColor24BackpackExample {
         RoboContext ctx = new RoboBuilder().add(settings).build();
 
         ctx.start();
-        RoboReference<LEDBackpackMessage> barUnit = ctx.getReference("24bargraph");
+        RoboReference<LEDBackpackMessage> barUnit = ctx.getReference("bargraph");
         LEDBackpackMessage clearMessage = new LEDBackpackMessage();
         AtomicInteger position = new AtomicInteger();
         executor.scheduleAtFixedRate(() -> {
-            if(position.get() < 24){
+            if(position.get() > BiColor24BarDevice.MAX_BARS - 1){
                 position.set(0);
             }
             barUnit.sendMessage(clearMessage);
@@ -58,13 +59,13 @@ public class AdafruitBiColor24BackpackExample {
             PackElement element = new PackElement(position.getAndIncrement(), BiColor.getByValue(position.get() % 3 + 1));
             LEDBackpackMessage addMessage= new LEDBackpackMessage(LEDBackpackMessageType.DISPLAY);
             addMessage.addElement(element);
+            barUnit.sendMessage(addMessage);
 
         }, 2, 1, TimeUnit.SECONDS);
 
         System.out.println("Press enter to quit\n");
         System.in.read();
         executor.shutdown();
-        barUnit.sendMessage(clearMessage);
         ctx.shutdown();
 
 	}
