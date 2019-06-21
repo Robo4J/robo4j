@@ -30,9 +30,7 @@ import java.io.IOException;
  */
 public abstract class LEDBackpack extends AbstractI2CDevice {
 
-	public static int DEFAULT_I2C_BUS = I2CBus.BUS_1;
-	public static int DEFAULT_I2C_ADDRESS = 0x70;
-	public static int DEFAULT_BRIGHTNESS = 15;
+	public static final int DEFAULT_BRIGHTNESS = 15;
 	private static final int OSCILLATOR_TURN_ON = 0x21;
 	private static final int HT16K33_BLINK_CMD = 0x80;
 	private static final int HT16K33_BLINK_DISPLAY_ON = 0x01;
@@ -41,8 +39,13 @@ public abstract class LEDBackpack extends AbstractI2CDevice {
 	private static final int HT16K33_BLINK_OFF = 0x00;
 	private final short[] buffer = new short[8]; // uint16_t
 
-	LEDBackpack(int bus, int address) throws IOException {
+	LEDBackpack() throws IOException {
+		this(I2CBus.BUS_1, 0x70, DEFAULT_BRIGHTNESS);
+	}
+
+	LEDBackpack(int bus, int address, int brightness) throws IOException {
 		super(bus, address);
+		initiate(brightness);
 	}
 
 	public void display() {
@@ -59,13 +62,6 @@ public abstract class LEDBackpack extends AbstractI2CDevice {
 		} catch (IOException e) {
 			System.out.println(String.format("error clear: %s", e.getMessage()));
 		}
-	}
-
-
-	void initiate(int brightness) throws IOException {
-		i2cDevice.write((byte) (OSCILLATOR_TURN_ON)); // Turn on oscilator
-		i2cDevice.write(blinkRate(HT16K33_BLINK_OFF));
-		i2cDevice.write(setBrightness(brightness));
 	}
 
 	short intToShort(int value) {
@@ -127,6 +123,12 @@ public abstract class LEDBackpack extends AbstractI2CDevice {
 		}
 	}
 
+	private void initiate(int brightness) throws IOException {
+		i2cDevice.write((byte) (OSCILLATOR_TURN_ON)); // Turn on oscilator
+		i2cDevice.write(blinkRate(HT16K33_BLINK_OFF));
+		i2cDevice.write(setBrightness(brightness));
+	}
+
 	private void writeDisplay() throws IOException {
 		int address = 0;
 		for (int i = 0; i < buffer.length; i++) {
@@ -140,7 +142,6 @@ public abstract class LEDBackpack extends AbstractI2CDevice {
 			buffer[i] = 0;
 		}
 	}
-
 
 	private short _BV(short i) {
 		return ((short) (1 << i));

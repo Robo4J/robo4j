@@ -33,6 +33,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Adafruit Bi-Color 8x8 Matrix example
  * 
+ * demo: Incrementally turning on a led light over the matrix diagonal. The each
+ * time with different Color {@link BiColor}. The color is changing circularly.
+ * 
  * https://learn.adafruit.com/adafruit-led-backpack/bi-color-8x8-matrix
  * 
  * @author Marcus Hirt (@hirt)
@@ -41,33 +44,35 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class AdafruitBiColorMatrix8x8BackpackExample {
 	public static void main(String[] args) throws Exception {
 
-        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        InputStream settings = AdafruitBiColorMatrix8x8BackpackExample.class.getClassLoader().getResourceAsStream("matrix8x8example.xml");
-        RoboContext ctx = new RoboBuilder().add(settings).build();
+		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+		InputStream settings = AdafruitBiColorMatrix8x8BackpackExample.class.getClassLoader()
+				.getResourceAsStream("matrix8x8example.xml");
+		RoboContext ctx = new RoboBuilder().add(settings).build();
 
-        ctx.start();
-        System.out.println("State after start:");
-        System.out.println(SystemUtil.printStateReport(ctx));
-        RoboReference<LEDBackpackMessage> barUnit = ctx.getReference("matrix");
-        LEDBackpackMessage clearMessage = new LEDBackpackMessage();
-        AtomicInteger position = new AtomicInteger();
-        executor.scheduleAtFixedRate(() -> {
-            if(position.get() > 7){
-                position.set(0);
-            }
-            barUnit.sendMessage(clearMessage);
+		ctx.start();
+		System.out.println("State after start:");
+		System.out.println(SystemUtil.printStateReport(ctx));
+		RoboReference<LEDBackpackMessage> barUnit = ctx.getReference("matrix");
+		LEDBackpackMessage clearMessage = new LEDBackpackMessage();
+		AtomicInteger position = new AtomicInteger();
+		executor.scheduleAtFixedRate(() -> {
+			if (position.get() > 7) {
+				position.set(0);
+			}
+			barUnit.sendMessage(clearMessage);
 
-            PackElement element = new PackElement(position.get(), position.getAndIncrement(), BiColor.getByValue(position.get() % 3 + 1));
-            LEDBackpackMessage addMessage= new LEDBackpackMessage(LEDBackpackMessageType.DISPLAY);
-            addMessage.addElement(element);
-            barUnit.sendMessage(addMessage);
+			PackElement element = new PackElement(position.get(), position.getAndIncrement(),
+					BiColor.getByValue(position.get() % 3 + 1));
+			LEDBackpackMessage addMessage = new LEDBackpackMessage(LEDBackpackMessageType.DISPLAY);
+			addMessage.addElement(element);
+			barUnit.sendMessage(addMessage);
 
-        }, 2, 1, TimeUnit.SECONDS);
+		}, 2, 1, TimeUnit.SECONDS);
 
-        System.out.println("Press enter to quit\n");
-        System.in.read();
-        executor.shutdown();
-        ctx.shutdown();
+		System.out.println("Press enter to quit\n");
+		System.in.read();
+		executor.shutdown();
+		ctx.shutdown();
 
 	}
 }

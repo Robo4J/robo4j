@@ -32,14 +32,14 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 	private MatrixRotation rotation;
 
 	public BiColor8x8MatrixDevice(int bus, int address, int brightness, MatrixRotation rotation) throws IOException {
-		super(bus, address);
-		initiate(brightness);
+		super(bus, address, brightness);
 		this.rotation = rotation;
 
 	}
 
 	public BiColor8x8MatrixDevice() throws IOException {
-		this(DEFAULT_I2C_BUS, DEFAULT_I2C_ADDRESS, DEFAULT_BRIGHTNESS, MatrixRotation.ONE);
+		super();
+		this.rotation = MatrixRotation.ONE;
 	}
 
 	public int getMatrixSize() {
@@ -86,10 +86,10 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 			x = (short) element.getX();
 			y = (short) element.getY();
 			break;
-        case TWO:
-            x = (short) element.getY();
-            y = (short) element.getX();
-            break;
+		case TWO:
+			x = (short) element.getY();
+			y = (short) element.getX();
+			break;
 		case THREE:
 			x = (short) element.getX();
 			y = flipPosition(element.getY());

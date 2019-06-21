@@ -21,6 +21,7 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.i2c.adafruitoled.BiColor24BarDevice;
+import com.robo4j.hw.rpi.i2c.adafruitoled.LEDBackpack;
 import com.robo4j.hw.rpi.i2c.adafruitoled.LEDBackpackType;
 import com.robo4j.hw.rpi.i2c.adafruitoled.PackElement;
 
@@ -40,12 +41,9 @@ import java.util.List;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Adafruit24BargraphUnit extends AbstractLEDBackpackUnit<BiColor24BarDevice> {
+public class Adafruit24BargraphUnit extends AbstractI2CBackpackUnit<BiColor24BarDevice> {
 
-    public static final String ATTRIBUTE_ADDRESS = "address";
-    public static final String ATTRIBUTE_BUS = "bus";
-
-    public Adafruit24BargraphUnit(RoboContext context, String id) {
+	public Adafruit24BargraphUnit(RoboContext context, String id) {
 		super(LEDBackpackMessage.class, context, id);
 	}
 
@@ -53,9 +51,12 @@ public class Adafruit24BargraphUnit extends AbstractLEDBackpackUnit<BiColor24Bar
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		int address = configuration.getInteger(ATTRIBUTE_ADDRESS, BiColor24BarDevice.DEFAULT_I2C_ADDRESS);
-		int bus = configuration.getInteger(ATTRIBUTE_BUS, BiColor24BarDevice.DEFAULT_I2C_BUS);
-		device = getBackpackDevice(LEDBackpackType.BI_COLOR_BAR_24, bus, address);
+		Integer address = configuration.getInteger(ATTRIBUTE_ADDRESS, null);
+		Integer bus = configuration.getInteger(ATTRIBUTE_BUS, null);
+		validateConfiguration(address, bus);
+		int brightness = configuration.getInteger(ATTRIBUTE_BRIGHTNESS, LEDBackpack.DEFAULT_BRIGHTNESS);
+
+		device = getBackpackDevice(LEDBackpackType.BI_COLOR_BAR_24, bus, address, brightness);
 	}
 
 	@Override

@@ -31,12 +31,11 @@ public class BiColor24BarDevice extends LEDBackpack {
 	public static final int MAX_BARS = 24;
 
 	public BiColor24BarDevice(int bus, int address, int brightness) throws IOException {
-		super(bus, address);
-		initiate(brightness);
+		super(bus, address, brightness);
 	}
 
 	public BiColor24BarDevice() throws IOException {
-		this(DEFAULT_I2C_BUS, DEFAULT_I2C_ADDRESS, DEFAULT_BRIGHTNESS);
+		super();
 	}
 
 	public void addBar(int pos, BiColor color) {
