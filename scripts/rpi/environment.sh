@@ -27,7 +27,7 @@ function createRobo4jPath(){
 
 export ROBO4J_PATH=$(createRobo4jPath)
 export _JAVA_OPTIONS="--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED"
-echo Robo4J v$ROBO4J_VERSION
+echo ROBO4J v$ROBO4J_VERSION
 echo ROBO4J_PATH=$ROBO4J_PATH
 echo REMOTE_DEBUG=$REMOTE_DEBUG
 
