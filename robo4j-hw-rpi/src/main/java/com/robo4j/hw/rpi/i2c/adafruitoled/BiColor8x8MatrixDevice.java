@@ -86,19 +86,23 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 			x = (short) element.getX();
 			y = (short) element.getY();
 			break;
-		case TWO:
+        case TWO:
+            x = (short) element.getY();
+            y = (short) element.getX();
+            break;
+		case THREE:
 			x = (short) element.getX();
 			y = flipPosition(element.getY());
 			break;
-		case THREE:
+		case FOUR:
 			x = flipPosition(element.getX());
 			y = (short) element.getY();
 			break;
-		case FOUR:
+		case FIVE:
 			x = flipPosition(element.getX());
 			y = flipPosition(element.getY());
 			break;
-		case FIVE:
+		case SIX:
 			x = flipPosition(element.getY());
 			y = flipPosition(element.getX());
 			break;

@@ -27,10 +27,11 @@ public enum MatrixRotation {
 	//@formatter:off
 	NONE		(0, "none"),
     ONE 		(1,"default setup to pins"),
-    TWO 		(2, "left rotation to pins"),
-    THREE	 	(3,"right rotation to pins"),
-    FOUR    	(4,"switch to pins, x vertical"),
-    FIVE    	(5,"switch to pins, y horizontal")
+    TWO 		(2, "90 degree to default right"),
+    THREE	 	(3,"left rotation to pins"),
+    FOUR    	(4,"right rotation to pins"),
+    FIVE    	(5,"switch to pins, x vertical"),
+	SIX			(6, "switch to pins, y horizontal")
     ;
     //@formatter:on
 
