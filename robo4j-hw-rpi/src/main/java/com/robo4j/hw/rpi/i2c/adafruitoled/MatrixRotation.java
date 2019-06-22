@@ -18,20 +18,22 @@
 package com.robo4j.hw.rpi.i2c.adafruitoled;
 
 /**
- * MatrixRotation allows to select matrix start x,y position
+ * MatrixRotation allows to select 2D matrix start Point(x,y) and axes direction
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public enum MatrixRotation {
 	//@formatter:off
-	NONE		(0, "none"),
-    ONE 		(1,"default setup to pins"),
-    TWO 		(2, "90 degree to default right"),
-    THREE	 	(3,"left rotation to pins"),
-    FOUR    	(4,"right rotation to pins"),
-    FIVE    	(5,"switch to pins, x vertical"),
-	SIX			(6, "switch to pins, y horizontal")
+	NONE				(0, "none"),
+    DEFAULT_X_Y	 		(1,"default setup to pins"),
+    RIGHT_90 			(2, "90d to default, right"),
+    RIGHT_180	 		(3,"180d to default, right"),
+    RIGHT_270    		(4,"240d to default, right"),
+	INVERSION    		(5,"default inversion"),
+	LEFT_90				(6,"90d  to default, left"),
+	LEFT_180 			(7, "180d to default, left "),
+	LEFT_270			(8, "270d to default, left")
     ;
     //@formatter:on
 

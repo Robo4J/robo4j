@@ -37,9 +37,15 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 
 	}
 
+	public BiColor8x8MatrixDevice(int bus, int address, int brightness) throws IOException {
+		super(bus, address, brightness);
+		this.rotation = MatrixRotation.DEFAULT_X_Y;
+
+	}
+
 	public BiColor8x8MatrixDevice() throws IOException {
 		super();
-		this.rotation = MatrixRotation.ONE;
+		this.rotation = MatrixRotation.DEFAULT_X_Y;
 	}
 
 	public int getMatrixSize() {
@@ -82,30 +88,36 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 		short x;
 		short y;
 		switch (rotation) {
-		case ONE:
+		case DEFAULT_X_Y:
 			x = (short) element.getX();
 			y = (short) element.getY();
 			break;
-		case TWO:
-			x = (short) element.getY();
-			y = (short) element.getX();
-			break;
-		case THREE:
-			x = (short) element.getX();
-			y = flipPosition(element.getY());
-			break;
-		case FOUR:
-			x = flipPosition(element.getX());
-			y = (short) element.getY();
-			break;
-		case FIVE:
-			x = flipPosition(element.getX());
-			y = flipPosition(element.getY());
-			break;
-		case SIX:
+		case RIGHT_90:
 			x = flipPosition(element.getY());
 			y = flipPosition(element.getX());
 			break;
+		case RIGHT_180:
+			x = flipPosition(element.getX());
+			y = flipPosition(element.getY());
+			break;
+		case RIGHT_270:
+			x = (short) element.getY();
+			y = flipPosition(element.getX());
+			break;
+		case INVERSION:
+			x = (short) element.getY();
+			y = (short) element.getX();
+			break;
+		case LEFT_90:
+			x = (short) element.getX();
+			y = flipPosition(element.getY());
+			break;
+		case LEFT_180:
+			x = flipPosition(element.getY());
+			y = flipPosition(element.getX());
+		case LEFT_270:
+			x = flipPosition(element.getX());
+			y = (short) element.getY();
 		default:
 			x = MATRIX_SIZE;
 			y = MATRIX_SIZE;
