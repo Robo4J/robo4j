@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 public class BiColor8x8MatrixFaceRotationExample {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-		System.out.println("...BiColor 8x8 Matrix Face Rotation Example...");
+		System.out.println("=== BiColor 8x8 Matrix Face Rotation Example ===");
 
 		BiColor8x8MatrixDevice matrix = new BiColor8x8MatrixDevice();
 		//@formatter:off
@@ -58,7 +58,7 @@ public class BiColor8x8MatrixFaceRotationExample {
 			TimeUnit.SECONDS.sleep(1);
 		}
 
-		System.out.println("...Click to quit...");
+		System.out.println("Press <Enter> to quit!");
 		System.in.read();
 		matrix.clear();
 		matrix.display();

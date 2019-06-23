@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 public class BiColor24BargraphExample {
 
 	public static void main(String[] args) throws Exception {
-		System.out.println("...Bi-BiColor 24 Bargraph... ");
+		System.out.println("=== Bi-BiColor 24 Bargraph ===");
 
 		BiColor24BarDevice device = new BiColor24BarDevice();
 		device.clear();
@@ -62,7 +62,7 @@ public class BiColor24BargraphExample {
 			counter++;
 		}
 
-		System.out.println("...Click to quit...");
+		System.out.println("Press <Enter> to quit!");
 		System.in.read();
 		device.clear();
 		device.display();

@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 public class BiColor8x8MatrixFaceExample {
 
 	public static void main(String[] args) throws Exception {
-		System.out.println("... BiColor 8x8 Matrix Face Example...");
+		System.out.println("=== BiColor 8x8 Matrix Face Example ===");
 
 		BiColor8x8MatrixDevice matrix = new BiColor8x8MatrixDevice();
 
