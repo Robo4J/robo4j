@@ -99,7 +99,7 @@ public class BNO055Example {
 					calibrationStatus.getAccelerometerCalibrationStatus()));
 			Thread.sleep(500);
 		}
-		System.out.println("System fully calibrated. Now printing data. Press enter to quit!");
+		System.out.println("System fully calibrated. Now printing data. Press <Enter> to quit!");
 
 		EXECUTOR.scheduleAtFixedRate(new BNOPrinter(bno), 40, 500, TimeUnit.MILLISECONDS);
 		System.in.read();

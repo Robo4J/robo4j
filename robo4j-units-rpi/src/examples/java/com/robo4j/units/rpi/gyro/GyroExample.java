@@ -60,7 +60,7 @@ public class GyroExample {
 		System.out.println("Let the gyro unit be absolutely still, then press enter to calibrate and start!");
 		System.in.read();
 		gyro.sendMessage(new GyroRequest(processor, GyroAction.CONTINUOUS, new Tuple3f(1.0f, 1.0f, 1.0f)));
-		System.out.println("Will report angular changes indefinitely.\nPress enter to quit!");
+		System.out.println("Will report angular changes indefinitely.\nPress <Enter> to quit!");
 		System.in.read();
 	}
 }

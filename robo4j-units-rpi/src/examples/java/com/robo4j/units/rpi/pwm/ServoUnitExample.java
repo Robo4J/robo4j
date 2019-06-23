@@ -74,7 +74,7 @@ public class ServoUnitExample {
 		thread.setDaemon(true);
 		thread.start();
 
-		System.out.println("Press enter to quit!");
+		System.out.println("Press <Enter> to quit!");
 		try {
 			System.in.read();
 		} catch (IOException e) {
