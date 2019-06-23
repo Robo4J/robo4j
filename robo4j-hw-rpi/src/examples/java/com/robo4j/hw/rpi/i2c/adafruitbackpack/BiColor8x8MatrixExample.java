@@ -56,7 +56,7 @@ public class BiColor8x8MatrixExample {
 			matrix.clear();
 		}
 
-		System.out.println("...Click to quit...");
+		System.out.println("Press <Enter> to quit!");
 		System.in.read();
 		matrix.clear();
 		matrix.display();

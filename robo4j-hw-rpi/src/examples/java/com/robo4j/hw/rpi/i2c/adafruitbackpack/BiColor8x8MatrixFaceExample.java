@@ -53,7 +53,7 @@ public class BiColor8x8MatrixFaceExample {
 			TimeUnit.SECONDS.sleep(1);
 		}
 
-		System.out.println("...Click to quit...");
+		System.out.println("Press <Enter> to quit!");
 		System.in.read();
 		matrix.clear();
 		matrix.display();
