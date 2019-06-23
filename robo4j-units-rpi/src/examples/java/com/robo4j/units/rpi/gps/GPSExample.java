@@ -52,10 +52,10 @@ public class GPSExample {
 		RoboReference<GPSRequest> gps = ctx.getReference(ID_GPS);
 		RoboReference<GPSEvent> processor = ctx.getReference(ID_PROCESSOR);
 
-		System.out.println("Press enter to start requesting events, then press enter again to stop requesting events!");
+		System.out.println("Press <Enter> to start requesting events, then press enter again to stop requesting events!");
 		System.in.read();
 
-		System.out.println("Requesting GPS events! Press enter to stop!");
+		System.out.println("Requesting GPS events! Press <Enter> to stop!");
 		gps.sendMessage(new GPSRequest(processor, Operation.REGISTER));
 		System.in.read();
 
@@ -63,7 +63,7 @@ public class GPSExample {
 		gps.sendMessage(new GPSRequest(processor, Operation.UNREGISTER));
 		// Note that we can still get a few more events after this, and that is
 		// quite fine. ;)
-		System.out.println("All done! Press enter to quit!");
+		System.out.println("All done! Press <Enter> to quit!");
 		System.in.read();
 
 		System.out.println("Exiting! Bye!");

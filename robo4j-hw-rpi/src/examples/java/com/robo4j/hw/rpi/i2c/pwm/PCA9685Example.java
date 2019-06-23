@@ -55,7 +55,7 @@ public class PCA9685Example {
 		motor0.setPWM(0, MOTOR_MIN);
 		motor1.setPWM(0, MOTOR_MIN);
 
-		System.out.println("Press enter to run loop!");
+		System.out.println("Press <Enter> to run loop!");
 		System.in.read();
 		System.out.println("Running perpetual loop...");
 		while (true) {

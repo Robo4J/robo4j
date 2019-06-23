@@ -91,7 +91,7 @@ public class SSD1306DeviceTest {
 		frame.setSize(256, 256);
 		frame.getContentPane().add(new JLabel(new ImageIcon(oled.getImage())));
 		frame.setVisible(true);
-		System.out.println("Press enter to quit!");
+		System.out.println("Press <Enter> to quit!");
 		System.in.read();
 		oled.setEnabled(false);
 		frame.setVisible(false);

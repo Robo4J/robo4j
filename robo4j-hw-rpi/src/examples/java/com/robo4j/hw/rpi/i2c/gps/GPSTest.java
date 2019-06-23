@@ -44,7 +44,7 @@ public class GPSTest {
 			}
 		});
 		sparkFunGPS.start();
-		System.out.println("Press enter to quit!");
+		System.out.println("Press <Enter> to quit!");
 		System.in.read();
 		sparkFunGPS.shutdown();
 	}
