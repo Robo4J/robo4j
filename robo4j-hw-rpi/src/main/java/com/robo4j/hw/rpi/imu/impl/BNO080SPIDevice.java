@@ -208,6 +208,58 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 						}
 					}
 
+					ShtpReport report = ShtpReport.getByCode(packet.getBodyFirst());
+					Register register = Register.getByChannel(packet.getHeaderChannel());
+					System.out.println("RECEIVED REGISTER: " + register);
+					if(report.equals(ShtpReport.GET_FEATURE_RESPONSE)){
+						ShtpPacketRequest packetToSend = prepareShtpPacketRequest(Register.CONTROL, 2);
+						packetToSend.addBody(0, ShtpReport.GET_FEATURE_REQUEST.getCode());
+						packetToSend.addBody(1, 1);
+						try {
+							sendPacket(Register.CONTROL, packetToSend, "received report: " + report + " send: response");
+
+
+							boolean waitForTimestamp = true;
+							while(waitForTimestamp){
+								ShtpPacketResponse packetToSendResponse = dataAvailable();
+								System.out.println("waitForTimestamp: " + packetToSendResponse);
+								ShtpReport reportResponse = ShtpReport.getByCode(packetToSendResponse.getBodyFirst());
+								Register registerResponse  = Register.getByChannel(packetToSendResponse.getHeaderChannel());
+								if(reportResponse.equals(ShtpReport.BASE_TIMESTAMP)){
+									waitForTimestamp = false;
+									System.out.println("waitForTimestamp DONE");
+								} else {
+									System.out.println("waitForTimestamp NO DONE: reportResponse:" + reportResponse + ", registerResponse=" +registerResponse);
+								}
+								System.out.println("RECEIVED TIMESTAMP  reportResponse: " + reportResponse + ", registerResponse: " + registerResponse);
+								TimeUnit.MICROSECONDS.sleep(100);
+							}
+
+							boolean waitForFeatureResponse = true;
+							while (waitForFeatureResponse) {
+								ShtpPacketResponse packetFeatureResponse = dataAvailable();
+								ShtpReport reportResponse1 = ShtpReport.getByCode(packetFeatureResponse.getBodyFirst());
+								Register registerResponse1 = Register.getByChannel(packetFeatureResponse.getHeaderChannel());
+
+								if(reportResponse1.equals(ShtpReport.GET_FEATURE_RESPONSE)){
+									waitForFeatureResponse = false;
+									System.out.println("waitForFeatureResponse DONE");
+								}
+
+								System.out.println("RECEIVED FEATURE RESPONSE  reportResponse: " + reportResponse1 + ", registerResponse1: " + registerResponse1);
+								if (reportResponse1.equals(ShtpReport.GET_FEATURE_RESPONSE)) {
+									TimeUnit.MICROSECONDS.sleep(100);
+								}
+							}
+
+
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+
 				}
 			}
 		});
@@ -350,7 +402,6 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		sendPacket(Register.EXECUTABLE, softResetRequest, "prepareForSpi soft Reset");
 		TimeUnit.MILLISECONDS.sleep(2000);
 
-
 		int counter = 0;
 		boolean active = true;
 		while (active) {
@@ -364,12 +415,10 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			TimeUnit.MICROSECONDS.sleep(100);
 		}
 
-
 		if (state) {
 			waitForInterrupt("beginSPI: system startup");
 		}
 		System.out.println("prepareForSpi 1");
-
 
 		System.out.println("START1: INT soft reset 3 packets " + state);
 
@@ -451,7 +500,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 
 	/**
 	 * Updates the latest variables if possible
-	 * 
+	 *
 	 * @return false if new readings are not available
 	 * @throws IOException
 	 *             exception
@@ -465,20 +514,23 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 
 		ShtpPacketResponse receivePacket = null;
 		try {
-//			TimeUnit.MICROSECONDS.sleep(200);
 			receivePacket = receivePacket();
 		} catch (IOException | InterruptedException e) {
 			System.err.println(String.format("dataAvailable e: %s", e));
 			return new ShtpPacketResponse(0);
 		}
+		System.out.println("dataAvailable HERE");
 		ShtpReport report = ShtpReport.getByCode(receivePacket.getBodyFirst());
 		Register register = Register.getByChannel(receivePacket.getHeaderChannel());
+		System.out.println("dataAvailable HERE: report=" + report + ", register=" + register );
 		if (receivePacket.dataAvailable()) {
 			// Check to see if this packet is a sensor reporting its data to us
 			if (Register.REPORTS.equals(register) && ShtpReport.BASE_TIMESTAMP.equals(report)) {
-				parseInputReport(receivePacket); // This will update the rawAccelX, etc variables depending on which
+				System.out.println("dataAvailable REPORT TIME STAMP ");
+//				parseInputReport(receivePacket); // This will update the rawAccelX, etc variables depending on which
 				return receivePacket;
 			} else if (Register.CONTROL.equals(register)) {
+				System.out.println("dataAvailable parseCommandReport ");
 				parseCommandReport(receivePacket); // This will update responses to commands, calibrationStatus, etc.
 				return receivePacket;
 			}
@@ -636,7 +688,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	/**
 	 * The BNO080 responds with this report to command requests. It's up to use to
 	 * remember which command we issued
-	 * 
+	 *
 	 * @param deviceCommand
 	 *            device command in response
 	 */
@@ -681,7 +733,6 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 * Given a sensor's report ID, this tells the BNO080 to begin reporting the
 	 * values Also sets the specific config word. Useful for personal activity
 	 * classifier
-	 *
 	 *
 	 * @param sensorReport
 	 *            - report id uint8_t
@@ -854,14 +905,13 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 				response.addBody(i, (Byte.toUnsignedInt(incoming) & 0xFF));
 			}
 		}
-
 		csGpio.setState(PinState.HIGH); // Release BNO080
 		ShtpReport report = ShtpReport.getByCode(response.getBodyFirst());
 
 		printShtpPacketPart(report, "receivePacketChannel current: SequenceNumbers", sequenceByChannel);
 		printArray("receivePacketHeader", response.getHeader());
 		printArray("receivePacketBody", response.getBody());
-
+		System.out.println("receivePacket: DONE RESPONSE");
 		return response; // we are done
 
 	}
