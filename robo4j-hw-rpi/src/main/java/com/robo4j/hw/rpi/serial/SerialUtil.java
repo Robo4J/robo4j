@@ -31,7 +31,7 @@ public class SerialUtil {
 		Set<SerialDeviceDescriptor> descriptors = new HashSet<>();
 		String[] devices = ExecUtil.execute("ls /sys/bus/usb-serial/devices/");
 		for (String device : devices) {
-			Map<String, String> metadata = asMetadata(ExecUtil.execute("cat /sys/bus/usb-serial/devices/../" + device));
+			Map<String, String> metadata = asMetadata(ExecUtil.execute("cat /sys/bus/usb-serial/devices/" + device + "/../uevent"));
 			String path = "/dev/" + device;
 			descriptors.add(createSerialDescriptor(path, metadata));
 		}
