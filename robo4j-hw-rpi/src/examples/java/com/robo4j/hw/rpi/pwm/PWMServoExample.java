@@ -37,7 +37,7 @@ public class PWMServoExample {
 		PWMServo servo = new PWMServo(RaspiPin.GPIO_01, false);
 		System.out.println("Setting input to " + input);
 		servo.setInput(input);
-		System.out.println("Press enter to quit");
+		System.out.println("Press <Enter> to quit");
 		System.in.read();
 	}
 }

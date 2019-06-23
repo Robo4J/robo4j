@@ -70,7 +70,8 @@ class TankExampleTests {
 
 		context.start();
 
-		context.getReference(ID_LCD).sendMessage("Press Key to end...");
+		context.getReference(ID_LCD).sendMessage("Press <Enter> to quit!");
+		System.in.read();
 		context.shutdown();
 	}
 }

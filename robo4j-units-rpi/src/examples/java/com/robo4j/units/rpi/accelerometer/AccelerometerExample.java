@@ -56,10 +56,10 @@ public class AccelerometerExample {
 		RoboReference<AccelerometerRequest> accelerometer = ctx.getReference("accelerometer");
 		RoboReference<AccelerometerEvent> processor = ctx.getReference(ID_PROCESSOR);
 
-		System.out.println("Press enter to start!");
+		System.out.println("Press <Enter> to start!");
 		System.in.read();
 		accelerometer.sendMessage(new AccelerometerRequest(processor, true, (Float3D) -> true));
-		System.out.println("Will report angular changes indefinitely.\nPress enter to quit!");
+		System.out.println("Will report angular changes indefinitely.\nPress <Enter> to quit!");
 		System.in.read();
 	}
 }

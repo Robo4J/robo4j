@@ -46,7 +46,7 @@ public class AccelerometerLSM303Test {
 
 	private static void prompt(String msg) throws IOException {
 		System.out.println(msg);
-		System.out.println("<Press enter to continue>");
+		System.out.println("Press <Enter> to continue!");
 		System.in.read();
 	}
 

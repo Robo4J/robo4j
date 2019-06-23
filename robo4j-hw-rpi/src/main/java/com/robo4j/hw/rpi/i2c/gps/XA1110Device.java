@@ -312,7 +312,7 @@ class XA1110Device extends AbstractI2CDevice {
 			}
 		});
 		t.setDaemon(true);
-		System.out.println("Starting reading from GPS. Press enter to quit!");
+		System.out.println("Starting reading from GPS. Press <Enter> to quit!");
 		t.start();
 		System.in.read();
 	}

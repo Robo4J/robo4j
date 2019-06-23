@@ -78,7 +78,7 @@ public class LcdUnit extends RoboUnit<Object> {
 	public void start() {
 		setState(LifecycleState.STARTING);
 		lcd.initRobo4j(lcdTilte, robotName);
-		lcd.printText("Press Escape to quit!");
+		lcd.printText("Press <Escape> to quit!");
 		setState(LifecycleState.STARTED);
 	}
 

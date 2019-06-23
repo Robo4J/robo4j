@@ -81,7 +81,7 @@ class CameraDecoratedImageProducerConsumerTests {
 		producerSystem.shutdown();
 		consumerSystem.shutdown();
 
-		System.out.println("Press any key to End...");
+		System.out.println("Press <Enter> to quit!");
 
 	}
 
