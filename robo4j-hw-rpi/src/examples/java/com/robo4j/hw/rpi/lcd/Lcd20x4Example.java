@@ -74,7 +74,7 @@ public class Lcd20x4Example {
 		Demo demo = new Demo(lcd);
 		Thread t = new Thread(demo, "LCD Demo Thread");
 		t.start();
-		System.out.println("Running LCD demo. Press enter to quit!");
+		System.out.println("Running LCD demo. Press <Enter> to quit!");
 		System.in.read();
 		demo.quit();
 	}

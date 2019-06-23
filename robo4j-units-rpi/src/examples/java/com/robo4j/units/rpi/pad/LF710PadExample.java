@@ -47,7 +47,7 @@ public class LF710PadExample {
 
 		System.out.println(SystemUtil.printStateReport(sytem));
 
-		System.out.println("Press enter to quit!");
+		System.out.println("Press <Enter> to quit!");
 		System.in.read();
 		sytem.shutdown();
 		System.out.println("Bye!");

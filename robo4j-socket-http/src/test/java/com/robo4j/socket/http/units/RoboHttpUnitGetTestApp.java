@@ -81,7 +81,7 @@ public class RoboHttpUnitGetTestApp {
 		system.start();
 		System.out.println("systemPong: State after start:");
 		System.out.println(SystemUtil.printStateReport(system));
-		System.out.println("Press Key...");
+		System.out.println("Press <Enter>...");
 		System.in.read();
 		system.shutdown();
 	}
@@ -125,7 +125,7 @@ public class RoboHttpUnitGetTestApp {
 		system.start();
 		System.out.println("systemPong: State after start:");
 		System.out.println(SystemUtil.printStateReport(system));
-		System.out.println("Press Key...");
+		System.out.println("Press <Enter>...");
 		System.in.read();
 		system.shutdown();
 
@@ -156,7 +156,7 @@ public class RoboHttpUnitGetTestApp {
 		request.addCallback(StringConsumer.NAME);
 		httpClient.sendMessage(request);
 
-		System.out.println("Press Key...");
+		System.out.println("Press <Enter>...");
 		System.in.read();
 		systemGetProvider.shutdown();
 	}

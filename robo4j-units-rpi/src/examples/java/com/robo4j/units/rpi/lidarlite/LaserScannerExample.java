@@ -75,7 +75,7 @@ public class LaserScannerExample {
 		tiltServo.sendMessage(Float.valueOf(0));
 		RoboReference<String> reference = ctx.getReference("controller");
 		ctx.start();
-		System.out.println("Starting scanning for ever\nPress enter to quit");
+		System.out.println("Starting scanning for ever\nPress <Enter> to quit");
 		reference.sendMessage("scan");
 		System.in.read();
 	}

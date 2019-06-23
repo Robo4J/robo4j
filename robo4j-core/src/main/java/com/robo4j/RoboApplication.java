@@ -88,7 +88,7 @@ public final class RoboApplication {
 			String logo = getBanner(Thread.currentThread().getContextClassLoader());
 			SimpleLoggingUtil.info(getClass(), logo);
 			SimpleLoggingUtil.info(RoboApplication.class, SystemUtil.printStateReport(context));
-			SimpleLoggingUtil.info(RoboApplication.class, "Press any Key...");
+			SimpleLoggingUtil.info(RoboApplication.class, "Press <Enter>...");
 			appLatch.await();
 			SimpleLoggingUtil.info(RoboApplication.class,"Going down...");
 			context.shutdown();
