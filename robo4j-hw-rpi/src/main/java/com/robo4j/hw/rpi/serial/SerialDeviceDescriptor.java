@@ -24,12 +24,12 @@ package com.robo4j.hw.rpi.serial;
 public class SerialDeviceDescriptor {
 	private final String path;
 	private final String vendorId;
-	private final String hardwareId;
+	private final String productId;
 
 	public SerialDeviceDescriptor(String path, String vendorId, String hardwareId) {
 		this.path = path;
 		this.vendorId = vendorId;
-		this.hardwareId = hardwareId;
+		this.productId = hardwareId;
 	}
 
 	/**
@@ -49,12 +49,12 @@ public class SerialDeviceDescriptor {
 	/**
 	 * @return the hardware id for the device.
 	 */
-	public String getHardwareId() {
-		return hardwareId;
+	public String getProductId() {
+		return productId;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("SerialDeviceDescriptor path=%s, vendor id=%s, hardware id=%s", getPath(), getVendorId(), getHardwareId());
+		return String.format("SerialDeviceDescriptor path=%s, vendor id=%s, hardware id=%s", getPath(), getVendorId(), getProductId());
 	}
 }
