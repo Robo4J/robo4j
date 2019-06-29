@@ -58,7 +58,7 @@ public final class ShtpPacketResponse {
     }
 
     public int getBodyFirst() {
-        return body.length == 0 ? 0 : body[0];
+        return body.length == 0 ? -1 : body[0];
     }
 
     public int[] getBody() {

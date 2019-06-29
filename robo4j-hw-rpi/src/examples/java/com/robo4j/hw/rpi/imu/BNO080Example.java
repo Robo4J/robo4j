@@ -33,12 +33,12 @@ public class BNO080Example {
                 BNO080SPIDevice.printArray("BODY",response.getBody());
         };
 
-        BNO080Device.SensorReport sensorReport = BNO080Device.SensorReport.ROTATION_VECTOR;
+        BNO080Device.SensorReport sensorReport = BNO080Device.SensorReport.ACCELEROMETER;
         System.out.println("BNO080 Example: " + sensorReport);
         BNO080SPIDevice device = new BNO080SPIDevice();
         device.addListener(listener);
 //        if(device.start(sensorReport, 50)){
-        if(device.singleStart(sensorReport, 60)){
+        if(device.singleStart(sensorReport, 110)){
             System.out.println("READY TO RECEIVE: " + sensorReport);
         }
 

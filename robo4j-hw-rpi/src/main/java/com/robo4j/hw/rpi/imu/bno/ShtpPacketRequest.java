@@ -55,6 +55,10 @@ public final class ShtpPacketRequest {
         }
     }
 
+    public BNO080Device.Register getRegister(){
+        return BNO080Device.Register.getByChannel((byte)header[2]);
+    }
+
     public int[] getHeader(){
         return header;
     }
