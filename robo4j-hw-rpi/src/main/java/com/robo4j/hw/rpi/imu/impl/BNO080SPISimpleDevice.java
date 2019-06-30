@@ -179,8 +179,9 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
                     System.out.println("REPORT DONE");
 
 					counter = 0;
-                    while (counter < 10){
+                    while (counter < 40){
 
+                    	waitForSPI();
                         receivedPacketContinual();
                         if(shtpHeader[2] == Register.REPORTS.getChannel() && shtpData[0] == ShtpReport.BASE_TIMESTAMP.getCode()){
                             System.out.println("FB received");
@@ -189,36 +190,6 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 
                         counter++;
                     }
-//					counter = 0;
-//					while (counter < 10) {
-////						if (waitForSPI()) {
-//						if (receivePacket()) {
-//
-//						    if(shtpHeader[2] == Register.REPORTS.getChannel() && shtpData[0] == ShtpReport.BASE_TIMESTAMP.getCode()){
-//                                System.out.println("FB received");
-//                                parseInputReport();
-////                                System.out.println("SEND: GET FEATURE REQUEST: ");
-////                                setGetFeatureRequest();
-////                                waitForSPI();
-////                                sendPacket(Register.CONTROL, 2);
-//
-//
-//                            } else if (shtpHeader[2] == Register.CONTROL.getChannel()){
-//						        if(shtpData[0] == ShtpReport.COMMAND_RESPONSE.getCode() && shtpData[2] == DeviceCommand.ME_CALIBRATE.getId()){
-//                                    int calibrationStatus = shtpData[5] & 0xFF;
-//						            System.out.println("Response to calibrate:" + calibrationStatus);
-//                                }
-//                            }
-//
-//
-//                            try {
-//                                TimeUnit.MICROSECONDS.sleep(100);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//						}
-//						counter++;
-//					}
 
 				}
 			}
@@ -301,21 +272,20 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 
 		shtpData[0] = ShtpReport.SET_FEATURE_COMMAND.getCode(); // Set feature command. Reference page 55
 		shtpData[1] = sensorReport.getId(); // Feature Report ID. 0x01 = Accelerometer, 0x05 = Rotation vector
-		shtpData[2] = 0; // Feature flags
-		shtpData[3] = 0; // Change sensitivity (LSB)
-		shtpData[4] = 0; // Change sensitivity (MSB)
-		shtpData[5] = (int) (microsBetweenReports) & 0xFF; // Report interval (LSB) in microseconds. 0x7A120 = 500ms
-		shtpData[6] = (int) (microsBetweenReports >> 8) & 0xFF; // Report interval
-		shtpData[7] = (int) (microsBetweenReports >> 16) & 0xFF; // Report interval
-		shtpData[8] = (int) (microsBetweenReports >> 24) & 0xFF; // Report interval (MSB)
-		shtpData[9] = 0; // Batch Interval (LSB)
+		shtpData[2] = 0; // Change sensitivity (LSB)
+		shtpData[3] = 0; // Change sensitivity (MSB)
+		shtpData[4] = (int) (microsBetweenReports) & 0xFF; // Report interval (LSB) in microseconds. 0x7A120 = 500ms
+		shtpData[5] = (int) (microsBetweenReports >> 8) & 0xFF; // Report interval
+		shtpData[6] = (int) (microsBetweenReports >> 16) & 0xFF; // Report interval
+		shtpData[7] = (int) (microsBetweenReports >> 24) & 0xFF; // Report interval (MSB)
+		shtpData[8] = 0; // Batch Interval (LSB)
+		shtpData[9] = 0; // Batch Interval
 		shtpData[10] = 0; // Batch Interval
-		shtpData[11] = 0; // Batch Interval
-		shtpData[12] = 0; // Batch Interval (MSB)
-		shtpData[13] = (int) (specificConfig) & 0xFF; // Sensor-specific config (LSB)
-		shtpData[14] = (int) (specificConfig >> 8) & 0xFF; // Sensor-specific config
-		shtpData[15] = (int) (specificConfig >> 16) & 0xFF; // Sensor-specific config
-		shtpData[16] = (int) (specificConfig >> 24) & 0xFF; // Sensor-specific config (MSB)
+		shtpData[11] = 0; // Batch Interval (MSB)
+		shtpData[12] = (int) (specificConfig) & 0xFF; // Sensor-specific config (LSB)
+		shtpData[13] = (int) (specificConfig >> 8) & 0xFF; // Sensor-specific config
+		shtpData[14] = (int) (specificConfig >> 16) & 0xFF; // Sensor-specific config
+		shtpData[15] = (int) (specificConfig >> 24) & 0xFF; // Sensor-specific config (MSB)
 	}
 
 	private void ps0WakePins(PinState state) {
@@ -369,10 +339,10 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 
 	private boolean receivedPacketContinual(){
         try {
-//            if(intGpio.isHigh()){
-//                System.out.println("receivedPacketContinual: no interrupt");
-//                return false;
-//            }
+            if(intGpio.isHigh()){
+                System.out.println("receivedPacketContinual: no interrupt");
+                return false;
+            }
             // Get first four bytes to find out how much data we need to read
             if(sensorReportDelayMilliSec > 0){
                 try {
@@ -385,11 +355,10 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
             csGpio.setState(PinState.LOW);
 
 
-
-            int packetLSB = toInt8U(spiDevice.write((byte) 0xFF));
-            int packetMSB = toInt8U(spiDevice.write((byte) 0xFF));
-            int channelNumber = toInt8U(spiDevice.write((byte) 0xFF));
-            int sequenceNumber = toInt8U(spiDevice.write((byte) 0xFF)); // Not sure if we need to store this or not
+            int packetLSB = toInt8U(spiDevice.write((byte) 0));
+            int packetMSB = toInt8U(spiDevice.write((byte) 0));
+            int channelNumber = toInt8U(spiDevice.write((byte) 0));
+            int sequenceNumber = toInt8U(spiDevice.write((byte) 0)); // Not sure if we need to store this or not
 
             // Store the header info
             shtpHeader[0] = packetLSB;

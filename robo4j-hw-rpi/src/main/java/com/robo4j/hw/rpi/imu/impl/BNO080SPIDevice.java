@@ -860,7 +860,6 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		int[] packetBody = new ShtpPacketBodyBuilder(packetRequest.getBodySize())
 				.addElement(ShtpReport.SET_FEATURE_COMMAND.getCode())
 				.addElement(sensorReport.getId()) 			// Feature Report ID. 0x01 = Accelerometer, 0x05 = Rotation vector
-				.addElement(0) // Feature flags
 				.addElement(0) // Change sensitivity (LSB)
 				.addElement(0) // Change sensitivity (MSB)
 				.addElement((int) microsBetweenReports & 0xFF) 			// Report interval (LSB) in microseconds.
