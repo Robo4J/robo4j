@@ -30,6 +30,19 @@ import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseType;
 /**
  * Driver for the ydlidar device.
  * 
+ * <p>
+ * To play with it directly from the command line, and ensure that it is happy, you can first set up the device to use the correct settings, e.g. (if on /dev/ttyUSB0):
+ * <p>
+ * stty -F /dev/ttyUSB0 230400 cs8 -cstopb -parenb
+ * <p>
+ * Next you can cat the device to list what it is saying, for example cat to file:
+ * <p>
+ * cat /dev/ttyUSB0 > mytest
+ * <p>
+ * Of course, to make it say something, you will need to send it a command, for example:
+ * <p>
+ * echo -en "\xA5\x90" > /dev/ttyUSB0
+ * 
  * @author Marcus
  */
 public class YDLidarDevice {
@@ -49,7 +62,7 @@ public class YDLidarDevice {
 
 	private static final int CMDFLAG_HAS_PAYLOAD = 0x80;
 	private static final byte CMD_SYNC_BYTE = (byte) 0xA5;
-	private static final int BAUD_RATE = 115200;
+	private static final int BAUD_RATE = 230400;
 
 	private final Serial serial;
 	private final String serialPort;
@@ -106,7 +119,7 @@ public class YDLidarDevice {
 		synchronized (this) {
 			disableDataGrabbing();
 			sendCommand(Command.GET_DEVICE_INFO);
-			ResponseHeader response = readResponseHeader(400);
+			ResponseHeader response = readResponseHeader(800);
 			if (!response.isValid()) {
 				throw new IOException("Got bad response!");
 			}
@@ -114,7 +127,7 @@ public class YDLidarDevice {
 				throw new IOException("Got the wrong response type. Should have been " + ResponseType.DEVICE_INFO + ". Got "
 						+ response.getResponseType() + ".");
 			}
-			byte[] readData = SerialUtil.readBytes(serial, 20, 400);
+			byte[] readData = SerialUtil.readBytes(serial, 20, 800);
 			byte[] serialVersion = new byte[16];
 			System.arraycopy(readData, 4, serialVersion, 0, serialVersion.length);
 			return new DeviceInfo(readData[0], readData[1] << 8 + readData[2], readData[3], serialVersion);
