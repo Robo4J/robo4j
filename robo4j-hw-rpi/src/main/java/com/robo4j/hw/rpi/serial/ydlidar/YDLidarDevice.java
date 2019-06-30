@@ -99,7 +99,7 @@ public class YDLidarDevice {
 			this.serialPort = serialPort;
 		}
 		serial = SerialFactory.createInstance();
-		serial.open(serialPort, BAUD_RATE);
+		serial.open(this.serialPort, BAUD_RATE);
 	}
 
 	public DeviceInfo getDeviceInfo() throws IllegalStateException, IOException, InterruptedException, TimeoutException {
