@@ -68,17 +68,8 @@ public class DeviceInfo {
 	}
 
 	public static String prettyPrintSerialVersion(byte[] bytes) {
-		return String.format("%d%d%d%d-%d%d-%d%d - %d", bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
-				bytesToLong(bytes, 8));
-	}
-
-	private static long bytesToLong(byte[] b, int offset) {
-		long result = 0;
-		for (int i = 0; i < 8; i++) {
-			result <<= 8;
-			result |= (b[i + offset] & 0xFF);
-		}
-		return result;
+		return String.format("%d%d%d%d-%d%d-%d%d - %d%d%d%d%d%d%d%d", bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6],
+				bytes[7], bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15]);
 	}
 
 	@Override
