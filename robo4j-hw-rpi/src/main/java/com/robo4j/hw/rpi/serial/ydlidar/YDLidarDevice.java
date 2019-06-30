@@ -222,5 +222,7 @@ public class YDLidarDevice {
 		System.out.println(device);
 		System.out.println(device.getDeviceInfo());
 		device.shutdown();
+		// Naughty that this has to be done... Perhaps fix Pi4J?
+		SerialFactory.shutdown();
 	}
 }
