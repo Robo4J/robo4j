@@ -16,8 +16,6 @@
  */
 package com.robo4j.hw.rpi.serial.ydlidar;
 
-import java.util.Arrays;
-
 public class DeviceInfo {
 	/**
 	 * The various models of the ydlidar.
@@ -69,9 +67,23 @@ public class DeviceInfo {
 		return serialVersion;
 	}
 
+	public static String prettyPrintSerialVersion(byte[] bytes) {
+		return String.format("%d%d%d%d-%d%d-%d%d - %d", bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
+				bytesToLong(bytes, 8));
+	}
+
+	private static long bytesToLong(byte[] b, int offset) {
+		long result = 0;
+		for (int i = 0; i < 8; i++) {
+			result <<= 8;
+			result |= (b[i + offset] & 0xFF);
+		}
+		return result;
+	}
+
 	@Override
 	public String toString() {
 		return "DeviceInfo [model=" + model + ", firmwareVersion=" + firmwareVersion + ", hardwareVersion=" + hardwareVersion
-				+ ", serialVersion=" + Arrays.toString(serialVersion) + "]";
+				+ ", serialVersion=" + prettyPrintSerialVersion(serialVersion) + "]";
 	}
 }
