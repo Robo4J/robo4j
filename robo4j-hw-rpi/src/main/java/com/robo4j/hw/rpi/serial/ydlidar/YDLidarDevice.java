@@ -19,6 +19,7 @@ package com.robo4j.hw.rpi.serial.ydlidar;
 import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.pi4j.io.serial.Serial;
@@ -31,15 +32,19 @@ import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseType;
  * Driver for the ydlidar device.
  * 
  * <p>
- * To play with it directly from the command line, and ensure that it is happy, you can first set up the device to use the correct settings, e.g. (if on /dev/ttyUSB0):
+ * To play with it directly from the command line, and ensure that it is happy,
+ * you can first set up the device to use the correct settings, e.g. (if on
+ * /dev/ttyUSB0):
  * <p>
  * stty -F /dev/ttyUSB0 230400 cs8 -cstopb -parenb
  * <p>
- * Next you can cat the device to list what it is saying, for example cat to file:
+ * Next you can cat the device to list what it is saying, for example cat to
+ * file:
  * <p>
  * cat /dev/ttyUSB0 > mytest
  * <p>
- * Of course, to make it say something, you will need to send it a command, for example:
+ * Of course, to make it say something, you will need to send it a command, for
+ * example:
  * <p>
  * echo -en "\xA5\x90" > /dev/ttyUSB0
  * 
@@ -134,6 +139,14 @@ public class YDLidarDevice {
 		}
 	}
 
+	public void shutdown() {
+		try {
+			serial.close();
+		} catch (IllegalStateException | IOException e) {
+			Logger.getLogger(YDLidarDevice.class.getName()).log(Level.WARNING, "Problem shutting down ydlidar serial", e);
+		}
+	}
+
 	private void sendCommand(Command command) throws IllegalStateException, IOException {
 		sendCommand(command, null);
 	}
@@ -201,12 +214,13 @@ public class YDLidarDevice {
 	 * 
 	 * @throws InterruptedException
 	 * @throws IOException
-	 * @throws TimeoutException 
-	 * @throws IllegalStateException 
+	 * @throws TimeoutException
+	 * @throws IllegalStateException
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException, IllegalStateException, TimeoutException {
 		YDLidarDevice device = new YDLidarDevice();
 		System.out.println(device);
 		System.out.println(device.getDeviceInfo());
+		device.shutdown();
 	}
 }
