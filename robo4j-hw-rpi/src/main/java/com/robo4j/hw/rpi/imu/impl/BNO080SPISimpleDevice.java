@@ -64,11 +64,11 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 	private SpiDevice spiDevice;
 	private GpioPinDigitalInput intGpio;
 	private GpioPinDigitalOutput wakeGpio;
-	private GpioPinDigitalOutput ps0Gpio;
 	private GpioPinDigitalOutput rstGpio;
 	private GpioPinDigitalOutput csGpio; // select slave SS = chip select CS
 
     private int accelerometer_Q1 = 8 ;
+    private int rotationVector_Q1 = 14 ;
 
 	final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, (r) -> {
 		Thread t = new Thread(r, "BNO080 Internal Executor");
@@ -179,7 +179,7 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
                     System.out.println("REPORT DONE");
 
 					counter = 0;
-                    while (counter < 40){
+                    while (counter < 30){
 
                     	waitForSPI();
                         receivedPacketContinual();
@@ -288,25 +288,17 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 		shtpData[15] = (int) (specificConfig >> 24) & 0xFF; // Sensor-specific config (MSB)
 	}
 
-	private void ps0WakePins(PinState state) {
-		wakeGpio.setState(state); // Before boot up the PS0/Wake
-		ps0Gpio.setState(state); // Before boot up the PS0/Wake
-	}
-
 	private boolean configureSpi() {
 		System.out.println("configureSpiPins");
 		GpioController gpioController = GpioFactory.getInstance();
 		csGpio = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_25);
 		wakeGpio = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_00);
-		ps0Gpio = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_04);
 		intGpio = gpioController.provisionDigitalInputPin(RaspiPin.GPIO_03, PinPullResistance.PULL_UP);
 		rstGpio = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_02);
 
 		// Configure the BNO080 for SPI communication
 		csGpio.setState(PinState.HIGH); // Deselect BNO080
-
-		ps0WakePins(PinState.HIGH);
-
+		wakeGpio.setState(PinState.HIGH);
 		rstGpio.setState(PinState.LOW); // Reset BNO080
 		try {
 			TimeUnit.MILLISECONDS.sleep(2); // Min length not specified in datasheet?
@@ -426,7 +418,7 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 			System.out.println("receivedPacket: dataLength packetLSB=" + packetLSB);
 			System.out.println("receivedPacket: dataLength packetMSB=" + packetMSB);
 			if (dataLength < 0) {
-				return true;
+				return false;
 			}
 
 			try {
@@ -459,15 +451,6 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 			System.out.println("sendPacket SPI not available for communication");
 			return false;
 		}
-		// try {
-		// TimeUnit.MICROSECONDS.sleep(1);
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-		// if (!waitForSPI()) {
-		// System.out.println("sendPacket SPI not available for communication");
-		// return false;
-		// }
 
 		// BNO080 has max CLK of 3MHz, MSB first,
 		// The BNO080 uses CPOL = 1 and CPHA = 1. This is mode3
@@ -501,11 +484,11 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 			for (int i = 0; i < size; i++) {
 				shtpData[i] = spiDevice.write((byte) shtpData[i])[0];
 			}
-			if (rxReceivedLent > 0) {
-				for (int i = size; i < size + rxReceivedLent; i++) {
-					shtpData[i] = spiDevice.write((byte) 0xFF)[0];
-				}
-			}
+//			if (rxReceivedLent > 0) {
+//				for (int i = size; i < size + rxReceivedLent; i++) {
+//					shtpData[i] = spiDevice.write((byte) 0xFF)[0];
+//				}
+//			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -567,8 +550,24 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 					qToFloat(rawAccelY, accelerometer_Q1),
                     qToFloat(rawAccelZ, accelerometer_Q1)));
 			break;
+		case ROTATION_VECTOR:
+		case GAME_ROTATION_VECTOR:
+			int quatAccuracy = status & 0xFFFF;
+			int rawQuatI = data1 & 0xFFFF;
+			int rawQuatJ = data2 & 0xFFFF;
+			int rawQuatK = data3 & 0xFFFF;
+			int rawQuatReal = data4 & 0xFFFF;
+			int rawQuatRadianAccuracy = data5 & 0xFFFF; // Only available on rotation vector, not game rot vector
+			System.out.println(String.format("parseInputReport: rotationVector:%d, i:%f, j:%f, k:%f, real: %f, accuracy: %f",
+					quatAccuracy,
+					qToFloat(rawQuatI, rotationVector_Q1),
+					qToFloat(rawQuatJ, rotationVector_Q1),
+					qToFloat(rawQuatK, rotationVector_Q1),
+					qToFloat(rawQuatReal, rotationVector_Q1),
+					qToFloat(rawQuatRadianAccuracy, rotationVector_Q1)));
+			break;
 		default:
-			System.out.println("parseInputReport: Not Implemented");
+			System.out.println("parseInputReport: Not Implemented: " + sensorReport);
 			break;
 
 		}

@@ -34,7 +34,6 @@ import com.robo4j.hw.rpi.imu.bno.ShtpPacketRequest;
 import com.robo4j.hw.rpi.imu.bno.ShtpPacketResponse;
 
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -65,7 +64,6 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	private static final int MAX_METADATA_SIZE = 9; // This is in words. There can be many but we mostly only care about
 	// the first 9 (Qs, range, etc)
 	public static final int MAX_PACKET_SIZE = 32762;
-	private static final int READ_INTERVAL = 1000;
 
 	private ScheduledFuture<?> scheduledFuture;
 
@@ -129,28 +127,14 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 
 	@Override
 	public boolean start(SensorReport sensorReport, int reportDelay) {
-		CountDownLatch latch = new CountDownLatch(1);
-		executor.execute(() -> {
-			if (!active.get()) {
+		synchronized (executor) {
+			executor.execute(() -> {
 				boolean initState = init();
 				if (initState) {
 					enableSensorReport(sensorReport, reportDelay);
-					latch.countDown();
 				}
 				active.set(initState);
-				System.out.println("Start: active= " + initState);
-			}
-		});
-		try {
-			latch.await(2, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			return false;
-		}
 
-		int sleep = 1000;
-		synchronized (executor) {
-			executor.execute(() -> {
 				while (active.get()) {
 					ShtpPacketResponse packet = dataAvailable();
 					if (packet.dataAvailable()) {
@@ -158,11 +142,6 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 							l.onResponse(packet);
 						}
 					} else {
-						try {
-							TimeUnit.MILLISECONDS.sleep(sleep);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
 					}
 				}
 			});
@@ -180,147 +159,13 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		}
 	}
 
-	public void sendProductIdRequest() throws InterruptedException, IOException {
+	public boolean sendProductIdRequest() throws InterruptedException, IOException {
 		// Check communication with device
 		// bytes: Request the product ID and reset info, Reserved
 		ShtpPacketRequest requestPacket = getProductIdRequest();
 
 		// Transmit packet on channel 2, 2 bytes
-		sendPacket(requestPacket, "beginSPI:CHANNEL_CONTROL:SHTP_REPORT_PRODUCT_ID_REQUEST");
-	}
-
-	public boolean start22(SensorReport sensorReport, int reportDelay) {
-		try {
-			configureSpiPins();
-			TimeUnit.MICROSECONDS.sleep(100);
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
-		int errorsCount = getShtpError();
-		if (errorsCount > 0) {
-			ShtpPacketRequest resetPacket = getSoftResetPacket();
-			try {
-				sendPacket(resetPacket, "start22");
-				TimeUnit.MILLISECONDS.sleep(700); // 700 milliseconds for the reboot
-				// After reset => 3 packets.
-				// 1. packet unsolicited advertising packet (chan0)
-
-				boolean active1 = true;
-				while (active1) {
-					ShtpPacketResponse packet1 = receivePacket();
-					Register register1 = Register.getByChannel(packet1.getHeaderChannel());
-					if (!register1.equals(Register.COMMAND) || packet1.getHeader()[3] != 1) {
-					} else {
-						System.out.println("start22: packet1: SHTP advertising.");
-						active1 = false;
-					}
-				}
-
-				// TimeUnit.MICROSECONDS.sleep(100);
-
-				boolean active2 = true;
-				while (active2) {
-					ShtpPacketResponse packet2 = receivePacket();
-					Register register2 = Register.getByChannel(packet2.getHeaderChannel());
-					if (!register2.equals(Register.EXECUTABLE) || packet2.getHeader()[3] != 1) {
-					} else {
-						System.out.println("start22: packetw: reset complete' status..");
-						active2 = false;
-					}
-				}
-
-				TimeUnit.MICROSECONDS.sleep(100);
-				ShtpPacketResponse packet3 = receivePacket();
-				Register register3 = Register.getByChannel(packet3.getHeaderChannel());
-
-				if (!register3.equals(Register.CONTROL) || packet3.getHeader()[3] != 1) {
-					System.out.println("start22: packet3:  can't get SH2 initialization");
-					return false;
-				}
-
-				System.out.println("start22: OK  Reset complete");
-				System.out.println("start22: OK  Initialization complete");
-				return true;
-
-			} catch (IOException | InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		return false;
-	}
-
-	public boolean singleStart(SensorReport sensorReport, int reportDelay) {
-		executor.execute(() -> {
-			if (!active.get()) {
-				boolean initState = init();
-				if (initState) {
-					enableSensorReport(sensorReport, reportDelay);
-					System.out.println("INIT DONE");
-				}
-				active.set(initState);
-				System.out.println("Start: active= " + initState);
-
-				while (active.get()) {
-					ShtpPacketResponse packet = dataAvailable();
-					if (packet.dataAvailable()) {
-						for (BNO80DeviceListener l : listeners) {
-							l.onResponse(packet);
-						}
-					}
-
-					ShtpReport report = ShtpReport.getByCode(packet.getBodyFirst());
-					Register register = Register.getByChannel(packet.getHeaderChannel());
-					System.out.println("RECEIVED REGISTER: " + register + " report: " + report);
-					if (report.equals(ShtpReport.GET_FEATURE_RESPONSE)) {
-						ShtpPacketRequest packetToSend = prepareShtpPacketRequest(Register.CONTROL, 2);
-						packetToSend.addBody(0, ShtpReport.GET_FEATURE_REQUEST.getCode());
-						packetToSend.addBody(1, 1);
-						try {
-							sendPacket(packetToSend, "received report: " + report + " send: response");
-
-							boolean waitForTimestamp = true;
-							while (waitForTimestamp) {
-								ShtpPacketResponse packetToSendResponse = dataAvailable();
-								ShtpReport reportResponse = ShtpReport.getByCode(packetToSendResponse.getBodyFirst());
-								Register registerResponse = Register
-										.getByChannel(packetToSendResponse.getHeaderChannel());
-								if (reportResponse.equals(ShtpReport.BASE_TIMESTAMP)) {
-									waitForTimestamp = false;
-									System.out.println("waitForTimestamp DONE reportResponse: " + reportResponse
-											+ ", registerResponse=" + registerResponse);
-								}
-							}
-
-							boolean waitForFeatureResponse = true;
-							while (waitForFeatureResponse) {
-								ShtpPacketResponse packetFeatureResponse = dataAvailable();
-								ShtpReport reportResponse1 = ShtpReport.getByCode(packetFeatureResponse.getBodyFirst());
-								Register registerResponse1 = Register
-										.getByChannel(packetFeatureResponse.getHeaderChannel());
-
-								if (reportResponse1.equals(ShtpReport.GET_FEATURE_RESPONSE)) {
-									waitForFeatureResponse = false;
-									System.out.println("waitForFeatureResponse DONE");
-								}
-
-								System.out.println("RECEIVED FEATURE RESPONSE  reportResponse: " + reportResponse1
-										+ ", registerResponse1: " + registerResponse1);
-								if (reportResponse1.equals(ShtpReport.GET_FEATURE_RESPONSE)) {
-									System.out
-											.println("RECEIVED FEATURE RESPONSE: reportResponse1= " + reportResponse1);
-								}
-							}
-
-						} catch (InterruptedException | IOException e) {
-							e.printStackTrace();
-						}
-					}
-
-				}
-			}
-		});
-
-		return active.get();
+		return sendPacket(requestPacket, "beginSPI:CHANNEL_CONTROL:SHTP_REPORT_PRODUCT_ID_REQUEST");
 	}
 
 	public boolean beginSPI() throws InterruptedException, IOException {
@@ -492,58 +337,21 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 
 	private boolean prepareForSpi() throws InterruptedException, IOException {
 		// Wait for first assertion of INT before using WAK pin. Can take ~104ms
-		boolean state = waitForSPI();
-
-
-		ShtpPacketRequest errorRequest = getErrorRequest();
-		sendPacket(errorRequest, "prepareForSpi");
-
-		int counter = 0;
-		int errorsCount = 0;
-		boolean active = true;
-		while (active) {
-			ShtpPacketResponse response = receivePacket();
-			ShtpReport report = ShtpReport.getByCode(response.getBodyFirst());
-			if (report.equals(ShtpReport.COMMAND_RESPONSE)) {
-				active = false;
-				errorsCount = response.getBody().length - 1;
-			} else {
-				counter++;
-			}
-			TimeUnit.MICROSECONDS.sleep(100);
+		if(waitForSPI()){
+			ShtpPacketResponse advertisementPacket = receivePacket();
+			printArray("prepareForSpi HEADER", advertisementPacket.getHeader());
+			printArray("prepareForSpi BODY", advertisementPacket.getBody());
 		}
 
-		if(errorsCount > 0){
-			ShtpPacketRequest resetRequest = getSoftResetPacket();
-			TimeUnit.MILLISECONDS.sleep(700);
+		if(sendProductIdRequest()){
+			boolean active = true;
+			while ((active)){
 
-			if (state) {
-				waitForInterrupt("beginSPI: system startup");
-			}
-			System.out.println("prepareForSpi 1");
-
-			/*
-			 * At system startup, the hub must send its full advertisement message (see 5.2
-			 * and 5.3) to the host. It must not send any other data until this step is
-			 * complete. When BNO080 first boots it broadcasts big startup packet Read it
-			 * and dump it
-			 */
-			if (state) {
-				waitForInterrupt("beginSPI: BNO080 unsolicited response");
-			}
-			System.out.println("prepareForSpi 2");
-
-			/*
-			 * The BNO080 will then transmit an unsolicited Initialize Response (see
-			 * 6.4.5.2) Read it and dump it
-			 */
-			if (state) {
-				waitForInterrupt("beginSPI: BNO080 unsolicited response");
 			}
 		}
 
 
-		return state;
+		return true;
 	}
 
 	private void printRotationVectorData(AtomicLong measurements) {
@@ -1007,13 +815,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			}
 		}
 		csGpio.setState(PinState.HIGH); // Release BNO080
-		ShtpReport report = ShtpReport.getByCode(response.getBodyFirst());
-
-		printShtpPacketPart(report, "receivePacketChannel current: SequenceNumbers", sequenceByChannel);
-		printArray("receivePacketHeader", response.getHeader());
-		printArray("receivePacketBody", response.getBody());
-		System.out.println("receivePacket: DONE RESPONSE");
-		return response; // we are done
+		return response;
 
 	}
 

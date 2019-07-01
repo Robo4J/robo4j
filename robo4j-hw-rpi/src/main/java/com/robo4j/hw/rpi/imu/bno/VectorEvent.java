@@ -26,7 +26,21 @@ package com.robo4j.hw.rpi.imu.bno;
 public class VectorEvent {
 
     public enum Type {
-        ROTATION, GAME;
+
+        //@formatter:off
+        GAME        (14),
+        ROTATION    (14)
+        ;
+        //@formatter:on
+        private final int qPoint;
+
+        Type(int qPoint) {
+            this.qPoint = qPoint;
+        }
+
+        public int getQ(){
+            return qPoint;
+        }
     }
 
     private final Type type;

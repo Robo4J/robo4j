@@ -38,9 +38,6 @@ public class BNO080Example {
         BNO080SPIDevice device = new BNO080SPIDevice();
         device.addListener(listener);
 //        if(device.start(sensorReport, 50)){
-        if(device.singleStart(sensorReport, 110)){
-            System.out.println("READY TO RECEIVE: " + sensorReport);
-        }
 
 //        System.out.println("FLUSH");
 //        device.sendForceSensorFlush(BNO080Device.SensorReport.ROTATION_VECTOR);

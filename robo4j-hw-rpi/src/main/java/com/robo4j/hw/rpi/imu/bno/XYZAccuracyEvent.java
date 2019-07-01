@@ -27,7 +27,22 @@ package com.robo4j.hw.rpi.imu.bno;
 public class XYZAccuracyEvent {
 
 	public enum Type {
-		ACCELEROMETER_RAW, ACCELEROMETER_LINEAR, GYROSCOPE, MAGNETOMETER;
+		//@formatter:off
+		ACCELEROMETER_RAW 			(8),
+		ACCELEROMETER_LINEAR 		(8),
+		GYROSCOPE					(9),
+		MAGNETOMETER				(4)
+		;
+		//@formatter:on
+		private final int qPoint;
+
+		Type(int qPoint) {
+			this.qPoint = qPoint;
+		}
+
+		public int getQ() {
+			return qPoint;
+		}
 	}
 
 	private final Type type;
