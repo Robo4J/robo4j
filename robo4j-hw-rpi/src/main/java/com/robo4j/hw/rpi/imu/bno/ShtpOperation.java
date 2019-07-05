@@ -18,35 +18,59 @@
 package com.robo4j.hw.rpi.imu.bno;
 
 /**
+ * ShtpOperation wrapper full shtp operation consists from request/response
+ * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ShtpOperation {
 
-    private boolean processed;
-    private ShtpPacketRequest  request;
-    private ShtpPacketResponse response;
-    private ShtpOperation next;
+    private final ShtpPacketRequest request;
+    private final ShtpOperationResponse response;
+	private ShtpOperation next;
+	private boolean processed;
 
-    public ShtpOperation(ShtpPacketRequest request, ShtpPacketResponse response) {
-        this.request = request;
-        this.response = response;
-        this.next = null;
+	public ShtpOperation(ShtpPacketRequest request, ShtpOperationResponse response) {
+		this.request = request;
+		this.response = response;
+		this.next = null;
+	}
+
+	public boolean hasRequest(){
+	    return request != null;
     }
 
-    public ShtpPacketRequest getRequest() {
-        return request;
+	public ShtpPacketRequest getRequest() {
+		return request;
+	}
+
+	public ShtpOperationResponse getResponse() {
+		return response;
+	}
+
+	public ShtpOperation getNext() {
+		return next;
+	}
+
+	public void setNext(ShtpOperation next) {
+		this.next = next;
+	}
+
+    public void setProcessed(boolean processed) {
+        this.processed = processed;
     }
 
-    public ShtpPacketResponse getResponse() {
-        return response;
-    }
+    public boolean isProcessed() {
+		return processed;
+	}
 
-    public ShtpOperation getNext() {
-        return next;
-    }
-
-    public void setNext(ShtpOperation next) {
-        this.next = next;
+    @Override
+    public String toString() {
+        return "ShtpOperation{" +
+                "request=" + request +
+                ", response=" + response +
+                ", next=" + next +
+                ", processed=" + processed +
+                '}';
     }
 }

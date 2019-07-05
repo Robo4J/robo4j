@@ -18,17 +18,19 @@
 package com.robo4j.hw.rpi.imu.bno;
 
 /**
+ * ShtpOperationBuilder provides a chain of operation needs to by processed in desired order
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ShtpOperationBuilder {
 
-    private final ShtpOperation start;
+    private final ShtpOperation head;
     private ShtpOperation current;
 
-    public ShtpOperationBuilder(ShtpOperation start) {
-        this.start = start;
-        this.current = start;
+    public ShtpOperationBuilder(ShtpOperation head) {
+        this.head = head;
+        this.current = head;
     }
 
     public ShtpOperationBuilder addOperation(ShtpOperation operation){
@@ -38,6 +40,6 @@ public class ShtpOperationBuilder {
     }
 
     public ShtpOperation build(){
-        return start;
+        return head;
     }
 }

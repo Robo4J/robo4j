@@ -35,8 +35,8 @@ public final class ShtpPacketRequest {
         this.sequenceNumber = sequenceNumber;
     }
 
-    public void createHeader(BNO080Device.Register register) {
-        int[] header = createSpiHeader(body.length + SHTP_HEADER_SIZE, register, sequenceNumber);
+    public void createHeader(BNO080Device.ShtpChannel shtpChannel) {
+        int[] header = createSpiHeader(body.length + SHTP_HEADER_SIZE, shtpChannel, sequenceNumber);
         this.header[0] = header[0]; // LSB
         this.header[1] = header[1]; // MSB
         this.header[2] = header[2]; // Channel Number
@@ -55,8 +55,8 @@ public final class ShtpPacketRequest {
         }
     }
 
-    public BNO080Device.Register getRegister(){
-        return BNO080Device.Register.getByChannel((byte)header[2]);
+    public BNO080Device.ShtpChannel getRegister(){
+        return BNO080Device.ShtpChannel.getByChannel((byte)header[2]);
     }
 
     public int[] getHeader(){
@@ -83,14 +83,14 @@ public final class ShtpPacketRequest {
         return body.length;
     }
 
-    private int[] createSpiHeader(int packetLength, BNO080Device.Register register, int sequenceNumber) {
+    private int[] createSpiHeader(int packetLength, BNO080Device.ShtpChannel shtpChannel, int sequenceNumber) {
         int[] header = new int[SHTP_HEADER_SIZE];
         header[0] = (byte) (packetLength & 0xFF); // LSB
         header[1] = (byte) ((packetLength >> 8) & 0xFF);   // MSB
-        header[2] = (byte) (register.getChannel() & 0xFF); // Channel Number
+        header[2] = (byte) (shtpChannel.getChannel() & 0xFF); // Channel Number
         // Send the sequence number, increments with each packet sent, different counter
         // for each channel
-        // header[3] = (byte) (0xFF & sequenceByChannel[register.getChannel()]++); //
+        // header[3] = (byte) (0xFF & sequenceByChannel[shtpChannel.getChannel()]++); //
         // Sequence number
         header[3] = (byte) (sequenceNumber & 0xFF); // Sequence number
         return header;

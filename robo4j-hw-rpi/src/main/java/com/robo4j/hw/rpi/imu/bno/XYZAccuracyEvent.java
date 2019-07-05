@@ -17,6 +17,9 @@
 
 package com.robo4j.hw.rpi.imu.bno;
 
+import java.util.EnumSet;
+import java.util.Objects;
+
 /**
  * XYZAccuracyEvent BNO Accelerometer Event used for Raw, Linear Accelerometer,
  * Gyroscope, Magnetometer
@@ -24,42 +27,37 @@ package com.robo4j.hw.rpi.imu.bno;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class XYZAccuracyEvent {
+public class XYZAccuracyEvent implements DeviceEvent {
 
-	public enum Type {
-		//@formatter:off
-		ACCELEROMETER_RAW 			(8),
-		ACCELEROMETER_LINEAR 		(8),
-		GYROSCOPE					(9),
-		MAGNETOMETER				(4)
-		;
-		//@formatter:on
-		private final int qPoint;
+	private static final EnumSet<DeviceEventType> ALLOWED = EnumSet.range(DeviceEventType.MAGNETOMETER,
+			DeviceEventType.GYROSCOPE);
 
-		Type(int qPoint) {
-			this.qPoint = qPoint;
-		}
-
-		public int getQ() {
-			return qPoint;
-		}
-	}
-
-	private final Type type;
+	private final DeviceEventType type;
 	private final float x;
 	private final float y;
 	private final float z;
 	private final int accuracy;
+	private final long timestamp;
 
-	public XYZAccuracyEvent(Type type, float x, float y, float z, int accuracy) {
-        this.type = type;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.accuracy = accuracy;
-    }
+	public XYZAccuracyEvent(DeviceEventType type, float x, float y, float z, int accuracy, long timestamp) {
+		if (ALLOWED.contains(type)) {
+			this.type = type;
+			this.x = x;
+			this.y = y;
+			this.z = z;
+			this.accuracy = accuracy;
+			this.timestamp = timestamp;
+		} else {
+			this.type = DeviceEventType.NONE;
+			this.x = 0;
+			this.y = 0;
+			this.z = 0;
+			this.accuracy = 0;
+			this.timestamp = 0;
+		}
+	}
 
-	public Type getType() {
+	public DeviceEventType getType() {
 		return type;
 	}
 
@@ -79,9 +77,39 @@ public class XYZAccuracyEvent {
 		return accuracy;
 	}
 
+
+	@Override
+	public long timestampMicro() {
+		return timestamp;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		XYZAccuracyEvent that = (XYZAccuracyEvent) o;
+		return Float.compare(that.x, x) == 0 &&
+				Float.compare(that.y, y) == 0 &&
+				Float.compare(that.z, z) == 0 &&
+				accuracy == that.accuracy &&
+				timestamp == that.timestamp &&
+				type == that.type;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(type, x, y, z, accuracy, timestamp);
+	}
+
 	@Override
 	public String toString() {
-		return "XYZAccuracyEvent{" + "type=" + type + ", x=" + x + ", y=" + y + ", z=" + z + ", accuracy=" + accuracy
-				+ '}';
+		return "XYZAccuracyEvent{" +
+				"type=" + type +
+				", x=" + x +
+				", y=" + y +
+				", z=" + z +
+				", accuracy=" + accuracy +
+				", timestamp=" + timestamp +
+				'}';
 	}
 }

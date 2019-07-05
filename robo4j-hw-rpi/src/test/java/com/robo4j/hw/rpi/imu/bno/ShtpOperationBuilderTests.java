@@ -37,14 +37,14 @@ class ShtpOperationBuilderTests {
 
 
         ShtpPacketRequest req1 = new ShtpPacketRequest(1,1);
-        req1.createHeader(BNO080Device.Register.CONTROL);
+        req1.createHeader(BNO080Device.ShtpChannel.CONTROL);
         req1.addBody(new int[]{1});
         ShtpPacketResponse res1 = new ShtpPacketResponse(1);
         res1.addHeader(0, 0, 1, 1);
         res1.addBody(0, 1);
 
         ShtpPacketRequest req2 = new ShtpPacketRequest(2,2);
-        req2.createHeader(BNO080Device.Register.COMMAND);
+        req2.createHeader(BNO080Device.ShtpChannel.COMMAND);
         req2.addBody(new int[]{1, 2});
         ShtpPacketResponse res2 = new ShtpPacketResponse(2);
         res2.addHeader(0, 0, 1, 2);
@@ -52,7 +52,7 @@ class ShtpOperationBuilderTests {
         res2.addBody(1, 2);
 
         ShtpPacketRequest req3 = new ShtpPacketRequest(3,2);
-        req3.createHeader(BNO080Device.Register.EXECUTABLE);
+        req3.createHeader(BNO080Device.ShtpChannel.EXECUTABLE);
         req3.addBody(new int[]{1, 2, 3});
         ShtpPacketResponse res3 = new ShtpPacketResponse(3);
         res3.addHeader(0, 0, 1, 3);
@@ -70,7 +70,7 @@ class ShtpOperationBuilderTests {
                 .addOperation(op3)
                 .build();
 
-        Map<String, String> overview  = ShtpOperationUtil.getOperationSequenceOverview(operationChain);
+        Map<String, String> overview  = ShtpOperationUtil.getOperationSequenceHexOverview(operationChain);
         System.out.println("OVERVIEW:" + overview);
 
     }

@@ -28,7 +28,13 @@ import java.util.Map;
  */
 public final class ShtpOperationUtil {
 
-	public static Map<String, String> getOperationSequenceOverview(ShtpOperation operation) {
+    /**
+     * Extract Hexadecimal form of all chained operations, by providing a head
+     *
+     * @param operation shtp operation
+     * @return map of request=response
+     */
+	public static Map<String, String> getOperationSequenceHexOverview(ShtpOperation operation) {
 		final Map<String, String> result = new LinkedHashMap<>();
 		ShtpOperation currentOp = operation;
 		while (currentOp.getNext() != null) {
@@ -37,17 +43,6 @@ public final class ShtpOperationUtil {
 		}
 		addOperationToMap(result, currentOp);
 		return result;
-	}
-
-	private static String convertHeadAndBodyToString(int[] head, int[] body) {
-		//@formatter:off
-        return new StringBuilder().append("[HEAD:")
-                .append(convertArrayToHexString(head))
-                .append(",").append("BODY:")
-                .append(convertArrayToHexString(body))
-                .append("]")
-                .toString();
-        //@formatter:on
 	}
 
 	public static String convertArrayToHexString(int[] array) {
@@ -61,9 +56,21 @@ public final class ShtpOperationUtil {
 
 	private static void addOperationToMap(Map<String, String> map, ShtpOperation op) {
 		ShtpPacketRequest request = op.getRequest();
-		ShtpPacketResponse response = op.getResponse();
+//		ShtpOperationResponse response = op.getResponse();
 		String requestString = convertHeadAndBodyToString(request.getHeader(), request.getBody());
-		String responseString = convertHeadAndBodyToString(response.getHeader(), response.getBody());
-		map.put(requestString, responseString);
+//		String responseString = convertHeadAndBodyToString(response.getHeader(), response.getBody());
+		map.put(requestString, "");
 	}
+
+    private static String convertHeadAndBodyToString(int[] head, int[] body) {
+        //@formatter:off
+        return new StringBuilder().append("[H:")
+                .append(convertArrayToHexString(head))
+                .append(",").append("B:")
+                .append(convertArrayToHexString(body))
+                .append("]")
+                .toString();
+        //@formatter:on
+    }
+
 }

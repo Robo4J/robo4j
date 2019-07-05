@@ -15,25 +15,32 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu;
-
-import com.robo4j.hw.rpi.imu.impl.BNO080I2CDevice;
+package com.robo4j.hw.rpi.imu.bno;
 
 /**
+ * Type of BNO080 Event
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BNO080I2CExample {
-    public static void main(String[] args) throws Exception {
-        System.out.println("... BNO080 Test Example ...");
+public enum DeviceEventType {
+    //@formatter:off
+    NONE                    (-1),
+    MAGNETOMETER			(4),
+    ACCELEROMETER_RAW 		(8),
+    ACCELEROMETER_LINEAR 	(8),
+    GYROSCOPE				(9),
+    VECTOR_GAME             (14),
+    VECTOR_ROTATION         (14)
+    ;
+    //@formatter:on
+    private final int qPoint;
 
-        BNO080I2CDevice device = new BNO080I2CDevice();
-        device.start(null, 50);
+    DeviceEventType(int qPoint) {
+        this.qPoint = qPoint;
+    }
 
-        System.out.println("Press enter to quit!");
-        System.in.read();
-        device.shutdown();
-
-
+    public int getQ(){
+        return qPoint;
     }
 }

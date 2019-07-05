@@ -55,7 +55,7 @@ public class BNO080I2CDevice extends AbstractBNO080Device {
 	}
 
 	@Override
-	public boolean start(SensorReport sensorReport, int reportDelay) {
+	public boolean start(ShtpSensorReport sensorReport, int reportDelay) {
 
 		/*
 		 * We expect caller to begin their I2C port, with the speed of their choice
@@ -75,7 +75,7 @@ public class BNO080I2CDevice extends AbstractBNO080Device {
 			int counter = 0;
 			while (active && counter < 20) {
 				ShtpPacketResponse response = receivePacket();
-				if (containsResponseCode(response, ShtpReport.PRODUCT_ID_RESPONSE)) {
+				if (containsResponseCode(response, ShtpDeviceReport.PRODUCT_ID_RESPONSE)) {
 					active = false;
 				}
 				counter++;
@@ -118,8 +118,8 @@ public class BNO080I2CDevice extends AbstractBNO080Device {
 		boolean active = true;
 		while (active && counter < 300) {
 			ShtpPacketResponse response = receivePacket();
-			ShtpReport report = ShtpReport.getByCode(response.getBodyFirst());
-			if (report.equals(ShtpReport.COMMAND_RESPONSE)) {
+			ShtpDeviceReport report = ShtpDeviceReport.getById(response.getBodyFirst());
+			if (report.equals(ShtpDeviceReport.COMMAND_RESPONSE)) {
 				active = false;
 			} else {
 				counter++;

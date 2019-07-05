@@ -27,7 +27,7 @@ public class BNO080SimpleExample {
 	public static void main(String[] args) throws Exception {
 		System.out.println("BNO080 Simple Example");
 		BNO080SPISimpleDevice device = new BNO080SPISimpleDevice();
-		device.start(BNO080Device.SensorReport.ACCELEROMETER, 60);
+		device.start(BNO080Device.ShtpSensorReport.ACCELEROMETER, 60);
 		System.in.read();
         System.out.println("CLICK TO END");
 	}

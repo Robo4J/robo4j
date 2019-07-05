@@ -15,35 +15,13 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu;
+package com.robo4j.hw.rpi.imu.bno;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Test {
-
-    public static void main(String[] args) {
-
-        byte lsbB = (byte)2;
-        byte msbB = (byte)2;
-        int packetLSB = toInt8U(lsbB);
-        int packetMSB = toInt8U(msbB);
-        int length = calculateNumberOfBytesInPacket(packetMSB, packetLSB);
-        System.out.println("length= " + length);
-
-    }
-
-
-
-    private static int calculateNumberOfBytesInPacket(int packetMSB, int packetLSB) {
-        // Calculate the number of data bytes in this packet
-        int dataLength = (0xFFFF & packetMSB << 8 | packetLSB);
-        dataLength &= ~(1 << 15); // Clear the MSbit.
-        return dataLength;
-    }
-
-    private static int toInt8U(byte b) {
-        return b & 0xFF;
-    }
+public interface DeviceEvent {
+    DeviceEventType getType();
+    long timestampMicro();
 }

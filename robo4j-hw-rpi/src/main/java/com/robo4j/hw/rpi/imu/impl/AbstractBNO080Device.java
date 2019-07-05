@@ -71,7 +71,7 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 	});
 
 	@Override
-	public abstract boolean start(SensorReport sensorReport, int reportDelay);
+	public abstract boolean start(ShtpSensorReport report, int reportDelay);
 
 	@Override
 	public void shutdown() {
@@ -85,13 +85,13 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 		listeners.add(listener);
 	}
 
-	ShtpPacketRequest prepareShtpPacketRequest(Register register, int size) {
-		ShtpPacketRequest packet = new ShtpPacketRequest(size, sequenceByChannel[register.getChannel()]++);
-		packet.createHeader(register);
+	ShtpPacketRequest prepareShtpPacketRequest(ShtpChannel shtpChannel, int size) {
+		ShtpPacketRequest packet = new ShtpPacketRequest(size, sequenceByChannel[shtpChannel.getChannel()]++);
+		packet.createHeader(shtpChannel);
 		return packet;
 	}
 
-	boolean processShtpReportResponse(ShtpReport report) {
+	boolean processShtpReportResponse(ShtpDeviceReport report) {
 		switch (report) {
 		case COMMAND_RESPONSE:
 		case FRS_READ_RESPONSE:
@@ -110,22 +110,22 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 	ShtpPacketRequest getProductIdRequest() {
 		// Check communication with device
 		// bytes: Request the product ID and reset info, Reserved
-		ShtpPacketRequest result = prepareShtpPacketRequest(Register.CONTROL, 2);
-		result.addBody(0, ShtpReport.PRODUCT_ID_REQUEST.getCode());
+		ShtpPacketRequest result = prepareShtpPacketRequest(ShtpChannel.CONTROL, 2);
+		result.addBody(0, ShtpDeviceReport.PRODUCT_ID_REQUEST.getId());
 		result.addBody(1, 0);
 		return result;
 	}
 
 	ShtpPacketRequest getSoftResetPacket() {
-		Register register = Register.EXECUTABLE;
-		ShtpPacketRequest packet = prepareShtpPacketRequest(register, 1);
+		ShtpChannel shtpChannel = ShtpChannel.EXECUTABLE;
+		ShtpPacketRequest packet = prepareShtpPacketRequest(shtpChannel, 1);
 		packet.addBody(0, 1);
 		return packet;
 	}
 
-	boolean containsResponseCode(ShtpPacketResponse response, ShtpReport expectedReport) {
+	boolean containsResponseCode(ShtpPacketResponse response, ShtpDeviceReport expectedReport) {
 		if (response.dataAvailable()) {
-			ShtpReport report = ShtpReport.getByCode(response.getBodyFirst());
+			ShtpDeviceReport report = ShtpDeviceReport.getById(response.getBodyFirst());
 			return expectedReport.equals(report);
 		} else {
 			System.out.println("containsResponseCode: No Data");

@@ -46,7 +46,9 @@ public final class ShtpPacketResponse {
     }
 
     public int[] getHeader() {
-        return header;
+        int[] copy = new int[header.length];
+        System.arraycopy(header, 0, copy, 0, header.length);
+        return copy;
     }
 
     public byte getHeaderChannel() {
@@ -62,7 +64,9 @@ public final class ShtpPacketResponse {
     }
 
     public int[] getBody() {
-        return body;
+        int[] copy = new int[body.length];
+        System.arraycopy(body, 0, copy, 0, body.length);
+        return copy;
     }
 
     public int getBodySize() {

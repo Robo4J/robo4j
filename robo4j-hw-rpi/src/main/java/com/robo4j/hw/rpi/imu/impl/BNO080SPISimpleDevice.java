@@ -57,9 +57,8 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 	private int commandSequenceNumber = 0;
 	private long timeStamp;
 	private long unitTickMicroSec = 100;
-	private long sensorReportDelayMicroSec = 17;
 	private long timeBaseDeltaReferenceMicroSec = 120;
-	private long sensorReportDelayMilliSec = 0;
+	private long sensorReportDelayMicroSec = 0;
 
 	private SpiDevice spiDevice;
 	private GpioPinDigitalInput intGpio;
@@ -85,7 +84,7 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 	}
 
 	@Override
-	public boolean start(SensorReport sensorReport, int reportDelay) {
+	public boolean start(ShtpSensorReport sensorReport, int reportDelay) {
 
 		if (configureSpi()) {
 			// Wait for first assertion of INT before using WAK pin. Can take ~104ms
@@ -94,7 +93,7 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 				receivePacket();
 			}
 			// shtpData[0] = 1;
-			// sendPacket(Register.COMMAND, 1);
+			// sendPacket(ShtpChannel.COMMAND, 1);
 
 			// waitForSPI(); // Wait for assertion of INT before reading advert message.
 			// receivePacket();
@@ -106,19 +105,19 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 			// receivePacket();
 
 			// Check communication with device
-			shtpData[0] = ShtpReport.PRODUCT_ID_REQUEST.getCode(); // Request the product ID and reset info
+			shtpData[0] = ShtpDeviceReport.PRODUCT_ID_REQUEST.getId(); // Request the product ID and reset info
 			shtpData[1] = 0; // Reserved
 
-			sendPacket(Register.CONTROL, 2);
+			sendPacket(ShtpChannel.CONTROL, 2);
 
 			// Now we wait for response
 			waitForSPI();
 			if (receivePacket()) {
-				if (shtpData[0] == ShtpReport.PRODUCT_ID_RESPONSE.getCode()) {
+				if (shtpData[0] == ShtpDeviceReport.PRODUCT_ID_RESPONSE.getId()) {
 					System.out.println("Received Product response");
 //					setFeatureCommand(sensorReport, reportDelay, 0);
 //					waitForSPI();
-//					sendPacket(Register.CONTROL, 17);
+//					sendPacket(ShtpChannel.CONTROL, 17);
                     try {
                         TimeUnit.MICROSECONDS.sleep(100);
                     } catch (InterruptedException e) {
@@ -128,7 +127,7 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 					int counter = 0;
 					boolean active = true;
 					while (active) {
-						if (receivePacket() && shtpData[0] == ShtpReport.COMMAND_RESPONSE.getCode()) {
+						if (receivePacket() && shtpData[0] == ShtpDeviceReport.COMMAND_RESPONSE.getId()) {
 							active = false;
 							System.out.println("COMMAND_RESPONSE");
 						} else {
@@ -138,7 +137,7 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 					}
                     setFeatureCommand(sensorReport, reportDelay, 0);
                     waitForSPI();
-                    sendPacket(Register.CONTROL, 17);
+                    sendPacket(ShtpChannel.CONTROL, 17);
 
                     try {
                         TimeUnit.MICROSECONDS.sleep(100);
@@ -149,7 +148,7 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
                     waitForSPI();
 					active = true;
 					while (active) {
-						if (receivePacket() && shtpData[0] == ShtpReport.GET_FEATURE_RESPONSE.getCode()) {
+						if (receivePacket() && shtpData[0] == ShtpDeviceReport.GET_FEATURE_RESPONSE.getId()) {
 							active = false;
 							System.out.println("RECEIVED GET_FEATURE_RESPONSE");
 						} else {
@@ -161,13 +160,13 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
                     active = true;
 					while(active){
                         if (receivePacket()) {
-                            if(shtpHeader[2] == Register.REPORTS.getChannel() && shtpData[0] == ShtpReport.BASE_TIMESTAMP.getCode()){
+                            if(shtpHeader[2] == ShtpChannel.REPORTS.getChannel() && shtpData[0] == ShtpDeviceReport.BASE_TIMESTAMP.getId()){
                                 System.out.println("FB received");
                                 parseInputReport();
                                 active = false;
 
-                            } else if (shtpHeader[2] == Register.CONTROL.getChannel()){
-                                if(shtpData[0] == ShtpReport.COMMAND_RESPONSE.getCode() && shtpData[2] == DeviceCommand.ME_CALIBRATE.getId()){
+                            } else if (shtpHeader[2] == ShtpChannel.CONTROL.getChannel()){
+                                if(shtpData[0] == ShtpDeviceReport.COMMAND_RESPONSE.getId() && shtpData[2] == DeviceCommand.ME_CALIBRATE.getId()){
                                     int calibrationStatus = shtpData[5] & 0xFF;
                                     System.out.println("Response to calibrate:" + calibrationStatus);
                                 }
@@ -180,10 +179,9 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 
 					counter = 0;
                     while (counter < 30){
-
                     	waitForSPI();
-                        receivedPacketContinual();
-                        if(shtpHeader[2] == Register.REPORTS.getChannel() && shtpData[0] == ShtpReport.BASE_TIMESTAMP.getCode()){
+                        receivePacketContinual();
+                        if(shtpHeader[2] == ShtpChannel.REPORTS.getChannel() && shtpData[0] == ShtpDeviceReport.BASE_TIMESTAMP.getId()){
                             System.out.println("FB received");
                             parseInputReport();
                         }
@@ -204,7 +202,7 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 		int errors = 0;
 		while (active) {
 			receivePacket();
-			if (shtpHeader[2] == Register.COMMAND.getChannel() && shtpData[0] == 0x01) {
+			if (shtpHeader[2] == ShtpChannel.COMMAND.getChannel() && shtpData[0] == 0x01) {
 				active = false;
 			}
 			int packetLength = calculateNumberOfBytesInPacket(shtpHeader[1], shtpHeader[0]);
@@ -218,7 +216,7 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 			// Send Reset Request
 			shtpData[0] = 1;
 			System.out.println("EXECUTE");
-			sendPacket(Register.EXECUTABLE, 1);
+			sendPacket(ShtpChannel.EXECUTABLE, 1);
 			try {
 				TimeUnit.MILLISECONDS.sleep(700);
 			} catch (InterruptedException e) {
@@ -233,7 +231,7 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 			 */
 			active = true;
 			while (active) {
-				if (receivePacket() && (shtpHeader[2] != Register.COMMAND.getChannel() || shtpHeader[3] != 1)) {
+				if (receivePacket() && (shtpHeader[2] != ShtpChannel.COMMAND.getChannel() || shtpHeader[3] != 1)) {
 					System.out.println("Error: can't get SHTP advertising.");
 					waitForSPI();
 				} else {
@@ -248,7 +246,7 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 			 */
 			active = true;
 			while (active) {
-				if (receivePacket() && (shtpHeader[2] != Register.EXECUTABLE.getChannel() || shtpHeader[3] != 1
+				if (receivePacket() && (shtpHeader[2] != ShtpChannel.EXECUTABLE.getChannel() || shtpHeader[3] != 1
 						|| shtpData[0] != 1)) {
 					System.out.println("Error: can't get 'reset complete' status.");
 					waitForSPI();
@@ -263,14 +261,14 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 	}
 
 	public void setGetFeatureRequest() {
-		shtpData[0] = ShtpReport.GET_FEATURE_REQUEST.getCode();
+		shtpData[0] = ShtpDeviceReport.GET_FEATURE_REQUEST.getId();
 		shtpData[1] = 1;
 	}
 
-	public void setFeatureCommand(SensorReport sensorReport, int timeBetweenReports, long specificConfig) {
+	public void setFeatureCommand(ShtpSensorReport sensorReport, int timeBetweenReports, long specificConfig) {
 		long microsBetweenReports = (long) timeBetweenReports * 1000L;
 
-		shtpData[0] = ShtpReport.SET_FEATURE_COMMAND.getCode(); // Set feature command. Reference page 55
+		shtpData[0] = ShtpDeviceReport.SET_FEATURE_COMMAND.getId(); // Set feature command. Reference page 55
 		shtpData[1] = sensorReport.getId(); // Feature Report ID. 0x01 = Accelerometer, 0x05 = Rotation vector
 		shtpData[2] = 0; // Change sensitivity (LSB)
 		shtpData[3] = 0; // Change sensitivity (MSB)
@@ -329,17 +327,17 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 		return false;
 	}
 
-	private boolean receivedPacketContinual(){
+	private boolean receivePacketContinual(){
         try {
             if(intGpio.isHigh()){
                 System.out.println("receivedPacketContinual: no interrupt");
                 return false;
             }
             // Get first four bytes to find out how much data we need to read
-            if(sensorReportDelayMilliSec > 0){
+            if(sensorReportDelayMicroSec > 0){
                 try {
-                    TimeUnit.MICROSECONDS.sleep(sensorReportDelayMilliSec);
-                    System.out.println("SLEEP");
+                    TimeUnit.MICROSECONDS.sleep(sensorReportDelayMicroSec);
+                    System.out.println("SLEEP: sensorReportDelayMicroSec=" + sensorReportDelayMicroSec);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -395,6 +393,16 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 			}
 
 			// Get first four bytes to find out how much data we need to read
+			if(sensorReportDelayMicroSec > 0){
+				try {
+					TimeUnit.MICROSECONDS.sleep(sensorReportDelayMicroSec);
+					System.out.println("SLEEP: sensorReportDelayMicroSec=" + sensorReportDelayMicroSec);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+
+			// Get first four bytes to find out how much data we need to read
 			csGpio.setState(PinState.LOW);
 
 			// Get the first four bytes, aka the packet header
@@ -444,7 +452,7 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 
 	}
 
-	private boolean sendPacket(Register register, int size) {
+	private boolean sendPacket(ShtpChannel shtpChannel, int size) {
 
 		// Wait for BNO080 to indicate it is available for communication
 		if (intGpio.isHigh()) {
@@ -459,9 +467,9 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 		int packetLength = size + HEADER_SIZE;
 		int headerLSB = packetLength & 0xFF;
 		int headerMSB = (packetLength >> 8) & 0xFF;
-		int headerChannel = register.getChannel();
-		int headerSequence = sequenceNumber[register.getChannel()]++;
-		// int headerSequence = sequenceNumber[register.getChannel()]++;
+		int headerChannel = shtpChannel.getChannel();
+		int headerSequence = sequenceNumber[shtpChannel.getChannel()]++;
+		// int headerSequence = sequenceNumber[shtpChannel.getChannel()]++;
 
 		printArray("sendPacket HEADER:", shtpHeader);
 		System.out.println("sendPacket BODY SIZE:" + size);
@@ -484,11 +492,6 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 			for (int i = 0; i < size; i++) {
 				shtpData[i] = spiDevice.write((byte) shtpData[i])[0];
 			}
-//			if (rxReceivedLent > 0) {
-//				for (int i = size; i < size + rxReceivedLent; i++) {
-//					shtpData[i] = spiDevice.write((byte) 0xFF)[0];
-//				}
-//			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -496,13 +499,6 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 
 		printArray("sendPacket received HEADER", shtpHeader);
 		printArray("sendPacket received BODY", shtpHeader);
-
-		try {
-			TimeUnit.MICROSECONDS.sleep(100);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
 		return true;
 	}
 
@@ -515,7 +511,7 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 				| (shtpData[1]);
 
         long accDelay = 17;
-        sensorReportDelayMilliSec = timeStamp + accDelay;
+        sensorReportDelayMicroSec = timeStamp + accDelay;
 
 
 		int status = (shtpData[7] & 0x03) & 0xFF; // Get status bits
@@ -532,10 +528,10 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 			data5 = (shtpData[18] & 0xFFFF) << 8 | shtpData[17] & 0xFF;
 		}
 
-		Register register = Register.getByChannel((byte)(shtpHeader[2] & 0xFF));
-		SensorReport sensorReport = SensorReport.getById(shtpData[5] & 0xFF);
-		System.out.println("parseInputReport: register:" + register + ", sensorReport:" + sensorReport + ", timeStamp: " + timeStamp);
-		System.out.println("parseInputReport: sensorReportDelayMilliSec:" + sensorReportDelayMilliSec);
+		ShtpChannel shtpChannel = ShtpChannel.getByChannel((byte)(shtpHeader[2] & 0xFF));
+		ShtpSensorReport sensorReport = ShtpSensorReport.getById(shtpData[5] & 0xFF);
+		System.out.println("parseInputReport: shtpChannel:" + shtpChannel + ", sensorReport:" + sensorReport + ", timeStamp: " + timeStamp);
+		System.out.println("parseInputReport: sensorReportDelayMicroSec:" + sensorReportDelayMicroSec);
 
 
 		switch (sensorReport) {

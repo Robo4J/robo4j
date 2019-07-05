@@ -17,7 +17,7 @@
 
 package com.robo4j.hw.rpi.imu;
 
-import com.robo4j.hw.rpi.imu.bno.ShtpPacketResponse;
+import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
 import com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice;
 
 /**
@@ -28,19 +28,16 @@ public class BNO080Example {
     public static void main(String[] args) throws Exception {
 
 
-        BNO80DeviceListener listener = (ShtpPacketResponse response ) -> {
-                BNO080SPIDevice.printArray("HEADER",response.getHeader());
-                BNO080SPIDevice.printArray("BODY",response.getBody());
-        };
+        BNO80DeviceListener listener = (DeviceEvent event) -> System.out.println("ShtpPacketResponse: " + event);
 
-        BNO080Device.SensorReport sensorReport = BNO080Device.SensorReport.ACCELEROMETER;
+        BNO080Device.ShtpSensorReport sensorReport = BNO080Device.ShtpSensorReport.ACCELEROMETER;
         System.out.println("BNO080 Example: " + sensorReport);
         BNO080SPIDevice device = new BNO080SPIDevice();
         device.addListener(listener);
 //        if(device.start(sensorReport, 50)){
 
 //        System.out.println("FLUSH");
-//        device.sendForceSensorFlush(BNO080Device.SensorReport.ROTATION_VECTOR);
+//        device.sendForceSensorFlush(BNO080Device.ShtpSensorReport.ROTATION_VECTOR);
         System.out.println("Press enter to quit!");
         System.in.read();
         device.shutdown();

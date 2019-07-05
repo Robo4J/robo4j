@@ -18,12 +18,23 @@
 package com.robo4j.hw.rpi.imu;
 
 import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
+import com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface BNO80DeviceListener {
+public class BNO080SPIExample {
 
-    void onResponse(DeviceEvent event);
+	public static void main(String[] args) throws Exception {
+
+		BNO80DeviceListener listener = (DeviceEvent event) -> System.out.println("ShtpPacketResponse: " + event);
+
+		System.out.println("BNO080 SPI Example");
+		BNO080SPIDevice device = new BNO080SPIDevice();
+		device.addListener(listener);
+		device.start(BNO080Device.ShtpSensorReport.ROTATION_VECTOR, 60);
+		System.out.println("CLICK TO END...");
+		System.in.read();
+	}
 }
