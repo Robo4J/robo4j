@@ -17,6 +17,7 @@
 
 package com.robo4j.hw.rpi.imu;
 
+import com.robo4j.hw.rpi.imu.bno.DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
 import com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice;
 
@@ -28,7 +29,7 @@ public class BNO080Example {
     public static void main(String[] args) throws Exception {
 
 
-        BNO080Listener listener = (DeviceEvent event) -> System.out.println("ShtpPacketResponse: " + event);
+        DeviceListener listener = (DeviceEvent event) -> System.out.println("ShtpPacketResponse: " + event);
 
         BNO080Device.ShtpSensorReport sensorReport = BNO080Device.ShtpSensorReport.ACCELEROMETER;
         System.out.println("BNO080 Example: " + sensorReport);

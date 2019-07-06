@@ -18,9 +18,8 @@
 package com.robo4j.hw.rpi.imu.impl;
 
 import com.robo4j.hw.rpi.imu.BNO080Device;
-import com.robo4j.hw.rpi.imu.BNO080Listener;
+import com.robo4j.hw.rpi.imu.bno.DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.ShtpPacketRequest;
-import com.robo4j.hw.rpi.imu.bno.ShtpPacketResponse;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -31,6 +30,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * AbstractBNO080Device base functionality for BNO080 Devices
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
@@ -54,13 +55,10 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 		}
 	}
 
-	public static final short CHANNEL_COUNT = 6; // BNO080 supports 6 channels
 	public static final int SHTP_HEADER_SIZE = 4;
-
-	private static final int AWAIT_TERMINATION = 10;
-
-	final int[] sequenceByChannel = new int[CHANNEL_COUNT];
-	final List<BNO080Listener> listeners = new CopyOnWriteArrayList<>();
+	static byte RECEIVE_WRITE_BYTE = (byte) 0xFF;
+	static byte RECEIVE_WRITE_BYTE_CONTINUAL = (byte) 0;
+	final List<DeviceListener> listeners = new CopyOnWriteArrayList<>();
 	final AtomicBoolean active = new AtomicBoolean(false);
 	final AtomicBoolean ready = new AtomicBoolean(false);
 	final AtomicInteger commandSequenceNumber = new AtomicInteger(0);
@@ -70,6 +68,11 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 		t.setDaemon(true);
 		return t;
 	});
+	private static final short CHANNEL_COUNT = 6; // BNO080 supports 6 channels
+	private static final int AWAIT_TERMINATION = 10;
+	private final int[] sequenceByChannel = new int[CHANNEL_COUNT];
+
+
 
 	@Override
 	public abstract boolean start(ShtpSensorReport report, int reportDelay);
@@ -84,12 +87,12 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 	}
 
 	@Override
-	public void addListener(BNO080Listener listener) {
+	public void addListener(DeviceListener listener) {
 		listeners.add(listener);
 	}
 
 	@Override
-	public void removeListener(BNO080Listener listener) {
+	public void removeListener(DeviceListener listener) {
 		listeners.remove(listener);
 	}
 
@@ -97,23 +100,7 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 		ShtpPacketRequest packet = new ShtpPacketRequest(size, sequenceByChannel[shtpChannel.getChannel()]++);
 		packet.createHeader(shtpChannel);
 		return packet;
-	}
-
-	boolean processShtpReportResponse(ShtpDeviceReport report) {
-		switch (report) {
-		case COMMAND_RESPONSE:
-		case FRS_READ_RESPONSE:
-		case PRODUCT_ID_RESPONSE:
-		case BASE_TIMESTAMP:
-		case GET_FEATURE_RESPONSE:
-		case FLUSH_COMPLETED:
-			System.out.println("processShtpReportResponse response: " + report);
-			return true;
-		default:
-			System.out.println("processShtpReportResponse: received not valid response: " + report);
-			return false;
-		}
-	}
+	} 
 
 	ShtpPacketRequest getProductIdRequest() {
 		// Check communication with device
@@ -131,16 +118,6 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 		return packet;
 	}
 
-	boolean containsResponseCode(ShtpPacketResponse response, ShtpDeviceReport expectedReport) {
-		if (response.dataAvailable()) {
-			ShtpDeviceReport report = ShtpDeviceReport.getById(response.getBodyFirst());
-			return expectedReport.equals(report);
-		} else {
-			System.out.println("containsResponseCode: No Data");
-		}
-		return false;
-	}
-
 	private void awaitTermination() {
 		try {
 			executor.awaitTermination(AWAIT_TERMINATION, TimeUnit.MILLISECONDS);
@@ -148,20 +125,6 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 		} catch (InterruptedException e) {
 			System.err.println(String.format("awaitTermination e: %s", e));
 		}
-	}
-
-	/**
-	 *
-	 * @param array
-	 *            byte array
-	 * @return unsigned 8-bit int
-	 */
-	int toInt8U(byte[] array) {
-		return array[0] & 0xFF;
-	}
-
-	int toInt8U(byte b) {
-		return b & 0xFF;
 	}
 
 }

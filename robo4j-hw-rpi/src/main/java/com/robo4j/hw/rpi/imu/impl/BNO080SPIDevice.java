@@ -29,7 +29,7 @@ import com.pi4j.io.spi.SpiChannel;
 import com.pi4j.io.spi.SpiDevice;
 import com.pi4j.io.spi.SpiMode;
 import com.pi4j.io.spi.impl.SpiDeviceImpl;
-import com.robo4j.hw.rpi.imu.BNO080Listener;
+import com.robo4j.hw.rpi.imu.bno.DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
 import com.robo4j.hw.rpi.imu.bno.DeviceEventType;
 import com.robo4j.hw.rpi.imu.bno.ShtpOperation;
@@ -49,6 +49,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.intToFloat;
 import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.printArray;
+import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.toInt8U;
 
 /**
  * Abstraction for a BNO080 absolute orientation device.
@@ -169,7 +170,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	private void forwardReceivedPacketToListeners() {
 		DeviceEvent deviceEvent = processReceivedPacket();
 		if (!deviceEvent.getType().equals(DeviceEventType.NONE)) {
-			for (BNO080Listener l : listeners) {
+			for (DeviceListener l : listeners) {
 				l.onResponse(deviceEvent);
 			}
 		}
@@ -241,7 +242,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			}
 			boolean waitForResponse = true;
 			while (waitForResponse && counter < MAX_COUNTER) {
-				ShtpPacketResponse response = receivePacket();
+				ShtpPacketResponse response = receivePacket(false, RECEIVE_WRITE_BYTE);
 				ShtpOperationResponse opResponse = new ShtpOperationResponse(
 						ShtpChannel.getByChannel(response.getHeaderChannel()), response.getBodyFirst());
 				if (head.getResponse().equals(opResponse)) {
@@ -264,7 +265,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	private DeviceEvent processReceivedPacket() {
 		try {
 			waitForSPI();
-			ShtpPacketResponse receivedPacket = receivePacketContinual(true);
+			ShtpPacketResponse receivedPacket = receivePacket(true, RECEIVE_WRITE_BYTE_CONTINUAL);
 			ShtpChannel channel = ShtpChannel.getByChannel(receivedPacket.getHeaderChannel());
 			ShtpReport reportType = getReportType(channel, receivedPacket);
 
@@ -372,7 +373,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			boolean active = true;
 			sendPacket(errorRequest);
 			while (active) {
-				ShtpPacketResponse response = receivePacket();
+				ShtpPacketResponse response = receivePacket(false, RECEIVE_WRITE_BYTE);
 				ShtpChannel shtpChannel = ShtpChannel.getByChannel(response.getHeaderChannel());
 				if (shtpChannel.equals(ShtpChannel.COMMAND) && (response.getBody()[0] == 0x01)) {
 					active = false;
@@ -785,47 +786,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 
 	}
 
-	private ShtpPacketResponse receivePacket() throws IOException, InterruptedException {
-		if (intGpio.isHigh()) {
-			System.out.println("receivePacket: INTERRUPT: data are not available");
-			return new ShtpPacketResponse(0);
-		}
-
-		csGpio.setState(PinState.LOW);
-
-		// Get the first four bytes, aka the packet header
-		int packetLSB = toInt8U(spiDevice.write((byte) 0xFF));
-		int packetMSB = toInt8U(spiDevice.write((byte) 0xFF));
-		int channelNumber = toInt8U(spiDevice.write((byte) 0xFF));
-		int sequenceNumber = toInt8U(spiDevice.write((byte) 0xFF)); // Not sure if we need to store this or not
-
-		// Calculate the number of data bytes in this packet
-		int dataLength = calculateNumberOfBytesInPacket(packetMSB, packetLSB) - SHTP_HEADER_SIZE;
-		// This bit indicates if this package is a continuation of the last. Ignore it
-		// for now.
-		if (dataLength <= 0) {
-			return new ShtpPacketResponse(0);
-		}
-
-		ShtpPacketResponse response = new ShtpPacketResponse(dataLength);
-		response.addHeader(packetLSB, packetMSB, channelNumber, sequenceNumber);
-
-		// Read incoming data into the shtpData array
-		for (int i = 0; i < dataLength; i++) {
-			byte[] inArray = spiDevice.write((byte) 0xFF);
-			byte incoming = inArray[0];
-			if (i < MAX_PACKET_SIZE) {
-				response.addBody(i, (incoming & 0xFF));
-			}
-		}
-		csGpio.setState(PinState.HIGH); // Release BNO080
-		printArray("receivePacketHeader", response.getHeader());
-		printArray("receivePacketBody", response.getBody());
-		return response;
-
-	}
-
-	private ShtpPacketResponse receivePacketContinual(boolean delay) throws IOException, InterruptedException {
+	private ShtpPacketResponse receivePacket(boolean delay, byte writeByte) throws IOException, InterruptedException {
 		if (intGpio.isHigh()) {
 			System.out.println("receivedPacketContinual: no interrupt");
 			return new ShtpPacketResponse(0);
@@ -836,10 +797,10 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		}
 		csGpio.setState(PinState.LOW);
 
-		int packetLSB = toInt8U(spiDevice.write((byte) 0));
-		int packetMSB = toInt8U(spiDevice.write((byte) 0));
-		int channelNumber = toInt8U(spiDevice.write((byte) 0));
-		int sequenceNumber = toInt8U(spiDevice.write((byte) 0)); // Not sure if we need to store this or not
+		int packetLSB = toInt8U(spiDevice.write(writeByte));
+		int packetMSB = toInt8U(spiDevice.write(writeByte));
+		int channelNumber = toInt8U(spiDevice.write(writeByte));
+		int sequenceNumber = toInt8U(spiDevice.write(writeByte)); // Not sure if we need to store this or not
 
 		// Calculate the number of data bytes in this packet
 		int dataLength = calculateNumberOfBytesInPacket(packetMSB, packetLSB) - SHTP_HEADER_SIZE;

@@ -15,17 +15,15 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu;
-
-import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
+package com.robo4j.hw.rpi.imu.bno;
 
 /**
- * BNO080Listener reacts on produced event
+ * DeviceListener reacts on produced event
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface BNO080Listener {
+public interface DeviceListener {
 
     void onResponse(DeviceEvent event);
 }

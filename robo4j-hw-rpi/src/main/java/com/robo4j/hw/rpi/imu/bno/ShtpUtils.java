@@ -56,4 +56,14 @@ public final class ShtpUtils {
 		}
 		System.out.print("\n");
 	}
+
+    /**
+     *
+     * @param array
+     *            byte array
+     * @return unsigned 8-bit int
+     */
+    public static int toInt8U(byte[] array) {
+        return array[0] & 0xFF;
+    }
 }
