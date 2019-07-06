@@ -18,7 +18,7 @@
 package com.robo4j.hw.rpi.imu.impl;
 
 import com.robo4j.hw.rpi.imu.BNO080Device;
-import com.robo4j.hw.rpi.imu.BNO80DeviceListener;
+import com.robo4j.hw.rpi.imu.BNO080Listener;
 import com.robo4j.hw.rpi.imu.bno.ShtpPacketRequest;
 import com.robo4j.hw.rpi.imu.bno.ShtpPacketResponse;
 
@@ -60,8 +60,9 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 	private static final int AWAIT_TERMINATION = 10;
 
 	final int[] sequenceByChannel = new int[CHANNEL_COUNT];
-	final List<BNO80DeviceListener> listeners = new CopyOnWriteArrayList<>();
+	final List<BNO080Listener> listeners = new CopyOnWriteArrayList<>();
 	final AtomicBoolean active = new AtomicBoolean(false);
+	final AtomicBoolean ready = new AtomicBoolean(false);
 	final AtomicInteger commandSequenceNumber = new AtomicInteger(0);
 
 	final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, (r) -> {
@@ -77,12 +78,19 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 	public void shutdown() {
 		synchronized (executor) {
 			active.set(false);
+			ready.set(false);
 			awaitTermination();
 		}
 	}
 
-	public void addListener(BNO80DeviceListener listener) {
+	@Override
+	public void addListener(BNO080Listener listener) {
 		listeners.add(listener);
+	}
+
+	@Override
+	public void removeListener(BNO080Listener listener) {
+		listeners.remove(listener);
 	}
 
 	ShtpPacketRequest prepareShtpPacketRequest(ShtpChannel shtpChannel, int size) {

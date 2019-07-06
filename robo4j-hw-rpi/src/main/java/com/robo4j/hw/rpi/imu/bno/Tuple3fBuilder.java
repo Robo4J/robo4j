@@ -15,28 +15,47 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu;
+package com.robo4j.hw.rpi.imu.bno;
 
-import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
-import com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
+ * Tuple3fBuilder build a Tuple3f by fixed point values abd defined Q-point
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BNO080SPIExample {
+public class Tuple3fBuilder {
 
-	public static void main(String[] args) throws Exception {
+	private final int qPoint;
+	private int fixedX;
+	private int fixedY;
+	private int fixedZ;
 
-		BNO080Listener listener = (DeviceEvent event) -> System.out.println("ShtpPacketResponse: " + event);
-
-		System.out.println("BNO080 SPI Example");
-		BNO080SPIDevice device = new BNO080SPIDevice();
-		device.addListener(listener);
-		device.start(BNO080Device.ShtpSensorReport.ACCELEROMETER, 60);
-		System.out.println("CLICK TO END...");
-		System.in.read();
-		device.shutdown();
-
+	public Tuple3fBuilder(int qPoint) {
+		this.qPoint = qPoint;
 	}
+
+	public Tuple3fBuilder setX(int x) {
+		fixedX = x;
+		return this;
+	}
+
+	public Tuple3fBuilder setY(int y) {
+		fixedY = y;
+		return this;
+	}
+
+	public Tuple3fBuilder setZ(int z) {
+		fixedZ = z;
+		return this;
+	}
+
+	public Tuple3f build(){
+	    float x = ShtpUtils.intToFloat(fixedX, qPoint);
+	    float y = ShtpUtils.intToFloat(fixedY, qPoint);
+	    float z = ShtpUtils.intToFloat(fixedZ, qPoint);
+	    return new Tuple3f(x, y, z);
+    }
+
 }

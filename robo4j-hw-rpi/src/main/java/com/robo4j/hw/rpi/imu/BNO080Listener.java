@@ -20,10 +20,12 @@ package com.robo4j.hw.rpi.imu;
 import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
 
 /**
+ * BNO080Listener reacts on produced event
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface BNO80DeviceListener {
+public interface BNO080Listener {
 
     void onResponse(DeviceEvent event);
 }

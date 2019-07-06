@@ -17,6 +17,8 @@
 
 package com.robo4j.hw.rpi.imu.bno;
 
+import com.robo4j.math.geometry.Tuple3f;
+
 import java.util.EnumSet;
 import java.util.Objects;
 
@@ -28,33 +30,28 @@ import java.util.Objects;
  */
 public class VectorEvent implements DeviceEvent {
 
-	private static final EnumSet<DeviceEventType> ALLOWED = EnumSet.of(DeviceEventType.VECTOR_ROTATION, DeviceEventType.VECTOR_GAME);
+	private static final EnumSet<DeviceEventType> ALLOWED = EnumSet.of(DeviceEventType.VECTOR_ROTATION,
+			DeviceEventType.VECTOR_GAME);
 	private final DeviceEventType type;
-	private final int quatAccuracy;
-	private final float quatI;
-	private final float quatJ;
-	private final float quatK;
+	private final int status;
+	private final Tuple3f data;
 	private final float quatReal;
 	private final float radianAccuracy;
 	private final long timestamp;
 
-	public VectorEvent(DeviceEventType type, int quatAccuracy,   float quatI, float quatJ, float quatK, float quatReal,
-			float radianAccuracy, long timestamp) {
+	public VectorEvent(DeviceEventType type, int status, Tuple3f data, float quatReal, float radianAccuracy,
+			long timestamp) {
 		if (ALLOWED.contains(type)) {
-		    this.quatAccuracy = quatAccuracy;
+			this.status = status;
 			this.type = type;
-			this.quatI = quatI;
-			this.quatJ = quatJ;
-			this.quatK = quatK;
+			this.data = data;
 			this.quatReal = quatReal;
 			this.radianAccuracy = radianAccuracy;
 			this.timestamp = timestamp;
 		} else {
 			this.type = DeviceEventType.NONE;
-			this.quatAccuracy = 0;
-			this.quatI = 0;
-			this.quatJ = 0;
-			this.quatK = 0;
+			this.status = 0;
+			this.data = null;
 			this.quatReal = 0;
 			this.radianAccuracy = 0;
 			this.timestamp = 0;
@@ -66,20 +63,12 @@ public class VectorEvent implements DeviceEvent {
 		return type;
 	}
 
-    public int getQuatAccuracy() {
-        return quatAccuracy;
-    }
-
-    public float getQuatI() {
-		return quatI;
+	public int getStatus() {
+		return status;
 	}
 
-	public float getQuatJ() {
-		return quatJ;
-	}
-
-	public float getQuatK() {
-		return quatK;
+	public Tuple3f getData() {
+		return data;
 	}
 
 	public float getQuatReal() {
@@ -90,42 +79,31 @@ public class VectorEvent implements DeviceEvent {
 		return radianAccuracy;
 	}
 
-    @Override
-    public long timestampMicro() {
-        return timestamp;
-    }
+	@Override
+	public long timestampMicro() {
+		return timestamp;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        VectorEvent that = (VectorEvent) o;
-        return quatAccuracy == that.quatAccuracy &&
-                Float.compare(that.quatI, quatI) == 0 &&
-                Float.compare(that.quatJ, quatJ) == 0 &&
-                Float.compare(that.quatK, quatK) == 0 &&
-                Float.compare(that.quatReal, quatReal) == 0 &&
-                Float.compare(that.radianAccuracy, radianAccuracy) == 0 &&
-                timestamp == that.timestamp &&
-                type == that.type;
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		VectorEvent that = (VectorEvent) o;
+		return status == that.status && Float.compare(that.quatReal, quatReal) == 0
+				&& Float.compare(that.radianAccuracy, radianAccuracy) == 0 && timestamp == that.timestamp
+				&& type == that.type && Objects.equals(data, that.data);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, quatAccuracy, quatI, quatJ, quatK, quatReal, radianAccuracy, timestamp);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(type, status, data, quatReal, radianAccuracy, timestamp);
+	}
 
-    @Override
-    public String toString() {
-        return "VectorEvent{" +
-                "type=" + type +
-                ", quatAccuracy=" + quatAccuracy +
-                ", quatI=" + quatI +
-                ", quatJ=" + quatJ +
-                ", quatK=" + quatK +
-                ", quatReal=" + quatReal +
-                ", radianAccuracy=" + radianAccuracy +
-                ", timestamp=" + timestamp +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "VectorEvent{" + "type=" + type + ", status=" + status + ", data=" + data + ", quatReal=" + quatReal
+				+ ", radianAccuracy=" + radianAccuracy + ", timestamp=" + timestamp + '}';
+	}
 }

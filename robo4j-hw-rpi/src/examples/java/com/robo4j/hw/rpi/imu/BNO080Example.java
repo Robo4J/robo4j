@@ -28,7 +28,7 @@ public class BNO080Example {
     public static void main(String[] args) throws Exception {
 
 
-        BNO80DeviceListener listener = (DeviceEvent event) -> System.out.println("ShtpPacketResponse: " + event);
+        BNO080Listener listener = (DeviceEvent event) -> System.out.println("ShtpPacketResponse: " + event);
 
         BNO080Device.ShtpSensorReport sensorReport = BNO080Device.ShtpSensorReport.ACCELEROMETER;
         System.out.println("BNO080 Example: " + sensorReport);

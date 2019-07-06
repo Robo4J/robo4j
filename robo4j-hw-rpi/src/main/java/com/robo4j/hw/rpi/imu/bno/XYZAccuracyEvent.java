@@ -17,6 +17,8 @@
 
 package com.robo4j.hw.rpi.imu.bno;
 
+import com.robo4j.math.geometry.Tuple3f;
+
 import java.util.EnumSet;
 import java.util.Objects;
 
@@ -33,26 +35,20 @@ public class XYZAccuracyEvent implements DeviceEvent {
 			DeviceEventType.GYROSCOPE);
 
 	private final DeviceEventType type;
-	private final float x;
-	private final float y;
-	private final float z;
-	private final int accuracy;
+	private final int status;
+	private final Tuple3f data;
 	private final long timestamp;
 
-	public XYZAccuracyEvent(DeviceEventType type, float x, float y, float z, int accuracy, long timestamp) {
+	public XYZAccuracyEvent(DeviceEventType type, int status, Tuple3f data, long timestamp) {
 		if (ALLOWED.contains(type)) {
 			this.type = type;
-			this.x = x;
-			this.y = y;
-			this.z = z;
-			this.accuracy = accuracy;
+			this.status = status;
+			this.data = data;
 			this.timestamp = timestamp;
 		} else {
 			this.type = DeviceEventType.NONE;
-			this.x = 0;
-			this.y = 0;
-			this.z = 0;
-			this.accuracy = 0;
+			this.status = 0;
+			this.data = null;
 			this.timestamp = 0;
 		}
 	}
@@ -61,22 +57,13 @@ public class XYZAccuracyEvent implements DeviceEvent {
 		return type;
 	}
 
-	public float getX() {
-		return x;
+	public int getStatus() {
+		return status;
 	}
 
-	public float getY() {
-		return y;
+	public Tuple3f getData() {
+		return data;
 	}
-
-	public float getZ() {
-		return z;
-	}
-
-	public int getAccuracy() {
-		return accuracy;
-	}
-
 
 	@Override
 	public long timestampMicro() {
@@ -85,31 +72,23 @@ public class XYZAccuracyEvent implements DeviceEvent {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 		XYZAccuracyEvent that = (XYZAccuracyEvent) o;
-		return Float.compare(that.x, x) == 0 &&
-				Float.compare(that.y, y) == 0 &&
-				Float.compare(that.z, z) == 0 &&
-				accuracy == that.accuracy &&
-				timestamp == that.timestamp &&
-				type == that.type;
+		return status == that.status && timestamp == that.timestamp && type == that.type
+				&& Objects.equals(data, that.data);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(type, x, y, z, accuracy, timestamp);
+		return Objects.hash(type, status, data, timestamp);
 	}
 
 	@Override
 	public String toString() {
-		return "XYZAccuracyEvent{" +
-				"type=" + type +
-				", x=" + x +
-				", y=" + y +
-				", z=" + z +
-				", accuracy=" + accuracy +
-				", timestamp=" + timestamp +
-				'}';
+		return "XYZAccuracyEvent{" + "type=" + type + ", status=" + status + ", data=" + data + ", timestamp="
+				+ timestamp + '}';
 	}
 }

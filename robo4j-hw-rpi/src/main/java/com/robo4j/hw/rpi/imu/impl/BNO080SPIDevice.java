@@ -29,7 +29,7 @@ import com.pi4j.io.spi.SpiChannel;
 import com.pi4j.io.spi.SpiDevice;
 import com.pi4j.io.spi.SpiMode;
 import com.pi4j.io.spi.impl.SpiDeviceImpl;
-import com.robo4j.hw.rpi.imu.BNO80DeviceListener;
+import com.robo4j.hw.rpi.imu.BNO080Listener;
 import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
 import com.robo4j.hw.rpi.imu.bno.DeviceEventType;
 import com.robo4j.hw.rpi.imu.bno.ShtpOperation;
@@ -37,14 +37,18 @@ import com.robo4j.hw.rpi.imu.bno.ShtpOperationBuilder;
 import com.robo4j.hw.rpi.imu.bno.ShtpOperationResponse;
 import com.robo4j.hw.rpi.imu.bno.ShtpPacketRequest;
 import com.robo4j.hw.rpi.imu.bno.ShtpPacketResponse;
+import com.robo4j.hw.rpi.imu.bno.Tuple3fBuilder;
 import com.robo4j.hw.rpi.imu.bno.VectorEvent;
 import com.robo4j.hw.rpi.imu.bno.XYZAccuracyEvent;
+import com.robo4j.math.geometry.Tuple3f;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.intToFloat;
+import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.printArray;
 
 /**
  * Abstraction for a BNO080 absolute orientation device.
@@ -73,11 +77,10 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	public static final int MAX_PACKET_SIZE = 32762;
 	private static final int MAX_METADATA_SIZE = 9; // This is in words. There can be many but we mostly only care about
 	private static final int MAX_COUNTER = 255;
-	public static final int DEFAULT_TIMEOUT_MS = 10;
+	public static final int DEFAULT_TIMEOUT_MS = 1000;
 	public static final int UNIT_TICK_MICRO = 100;
 	public static final int TIMEBASE_REFER_DELTA = 120;
 
-	private final AtomicBoolean active = new AtomicBoolean();
 	private ScheduledFuture<?> scheduledFuture;
 
 	private final DeviceEvent emptyEvent = new DeviceEvent() {
@@ -117,6 +120,76 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 
 	public boolean isActive() {
 		return active.get();
+	}
+
+	@Override
+	public boolean start(ShtpSensorReport report, int reportDelay) {
+		if (reportDelay > 0) {
+			final CountDownLatch latch = new CountDownLatch(1);
+			synchronized (executor) {
+				if (!ready.get())
+					initAndActive(latch, report, reportDelay);
+				if (waitForLatch(latch)) {
+					executor.execute(() -> {
+						active.set(ready.get());
+						executeListenerJob();
+					});
+				}
+			}
+		} else {
+			System.out.println(String.format("start: not valid sensor:%s delay: %d", report, reportDelay));
+		}
+		return active.get();
+
+	}
+
+	private void initAndActive(final CountDownLatch latch, ShtpSensorReport report, int reportDelay) {
+		executor.submit(() -> {
+			boolean initState = initiate();
+			if (initState && enableSensorReport(report, reportDelay)) {
+				latch.countDown();
+				ready.set(initState);
+			}
+		});
+	}
+
+	private void executeListenerJob() {
+		executor.execute(() -> {
+			if (ready.get()) {
+				active.set(ready.get());
+				while (active.get()) {
+					forwardReceivedPacketToListeners();
+				}
+			} else {
+				throw new IllegalStateException("not initiated");
+			}
+		});
+	}
+
+	private void forwardReceivedPacketToListeners() {
+		DeviceEvent deviceEvent = processReceivedPacket();
+		if (!deviceEvent.getType().equals(DeviceEventType.NONE)) {
+			for (BNO080Listener l : listeners) {
+				l.onResponse(deviceEvent);
+			}
+		}
+	}
+
+	@Override
+	public boolean stop() {
+		CountDownLatch latch = new CountDownLatch(1);
+		if (ready.get() && active.get()) {
+			active.set(false);
+			System.out.println("SOFT RESET EXECUTED");
+			if (softReset()) {
+				latch.countDown();
+				System.out.println("SOFT DONE");
+				return true;
+			} else {
+				System.out.println("SOFT FALSE");
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -159,61 +232,33 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		}
 	}
 
-	@Override
-	public boolean start(ShtpSensorReport report, int reportDelay) {
-
-		CountDownLatch latch = new CountDownLatch(1);
-		synchronized (executor) {
-			executor.execute(() -> {
-				boolean initState = initiate();
-				if (initState && enableSensorReport(report, reportDelay)) {
-					latch.countDown();
-				}
-				active.set(initState);
-
-				// TODO : move to separate thread in case purpose of the unit has been changed
-				if (waitForLatch(latch)) {
-					int counter = 0;
-					while (counter < 100) {
-						DeviceEvent deviceEvent = processReceivedPacket();
-						if (!deviceEvent.getType().equals(DeviceEventType.NONE)) {
-							for (BNO80DeviceListener l : listeners) {
-								l.onResponse(deviceEvent);
-							}
-						}
-						counter++;
-					}
-				}
-			});
-		}
-
-		return active.get();
-
-	}
-
-	private DeviceEvent processEventOperation(ShtpOperation operation) {
+	private boolean processOperationChainByHead(ShtpOperation head) throws InterruptedException, IOException {
 		int counter = 0;
-		boolean waitForResponse = true;
-		try {
-			ShtpPacketResponse response = null;
+		boolean state = true;
+		do {
+			if (head.hasRequest()) {
+				sendPacket(head.getRequest());
+			}
+			boolean waitForResponse = true;
 			while (waitForResponse && counter < MAX_COUNTER) {
-				waitForSPI();
-				response = receivePacket();
+				ShtpPacketResponse response = receivePacket();
 				ShtpOperationResponse opResponse = new ShtpOperationResponse(
 						ShtpChannel.getByChannel(response.getHeaderChannel()), response.getBodyFirst());
-
-				if (operation.getResponse().equals(opResponse)) {
+				if (head.getResponse().equals(opResponse)) {
+					printArray("startINIT HEADER:", response.getHeader());
+					printArray("startINIT BODY:", response.getBody());
 					waitForResponse = false;
 				} else {
-					response = null;
+					waitForSPI();
 				}
 				counter++;
 			}
-			return response == null ? emptyEvent : parseInputReport(response);
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-			return emptyEvent;
-		}
+			head = head.getNext();
+			if (state && counter >= MAX_COUNTER) {
+				state = false;
+			}
+		} while (head != null);
+		return state;
 	}
 
 	private DeviceEvent processReceivedPacket() {
@@ -260,6 +305,11 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		}
 	}
 
+	private ShtpOperation softResetSequence() {
+		ShtpPacketRequest request = getSoftResetPacket();
+		return getInitSequence(request);
+	}
+
 	/**
 	 * Initiation operation sequence: 1. BNO080 is restarted and sends advertisement
 	 * packet 2. BNO080 is requested for product id (product id) 3. BNO080 wait
@@ -267,9 +317,9 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 *
 	 * @return head of operations
 	 */
-	private ShtpOperation getInitSequence() {
+	private ShtpOperation getInitSequence(ShtpPacketRequest initRequest) {
 		ShtpOperationResponse advResponse = new ShtpOperationResponse(ShtpChannel.COMMAND, 0);
-		ShtpOperation headAdvertisementOp = new ShtpOperation(null, advResponse);
+		ShtpOperation headAdvertisementOp = new ShtpOperation(initRequest, advResponse);
 		ShtpOperationBuilder builder = new ShtpOperationBuilder(headAdvertisementOp);
 
 		ShtpOperationResponse reportIdResponse = new ShtpOperationResponse(ShtpDeviceReport.PRODUCT_ID_RESPONSE);
@@ -284,15 +334,27 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 
 	}
 
+	private boolean softReset() {
+		try {
+			ShtpOperation opHead = softResetSequence();
+			boolean state = processOperationChainByHead(opHead);
+			active.set(!state);
+			return state;
+		} catch (InterruptedException | IOException e) {
+			System.out.println(String.format("softReset error: %s", e.getMessage()));
+		}
+		return false;
+	}
+
 	/**
 	 * Initiate BNO080 unit and return the state
 	 *
 	 * @return BNO080 initial state
 	 */
-	public boolean initiate() {
+	private boolean initiate() {
 		try {
 			if (configureSpiPins()) {
-				ShtpOperation opHead = getInitSequence();
+				ShtpOperation opHead = getInitSequence(null);
 				active.set(processOperationChainByHead(opHead));
 				return active.get();
 			}
@@ -389,62 +451,6 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		return true;
 	}
 
-	private boolean prepareForSpi() throws InterruptedException, IOException {
-		// Wait for first assertion of INT before using WAK pin. Can take ~104ms
-		if (waitForSPI()) {
-			ShtpPacketResponse advertisementPacket = receivePacket();
-			printArray("prepareForSpi HEADER", advertisementPacket.getHeader());
-			printArray("prepareForSpi BODY", advertisementPacket.getBody());
-		}
-
-		return true;
-	}
-
-	/**
-	 * Given a register value and a Q point, convert to float See
-	 * https://en.wikipedia.org/wiki/Q_(number_format)
-	 *
-	 * @param fixedPointValue
-	 *            fixed point value
-	 * @param qPoint
-	 *            q point
-	 * @return float value
-	 */
-	private float qToFloat(int fixedPointValue, int qPoint) {
-		float qFloat = fixedPointValue & 0xFFFF;
-		qFloat *= Math.pow(2, (qPoint & 0xFF) * -1);
-		return qFloat;
-	}
-
-	private boolean processOperationChainByHead(ShtpOperation head) throws InterruptedException, IOException {
-		int counter = 0;
-		boolean state = true;
-		do {
-			if (head.hasRequest()) {
-				sendPacket(head.getRequest());
-			}
-			boolean waitForResponse = true;
-			while (waitForResponse && counter < MAX_COUNTER) {
-				ShtpPacketResponse response = receivePacket();
-				ShtpOperationResponse opResponse = new ShtpOperationResponse(
-						ShtpChannel.getByChannel(response.getHeaderChannel()), response.getBodyFirst());
-				if (head.getResponse().equals(opResponse)) {
-					printArray("startINIT HEADER:", response.getHeader());
-					printArray("startINIT BODY:", response.getBody());
-					waitForResponse = false;
-				} else {
-					waitForSPI();
-				}
-				counter++;
-			}
-			head = head.getNext();
-			if (state && counter >= MAX_COUNTER) {
-				state = false;
-			}
-		} while (head != null);
-		return state;
-	}
-
 	/**
 	 * Unit responds with packet that contains the following
 	 */
@@ -502,7 +508,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		int[] shtpData = packet.getBody();
 
 		// Calculate the number of data bytes in this packet
-		int dataLength = packet.getBodySize();
+		final int dataLength = packet.getBodySize();
 		long timeStamp = (shtpData[4] << 24) | (shtpData[3] << 16) | (shtpData[2] << 8) | (shtpData[1]);
 
 		long accDelay = 17;
@@ -523,7 +529,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			data5 = (shtpData[18] & 0xFFFF) << 8 | shtpData[17] & 0xFF;
 		}
 
-		ShtpSensorReport sensorReport = ShtpSensorReport.getById(sensor);
+		final ShtpSensorReport sensorReport = ShtpSensorReport.getById(sensor);
 
 		switch (sensorReport) {
 		case ACCELEROMETER:
@@ -564,25 +570,33 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 
 	}
 
-	private VectorEvent createVectorEvent(DeviceEventType type, long timeStamp, int... data) {
-		int quatAccuracy = data[0] & 0xFFFF;
-		int quatI = data[1] & 0xFFFF;
-		int quatJ = data[2] & 0xFFFF;
-		int quatK = data[3] & 0xFFFF;
-		int quatReal = data[4] & 0xFFFF;
-		int quatRadianAccuracy = data[5] & 0xFFFF; // Only available on rotation vector, not game rot vector
-		return new VectorEvent(type, quatAccuracy, qToFloat(quatI, type.getQ()), qToFloat(quatJ, type.getQ()),
-				qToFloat(quatK, type.getQ()), qToFloat(quatReal, type.getQ()),
-				qToFloat(quatRadianAccuracy, type.getQ()), timeStamp);
+	private DeviceEvent createVectorEvent(DeviceEventType type, long timeStamp, int... data) {
+		if (data == null || data.length < 6) {
+			return emptyEvent;
+		}
+		final int status = data[0] & 0xFFFF;
+		final int qX = data[1] & 0xFFFF;
+		final int qY = data[2] & 0xFFFF;
+		final int qZ = data[3] & 0xFFFF;
+		final int qReal = data[4] & 0xFFFF;
+		final int qRadianAccuracy = data[5] & 0xFFFF; // Only available on rotation vector, not game rot vector
+
+		final Tuple3f tuple3f = new Tuple3fBuilder(type.getQ()).setX(qX).setY(qY).setZ(qZ).build();
+
+		return new VectorEvent(type, status, tuple3f, intToFloat(qReal, type.getQ()),
+				intToFloat(qRadianAccuracy, type.getQ()), timeStamp);
 	}
 
-	private XYZAccuracyEvent createXYZAccuracyEvent(DeviceEventType type, long timeStamp, int... data) {
-		int accuracy = data[0] & 0xFFFF;
-		int x = data[1] & 0xFFFF;
-		int y = data[2] & 0xFFFF;
-		int z = data[3] & 0xFFFF;
-		return new XYZAccuracyEvent(type, qToFloat(x, type.getQ()), qToFloat(y, type.getQ()), qToFloat(z, type.getQ()),
-				accuracy, timeStamp);
+	private DeviceEvent createXYZAccuracyEvent(DeviceEventType type, long timeStamp, int... data) {
+		if (data == null || data.length < 4) {
+			return emptyEvent;
+		}
+		final int status = data[0] & 0xFFFF;
+		final int x = data[1] & 0xFFFF;
+		final int y = data[2] & 0xFFFF;
+		final int z = data[3] & 0xFFFF;
+		final Tuple3f tuple3f = new Tuple3fBuilder(type.getQ()).setX(x).setY(y).setZ(z).build();
+		return new XYZAccuracyEvent(type, status, tuple3f, timeStamp);
 	}
 
 	/**
@@ -610,7 +624,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			System.out.println("parseInputReport: DCD deviceCommand=" + deviceCommand);
 			break;
 		case ME_CALIBRATE:
-			calibrationStatus = shtpData[5 + 5] & 0xFF; // R0 - Status (0 = success, non-zero = fail)
+			calibrationStatus = shtpData[10] & 0xFF; // R0 - Status (0 = success, non-zero = fail)
 			System.out.println("parseInputReport: command response: command= " + deviceCommand + " calibrationStatus= "
 					+ calibrationStatus);
 			break;
@@ -714,7 +728,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 * Blocking wait for BNO080 to assert (pull low) the INT pin indicating it's
 	 * ready for comm. Can take more than 200ms after a hardware reset
 	 */
-	public boolean waitForSPI() throws IOException, InterruptedException {
+	private boolean waitForSPI() throws IOException, InterruptedException {
 		int counter = 0;
 		for (int i = 0; i < 255; i++) { // Don't got more than 255
 			if (intGpio.isLow()) {
@@ -727,14 +741,6 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		}
 		System.out.println("waitForSPI: ERROR counter: " + counter);
 		return false;
-	}
-
-	public static void printArray(String message, int[] array) {
-		System.out.print("printArray: " + message);
-		for (int i = 0; i < array.length; i++) {
-			System.out.print(" " + Integer.toHexString(array[i] & 0xFF) + ",");
-		}
-		System.out.print("\n");
 	}
 
 	private boolean sendPacket(ShtpPacketRequest packet) throws InterruptedException, IOException {

@@ -35,8 +35,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.printArray;
 import static com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice.calculateNumberOfBytesInPacket;
-import static com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice.printArray;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -194,6 +194,11 @@ public class BNO080SPISimpleDevice extends AbstractBNO080Device {
 
 		}
 
+		return false;
+	}
+
+	@Override
+	public boolean stop() {
 		return false;
 	}
 

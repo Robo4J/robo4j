@@ -313,7 +313,13 @@ public interface BNO080Device {
 		}
 	}
 
+	void addListener(BNO080Listener listener);
+
+	void removeListener(BNO080Listener listener);
+
 	boolean start(ShtpSensorReport report, int reportDelay);
+
+	boolean stop();
 
 	void shutdown();
 

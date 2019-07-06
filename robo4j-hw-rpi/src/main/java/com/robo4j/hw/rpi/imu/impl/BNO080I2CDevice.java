@@ -93,6 +93,11 @@ public class BNO080I2CDevice extends AbstractBNO080Device {
 		return false;
 	}
 
+	@Override
+	public boolean stop() {
+		return false;
+	}
+
 	/**
 	 * end command to reset IC Read all advertisement packets from sensor The sensor
 	 * has been seen to reset twice if we attempt too much too quickly. This seems
