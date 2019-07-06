@@ -29,9 +29,9 @@ import com.pi4j.io.spi.SpiChannel;
 import com.pi4j.io.spi.SpiDevice;
 import com.pi4j.io.spi.SpiMode;
 import com.pi4j.io.spi.impl.SpiDeviceImpl;
-import com.robo4j.hw.rpi.imu.bno.DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
 import com.robo4j.hw.rpi.imu.bno.DeviceEventType;
+import com.robo4j.hw.rpi.imu.bno.DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.ShtpOperation;
 import com.robo4j.hw.rpi.imu.bno.ShtpOperationBuilder;
 import com.robo4j.hw.rpi.imu.bno.ShtpOperationResponse;
@@ -44,9 +44,10 @@ import com.robo4j.math.geometry.Tuple3f;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.calculateNumberOfBytesInPacket;
+import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.emptyEvent;
 import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.intToFloat;
 import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.printArray;
 import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.toInt8U;
@@ -74,27 +75,13 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	public static final int DEFAULT_SPI_SPEED = 3000000; // 3MHz maximum SPI speed
 	public static final SpiChannel DEFAULT_SPI_CHANNEL = SpiChannel.CS0;
 
-	// the first 9 (Qs, range, etc)
 	public static final int MAX_PACKET_SIZE = 32762;
-	private static final int MAX_METADATA_SIZE = 9; // This is in words. There can be many but we mostly only care about
 	private static final int MAX_COUNTER = 255;
 	public static final int DEFAULT_TIMEOUT_MS = 1000;
 	public static final int UNIT_TICK_MICRO = 100;
 	public static final int TIMEBASE_REFER_DELTA = 120;
-
-	private ScheduledFuture<?> scheduledFuture;
-
-	private final DeviceEvent emptyEvent = new DeviceEvent() {
-		@Override
-		public DeviceEventType getType() {
-			return DeviceEventType.NONE;
-		}
-
-		@Override
-		public long timestampMicro() {
-			return 0;
-		}
-	};
+	public static final int MAX_SPI_COUNT = 255;
+	public static final int MAX_SPI_WAIT_CYCLES = 2;
 
 	private SpiDevice spiDevice;
 	private GpioPinDigitalInput intGpio;
@@ -107,6 +94,9 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	private int activityClassifier;
 	private int[] activityConfidences = new int[9]; // Array that store the confidences of the 9 possible activities
 	private int calibrationStatus; // Byte R0 of ME Calibration Response
+	private int spiWaitCounter = 0;
+	private ShtpSensorReport activeReport;
+	private int activeReportDelay;
 
 	// uint32_t
 	private long sensorReportDelayMicroSec = 0;
@@ -145,6 +135,8 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	}
 
 	private void initAndActive(final CountDownLatch latch, ShtpSensorReport report, int reportDelay) {
+		activeReport = report;
+		activeReportDelay = reportDelay;
 		executor.submit(() -> {
 			boolean initState = initiate();
 			if (initState && enableSensorReport(report, reportDelay)) {
@@ -269,20 +261,24 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			ShtpChannel channel = ShtpChannel.getByChannel(receivedPacket.getHeaderChannel());
 			ShtpReport reportType = getReportType(channel, receivedPacket);
 
-			if (ShtpChannel.REPORTS.equals(channel) && ShtpSensorReport.BASE_TIMESTAMP.equals(reportType)) {
-				return parseInputReport(receivedPacket);
+			switch (channel) {
+			case CONTROL:
+				break;
+			case REPORTS:
+				if (ShtpSensorReport.BASE_TIMESTAMP.equals(reportType)) {
+					return parseInputReport(receivedPacket);
+				}
+				break;
+			default:
+
 			}
-			// else if (ShtpChannel.CONTROL.equals(channel)) {
-			// printArray("RECIEVED CONTROL H:", receivedPacket.getHeader());
-			// printArray("RECIEVED CONTROL B:", receivedPacket.getBody());
-			// }
+			System.out.println(String.format("not implemented channel: %s, report: %s", channel, reportType));
+			return emptyEvent;
 
 		} catch (IOException | InterruptedException e) {
 			System.out.println("ERROR: processReceivedPacket e:" + e.getMessage());
 			return emptyEvent;
 		}
-
-		return emptyEvent;
 	}
 
 	private ShtpReport getReportType(ShtpChannel channel, ShtpPacketResponse response) {
@@ -455,21 +451,6 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	/**
 	 * Unit responds with packet that contains the following
 	 */
-	// shtpHeader[0:3]: First, a 4 byte header
-	// shtpData[0]: The Report ID
-	// shtpData[1]: Sequence number (See 6.5.18.2)
-	// shtpData[2]: Command
-	// shtpData[3]: Command Sequence Number
-	// shtpData[4]: Response Sequence Number
-	// shtpData[5 + 0]: R0
-	// shtpData[5 + 1]: R1
-	// shtpData[5 + 2]: R2
-	// shtpData[5 + 3]: R3
-	// shtpData[5 + 4]: R4
-	// shtpData[5 + 5]: R5
-	// shtpData[5 + 6]: R6
-	// shtpData[5 + 7]: R7
-	// shtpData[5 + 8]: R8
 	private void parseCommandReport(ShtpPacketResponse packet) {
 		int[] shtpData = packet.getBody();
 		ShtpDeviceReport report = ShtpDeviceReport.getById(shtpData[0] & 0xFF);
@@ -478,12 +459,10 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			// remember which command we issued.
 			DeviceCommand command = DeviceCommand.getById(shtpData[2] & 0xFF); // This is the Command byte of the
 			System.out.println("parseCommandReport: commandResponse: " + command);
-			// response
 			if (DeviceCommand.ME_CALIBRATE.equals(command)) {
 				calibrationStatus = shtpData[5] & 0xFF; // R0 - Status (0 = success, non-zero = fail)
 			}
 		} else {
-			// This sensor report ID is unhandled.
 			System.out.println("parseCommandReport: This sensor report ID is unhandled");
 		}
 
@@ -491,19 +470,6 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 
 	/**
 	 * Unit responds with packet that contains the following:
-	 * //@formatter:off
-	 * shtpHeader[0:3]: First, a 4 byte header
-	 * shtpData[0:4]: Then a 5 byte timestamp of microsecond clicks since reading was taken
-	 * shtpData[5 + 0]: Then a feature report ID (0x01 for Accel, 0x05 for Rotation Vector)
-	 * shtpData[5 + 1]: Sequence number (See 6.5.18.2)
-	 * shtpData[5 + 2]: Status
-	 * shtpData[3]: Delay
-	 * shtpData[4:5]: i/accel x/gyro x/etc
-	 * shtpData[6:7]: j/accel y/gyro y/etc
-	 * shtpData[8:9]: k/accel z/gyro z/etc
-	 * shtpData[10:11]: real/gyro temp/etc
-	 * shtpData[12:13]: Accuracy estimate
-	 * //@formatter:on
 	 */
 	private DeviceEvent parseInputReport(ShtpPacketResponse packet) {
 		int[] shtpData = packet.getBody();
@@ -549,21 +515,6 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		case GEOMAGNETIC_ROTATION_VECTOR:
 			return createVectorEvent(DeviceEventType.VECTOR_ROTATION, timeStamp, status, data1, data2, data3, data4,
 					data5);
-		// case STEP_COUNTER:
-		// stepCount = data3 & 0xFFFF; // Bytes 8/9
-		// break;
-		// case STABILITY_CLASSIFIER:
-		// stabilityClassifier = shtpData[5 + 4] & 0xFF; // Byte 4 only
-		// break;
-		// case PERSONAL_ACTIVITY_CLASSIFIER:
-		// activityClassifier = shtpData[5 + 5] & 0xFF; // Most likely state
-		// // Load activity classification confidences into the array
-		// for (int x = 0; x < 9; x++) // Hardcoded to max of 9. TODO - bring in array
-		// size
-		// activityConfidences[x] = shtpData[5 + 6 + x] & 0xFF; // 5 bytes of timestamp,
-		// byte 6 is first confidence
-		// // byte
-		// break;
 		default:
 			return emptyEvent;
 
@@ -731,7 +682,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 */
 	private boolean waitForSPI() throws IOException, InterruptedException {
 		int counter = 0;
-		for (int i = 0; i < 255; i++) { // Don't got more than 255
+		for (int i = 0; i < MAX_SPI_COUNT; i++) {
 			if (intGpio.isLow()) {
 				return true;
 			} else {
@@ -739,6 +690,16 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 				counter++;
 			}
 			TimeUnit.MICROSECONDS.sleep(1);
+		}
+		if(spiWaitCounter == MAX_SPI_WAIT_CYCLES){
+			active.set(false);
+			ready.set(false);
+			if(start(activeReport, activeReportDelay)){
+				spiWaitCounter = 0;
+			}else {
+				System.out.println("SYSTEM IS GOING DOWN");
+				shutdown();
+			}
 		}
 		System.out.println("waitForSPI: ERROR counter: " + counter);
 		return false;
@@ -822,13 +783,6 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		csGpio.setState(PinState.HIGH);
 
 		return response;
-	}
-
-	static int calculateNumberOfBytesInPacket(int packetMSB, int packetLSB) {
-		// Calculate the number of data bytes in this packet
-		int dataLength = (0xFFFF & packetMSB << 8 | packetLSB);
-		dataLength &= ~(1 << 15); // Clear the MSbit.
-		return dataLength;
 	}
 
 }

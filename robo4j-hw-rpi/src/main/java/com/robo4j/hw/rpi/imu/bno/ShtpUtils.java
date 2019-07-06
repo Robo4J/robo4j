@@ -57,13 +57,44 @@ public final class ShtpUtils {
 		System.out.print("\n");
 	}
 
-    /**
-     *
-     * @param array
-     *            byte array
-     * @return unsigned 8-bit int
-     */
-    public static int toInt8U(byte[] array) {
-        return array[0] & 0xFF;
-    }
+	/**
+	 *
+	 * @param array
+	 *            byte array
+	 * @return unsigned 8-bit int
+	 */
+	public static int toInt8U(byte[] array) {
+		return array[0] & 0xFF;
+	}
+
+	/**
+	 * Empty Shtp Device Event
+	 */
+	public static final DeviceEvent emptyEvent = new DeviceEvent() {
+		@Override
+		public DeviceEventType getType() {
+			return DeviceEventType.NONE;
+		}
+
+		@Override
+		public long timestampMicro() {
+			return 0;
+		}
+	};
+
+	/**
+	 * calculate packet length
+	 * 
+	 * @param packetMSB
+	 *            uint8
+	 * @param packetLSB
+	 *            uint8
+	 * @return integer size
+	 */
+	public static int calculateNumberOfBytesInPacket(int packetMSB, int packetLSB) {
+		// Calculate the number of data bytes in this packet
+		int dataLength = (0xFFFF & packetMSB << 8 | packetLSB);
+		dataLength &= ~(1 << 15); // Clear the MSbit.
+		return dataLength;
+	}
 }
