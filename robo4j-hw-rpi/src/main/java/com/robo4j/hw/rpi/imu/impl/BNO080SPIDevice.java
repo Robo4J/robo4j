@@ -188,7 +188,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	/**
 	 *
 	 */
-	private boolean sendCalibrateCommandAll() throws InterruptedException, IOException {
+	private ShtpPacketRequest createCalibrateCommandAll() {
 		ShtpChannel shtpChannel = ShtpChannel.COMMAND;
 		ShtpPacketRequest packet = prepareShtpPacketRequest(shtpChannel, 12);
 		packet.addBody(0, ShtpDeviceReport.COMMAND_REQUEST.getId());
@@ -197,7 +197,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		packet.addBody(3, 1);
 		packet.addBody(4, 1);
 		packet.addBody(5, 1);
-		return sendPacket(packet);
+		return packet;
 	}
 
 	/**
@@ -429,7 +429,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 * @throws InterruptedException
 	 *             exception
 	 */
-	private boolean configureSpiPins(Pin wake, Pin cs, Pin rst, Pin inter) throws IOException, InterruptedException {
+	private boolean configureSpiPins(Pin wake, Pin cs, Pin rst, Pin inter) throws InterruptedException {
 		System.out.println(String.format("configurePins: wak=%s, cs=%s, rst=%s, inter=%s", wake, cs, rst, inter));
 		GpioController gpioController = GpioFactory.getInstance();
 		csGpio = gpioController.provisionDigitalOutputPin(cs, "CS");
@@ -606,31 +606,6 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 *            - time between reports uint16_t
 	 * @param specificConfig
 	 *            - contains specific config (uint32_t)
-	 * @throws InterruptedException
-	 *             exception
-	 * @throws IOException
-	 *             exception
-	 */
-	private void sendFeatureCommand(ShtpSensorReport report, int timeBetweenReports, int specificConfig)
-			throws InterruptedException, IOException {
-
-		ShtpPacketRequest packetRequest = createFeatureRequest(report, timeBetweenReports, specificConfig);
-
-		// Transmit packet on channel 2, 17 bytes
-		sendPacket(packetRequest);
-	}
-
-	/**
-	 * Given a sensor's report ID, this tells the BNO080 to begin reporting the
-	 * values Also sets the specific config word. Useful for personal activity
-	 * classifier
-	 *
-	 * @param report
-	 *            - Shtp report received on Channel.REPORTS.
-	 * @param timeBetweenReports
-	 *            - time between reports uint16_t
-	 * @param specificConfig
-	 *            - contains specific config (uint32_t)
 	 */
 	private ShtpPacketRequest createFeatureRequest(ShtpSensorReport report, int timeBetweenReports,
 			int specificConfig) {
@@ -661,7 +636,8 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		return request;
 	}
 
-	private void sendReport(ShtpDeviceReport type, ShtpSensorReport sensor) throws InterruptedException, IOException {
+	private ShtpPacketRequest createSensorReportRequest(ShtpDeviceReport type, ShtpSensorReport sensor)
+			throws InterruptedException, IOException {
 		ShtpChannel shtpChannel = ShtpChannel.CONTROL;
 		ShtpPacketRequest packetRequest = prepareShtpPacketRequest(shtpChannel, 2);
 
@@ -672,15 +648,14 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 				.build();
 		//@formatter:on
 		packetRequest.addBody(packetBody);
-
-		sendPacket(packetRequest);
+		return packetRequest;
 	}
 
 	/**
 	 * Blocking wait for BNO080 to assert (pull low) the INT pin indicating it's
 	 * ready for comm. Can take more than 200ms after a hardware reset
 	 */
-	private boolean waitForSPI() throws IOException, InterruptedException {
+	private boolean waitForSPI() throws InterruptedException {
 		int counter = 0;
 		for (int i = 0; i < MAX_SPI_COUNT; i++) {
 			if (intGpio.isLow()) {
@@ -691,12 +666,12 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			}
 			TimeUnit.MICROSECONDS.sleep(1);
 		}
-		if(spiWaitCounter == MAX_SPI_WAIT_CYCLES){
+		if (spiWaitCounter == MAX_SPI_WAIT_CYCLES) {
 			active.set(false);
 			ready.set(false);
-			if(start(activeReport, activeReportDelay)){
+			if (start(activeReport, activeReportDelay)) {
 				spiWaitCounter = 0;
-			}else {
+			} else {
 				System.out.println("SYSTEM IS GOING DOWN");
 				shutdown();
 			}
