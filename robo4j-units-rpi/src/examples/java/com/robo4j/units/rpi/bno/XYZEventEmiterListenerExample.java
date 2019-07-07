@@ -26,17 +26,17 @@ import com.robo4j.util.SystemUtil;
 import java.io.InputStream;
 
 /**
- * BNO080EventEmiterListenerExample simple example
+ * XYZEventEmiterListenerExample simple example
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BNO080EventEmiterListenerExample {
+public class XYZEventEmiterListenerExample {
 
     public static void main(String[] args) throws Exception{
         RoboBuilder builder = new RoboBuilder();
         InputStream settings = Thread.currentThread().getContextClassLoader()
-                .getResourceAsStream("bno080example.xml");
+                .getResourceAsStream("bno080XYZexample.xml");
         if (settings == null) {
             System.out.println("Could not find the settings for the BNO080 Example!");
             System.exit(2);

@@ -119,9 +119,12 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		if (reportDelay > 0) {
 			final CountDownLatch latch = new CountDownLatch(1);
 			System.out.println(String.format("START: ready:%s, active:%s", ready.get(), active.get()));
+			spiWaitCounter.set(0);
 			synchronized (executor) {
 				if (!ready.get()){
 					initAndActive(latch, report, reportDelay);
+				} else {
+					reactivate(latch, report, reportDelay);
 				}
 				if (waitForLatch(latch)) {
 					executor.execute(() -> {
@@ -149,10 +152,17 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		});
 	}
 
-	private void activate(final CountDownLatch latch, ShtpSensorReport report, int reportDelay){
+	private void reactivate(final CountDownLatch latch, ShtpSensorReport report, int reportDelay){
 		executor.submit(() -> {
-			if(enableSensorReport(report, reportDelay)){
-				latch.countDown();
+
+			try {
+				ShtpOperation opHead = getInitSequence(null);
+				active.set(processOperationChainByHead(opHead));
+				if(active.get() && enableSensorReport(report, reportDelay)){
+					latch.countDown();
+				}
+			} catch (InterruptedException | IOException e) {
+				throw new IllegalStateException("not activated");
 			}
 		});
 	}
@@ -179,12 +189,21 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		}
 	}
 
+	/**
+	 * stop forces a soft reset command unit needs 700 millis to become to be available
+	 * @return status
+	 */
 	@Override
 	public boolean stop() {
 		CountDownLatch latch = new CountDownLatch(1);
 		if (ready.get() && active.get()) {
 			active.set(false);
 			if (softReset()) {
+				try {
+					TimeUnit.MILLISECONDS.sleep(700);
+				} catch (InterruptedException e) {
+					throw new IllegalStateException("not possible stop");
+				}
 				latch.countDown();
 				return true;
 			} else {
@@ -247,8 +266,6 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 				ShtpOperationResponse opResponse = new ShtpOperationResponse(
 						ShtpChannel.getByChannel(response.getHeaderChannel()), response.getBodyFirst());
 				if (head.getResponse().equals(opResponse)) {
-					printArray("startINIT HEADER:", response.getHeader());
-					printArray("startINIT BODY:", response.getBody());
 					waitForResponse = false;
 				} else {
 					waitForSPI();
