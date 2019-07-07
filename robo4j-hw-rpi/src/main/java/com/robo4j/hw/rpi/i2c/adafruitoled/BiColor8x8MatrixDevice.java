@@ -17,9 +17,8 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitoled;
 
-import com.pi4j.io.i2c.I2CBus;
-
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * https://learn.adafruit.com/adafruit-led-backpack/bi-color-8x8-matrix
@@ -33,14 +32,20 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 	private MatrixRotation rotation;
 
 	public BiColor8x8MatrixDevice(int bus, int address, int brightness, MatrixRotation rotation) throws IOException {
-		super(bus, address);
-		initiate(brightness);
+		super(bus, address, brightness);
 		this.rotation = rotation;
 
 	}
 
+	public BiColor8x8MatrixDevice(int bus, int address, int brightness) throws IOException {
+		super(bus, address, brightness);
+		this.rotation = MatrixRotation.DEFAULT_X_Y;
+
+	}
+
 	public BiColor8x8MatrixDevice() throws IOException {
-		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, DEFAULT_BRIGHTNESS, MatrixRotation.ONE);
+		super();
+		this.rotation = MatrixRotation.DEFAULT_X_Y;
 	}
 
 	public int getMatrixSize() {
@@ -55,58 +60,69 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 		}
 	}
 
-	public void addPixes(PackElement... elements) {
+	public void addPixels(Collection<PackElement> elements) {
 		if (elements == null) {
-			System.out.println("addPixes: not allowed state!");
+			System.out.println("addPixels: not allowed state!");
+		} else {
+			for (PackElement e : elements) {
+				addPixels(e);
+			}
+		}
+	}
+
+	public void addPixels(PackElement... elements) {
+		if (elements == null || elements.length == 0) {
+			System.out.println("addPixels: not allowed state!");
 		} else {
 			for (PackElement e : elements) {
 				addPixel(e);
 			}
 		}
-
 	}
 
 	public void setRotation(MatrixRotation rotation) {
 		this.rotation = rotation;
 	}
 
-	public void clear() throws IOException {
-		clearBuffer();
-	}
-
-	public void display() throws IOException {
-		writeDisplay();
-	}
-
 	private void setPixel(PackElement element) {
 		short x;
 		short y;
 		switch (rotation) {
-		case ONE:
+		case DEFAULT_X_Y:
 			x = (short) element.getX();
 			y = (short) element.getY();
 			break;
-		case TWO:
-			x = (short) element.getX();
-			y = flipPosition(element.getY());
-			break;
-		case THREE:
-			x = flipPosition(element.getX());
-			y = (short) element.getY();
-			break;
-		case FOUR:
-			x = flipPosition(element.getX());
-			y = flipPosition(element.getY());
-			break;
-		case FIVE:
+		case RIGHT_90:
 			x = flipPosition(element.getY());
 			y = flipPosition(element.getX());
 			break;
+		case RIGHT_180:
+			x = flipPosition(element.getX());
+			y = flipPosition(element.getY());
+			break;
+		case RIGHT_270:
+			x = (short) element.getY();
+			y = flipPosition(element.getX());
+			break;
+		case INVERSION:
+			x = (short) element.getY();
+			y = (short) element.getX();
+			break;
+		case LEFT_90:
+			x = (short) element.getX();
+			y = flipPosition(element.getY());
+			break;
+		case LEFT_180:
+			x = flipPosition(element.getY());
+			y = flipPosition(element.getX());
+		case LEFT_270:
+			x = flipPosition(element.getX());
+			y = (short) element.getY();
 		default:
 			x = MATRIX_SIZE;
 			y = MATRIX_SIZE;
 		}
-		setColorByMatrixToBuffer(MATRIX_SIZE, x, y, element.getColor());
+		setColorByMatrixToBuffer(x, y, element.getColor());
 	}
 
 	private boolean validateElement(int x, int y) {

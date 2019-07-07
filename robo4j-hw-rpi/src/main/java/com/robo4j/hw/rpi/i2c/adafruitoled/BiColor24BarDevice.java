@@ -17,9 +17,8 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitoled;
 
-import com.pi4j.io.i2c.I2CBus;
-
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * https://learn.adafruit.com/adafruit-led-backpack/bi-color-24-bargraph
@@ -29,15 +28,14 @@ import java.io.IOException;
  */
 public class BiColor24BarDevice extends LEDBackpack {
 
-	private final int MAX_BARS = 24;
+	public static final int MAX_BARS = 24;
 
 	public BiColor24BarDevice(int bus, int address, int brightness) throws IOException {
-		super(bus, address);
-		initiate(brightness);
+		super(bus, address, brightness);
 	}
 
 	public BiColor24BarDevice() throws IOException {
-		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, DEFAULT_BRIGHTNESS);
+		super();
 	}
 
 	public void addBar(int pos, BiColor color) {
@@ -53,6 +51,16 @@ public class BiColor24BarDevice extends LEDBackpack {
 		}
 	}
 
+	public void addBars(Collection<PackElement> elements) {
+		if (elements == null || elements.size() > MAX_BARS) {
+			System.out.println("addBars: not allowed state!");
+		} else {
+			for (PackElement e : elements) {
+				addBar(e);
+			}
+		}
+	}
+
 	public void addBars(PackElement... elements) {
 		if (elements == null || elements.length > MAX_BARS) {
 			System.out.println("addBars: not allowed state!");
@@ -63,17 +71,10 @@ public class BiColor24BarDevice extends LEDBackpack {
 		}
 	}
 
-	public void clear() throws IOException {
-		clearBuffer();
-	}
-
 	public int getMaxBar() {
 		return MAX_BARS;
 	}
 
-	public void display() throws IOException {
-		writeDisplay();
-	}
 
 	// private void setBar(int bar, BiColor color) {
 	private void setBar(PackElement element) {
@@ -91,7 +92,7 @@ public class BiColor24BarDevice extends LEDBackpack {
 			a = intToShort(a + 4);
 		}
 
-		setColorToBuffer(a, c, element.getColor());
+		setColorToBarBuffer(a, c, element.getColor());
 	}
 
 	private boolean validatePositions(int pos) {

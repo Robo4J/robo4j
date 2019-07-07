@@ -18,43 +18,16 @@
 package com.robo4j.hw.rpi.i2c.adafruitoled;
 
 /**
- * MatrixRotation allows to select 2D matrix start Point(x,y) and axes direction
+ * LEDBackpackType available Adafruit backpack types
+ *
+ * https://learn.adafruit.com/adafruit-led-backpack/overview
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public enum MatrixRotation {
-	//@formatter:off
-	NONE				(0, "none"),
-    DEFAULT_X_Y	 		(1,"default setup to pins"),
-    RIGHT_90 			(2, "90d to default, right"),
-    RIGHT_180	 		(3,"180d to default, right"),
-    RIGHT_270    		(4,"240d to default, right"),
-	INVERSION    		(5,"default inversion"),
-	LEFT_90				(6,"90d  to default, left"),
-	LEFT_180 			(7, "180d to default, left "),
-	LEFT_270			(8, "270d to default, left")
-    ;
+public enum LEDBackpackType {
+    //@formatter:off
+    BI_COLOR_BAR_24,
+    BI_COLOR_MATRIX_8x8
     //@formatter:on
-
-	private int id;
-	private final String note;
-
-	MatrixRotation(int id, String note) {
-		this.id = id;
-		this.note = note;
-	}
-
-	public String getNote() {
-		return note;
-	}
-
-	public static MatrixRotation getById(int code) {
-		for (MatrixRotation r : values()) {
-			if (code == r.id) {
-				return r;
-			}
-		}
-		return NONE;
-	}
 }

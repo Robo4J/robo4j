@@ -17,41 +17,50 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitoled;
 
+import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 
 import java.io.IOException;
 
 /**
- *
+ * LED Backpack
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-abstract class LEDBackpack extends AbstractI2CDevice {
+public abstract class LEDBackpack extends AbstractI2CDevice {
 
-	static int DEFAULT_I2C_ADDRESS = 0x70;
-	static int DEFAULT_BRIGHTNESS = 15;
+	public static final int DEFAULT_BRIGHTNESS = 15;
 	private static final int OSCILLATOR_TURN_ON = 0x21;
 	private static final int HT16K33_BLINK_CMD = 0x80;
 	private static final int HT16K33_BLINK_DISPLAY_ON = 0x01;
 	private static final int HT16K33_BLINK_DISPLAY_OFF = 0;
 	private static final int HT16K33_CMD_BRIGHTNESS = 0xE0;
 	private static final int HT16K33_BLINK_OFF = 0x00;
-	static short[] buffer = new short[8]; // uint16_t
+	private final short[] buffer = new short[8]; // uint16_t
 
-	LEDBackpack(int bus, int address) throws IOException {
+	LEDBackpack() throws IOException {
+		this(I2CBus.BUS_1, 0x70, DEFAULT_BRIGHTNESS);
+	}
+
+	LEDBackpack(int bus, int address, int brightness) throws IOException {
 		super(bus, address);
+		initiate(brightness);
 	}
 
-	void initiate(int brightness) throws IOException {
-		i2cDevice.write((byte) (OSCILLATOR_TURN_ON)); // Turn on oscilator
-		i2cDevice.write(blinkRate(HT16K33_BLINK_OFF));
-		i2cDevice.write(setBrightness(brightness));
+	public void display() {
+		try {
+			writeDisplay();
+		} catch (IOException e) {
+			System.out.println(String.format("error display: %s", e.getMessage()));
+		}
 	}
 
-	void clearBuffer() throws IOException {
-		for (int i = 0; i < buffer.length; i++) {
-			buffer[i] = 0;
+	public void clear() {
+		try {
+			clearBuffer();
+		} catch (IOException e) {
+			System.out.println(String.format("error clear: %s", e.getMessage()));
 		}
 	}
 
@@ -59,26 +68,26 @@ abstract class LEDBackpack extends AbstractI2CDevice {
 		return (short) (value & 0xFFFF);
 	}
 
-	void setColorByMatrixToBuffer(short size, short x, short y, BiColor color) {
+	void setColorByMatrixToBuffer(short x, short y, BiColor color) {
 		switch (color) {
 		case RED:
 			// Turn on red LED.
-			buffer[y] |= _BV(intToShort(x + size));
+			buffer[y] |= _BV(intToShort(x + 8));
 			// Turn off green LED.
 			buffer[y] &= ~_BV(x);
 			break;
 		case YELLOW:
 			// Turn on green and red LED.
-			buffer[y] |= _BV(intToShort(x + size)) | _BV(x);
+			buffer[y] |= _BV(intToShort(x + 8)) | _BV(x);
 			break;
 		case GREEN:
 			// Turn on green LED.
 			buffer[y] |= _BV(x);
 			// Turn off red LED.
-			buffer[y] &= ~_BV(intToShort(x + size));
+			buffer[y] &= ~_BV(intToShort(x + 8));
 			break;
 		case OFF:
-			buffer[y] &= ~_BV(x) & ~_BV(intToShort(x + size));
+			buffer[y] &= ~_BV(x) & ~_BV(intToShort(x + 8));
 			break;
 		default:
 			System.out.println("setColorByMatrixToBuffer: " + color);
@@ -86,7 +95,7 @@ abstract class LEDBackpack extends AbstractI2CDevice {
 		}
 	}
 
-	void setColorToBuffer(short a, short c, BiColor color) {
+	void setColorToBarBuffer(short a, short c, BiColor color) {
 		switch (color) {
 		case RED:
 			// Turn on red LED.
@@ -109,16 +118,28 @@ abstract class LEDBackpack extends AbstractI2CDevice {
 			buffer[c] &= ~_BV(a) & ~_BV(intToShort(a + 8));
 			break;
 		default:
-			System.out.println("setColorToBuffer: " + color);
+			System.out.println("setColorToBarBuffer: " + color);
 			break;
 		}
 	}
 
-	void writeDisplay() throws IOException {
+	private void initiate(int brightness) throws IOException {
+		i2cDevice.write((byte) (OSCILLATOR_TURN_ON)); // Turn on oscilator
+		i2cDevice.write(blinkRate(HT16K33_BLINK_OFF));
+		i2cDevice.write(setBrightness(brightness));
+	}
+
+	private void writeDisplay() throws IOException {
 		int address = 0;
 		for (int i = 0; i < buffer.length; i++) {
 			i2cDevice.write(address++, (byte) (buffer[i] & 0xFF));
 			i2cDevice.write(address++, (byte) (buffer[i] >> 8));
+		}
+	}
+
+	private void clearBuffer() throws IOException {
+		for (int i = 0; i < buffer.length; i++) {
+			buffer[i] = 0;
 		}
 	}
 

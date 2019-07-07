@@ -239,7 +239,8 @@ project("robo4j-units-rpi") {
         implementation(project(":robo4j-hw-rpi"))
         implementation(project(":robo4j-core"))
         implementation(project(":robo4j-math"))
-        implementation "com.pi4j:pi4j-core:${pi4jVersion}"
+//        implementation "com.pi4j:pi4j-core:${pi4jVersion}"
+        implementation fileTree(dir: "${rootDir}/libs", include: 'pi4j-core-2.0-SNAPSHOT.jar')
     }
 
     configureExampleSources(project)
