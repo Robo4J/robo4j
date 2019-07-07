@@ -20,7 +20,7 @@ package com.robo4j.hw.rpi.imu.bno;
 import com.robo4j.hw.rpi.imu.BNO080Device;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
@@ -31,48 +31,41 @@ import java.util.Map;
  */
 class ShtpOperationBuilderTests {
 
+	@Test
+	void testShtpOperationBuilder() {
 
-    @Test
-    void testShtpOperationBuilder(){
+		ShtpOperationResponse advResponse = new ShtpOperationResponse(BNO080Device.ShtpChannel.COMMAND, 0);
+		ShtpOperationResponse reportIdResponse = new ShtpOperationResponse(
+				BNO080Device.ShtpDeviceReport.PRODUCT_ID_RESPONSE);
+		ShtpOperationResponse resetResponse = new ShtpOperationResponse(BNO080Device.ShtpDeviceReport.COMMAND_RESPONSE);
 
+		ShtpPacketRequest req1 = new ShtpPacketRequest(1, 1);
+		req1.createHeader(BNO080Device.ShtpChannel.CONTROL);
+		req1.addBody(new int[] { 1 });
 
-        ShtpPacketRequest req1 = new ShtpPacketRequest(1,1);
-        req1.createHeader(BNO080Device.ShtpChannel.CONTROL);
-        req1.addBody(new int[]{1});
-        ShtpPacketResponse res1 = new ShtpPacketResponse(1);
-        res1.addHeader(0, 0, 1, 1);
-        res1.addBody(0, 1);
+		ShtpPacketRequest req2 = new ShtpPacketRequest(2, 2);
+		req2.createHeader(BNO080Device.ShtpChannel.COMMAND);
+		req2.addBody(new int[] { 1, 2 });
 
-        ShtpPacketRequest req2 = new ShtpPacketRequest(2,2);
-        req2.createHeader(BNO080Device.ShtpChannel.COMMAND);
-        req2.addBody(new int[]{1, 2});
-        ShtpPacketResponse res2 = new ShtpPacketResponse(2);
-        res2.addHeader(0, 0, 1, 2);
-        res2.addBody(0, 1);
-        res2.addBody(1, 2);
+		ShtpPacketRequest req3 = new ShtpPacketRequest(3, 2);
+		req3.createHeader(BNO080Device.ShtpChannel.EXECUTABLE);
+		req3.addBody(new int[] { 1, 2, 3 });
 
-        ShtpPacketRequest req3 = new ShtpPacketRequest(3,2);
-        req3.createHeader(BNO080Device.ShtpChannel.EXECUTABLE);
-        req3.addBody(new int[]{1, 2, 3});
-        ShtpPacketResponse res3 = new ShtpPacketResponse(3);
-        res3.addHeader(0, 0, 1, 3);
-        res3.addBody(0, 1);
-        res3.addBody(1, 2);
-        res3.addBody(2, 3);
+		ShtpOperation op1 = new ShtpOperation(req1, advResponse);
+		ShtpOperation op2 = new ShtpOperation(req2, reportIdResponse);
+		ShtpOperation op3 = new ShtpOperation(req3, resetResponse);
 
-        ShtpOperation op1 = new ShtpOperation(req1, res1);
-        ShtpOperation op2 = new ShtpOperation(req2, res2);
-        ShtpOperation op3 = new ShtpOperation(req3, res3);
+		ShtpOperation operationChain = new ShtpOperationBuilder(op1).addOperation(op2).addOperation(op3).build();
 
+		int counter = 0;
+		ShtpOperation head = operationChain;
+		while (head != null) {
+			counter++;
+			head = head.getNext();
 
-        ShtpOperation operationChain = new ShtpOperationBuilder(op1)
-                .addOperation(op2)
-                .addOperation(op3)
-                .build();
+		}
+		assertEquals(3, counter);
 
-        Map<String, String> overview  = ShtpOperationUtil.getOperationSequenceHexOverview(operationChain);
-        System.out.println("OVERVIEW:" + overview);
-
-    }
+	}
 
 }

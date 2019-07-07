@@ -36,14 +36,14 @@ public final class ShtpUtils {
 	 * @return float value
 	 */
 	public static float intToFloat(int fixedPointValue, int qPoint) {
-		float qFloat = fixedPointValue & 0xFFFF;
+		float qFloat = (short) fixedPointValue;
 		qFloat *= Math.pow(2, (qPoint & 0xFF) * -1);
 		return qFloat;
 	}
 
 	/**
 	 * Print hexadecimal values of int array to system output
-	 * 
+	 * s
 	 * @param message
 	 *            message
 	 * @param array

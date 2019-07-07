@@ -45,6 +45,7 @@ import com.robo4j.math.geometry.Tuple3f;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.calculateNumberOfBytesInPacket;
 import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.emptyEvent;
@@ -89,25 +90,25 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	private GpioPinDigitalOutput rstGpio;
 	private GpioPinDigitalOutput csGpio; // select slave SS = chip select CS
 
-	// unit8_t
 	private int stabilityClassifier;
 	private int activityClassifier;
 	private int[] activityConfidences = new int[9]; // Array that store the confidences of the 9 possible activities
 	private int calibrationStatus; // Byte R0 of ME Calibration Response
-	private int spiWaitCounter = 0;
+	private AtomicInteger spiWaitCounter = new AtomicInteger();
 	private ShtpSensorReport activeReport;
 	private int activeReportDelay;
 
 	// uint32_t
 	private long sensorReportDelayMicroSec = 0;
 
-	public BNO080SPIDevice() throws IOException, InterruptedException {
+	public BNO080SPIDevice() throws IOException {
 		this(DEFAULT_SPI_CHANNEL, DEFAULT_SPI_SPEED, DEFAULT_SPI_MODE);
 	}
 
 	public BNO080SPIDevice(SpiChannel spiChannel, int speed, SpiMode mode) throws IOException {
 		spiDevice = new SpiDeviceImpl(spiChannel, speed, mode);
 	}
+
 
 	public boolean isActive() {
 		return active.get();
@@ -117,9 +118,11 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	public boolean start(ShtpSensorReport report, int reportDelay) {
 		if (reportDelay > 0) {
 			final CountDownLatch latch = new CountDownLatch(1);
+			System.out.println(String.format("START: ready:%s, active:%s", ready.get(), active.get()));
 			synchronized (executor) {
-				if (!ready.get())
+				if (!ready.get()){
 					initAndActive(latch, report, reportDelay);
+				}
 				if (waitForLatch(latch)) {
 					executor.execute(() -> {
 						active.set(ready.get());
@@ -142,6 +145,14 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			if (initState && enableSensorReport(report, reportDelay)) {
 				latch.countDown();
 				ready.set(initState);
+			}
+		});
+	}
+
+	private void activate(final CountDownLatch latch, ShtpSensorReport report, int reportDelay){
+		executor.submit(() -> {
+			if(enableSensorReport(report, reportDelay)){
+				latch.countDown();
 			}
 		});
 	}
@@ -173,10 +184,8 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		CountDownLatch latch = new CountDownLatch(1);
 		if (ready.get() && active.get()) {
 			active.set(false);
-			System.out.println("SOFT RESET EXECUTED");
 			if (softReset()) {
 				latch.countDown();
-				System.out.println("SOFT DONE");
 				return true;
 			} else {
 				System.out.println("SOFT FALSE");
@@ -334,9 +343,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	private boolean softReset() {
 		try {
 			ShtpOperation opHead = softResetSequence();
-			boolean state = processOperationChainByHead(opHead);
-			active.set(!state);
-			return state;
+			return processOperationChainByHead(opHead);
 		} catch (InterruptedException | IOException e) {
 			System.out.println(String.format("softReset error: %s", e.getMessage()));
 		}
@@ -666,15 +673,8 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			}
 			TimeUnit.MICROSECONDS.sleep(1);
 		}
-		if (spiWaitCounter == MAX_SPI_WAIT_CYCLES) {
-			active.set(false);
-			ready.set(false);
-			if (start(activeReport, activeReportDelay)) {
-				spiWaitCounter = 0;
-			} else {
-				System.out.println("SYSTEM IS GOING DOWN");
-				shutdown();
-			}
+		if (spiWaitCounter.getAndIncrement() == MAX_SPI_WAIT_CYCLES) {
+			stop();
 		}
 		System.out.println("waitForSPI: ERROR counter: " + counter);
 		return false;
