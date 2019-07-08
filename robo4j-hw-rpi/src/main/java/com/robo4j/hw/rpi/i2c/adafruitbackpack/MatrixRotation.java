@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.i2c.adafruitoled;
+package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
 /**
  * MatrixRotation allows to select 2D matrix start Point(x,y) and axes direction

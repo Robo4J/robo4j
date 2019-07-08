@@ -17,7 +17,7 @@
 
 package com.robo4j.units.rpi.led;
 
-import com.robo4j.hw.rpi.i2c.adafruitoled.PackElement;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.PackElement;
 
 import java.io.Serializable;
 import java.util.ArrayList;

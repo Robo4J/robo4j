@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.i2c.adafruitoled;
+package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
 /**
  * Useful support utils to process Arduino demos

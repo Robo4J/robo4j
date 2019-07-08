@@ -20,8 +20,8 @@ package com.robo4j.units.rpi.led;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.hw.rpi.i2c.adafruitoled.BiColor;
-import com.robo4j.hw.rpi.i2c.adafruitoled.PackElement;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.PackElement;
 import com.robo4j.util.SystemUtil;
 
 import java.io.InputStream;

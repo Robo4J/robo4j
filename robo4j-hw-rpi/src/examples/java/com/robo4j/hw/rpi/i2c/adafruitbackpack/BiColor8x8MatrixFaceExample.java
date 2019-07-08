@@ -17,10 +17,6 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
-import com.robo4j.hw.rpi.i2c.adafruitoled.BiColor8x8MatrixDevice;
-import com.robo4j.hw.rpi.i2c.adafruitoled.LEDBackpackUtils;
-import com.robo4j.hw.rpi.i2c.adafruitoled.PackElement;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;

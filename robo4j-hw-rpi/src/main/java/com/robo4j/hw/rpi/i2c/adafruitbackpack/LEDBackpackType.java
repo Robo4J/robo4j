@@ -15,27 +15,19 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.i2c.adafruitoled;
-
-import java.io.IOException;
+package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
 /**
- * LEDBackpackFactory
+ * LEDBackpackType available Adafruit backpack types
+ *
+ * https://learn.adafruit.com/adafruit-led-backpack/overview
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class LEDBackpackFactory {
-
-	public static LEDBackpack createDevice(int bus, int address, LEDBackpackType type, int brightness)
-			throws IOException {
-		switch (type) {
-		case BI_COLOR_BAR_24:
-			return new BiColor24BarDevice(bus, address, brightness);
-		case BI_COLOR_MATRIX_8x8:
-			return new BiColor8x8MatrixDevice(bus, address, brightness);
-		default:
-			throw new IllegalStateException("not available backpack: " + type);
-		}
-	}
+public enum LEDBackpackType {
+    //@formatter:off
+    BI_COLOR_BAR_24,
+    BI_COLOR_MATRIX_8x8
+    //@formatter:on
 }
