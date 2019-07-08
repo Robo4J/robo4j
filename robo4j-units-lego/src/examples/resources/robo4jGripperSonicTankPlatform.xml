@@ -1,0 +1,74 @@
+<!--
+
+    Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+
+    Robo4J is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Robo4J is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<robo4j>
+    <roboUnit id="buttons">
+        <class>com.robo4j.units.lego.BrickButtonsUnit</class>
+        <config name="com.robo4j.root">
+            <value name="target" type="String">controller</value>
+            <value name="button_right" type="String">right</value>
+            <value name="button_left" type="String">left</value>
+            <value name="button_up" type="String">up</value>
+            <value name="button_down" type="String">down</value>
+            <value name="button_enter" type="String">enter</value>
+        </config>
+    </roboUnit>
+    <roboUnit id="lcd">
+        <class>com.robo4j.units.lego.LcdUnit</class>
+        <config name="com.robo4j.root">
+        </config>
+    </roboUnit>
+    <roboUnit id="sonicSensor">
+        <class>com.robo4j.units.lego.SonicSensorUnit</class>
+        <config name="com.robo4j.root">
+            <value name="target" type="String">sonicController</value>
+            <value name="sensorPort" type="String">S4</value>
+        </config>
+    </roboUnit>
+    <roboUnit id="sonicController">
+        <class>com.robo4j.units.lego.controller.SonicPlatformController</class>
+        <config name="com.robo4j.root">
+            <value name="target" type="String">controller</value>
+            <value name="targetGripper" type="String">gripperController</value>
+            <value name="scanInitDelay" type="int">1000</value>
+            <value name="scanPeriod" type="int">400</value>
+        </config>
+    </roboUnit>
+    <roboUnit id="gripperController">
+        <class>com.robo4j.units.lego.controller.GripperController</class>
+        <config name="com.robo4j.root">
+            <value name="motorPort" type="String">A</value>
+            <value name="motorType" type="Character">N</value>
+        </config>
+    </roboUnit>
+    <roboUnit id="controller">
+        <class>com.robo4j.units.lego.controller.PlatformController</class>
+        <config name="com.robo4j.root">
+            <value name="target" type="String">platform</value>
+        </config>
+    </roboUnit>
+    <roboUnit id="platform">
+        <class>com.robo4j.units.lego.SimpleTankUnit</class>
+        <config name="com.robo4j.root">
+            <value name="leftMotorPort" type="String">B</value>
+            <value name="leftMotorType" type="Character">N</value>
+            <value name="rightMotorPort" type="String">C</value>
+            <value name="rightMotorType" type="Character">N</value>
+        </config>
+    </roboUnit>
+</robo4j>

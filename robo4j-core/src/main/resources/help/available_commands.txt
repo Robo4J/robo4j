@@ -1,4 +1,0 @@
-Available commands...
-type B: name= exit content= exit
-type B: name= rotate1 content= move(10),right(30),left(30),back(10)
-type B: name= line1 content= move(30),back(30),move(30)

@@ -1,0 +1,37 @@
+<!--
+
+    Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+
+    Robo4J is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Robo4J is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<!-- Example - Update parameters to suit your set up, especially offsets and multipliers! -->
+<config name="com.robo4j.root">
+	<value name="bus" type="int">1</value>
+	<value name="address" type="int">0x19</value>
+	<value name="rate" type="String">HZ_10</value>
+	<value name="axisEnable" type="String">7</value>
+	<!-- Periodicity, in ms, to sample the gyro -->
+	<value name="period" type="int">200</value>
+	<config name="offsets">
+		<value name="x" type="float">0.064</value>
+		<value name="y" type="float">0.001</value>
+		<value name="z" type="float">0</value>
+	</config>
+	<config name="multipliers">
+		<value name="x" type="float">-0.969932</value>
+		<value name="y" type="float">0.917431</value>
+		<value name="z" type="float">0.943396</value>
+	</config>
+</config>

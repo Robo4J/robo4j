@@ -1,212 +1,286 @@
-group 'com.robo4j'
-
-apply plugin: 'java'
-apply plugin: 'idea'
-
-apply from: 'libraries.gradle'
-
-sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-    mavenLocal()
+plugins {
+    id 'idea'
+    id 'eclipse'
+    id 'org.kordamp.gradle.project'      version '0.12.0'
+    id 'com.github.johnrengelman.shadow' version '4.0.4' apply false
 }
 
-project("robo4j-commons"){
-    description = "Robo4j-Commons"
+ext.ossrhUsername = project.findProperty('ossrhUsername') ?: ''
+ext.ossrhPassword = project.findProperty('ossrhPassword') ?: ''
 
-    group 'com.robo4j'
-    version "${robo4jVersion}"
+def configureShadow(Project p) {
+    p.apply plugin: 'com.github.johnrengelman.shadow'
 
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'maven'
-
-    sourceCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
+    p.tasks.shadowJar {
+        baseName = p.name
+        classifier = ''
     }
 
-    dependencies {
-        testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
-    }
+    p.tasks.jar.finalizedBy p.tasks.shadowJar
 }
 
-project("robo4j-core"){
-    description = "Robo4j-Core"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'maven'
-
-    sourceCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
-    dependencies {
-        compile(project(":robo4j-lego"))
-        compile "org.javassist:javassist:${javassistVersion}"
-        compile "com.google.guava:guava:${guavaVersion}"
-        compile "com.googlecode.json-simple:json-simple:${jsonVersion}"
-        compile "org.apache.commons:commons-lang3:${apacheCommonsVersion}"
-        compile "org.apache.commons:commons-collections4:${apacheCollectionsVersion}"
-        compile "org.apache.commons:commons-exec:${apacheCollectionsExecVersion}"
-        compile "org.reflections:reflections-maven:${reflectionsVersion}"
-        compile "com.google.collections:google-collections:${googleCollectionsVersion}"
-        compile "org.apache.logging.log4j:log4j-api:${log4jApiVersion}"
-        compile "org.apache.logging.log4j:log4j-core:${log4jApiVersion}"
-        compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4jApiVersion}"
-        compile "lejos:ev3classes:${lejosVersion}"
-        testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
-    }
-}
-
-project("robo4j-lego"){
-    description = "Robo4j-Lego"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-
-    sourceCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
-    dependencies {
-        compile(project(":robo4j-commons"))
-        testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
-    }
-}
-
-project("robo4j-brick-client"){
-    description = "Robo4j-Brick-Client"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'maven'
-
-    sourceCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
-    //create a single Jar with all dependencies
-    task fatJar(type: Jar) {
-        manifest {
-            attributes 'Implementation-Title': 'Robo4j-brick-client',
-                    'Implementation-Version': version,
-                    'Main-Class': 'com.robo4j.brick.ClientMain'
+def configureExampleSources(Project p) {
+    p.sourceSets {
+        main {
+            java {
+                srcDirs += 'src/examples/java'
+            }
+            resources {
+                srcDirs += 'src/examples/resources'
+            }
         }
-        baseName = project.name + '-all'
-        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-        with jar
-    }
-
-    dependencies {
-        compile(project(":robo4j-lego"))
-        compile(project(":robo4j-page"))
-        compile "lejos:ev3classes:${lejosVersion}@jar"
-        compile "com.googlecode.json-simple:json-simple:${jsonVersion}"
-        testCompile "junit:junit:${junitVersion}@jar"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
     }
 }
 
+config {
+    release = (rootProject.findProperty('release') ?: false).toBoolean()
 
+    info {
+        name = 'Robo4J'
+        description = 'Robo4J'
+        vendor = 'Robo4J'
+        inceptionYear = '2014'
 
-
-
-project("robo4j-line"){
-    description = "Robo4j CommandLine Client"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'maven'
-
-    sourceCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
-    //create a single Jar with all dependencies
-    task fatJar(type: Jar) {
-        manifest {
-            attributes 'Implementation-Title': 'Robo4j-line',
-                    'Implementation-Version': version,
-                    'Main-Class': 'com.robo4j.line.Robo4jCommandLineMain'
+        links {
+            website = 'http://www.robo4j.io'
         }
-        baseName = project.name + '-all'
-        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-        with jar
+
+        scm {
+            connection = 'scm:git@github.com:Robo4J/robo4j.git'
+            developerConnection = 'scm:git@github.com:Robo4J/robo4j.git'
+            url = 'scm:git@github.com:Robo4J/robo4j.git'
+        }
+
+        people {
+            person {
+                id = 'thegreystone'
+                name = 'Marcus Hirt'
+                email = 'marcus@robo4j.io'
+                roles = ['developer', 'author']
+            }
+            person {
+                id = 'mirage22'
+                name = 'Miroslav Wengner'
+                email = 'miro@robo4j.io'
+                roles = ['developer', 'author']
+            }
+        }
+
+        repositories {
+            repository {
+                name = 'mavenRelease'
+                url = mavenReleaseRepositoryUrl
+                credentials {
+                    username = ossrhUsername
+                    password = ossrhPassword
+                }
+            }
+            repository {
+                name = 'mavenSnapshot'
+                url = mavenSnapshotRepositoryUrl
+                credentials {
+                    username = ossrhUsername
+                    password = ossrhPassword
+                }
+            }
+        }
     }
 
-    dependencies {
-        compile (project(":robo4j-core"))
-        compile "org.javassist:javassist:${javassistVersion}"
-        compile "com.google.guava:guava:${guavaVersion}"
-        compile "org.reflections:reflections-maven:${reflectionsVersion}"
-        compile "com.google.collections:google-collections:${googleCollectionsVersion}"
-        compile "org.apache.logging.log4j:log4j-api:${log4jApiVersion}"
-        compile "org.apache.logging.log4j:log4j-core:${log4jApiVersion}"
-        compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4jApiVersion}"
-        compile "lejos:ev3classes:${lejosVersion}"
-        testCompile "junit:junit:${junitVersion}"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}"
+    license {
+        licenses {
+            license {
+            	enabled = false
+                id = 'GPL-3.0'
+            }
+        }
+    }
+
+    publishing {
+        signing = true
+        releasesRepository = 'mavenRelease'
+        snapshotsRepository = 'mavenSnapshot'
     }
 }
 
-project("robo4j-page"){
-    description = "Robo4j-Page"
-
-    group 'com.robo4j'
-    version "${robo4jVersion}"
-
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    apply plugin: 'maven'
-
-    sourceCompatibility = 1.8
-
+allprojects {
     repositories {
-        mavenCentral()
-        mavenLocal()
-    }
-
-    dependencies {
-        testCompile "junit:junit:${junitVersion}@jar"
-        testCompile "org.hamcrest:hamcrest-all:${hamcrestAllVersion}@jar"
+        jcenter()
+        maven {
+            url mavenSnapshotRepositoryUrl
+        }
     }
 }
 
+subprojects {
+    apply plugin: 'java-library'
 
+    compileJava.options*.compilerArgs = [
+            "-Xlint:unchecked", "-Xlint:rawtypes", "-Xlint:deprecation"
+    ]
 
+    compileTestJava.options*.compilerArgs = [
+            "-Xlint:deprecation", "-Xlint:unchecked", "-Xlint:rawtypes",
+    ]
 
+    sourceCompatibility = "${javaVersion}"
 
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events 'passed', 'skipped', 'failed'
+            exceptionFormat "full"
+        }
+    }
 
+    dependencies {
+        testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+        testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+        testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
+    }
+}
 
+project("robo4j-core") {
+    config {
+        info {
+            name = 'Robo4j Core'
+            description = 'Robo4j Core'
+        }
+    }
+
+    test {
+        systemProperty "java.net.preferIPv4Stack", "true"
+    }
+}
+
+project("robo4j-hw-lego") {
+    config {
+        info {
+            name = 'Robo4j Lego Hardware'
+            description = 'Robo4j Lego Hardware'
+        }
+    }
+
+    dependencies {
+        implementation fileTree(dir: "${rootDir}/libs", include: 'ev3classes-9.1.jar')
+        implementation(project(":robo4j-math"))
+    }
+
+    configureShadow(project)
+}
+
+project("robo4j-hw-rpi") {
+    config {
+        info {
+            name = 'Robo4j RaspberryPi Hardware'
+            description = 'Robo4j RaspberryPi Hardware'
+        }
+    }
+
+    dependencies {
+        implementation(project(":robo4j-math"))
+//        implementation "com.pi4j:pi4j-core:${pi4jVersion}"
+        implementation fileTree(dir: "${rootDir}/libs", include: 'pi4j-core-2.0-SNAPSHOT.jar')
+    }
+
+    configureExampleSources(project)
+    configureShadow(project)
+}
+
+project("robo4j-math") {
+    config {
+        info {
+            name = 'Robo4j Math'
+            description = 'Robo4j Math'
+        }
+    }
+}
+
+project("robo4j-socket-http") {
+    config {
+        info {
+            name = 'Robo4j socket http'
+            description = 'Robo4j socket http'
+        }
+    }
+
+    dependencies {
+        implementation(project(":robo4j-core"))
+    }
+}
+
+project("robo4j-units-lego") {
+    config {
+        info {
+            name = 'Robo4j Lego Abstractions'
+            description = 'Robo4j Lego Abstractions'
+        }
+    }
+
+    dependencies {
+        implementation fileTree(dir: "${rootDir}/libs", include: 'ev3classes-9.1.jar')
+        implementation(project(":robo4j-core"))
+        implementation(project(":robo4j-hw-lego"))
+        testImplementation(project(":robo4j-socket-http"))
+    }
+
+    configureExampleSources(project)
+    configureShadow(project)
+}
+
+project("robo4j-units-rpi") {
+    config {
+        info {
+            name = 'Robo4j Raspberry Pi Units'
+            description = 'Robo4j Raspberry Pi Units'
+        }
+    }
+
+    dependencies {
+        implementation(project(":robo4j-hw-rpi"))
+        implementation(project(":robo4j-core"))
+        implementation(project(":robo4j-math"))
+//        implementation "com.pi4j:pi4j-core:${pi4jVersion}"
+        implementation fileTree(dir: "${rootDir}/libs", include: 'pi4j-core-2.0-SNAPSHOT.jar')
+    }
+
+    configureExampleSources(project)
+    configureShadow(project)
+}
+
+project("robo4j-units-rpi-http") {
+    config {
+        info {
+            name = 'Robo4j Codecs for rpi units'
+            description = 'Robo4j Codecs for rpi units'
+        }
+    }
+
+    dependencies {
+        implementation(project(":robo4j-core"))
+        implementation(project(":robo4j-socket-http"))
+        implementation(project(":robo4j-units-rpi"))
+    }
+}
+
+project("robo4j-spring-configuration-starter") {
+    config {
+        info {
+            name = 'Robo4j Spring Configuration Starter'
+            description = 'Robo4j Spring Configuration Starter'
+        }
+    }
+
+    dependencies {
+        implementation(project(":robo4j-core"))
+        implementation "org.springframework:spring-core:${springCoreVersion}"
+        implementation "org.springframework.boot:spring-boot-autoconfigure:${springBootVersion}"
+        testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+    }
+
+    test {
+        systemProperty "java.net.preferIPv4Stack", "true"
+    }
+
+    configureExampleSources(project)
+    configureShadow(project)
+}

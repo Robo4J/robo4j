@@ -1,36 +1,62 @@
-## Robo4j.io Framework
-"real-time" - synchronisation of asynchronous events/tasks for rapid system development.
-Robo4j is robotics oriented framework and provides comprehensive programming and configuration
-model for Java based application development.  
+[![Build Status](https://travis-ci.org/Robo4J/robo4j.svg?branch=master)](https://travis-ci.org/Robo4J/robo4j)
 
-* [Robo4j.io][] :: is the robotics framework running on JVM
-* [Robo4j.io][] :: is capable to handle stream of commands and process all of them properly
-* [Robo4j.io][] :: version: alfa-0.2
+# Robo4J
+Robo4J provides an easy way of getting started with building custom hardware and creating software for it running on the JVM.
 
-## Documentation
-See currnet [Robo4j documentation][]
-> **Note:** under construciton.
+* [Robo4j.io][] is a robotics framework running on the JVM
+* [Robo4j.io][] provides a library of hardware abstractions for RaspberryPi and Lego EV3 out of the box
+* [Robo4j.io][] provides a library of configurable units that allows hardware to be enabled and configured through XML
+* [Robo4j.io][] provides a threading model controlled by annotations
 
-## Building from Source
-The Robo4j framework uses a [Gradle][] building system
-> **Note:** Ensure that you have JDK 8 configured properly in your IDE.
+The current [Robo4j.io][] version is 0.5
 
 ## Requirements
-[Git][] and [Java JDK 8][]
+[Git][], [Gradle][], [Java JDK 11][]
+
+If you are looking for a JDK 11 ARM hard float build for Raspbian, we recommend looking into [Liberica JDK][] or [Azul Zulu Embedded][].
+
+## Documentation
+See current [Robo4j documentation][].
+> **Note:** Under construction.
+
+## Building from Source
+The Robo4j framework uses [Gradle][] for building.
+
+The following will build all components:
+
+```bash
+./gradlew jar
+```
+The individual bundles will be available under robo4j/&lt;component&gt;/build/libs.
+To install the bundles and make them available to downstream dependencies, run the following:
+
+```bash
+./gradlew install
+```
+
+> **Note:** If you are not using Robo4J as the standard user (pi) on a Raspberry Pi, you will have to specify the path to the local maven repository in the file _**libraries.gradle**_, variable: _mavenRepository_
+
+> **Note:** Robo4J currently requires OpenJDK 11. Ensure that you build and run with OpenJDK 11.
 
 ## Staying in Touch
-Follow [@robo4j][] or author [@miragemiko][]
-on Twitter. In-depth articles can be found at [Robo4j.io][] or [miragemiko blog][]
+Follow [@robo4j][] or authors: [@miragemiko][], [@hirt][] on Twitter. 
+
+In-depth articles can be found at [Robo4j.io][], [miragemiko blog][] or [marcus blog][]
 
 ## License
-The Robo4j.io Framework is released under version 3.0 of the [General Public License][].
+Robo4J is released under [General Public License][] v3.
 
 [Robo4j.io]: http://www.robo4j.io
 [miragemiko blog]: http://www.miroslavkopecky.com
-[General Public License]: http://www.gnu.org/licenses/gpl-3.0-standalone.html0
+[marcus blog]: http://hirt.se/blog/
+[General Public License]: http://www.gnu.org/licenses/gpl-3.0-standalone.html
 [@robo4j]: https://twitter.com/robo4j
 [@miragemiko]: https://twitter.com/miragemiko
+[@hirt]: https://twitter.com/hirt
 [Gradle]: http://gradle.org
-[Java JDK 8]: http://www.oracle.com/technetwork/java/javase/downloads
+[Java JDK 11]: http://jdk.java.net/
 [Git]: http://help.github.com/set-up-git-redirect
+[Gradle]: http://www.gradle.org
 [Robo4j documentation]: http://www.robo4j.io/p/documentation.html
+[Liberica JDK]: https://www.bell-sw.com/java.html
+[Azul Zulu Embedded]: https://www.azul.com/downloads/zulu-embedded/
