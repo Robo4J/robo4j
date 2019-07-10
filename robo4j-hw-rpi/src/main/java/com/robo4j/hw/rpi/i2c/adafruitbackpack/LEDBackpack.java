@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.i2c.adafruitoled;
+package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
 import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
@@ -93,6 +93,12 @@ public abstract class LEDBackpack extends AbstractI2CDevice {
 			System.out.println("setColorByMatrixToBuffer: " + color);
 			break;
 		}
+	}
+
+	void setCharacter(int n, int c, boolean dp) {
+
+		short value = (short) c;
+		buffer[n] = dp ? (value |= (1 << 14)) : value;
 	}
 
 	void setColorToBarBuffer(short a, short c, BiColor color) {
