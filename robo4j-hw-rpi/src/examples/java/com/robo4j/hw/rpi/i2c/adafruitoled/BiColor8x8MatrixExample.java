@@ -17,6 +17,11 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitoled;
 
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor8x8MatrixDevice;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.MatrixRotation;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.PackElement;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,32 +33,31 @@ import java.util.concurrent.TimeUnit;
 public class BiColor8x8MatrixExample {
 
 	public static void main(String[] args) throws Exception {
-        System.out.println("... BiColor 8x8 Matrix Example...");
+		System.out.println("... BiColor 8x8 Matrix Example...");
 
-        BiColor8x8MatrixDevice matrix = new BiColor8x8MatrixDevice();
-        matrix.clear();
-        matrix.display();
+		BiColor8x8MatrixDevice matrix = new BiColor8x8MatrixDevice();
+		matrix.clear();
+		matrix.display();
 
-        for(MatrixRotation rotation: MatrixRotation.values()){
-            matrix.setRotation(rotation);
-            matrix.addPixel(new PackElement(0,0, BiColor.RED));
-            matrix.addPixel(new PackElement(1,0, BiColor.GREEN));
-            matrix.addPixel(new PackElement(2,0, BiColor.YELLOW));
-            matrix.addPixel(new PackElement(3,0, BiColor.RED));
-            matrix.addPixel(new PackElement(0,1, BiColor.GREEN));
-            matrix.addPixel(new PackElement(0,2, BiColor.YELLOW));
-            matrix.addPixel(new PackElement(7,7, BiColor.GREEN));
-            matrix.addPixel(new PackElement(7,6, BiColor.GREEN));
-            matrix.display();
-            TimeUnit.SECONDS.sleep(1);
-            matrix.clear();
-        }
+		for (MatrixRotation rotation : MatrixRotation.values()) {
+			matrix.setRotation(rotation);
+			matrix.addPixel(new PackElement(0, 0, BiColor.RED));
+			matrix.addPixel(new PackElement(1, 0, BiColor.GREEN));
+			matrix.addPixel(new PackElement(2, 0, BiColor.YELLOW));
+			matrix.addPixel(new PackElement(3, 0, BiColor.RED));
+			matrix.addPixel(new PackElement(0, 1, BiColor.GREEN));
+			matrix.addPixel(new PackElement(0, 2, BiColor.YELLOW));
+			matrix.addPixel(new PackElement(7, 7, BiColor.GREEN));
+			matrix.addPixel(new PackElement(7, 6, BiColor.GREEN));
+			matrix.display();
+			TimeUnit.SECONDS.sleep(1);
+			matrix.clear();
+		}
 
-
-        System.out.println("...Click to quit...");
-        System.in.read();
-        matrix.clear();
-        matrix.display();
+		System.out.println("...Click to quit...");
+		System.in.read();
+		matrix.clear();
+		matrix.display();
 
 	}
 }

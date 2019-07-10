@@ -17,6 +17,10 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitoled;
 
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor24BarDevice;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.PackElement;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,22 +38,22 @@ public class BiColor24BargraphExample {
 		device.clear();
 		device.display();
 
-		for(int i=0; i< device.getMaxBar(); i++){
+		for (int i = 0; i < device.getMaxBar(); i++) {
 			device.addBar(i, BiColor.GREEN);
 			device.display();
 			TimeUnit.MILLISECONDS.sleep(200);
 		}
 
-		for(int i=device.getMaxBar()-1; i >= 0; i--){
+		for (int i = device.getMaxBar() - 1; i >= 0; i--) {
 			device.addBar(new PackElement(i));
 			device.display();
 			TimeUnit.MILLISECONDS.sleep(100);
 		}
 
 		int counter = 0;
-		while(counter < 3){
-			for (int i=0; i<12; i++){
-				int colorNumber = (i+counter) % 3 + 1;
+		while (counter < 3) {
+			for (int i = 0; i < 12; i++) {
+				int colorNumber = (i + counter) % 3 + 1;
 				PackElement element = new PackElement(i, BiColor.getByValue(colorNumber));
 				device.addBar(element);
 				TimeUnit.MILLISECONDS.sleep(200);
