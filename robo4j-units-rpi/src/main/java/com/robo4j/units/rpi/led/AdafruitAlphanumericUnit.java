@@ -20,34 +20,37 @@ package com.robo4j.units.rpi.led;
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor24BarDevice;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractLEDBackpack;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.AlphanumericDevice;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.AsciElement;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.LEDBackpackType;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.XYElement;
 
 import java.util.List;
 
 /**
- * Adafruit Bi-Color 24 Bargraph Unit This version of the LED backpack is
- * designed for these bright and colorful bi-color bargraph modules. Each module
- * has 12 red and 12 green LEDs inside, for a total of 24 LEDs controlled as a
- * 1x12 matrix. We put two modules on each backpack for a 24-bar long bargraph
- * (48 total LEDs)
+ * AdafruitAlphanumericUnit
  *
- * https://learn.adafruit.com/adafruit-led-backpack/bi-color-24-bargraph
+ * This version of the LED backpack is designed for two dual 14-segment
+ * "Alphanumeric" displays. These 14-segment displays normally require 18 pins
+ * (4 'characters' and 14 total segments each) This backpack solves the
+ * annoyance of using 18 pins or a bunch of chips by having an I2C
+ * constant-current matrix controller sit neatly on the back of the PCB. The
+ * controller chip takes care of everything, drawing all the LEDs in the
+ * background. All you have to do is write data to it using the 2-pin I2C
+ * interface
  *
- *
+ * see https://learn.adafruit.com/adafruit-led-backpack/0-54-alphanumeric
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Adafruit24BargraphUnit extends AbstractI2CBackpackUnit<BiColor24BarDevice, XYElement> {
+public class AdafruitAlphanumericUnit extends AbstractI2CBackpackUnit<AlphanumericDevice, AsciElement> {
 
-	public Adafruit24BargraphUnit(RoboContext context, String id) {
+	public AdafruitAlphanumericUnit(RoboContext context, String id) {
 		super(LEDBackpackMessage.class, context, id);
 	}
 
-	private BiColor24BarDevice device;
+	private AlphanumericDevice device;
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
@@ -56,21 +59,22 @@ public class Adafruit24BargraphUnit extends AbstractI2CBackpackUnit<BiColor24Bar
 		validateConfiguration(address, bus);
 		int brightness = configuration.getInteger(ATTRIBUTE_BRIGHTNESS, AbstractLEDBackpack.DEFAULT_BRIGHTNESS);
 
-		device = getBackpackDevice(LEDBackpackType.BI_COLOR_BAR_24, bus, address, brightness);
+		device = getBackpackDevice(LEDBackpackType.ALPHANUMERIC, bus, address, brightness);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void onMessage(LEDBackpackMessage message) {
 		processMessage(device, message);
 	}
 
 	@Override
-	void addElements(List<XYElement> elements) {
-		int size = elements.size() > BiColor24BarDevice.MAX_BARS ? BiColor24BarDevice.MAX_BARS : elements.size();
-		for (int i = 0; i < size; i++) {
-			XYElement element = elements.get(i);
-			device.addBar(element);
+	void addElements(List<AsciElement> elements) {
+		for (AsciElement e : elements) {
+			if (e.getPosition() == null) {
+				device.addCharacter(e.getValue(), e.getDot());
+			} else {
+				device.addCharacter(e.getPosition(), e.getValue(), e.getDot());
+			}
 		}
 	}
 }

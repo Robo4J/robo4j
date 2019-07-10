@@ -27,13 +27,15 @@ import java.util.List;
 /**
  *
  *
+ * @param <T> represents type of used messages
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class LEDBackpackMessage implements Serializable {
+public class LEDBackpackMessage<T extends PackElement> implements Serializable {
 
 	private final LEDBackpackMessageType type;
-	private List<PackElement> elements = new ArrayList<>();
+	private List<T> elements = new ArrayList<>();
 
 	public LEDBackpackMessage() {
 		this.type = LEDBackpackMessageType.CLEAR;
@@ -47,15 +49,15 @@ public class LEDBackpackMessage implements Serializable {
 		return type;
 	}
 
-	public List<PackElement> getElements() {
+	public List<T> getElements() {
 		return elements;
 	}
 
-	public void addElement(PackElement element){
+	public void addElement(T element){
 		this.elements.add(element);
 	}
 
-	public void setElements(Collection<PackElement> elements) {
+	public void setElements(Collection<T> elements) {
 		this.elements.addAll(elements);
 	}
 

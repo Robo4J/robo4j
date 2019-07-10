@@ -21,10 +21,10 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor8x8MatrixDevice;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.LEDBackpack;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractLEDBackpack;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.LEDBackpackType;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.MatrixRotation;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.PackElement;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.XYElement;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ import java.util.List;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Adafruit8x8MatrixUnit extends AbstractI2CBackpackUnit<BiColor8x8MatrixDevice> {
+public class Adafruit8x8MatrixUnit extends AbstractI2CBackpackUnit<BiColor8x8MatrixDevice, XYElement> {
 
 	public static final String DEFAULT_MATRIX_ROTATION = "one";
 	public static final String ATTRIBUTE_ROTATION = "rotation";
@@ -52,7 +52,7 @@ public class Adafruit8x8MatrixUnit extends AbstractI2CBackpackUnit<BiColor8x8Mat
 		Integer address = configuration.getInteger(ATTRIBUTE_ADDRESS, null);
 		Integer bus = configuration.getInteger(ATTRIBUTE_BUS, null);
 		validateConfiguration(address, bus);
-		int brightness = configuration.getInteger(ATTRIBUTE_BRIGHTNESS, LEDBackpack.DEFAULT_BRIGHTNESS);
+		int brightness = configuration.getInteger(ATTRIBUTE_BRIGHTNESS, AbstractLEDBackpack.DEFAULT_BRIGHTNESS);
 		MatrixRotation rotation = MatrixRotation
 				.valueOf(configuration.getString(ATTRIBUTE_ROTATION, DEFAULT_MATRIX_ROTATION).toUpperCase());
 		device = getBackpackDevice(LEDBackpackType.BI_COLOR_MATRIX_8x8, bus, address, brightness);
@@ -65,7 +65,7 @@ public class Adafruit8x8MatrixUnit extends AbstractI2CBackpackUnit<BiColor8x8Mat
 	}
 
 	@Override
-	void addElements(List<PackElement> elements) {
+	void addElements(List<XYElement> elements) {
 		device.addPixels(elements);
 	}
 }

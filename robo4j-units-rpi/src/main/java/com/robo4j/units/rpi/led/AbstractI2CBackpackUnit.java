@@ -20,7 +20,7 @@ package com.robo4j.units.rpi.led;
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.LEDBackpack;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractLEDBackpack;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.LEDBackpackFactory;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.LEDBackpackType;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.PackElement;
@@ -31,10 +31,18 @@ import com.robo4j.units.rpi.I2CRegistry;
 import java.util.List;
 
 /**
+ *
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-abstract class AbstractI2CBackpackUnit<T extends LEDBackpack> extends RoboUnit<LEDBackpackMessage> {
+
+/**
+ *
+ * @param <T1>
+ *
+ */
+abstract class AbstractI2CBackpackUnit<T1 extends AbstractLEDBackpack, T2 extends PackElement> extends RoboUnit<LEDBackpackMessage> {
 
 	static final String ATTRIBUTE_ADDRESS = "address";
 	static final String ATTRIBUTE_BUS = "bus";
@@ -54,7 +62,7 @@ abstract class AbstractI2CBackpackUnit<T extends LEDBackpack> extends RoboUnit<L
 	}
 
 	@SuppressWarnings("unchecked")
-	T getBackpackDevice(LEDBackpackType type, int bus, int address, int brightness) throws ConfigurationException {
+	T1 getBackpackDevice(LEDBackpackType type, int bus, int address, int brightness) throws ConfigurationException {
 		I2CEndPoint endPoint = new I2CEndPoint(bus, address);
 		Object device = I2CRegistry.getI2CDeviceByEndPoint(endPoint);
 		if (device == null) {
@@ -67,10 +75,10 @@ abstract class AbstractI2CBackpackUnit<T extends LEDBackpack> extends RoboUnit<L
 			}
 			I2CRegistry.registerI2CDevice(device, new I2CEndPoint(bus, address));
 		}
-		return (T) device;
+		return (T1) device;
 	}
 
-	void processMessage(LEDBackpack device, LEDBackpackMessage message) {
+	void processMessage(AbstractLEDBackpack device, LEDBackpackMessage<T2> message) {
 		switch (message.getType()) {
 		case CLEAR:
 			device.clear();
@@ -88,5 +96,5 @@ abstract class AbstractI2CBackpackUnit<T extends LEDBackpack> extends RoboUnit<L
 		}
 	}
 
-	abstract void addElements(List<PackElement> elements);
+	abstract void addElements(List<T2> elements);
 }

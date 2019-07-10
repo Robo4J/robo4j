@@ -28,6 +28,7 @@ package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 public enum LEDBackpackType {
     //@formatter:off
     BI_COLOR_BAR_24,
-    BI_COLOR_MATRIX_8x8
+    BI_COLOR_MATRIX_8x8,
+    ALPHANUMERIC
     //@formatter:on
 }

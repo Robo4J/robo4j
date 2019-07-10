@@ -43,7 +43,7 @@ public class BiColor8x8MatrixFaceExample {
 			matrix.display();
 			byte[] faceByte = LEDBackpackUtils.createMatrixBiColorArrayByCharSequence(matrix.getMatrixSize(), ',',
 					face);
-			PackElement[] faceElements = LEDBackpackUtils.createMatrixByBiColorByteArray(matrix.getMatrixSize(), faceByte);
+			XYElement[] faceElements = LEDBackpackUtils.createMatrixByBiColorByteArray(matrix.getMatrixSize(), faceByte);
 			matrix.addPixels(faceElements);
 			matrix.display();
 			TimeUnit.SECONDS.sleep(1);

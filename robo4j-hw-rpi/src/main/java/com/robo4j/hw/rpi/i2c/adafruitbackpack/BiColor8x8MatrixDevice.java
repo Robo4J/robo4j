@@ -26,7 +26,7 @@ import java.util.Collection;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BiColor8x8MatrixDevice extends LEDBackpack {
+public class BiColor8x8MatrixDevice extends AbstractLEDBackpack {
 
 	private static final short MATRIX_SIZE = 8;
 	private MatrixRotation rotation;
@@ -52,7 +52,7 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 		return MATRIX_SIZE;
 	}
 
-	public void addPixel(PackElement element) {
+	public void addPixel(XYElement element) {
 		if (validateElement(element.getX(), element.getY())) {
 			setPixel(element);
 		} else {
@@ -60,21 +60,21 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 		}
 	}
 
-	public void addPixels(Collection<PackElement> elements) {
+	public void addPixels(Collection<XYElement> elements) {
 		if (elements == null) {
 			System.out.println("addPixels: not allowed state!");
 		} else {
-			for (PackElement e : elements) {
+			for (XYElement e : elements) {
 				addPixels(e);
 			}
 		}
 	}
 
-	public void addPixels(PackElement... elements) {
+	public void addPixels(XYElement... elements) {
 		if (elements == null || elements.length == 0) {
 			System.out.println("addPixels: not allowed state!");
 		} else {
-			for (PackElement e : elements) {
+			for (XYElement e : elements) {
 				addPixel(e);
 			}
 		}
@@ -84,7 +84,7 @@ public class BiColor8x8MatrixDevice extends LEDBackpack {
 		this.rotation = rotation;
 	}
 
-	private void setPixel(PackElement element) {
+	private void setPixel(XYElement element) {
 		short x;
 		short y;
 		switch (rotation) {

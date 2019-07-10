@@ -41,7 +41,7 @@ public class BiColor24BargraphExample {
 		}
 
 		for(int i=device.getMaxBar()-1; i >= 0; i--){
-			device.addBar(new PackElement(i));
+			device.addBar(new XYElement(i));
 			device.display();
 			TimeUnit.MILLISECONDS.sleep(100);
 		}
@@ -50,7 +50,7 @@ public class BiColor24BargraphExample {
 		while(counter < 3){
 			for (int i=0; i<12; i++){
 				int colorNumber = (i+counter) % 3 + 1;
-				PackElement element = new PackElement(i, BiColor.getByValue(colorNumber));
+				XYElement element = new XYElement(i, BiColor.getByValue(colorNumber));
 				device.addBar(element);
 				TimeUnit.MILLISECONDS.sleep(200);
 				device.display();

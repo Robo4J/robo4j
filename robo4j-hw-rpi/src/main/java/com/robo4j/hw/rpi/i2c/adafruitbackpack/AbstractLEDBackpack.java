@@ -28,7 +28,7 @@ import java.io.IOException;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public abstract class LEDBackpack extends AbstractI2CDevice {
+public abstract class AbstractLEDBackpack extends AbstractI2CDevice {
 
 	public static final int DEFAULT_BRIGHTNESS = 15;
 	private static final int OSCILLATOR_TURN_ON = 0x21;
@@ -39,11 +39,11 @@ public abstract class LEDBackpack extends AbstractI2CDevice {
 	private static final int HT16K33_BLINK_OFF = 0x00;
 	private final short[] buffer = new short[8]; // uint16_t
 
-	LEDBackpack() throws IOException {
+	AbstractLEDBackpack() throws IOException {
 		this(I2CBus.BUS_1, 0x70, DEFAULT_BRIGHTNESS);
 	}
 
-	LEDBackpack(int bus, int address, int brightness) throws IOException {
+	AbstractLEDBackpack(int bus, int address, int brightness) throws IOException {
 		super(bus, address);
 		initiate(brightness);
 	}
@@ -68,6 +68,16 @@ public abstract class LEDBackpack extends AbstractI2CDevice {
 		return (short) (value & 0xFFFF);
 	}
 
+	/**
+	 * turn on of the position on the matrix grid
+	 * 
+	 * @param x
+	 *            x position on the matrix
+	 * @param y
+	 *            y position on the matrix
+	 * @param color
+	 *            led color
+	 */
 	void setColorByMatrixToBuffer(short x, short y, BiColor color) {
 		switch (color) {
 		case RED:
@@ -95,12 +105,30 @@ public abstract class LEDBackpack extends AbstractI2CDevice {
 		}
 	}
 
+	/**
+	 * 
+	 * @param n
+	 *            position on alphanumeric display
+	 * @param c
+	 *            character to be displayed
+	 * @param dp
+	 *            point
+	 */
 	void setCharacter(int n, int c, boolean dp) {
-
 		short value = (short) c;
 		buffer[n] = dp ? (value |= (1 << 14)) : value;
 	}
 
+	/**
+	 * Turn off/on the a led on the bar
+	 * 
+	 * @param a
+	 *            position on the bar
+	 * @param c
+	 *            position on the bar
+	 * @param color
+	 *            color on the bar
+	 */
 	void setColorToBarBuffer(short a, short c, BiColor color) {
 		switch (color) {
 		case RED:
