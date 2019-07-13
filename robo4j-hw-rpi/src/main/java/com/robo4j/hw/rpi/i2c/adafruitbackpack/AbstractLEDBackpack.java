@@ -116,7 +116,20 @@ public abstract class AbstractLEDBackpack extends AbstractI2CDevice {
 	 */
 	void setCharacter(int n, int c, boolean dp) {
 		short value = (short) c;
-		buffer[n] = dp ? (value |= (1 << 14)) : value;
+		setValue(n, value, dp);
+	}
+
+	/**
+	 * 
+	 * @param n
+	 *            position
+	 * @param v
+	 *            value 16-bits
+	 * @param dp
+	 *            point
+	 */
+	void setValue(int n, short v, boolean dp) {
+		buffer[n] = dp ? (v |= (1 << 14)) : v;
 	}
 
 	/**

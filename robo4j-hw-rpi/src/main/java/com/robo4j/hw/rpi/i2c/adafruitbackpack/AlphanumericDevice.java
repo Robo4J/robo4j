@@ -37,8 +37,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class AlphanumericDevice extends AbstractLEDBackpack {
 
-    public static final int POSITION_START = 0;
-    public static final int POSITION_MAX = 3;
+	public static final int POSITION_START = 0;
+	public static final int POSITION_MAX = 3;
 	private static int[] FONTS = { 0b0000000000000001, 0b0000000000000010, 0b0000000000000100, 0b0000000000001000,
 			0b0000000000010000, 0b0000000000100000, 0b0000000001000000, 0b0000000010000000, 0b0000000100000000,
 			0b0000001000000000, 0b0000010000000000, 0b0000100000000000, 0b0001000000000000, 0b0010000000000000,
@@ -155,26 +155,38 @@ public class AlphanumericDevice extends AbstractLEDBackpack {
 	}
 
 	public void addCharacter(char c, boolean dp) {
-	    int p = currentPosition();
+		int p = currentPosition();
 		setCharacter(p, FONTS[c], dp);
 	}
 
-	public void addCharacter(int pos, char c, boolean dp){
-	    if(validPosition(pos)){
-	        setCharacter(pos, FONTS[c], dp);
-	        position.set(c);
-        }
-    }
+	public void addCharacter(int pos, char c, boolean dp) {
+		if (validPosition(pos)) {
+			setCharacter(pos, FONTS[c], dp);
+			position.set(pos);
+		}
+	}
 
-    private boolean validPosition(int p){
-	    return p >= POSITION_START && p <= POSITION_MAX;
-    }
+	public void addByteValue(short v, boolean dp) {
+		int p = currentPosition();
+		setValue(p, v, dp);
+	}
 
-	private int currentPosition(){
-	    if(position.get() > POSITION_MAX){
-	        position.set(POSITION_START);
-        }
-	    return position.getAndIncrement();
-    }
+	public void addByteValue(int pos, short v, boolean dp) {
+		if (validPosition(pos)) {
+			setValue(pos, v, dp);
+			position.set(pos) ;
+		}
+	}
+
+	private boolean validPosition(int p) {
+		return p >= POSITION_START && p <= POSITION_MAX;
+	}
+
+	private int currentPosition() {
+		if (position.get() > POSITION_MAX) {
+			position.set(POSITION_START);
+		}
+		return position.getAndIncrement();
+	}
 
 }

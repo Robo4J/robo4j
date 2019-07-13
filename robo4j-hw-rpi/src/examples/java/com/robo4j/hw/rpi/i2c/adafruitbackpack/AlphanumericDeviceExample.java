@@ -38,10 +38,10 @@ public class AlphanumericDeviceExample {
         TimeUnit.SECONDS.sleep(3);
         device.clear();
         device.display();
-        device.addCharacter('1', false);
-        device.addCharacter('2', true);
-        device.addCharacter(' ', false);
-        device.addCharacter('4', true);
+        device.addCharacter('R', false);
+        device.addCharacter('O', true);
+        device.addCharacter('B', false);
+        device.addByteValue((short) 0x3FFF, true);
         device.display();
 
 
