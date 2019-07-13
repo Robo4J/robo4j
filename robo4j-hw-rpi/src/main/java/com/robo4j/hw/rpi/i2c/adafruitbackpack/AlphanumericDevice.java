@@ -166,12 +166,12 @@ public class AlphanumericDevice extends AbstractLEDBackpack {
 		}
 	}
 
-	public void addByteValue(short v, boolean dp) {
+	public void addValue(short v, boolean dp) {
 		int p = currentPosition();
 		setValue(p, v, dp);
 	}
 
-	public void addByteValue(int pos, short v, boolean dp) {
+	public void addValue(int pos, short v, boolean dp) {
 		if (validPosition(pos)) {
 			setValue(pos, v, dp);
 			position.set(pos) ;

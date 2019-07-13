@@ -41,7 +41,7 @@ public class AlphanumericDeviceExample {
         device.addCharacter('R', false);
         device.addCharacter('O', true);
         device.addCharacter('B', false);
-        device.addByteValue((short) 0x3FFF, true);
+        device.addValue((short) 0x3FFF, true);
         device.display();
 
 
