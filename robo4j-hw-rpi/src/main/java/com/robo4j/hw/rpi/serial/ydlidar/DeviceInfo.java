@@ -16,6 +16,11 @@
  */
 package com.robo4j.hw.rpi.serial.ydlidar;
 
+/**
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ */
 public class DeviceInfo {
 	/**
 	 * The various models of the ydlidar.

@@ -16,6 +16,12 @@
  */
 package com.robo4j.hw.rpi.serial.ydlidar;
 
+/**
+ * The response header.
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ */
 public class ResponseHeader {
 	private static final byte ANSWER_SYNC_BYTE1 = (byte) 0xA5;
 	private static final byte ANSWER_SYNC_BYTE2 = 0x5A;

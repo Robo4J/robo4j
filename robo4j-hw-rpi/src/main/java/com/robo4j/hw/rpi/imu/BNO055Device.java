@@ -249,7 +249,7 @@ public interface BNO055Device {
 	 */
 	public enum OrientationMode {
 		/**
-		 * Pitch: -180° to +180° (turing clockwise increases values) Roll: -90° to +90°
+		 * Pitch: -180° to +180° (turning clockwise increases values) Roll: -90° to +90°
 		 * (increasing with increasing inclination) Heading (Yaw): 0° to 360° (turning
 		 * clockwise increases values)
 		 */

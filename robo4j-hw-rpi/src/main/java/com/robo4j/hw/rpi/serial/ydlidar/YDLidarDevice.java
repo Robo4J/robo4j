@@ -26,6 +26,7 @@ import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialFactory;
 import com.robo4j.hw.rpi.serial.SerialDeviceDescriptor;
 import com.robo4j.hw.rpi.serial.SerialUtil;
+import com.robo4j.hw.rpi.serial.ydlidar.HealthInfo.HealthStatus;
 import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseType;
 
 /**
@@ -48,7 +49,8 @@ import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseType;
  * <p>
  * echo -en "\xA5\x90" > /dev/ttyUSB0
  * 
- * @author Marcus
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
  */
 public class YDLidarDevice {
 	public static String SERIAL_PORT_AUTO = "auto";
@@ -76,8 +78,19 @@ public class YDLidarDevice {
 	 * The commands available.
 	 */
 	public enum Command {
-		STOP(0x65), FORCE_STOP(0x00), SCAN(0x60), FORCE_SCAN(0x61), RESET(0x80), GET_EAI(0x55), GET_DEVICE_INFO(0x90), GET_DEVICE_HEALTH(
-				0x92);
+		//@formatter:off
+		FORCE_STOP(0x00),
+		LOW_POWER_CONSUMPTION(0x01),
+		LOW_POWER_SHUTDOWN(0x02),
+		STOP(0x65),
+		SCAN(0x60),
+		FORCE_SCAN(0x61),
+		RESET(0x80),
+		GET_EAI(0x55),
+		GET_DEVICE_INFO(0x90),
+		GET_DEVICE_HEALTH(0x92);
+
+		//@formatter:on
 
 		int instructionCode;
 
@@ -88,6 +101,10 @@ public class YDLidarDevice {
 		public int getInstructionCode() {
 			return instructionCode;
 		}
+	}
+
+	public enum IdleMode {
+		NORMA, LOW_POWER
 	}
 
 	/**
@@ -120,7 +137,18 @@ public class YDLidarDevice {
 		serial.open(this.serialPort, BAUD_RATE);
 	}
 
-	public DeviceInfo getDeviceInfo() throws IllegalStateException, IOException, InterruptedException, TimeoutException {
+	/**
+	 * Returns information about the ydlidar, such as the version.
+	 * 
+	 * @return information about the ydlidar, such as the version.
+	 * 
+	 * @throws IllegalStateException
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws TimeoutException
+	 */
+	public DeviceInfo getDeviceInfo()
+			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
 		synchronized (this) {
 			disableDataGrabbing();
 			sendCommand(Command.GET_DEVICE_INFO);
@@ -129,8 +157,8 @@ public class YDLidarDevice {
 				throw new IOException("Got bad response!");
 			}
 			if (response.getResponseType() != ResponseType.DEVICE_INFO) {
-				throw new IOException("Got the wrong response type. Should have been " + ResponseType.DEVICE_INFO + ". Got "
-						+ response.getResponseType() + ".");
+				throw new IOException("Got the wrong response type. Should have been " + ResponseType.DEVICE_INFO
+						+ ". Got " + response.getResponseType() + ".");
 			}
 			byte[] readData = SerialUtil.readBytes(serial, 20, 800);
 			byte[] serialVersion = new byte[16];
@@ -139,12 +167,84 @@ public class YDLidarDevice {
 		}
 	}
 
+	/**
+	 * Returns health information about the ydlidar.
+	 * 
+	 * @return health information about the ydlidar.
+	 * 
+	 * @throws IllegalStateException
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws TimeoutException
+	 */
+	public HealthInfo getHealthInfo()
+			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
+		synchronized (this) {
+			disableDataGrabbing();
+			sendCommand(Command.GET_DEVICE_HEALTH);
+			ResponseHeader response = readResponseHeader(800);
+			if (!response.isValid()) {
+				throw new IOException("Got bad response!");
+			}
+			if (response.getResponseType() != ResponseType.DEVICE_HEALTH) {
+				throw new IOException("Got the wrong response type. Should have been " + ResponseType.DEVICE_HEALTH
+						+ ". Got " + response.getResponseType() + ".");
+			}
+			byte[] readData = SerialUtil.readBytes(serial, 3, 800);
+			return new HealthInfo(HealthStatus.fromStatusCode(readData[0]), (short) (readData[1] << 8 + readData[2]));
+		}
+	}
+
+	/**
+	 * Sets the low power mode.
+	 * 
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws IllegalStateException
+	 * @throws TimeoutException
+	 */
+	public void setIdleMode(IdleMode mode)
+			throws IOException, IllegalStateException, InterruptedException, TimeoutException {
+		synchronized (this) {
+			disableDataGrabbing();
+			if (mode == IdleMode.LOW_POWER) {
+				sendCommand(Command.LOW_POWER_CONSUMPTION);
+			} else {
+				sendCommand(Command.LOW_POWER_SHUTDOWN);
+			}
+			ResponseHeader response = readResponseHeader(800);
+			if (!response.isValid()) {
+				throw new IOException("Got bad response!");
+			}
+			if (response.getResponseType() != ResponseType.DEVICE_INFO) {
+				throw new IOException("Got the wrong response type. Should have been " + ResponseType.DEVICE_INFO
+						+ ". Got " + response.getResponseType() + ".");
+			}
+			byte[] readData = SerialUtil.readBytes(serial, 1, 800);
+			int expectedResponse = mode == IdleMode.LOW_POWER ? 0x01 : 0x00;
+			if (readData.length != 1 || readData[0] != expectedResponse) {
+				throw new IOException("Unexpected response " + readData.length);
+			}
+		}
+	}
+
+	/**
+	 * Shuts down the ydlidar and releases resources. After this, no more
+	 * communication will be possible.
+	 */
 	public void shutdown() {
 		try {
+			stopMotor();
 			serial.close();
-		} catch (IllegalStateException | IOException e) {
-			Logger.getLogger(YDLidarDevice.class.getName()).log(Level.WARNING, "Problem shutting down ydlidar serial", e);
+		} catch (IllegalStateException | IOException | InterruptedException e) {
+			Logger.getLogger(YDLidarDevice.class.getName()).log(Level.WARNING, "Problem shutting down ydlidar serial",
+					e);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "ydlidar@" + serialPort;
 	}
 
 	private void sendCommand(Command command) throws IllegalStateException, IOException {
@@ -159,8 +259,17 @@ public class YDLidarDevice {
 	}
 
 	private void stopMotor() throws IllegalStateException, IOException, InterruptedException {
-		serial.setDTR(false);
-		Thread.sleep(500);
+		synchronized (this) {
+			serial.setDTR(false);
+			Thread.sleep(500);
+		}
+	}
+
+	private void startMotor() throws IllegalStateException, IOException, InterruptedException {
+		synchronized (this) {
+			serial.setDTR(true);
+			Thread.sleep(500);
+		}
 	}
 
 	private ResponseHeader readResponseHeader(long timeout)
@@ -205,10 +314,6 @@ public class YDLidarDevice {
 		throw new IOException("Failed to auto resolve the serial port used by the ydlidar.");
 	}
 
-	public String toString() {
-		return "ydlidar@" + serialPort;
-	}
-
 	/**
 	 * Just trying something out...
 	 * 
@@ -217,7 +322,8 @@ public class YDLidarDevice {
 	 * @throws TimeoutException
 	 * @throws IllegalStateException
 	 */
-	public static void main(String[] args) throws IOException, InterruptedException, IllegalStateException, TimeoutException {
+	public static void main(String[] args)
+			throws IOException, InterruptedException, IllegalStateException, TimeoutException {
 		YDLidarDevice device = new YDLidarDevice();
 		System.out.println(device);
 		System.out.println(device.getDeviceInfo());
