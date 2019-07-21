@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class Adafruit8x8MatrixUnit extends AbstractI2CBackpackUnit<BiColor8x8MatrixDevice> {
 
-	public static final String DEFAULT_MATRIX_ROTATION = "one";
+	public static final String DEFAULT_MATRIX_ROTATION = "DEFAULT_X_Y";
 	public static final String ATTRIBUTE_ROTATION = "rotation";
 
 	private BiColor8x8MatrixDevice device;
