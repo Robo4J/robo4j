@@ -82,14 +82,45 @@ public class YDLidarDevice {
 		FORCE_STOP(0x00),
 		LOW_POWER_CONSUMPTION(0x01),
 		LOW_POWER_SHUTDOWN(0x02),
-		STOP(0x65),
+		/**
+		 * This command is used to enable the constant frequency of the system. 
+		 * After being enabled, when the lidar is in scanning mode, it will 
+		 * automatically adjust the speed so that the scanning frequency will 
+		 * be stabilized at the currently set scanning frequency. 
+		 * G4 defaults to constant frequency.
+		 */
+		CONSTANT_FREQUENCY_ON(0x0E),
+		/**
+		 * This command is used to shut down the system constant frequency. 
+		 * After the radar is turned off, the lidar does not perform automatic 
+		 * speed adjustment in the scanning mode. 
+		 */
+		CONSTANT_FREQUENCY_OFF(0x0F),
+		/**
+		 * G4 enters a soft reboot and the system restarts. 
+		 * This command does not answer.
+		 */
+		RESTART(0x40),
+		/**
+		 * Enters scan mode and feeds back point cloud data.
+		 */
 		SCAN(0x60),
 		FORCE_SCAN(0x61),
+		STOP(0x65),
 		RESET(0x80),
 		GET_EAI(0x55),
 		GET_DEVICE_INFO(0x90),
-		GET_DEVICE_HEALTH(0x92);
-
+		GET_DEVICE_HEALTH(0x92),
+		/**
+		 * This command is used to set the system's ranging frequency and switch the 
+		 * ranging frequency between 4 KHz, 8 KHz and 9 KHz. 
+		 * The default ranging frequency is 9 KHz. 
+		 */
+		SET_RANGING_FREQUENCY(0xD0),
+		/**
+		 * This command is used to obtain the current ranging frequency of the system. 
+		 */
+		GET_RANGING_FREQUENCY(0xD1);
 		//@formatter:on
 
 		int instructionCode;
@@ -104,7 +135,42 @@ public class YDLidarDevice {
 	}
 
 	public enum IdleMode {
-		NORMA, LOW_POWER
+		NORMAL, LOW_POWER
+	}
+
+	public enum RangingFrequency {
+		FOUR_KHZ((byte) 0x00, 4), EIGHT_KHZ((byte) 0x01, 8), NINE_KHZ((byte) 0x02, 9);
+
+		byte frequencyCode;
+		int frequency;
+
+		RangingFrequency(byte frequencyCode, int frequency) {
+			this.frequencyCode = frequencyCode;
+			this.frequency = frequency;
+		}
+
+		public byte getFrequencyCode() {
+			return frequencyCode;
+		}
+
+		/**
+		 * Returns the RangingFrequency from the ydlidar specific frequency
+		 * code.
+		 * 
+		 * @param frequencyCode
+		 *            the ydlidar specific frequency code for which to get the
+		 *            {@link RangingFrequency}.
+		 * @return the {@link RangingFrequency} or null, if no matching
+		 *         {@link RangingFrequency} could be found.∫
+		 */
+		public static RangingFrequency fromFrequencyCode(int frequencyCode) {
+			for (RangingFrequency frequency : values()) {
+				if (frequency.getFrequencyCode() == frequencyCode) {
+					return frequency;
+				}
+			}
+			return null;
+		}
 	}
 
 	/**
@@ -153,13 +219,7 @@ public class YDLidarDevice {
 			disableDataGrabbing();
 			sendCommand(Command.GET_DEVICE_INFO);
 			ResponseHeader response = readResponseHeader(800);
-			if (!response.isValid()) {
-				throw new IOException("Got bad response!");
-			}
-			if (response.getResponseType() != ResponseType.DEVICE_INFO) {
-				throw new IOException("Got the wrong response type. Should have been " + ResponseType.DEVICE_INFO
-						+ ". Got " + response.getResponseType() + ".");
-			}
+			validateResponseType(response, ResponseType.DEVICE_INFO);
 			byte[] readData = SerialUtil.readBytes(serial, 20, 800);
 			byte[] serialVersion = new byte[16];
 			System.arraycopy(readData, 4, serialVersion, 0, serialVersion.length);
@@ -183,15 +243,47 @@ public class YDLidarDevice {
 			disableDataGrabbing();
 			sendCommand(Command.GET_DEVICE_HEALTH);
 			ResponseHeader response = readResponseHeader(800);
-			if (!response.isValid()) {
-				throw new IOException("Got bad response!");
-			}
-			if (response.getResponseType() != ResponseType.DEVICE_HEALTH) {
-				throw new IOException("Got the wrong response type. Should have been " + ResponseType.DEVICE_HEALTH
-						+ ". Got " + response.getResponseType() + ".");
-			}
+			validateResponseType(response, ResponseType.DEVICE_HEALTH);
 			byte[] readData = SerialUtil.readBytes(serial, 3, 800);
 			return new HealthInfo(HealthStatus.fromStatusCode(readData[0]), (short) (readData[1] << 8 + readData[2]));
+		}
+	}
+
+	/**
+	 * Returns the currently set {@link RangingFrequency}.
+	 * 
+	 * @return the currently set {@link RangingFrequency}, or null.
+	 * 
+	 * @throws IOException
+	 *             on communication error.
+	 * @throws IllegalStateException
+	 * @throws InterruptedException
+	 * @throws TimeoutException
+	 *             if the {@link RangingFrequency} could not be read in time.
+	 */
+	public RangingFrequency getRangingFrequency()
+			throws IOException, IllegalStateException, InterruptedException, TimeoutException {
+		synchronized (this) {
+			disableDataGrabbing();
+			sendCommand(Command.GET_RANGING_FREQUENCY);
+			ResponseHeader response = readResponseHeader(800);
+			validateResponseType(response, ResponseType.DEVICE_INFO);
+			byte[] readData = SerialUtil.readBytes(serial, 1, 800);
+			return RangingFrequency.fromFrequencyCode(readData[0]);
+		}
+	}
+
+	public void setRangingFrequency(RangingFrequency rangingFrequency)
+			throws IOException, IllegalStateException, InterruptedException, TimeoutException {
+		synchronized (this) {
+			disableDataGrabbing();
+			sendCommand(Command.SET_RANGING_FREQUENCY, new byte[] { rangingFrequency.getFrequencyCode() });
+			ResponseHeader response = readResponseHeader(800);
+			validateResponseType(response, ResponseType.DEVICE_INFO);
+			byte[] readData = SerialUtil.readBytes(serial, 1, 800);
+			if (readData.length != 1 || readData[0] != rangingFrequency.getFrequencyCode()) {
+				throw new IOException("Unexpected response " + readData.length);
+			}
 		}
 	}
 
@@ -213,13 +305,7 @@ public class YDLidarDevice {
 				sendCommand(Command.LOW_POWER_SHUTDOWN);
 			}
 			ResponseHeader response = readResponseHeader(800);
-			if (!response.isValid()) {
-				throw new IOException("Got bad response!");
-			}
-			if (response.getResponseType() != ResponseType.DEVICE_INFO) {
-				throw new IOException("Got the wrong response type. Should have been " + ResponseType.DEVICE_INFO
-						+ ". Got " + response.getResponseType() + ".");
-			}
+			validateResponseType(response, ResponseType.DEVICE_INFO);
 			byte[] readData = SerialUtil.readBytes(serial, 1, 800);
 			int expectedResponse = mode == IdleMode.LOW_POWER ? 0x01 : 0x00;
 			if (readData.length != 1 || readData[0] != expectedResponse) {
@@ -312,6 +398,17 @@ public class YDLidarDevice {
 			}
 		}
 		throw new IOException("Failed to auto resolve the serial port used by the ydlidar.");
+	}
+
+	private static void validateResponseType(ResponseHeader header, ResponseType expected) throws IOException {
+		if (!header.isValid()) {
+			throw new IOException("Got bad response!");
+		}
+		if (header.getResponseType() != expected) {
+			throw new IOException("Got the wrong response type. Should have been " + expected + ". Got "
+					+ header.getResponseType() + ".");
+		}
+
 	}
 
 	/**

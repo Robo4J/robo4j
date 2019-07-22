@@ -26,7 +26,10 @@ public class ResponseHeader {
 	private static final byte ANSWER_SYNC_BYTE1 = (byte) 0xA5;
 	private static final byte ANSWER_SYNC_BYTE2 = 0x5A;
 
-	private final byte[] headerData;
+	private final ResponseType responseType;
+	private final ResponseMode responseMode;
+	private final boolean isValid;
+	private final long responseLength;
 
 	public static class BadResponseException extends Exception {
 		private static final long serialVersionUID = 1L;
@@ -56,19 +59,67 @@ public class ResponseHeader {
 		}
 	}
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param headerData
-	 */
-	public ResponseHeader(byte[] headerData) {
-		this.headerData = headerData;
+	public enum ResponseMode {
+		/**
+		 * A single result is expected.
+		 */
+		SINGLE,
+		/**
+		 * Results will be continuously sent until another command is sent to
+		 * change this.
+		 */
+		CONTINUOUS,
+		/**
+		 * An error has occurred.
+		 */
+		UNDEFINED
 	}
 
 	/**
-	 * @return true if this header is valid, i.e. the sync bytes are correct.
+	 * Constructor.
+	 * 
+	 * @param headerData the data for the header. Must be 7 bytes long.
+	 */
+	public ResponseHeader(byte[] headerData) {
+		if (headerData.length != 7) {
+			throw new IllegalArgumentException("The length of the header must be 7 bytes long!");
+		}
+		this.responseType = ResponseType.getResponseType(headerData[6]);
+		this.isValid = isValid(headerData);
+		this.responseLength = getResponseLength(headerData);
+		this.responseMode = getResponseMode(headerData);
+	}
+
+	/**
+	 * @return the response type for which the header was generated.
+	 */
+	public ResponseType getResponseType() {
+		return responseType;
+	}
+
+	/**
+	 * @return true if the response header was a valid response header, i.e.
+	 *         starting with the sync bytes.
 	 */
 	public boolean isValid() {
+		return isValid;
+	}
+
+	/**
+	 * @return the response length.
+	 */
+	public long getResponseLength() {
+		return responseLength;
+	}
+
+	/**
+	 * @return the {@link ResponseMode}.
+	 */
+	public ResponseMode getResponseMode() {
+		return responseMode;
+	}
+
+	private static boolean isValid(byte[] headerData) {
 		if (headerData[0] != ANSWER_SYNC_BYTE1) {
 			return false;
 		}
@@ -78,10 +129,23 @@ public class ResponseHeader {
 		return true;
 	}
 
-	/**
-	 * @return the response type for which the header was generated.
-	 */
-	public ResponseType getResponseType() {
-		return ResponseType.getResponseType(headerData[6]);
+	private static long getResponseLength(byte[] headerData) {
+		long responseLength = headerData[5] & 0x3F;
+		responseLength = responseLength << 8 + 0xFF & headerData[4];
+		responseLength = responseLength << 8 + 0xFF & headerData[3];
+		responseLength = responseLength << 8 + 0xFF & headerData[2];
+		return responseLength;
+	}
+
+	private static ResponseMode getResponseMode(byte[] headerData) {
+		int mode = (headerData[5] & 0xC0) >> 6;
+		switch (mode) {
+		case 0:
+			return ResponseMode.SINGLE;
+		case 1:
+			return ResponseMode.CONTINUOUS;
+		default:
+			return ResponseMode.UNDEFINED;
+		}
 	}
 }
