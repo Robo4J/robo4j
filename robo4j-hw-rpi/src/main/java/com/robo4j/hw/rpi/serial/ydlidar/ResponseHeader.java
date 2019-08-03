@@ -29,7 +29,7 @@ public class ResponseHeader {
 	private final ResponseType responseType;
 	private final ResponseMode responseMode;
 	private final boolean isValid;
-	private final long responseLength;
+	private final int responseLength;
 
 	public static class BadResponseException extends Exception {
 		private static final long serialVersionUID = 1L;
@@ -108,7 +108,7 @@ public class ResponseHeader {
 	/**
 	 * @return the response length.
 	 */
-	public long getResponseLength() {
+	public int getResponseLength() {
 		return responseLength;
 	}
 
@@ -129,11 +129,11 @@ public class ResponseHeader {
 		return true;
 	}
 
-	private static long getResponseLength(byte[] headerData) {
-		long responseLength = headerData[5] & 0x3F;
-		responseLength = responseLength << 8 + 0xFF & headerData[4];
-		responseLength = responseLength << 8 + 0xFF & headerData[3];
-		responseLength = responseLength << 8 + 0xFF & headerData[2];
+	private static int getResponseLength(byte[] headerData) {
+		int responseLength = headerData[5] & 0x3F;
+		responseLength = (responseLength << 8) + 0xFF & headerData[4];
+		responseLength = (responseLength << 8) + 0xFF & headerData[3];
+		responseLength = (responseLength << 8) + 0xFF & headerData[2];
 		return responseLength;
 	}
 

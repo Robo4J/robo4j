@@ -220,7 +220,7 @@ public class YDLidarDevice {
 			sendCommand(Command.GET_DEVICE_INFO);
 			ResponseHeader response = readResponseHeader(800);
 			validateResponseType(response, ResponseType.DEVICE_INFO);
-			byte[] readData = SerialUtil.readBytes(serial, 20, 800);
+			byte[] readData = SerialUtil.readBytes(serial, response.getResponseLength(), 800);
 			byte[] serialVersion = new byte[16];
 			System.arraycopy(readData, 4, serialVersion, 0, serialVersion.length);
 			return new DeviceInfo(readData[0], readData[1] << 8 + readData[2], readData[3], serialVersion);
@@ -424,6 +424,7 @@ public class YDLidarDevice {
 		YDLidarDevice device = new YDLidarDevice();
 		System.out.println(device);
 		System.out.println(device.getDeviceInfo());
+		System.out.println(device.getHealthInfo());
 		device.shutdown();
 		// Naughty that this has to be done... Perhaps fix Pi4J?
 		SerialFactory.shutdown();

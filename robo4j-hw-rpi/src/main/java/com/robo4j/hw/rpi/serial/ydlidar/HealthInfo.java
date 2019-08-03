@@ -66,4 +66,8 @@ public class HealthInfo {
 	public short getErrorCode() {
 		return errorCode;
 	}
+
+	public String toString() {
+		return String.format("HealthInfo status=%s, errorCode=%d", status.name(), errorCode);
+	}
 }
