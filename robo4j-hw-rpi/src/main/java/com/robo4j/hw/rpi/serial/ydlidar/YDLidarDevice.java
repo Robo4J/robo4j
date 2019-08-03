@@ -53,7 +53,7 @@ import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseType;
  * @author Miro Wengner (@miragemiko)
  */
 public class YDLidarDevice {
-	public static String SERIAL_PORT_AUTO = "auto";
+	public static final String SERIAL_PORT_AUTO = "auto";
 
 	/**
 	 * Vendor ID for the CP2102 USB to UART Bridge Controller that is included
@@ -67,6 +67,7 @@ public class YDLidarDevice {
 	 */
 	private static final String PRODUCT_ID = "ea60";
 
+	private static final int RESPONSE_HEADER_LENGTH = 7;
 	private static final int CMDFLAG_HAS_PAYLOAD = 0x80;
 	private static final byte CMD_SYNC_BYTE = (byte) 0xA5;
 	private static final int BAUD_RATE = 230400;
@@ -244,7 +245,7 @@ public class YDLidarDevice {
 			sendCommand(Command.GET_DEVICE_HEALTH);
 			ResponseHeader response = readResponseHeader(800);
 			validateResponseType(response, ResponseType.DEVICE_HEALTH);
-			byte[] readData = SerialUtil.readBytes(serial, 3, 800);
+			byte[] readData = SerialUtil.readBytes(serial, response.getResponseLength(), 800);
 			return new HealthInfo(HealthStatus.fromStatusCode(readData[0]), (short) (readData[1] << 8 + readData[2]));
 		}
 	}
@@ -268,7 +269,7 @@ public class YDLidarDevice {
 			sendCommand(Command.GET_RANGING_FREQUENCY);
 			ResponseHeader response = readResponseHeader(800);
 			validateResponseType(response, ResponseType.DEVICE_INFO);
-			byte[] readData = SerialUtil.readBytes(serial, 1, 800);
+			byte[] readData = SerialUtil.readBytes(serial, response.getResponseLength(), 800);
 			return RangingFrequency.fromFrequencyCode(readData[0]);
 		}
 	}
@@ -280,7 +281,7 @@ public class YDLidarDevice {
 			sendCommand(Command.SET_RANGING_FREQUENCY, new byte[] { rangingFrequency.getFrequencyCode() });
 			ResponseHeader response = readResponseHeader(800);
 			validateResponseType(response, ResponseType.DEVICE_INFO);
-			byte[] readData = SerialUtil.readBytes(serial, 1, 800);
+			byte[] readData = SerialUtil.readBytes(serial, response.getResponseLength(), 800);
 			if (readData.length != 1 || readData[0] != rangingFrequency.getFrequencyCode()) {
 				throw new IOException("Unexpected response " + readData.length);
 			}
@@ -306,7 +307,7 @@ public class YDLidarDevice {
 			}
 			ResponseHeader response = readResponseHeader(800);
 			validateResponseType(response, ResponseType.DEVICE_INFO);
-			byte[] readData = SerialUtil.readBytes(serial, 1, 800);
+			byte[] readData = SerialUtil.readBytes(serial, response.getResponseLength(), 800);
 			int expectedResponse = mode == IdleMode.LOW_POWER ? 0x01 : 0x00;
 			if (readData.length != 1 || readData[0] != expectedResponse) {
 				throw new IOException("Unexpected response " + readData.length);
@@ -360,7 +361,7 @@ public class YDLidarDevice {
 
 	private ResponseHeader readResponseHeader(long timeout)
 			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
-		byte[] readBytes = SerialUtil.readBytes(serial, 7, timeout);
+		byte[] readBytes = SerialUtil.readBytes(serial, RESPONSE_HEADER_LENGTH, timeout);
 		return new ResponseHeader(readBytes);
 	}
 
@@ -425,6 +426,7 @@ public class YDLidarDevice {
 		System.out.println(device);
 		System.out.println(device.getDeviceInfo());
 		System.out.println(device.getHealthInfo());
+		System.out.println(device.getRangingFrequency());
 		device.shutdown();
 		// Naughty that this has to be done... Perhaps fix Pi4J?
 		SerialFactory.shutdown();

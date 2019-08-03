@@ -30,7 +30,7 @@ public class ResponseHeaderTests {
 	}
 
 	@Test
-	void testValidHeader() {
+	void testValidDeviceInfoHeader() {
 		byte[] data = new byte[] { (byte) 0xA5, (byte) 0x5A, (byte) 0x14, (byte) 0x00, (byte) 0x00, (byte) 0x00,
 				(byte) 0x04 };
 		ResponseHeader header = new ResponseHeader(data);
@@ -38,5 +38,16 @@ public class ResponseHeaderTests {
 		assertSame(header.getResponseType(), ResponseType.DEVICE_INFO);
 		assertSame(header.getResponseMode(), ResponseMode.SINGLE);
 		assertEquals(header.getResponseLength(), 0x14);
+	}
+
+	@Test
+	void testValidHealthInfoHeader() {
+		byte[] data = new byte[] { (byte) 0xA5, (byte) 0x5A, (byte) 0x03, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+				(byte) 0x06 };
+		ResponseHeader header = new ResponseHeader(data);
+		assertTrue(header.isValid(), "This header should be valid!");
+		assertSame(header.getResponseType(), ResponseType.DEVICE_HEALTH);
+		assertSame(header.getResponseMode(), ResponseMode.SINGLE);
+		assertEquals(header.getResponseLength(), 0x03);
 	}
 }
