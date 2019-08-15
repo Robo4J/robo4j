@@ -426,7 +426,7 @@ public class YDLidarDevice {
 		System.out.println(device);
 		System.out.println(device.getDeviceInfo());
 		System.out.println(device.getHealthInfo());
-		System.out.println(device.getRangingFrequency());
+		System.out.println("Ranging Frequency = " + device.getRangingFrequency());
 		device.shutdown();
 		// Naughty that this has to be done... Perhaps fix Pi4J?
 		SerialFactory.shutdown();
