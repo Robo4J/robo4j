@@ -17,6 +17,7 @@
 package com.robo4j.hw.rpi.serial.ydlidar;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
@@ -27,7 +28,9 @@ import com.pi4j.io.serial.SerialFactory;
 import com.robo4j.hw.rpi.serial.SerialDeviceDescriptor;
 import com.robo4j.hw.rpi.serial.SerialUtil;
 import com.robo4j.hw.rpi.serial.ydlidar.HealthInfo.HealthStatus;
+import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseMode;
 import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseType;
+import com.robo4j.math.geometry.ScanResult2D;
 
 /**
  * Driver for the ydlidar device.
@@ -53,6 +56,9 @@ import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseType;
  * @author Miro Wengner (@miragemiko)
  */
 public class YDLidarDevice {
+	private static final Logger LOGGER = Logger.getLogger(YDLidarDevice.class.getClass().getName());
+	private static final int DEFAULT_SERIAL_TIMEOUT = 800;
+
 	public static final String SERIAL_PORT_AUTO = "auto";
 
 	/**
@@ -67,6 +73,7 @@ public class YDLidarDevice {
 	 */
 	private static final String PRODUCT_ID = "ea60";
 
+	private static final int DATA_HEADER_LENGTH = 10;
 	private static final int RESPONSE_HEADER_LENGTH = 7;
 	private static final int CMDFLAG_HAS_PAYLOAD = 0x80;
 	private static final byte CMD_SYNC_BYTE = (byte) 0xA5;
@@ -74,66 +81,9 @@ public class YDLidarDevice {
 
 	private final Serial serial;
 	private final String serialPort;
+	private final ScanReceiver receiver;
 
-	/**
-	 * The commands available.
-	 */
-	public enum Command {
-		//@formatter:off
-		FORCE_STOP(0x00),
-		LOW_POWER_CONSUMPTION(0x01),
-		LOW_POWER_SHUTDOWN(0x02),
-		/**
-		 * This command is used to enable the constant frequency of the system. 
-		 * After being enabled, when the lidar is in scanning mode, it will 
-		 * automatically adjust the speed so that the scanning frequency will 
-		 * be stabilized at the currently set scanning frequency. 
-		 * G4 defaults to constant frequency.
-		 */
-		CONSTANT_FREQUENCY_ON(0x0E),
-		/**
-		 * This command is used to shut down the system constant frequency. 
-		 * After the radar is turned off, the lidar does not perform automatic 
-		 * speed adjustment in the scanning mode. 
-		 */
-		CONSTANT_FREQUENCY_OFF(0x0F),
-		/**
-		 * G4 enters a soft reboot and the system restarts. 
-		 * This command does not answer.
-		 */
-		RESTART(0x40),
-		/**
-		 * Enters scan mode and feeds back point cloud data.
-		 */
-		SCAN(0x60),
-		FORCE_SCAN(0x61),
-		STOP(0x65),
-		RESET(0x80),
-		GET_EAI(0x55),
-		GET_DEVICE_INFO(0x90),
-		GET_DEVICE_HEALTH(0x92),
-		/**
-		 * This command is used to set the system's ranging frequency and switch the 
-		 * ranging frequency between 4 KHz, 8 KHz and 9 KHz. 
-		 * The default ranging frequency is 9 KHz. 
-		 */
-		SET_RANGING_FREQUENCY(0xD0),
-		/**
-		 * This command is used to obtain the current ranging frequency of the system. 
-		 */
-		GET_RANGING_FREQUENCY(0xD1);
-		//@formatter:on
-
-		int instructionCode;
-
-		Command(int instructionCode) {
-			this.instructionCode = instructionCode;
-		}
-
-		public int getInstructionCode() {
-			return instructionCode;
-		}
-	}
+	private volatile boolean isScanning;
 
 	public enum IdleMode {
 		NORMAL, LOW_POWER
@@ -174,6 +124,41 @@ public class YDLidarDevice {
 		}
 	}
 
+	public class DataRetriever implements Runnable {
+		private final RangingFrequency frequency;
+
+		public DataRetriever(RangingFrequency frequency) {
+			this.frequency = frequency;
+		}
+
+		@Override
+		public void run() {
+			while (isScanning) {
+				try {
+					DataHeader header = readDataHeader(DEFAULT_SERIAL_TIMEOUT);
+					if (!header.isValid()) {
+						LOGGER.log(Level.SEVERE, "Got invalid header - stopping scanner");
+						stopScanning();
+						break;
+					}
+					byte[] data = readData(header, DEFAULT_SERIAL_TIMEOUT);
+				} catch (IllegalStateException | IOException | InterruptedException | TimeoutException e) {
+					LOGGER.log(Level.SEVERE, "Failed to read data from the ydlidar - stopping scanner", e);
+					stopScanning();
+					break;
+				}
+			}
+		}
+
+		public void stopScanning() {
+			try {
+				setScanning(false);
+			} catch (IllegalStateException | IOException | InterruptedException | TimeoutException e) {
+				// Do not care...
+			}
+		}
+	}
+
 	/**
 	 * Default constructor. Will attempt to auto detect the USB to UART bridge
 	 * controller included with the YDLidar device.
@@ -181,8 +166,8 @@ public class YDLidarDevice {
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public YDLidarDevice() throws IOException, InterruptedException {
-		this(SERIAL_PORT_AUTO);
+	public YDLidarDevice(ScanReceiver receiver) throws IOException, InterruptedException {
+		this(SERIAL_PORT_AUTO, receiver);
 	}
 
 	/**
@@ -194,7 +179,8 @@ public class YDLidarDevice {
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public YDLidarDevice(String serialPort) throws IOException, InterruptedException {
+	public YDLidarDevice(String serialPort, ScanReceiver receiver) throws IOException, InterruptedException {
+		this.receiver = receiver;
 		if (SERIAL_PORT_AUTO.equals(serialPort)) {
 			this.serialPort = autoResolveSerialPort();
 		} else {
@@ -217,9 +203,9 @@ public class YDLidarDevice {
 	public DeviceInfo getDeviceInfo()
 			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
 		synchronized (this) {
-			disableDataGrabbing();
+			disableDataCapturing();
 			sendCommand(Command.GET_DEVICE_INFO);
-			ResponseHeader response = readResponseHeader(800);
+			ResponseHeader response = readResponseHeader(DEFAULT_SERIAL_TIMEOUT);
 			validateResponseType(response, ResponseType.DEVICE_INFO);
 			byte[] readData = SerialUtil.readBytes(serial, response.getResponseLength(), 800);
 			byte[] serialVersion = new byte[16];
@@ -241,7 +227,7 @@ public class YDLidarDevice {
 	public HealthInfo getHealthInfo()
 			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
 		synchronized (this) {
-			disableDataGrabbing();
+			disableDataCapturing();
 			sendCommand(Command.GET_DEVICE_HEALTH);
 			ResponseHeader response = readResponseHeader(800);
 			validateResponseType(response, ResponseType.DEVICE_HEALTH);
@@ -265,7 +251,7 @@ public class YDLidarDevice {
 	public RangingFrequency getRangingFrequency()
 			throws IOException, IllegalStateException, InterruptedException, TimeoutException {
 		synchronized (this) {
-			disableDataGrabbing();
+			disableDataCapturing();
 			sendCommand(Command.GET_RANGING_FREQUENCY);
 			ResponseHeader response = readResponseHeader(800);
 			validateResponseType(response, ResponseType.DEVICE_INFO);
@@ -277,13 +263,45 @@ public class YDLidarDevice {
 	public void setRangingFrequency(RangingFrequency rangingFrequency)
 			throws IOException, IllegalStateException, InterruptedException, TimeoutException {
 		synchronized (this) {
-			disableDataGrabbing();
+			disableDataCapturing();
 			sendCommand(Command.SET_RANGING_FREQUENCY, new byte[] { rangingFrequency.getFrequencyCode() });
 			ResponseHeader response = readResponseHeader(800);
 			validateResponseType(response, ResponseType.DEVICE_INFO);
 			byte[] readData = SerialUtil.readBytes(serial, response.getResponseLength(), 800);
 			if (readData.length != 1 || readData[0] != rangingFrequency.getFrequencyCode()) {
 				throw new IOException("Unexpected response " + readData.length);
+			}
+		}
+	}
+
+	/**
+	 * Starts the data capturing. Remember to keep reading data
+	 * 
+	 * @param enable
+	 *            true to start capturing data.
+	 */
+	public void setScanning(boolean enable)
+			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
+		synchronized (this) {
+			if (enable) {
+				if (isScanning) {
+					return;
+				}
+				RangingFrequency rf = getRangingFrequency();
+				startMotor();
+				sendCommand(Command.SCAN);
+				ResponseHeader response = readResponseHeader(800);
+				validateResponseType(response, ResponseType.MEASUREMENT);
+				if (response.getResponseMode() != ResponseMode.CONTINUOUS) {
+					throw new IOException("Expected a continuous response type");
+				}
+				isScanning = true;
+				Thread t = new Thread(new DataRetriever(rf), "ydlidar data retriever");
+				t.setDaemon(true);
+				t.start();
+			} else {
+				isScanning = false;
+				disableDataCapturing();
 			}
 		}
 	}
@@ -299,7 +317,7 @@ public class YDLidarDevice {
 	public void setIdleMode(IdleMode mode)
 			throws IOException, IllegalStateException, InterruptedException, TimeoutException {
 		synchronized (this) {
-			disableDataGrabbing();
+			disableDataCapturing();
 			if (mode == IdleMode.LOW_POWER) {
 				sendCommand(Command.LOW_POWER_CONSUMPTION);
 			} else {
@@ -320,13 +338,19 @@ public class YDLidarDevice {
 	 * communication will be possible.
 	 */
 	public void shutdown() {
-		try {
-			stopMotor();
-			serial.close();
-		} catch (IllegalStateException | IOException | InterruptedException e) {
-			Logger.getLogger(YDLidarDevice.class.getName()).log(Level.WARNING, "Problem shutting down ydlidar serial",
-					e);
+		synchronized (this) {
+			try {
+				disableDataCapturing();
+				serial.close();
+			} catch (IllegalStateException | IOException | InterruptedException e) {
+				LOGGER.log(Level.WARNING, "Problem shutting down ydlidar serial", e);
+			}
 		}
+	}
+
+	public List<ScanResult2D> readData() {
+
+		return null;
 	}
 
 	@Override
@@ -338,7 +362,10 @@ public class YDLidarDevice {
 		sendCommand(command, null);
 	}
 
-	private void disableDataGrabbing() throws IllegalStateException, IOException, InterruptedException {
+	/**
+	 * Stops the capturing of data and shuts down the motor.
+	 */
+	private void disableDataCapturing() throws IllegalStateException, IOException, InterruptedException {
 		synchronized (this) {
 			sendCommand(Command.STOP);
 			stopMotor();
@@ -363,6 +390,16 @@ public class YDLidarDevice {
 			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
 		byte[] readBytes = SerialUtil.readBytes(serial, RESPONSE_HEADER_LENGTH, timeout);
 		return new ResponseHeader(readBytes);
+	}
+
+	private DataHeader readDataHeader(long timeout)
+			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
+		byte[] readBytes = SerialUtil.readBytes(serial, DATA_HEADER_LENGTH, timeout);
+		return new DataHeader(readBytes);
+	}
+
+	private byte[] readData(DataHeader header, int timeout) {
+		return SerialUtil.readBytes(serial, header.getDataLength(), timeout);
 	}
 
 	private void sendCommand(Command command, byte[] payload) throws IllegalStateException, IOException {
@@ -394,7 +431,7 @@ public class YDLidarDevice {
 		Set<SerialDeviceDescriptor> availableUSBSerialDevices = SerialUtil.getAvailableUSBSerialDevices();
 		for (SerialDeviceDescriptor descriptor : availableUSBSerialDevices) {
 			if (VENDOR_ID.equals(descriptor.getVendorId()) && PRODUCT_ID.equals(descriptor.getProductId())) {
-				Logger.getLogger(YDLidarDevice.class.getClass().getName()).info("Bound ydlidar to " + descriptor);
+				LOGGER.info("Bound ydlidar to " + descriptor);
 				return descriptor.getPath();
 			}
 		}
@@ -422,11 +459,20 @@ public class YDLidarDevice {
 	 */
 	public static void main(String[] args)
 			throws IOException, InterruptedException, IllegalStateException, TimeoutException {
-		YDLidarDevice device = new YDLidarDevice();
+		YDLidarDevice device = new YDLidarDevice(new ScanReceiver() {
+			@Override
+			public void onScan(ScanResult2D scanResult) {
+				System.out.println("Got scan result: " + scanResult);
+			}
+		});
 		System.out.println(device);
 		System.out.println(device.getDeviceInfo());
 		System.out.println(device.getHealthInfo());
 		System.out.println("Ranging Frequency = " + device.getRangingFrequency());
+		System.out.println("Starting to capture data...");
+		device.setScanning(true);
+		Thread.sleep(3000);
+		device.setScanning(false);
 		device.shutdown();
 		// Naughty that this has to be done... Perhaps fix Pi4J?
 		SerialFactory.shutdown();
