@@ -101,7 +101,7 @@ public class DataHeader {
 		return headerChecksum;
 	}
 
-	public float getAngleAt(int samplePointIndex, int distance) {
+	public float getAngleAt(int samplePointIndex, float distance) {
 		float correction = calcCorrection(distance);
 		float angleFSA = (fsa >> 1) / 64.0f + correction;
 		if (samplePointIndex == 0) {
@@ -115,7 +115,7 @@ public class DataHeader {
 		return (angleLSA - angleFSA) * (samplePointIndex) + angleFSA + correction;
 	}
 
-	private float calcCorrection(int distance) {
+	private float calcCorrection(float distance) {
 		if (distance <= 0) {
 			return 0;
 		}
@@ -150,7 +150,7 @@ public class DataHeader {
 		return (headerData[index] & 0xFF);
 	}
 
-	private static int getFromShort(byte[] headerData, int startIndex) {
+	static int getFromShort(byte[] headerData, int startIndex) {
 		// Funny byte ordering courtesy of the protocol
 		return (headerData[startIndex] & 0xFF) | ((headerData[startIndex + 1] & 0xFF) << 8);
 	}

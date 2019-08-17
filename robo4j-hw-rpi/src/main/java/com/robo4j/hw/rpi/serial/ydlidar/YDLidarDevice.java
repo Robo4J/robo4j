@@ -17,7 +17,6 @@
 package com.robo4j.hw.rpi.serial.ydlidar;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
@@ -30,7 +29,9 @@ import com.robo4j.hw.rpi.serial.SerialUtil;
 import com.robo4j.hw.rpi.serial.ydlidar.HealthInfo.HealthStatus;
 import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseMode;
 import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseType;
+import com.robo4j.math.geometry.Point2f;
 import com.robo4j.math.geometry.ScanResult2D;
+import com.robo4j.math.geometry.impl.ScanResultImpl;
 
 /**
  * Driver for the ydlidar device.
@@ -347,11 +348,6 @@ public class YDLidarDevice {
 		}
 	}
 
-	public List<ScanResult2D> readData() {
-
-		return null;
-	}
-
 	@Override
 	public String toString() {
 		return "ydlidar@" + serialPort;
@@ -448,8 +444,18 @@ public class YDLidarDevice {
 	}
 
 	private static ScanResult2D calculateResult(RangingFrequency frequency, DataHeader header, byte[] data) {
-		// TODO(Marcus/17 aug. 2019): To be implemented
-		return null;
+		// TODO(Marcus/17 aug. 2019): Fix so that angular resolution is
+		// calculated if not specified.
+		ScanResultImpl scanResult = new ScanResultImpl(1.0f, null);
+		for (int i = 0; i < data.length; i++) {
+			// Distance in mm according to protocol
+			float distance = DataHeader.getFromShort(data, i * 2) / 4.0f;
+			float angle = header.getAngleAt(i, distance);
+
+			Point2f p = Point2f.fromPolar(distance, (float) Math.toRadians(angle));
+			scanResult.addPoint(p);
+		}
+		return scanResult;
 	}
 
 	/**
