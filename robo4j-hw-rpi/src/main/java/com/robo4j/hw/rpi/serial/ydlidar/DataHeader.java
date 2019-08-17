@@ -16,17 +16,20 @@
  */
 package com.robo4j.hw.rpi.serial.ydlidar;
 
-import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseType;
-
 /**
  * Header for data.
  */
 public class DataHeader {
-	private static final byte ANSWER_SYNC_BYTE1 = (byte) 0x55;
-	private static final byte ANSWER_SYNC_BYTE2 = (byte) 0xAA;
+	private static final byte ANSWER_SYNC_BYTE1 = (byte) 0xAA;
+	private static final byte ANSWER_SYNC_BYTE2 = (byte) 0x55;
 	private final boolean isValid;
 	private final PacketType packetType;
-	private final int dataLength;
+	private final int lsn;
+	private final int fsa;
+	private final int lsa;
+	private final int checksum;
+	// For the fields in the header only, not including
+	private final int headerChecksum;
 
 	public enum PacketType {
 		POINT_CLOUD(0x0), ZERO(0x1), UNKNOWN(-1);
@@ -53,11 +56,84 @@ public class DataHeader {
 		}
 		this.isValid = isValid(headerData);
 		this.packetType = PacketType.getPacketType(headerData[2]);
-		this.dataLength = calculateDataLength(headerData);
+		this.lsn = getByte(headerData, 3);
+		this.fsa = getFromShort(headerData, 4);
+		this.lsa = getFromShort(headerData, 6);
+		this.checksum = getFromShort(headerData, 8);
+		this.headerChecksum = calculateHeaderChecksum(headerData);
 	}
 
 	public boolean isValid() {
 		return isValid;
+	}
+
+	public PacketType getPacketType() {
+		return packetType;
+	}
+
+	/**
+	 * @return the length of the data part in bytes.
+	 */
+	public int getDataLength() {
+		return lsn * 2;
+	}
+
+	/**
+	 * @return the sample count
+	 */
+	public int getSampleCount() {
+		return lsn;
+	}
+
+	/**
+	 * @return the expected checksum for the header plus data (not including
+	 *         checksum field)
+	 */
+	public int getExpectedChecksum() {
+		return checksum;
+	}
+
+	/**
+	 * @return the precalculated part of the checksum for the header (not
+	 *         including checksum field)
+	 */
+	public int getHeaderChecksum() {
+		return headerChecksum;
+	}
+
+	public float getAngleAt(int samplePointIndex, int distance) {
+		float correction = calcCorrection(distance);
+		float angleFSA = (fsa >> 1) / 64.0f + correction;
+		if (samplePointIndex == 0) {
+			return angleFSA;
+		}
+		float angleLSA = (lsa >> 1) / 64.0f + correction;
+		if (samplePointIndex == lsn - 1) {
+			return angleLSA;
+		}
+
+		return (angleLSA - angleFSA) * (samplePointIndex) + angleFSA + correction;
+	}
+
+	private float calcCorrection(int distance) {
+		if (distance <= 0) {
+			return 0;
+		}
+		return (float) Math.toDegrees(Math.atan(21.8 * (155.3 - distance) / (155.3 * distance)));
+	}
+
+	/**
+	 * FSA, as defined in the protocol.
+	 */
+	int getFSA() {
+		return fsa;
+	}
+
+	/**
+	 * LSA, as defined in the protocol.
+	 */
+	int getLSA() {
+		return lsa;
 	}
 
 	private static boolean isValid(byte[] headerData) {
@@ -70,13 +146,20 @@ public class DataHeader {
 		return true;
 	}
 
-	public int getDataLength() {
-		return dataLength;
+	private static int getByte(byte[] headerData, int index) {
+		return (headerData[index] & 0xFF);
 	}
 
-	private static int calculateDataLength(byte[] headerData) {
-		// Widened to int by & to get sign right (provided as unsigned byte)
-		return (headerData[3] & 0xFF) * 2;
+	private static int getFromShort(byte[] headerData, int startIndex) {
+		// Funny byte ordering courtesy of the protocol
+		return (headerData[startIndex] & 0xFF) | ((headerData[startIndex + 1] & 0xFF) << 8);
 	}
 
+	private int calculateHeaderChecksum(byte[] headerData) {
+		int checksum = 0;
+		for (int i = 0; i < 4; i++) {
+			checksum ^= (headerData[i] & 0xFF) << 8 | (headerData[i + 1] & 0xFF);
+		}
+		return checksum;
+	}
 }

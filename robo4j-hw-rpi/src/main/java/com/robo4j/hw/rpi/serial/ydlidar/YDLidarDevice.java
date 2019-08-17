@@ -133,6 +133,8 @@ public class YDLidarDevice {
 
 		@Override
 		public void run() {
+			// TODO(Marcus/17 aug. 2019): Remove sysouts...
+			System.out.println("Scanning at frequency" + frequency);
 			while (isScanning) {
 				try {
 					DataHeader header = readDataHeader(DEFAULT_SERIAL_TIMEOUT);
@@ -142,6 +144,8 @@ public class YDLidarDevice {
 						break;
 					}
 					byte[] data = readData(header, DEFAULT_SERIAL_TIMEOUT);
+					System.out.println("Data received: " + data);
+					receiver.onScan(calculateResult(frequency, header, data));
 				} catch (IllegalStateException | IOException | InterruptedException | TimeoutException e) {
 					LOGGER.log(Level.SEVERE, "Failed to read data from the ydlidar - stopping scanner", e);
 					stopScanning();
@@ -200,8 +204,7 @@ public class YDLidarDevice {
 	 * @throws InterruptedException
 	 * @throws TimeoutException
 	 */
-	public DeviceInfo getDeviceInfo()
-			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
+	public DeviceInfo getDeviceInfo() throws IllegalStateException, IOException, InterruptedException, TimeoutException {
 		synchronized (this) {
 			disableDataCapturing();
 			sendCommand(Command.GET_DEVICE_INFO);
@@ -224,8 +227,7 @@ public class YDLidarDevice {
 	 * @throws InterruptedException
 	 * @throws TimeoutException
 	 */
-	public HealthInfo getHealthInfo()
-			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
+	public HealthInfo getHealthInfo() throws IllegalStateException, IOException, InterruptedException, TimeoutException {
 		synchronized (this) {
 			disableDataCapturing();
 			sendCommand(Command.GET_DEVICE_HEALTH);
@@ -248,8 +250,7 @@ public class YDLidarDevice {
 	 * @throws TimeoutException
 	 *             if the {@link RangingFrequency} could not be read in time.
 	 */
-	public RangingFrequency getRangingFrequency()
-			throws IOException, IllegalStateException, InterruptedException, TimeoutException {
+	public RangingFrequency getRangingFrequency() throws IOException, IllegalStateException, InterruptedException, TimeoutException {
 		synchronized (this) {
 			disableDataCapturing();
 			sendCommand(Command.GET_RANGING_FREQUENCY);
@@ -280,8 +281,7 @@ public class YDLidarDevice {
 	 * @param enable
 	 *            true to start capturing data.
 	 */
-	public void setScanning(boolean enable)
-			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
+	public void setScanning(boolean enable) throws IllegalStateException, IOException, InterruptedException, TimeoutException {
 		synchronized (this) {
 			if (enable) {
 				if (isScanning) {
@@ -314,8 +314,7 @@ public class YDLidarDevice {
 	 * @throws IllegalStateException
 	 * @throws TimeoutException
 	 */
-	public void setIdleMode(IdleMode mode)
-			throws IOException, IllegalStateException, InterruptedException, TimeoutException {
+	public void setIdleMode(IdleMode mode) throws IOException, IllegalStateException, InterruptedException, TimeoutException {
 		synchronized (this) {
 			disableDataCapturing();
 			if (mode == IdleMode.LOW_POWER) {
@@ -392,13 +391,13 @@ public class YDLidarDevice {
 		return new ResponseHeader(readBytes);
 	}
 
-	private DataHeader readDataHeader(long timeout)
-			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
+	private DataHeader readDataHeader(long timeout) throws IllegalStateException, IOException, InterruptedException, TimeoutException {
 		byte[] readBytes = SerialUtil.readBytes(serial, DATA_HEADER_LENGTH, timeout);
 		return new DataHeader(readBytes);
 	}
 
-	private byte[] readData(DataHeader header, int timeout) {
+	private byte[] readData(DataHeader header, int timeout)
+			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
 		return SerialUtil.readBytes(serial, header.getDataLength(), timeout);
 	}
 
@@ -443,10 +442,14 @@ public class YDLidarDevice {
 			throw new IOException("Got bad response!");
 		}
 		if (header.getResponseType() != expected) {
-			throw new IOException("Got the wrong response type. Should have been " + expected + ". Got "
-					+ header.getResponseType() + ".");
+			throw new IOException("Got the wrong response type. Should have been " + expected + ". Got " + header.getResponseType() + ".");
 		}
 
+	}
+
+	private static ScanResult2D calculateResult(RangingFrequency frequency, DataHeader header, byte[] data) {
+		// TODO(Marcus/17 aug. 2019): To be implemented
+		return null;
 	}
 
 	/**
@@ -457,8 +460,7 @@ public class YDLidarDevice {
 	 * @throws TimeoutException
 	 * @throws IllegalStateException
 	 */
-	public static void main(String[] args)
-			throws IOException, InterruptedException, IllegalStateException, TimeoutException {
+	public static void main(String[] args) throws IOException, InterruptedException, IllegalStateException, TimeoutException {
 		YDLidarDevice device = new YDLidarDevice(new ScanReceiver() {
 			@Override
 			public void onScan(ScanResult2D scanResult) {

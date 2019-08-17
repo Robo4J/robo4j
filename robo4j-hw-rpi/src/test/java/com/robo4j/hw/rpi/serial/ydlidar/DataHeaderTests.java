@@ -16,16 +16,79 @@
  */
 package com.robo4j.hw.rpi.serial.ydlidar;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import com.robo4j.hw.rpi.serial.ydlidar.DataHeader.PacketType;
+
 public class DataHeaderTests {
 	@Test
+	void testInvalidLengthHeader() {
+		byte[] data = new byte[] { (byte) 0xA1, (byte) 0xA2, (byte) 0xA3, (byte) 0xA4, (byte) 0xA5, (byte) 0x99, (byte) 0x99 };
+		try {
+			new DataHeader(data);
+			assertTrue(false, "Should have thrown exception!");
+		} catch (IllegalArgumentException e) {
+
+		}
+	}
+
+	@Test
 	void testInvalidHeader() {
-		byte[] data = new byte[] { (byte) 0xA1, (byte) 0xA2, (byte) 0xA3, (byte) 0xA4, (byte) 0xA5, (byte) 0x99,
-				(byte) 0x99 };
+		byte[] data = new byte[] { (byte) 0xA1, (byte) 0xA2, (byte) 0xA3, (byte) 0xA4, (byte) 0xA5, (byte) 0x99, (byte) 0x99, (byte) 0x99,
+				(byte) 0x99, (byte) 0x99 };
 		DataHeader header = new DataHeader(data);
-		assertFalse(header.isValid(), "This valid should be invalid!");
+		assertTrue(!header.isValid(), "Should have been invalid header!");
+	}
+
+	@Test
+	void testValidPacketHeader() {
+		byte[] data = new byte[] { (byte) 0xAA, (byte) 0x55, (byte) 0xA3, (byte) 0xA4, (byte) 0xA5, (byte) 0x99, (byte) 0x99, (byte) 0x99,
+				(byte) 0x99, (byte) 0x99 };
+		DataHeader header = new DataHeader(data);
+		assertTrue(header.isValid(), "Should have been valid packet header!");
+	}
+
+	@Test
+	void testCloudType() {
+		byte[] data = new byte[] { (byte) 0xAA, (byte) 0x55, (byte) 0x00, (byte) 0xA4, (byte) 0xA5, (byte) 0x99, (byte) 0x99, (byte) 0x99,
+				(byte) 0x99, (byte) 0x99 };
+		DataHeader header = new DataHeader(data);
+		assertSame(header.getPacketType(), PacketType.POINT_CLOUD, "Should have been point cloud!");
+	}
+
+	@Test
+	void testLength() {
+		byte[] data = new byte[] { (byte) 0xAA, (byte) 0x55, (byte) 0x00, (byte) 0x08, (byte) 0xE5, (byte) 0x6F, (byte) 0xBD, (byte) 0x79,
+				(byte) 0x12, (byte) 0x34 };
+		DataHeader header = new DataHeader(data);
+		assertEquals(header.getDataLength(), 0x10, "Got wrong length");
+	}
+
+	@Test
+	void testAngle() {
+		byte[] data = new byte[] { (byte) 0xAA, (byte) 0x55, (byte) 0x00, (byte) 0x28, (byte) 0xE5, (byte) 0x6F, (byte) 0xBD, (byte) 0x79,
+				(byte) 0x12, (byte) 0x34 };
+		DataHeader header = new DataHeader(data);
+		assertEquals(0x50, header.getDataLength(), "Got wrong length");
+		assertEquals(0x6FE5, header.getFSA(), "Wrong start angle factor");
+		assertEquals(0x79BD, header.getLSA(), "Wrong end angle factor");
+
+		// These values are from the examples - I since Java is doing many of
+		// the calculations in double precision it's fine to not get exactly the
+		// same results.
+		assertEquals(217.0178, header.getAngleAt(0, 1000), 0.01);
+		assertEquals(235.6326, header.getAngleAt(header.getSampleCount() - 1, 8000), 0.01);
+	}
+
+	@Test
+	void testChecksum() {
+		byte[] data = new byte[] { (byte) 0xAA, (byte) 0x55, (byte) 0x00, (byte) 0x28, (byte) 0xE5, (byte) 0x6F, (byte) 0xBD, (byte) 0x79,
+				(byte) 0x12, (byte) 0x34 };
+		DataHeader header = new DataHeader(data);
+		assertEquals(0x3412, header.getExpectedChecksum());
 	}
 }
