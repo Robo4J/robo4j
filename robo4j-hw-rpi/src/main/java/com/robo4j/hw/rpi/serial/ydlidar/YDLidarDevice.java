@@ -136,7 +136,7 @@ public class YDLidarDevice {
 				ScanResultImpl scanResult = new ScanResultImpl(1.0f);
 				while (true) {
 					try {
-						DataHeader header = readDataHeader(DEFAULT_SERIAL_TIMEOUT);
+						DataHeader header = readDataHeader(DEFAULT_SERIAL_TIMEOUT * 4);
 						if (!header.isValid()) {
 							LOGGER.log(Level.SEVERE, "Got invalid header - stopping scanner");
 							stopScanning();
