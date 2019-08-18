@@ -148,8 +148,7 @@ public class YDLidarDevice {
 						if (header.getPacketType() == PacketType.ZERO) {
 							break;
 						}
-						scanResult.addAll(calculateResult(header, data));
-						System.out.println("Data received: " + data);
+						scanResult.addAll(calculatePoints(header, data));
 					} catch (IllegalStateException | IOException | InterruptedException | TimeoutException e) {
 						LOGGER.log(Level.SEVERE, "Failed to read data from the ydlidar - stopping scanner", e);
 						stopScanning();
@@ -470,17 +469,17 @@ public class YDLidarDevice {
 
 	}
 
-	private static List<Point2f> calculateResult(DataHeader header, byte[] data) {
-		List<Point2f> scanResult = new ArrayList<>(data.length / 2);
+	private static List<Point2f> calculatePoints(DataHeader header, byte[] data) {
+		List<Point2f> points = new ArrayList<>(data.length / 2);
 		for (int i = 0; i < data.length / 2; i++) {
 			// Distance in mm according to protocol
 			float distance = DataHeader.getFromShort(data, i * 2) / 4.0f;
 			float angle = header.getAngleAt(i, distance);
 
-			Point2f p = Point2f.fromPolar(distance, (float) Math.toRadians(angle));
-			scanResult.add(p);
+			Point2f p = Point2f.fromPolar(distance / 1000.0f, (float) Math.toRadians(angle));
+			points.add(p);
 		}
-		return scanResult;
+		return points;
 	}
 
 	/**
