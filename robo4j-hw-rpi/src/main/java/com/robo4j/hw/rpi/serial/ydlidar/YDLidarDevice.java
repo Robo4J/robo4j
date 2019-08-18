@@ -19,6 +19,8 @@ package com.robo4j.hw.rpi.serial.ydlidar;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
@@ -78,6 +80,10 @@ public class YDLidarDevice {
 	 */
 	private static final String PRODUCT_ID = "ea60";
 
+	// This should be calculated later - right now assuming defaults (9kHz
+	// sample frequency, 7Hz rotation rate).
+	private static final float ANGULAR_RESOLUTION = (float) Math.toRadians(360.0 / (9000.0 / 7.0));
+
 	private static final int CMDFLAG_HAS_PAYLOAD = 0x80;
 	private static final byte CMD_SYNC_BYTE = (byte) 0xA5;
 	private static final int BAUD_RATE = 230400;
@@ -132,8 +138,8 @@ public class YDLidarDevice {
 		public void run() {
 			while (isScanning) {
 				// TODO(Marcus/18 aug. 2019): Calculate the angular resolution
-				// properly
-				ScanResultImpl scanResult = new ScanResultImpl(1.0f);
+				// properly.
+				ScanResultImpl scanResult = new ScanResultImpl(ANGULAR_RESOLUTION);
 				while (true) {
 					try {
 						DataHeader header = readDataHeader(DEFAULT_SERIAL_TIMEOUT * 4);
@@ -503,7 +509,15 @@ public class YDLidarDevice {
 				System.out.println("Got scan result: " + scanResult);
 				if (counter++ % 20 == 0) {
 					System.out.println("--- Points ---");
-					System.out.println(scanResult.getPoints());
+
+					List<Point2f> points = scanResult.getPoints();
+					Collections.sort(points, new Comparator<Point2f>() {
+						@Override
+						public int compare(Point2f p1, Point2f p2) {
+							return Float.compare(p2.getAngle(), p1.getAngle());
+						}
+					});
+					System.out.println(points);
 					System.out.println("--------------");
 					System.out.println("");
 				}
