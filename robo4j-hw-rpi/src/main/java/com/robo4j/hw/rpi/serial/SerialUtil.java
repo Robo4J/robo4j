@@ -70,6 +70,8 @@ public class SerialUtil {
 	 *            the byte buffer to read into.
 	 * @param serial
 	 *            the (opened) serial port to read from.
+	 * @param bytes
+	 *            the number of bytes to read.
 	 * @param timeout
 	 *            the timeout after which to fail.
 	 * @throws IOException
@@ -81,7 +83,7 @@ public class SerialUtil {
 		int available = serial.available();
 
 		if (available >= bytes) {
-			serial.read(buffer);
+			serial.read(bytes, buffer);
 			return;
 		}
 
