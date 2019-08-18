@@ -73,8 +73,7 @@ public class ResponseHeaderTests {
 				(byte) -127 };
 		ResponseHeader header = new ResponseHeader(data);
 		assertTrue(header.isValid(), "This header should be valid!");
-		assertSame(header.getResponseType(), ResponseType.DEVICE_HEALTH);
-		assertSame(header.getResponseMode(), ResponseMode.SINGLE);
-		assertEquals(header.getResponseLength(), 0x03);
+		assertSame(header.getResponseType(), ResponseType.MEASUREMENT);
+		assertSame(header.getResponseMode(), ResponseMode.CONTINUOUS);
 	}
 }
