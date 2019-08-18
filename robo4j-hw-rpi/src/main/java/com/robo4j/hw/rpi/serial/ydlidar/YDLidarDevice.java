@@ -501,11 +501,12 @@ public class YDLidarDevice {
 		System.out.println(device.getDeviceInfo());
 		System.out.println(device.getHealthInfo());
 		System.out.println("Ranging Frequency = " + device.getRangingFrequency());
-		System.out.println("Starting to capture data...");
+		System.out.println("Will capture data for 10 seconds...");
 		device.setScanning(true);
-		Thread.sleep(3000);
+		Thread.sleep(10000);
 		device.setScanning(false);
 		device.shutdown();
+		System.out.println("Done!");
 		// Naughty that this has to be done... Perhaps fix Pi4J?
 		SerialFactory.shutdown();
 	}
