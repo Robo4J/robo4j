@@ -48,7 +48,13 @@ public enum Command {
 	 */
 	SCAN(0x60),
 	FORCE_SCAN(0x61),
+	/**
+	 * Stops scanning.
+	 */
 	STOP(0x65),
+	/**
+	 * Resets the device.
+	 */
 	RESET(0x80),
 	GET_EAI(0x55),
 	GET_DEVICE_INFO(0x90),

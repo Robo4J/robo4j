@@ -196,6 +196,15 @@ public class YDLidarDevice {
 	}
 
 	/**
+	 * Attempts to do a soft restart of the device.
+	 * @throws IOException 
+	 * @throws IllegalStateException 
+	 */
+	public void restart() throws IllegalStateException, IOException {
+		sendCommand(Command.RESTART);
+	}
+
+	/**
 	 * Returns information about the ydlidar, such as the version.
 	 * 
 	 * @return information about the ydlidar, such as the version.
