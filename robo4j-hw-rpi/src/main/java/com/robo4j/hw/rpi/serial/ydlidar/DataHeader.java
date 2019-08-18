@@ -55,7 +55,7 @@ public class DataHeader {
 			throw new IllegalArgumentException("The length of the data header must be 10 bytes long!");
 		}
 		this.isValid = isValid(headerData);
-		this.packetType = PacketType.getPacketType(headerData[2]);
+		this.packetType = PacketType.getPacketType(getByte(headerData, 2));
 		this.lsn = getByte(headerData, 3);
 		this.fsa = getFromShort(headerData, 4);
 		this.lsa = getFromShort(headerData, 6);
