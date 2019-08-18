@@ -119,8 +119,13 @@ public class DataHeader {
 		if (samplePointIndex == lsn - 1) {
 			return getUncorrectedEndAngle() + correction;
 		}
-		return ((getUncorrectedStartAngle() - getUncorrectedEndAngle()) / (lsn - 1)) * (samplePointIndex) + getUncorrectedStartAngle()
-				+ correction;
+		float diff;
+		if (getUncorrectedStartAngle() > 270 && getUncorrectedEndAngle() < 90) {
+			diff = 360 * getUncorrectedEndAngle() - getUncorrectedStartAngle();
+		} else {
+			diff = getUncorrectedStartAngle() - getUncorrectedEndAngle();
+		}
+		return (diff / (lsn - 1)) * (samplePointIndex) + getUncorrectedStartAngle() + correction;
 	}
 
 	private float calcCorrection(float distance) {

@@ -133,28 +133,39 @@ public class YDLidarDevice {
 		}
 	}
 
+	private enum RetrieverState {
+		NORMAL, ENDING, ENDED
+	}
+
 	public class DataRetriever implements Runnable {
+		private final List<Point2f> survivors = new ArrayList<>();
+		private RetrieverState state = RetrieverState.NORMAL;
+
 		@Override
 		public void run() {
 			while (isScanning) {
 				// TODO(Marcus/18 aug. 2019): Calculate the angular resolution
 				// properly.
 				ScanResultImpl scanResult = new ScanResultImpl(ANGULAR_RESOLUTION);
+				if (!survivors.isEmpty()) {
+					scanResult.addAll(survivors);
+					survivors.clear();
+				}
 				while (true) {
 					try {
 						DataHeader header = readDataHeader(DEFAULT_SERIAL_TIMEOUT * 4);
 						if (!header.isValid()) {
 							LOGGER.log(Level.SEVERE, "Got invalid header - stopping scanner");
 							stopScanning();
-							break;
+							return;
 						}
 						byte[] data = readData(header, DEFAULT_SERIAL_TIMEOUT);
 
-						// Got a zero packet - done - send off the result
-						if (header.getPacketType() == PacketType.ZERO) {
+						scanResult.addAll(calculatePoints(header, data));
+						if (state == RetrieverState.ENDED) {
+							state = RetrieverState.NORMAL;
 							break;
 						}
-						scanResult.addAll(calculatePoints(header, data));
 					} catch (IllegalStateException | IOException | InterruptedException | TimeoutException e) {
 						LOGGER.log(Level.SEVERE, "Failed to read data from the ydlidar - stopping scanner", e);
 						stopScanning();
@@ -165,6 +176,42 @@ public class YDLidarDevice {
 					receiver.onScan(scanResult);
 				}
 			}
+		}
+
+		private List<Point2f> calculatePoints(DataHeader header, byte[] data) {
+			if (header.getPacketType() == PacketType.ZERO) {
+				return Collections.emptyList();
+			}
+			List<Point2f> points = new ArrayList<>(data.length / 2);
+			for (int i = 0; i < data.length / 2; i++) {
+				// Distance in mm according to protocol
+				float distance = DataHeader.getFromShort(data, i * 2) / 4.0f;
+				float angle = header.getAngleAt(i, distance);
+				if (angle >= 360.0) {
+					angle -= 360.0;
+				}
+
+				// Transpose to -180, 180
+				float relabeledAngle = angle > 180 ? angle - 360 : angle;
+
+				Point2f point = Point2f.fromPolar(distance / 1000.0f, (float) Math.toRadians(relabeledAngle));
+
+				// If we've found an angle over 130 AND a negative one, we've
+				// likely crossed the boundary and it's time to send it all off.
+				if (state == RetrieverState.NORMAL && relabeledAngle > 130) {
+					state = RetrieverState.ENDING;
+				}
+
+				if (state == RetrieverState.ENDING || state == RetrieverState.ENDED) {
+					if (relabeledAngle < 0) {
+						survivors.add(point);
+						state = RetrieverState.ENDED;
+					}
+					continue;
+				}
+				points.add(point);
+			}
+			return points;
 		}
 
 		public void stopScanning() {
@@ -178,7 +225,11 @@ public class YDLidarDevice {
 
 	/**
 	 * Default constructor. Will attempt to auto detect the USB to UART bridge
-	 * controller included with the YDLidar device.
+	 * controller included with the YDLidar device. Will default to sending
+	 * scans for 360 degrees from -180 to 180.
+	 * 
+	 * @param receiver
+	 *            call back for the receiver of the scans.
 	 * 
 	 * @throws InterruptedException
 	 * @throws IOException
@@ -188,10 +239,14 @@ public class YDLidarDevice {
 	}
 
 	/**
+	 * Constructor.
 	 * 
 	 * @param serialPort
 	 *            the serial port to use, or SERIAL_PORT_AUTO if an attempt to
 	 *            auto resolve should be made.
+	 * 
+	 * @param receiver
+	 *            call back for the receiver of the scans.
 	 * 
 	 * @throws InterruptedException
 	 * @throws IOException
@@ -222,10 +277,12 @@ public class YDLidarDevice {
 	 * 
 	 * @return information about the ydlidar, such as the version.
 	 * 
-	 * @throws IllegalStateException
 	 * @throws IOException
+	 *             on communication error.
 	 * @throws InterruptedException
+	 *             if the thread was interrupted.
 	 * @throws TimeoutException
+	 *             if the {@link RangingFrequency} could not be read in time.
 	 */
 	public DeviceInfo getDeviceInfo() throws IllegalStateException, IOException, InterruptedException, TimeoutException {
 		synchronized (this) {
@@ -245,10 +302,12 @@ public class YDLidarDevice {
 	 * 
 	 * @return health information about the ydlidar.
 	 * 
-	 * @throws IllegalStateException
 	 * @throws IOException
+	 *             on communication error.
 	 * @throws InterruptedException
+	 *             if the thread was interrupted.
 	 * @throws TimeoutException
+	 *             if the {@link RangingFrequency} could not be read in time.
 	 */
 	public HealthInfo getHealthInfo() throws IllegalStateException, IOException, InterruptedException, TimeoutException {
 		synchronized (this) {
@@ -268,12 +327,12 @@ public class YDLidarDevice {
 	 * 
 	 * @throws IOException
 	 *             on communication error.
-	 * @throws IllegalStateException
 	 * @throws InterruptedException
+	 *             if the thread was interrupted.
 	 * @throws TimeoutException
 	 *             if the {@link RangingFrequency} could not be read in time.
 	 */
-	public RangingFrequency getRangingFrequency() throws IOException, IllegalStateException, InterruptedException, TimeoutException {
+	public RangingFrequency getRangingFrequency() throws IOException, InterruptedException, TimeoutException {
 		synchronized (this) {
 			disableDataCapturing();
 			sendCommand(Command.GET_RANGING_FREQUENCY);
@@ -284,6 +343,19 @@ public class YDLidarDevice {
 		}
 	}
 
+	/**
+	 * Sets the ranging frequency.
+	 * 
+	 * @param rangingFrequency
+	 *            the ranging frequency to set.
+	 * 
+	 * @throws IOException
+	 *             on communication error.
+	 * @throws InterruptedException
+	 *             if the thread was interrupted.
+	 * @throws TimeoutException
+	 *             if the {@link RangingFrequency} could not be read in time.
+	 */
 	public void setRangingFrequency(RangingFrequency rangingFrequency)
 			throws IOException, IllegalStateException, InterruptedException, TimeoutException {
 		synchronized (this) {
@@ -304,7 +376,7 @@ public class YDLidarDevice {
 	 * @param enable
 	 *            true to start capturing data.
 	 */
-	public void setScanning(boolean enable) throws IllegalStateException, IOException, InterruptedException, TimeoutException {
+	public void setScanning(boolean enable) throws IOException, InterruptedException, TimeoutException {
 		synchronized (this) {
 			if (enable) {
 				if (isScanning) {
@@ -332,11 +404,13 @@ public class YDLidarDevice {
 	 * Sets the low power mode.
 	 * 
 	 * @throws IOException
+	 *             on communication error.
 	 * @throws InterruptedException
-	 * @throws IllegalStateException
+	 *             if the thread was interrupted.
 	 * @throws TimeoutException
+	 *             if the {@link RangingFrequency} could not be read in time.
 	 */
-	public void setIdleMode(IdleMode mode) throws IOException, IllegalStateException, InterruptedException, TimeoutException {
+	public void setIdleMode(IdleMode mode) throws IOException, InterruptedException, TimeoutException {
 		synchronized (this) {
 			disableDataCapturing();
 			if (mode == IdleMode.LOW_POWER) {
@@ -374,14 +448,21 @@ public class YDLidarDevice {
 		return "ydlidar@" + serialPort;
 	}
 
-	private void sendCommand(Command command) throws IllegalStateException, IOException {
+	private void sendCommand(Command command) throws IOException {
 		sendCommand(command, null);
 	}
 
 	/**
 	 * Stops the capturing of data and shuts down the motor.
+	 * 
+	 * @throws IOException
+	 *             on communication error.
+	 * 
+	 * @throws InterruptedException
+	 *             if the thread was interrupted.
+	 * 
 	 */
-	private void disableDataCapturing() throws IllegalStateException, IOException, InterruptedException {
+	private void disableDataCapturing() throws IOException, InterruptedException {
 		synchronized (this) {
 			sendCommand(Command.STOP);
 			stopMotor();
@@ -475,32 +556,17 @@ public class YDLidarDevice {
 
 	}
 
-	private static List<Point2f> calculatePoints(DataHeader header, byte[] data) {
-		List<Point2f> points = new ArrayList<>(data.length / 2);
-		for (int i = 0; i < data.length / 2; i++) {
-			// Distance in mm according to protocol
-			float distance = DataHeader.getFromShort(data, i * 2) / 4.0f;
-			float angle = header.getAngleAt(i, distance);
-			// Could have done % 360, but this seems to be the only case and is
-			// faster
-			if (angle >= 360.0) {
-				angle -= 360.0;
-			}
-			Point2f p = Point2f.fromPolar(distance / 1000.0f, (float) Math.toRadians(angle));
-			points.add(p);
-		}
-		return points;
-	}
-
 	/**
 	 * Just trying something out...
 	 * 
-	 * @throws InterruptedException
 	 * @throws IOException
+	 *             on communication error.
+	 * @throws InterruptedException
+	 *             if the thread was interrupted.
 	 * @throws TimeoutException
-	 * @throws IllegalStateException
+	 *             if the {@link RangingFrequency} could not be read in time.
 	 */
-	public static void main(String[] args) throws IOException, InterruptedException, IllegalStateException, TimeoutException {
+	public static void main(String[] args) throws IOException, InterruptedException, TimeoutException {
 		YDLidarDevice device = new YDLidarDevice(new ScanReceiver() {
 			int counter;
 
