@@ -77,8 +77,8 @@ public class DataHeaderTests {
 		assertEquals(0x6FE5, header.getFSA(), "Wrong start angle factor");
 		assertEquals(0x79BD, header.getLSA(), "Wrong end angle factor");
 
-		// These values are from the examples - I since Java is doing many of
-		// the calculations in double precision it's fine to not get exactly the
+		// These values are from the examples - since Java is doing many of the
+		// calculations in double precision it's fine to not get exactly the
 		// same results.
 		assertEquals(217.0178, header.getAngleAt(0, 1000), 0.01);
 		assertEquals(235.6326, header.getAngleAt(header.getSampleCount() - 1, 8000), 0.01);

@@ -474,8 +474,7 @@ public class YDLidarDevice {
 		for (int i = 0; i < data.length / 2; i++) {
 			// Distance in mm according to protocol
 			float distance = DataHeader.getFromShort(data, i * 2) / 4.0f;
-			float angle = header.getAngleAt(i, distance);
-
+			float angle = header.getAngleAt(i, distance) % 360;
 			Point2f p = Point2f.fromPolar(distance / 1000.0f, (float) Math.toRadians(angle));
 			points.add(p);
 		}

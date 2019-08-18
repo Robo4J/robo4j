@@ -95,13 +95,22 @@ public class DataHeader {
 	}
 
 	/**
-	 * @return the precalculated part of the checksum for the header (not
+	 * @return the pre-calculated part of the checksum for the header (not
 	 *         including checksum field)
 	 */
 	public int getHeaderChecksum() {
 		return headerChecksum;
 	}
 
+	/**
+	 * Returns the angle at the point.
+	 * 
+	 * @param samplePointIndex
+	 *            the sample point index for which to calculate the angle.
+	 * @param distance
+	 *            the distance, in mm.
+	 * @return the angle, in degrees.
+	 */
 	public float getAngleAt(int samplePointIndex, float distance) {
 		float correction = calcCorrection(distance);
 		float angleFSA = (fsa >> 1) / 64.0f + correction;
@@ -112,7 +121,6 @@ public class DataHeader {
 		if (samplePointIndex == lsn - 1) {
 			return angleLSA;
 		}
-
 		return (angleLSA - angleFSA) * (samplePointIndex) + angleFSA + correction;
 	}
 
