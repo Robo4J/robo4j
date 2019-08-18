@@ -482,7 +482,7 @@ public class YDLidarDevice {
 
 	private static List<Point2f> calculateResult(RangingFrequency frequency, DataHeader header, byte[] data) {
 		List<Point2f> scanResult = new ArrayList<>(data.length / 2);
-		for (int i = 0; i < data.length; i++) {
+		for (int i = 0; i < data.length / 2; i++) {
 			// Distance in mm according to protocol
 			float distance = DataHeader.getFromShort(data, i * 2) / 4.0f;
 			float angle = header.getAngleAt(i, distance);
