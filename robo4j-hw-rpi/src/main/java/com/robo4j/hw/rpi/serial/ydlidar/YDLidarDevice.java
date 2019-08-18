@@ -18,6 +18,8 @@ package com.robo4j.hw.rpi.serial.ydlidar;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
@@ -27,6 +29,7 @@ import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialFactory;
 import com.robo4j.hw.rpi.serial.SerialDeviceDescriptor;
 import com.robo4j.hw.rpi.serial.SerialUtil;
+import com.robo4j.hw.rpi.serial.ydlidar.DataHeader.PacketType;
 import com.robo4j.hw.rpi.serial.ydlidar.HealthInfo.HealthStatus;
 import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseMode;
 import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseType;
@@ -136,20 +139,34 @@ public class YDLidarDevice {
 			// TODO(Marcus/17 aug. 2019): Remove sysouts...
 			System.out.println("Scanning at frequency" + frequency);
 			while (isScanning) {
-				try {
-					DataHeader header = readDataHeader(DEFAULT_SERIAL_TIMEOUT);
-					if (!header.isValid()) {
-						LOGGER.log(Level.SEVERE, "Got invalid header - stopping scanner");
+				ScanResultImpl scanResult = new ScanResultImpl(1.0f, null);
+				while (true) {
+					try {
+						DataHeader header = readDataHeader(DEFAULT_SERIAL_TIMEOUT);
+						if (!header.isValid()) {
+							LOGGER.log(Level.SEVERE, "Got invalid header - stopping scanner");
+							stopScanning();
+							break;
+						}
+						if (header.getPacketType() == PacketType.ZERO) {
+							continue;
+						}
+						byte[] data = readData(header, DEFAULT_SERIAL_TIMEOUT);
+
+						// Got a zero packet - done - send off the result
+						if (header.getPacketType() == PacketType.ZERO) {
+							break;
+						}
+						scanResult.addAll(calculateResult(frequency, header, data));
+						System.out.println("Data received: " + data);
+					} catch (IllegalStateException | IOException | InterruptedException | TimeoutException e) {
+						LOGGER.log(Level.SEVERE, "Failed to read data from the ydlidar - stopping scanner", e);
 						stopScanning();
-						break;
+						return;
 					}
-					byte[] data = readData(header, DEFAULT_SERIAL_TIMEOUT);
-					System.out.println("Data received: " + data);
-					receiver.onScan(calculateResult(frequency, header, data));
-				} catch (IllegalStateException | IOException | InterruptedException | TimeoutException e) {
-					LOGGER.log(Level.SEVERE, "Failed to read data from the ydlidar - stopping scanner", e);
-					stopScanning();
-					break;
+				}
+				if (scanResult.getPoints().size() != 0) {
+					receiver.onScan(scanResult);
 				}
 			}
 		}
@@ -463,17 +480,15 @@ public class YDLidarDevice {
 
 	}
 
-	private static ScanResult2D calculateResult(RangingFrequency frequency, DataHeader header, byte[] data) {
-		// TODO(Marcus/17 aug. 2019): Fix so that angular resolution is
-		// calculated if not specified.
-		ScanResultImpl scanResult = new ScanResultImpl(1.0f, null);
+	private static List<Point2f> calculateResult(RangingFrequency frequency, DataHeader header, byte[] data) {
+		List<Point2f> scanResult = new ArrayList<>(data.length / 2);
 		for (int i = 0; i < data.length; i++) {
 			// Distance in mm according to protocol
 			float distance = DataHeader.getFromShort(data, i * 2) / 4.0f;
 			float angle = header.getAngleAt(i, distance);
 
 			Point2f p = Point2f.fromPolar(distance, (float) Math.toRadians(angle));
-			scanResult.addPoint(p);
+			scanResult.add(p);
 		}
 		return scanResult;
 	}

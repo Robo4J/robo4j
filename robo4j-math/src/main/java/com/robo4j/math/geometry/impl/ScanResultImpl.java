@@ -181,4 +181,16 @@ public class ScanResultImpl implements ScanResult2D {
 		// separate from the read phase.
 		return points.get(points.size() - 1);
 	}
+
+	/**
+	 * Adds all the points in the list to the scan result.
+	 * 
+	 * @param points
+	 *            the points to add.
+	 */
+	public void addAll(List<Point2f> points) {
+		for (Point2f point : points) {
+			addPoint(point);
+		}
+	}
 }
