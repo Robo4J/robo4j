@@ -113,19 +113,18 @@ public class DataHeader {
 	 */
 	public float getAngleAt(int samplePointIndex, float distance) {
 		float correction = calcCorrection(distance);
-		float angleFSA = (fsa >> 1) / 64.0f + correction;
 		if (samplePointIndex == 0) {
-			return angleFSA;
+			return getUncorrectedStartAngle() + correction;
 		}
-		float angleLSA = (lsa >> 1) / 64.0f + correction;
 		if (samplePointIndex == lsn - 1) {
-			return angleLSA;
+			return getUncorrectedEndAngle() + correction;
 		}
-		return (angleLSA - angleFSA) * (samplePointIndex) + angleFSA + correction;
+		return ((getUncorrectedStartAngle() - getUncorrectedEndAngle()) / (lsn - 1)) * (samplePointIndex) + getUncorrectedStartAngle()
+				+ correction;
 	}
 
 	private float calcCorrection(float distance) {
-		if (distance <= 0) {
+		if (distance <= 0.02) {
 			return 0;
 		}
 		return (float) Math.toDegrees(Math.atan(21.8 * (155.3 - distance) / (155.3 * distance)));
@@ -143,6 +142,14 @@ public class DataHeader {
 	 */
 	int getLSA() {
 		return lsa;
+	}
+
+	float getUncorrectedStartAngle() {
+		return (fsa >> 1) / 64.0f;
+	}
+
+	float getUncorrectedEndAngle() {
+		return (lsa >> 1) / 64.0f;
 	}
 
 	private static boolean isValid(byte[] headerData) {

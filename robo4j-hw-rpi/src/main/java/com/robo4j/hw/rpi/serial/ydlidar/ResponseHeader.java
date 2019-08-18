@@ -25,7 +25,7 @@ package com.robo4j.hw.rpi.serial.ydlidar;
 public class ResponseHeader {
 	public static final int RESPONSE_HEADER_LENGTH = 7;
 	private static final byte ANSWER_SYNC_BYTE1 = (byte) 0xA5;
-	private static final byte ANSWER_SYNC_BYTE2 = 0x5A;
+	private static final byte ANSWER_SYNC_BYTE2 = (byte) 0x5A;
 
 	private final ResponseType responseType;
 	private final ResponseMode responseMode;
