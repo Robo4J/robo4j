@@ -23,6 +23,7 @@ package com.robo4j.hw.rpi.serial.ydlidar;
  * @author Miro Wengner (@miragemiko)
  */
 public class ResponseHeader {
+	public static final int RESPONSE_HEADER_LENGTH = 7;
 	private static final byte ANSWER_SYNC_BYTE1 = (byte) 0xA5;
 	private static final byte ANSWER_SYNC_BYTE2 = 0x5A;
 
@@ -78,11 +79,12 @@ public class ResponseHeader {
 	/**
 	 * Constructor.
 	 * 
-	 * @param headerData the data for the header. Must be 7 bytes long.
+	 * @param headerData
+	 *            the data for the header. Must be at least 7 bytes long and contain header data.
 	 */
 	public ResponseHeader(byte[] headerData) {
-		if (headerData.length != 7) {
-			throw new IllegalArgumentException("The length of the header must be 7 bytes long!");
+		if (headerData.length < 7) {
+			throw new IllegalArgumentException("Not enough elements to contain response header data - must be at least 7 elements");
 		}
 		this.responseType = ResponseType.getResponseType(headerData[6] & 0xFF);
 		this.isValid = isValid(headerData);
@@ -147,5 +149,12 @@ public class ResponseHeader {
 		default:
 			return ResponseMode.UNDEFINED;
 		}
+	}
+
+	/**
+	 * Can be used to check if a byte array is a start of a response.
+	 */
+	public static boolean isResponseHeaderStart(byte[] bytes) {
+		return bytes.length >= 2 && isValid(bytes);
 	}
 }

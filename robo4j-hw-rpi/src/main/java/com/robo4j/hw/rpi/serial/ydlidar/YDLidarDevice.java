@@ -17,6 +17,7 @@
 package com.robo4j.hw.rpi.serial.ydlidar;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
@@ -74,8 +75,6 @@ public class YDLidarDevice {
 	 */
 	private static final String PRODUCT_ID = "ea60";
 
-	private static final int DATA_HEADER_LENGTH = 10;
-	private static final int RESPONSE_HEADER_LENGTH = 7;
 	private static final int CMDFLAG_HAS_PAYLOAD = 0x80;
 	private static final byte CMD_SYNC_BYTE = (byte) 0xA5;
 	private static final int BAUD_RATE = 230400;
@@ -197,8 +196,9 @@ public class YDLidarDevice {
 
 	/**
 	 * Attempts to do a soft restart of the device.
-	 * @throws IOException 
-	 * @throws IllegalStateException 
+	 * 
+	 * @throws IOException
+	 * @throws IllegalStateException
 	 */
 	public void restart() throws IllegalStateException, IOException {
 		sendCommand(Command.RESTART);
@@ -392,13 +392,24 @@ public class YDLidarDevice {
 
 	private ResponseHeader readResponseHeader(long timeout)
 			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
-		byte[] readBytes = SerialUtil.readBytes(serial, RESPONSE_HEADER_LENGTH, timeout);
+		byte[] readBytes = SerialUtil.readBytes(serial, ResponseHeader.RESPONSE_HEADER_LENGTH, timeout);
 		return new ResponseHeader(readBytes);
 	}
 
 	private DataHeader readDataHeader(long timeout) throws IllegalStateException, IOException, InterruptedException, TimeoutException {
-		byte[] readBytes = SerialUtil.readBytes(serial, DATA_HEADER_LENGTH, timeout);
-		return new DataHeader(readBytes);
+		ByteBuffer buffer = ByteBuffer.allocate(DataHeader.DATA_HEADER_LENGTH);
+		while (true) {
+			// We'll read one byte at a time until we're in data sync...
+			SerialUtil.readBytes(buffer, serial, 1, timeout);
+			if (buffer.get(0) == DataHeader.ANSWER_SYNC_BYTE1) {
+				SerialUtil.readBytes(buffer, serial, 1, timeout);
+				if (DataHeader.isDataHeaderStart(buffer.array())) {
+					SerialUtil.readBytes(buffer, serial, DataHeader.DATA_HEADER_LENGTH - 2, timeout);
+					return new DataHeader(buffer.array());
+				}
+			}
+			buffer.clear();
+		}
 	}
 
 	private byte[] readData(DataHeader header, int timeout)

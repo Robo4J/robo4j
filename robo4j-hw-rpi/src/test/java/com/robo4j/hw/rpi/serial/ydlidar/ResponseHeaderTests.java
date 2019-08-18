@@ -75,5 +75,5 @@ public class ResponseHeaderTests {
 		assertTrue(header.isValid(), "This header should be valid!");
 		assertSame(header.getResponseType(), ResponseType.MEASUREMENT);
 		assertSame(header.getResponseMode(), ResponseMode.CONTINUOUS);
-	}
+	}	
 }

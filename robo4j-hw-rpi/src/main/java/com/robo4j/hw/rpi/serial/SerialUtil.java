@@ -56,6 +56,27 @@ public class SerialUtil {
 	 */
 	public static byte[] readBytes(Serial serial, int bytes, long timeout)
 			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
+		return readBytes(ByteBuffer.allocate(bytes), serial, bytes, timeout);
+	}
+
+	/**
+	 * Will attempt to read to read the indicated number of bytes from the
+	 * serial port into the provided buffer. It's up to you to ensure that there
+	 * is enough space to hold the data.
+	 * 
+	 * @param serial
+	 *            the (opened) serial port to read from.
+	 * @param timeout
+	 *            the timeout after which to fail.
+	 * @param buffer
+	 *            the byte buffer to read into.
+	 * @return the byte [] with the result.
+	 * @throws IOException
+	 * @throws IllegalStateException
+	 * @throws InterruptedException
+	 */
+	public static byte[] readBytes(ByteBuffer buffer, Serial serial, int bytes, long timeout)
+			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
 		int available = serial.available();
 
 		if (available >= bytes) {
@@ -64,7 +85,6 @@ public class SerialUtil {
 
 		long startTime = System.currentTimeMillis();
 		int leftToRead = bytes;
-		ByteBuffer buffer = ByteBuffer.allocate(bytes);
 		while (leftToRead > 0) {
 			if (System.currentTimeMillis() - startTime > timeout) {
 				throw new TimeoutException("Could not read bytes in time");

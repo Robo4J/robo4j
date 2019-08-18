@@ -20,8 +20,9 @@ package com.robo4j.hw.rpi.serial.ydlidar;
  * Header for data.
  */
 public class DataHeader {
-	private static final byte ANSWER_SYNC_BYTE1 = (byte) 0xAA;
-	private static final byte ANSWER_SYNC_BYTE2 = (byte) 0x55;
+	public static final int DATA_HEADER_LENGTH = 10;
+	public static final byte ANSWER_SYNC_BYTE1 = (byte) 0xAA;
+	public static final byte ANSWER_SYNC_BYTE2 = (byte) 0x55;
 	private final boolean isValid;
 	private final PacketType packetType;
 	private final int lsn;
@@ -51,8 +52,8 @@ public class DataHeader {
 	}
 
 	public DataHeader(byte[] headerData) {
-		if (headerData.length != 10) {
-			throw new IllegalArgumentException("The length of the data header must be 10 bytes long!");
+		if (headerData.length < DATA_HEADER_LENGTH) {
+			throw new IllegalArgumentException("Too short array to contain a data header - must be at least 10 elements");
 		}
 		this.isValid = isValid(headerData);
 		this.packetType = PacketType.getPacketType(getByte(headerData, 2));
@@ -161,5 +162,12 @@ public class DataHeader {
 			checksum ^= (headerData[i] & 0xFF) << 8 | (headerData[i + 1] & 0xFF);
 		}
 		return checksum;
+	}
+
+	/**
+	 * Can be used to check if a byte array is a start of a response.
+	 */
+	public static boolean isDataHeaderStart(byte[] bytes) {
+		return bytes.length >= 2 && isValid(bytes);
 	}
 }
