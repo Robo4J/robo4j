@@ -128,16 +128,9 @@ public class YDLidarDevice {
 	}
 
 	public class DataRetriever implements Runnable {
-		private final RangingFrequency frequency;
-
-		public DataRetriever(RangingFrequency frequency) {
-			this.frequency = frequency;
-		}
 
 		@Override
 		public void run() {
-			// TODO(Marcus/17 aug. 2019): Remove sysouts...
-			System.out.println("Scanning at frequency" + frequency);
 			while (isScanning) {
 				// TODO(Marcus/18 aug. 2019): Calculate the angular resolution
 				// properly
@@ -159,7 +152,7 @@ public class YDLidarDevice {
 						if (header.getPacketType() == PacketType.ZERO) {
 							break;
 						}
-						scanResult.addAll(calculateResult(frequency, header, data));
+						scanResult.addAll(calculateResult(header, data));
 						System.out.println("Data received: " + data);
 					} catch (IllegalStateException | IOException | InterruptedException | TimeoutException e) {
 						LOGGER.log(Level.SEVERE, "Failed to read data from the ydlidar - stopping scanner", e);
@@ -316,7 +309,6 @@ public class YDLidarDevice {
 				if (isScanning) {
 					return;
 				}
-				RangingFrequency rf = getRangingFrequency();
 				startMotor();
 				sendCommand(Command.SCAN);
 				ResponseHeader response = readResponseHeader(800);
@@ -325,7 +317,7 @@ public class YDLidarDevice {
 					throw new IOException("Expected a continuous response type");
 				}
 				isScanning = true;
-				Thread t = new Thread(new DataRetriever(rf), "ydlidar data retriever");
+				Thread t = new Thread(new DataRetriever(), "ydlidar data retriever");
 				t.setDaemon(true);
 				t.start();
 			} else {
@@ -482,7 +474,7 @@ public class YDLidarDevice {
 
 	}
 
-	private static List<Point2f> calculateResult(RangingFrequency frequency, DataHeader header, byte[] data) {
+	private static List<Point2f> calculateResult(DataHeader header, byte[] data) {
 		List<Point2f> scanResult = new ArrayList<>(data.length / 2);
 		for (int i = 0; i < data.length / 2; i++) {
 			// Distance in mm according to protocol
