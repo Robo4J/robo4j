@@ -128,7 +128,6 @@ public class YDLidarDevice {
 	}
 
 	public class DataRetriever implements Runnable {
-
 		@Override
 		public void run() {
 			while (isScanning) {
