@@ -37,6 +37,7 @@ import com.robo4j.math.jfr.ScanPoint2DEvent;
 public class ScanResultImpl implements ScanResult2D {
 	private static final PointComparator POINT_COMPARATOR = new PointComparator();
 	private static final AtomicInteger SCANCOUNTER = new AtomicInteger(0);
+	private static final Predicate<Point2f> PREDICATE_KEEP_ALL = new KeepAllPredicate();
 
 	private final List<Point2f> points;
 
@@ -51,6 +52,17 @@ public class ScanResultImpl implements ScanResult2D {
 
 	private final float angularResolution;
 	private final Predicate<Point2f> pointFilter;
+
+	private static class KeepAllPredicate implements Predicate<Point2f> {
+		@Override
+		public boolean test(Point2f t) {
+			return true;
+		}
+	}
+
+	public ScanResultImpl(float angularResolution) {
+		this(70, angularResolution, PREDICATE_KEEP_ALL);
+	}
 
 	public ScanResultImpl(float angularResolution, Predicate<Point2f> pointFilter) {
 		this(70, angularResolution, pointFilter);

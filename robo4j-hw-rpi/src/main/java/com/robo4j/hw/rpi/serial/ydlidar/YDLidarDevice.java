@@ -139,7 +139,9 @@ public class YDLidarDevice {
 			// TODO(Marcus/17 aug. 2019): Remove sysouts...
 			System.out.println("Scanning at frequency" + frequency);
 			while (isScanning) {
-				ScanResultImpl scanResult = new ScanResultImpl(1.0f, null);
+				// TODO(Marcus/18 aug. 2019): Calculate the angular resolution
+				// properly
+				ScanResultImpl scanResult = new ScanResultImpl(1.0f);
 				while (true) {
 					try {
 						DataHeader header = readDataHeader(DEFAULT_SERIAL_TIMEOUT);
