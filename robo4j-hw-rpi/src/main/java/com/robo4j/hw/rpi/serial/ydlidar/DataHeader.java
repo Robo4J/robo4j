@@ -185,4 +185,10 @@ public class DataHeader {
 	public static boolean isDataHeaderStart(byte[] bytes) {
 		return bytes.length >= 2 && isValid(bytes);
 	}
+
+	@Override
+	public String toString() {
+		return "DataHeader [type: " + getPacketType().name() + ", samples: " + getSampleCount() + ", uncorrected start: "
+				+ getUncorrectedStartAngle() + ", uncorrected end: " + getUncorrectedEndAngle() + "]";
+	}
 }
