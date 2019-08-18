@@ -514,7 +514,7 @@ public class YDLidarDevice {
 					Collections.sort(points, new Comparator<Point2f>() {
 						@Override
 						public int compare(Point2f p1, Point2f p2) {
-							return Float.compare(p2.getAngle(), p1.getAngle());
+							return Float.compare(p1.getAngle(), p2.getAngle());
 						}
 					});
 					System.out.println(points);
