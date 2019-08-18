@@ -474,7 +474,12 @@ public class YDLidarDevice {
 		for (int i = 0; i < data.length / 2; i++) {
 			// Distance in mm according to protocol
 			float distance = DataHeader.getFromShort(data, i * 2) / 4.0f;
-			float angle = header.getAngleAt(i, distance) % 360;
+			float angle = header.getAngleAt(i, distance);
+			// Could have done % 360, but this seems to be the only case and is
+			// faster
+			if (angle >= 360.0) {
+				angle -= 360.0;
+			}
 			Point2f p = Point2f.fromPolar(distance / 1000.0f, (float) Math.toRadians(angle));
 			points.add(p);
 		}
@@ -491,9 +496,17 @@ public class YDLidarDevice {
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException, IllegalStateException, TimeoutException {
 		YDLidarDevice device = new YDLidarDevice(new ScanReceiver() {
+			int counter;
+
 			@Override
 			public void onScan(ScanResult2D scanResult) {
 				System.out.println("Got scan result: " + scanResult);
+				if (counter++ % 20 == 0) {
+					System.out.println("--- Points ---");
+					System.out.println(scanResult.getPoints());
+					System.out.println("--------------");
+					System.out.println("");
+				}
 			}
 		});
 		System.out.println(device);
