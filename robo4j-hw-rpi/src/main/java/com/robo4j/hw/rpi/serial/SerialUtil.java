@@ -56,7 +56,9 @@ public class SerialUtil {
 	 */
 	public static byte[] readBytes(Serial serial, int bytes, long timeout)
 			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
-		return readBytes(ByteBuffer.allocate(bytes), serial, bytes, timeout);
+		ByteBuffer buffer = ByteBuffer.allocate(bytes);
+		readBytes(buffer, serial, bytes, timeout);
+		return buffer.array();
 	}
 
 	/**
@@ -64,23 +66,23 @@ public class SerialUtil {
 	 * serial port into the provided buffer. It's up to you to ensure that there
 	 * is enough space to hold the data.
 	 * 
+	 * @param buffer
+	 *            the byte buffer to read into.
 	 * @param serial
 	 *            the (opened) serial port to read from.
 	 * @param timeout
 	 *            the timeout after which to fail.
-	 * @param buffer
-	 *            the byte buffer to read into.
-	 * @return the byte [] with the result.
 	 * @throws IOException
 	 * @throws IllegalStateException
 	 * @throws InterruptedException
 	 */
-	public static byte[] readBytes(ByteBuffer buffer, Serial serial, int bytes, long timeout)
+	public static void readBytes(ByteBuffer buffer, Serial serial, int bytes, long timeout)
 			throws IllegalStateException, IOException, InterruptedException, TimeoutException {
 		int available = serial.available();
 
 		if (available >= bytes) {
-			return serial.read(bytes);
+			serial.read(buffer);
+			return;
 		}
 
 		long startTime = System.currentTimeMillis();
@@ -98,7 +100,6 @@ public class SerialUtil {
 			serial.read(nextRead, buffer);
 			leftToRead -= nextRead;
 		}
-		return buffer.array();
 	}
 
 	private static Map<String, String> asMetadata(String[] lines) {
