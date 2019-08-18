@@ -142,9 +142,6 @@ public class YDLidarDevice {
 							stopScanning();
 							break;
 						}
-						if (header.getPacketType() == PacketType.ZERO) {
-							continue;
-						}
 						byte[] data = readData(header, DEFAULT_SERIAL_TIMEOUT);
 
 						// Got a zero packet - done - send off the result
