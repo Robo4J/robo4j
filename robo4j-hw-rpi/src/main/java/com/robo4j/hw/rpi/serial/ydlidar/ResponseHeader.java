@@ -84,7 +84,7 @@ public class ResponseHeader {
 		if (headerData.length != 7) {
 			throw new IllegalArgumentException("The length of the header must be 7 bytes long!");
 		}
-		this.responseType = ResponseType.getResponseType(headerData[6]);
+		this.responseType = ResponseType.getResponseType(headerData[6] & 0xFF);
 		this.isValid = isValid(headerData);
 		this.responseLength = getResponseLength(headerData);
 		this.responseMode = getResponseMode(headerData);

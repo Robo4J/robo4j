@@ -66,4 +66,15 @@ public class ResponseHeaderTests {
 		assertSame(header.getResponseMode(), ResponseMode.SINGLE);
 		assertEquals(header.getResponseLength(), 0x03);
 	}
+	
+	@Test
+	void testScanResponseHeader() {
+		byte[] data = new byte[] { (byte) -91, (byte) 90, (byte)5, (byte) 0x00, (byte) 0x00, (byte) 64,
+				(byte) -127 };
+		ResponseHeader header = new ResponseHeader(data);
+		assertTrue(header.isValid(), "This header should be valid!");
+		assertSame(header.getResponseType(), ResponseType.DEVICE_HEALTH);
+		assertSame(header.getResponseMode(), ResponseMode.SINGLE);
+		assertEquals(header.getResponseLength(), 0x03);
+	}
 }
