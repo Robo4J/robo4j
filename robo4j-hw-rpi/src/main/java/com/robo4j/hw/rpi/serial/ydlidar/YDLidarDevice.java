@@ -206,8 +206,8 @@ public class YDLidarDevice {
 					if (relabeledAngle < 0) {
 						survivors.add(point);
 						state = RetrieverState.ENDED;
-					}
-					continue;
+						continue;
+					} 
 				}
 				points.add(point);
 			}
