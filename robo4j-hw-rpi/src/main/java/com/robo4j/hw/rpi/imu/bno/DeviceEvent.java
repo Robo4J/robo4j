@@ -17,11 +17,14 @@
 
 package com.robo4j.hw.rpi.imu.bno;
 
+import java.io.Serializable;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface DeviceEvent {
-    DeviceEventType getType();
-    long timestampMicro();
+public interface DeviceEvent extends Serializable {
+	DeviceEventType getType();
+
+	long timestampMicro();
 }

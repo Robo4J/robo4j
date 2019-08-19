@@ -26,6 +26,8 @@
     <roboUnit id="listener">
         <class>com.robo4j.units.rpi.bno.BNOVectorEventListenerUnit</class>
         <config name="com.robo4j.root">
+            <value name="targetContext" type="String">cubeVizSystem</value>
+            <value name="remoteUnit" type="String">bnoReceiver</value>
         </config>
     </roboUnit>
 </robo4j>

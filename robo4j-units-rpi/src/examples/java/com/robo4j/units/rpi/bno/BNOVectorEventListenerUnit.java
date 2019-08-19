@@ -17,22 +17,50 @@
 
 package com.robo4j.units.rpi.bno;
 
+import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
+import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.imu.bno.VectorEvent;
 import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.net.LookupServiceProvider;
 
 /**
+ * BNOVectorEventListenerUnit listen to VectorEvent events produced by {@link BNO080EmitterUnit}
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class BNOVectorEventListenerUnit extends RoboUnit<VectorEvent> {
+	
+	public static final String ATTR_TARGET_CONTEXT = "targetContext";
+	public static final String ATTR_REMOTE_UNIT = "remoteUnit";
+
 	public BNOVectorEventListenerUnit(RoboContext context, String id) {
 		super(VectorEvent.class, context, id);
+	}
+
+	private String targetContext;
+	private String remoteUnit;
+
+	@Override
+	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		targetContext = configuration.getString(ATTR_TARGET_CONTEXT, null);
+		remoteUnit = configuration.getString(ATTR_REMOTE_UNIT, null);
 	}
 
 	@Override
 	public void onMessage(VectorEvent message) {
 		SimpleLoggingUtil.info(getClass(), "received:" + message);
+		RoboContext remoteContext = LookupServiceProvider.getDefaultLookupService().getContext(targetContext);
+		if(remoteContext != null){
+			RoboReference<VectorEvent> roboReference = remoteContext.getReference(remoteUnit);
+			if(roboReference != null){
+				roboReference.sendMessage(message);
+			}
+		} else {
+			SimpleLoggingUtil.info(getClass(), String.format("context not found: %s", targetContext));
+		}
 	}
 }
