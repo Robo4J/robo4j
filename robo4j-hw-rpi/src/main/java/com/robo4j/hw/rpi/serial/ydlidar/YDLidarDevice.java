@@ -163,7 +163,6 @@ public class YDLidarDevice {
 
 						scanResult.addAll(calculatePoints(header, data));
 						if (state == RetrieverState.ENDED) {
-							state = RetrieverState.NORMAL;
 							break;
 						}
 					} catch (IllegalStateException | IOException | InterruptedException | TimeoutException e) {
@@ -172,6 +171,7 @@ public class YDLidarDevice {
 						return;
 					}
 				}
+				state = RetrieverState.NORMAL;
 				if (scanResult.getPoints().size() != 0) {
 					receiver.onScan(scanResult);
 				}
@@ -198,7 +198,7 @@ public class YDLidarDevice {
 
 				// If we've found an angle over 130 AND a negative one, we've
 				// likely crossed the boundary and it's time to send it all off.
-				if (state == RetrieverState.NORMAL && relabeledAngle > 130) {
+				if (state == RetrieverState.NORMAL && relabeledAngle > 150) {
 					state = RetrieverState.ENDING;
 				}
 
