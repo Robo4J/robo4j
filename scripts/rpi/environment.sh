@@ -10,7 +10,7 @@ export ROBO4J_VERSION=0.5
 export PI4J_HOME=~/.m2/repository/com/pi4j/pi4j-core/2.0-SNAPSHOT/
 
 # Pre-defined debug flags
-export REMOTE_DEBUG="-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=*:9876,suspend=y"
+export DEBUG="-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=*:9876,suspend=y"
 
 # Pre-defined JFR flags
 export JFR="-XX:StartFlightRecording=settings=profile,dumponexit=true,filename=$ROBO4J_HOME/latestrun.jfr"
@@ -22,5 +22,5 @@ export ROBO4J_PATH=$PI4J_HOME/*:$ROBO4J_HOME/robo4j-math/build/libs/robo4j-math-
 export _JAVA_OPTIONS="--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED"
 echo Robo4J v$ROBO4J_VERSION
 echo ROBO4J_PATH=$ROBO4J_PATH
-echo REMOTE_DEBUG=$REMOTE_DEBUG
+echo DEBUG=$DEBUG
 echo JFR=$JFR
