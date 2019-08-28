@@ -146,37 +146,36 @@ public class YDLidarDevice {
 		NORMAL, ENDING, ENDED
 	}
 
-	
 	@Name("robo4j.hw.rpi.serial.ydlidar.YdDebug")
 	@Category({ "Robo4J", "Math", "Scan" })
 	@Label("Yd Debug")
 	@Description("This is an event to help debug the ydlidar if there is trouble")
 	@StackTrace(false)
 	public class YDLidarDebugEvent extends Event {
-		@Label("Scan ID")
+		@Label("Scan Id")
 		@Description("The numerical identifier, uniquely identifying the scan")
 		@ScanId
-		private int scanID;
+		private int scanId;
 
 		@Label("Start Angle")
 		private float startAngle;
-		
+
 		@Label("Corrected Start Angle")
 		private float correctedStartAngle;
 
 		@Label("End Angle")
 		private float endAngle;
-		
+
 		@Label("Corrected End Angle")
 		private float correctedEndAngle;
-	
+
 		@Label("Data Length")
 		private int entries;
 
 		@Label("Data Points")
 		private int lsn;
 	}
-	
+
 	public class DataRetriever implements Runnable {
 		private final List<Point2f> survivors = new ArrayList<>();
 		private RetrieverState state = RetrieverState.NORMAL;
@@ -203,7 +202,7 @@ public class YDLidarDevice {
 						}
 						byte[] data = readData(header, DEFAULT_SERIAL_TIMEOUT);
 
-						scanResult.addAll(calculatePoints(header, data));
+						scanResult.addAll(calculatePoints(scanResult.getScanID(), header, data));
 						if (state == RetrieverState.ENDED) {
 							break;
 						}
@@ -221,8 +220,9 @@ public class YDLidarDevice {
 			}
 		}
 
-		private List<Point2f> calculatePoints(DataHeader header, byte[] data) {
+		private List<Point2f> calculatePoints(int scanId, DataHeader header, byte[] data) {
 			YDLidarDebugEvent debugEvent = new YDLidarDebugEvent();
+			debugEvent.scanId = scanId;
 			if (header.getPacketType() == PacketType.ZERO) {
 				debugEvent.commit();
 				return Collections.emptyList();
@@ -232,7 +232,7 @@ public class YDLidarDevice {
 			debugEvent.startAngle = header.getUncorrectedStartAngle();
 			debugEvent.endAngle = header.getUncorrectedEndAngle();
 			debugEvent.correctedStartAngle = header.getAngleAt(0, DataHeader.getFromShort(data, 0) / 4.0f);
-			debugEvent.correctedEndAngle = header.getAngleAt(debugEvent.entries/2, DataHeader.getFromShort(data, data.length - 2) / 4.0f);
+			debugEvent.correctedEndAngle = header.getAngleAt(debugEvent.entries / 2, DataHeader.getFromShort(data, data.length - 2) / 4.0f);
 			debugEvent.commit();
 			List<Point2f> points = new ArrayList<>(header.getLSN());
 			for (int i = 0; i < header.getLSN(); i++) {
