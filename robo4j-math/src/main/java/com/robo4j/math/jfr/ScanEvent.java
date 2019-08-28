@@ -26,8 +26,8 @@ import jdk.jfr.*;
  */
 
 @Name("robo4j.math.Scan")
-@Category({ "Robo4J", "Math", "Scan", "Overview" })
-@Label("FeatureExtraction")
+@Category({ "Robo4J", "Math", "Scan" })
+@Label("Scan Event")
 @Description("An event for a full scan")
 @StackTrace(false)
 public class ScanEvent extends Event {

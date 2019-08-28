@@ -22,14 +22,15 @@ import com.robo4j.math.geometry.Point2f;
 /**
  * This is the JFR event definition for a single scan point.
  * 
- * FIXME(Marcus/Jan 13, 2017): When we start supporting JDK 9, we will simply have a multiversion JAR with
- * overrides.
+ * FIXME(Marcus/Jan 13, 2017): When we start supporting JDK 9, we will simply
+ * have a multiversion JAR with overrides.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 
 @Name("robo4j.math.ScanPoint2D")
+@Category({ "Robo4J", "Math", "Scan" })
 @Label("Scan Point 2D")
 @Description("An instant event for a scanned point relative to the scanner")
 @StackTrace(false)
@@ -53,7 +54,7 @@ public class ScanPoint2DEvent extends Event {
 
 	public ScanPoint2DEvent() {
 	}
-	
+
 	public ScanPoint2DEvent(Point2f p) {
 		setPoint(p);
 	}
