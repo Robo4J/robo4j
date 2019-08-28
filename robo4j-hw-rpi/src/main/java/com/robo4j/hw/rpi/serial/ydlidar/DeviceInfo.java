@@ -17,6 +17,7 @@
 package com.robo4j.hw.rpi.serial.ydlidar;
 
 /**
+ * Information about the lidar device.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)

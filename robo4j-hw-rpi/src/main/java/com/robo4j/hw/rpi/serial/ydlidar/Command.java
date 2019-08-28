@@ -18,6 +18,9 @@ package com.robo4j.hw.rpi.serial.ydlidar;
 
 /**
  * The commands available.
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
  */
 public enum Command {
 	//@formatter:off

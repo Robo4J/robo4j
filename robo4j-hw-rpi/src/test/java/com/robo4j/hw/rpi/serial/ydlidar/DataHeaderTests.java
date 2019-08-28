@@ -24,6 +24,12 @@ import org.junit.jupiter.api.Test;
 
 import com.robo4j.hw.rpi.serial.ydlidar.DataHeader.PacketType;
 
+/**
+ * Tests for the data headers.
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ */
 public class DataHeaderTests {
 	@Test
 	void testInvalidLengthHeader() {
@@ -80,11 +86,11 @@ public class DataHeaderTests {
 		// These values are from the examples - since Java is doing many of the
 		// calculations in double precision it's fine to not get exactly the
 		// same results.
-		
+
 		float startAngle = header.getAngleAt(0, 1000, 0);
-		
+
 		float endAngle = header.getAngleAt(header.getSampleCount() - 1, 8000, 0);
-		
+
 		float midAngle = header.getAngleAt((header.getSampleCount() - 1) / 2, 4000, DataHeader.getAngularDiff(startAngle, endAngle));
 		assertEquals(217.0178, startAngle, 0.005);
 		assertEquals(235.6326, endAngle, 0.005);

@@ -26,11 +26,16 @@ import org.junit.jupiter.api.Test;
 import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseMode;
 import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseType;
 
+/**
+ * Tests for the response headers.
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
+ */
 public class ResponseHeaderTests {
 	@Test
 	void testInvalidHeader() {
-		byte[] data = new byte[] { (byte) 0xA1, (byte) 0xA2, (byte) 0xA3, (byte) 0xA4, (byte) 0xA5, (byte) 0x99,
-				(byte) 0x99 };
+		byte[] data = new byte[] { (byte) 0xA1, (byte) 0xA2, (byte) 0xA3, (byte) 0xA4, (byte) 0xA5, (byte) 0x99, (byte) 0x99 };
 		ResponseHeader header = new ResponseHeader(data);
 		assertFalse(header.isValid(), "This valid should be invalid!");
 	}
@@ -47,8 +52,7 @@ public class ResponseHeaderTests {
 
 	@Test
 	void testValidDeviceInfoHeader() {
-		byte[] data = new byte[] { (byte) 0xA5, (byte) 0x5A, (byte) 0x14, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-				(byte) 0x04 };
+		byte[] data = new byte[] { (byte) 0xA5, (byte) 0x5A, (byte) 0x14, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x04 };
 		ResponseHeader header = new ResponseHeader(data);
 		assertTrue(header.isValid(), "This header should be valid!");
 		assertSame(header.getResponseType(), ResponseType.DEVICE_INFO);
@@ -58,22 +62,20 @@ public class ResponseHeaderTests {
 
 	@Test
 	void testValidHealthInfoHeader() {
-		byte[] data = new byte[] { (byte) 0xA5, (byte) 0x5A, (byte) 0x03, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-				(byte) 0x06 };
+		byte[] data = new byte[] { (byte) 0xA5, (byte) 0x5A, (byte) 0x03, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x06 };
 		ResponseHeader header = new ResponseHeader(data);
 		assertTrue(header.isValid(), "This header should be valid!");
 		assertSame(header.getResponseType(), ResponseType.DEVICE_HEALTH);
 		assertSame(header.getResponseMode(), ResponseMode.SINGLE);
 		assertEquals(header.getResponseLength(), 0x03);
 	}
-	
+
 	@Test
 	void testScanResponseHeader() {
-		byte[] data = new byte[] { (byte) -91, (byte) 90, (byte)5, (byte) 0x00, (byte) 0x00, (byte) 64,
-				(byte) -127 };
+		byte[] data = new byte[] { (byte) -91, (byte) 90, (byte) 5, (byte) 0x00, (byte) 0x00, (byte) 64, (byte) -127 };
 		ResponseHeader header = new ResponseHeader(data);
 		assertTrue(header.isValid(), "This header should be valid!");
 		assertSame(header.getResponseType(), ResponseType.MEASUREMENT);
 		assertSame(header.getResponseMode(), ResponseMode.CONTINUOUS);
-	}	
+	}
 }

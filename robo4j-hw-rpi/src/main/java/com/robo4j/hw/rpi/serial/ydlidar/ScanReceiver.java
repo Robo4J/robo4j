@@ -20,6 +20,9 @@ import com.robo4j.math.geometry.ScanResult2D;
 
 /**
  * Interface for consumers of scan results.
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
  */
 public interface ScanReceiver {
 	/**

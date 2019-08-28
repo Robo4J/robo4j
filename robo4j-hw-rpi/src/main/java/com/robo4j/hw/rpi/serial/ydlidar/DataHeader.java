@@ -18,6 +18,9 @@ package com.robo4j.hw.rpi.serial.ydlidar;
 
 /**
  * Header for data.
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miro Wengner (@miragemiko)
  */
 public class DataHeader {
 	public static final int DATA_HEADER_LENGTH = 10;
