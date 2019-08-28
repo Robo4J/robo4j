@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
@@ -621,25 +620,9 @@ public class YDLidarDevice {
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException, TimeoutException {
 		YDLidarDevice device = new YDLidarDevice(new ScanReceiver() {
-			int counter;
-
 			@Override
 			public void onScan(ScanResult2D scanResult) {
 				System.out.println("Got scan result: " + scanResult);
-				if (counter++ % 20 == 0) {
-					System.out.println("--- Points ---");
-
-					List<Point2f> points = scanResult.getPoints();
-					Collections.sort(points, new Comparator<Point2f>() {
-						@Override
-						public int compare(Point2f p1, Point2f p2) {
-							return Float.compare(p1.getAngle(), p2.getAngle());
-						}
-					});
-					System.out.println(points);
-					System.out.println("--------------");
-					System.out.println("");
-				}
 			}
 		});
 		System.out.println(device);
