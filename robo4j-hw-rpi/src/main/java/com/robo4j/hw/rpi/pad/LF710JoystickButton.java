@@ -29,12 +29,12 @@ import java.util.stream.Stream;
 public enum LF710JoystickButton implements LF710Input {
 
     //@formatter:off
-    PAD_X       ((short)0, "pad x"),
-    PAD_Y       ((short)1, "pad y"),
+    LEFT_X      ((short)0, "left x"),
+    LEFT_Y      ((short)1, "left y"),
     RIGHT_X     ((short)2, "right x"),
     RIGHT_Y     ((short)3, "right y"),
-    LEFT_X      ((short)4, "left x"),
-    LEFT_Y      ((short)5, "left y"),
+    PAD_X       ((short)4, "pad x"),
+    PAD_Y       ((short)5, "pad y"),
     ;
     //@formatter:on
 

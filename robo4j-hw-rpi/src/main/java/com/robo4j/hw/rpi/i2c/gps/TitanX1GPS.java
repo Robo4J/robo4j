@@ -16,6 +16,12 @@
  */
 package com.robo4j.hw.rpi.i2c.gps;
 
+import com.robo4j.hw.rpi.gps.GPS;
+import com.robo4j.hw.rpi.gps.GPSListener;
+import com.robo4j.hw.rpi.gps.NmeaUtils;
+import com.robo4j.hw.rpi.gps.PositionEvent;
+import com.robo4j.hw.rpi.gps.VelocityEvent;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -26,12 +32,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.robo4j.hw.rpi.gps.GPS;
-import com.robo4j.hw.rpi.gps.GPSListener;
-import com.robo4j.hw.rpi.gps.NmeaUtils;
-import com.robo4j.hw.rpi.gps.PositionEvent;
-import com.robo4j.hw.rpi.gps.VelocityEvent;
 
 /**
  * The GPS class for the SparkFun GPS.
@@ -50,7 +50,6 @@ public class TitanX1GPS implements GPS {
 		Thread t = new Thread(r, "GPS Internal Executor");
 		t.setDaemon(true);
 		return t;
-
 	});
 
 	// This is the scheduled future controlling the auto updates.
