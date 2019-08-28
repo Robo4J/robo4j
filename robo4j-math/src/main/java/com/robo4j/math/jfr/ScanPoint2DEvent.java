@@ -67,8 +67,8 @@ public class ScanPoint2DEvent extends Event {
 		return y;
 	}
 
-	public int getScanID() {
-		return scanID;
+	public int getScanId() {
+		return scanId;
 	}
 
 	public void setPoint(Point2f point) {
@@ -76,7 +76,7 @@ public class ScanPoint2DEvent extends Event {
 		y = (float) point.getY();
 	}
 
-	public void setScanID(int scanID) {
-		this.scanID = scanID;
+	public void setScanId(int scanId) {
+		this.scanId = scanId;
 	}
 }

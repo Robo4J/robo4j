@@ -45,7 +45,7 @@ public class ScanResultImpl implements ScanResult2D {
 	private double minX;
 	private double maxY;
 	private double minY;
-	private int scanID;
+	private int scanId;
 
 	private Point2f farthestPoint;
 	private Point2f closestPoint;
@@ -70,7 +70,7 @@ public class ScanResultImpl implements ScanResult2D {
 
 	public ScanResultImpl(int size, float angularResolution, Predicate<Point2f> pointFilter) {
 		this.pointFilter = pointFilter;
-		scanID = SCANCOUNTER.incrementAndGet();
+		scanId = SCANCOUNTER.incrementAndGet();
 		this.angularResolution = angularResolution;
 		points = new ArrayList<Point2f>(size);
 	}
@@ -92,7 +92,7 @@ public class ScanResultImpl implements ScanResult2D {
 	}
 
 	public int getScanID() {
-		return scanID;
+		return scanId;
 	}
 
 	public void addPoint(Point2f p) {
@@ -106,7 +106,7 @@ public class ScanResultImpl implements ScanResult2D {
 
 	private void emitEvent(Point2f p) {
 		ScanPoint2DEvent event = new ScanPoint2DEvent(p);
-		event.setScanID(scanID);
+		event.setScanId(scanId);
 		event.commit();
 	}
 
