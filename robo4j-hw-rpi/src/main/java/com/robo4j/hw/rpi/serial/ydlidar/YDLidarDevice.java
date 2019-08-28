@@ -38,6 +38,7 @@ import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseType;
 import com.robo4j.math.geometry.Point2f;
 import com.robo4j.math.geometry.ScanResult2D;
 import com.robo4j.math.geometry.impl.ScanResultImpl;
+import com.robo4j.math.jfr.ScanEvent;
 
 /**
  * Driver for the ydlidar device.
@@ -147,6 +148,7 @@ public class YDLidarDevice {
 				// TODO(Marcus/18 aug. 2019): Calculate the angular resolution
 				// properly.
 				ScanResultImpl scanResult = new ScanResultImpl(ANGULAR_RESOLUTION);
+				ScanEvent event = new ScanEvent(scanResult.getScanID(), "ydlidar 360");
 				if (!survivors.isEmpty()) {
 					scanResult.addAll(survivors);
 					survivors.clear();
@@ -174,6 +176,7 @@ public class YDLidarDevice {
 				state = RetrieverState.NORMAL;
 				if (scanResult.getPoints().size() != 0) {
 					receiver.onScan(scanResult);
+					event.commit();
 				}
 			}
 		}
@@ -207,7 +210,7 @@ public class YDLidarDevice {
 						survivors.add(point);
 						state = RetrieverState.ENDED;
 						continue;
-					} 
+					}
 				}
 				points.add(point);
 			}
