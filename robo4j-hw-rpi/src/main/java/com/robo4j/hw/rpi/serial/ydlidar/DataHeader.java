@@ -111,7 +111,7 @@ public class DataHeader {
 	 *            the distance, in mm.
 	 * @return the angle, in degrees.
 	 */
-	public float getAngleAt(int samplePointIndex, float distance) {
+	public float getAngleAt(int samplePointIndex, float distance, float diff) {
 		float correction = calcCorrection(distance);
 		if (samplePointIndex == 0) {
 			return getUncorrectedStartAngle() + correction;
@@ -119,13 +119,17 @@ public class DataHeader {
 		if (samplePointIndex == lsn - 1) {
 			return getUncorrectedEndAngle() + correction;
 		}
-		float diff;
-		if (getUncorrectedStartAngle() > 270 && getUncorrectedEndAngle() < 90) {
-			diff = 360 * getUncorrectedEndAngle() - getUncorrectedStartAngle();
-		} else {
-			diff = getUncorrectedStartAngle() - getUncorrectedEndAngle();
-		}
 		return (diff / (lsn - 1)) * (samplePointIndex) + getUncorrectedStartAngle() + correction;
+	}
+
+	public static float getAngularDiff(float correctedStart, float correctedEnd) {
+		float diff;
+		if (correctedStart > 270 && correctedEnd < 90) {
+			diff = 360 + correctedEnd - correctedStart;
+		} else {
+			diff = correctedEnd - correctedStart;
+		}
+		return diff;
 	}
 
 	private float calcCorrection(float distance) {
@@ -148,7 +152,7 @@ public class DataHeader {
 	int getLSA() {
 		return lsa;
 	}
-	
+
 	/**
 	 * LSN, as defined in the protocol.
 	 */

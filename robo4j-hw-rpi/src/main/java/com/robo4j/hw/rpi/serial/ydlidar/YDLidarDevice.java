@@ -226,18 +226,23 @@ public class YDLidarDevice {
 				debugEvent.commit();
 				return Collections.emptyList();
 			}
+			float startAngle = header.getAngleAt(0, DataHeader.getFromShort(data, 0) / 4.0f, 0);
+			float endAngle = header.getAngleAt(header.getLSN() - 1, DataHeader.getFromShort(data, data.length - 2) / 4.0f, 0);
 			debugEvent.entries = data.length;
 			debugEvent.lsn = header.getLSN();
 			debugEvent.startAngle = header.getUncorrectedStartAngle();
 			debugEvent.endAngle = header.getUncorrectedEndAngle();
-			debugEvent.correctedStartAngle = header.getAngleAt(0, DataHeader.getFromShort(data, 0) / 4.0f);
-			debugEvent.correctedEndAngle = header.getAngleAt(debugEvent.entries / 2, DataHeader.getFromShort(data, data.length - 2) / 4.0f);
+			debugEvent.correctedStartAngle = startAngle;
+			debugEvent.correctedEndAngle = endAngle;
 			debugEvent.commit();
+
+			float diff = DataHeader.getAngularDiff(startAngle, endAngle);
+
 			List<Point2f> points = new ArrayList<>(header.getLSN());
 			for (int i = 0; i < header.getLSN(); i++) {
 				// Distance in mm according to protocol
 				float distance = DataHeader.getFromShort(data, i * 2) / 4.0f;
-				float angle = header.getAngleAt(i, distance);
+				float angle = header.getAngleAt(i, distance, diff);
 				if (angle >= 360.0) {
 					angle -= 360.0;
 				}
