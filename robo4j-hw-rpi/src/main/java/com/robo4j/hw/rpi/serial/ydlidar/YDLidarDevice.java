@@ -581,6 +581,7 @@ public class YDLidarDevice {
 			serial.write(payload);
 			serial.write((byte) checksum);
 		}
+		serial.flush();
 	}
 
 	/*
