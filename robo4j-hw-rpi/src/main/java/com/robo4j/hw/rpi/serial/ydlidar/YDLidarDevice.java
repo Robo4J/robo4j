@@ -143,7 +143,7 @@ public class YDLidarDevice {
 	}
 
 	private enum RetrieverState {
-		NORMAL, ENDING, ENDED
+		FIRST_RESULTS, NORMAL, ENDING, ENDED
 	}
 
 	@Name("robo4j.hw.rpi.serial.ydlidar.YdDebug")
@@ -179,7 +179,7 @@ public class YDLidarDevice {
 	public class DataRetriever implements Runnable {
 		private static final float YDLIDAR_MIN_DISTANCE = 0.12f;
 		private final List<Point2f> survivors = new ArrayList<>();
-		private RetrieverState state = RetrieverState.NORMAL;
+		private RetrieverState state = RetrieverState.FIRST_RESULTS;
 
 		@Override
 		public void run() {
@@ -193,7 +193,10 @@ public class YDLidarDevice {
 					scanResult.addAll(survivors);
 					survivors.clear();
 				}
+				state = RetrieverState.FIRST_RESULTS;
 				while (true) {
+					// This is a workaround for getting two results in a row
+					// crossing the 180 boundary
 					try {
 						DataHeader header = readDataHeader(DEFAULT_SERIAL_TIMEOUT * 4);
 						if (!header.isValid()) {
@@ -213,7 +216,6 @@ public class YDLidarDevice {
 						return;
 					}
 				}
-				state = RetrieverState.NORMAL;
 				if (scanResult.getPoints().size() != 0) {
 					receiver.onScan(scanResult);
 					event.commit();
@@ -271,6 +273,9 @@ public class YDLidarDevice {
 					}
 				}
 				points.add(point);
+				if (state == RetrieverState.FIRST_RESULTS) {
+					state = RetrieverState.NORMAL;
+				}
 			}
 			return points;
 		}
