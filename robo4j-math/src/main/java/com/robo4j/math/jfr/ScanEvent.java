@@ -40,10 +40,10 @@ public class ScanEvent extends Event {
 	@Description("Textual information about the scan performed")
 	private String scanInfo;
 
-	@Label("Scan ID")
+	@Label("Scan Id")
 	@Description("The numerical identifier, uniquely identifying the scan")
 	@ScanId
-	private int scanID;
+	private int scanId;
 
 	static {
 		FlightRecorder.register(ScanEvent.class);
@@ -63,11 +63,11 @@ public class ScanEvent extends Event {
 	}
 
 	public void setScanID(int scanID) {
-		this.scanID = scanID;
+		this.scanId = scanID;
 	}
 
 	public int getScanID() {
-		return scanID;
+		return scanId;
 	}
 
 	public void setScanInfo(String scanMode) {

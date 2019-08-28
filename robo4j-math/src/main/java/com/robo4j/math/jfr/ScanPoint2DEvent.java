@@ -43,10 +43,10 @@ public class ScanPoint2DEvent extends Event {
 	@Description("Y value of the point")
 	private float y;
 
-	@Label("Scan ID")
+	@Label("Scan Id")
 	@Description("The scan with which the point is associated")
 	@ScanId
-	private int scanID;
+	private int scanId;
 
 	static {
 		FlightRecorder.register(ScanPoint2DEvent.class);
