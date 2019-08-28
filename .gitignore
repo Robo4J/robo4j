@@ -5,6 +5,7 @@ licence.idea
 /build/
 bin/
 *.bak
+*.jfr
 .idea
 /.DS_Store
 robo4j-hw-rpi/out
