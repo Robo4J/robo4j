@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -176,6 +177,7 @@ public class YDLidarDevice {
 	}
 
 	public class DataRetriever implements Runnable {
+		private static final float YDLIDAR_MIN_DISTANCE = 0.12f;
 		private final List<Point2f> survivors = new ArrayList<>();
 		private RetrieverState state = RetrieverState.NORMAL;
 
@@ -242,8 +244,11 @@ public class YDLidarDevice {
 			for (int i = 0; i < header.getLSN(); i++) {
 				// Distance in mm according to protocol
 				float distance = DataHeader.getFromShort(data, i * 2) / 4.0f;
+				if (distance < YDLIDAR_MIN_DISTANCE) {
+					continue;
+				}
 				float angle = header.getAngleAt(i, distance, diff);
-				if (angle >= 360.0) {
+				if (angle > 360.0) {
 					angle -= 360.0;
 				}
 
