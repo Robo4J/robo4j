@@ -148,6 +148,13 @@ public class DataHeader {
 	int getLSA() {
 		return lsa;
 	}
+	
+	/**
+	 * LSN, as defined in the protocol.
+	 */
+	int getLSN() {
+		return lsn;
+	}
 
 	float getUncorrectedStartAngle() {
 		return (fsa >> 1) / 64.0f;

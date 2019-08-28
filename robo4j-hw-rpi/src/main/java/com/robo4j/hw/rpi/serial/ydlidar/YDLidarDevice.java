@@ -39,6 +39,14 @@ import com.robo4j.math.geometry.Point2f;
 import com.robo4j.math.geometry.ScanResult2D;
 import com.robo4j.math.geometry.impl.ScanResultImpl;
 import com.robo4j.math.jfr.ScanEvent;
+import com.robo4j.math.jfr.ScanId;
+
+import jdk.jfr.Category;
+import jdk.jfr.Description;
+import jdk.jfr.Event;
+import jdk.jfr.Label;
+import jdk.jfr.Name;
+import jdk.jfr.StackTrace;
 
 /**
  * Driver for the ydlidar device.
@@ -138,6 +146,37 @@ public class YDLidarDevice {
 		NORMAL, ENDING, ENDED
 	}
 
+	
+	@Name("robo4j.hw.rpi.serial.ydlidar.YdDebug")
+	@Category({ "Robo4J", "Math", "Scan" })
+	@Label("Yd Debug")
+	@Description("This is an event to help debug the ydlidar if there is trouble")
+	@StackTrace(false)
+	public class YDLidarDebugEvent extends Event {
+		@Label("Scan ID")
+		@Description("The numerical identifier, uniquely identifying the scan")
+		@ScanId
+		private int scanID;
+
+		@Label("Start Angle")
+		private float startAngle;
+		
+		@Label("Corrected Start Angle")
+		private float correctedStartAngle;
+
+		@Label("End Angle")
+		private float endAngle;
+		
+		@Label("Corrected End Angle")
+		private float correctedEndAngle;
+	
+		@Label("Data Length")
+		private int entries;
+
+		@Label("Data Points")
+		private int lsn;
+	}
+	
 	public class DataRetriever implements Runnable {
 		private final List<Point2f> survivors = new ArrayList<>();
 		private RetrieverState state = RetrieverState.NORMAL;
@@ -149,6 +188,7 @@ public class YDLidarDevice {
 				// properly.
 				ScanResultImpl scanResult = new ScanResultImpl(ANGULAR_RESOLUTION);
 				ScanEvent event = new ScanEvent(scanResult.getScanID(), "ydlidar 360");
+				event.begin();
 				if (!survivors.isEmpty()) {
 					scanResult.addAll(survivors);
 					survivors.clear();
@@ -182,11 +222,20 @@ public class YDLidarDevice {
 		}
 
 		private List<Point2f> calculatePoints(DataHeader header, byte[] data) {
+			YDLidarDebugEvent debugEvent = new YDLidarDebugEvent();
 			if (header.getPacketType() == PacketType.ZERO) {
+				debugEvent.commit();
 				return Collections.emptyList();
 			}
-			List<Point2f> points = new ArrayList<>(data.length / 2);
-			for (int i = 0; i < data.length / 2; i++) {
+			debugEvent.entries = data.length;
+			debugEvent.lsn = header.getLSN();
+			debugEvent.startAngle = header.getUncorrectedStartAngle();
+			debugEvent.endAngle = header.getUncorrectedEndAngle();
+			debugEvent.correctedStartAngle = header.getAngleAt(0, DataHeader.getFromShort(data, 0) / 4.0f);
+			debugEvent.correctedEndAngle = header.getAngleAt(debugEvent.entries/2, DataHeader.getFromShort(data, data.length - 2) / 4.0f);
+			debugEvent.commit();
+			List<Point2f> points = new ArrayList<>(header.getLSN());
+			for (int i = 0; i < header.getLSN(); i++) {
 				// Distance in mm according to protocol
 				float distance = DataHeader.getFromShort(data, i * 2) / 4.0f;
 				float angle = header.getAngleAt(i, distance);
