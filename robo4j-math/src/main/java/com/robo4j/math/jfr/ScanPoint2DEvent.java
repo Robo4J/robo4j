@@ -22,14 +22,15 @@ import com.robo4j.math.geometry.Point2f;
 /**
  * This is the JFR event definition for a single scan point.
  * 
- * FIXME(Marcus/Jan 13, 2017): When we start supporting JDK 9, we will simply have a multiversion JAR with
- * overrides.
+ * FIXME(Marcus/Jan 13, 2017): When we start supporting JDK 9, we will simply
+ * have a multiversion JAR with overrides.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 
 @Name("robo4j.math.ScanPoint2D")
+@Category({ "Robo4J", "Math", "Scan" })
 @Label("Scan Point 2D")
 @Description("An instant event for a scanned point relative to the scanner")
 @StackTrace(false)
@@ -42,10 +43,10 @@ public class ScanPoint2DEvent extends Event {
 	@Description("Y value of the point")
 	private float y;
 
-	@Label("Scan ID")
+	@Label("Scan Id")
 	@Description("The scan with which the point is associated")
 	@ScanId
-	private int scanID;
+	private int scanId;
 
 	static {
 		FlightRecorder.register(ScanPoint2DEvent.class);
@@ -53,7 +54,7 @@ public class ScanPoint2DEvent extends Event {
 
 	public ScanPoint2DEvent() {
 	}
-	
+
 	public ScanPoint2DEvent(Point2f p) {
 		setPoint(p);
 	}
@@ -66,8 +67,8 @@ public class ScanPoint2DEvent extends Event {
 		return y;
 	}
 
-	public int getScanID() {
-		return scanID;
+	public int getScanId() {
+		return scanId;
 	}
 
 	public void setPoint(Point2f point) {
@@ -75,7 +76,7 @@ public class ScanPoint2DEvent extends Event {
 		y = (float) point.getY();
 	}
 
-	public void setScanID(int scanID) {
-		this.scanID = scanID;
+	public void setScanId(int scanId) {
+		this.scanId = scanId;
 	}
 }

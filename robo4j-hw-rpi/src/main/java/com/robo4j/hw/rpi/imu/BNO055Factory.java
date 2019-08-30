@@ -25,7 +25,8 @@ import java.io.IOException;
 /**
  * Factory for creating BNO055 devices
  * 
- * @author Marcus
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
  */
 public final class BNO055Factory {
 	/**

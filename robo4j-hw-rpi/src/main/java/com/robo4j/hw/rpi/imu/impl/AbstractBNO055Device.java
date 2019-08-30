@@ -28,11 +28,11 @@ import java.io.IOException;
 /**
  * Abstraction for a BN0055 absolute orientation device.
  * 
- * NOTE(Marcus/Jul 27, 2017): Note that the Rasperry Pi does not properly
+ * NOTE(Marcus/Jul 27, 2017): Note that the Raspberry Pi does not properly
  * support clock stretching yet (Raspberry Pi 3), so this particular class does
  * not work until that has been fixed in the i2c implementation on the Raspberry
  * Pi. Until then, wire the BNO055 to use serial tty communication as described
- * in that data sheet, and use the com.robo4j.hw.rpi.serial.imu classes instead.
+ * in that data sheet, and use the {@link BNO055SerialDevice} instead.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -376,8 +376,8 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 * 
 	 * @param maxWaitTimeMillis
 	 *            max time to wait for the system to be ready.
-	 * @return returns true if the system is ready, false if the system is reporting
-	 *         an error or if the timeout was reached.
+	 * @return returns true if the system is ready, false if the system is
+	 *         reporting an error or if the timeout was reached.
 	 * @throws IOException
 	 */
 	private boolean waitForOk(int maxWaitTimeMillis) throws IOException {
