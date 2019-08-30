@@ -327,12 +327,10 @@ public class YDLidarDevice {
 	}
 
 	/**
-	 * Attempts to do a soft restart of the device.
-	 * 
-	 * @throws IOException
-	 * @throws IllegalStateException
+	 * The device will do a soft reboot.
 	 */
-	public void restart() throws IllegalStateException, IOException {
+	public void restart() throws IOException {
+		// This command will not return results
 		sendCommand(Command.RESTART);
 	}
 

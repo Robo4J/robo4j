@@ -44,8 +44,10 @@ public enum Command {
 	/**
 	 * G4 enters a soft reboot and the system restarts. 
 	 * This command does not answer.
+	 * 
+	 * (One manual says 0x80, one says 0x40 - going with 0x80...)
 	 */
-	RESTART(0x40),
+	RESTART(0x80),
 	/**
 	 * Enters scan mode and feeds back point cloud data.
 	 */
@@ -55,10 +57,6 @@ public enum Command {
 	 * Stops scanning.
 	 */
 	STOP(0x65),
-	/**
-	 * Resets the device.
-	 */
-	RESET(0x80),
 	GET_EAI(0x55),
 	GET_DEVICE_INFO(0x90),
 	GET_DEVICE_HEALTH(0x92),
