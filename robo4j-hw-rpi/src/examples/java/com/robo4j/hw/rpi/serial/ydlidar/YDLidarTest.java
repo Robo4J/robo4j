@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.roboj.hw.rpi.serial.ydlidar;
+package com.robo4j.hw.rpi.serial.ydlidar;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
