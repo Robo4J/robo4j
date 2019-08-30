@@ -174,6 +174,10 @@ public class YDLidarDevice {
 		private int lsn;
 	}
 
+	/**
+	 * This class will retrieve data continuously once the device has started
+	 * scanning.
+	 */
 	public class DataRetriever implements Runnable {
 		private static final float YDLIDAR_MIN_DISTANCE = 0.12f;
 		private final List<Point2f> survivors = new ArrayList<>();
@@ -522,7 +526,6 @@ public class YDLidarDevice {
 	 * 
 	 * @throws InterruptedException
 	 *             if the thread was interrupted.
-	 * 
 	 */
 	private void disableDataCapturing() throws IOException, InterruptedException {
 		synchronized (this) {
