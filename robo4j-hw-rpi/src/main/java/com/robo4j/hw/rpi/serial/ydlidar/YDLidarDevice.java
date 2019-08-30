@@ -336,6 +336,7 @@ public class YDLidarDevice {
 	public void restart() throws IOException {
 		// This command will not return results
 		sendCommand(Command.RESTART);
+		serial.discardAll();
 	}
 
 	/**
