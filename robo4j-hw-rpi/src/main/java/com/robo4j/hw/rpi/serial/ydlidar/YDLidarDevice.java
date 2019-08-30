@@ -213,8 +213,14 @@ public class YDLidarDevice {
 							break;
 						}
 					} catch (IllegalStateException | IOException | InterruptedException | TimeoutException e) {
-						LOGGER.log(Level.SEVERE, "Failed to read data from the ydlidar - stopping scanner", e);
-						stopScanning();
+						if (isScanning) {
+							// We got here by some real error whilst scanning.
+							// If we aren't scanning, we got here since we are
+							// shutting down scanning, and there is not much
+							// left to do.
+							LOGGER.log(Level.SEVERE, "Failed to read data from the ydlidar - stopping scanner", e);
+							stopScanning();
+						}
 						return;
 					}
 				}
