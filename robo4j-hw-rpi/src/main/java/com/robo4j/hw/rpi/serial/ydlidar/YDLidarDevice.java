@@ -35,7 +35,6 @@ import com.robo4j.hw.rpi.serial.ydlidar.HealthInfo.HealthStatus;
 import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseMode;
 import com.robo4j.hw.rpi.serial.ydlidar.ResponseHeader.ResponseType;
 import com.robo4j.math.geometry.Point2f;
-import com.robo4j.math.geometry.ScanResult2D;
 import com.robo4j.math.geometry.impl.ScanResultImpl;
 import com.robo4j.math.jfr.ScanEvent;
 import com.robo4j.math.jfr.ScanId;
@@ -619,37 +618,5 @@ public class YDLidarDevice {
 		if (header.getResponseType() != expected) {
 			throw new IOException("Got the wrong response type. Should have been " + expected + ". Got " + header.getResponseType() + ".");
 		}
-
-	}
-
-	/**
-	 * Just trying something out...
-	 * 
-	 * @throws IOException
-	 *             on communication error.
-	 * @throws InterruptedException
-	 *             if the thread was interrupted.
-	 * @throws TimeoutException
-	 *             if the {@link RangingFrequency} could not be read in time.
-	 */
-	public static void main(String[] args) throws IOException, InterruptedException, TimeoutException {
-		YDLidarDevice device = new YDLidarDevice(new ScanReceiver() {
-			@Override
-			public void onScan(ScanResult2D scanResult) {
-				System.out.println("Got scan result: " + scanResult);
-			}
-		});
-		System.out.println(device);
-		System.out.println(device.getDeviceInfo());
-		System.out.println(device.getHealthInfo());
-		System.out.println("Ranging Frequency = " + device.getRangingFrequency());
-		System.out.println("Will capture data for 10 seconds...");
-		device.setScanning(true);
-		Thread.sleep(10000);
-		device.setScanning(false);
-		device.shutdown();
-		System.out.println("Done!");
-		// Naughty that this has to be done... Perhaps fix Pi4J?
-		SerialFactory.shutdown();
 	}
 }
