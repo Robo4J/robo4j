@@ -39,9 +39,11 @@ public class YDLidarTest {
 				System.out.println("Got scan result: " + scanResult);
 			}
 		});
-		System.out.println("Resetting device");
+		System.out.println("Restarting the device to make sure we start with a clean slate");
 		device.restart();
-		Thread.sleep(1000);
+		// Takes some serious time to restart this thing ;)
+		System.out.println("Waiting 4s for the device to properly boot up");
+		Thread.sleep(4000);
 		System.out.println(device);
 		System.out.println(device.getDeviceInfo());
 		System.out.println(device.getHealthInfo());
