@@ -16,10 +16,10 @@
  */
 package com.robo4j.hw.rpi.imu.impl;
 
-import com.robo4j.hw.rpi.imu.BNO055CalibrationStatus;
-import com.robo4j.hw.rpi.imu.BNO055Device;
-import com.robo4j.hw.rpi.imu.BNO055SelfTestResult;
-import com.robo4j.hw.rpi.imu.BNO055SystemStatus;
+import com.robo4j.hw.rpi.imu.Bno055CalibrationStatus;
+import com.robo4j.hw.rpi.imu.Bno055Device;
+import com.robo4j.hw.rpi.imu.Bno055SelfTestResult;
+import com.robo4j.hw.rpi.imu.Bno055SystemStatus;
 import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.math.geometry.Tuple4d;
 
@@ -32,12 +32,12 @@ import java.io.IOException;
  * support clock stretching yet (Raspberry Pi 3), so this particular class does
  * not work until that has been fixed in the i2c implementation on the Raspberry
  * Pi. Until then, wire the BNO055 to use serial tty communication as described
- * in that data sheet, and use the {@link BNO055SerialDevice} instead.
+ * in that data sheet, and use the {@link Bno055SerialDevice} instead.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public abstract class AbstractBNO055Device implements BNO055Device {
+public abstract class AbstractBno055Device implements Bno055Device {
 	private static final int WAIT_STEP_MILLIS = 5;
 	// Spec 3.6.5.5
 	private static final float QUAT_SCALE = (float) (1.0 / (1 << 14));
@@ -86,7 +86,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 * @see PowerMode
 	 * @see OperatingMode
 	 */
-	public AbstractBNO055Device() throws IOException {
+	public AbstractBno055Device() throws IOException {
 
 	}
 
@@ -141,8 +141,8 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 * @see com.robo4j.hw.rpi.i2c.imu.BNO055Device#getCalibrationStatus()
 	 */
 	@Override
-	public BNO055CalibrationStatus getCalibrationStatus() throws IOException {
-		return new BNO055CalibrationStatus(read(REGISTER_CALIB_STAT));
+	public Bno055CalibrationStatus getCalibrationStatus() throws IOException {
+		return new Bno055CalibrationStatus(read(REGISTER_CALIB_STAT));
 	}
 
 	/*
@@ -151,8 +151,8 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 * @see com.robo4j.hw.rpi.i2c.imu.BNO055Device#getSystemStatus()
 	 */
 	@Override
-	public BNO055SystemStatus getSystemStatus() throws IOException {
-		return new BNO055SystemStatus(read(REGISTER_SYS_STATUS));
+	public Bno055SystemStatus getSystemStatus() throws IOException {
+		return new Bno055SystemStatus(read(REGISTER_SYS_STATUS));
 	}
 
 	/*
@@ -171,7 +171,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 * @see com.robo4j.hw.rpi.i2c.imu.BNO055Device#performSelfTest()
 	 */
 	@Override
-	public BNO055SelfTestResult performSelfTest() throws IOException {
+	public Bno055SelfTestResult performSelfTest() throws IOException {
 		OperatingMode previousOperatingMode = getOperatingMode();
 		if (previousOperatingMode != OperatingMode.CONFIG) {
 			setOperatingMode(OperatingMode.CONFIG);
@@ -184,7 +184,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 		if (resultCode != 0x0F) {
 			errorCode = read(REGISTER_SYS_ERR);
 		}
-		BNO055SelfTestResult result = new BNO055SelfTestResult(resultCode, errorCode);
+		Bno055SelfTestResult result = new Bno055SelfTestResult(resultCode, errorCode);
 		if (previousOperatingMode != OperatingMode.CONFIG) {
 			setOperatingMode(previousOperatingMode);
 			sleep(20);
@@ -383,7 +383,7 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	private boolean waitForOk(int maxWaitTimeMillis) throws IOException {
 		int waitTime = 0;
 		while (true) {
-			BNO055SystemStatus systemStatus = getSystemStatus();
+			Bno055SystemStatus systemStatus = getSystemStatus();
 			if (systemStatus.isReady() || systemStatus.hasError() || waitTime >= maxWaitTimeMillis) {
 				if (systemStatus.isReady()) {
 					return true;

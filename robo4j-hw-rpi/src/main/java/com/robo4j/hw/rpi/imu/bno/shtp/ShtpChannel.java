@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * available registers
+ * The Shtp channels in the BNO 080.
  */
 public enum ShtpChannel {
 	//@formatter:off

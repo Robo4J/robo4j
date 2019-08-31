@@ -76,7 +76,7 @@ import com.robo4j.math.geometry.Tuple3f;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BNO080SPIDevice extends AbstractBNO080Device {
+public class Bno080SPIDevice extends AbstractBno080Device {
 
 	public static final SpiMode DEFAULT_SPI_MODE = SpiMode.MODE_3;
 	public static final int DEFAULT_SPI_SPEED = 3000000; // 3MHz maximum SPI
@@ -103,11 +103,11 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	// uint32_t
 	private long sensorReportDelayMicroSec = 0;
 
-	public BNO080SPIDevice() throws IOException {
+	public Bno080SPIDevice() throws IOException {
 		this(DEFAULT_SPI_CHANNEL, DEFAULT_SPI_SPEED, DEFAULT_SPI_MODE);
 	}
 
-	public BNO080SPIDevice(SpiChannel spiChannel, int speed, SpiMode mode) throws IOException {
+	public Bno080SPIDevice(SpiChannel spiChannel, int speed, SpiMode mode) throws IOException {
 		spiDevice = new SpiDeviceImpl(spiChannel, speed, mode);
 	}
 

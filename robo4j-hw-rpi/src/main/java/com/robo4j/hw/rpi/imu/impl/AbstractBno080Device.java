@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.robo4j.hw.rpi.imu.BNO080Device;
+import com.robo4j.hw.rpi.imu.Bno080Device;
 import com.robo4j.hw.rpi.imu.bno.DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportIds;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
@@ -38,7 +38,7 @@ import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public abstract class AbstractBNO080Device implements BNO080Device {
+public abstract class AbstractBno080Device implements Bno080Device {
 	public static final int SHTP_HEADER_SIZE = 4;
 
 	static byte RECEIVE_WRITE_BYTE = (byte) 0xFF;

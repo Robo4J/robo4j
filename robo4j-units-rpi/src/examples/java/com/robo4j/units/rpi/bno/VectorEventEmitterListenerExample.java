@@ -30,7 +30,7 @@ import com.robo4j.util.SystemUtil;
 
 /**
  * VectorEventEmitterListenerExample is simple robo4j system displaying Rotation Vector event from
- * {@link com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice}
+ * {@link com.robo4j.hw.rpi.imu.impl.Bno080SPIDevice}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

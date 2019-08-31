@@ -22,7 +22,7 @@ package com.robo4j.hw.rpi.imu;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class BNO055CalibrationStatus {
+public final class Bno055CalibrationStatus {
 	private final int status;
 
 	public enum CalibrationStatus {
@@ -54,7 +54,7 @@ public final class BNO055CalibrationStatus {
 	 * @param statusRegisterValue
 	 *            the contents of the status register.
 	 */
-	public BNO055CalibrationStatus(int statusRegisterValue) {
+	public Bno055CalibrationStatus(int statusRegisterValue) {
 		this.status = statusRegisterValue;
 	}
 

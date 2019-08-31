@@ -22,7 +22,7 @@ package com.robo4j.hw.rpi.imu;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public enum BNO055SystemError {
+public enum Bno055SystemError {
 	//@formatter:off
 	NO_ERROR(0, "No error"), 
 	PERIPHERAL_INIT(1, "Peripheral initialization error"), 
@@ -40,7 +40,7 @@ public enum BNO055SystemError {
 	int errorCode;
 	String errorMessage;
 
-	BNO055SystemError(int errorCode, String errorMessage) {
+	Bno055SystemError(int errorCode, String errorMessage) {
 		this.errorCode = errorCode;
 		this.errorMessage = errorMessage;
 	}
@@ -53,8 +53,8 @@ public enum BNO055SystemError {
 		return errorMessage;
 	}
 
-	public static BNO055SystemError fromErrorCode(int errorCode) {
-		for (BNO055SystemError error : values()) {
+	public static Bno055SystemError fromErrorCode(int errorCode) {
+		for (Bno055SystemError error : values()) {
 			if (error.getErrorCode() == errorCode) {
 				return error;
 			}

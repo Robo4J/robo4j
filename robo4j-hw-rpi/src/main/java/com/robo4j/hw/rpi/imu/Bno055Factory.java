@@ -16,9 +16,9 @@
  */
 package com.robo4j.hw.rpi.imu;
 
-import com.robo4j.hw.rpi.imu.BNO055Device.OperatingMode;
-import com.robo4j.hw.rpi.imu.impl.BNO055I2CDevice;
-import com.robo4j.hw.rpi.imu.impl.BNO055SerialDevice;
+import com.robo4j.hw.rpi.imu.Bno055Device.OperatingMode;
+import com.robo4j.hw.rpi.imu.impl.Bno055I2CDevice;
+import com.robo4j.hw.rpi.imu.impl.Bno055SerialDevice;
 
 import java.io.IOException;
 
@@ -28,7 +28,7 @@ import java.io.IOException;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class BNO055Factory {
+public final class Bno055Factory {
 	/**
 	 * Will create an I2C connected BNO055 device.
 	 * 
@@ -40,8 +40,8 @@ public final class BNO055Factory {
 	 * @throws IOException
 	 *             exception
 	 */
-	public static BNO055Device createDefaultI2CDevice() throws IOException {
-		return new BNO055I2CDevice();
+	public static Bno055Device createDefaultI2CDevice() throws IOException {
+		return new Bno055I2CDevice();
 	}
 
 	/**
@@ -51,8 +51,8 @@ public final class BNO055Factory {
 	 * @throws IOException
 	 *             exception
 	 */
-	public static BNO055Device createDefaultSerialDevice() throws IOException {
-		return new BNO055SerialDevice();
+	public static Bno055Device createDefaultSerialDevice() throws IOException {
+		return new Bno055SerialDevice();
 	}
 
 	/**
@@ -68,8 +68,8 @@ public final class BNO055Factory {
 	 * @throws IOException
 	 *             exception
 	 */
-	public static BNO055Device createDevice(int bus, int address, OperatingMode operatingMode) throws IOException {
-		return new BNO055I2CDevice(bus, address, operatingMode);
+	public static Bno055Device createDevice(int bus, int address, OperatingMode operatingMode) throws IOException {
+		return new Bno055I2CDevice(bus, address, operatingMode);
 	}
 
 	/**
@@ -87,9 +87,9 @@ public final class BNO055Factory {
 	 * @throws IOException
 	 *             exception
 	 */
-	public static BNO055Device createDevice(String serialPort, OperatingMode operatingMode, long retryTimeout,
+	public static Bno055Device createDevice(String serialPort, OperatingMode operatingMode, long retryTimeout,
 			int noOfRetries) throws IOException {
-		return new BNO055SerialDevice(serialPort, operatingMode, retryTimeout, noOfRetries);
+		return new Bno055SerialDevice(serialPort, operatingMode, retryTimeout, noOfRetries);
 	}
 
 }

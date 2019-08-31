@@ -28,7 +28,7 @@ import com.robo4j.util.SystemUtil;
 /**
  * XYZEventEmiterListenerExample is an example displaying received data from
  * GYROSCOPE. Data are provided by
- * {@link com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice}
+ * {@link com.robo4j.hw.rpi.imu.impl.Bno080SPIDevice}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

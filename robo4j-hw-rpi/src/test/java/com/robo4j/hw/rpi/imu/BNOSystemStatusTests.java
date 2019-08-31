@@ -30,16 +30,16 @@ class BNOSystemStatusTests {
 
 	@Test
 	void testFlags() {
-		BNO055SystemStatus status = new BNO055SystemStatus(1);
+		Bno055SystemStatus status = new Bno055SystemStatus(1);
 		assertTrue(status.getStatusFlags().length == 1);
-		assertArrayEquals(createFlags(BNO055SystemStatus.StatusFlag.IDLE), status.getStatusFlags());
-		status = new BNO055SystemStatus(65);
+		assertArrayEquals(createFlags(Bno055SystemStatus.StatusFlag.IDLE), status.getStatusFlags());
+		status = new Bno055SystemStatus(65);
 		assertTrue(status.getStatusFlags().length == 2);
-		assertArrayEquals(createFlags(BNO055SystemStatus.StatusFlag.IDLE, BNO055SystemStatus.StatusFlag.RUNNING_NO_SENSOR_FUSION), status.getStatusFlags());
+		assertArrayEquals(createFlags(Bno055SystemStatus.StatusFlag.IDLE, Bno055SystemStatus.StatusFlag.RUNNING_NO_SENSOR_FUSION), status.getStatusFlags());
 
 	}
 
-	private BNO055SystemStatus.StatusFlag[] createFlags(BNO055SystemStatus.StatusFlag... flags) {
+	private Bno055SystemStatus.StatusFlag[] createFlags(Bno055SystemStatus.StatusFlag... flags) {
 		return flags;
 	}
 }

@@ -16,7 +16,7 @@
  */
 package com.robo4j.hw.rpi.imu;
 
-import com.robo4j.hw.rpi.imu.BNO055Device.OperatingMode;
+import com.robo4j.hw.rpi.imu.Bno055Device.OperatingMode;
 import com.robo4j.math.geometry.Tuple3f;
 
 import java.io.IOException;
@@ -30,14 +30,14 @@ import java.util.concurrent.TimeUnit;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BNO055Example {
+public class Bno055Example {
 	private final static ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(1);
 
 	private final static class BNOPrinter implements Runnable {
 
-		private final BNO055Device device;
+		private final Bno055Device device;
 
-		private BNOPrinter(BNO055Device device) {
+		private BNOPrinter(Bno055Device device) {
 			this.device = device;
 		}
 
@@ -69,7 +69,7 @@ public class BNO055Example {
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
 		System.out.println("Starting the BNO055 Example.");
-		BNO055Device bno = BNO055Factory.createDefaultSerialDevice();
+		Bno055Device bno = Bno055Factory.createDefaultSerialDevice();
 		Thread.sleep(20);
 
 		System.out.println("Resetting device...");
@@ -77,7 +77,7 @@ public class BNO055Example {
 		Thread.sleep(20);
 
 		System.out.println("Running Self Test...");
-		BNO055SelfTestResult testResult = bno.performSelfTest();
+		Bno055SelfTestResult testResult = bno.performSelfTest();
 		System.out.println("Result of self test: ");
 		System.out.println(testResult);
 		Thread.sleep(20);
@@ -90,7 +90,7 @@ public class BNO055Example {
 		}
 
 		System.out.println("Starting calibration sequence...");
-		BNO055CalibrationStatus calibrationStatus = null;
+		Bno055CalibrationStatus calibrationStatus = null;
 		while (!(calibrationStatus = bno.getCalibrationStatus()).isFullyCalibrated()) {
 			System.out.println(String.format(
 					"Calibration status: system:%s, gyro:%s, accelerometer:%s, magnetometer:%s",

@@ -22,7 +22,7 @@ package com.robo4j.hw.rpi.imu;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BNO055SystemStatus {
+public class Bno055SystemStatus {
 	private final StatusFlag[] flags;
 
 	public enum StatusFlag {
@@ -62,11 +62,11 @@ public class BNO055SystemStatus {
 		}
 	}
 
-	public BNO055SystemStatus(int registerValue) {
+	public Bno055SystemStatus(int registerValue) {
 		flags = deriveFlags(registerValue);
 	}
 
-	public BNO055SystemStatus(StatusFlag[] flags) {
+	public Bno055SystemStatus(StatusFlag[] flags) {
 		this.flags = flags;
 	}
 

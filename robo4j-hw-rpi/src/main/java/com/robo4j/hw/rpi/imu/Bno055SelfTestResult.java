@@ -22,17 +22,17 @@ package com.robo4j.hw.rpi.imu;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class BNO055SelfTestResult {
+public final class Bno055SelfTestResult {
 	private final int registerContent;
-	private final BNO055SystemError error;
+	private final Bno055SystemError error;
 
 	public enum TestResult {
 		FAILED, PASSED
 	}
 
-	public BNO055SelfTestResult(int registerContent, int errorCode) {
+	public Bno055SelfTestResult(int registerContent, int errorCode) {
 		this.registerContent = registerContent;
-		this.error = BNO055SystemError.fromErrorCode(errorCode);
+		this.error = Bno055SystemError.fromErrorCode(errorCode);
 	}
 
 	public TestResult getAccelerometerResult() {
@@ -51,12 +51,12 @@ public final class BNO055SelfTestResult {
 		return (registerContent & 8) == 0 ? TestResult.FAILED : TestResult.PASSED;
 	}
 
-	public BNO055SystemError getError() {
+	public Bno055SystemError getError() {
 		return error;
 	}
 	
 	public String toString() {
-		if (getError() == BNO055SystemError.NO_ERROR) {
+		if (getError() == Bno055SystemError.NO_ERROR) {
 			return String.format("Accelerometer: %s, Magnetometer: %s, Gyro: %s, Microcontroller: %s", getAccelerometerResult(), getMagnetometerResult(), getGyroResult(), getMicroControllerResult());
 		} else {
 			return String.format("Accelerometer: %s, Magnetometer: %s, Gyro: %s, Microcontroller: %s - Error: %s", getAccelerometerResult(), getMagnetometerResult(), getGyroResult(), getMicroControllerResult(), String.valueOf(getError()));
