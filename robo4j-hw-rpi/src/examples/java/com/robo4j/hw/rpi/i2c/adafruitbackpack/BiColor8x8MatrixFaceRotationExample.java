@@ -42,7 +42,6 @@ public class BiColor8x8MatrixFaceRotationExample {
             (byte)0b0011_1100};
         //@formatter:on
 
-		int color = 1;
 		for (int i = 0; i < faceSmile.length; i++) {
 			matrix.clear();
 			matrix.display();

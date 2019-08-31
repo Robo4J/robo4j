@@ -26,13 +26,7 @@ import com.robo4j.math.geometry.Tuple3f;
 import java.io.IOException;
 
 /**
- * Abstraction for a BN0055 absolute orientation device.
- * 
- * NOTE(Marcus/Jul 27, 2017): Note that the Rasperry Pi does not properly
- * support clock stretching yet (Raspberry Pi 3), so this particular class does
- * not work until that has been fixed in the i2c implementation on the Raspberry
- * Pi. Until then, wire the BNO055 to use serial tty communication as described
- * in that data sheet, and use the com.robo4j.hw.rpi.serial.imu classes instead.
+ * Serial implementation for the BNO050.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -49,9 +43,9 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 
 	/**
 	 * The default serial port is /dev/serial0. Since Raspberry Pi 3 nabbed the
-	 * /dev/ttyAMA0 for the bluetooth, serial0 should be the new logical name to use
-	 * for the rx/tx pins. This is supposedly compatible with the older Raspberry
-	 * Pis as well.
+	 * /dev/ttyAMA0 for the bluetooth, serial0 should be the new logical name to
+	 * use for the rx/tx pins. This is supposedly compatible with the older
+	 * Raspberry Pis as well.
 	 */
 	public static final String DEFAULT_SERIAL_PORT = "/dev/serial0";
 
@@ -61,7 +55,8 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 	public static final int DEFAULT_RETRY_TIMEOUT = 2;
 
 	/**
-	 * The default number of times to retry a command before throwing an exception.
+	 * The default number of times to retry a command before throwing an
+	 * exception.
 	 */
 	public static final int DEFAULT_NO_OF_RETRIES = 3;
 
