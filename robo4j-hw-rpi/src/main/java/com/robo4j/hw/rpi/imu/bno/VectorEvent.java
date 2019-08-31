@@ -29,9 +29,8 @@ import java.util.Objects;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class VectorEvent implements DeviceEvent {
-
-	private static final EnumSet<DeviceEventType> ALLOWED = EnumSet.of(DeviceEventType.VECTOR_ROTATION,
-			DeviceEventType.VECTOR_GAME);
+	private static final long serialVersionUID = 1L;
+	private static final EnumSet<DeviceEventType> ALLOWED = EnumSet.of(DeviceEventType.VECTOR_ROTATION, DeviceEventType.VECTOR_GAME);
 	private final DeviceEventType type;
 	private final int status;
 	private final Tuple3f data;
@@ -39,8 +38,7 @@ public class VectorEvent implements DeviceEvent {
 	private final float radianAccuracy;
 	private final long timestamp;
 
-	public VectorEvent(DeviceEventType type, int status, Tuple3f data, float quatReal, float radianAccuracy,
-			long timestamp) {
+	public VectorEvent(DeviceEventType type, int status, Tuple3f data, float quatReal, float radianAccuracy, long timestamp) {
 		if (ALLOWED.contains(type)) {
 			this.status = status;
 			this.type = type;
@@ -92,8 +90,8 @@ public class VectorEvent implements DeviceEvent {
 			return false;
 		VectorEvent that = (VectorEvent) o;
 		return status == that.status && Float.compare(that.quatReal, quatReal) == 0
-				&& Float.compare(that.radianAccuracy, radianAccuracy) == 0 && timestamp == that.timestamp
-				&& type == that.type && Objects.equals(data, that.data);
+				&& Float.compare(that.radianAccuracy, radianAccuracy) == 0 && timestamp == that.timestamp && type == that.type
+				&& Objects.equals(data, that.data);
 	}
 
 	@Override
@@ -103,7 +101,7 @@ public class VectorEvent implements DeviceEvent {
 
 	@Override
 	public String toString() {
-		return "VectorEvent{" + "type=" + type + ", status=" + status + ", data=" + data + ", quatReal=" + quatReal
-				+ ", radianAccuracy=" + radianAccuracy + ", timestamp=" + timestamp + '}';
+		return "VectorEvent{" + "type=" + type + ", status=" + status + ", data=" + data + ", quatReal=" + quatReal + ", radianAccuracy="
+				+ radianAccuracy + ", timestamp=" + timestamp + '}';
 	}
 }

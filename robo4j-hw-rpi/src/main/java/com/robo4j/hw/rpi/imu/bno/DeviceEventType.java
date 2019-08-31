@@ -31,8 +31,7 @@ public enum DeviceEventType {
     ACCELEROMETER_LINEAR 	(8),
     GYROSCOPE				(9),
     VECTOR_GAME             (14),
-    VECTOR_ROTATION         (14)
-    ;
+    VECTOR_ROTATION         (14);
     //@formatter:on
     private final int qPoint;
 

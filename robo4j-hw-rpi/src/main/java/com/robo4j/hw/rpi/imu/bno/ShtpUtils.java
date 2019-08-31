@@ -42,8 +42,8 @@ public final class ShtpUtils {
 	}
 
 	/**
-	 * Print hexadecimal values of int array to system output
-	 * s
+	 * Print hexadecimal values of int array to system output s
+	 * 
 	 * @param message
 	 *            message
 	 * @param array
@@ -71,6 +71,8 @@ public final class ShtpUtils {
 	 * Empty Shtp Device Event
 	 */
 	public static final DeviceEvent emptyEvent = new DeviceEvent() {
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public DeviceEventType getType() {
 			return DeviceEventType.NONE;

@@ -49,8 +49,7 @@ public interface BNO080Device {
         CONTROL         (2),
         REPORTS         (3),
         WAKE_REPORTS    (4),
-        GYRO            (5)
-        ;
+        GYRO            (5);
         //@formatter:on
 
 		private static final Map<Byte, ShtpChannel> map = getMap();
@@ -98,8 +97,7 @@ public interface BNO080Device {
         GET_FEATURE_REQUEST                     (0xFE),
         GET_FEATURE_RESPONSE                    (0xFC),
         FORCE_SENSOR_FLUSH                      (0xF0),
-        FLUSH_COMPLETED                         (0xEF)
-        ;
+        FLUSH_COMPLETED                         (0xEF);
         //@formatter:on
 
 		private final static Map<Integer, ShtpDeviceReport> map = getMap();
@@ -174,8 +172,7 @@ public interface BNO080Device {
         HUMIDITY                        (0x0C),
         PROXIMITY                       (0x0D),
         TEMPERATURE                     (0x0E),
-        BASE_TIMESTAMP                  (0xFB),
-        ;
+        BASE_TIMESTAMP                  (0xFB);
         //@formatter:on
 
 		private final int id;
@@ -216,8 +213,7 @@ public interface BNO080Device {
         ACCELEROMETER               (0xE302),
         GYROSCOPE_CALIBRATED        (0xE306),
         MAGNETIC_FIELD_CALIBRATED   (0xE309),
-        ROTATION_VECTOR             (0xE30B)
-        ;
+        ROTATION_VECTOR             (0xE30B);
         //@formatter:on
 
 		private final int id;
@@ -255,9 +251,8 @@ public interface BNO080Device {
         ME_CALIBRATE    (7),
         DCD_PERIOD_SAVE (9),
         OSCILLATOR      (10),
-        CLEAR_DCD       (11)
+        CLEAR_DCD       (11);
         //@formatter:on
-		;
 
 		private static Map<Integer, DeviceCommand> map = getMap();
 		private final int id;
@@ -292,9 +287,9 @@ public interface BNO080Device {
         MAG             (2),
         PLANAR_ACCEL    (3),
         ACCEL_GYRO_MAG  (4),
-        STOP            (5)
+        STOP            (5);
         //@formatter:on
-		;
+
 		private int id;
 
 		DeviceCalibrate(int id) {

@@ -235,8 +235,8 @@ public abstract class AbstractBNO055Device implements BNO055Device {
 	 * com.robo4j.hw.rpi.i2c.imu.BNO055I2CDevice.Orientation)
 	 */
 	@Override
-	public void setUnits(Unit accelerationUnit, Unit angularRateUnit, Unit angleUnit, Unit temperatureUnit,
-			OrientationMode orientationMode) throws IOException {
+	public void setUnits(Unit accelerationUnit, Unit angularRateUnit, Unit angleUnit, Unit temperatureUnit, OrientationMode orientationMode)
+			throws IOException {
 		int val = 0;
 		if (accelerationUnit == Unit.MILI_G) {
 			val |= 0x01;

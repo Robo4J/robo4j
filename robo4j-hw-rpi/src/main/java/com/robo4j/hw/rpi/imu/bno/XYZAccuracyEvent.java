@@ -30,9 +30,9 @@ import java.util.Objects;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class XYZAccuracyEvent implements DeviceEvent {
+	private static final long serialVersionUID = 1L;
 
-	private static final EnumSet<DeviceEventType> ALLOWED = EnumSet.range(DeviceEventType.MAGNETOMETER,
-			DeviceEventType.GYROSCOPE);
+	private static final EnumSet<DeviceEventType> ALLOWED = EnumSet.range(DeviceEventType.MAGNETOMETER, DeviceEventType.GYROSCOPE);
 
 	private final DeviceEventType type;
 	private final int status;
@@ -77,8 +77,7 @@ public class XYZAccuracyEvent implements DeviceEvent {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		XYZAccuracyEvent that = (XYZAccuracyEvent) o;
-		return status == that.status && timestamp == that.timestamp && type == that.type
-				&& Objects.equals(data, that.data);
+		return status == that.status && timestamp == that.timestamp && type == that.type && Objects.equals(data, that.data);
 	}
 
 	@Override
@@ -88,7 +87,6 @@ public class XYZAccuracyEvent implements DeviceEvent {
 
 	@Override
 	public String toString() {
-		return "XYZAccuracyEvent{" + "type=" + type + ", status=" + status + ", data=" + data + ", timestamp="
-				+ timestamp + '}';
+		return "XYZAccuracyEvent{" + "type=" + type + ", status=" + status + ", data=" + data + ", timestamp=" + timestamp + '}';
 	}
 }

@@ -24,56 +24,56 @@ import static com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice.SHTP_HEADER_SIZE;
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class ShtpPacketResponse {
-    private final int[] header = new int[SHTP_HEADER_SIZE];
-    private int[] body;
+	private final int[] header = new int[SHTP_HEADER_SIZE];
+	private int[] body;
 
-    public ShtpPacketResponse(int size) {
-        this.body = new int[size];
-    }
+	public ShtpPacketResponse(int size) {
+		this.body = new int[size];
+	}
 
-    public void addHeader(int... header) {
-        if (header.length != this.header.length) {
-            System.out.println("ShtpPacketRequest: wrong header");
-        } else {
-            this.header[0] = header[0]; // LSB
-            this.header[1] = header[1]; // MSB
-            this.header[2] = header[2]; // Channel Number
-            // Send the sequence number, increments with each packet sent, different counter
-            // for each channel
-            this.header[3] = header[3];
-        }
+	public void addHeader(int... header) {
+		if (header.length != this.header.length) {
+			System.out.println("ShtpPacketRequest: wrong header");
+		} else {
+			this.header[0] = header[0]; // LSB
+			this.header[1] = header[1]; // MSB
+			this.header[2] = header[2]; // Channel Number
+			// Send the sequence number, increments with each packet sent,
+			// different counter for each channel
+			this.header[3] = header[3];
+		}
 
-    }
+	}
 
-    public int[] getHeader() {
-        int[] copy = new int[header.length];
-        System.arraycopy(header, 0, copy, 0, header.length);
-        return copy;
-    }
+	public int[] getHeader() {
+		int[] copy = new int[header.length];
+		System.arraycopy(header, 0, copy, 0, header.length);
+		return copy;
+	}
 
-    public byte getHeaderChannel() {
-        return (byte) header[2];
-    }
+	public byte getHeaderChannel() {
+		return (byte) header[2];
+	}
 
-    public void addBody(int pos, int element) {
-        body[pos] = element;
-    }
+	public void addBody(int pos, int element) {
+		body[pos] = element;
+	}
 
-    public int getBodyFirst() {
-        return body.length == 0 ? -1 : body[0];
-    }
+	public int getBodyFirst() {
+		return body.length == 0 ? -1 : body[0];
+	}
 
-    public int[] getBody() {
-        int[] copy = new int[body.length];
-        System.arraycopy(body, 0, copy, 0, body.length);
-        return copy;
-    }
+	public int[] getBody() {
+		int[] copy = new int[body.length];
+		System.arraycopy(body, 0, copy, 0, body.length);
+		return copy;
+	}
 
-    public int getBodySize() {
-        return body.length;
-    }
+	public int getBodySize() {
+		return body.length;
+	}
 
-    public boolean dataAvailable() {
-        return body.length > 0;
-    }
+	public boolean dataAvailable() {
+		return body.length > 0;
+	}
 }
