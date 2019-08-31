@@ -17,13 +17,6 @@
 
 package com.robo4j.hw.rpi.imu.impl;
 
-import com.robo4j.hw.rpi.imu.BNO080Device;
-import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
-import com.robo4j.hw.rpi.imu.bno.DeviceDeviceReport;
-import com.robo4j.hw.rpi.imu.bno.DeviceListener;
-import com.robo4j.hw.rpi.imu.bno.DeviceSensorReport;
-import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
-
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
@@ -32,6 +25,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.robo4j.hw.rpi.imu.BNO080Device;
+import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
+import com.robo4j.hw.rpi.imu.bno.DeviceListener;
+import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportIds;
+import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
+
 /**
  * AbstractBNO080Device base functionality for BNO080 Devices
  *
@@ -39,6 +39,18 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Miroslav Wengner (@miragemiko)
  */
 public abstract class AbstractBNO080Device implements BNO080Device {
+	public static final int SHTP_HEADER_SIZE = 4;
+
+	static byte RECEIVE_WRITE_BYTE = (byte) 0xFF;
+	static byte RECEIVE_WRITE_BYTE_CONTINUAL = (byte) 0;
+	final List<DeviceListener> listeners = new CopyOnWriteArrayList<>();
+	final AtomicBoolean active = new AtomicBoolean(false);
+	final AtomicBoolean ready = new AtomicBoolean(false);
+	final AtomicInteger commandSequenceNumber = new AtomicInteger(0);
+	
+	private static final short CHANNEL_COUNT = 6; // BNO080 supports 6 channels
+	private static final int AWAIT_TERMINATION = 10;
+	private final int[] sequenceByChannel = new int[CHANNEL_COUNT];
 
 	static class ShtpPacketBodyBuilder {
 		private int[] body;
@@ -58,27 +70,15 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 		}
 	}
 
-	public static final int SHTP_HEADER_SIZE = 4;
-	static byte RECEIVE_WRITE_BYTE = (byte) 0xFF;
-	static byte RECEIVE_WRITE_BYTE_CONTINUAL = (byte) 0;
-	final List<DeviceListener> listeners = new CopyOnWriteArrayList<>();
-	final AtomicBoolean active = new AtomicBoolean(false);
-	final AtomicBoolean ready = new AtomicBoolean(false);
-	final AtomicInteger commandSequenceNumber = new AtomicInteger(0);
 
 	final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, (r) -> {
 		Thread t = new Thread(r, "BNO080 Internal Executor");
 		t.setDaemon(true);
 		return t;
 	});
-	private static final short CHANNEL_COUNT = 6; // BNO080 supports 6 channels
-	private static final int AWAIT_TERMINATION = 10;
-	private final int[] sequenceByChannel = new int[CHANNEL_COUNT];
-
-
-
+	
 	@Override
-	public abstract boolean start(DeviceSensorReport report, int reportDelay);
+	public abstract boolean start(SensorReportIds report, int reportDelay);
 
 	@Override
 	public void shutdown() {
@@ -99,17 +99,30 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 		listeners.remove(listener);
 	}
 
+	/**
+	 * SHTP packet contains 1 byte to get Error report. Packet is sent to the
+	 * COMMAND channel
+	 *
+	 * @return error request packet
+	 */
+	public ShtpPacketRequest getErrorRequest() {
+		ShtpPacketRequest result = prepareShtpPacketRequest(DeviceChannel.COMMAND, 1);
+		result.addBody(0, 0x01 & 0xFF);
+		return result;
+	}
+
+	
 	ShtpPacketRequest prepareShtpPacketRequest(DeviceChannel deviceChannel, int size) {
 		ShtpPacketRequest packet = new ShtpPacketRequest(size, sequenceByChannel[deviceChannel.getChannel()]++);
 		packet.createHeader(deviceChannel);
 		return packet;
-	} 
+	}
 
 	ShtpPacketRequest getProductIdRequest() {
 		// Check communication with device
 		// bytes: Request the product ID and reset info, Reserved
 		ShtpPacketRequest result = prepareShtpPacketRequest(DeviceChannel.CONTROL, 2);
-		result.addBody(0, DeviceDeviceReport.PRODUCT_ID_REQUEST.getId());
+		result.addBody(0, ControlReportIds.PRODUCT_ID_REQUEST.getId());
 		result.addBody(1, 0);
 		return result;
 	}
@@ -129,18 +142,4 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 			System.err.println(String.format("awaitTermination e: %s", e));
 		}
 	}
-
-	/**
-	 * SHTP packet contains 1 byte to get Error report. Packet is send to the
-	 * COMMAND channel
-	 *
-	 *
-	 * @return error request packet
-	 */
-	private ShtpPacketRequest getErrorRequest() {
-		ShtpPacketRequest result = prepareShtpPacketRequest(DeviceChannel.COMMAND, 1);
-		result.addBody(0, 0x01 & 0xFF);
-		return result;
-	}
-
 }

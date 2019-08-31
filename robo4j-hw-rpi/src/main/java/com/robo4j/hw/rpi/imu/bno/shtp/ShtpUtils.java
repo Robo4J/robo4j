@@ -19,6 +19,7 @@ package com.robo4j.hw.rpi.imu.bno.shtp;
 
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataEventType;
+import com.robo4j.math.geometry.Tuple3f;
 
 /**
  * ShtpUtils collection of useful utils
@@ -93,4 +94,21 @@ public final class ShtpUtils {
 		dataLength &= ~(1 << 15); // Clear the MSbit.
 		return dataLength;
 	}
+
+	/**
+	 * Creates a float tuple from data provided in fixed int format.
+	 * 
+	 * @param qPoint
+	 * @param fixedX
+	 * @param fixedY
+	 * @param fixedZ
+	 * @return the created float tuple.
+	 */
+	public static Tuple3f createTupleFromFixed(int qPoint, int fixedX, int fixedY, int fixedZ) {
+		float x = ShtpUtils.intToFloat(fixedX, qPoint);
+		float y = ShtpUtils.intToFloat(fixedY, qPoint);
+		float z = ShtpUtils.intToFloat(fixedZ, qPoint);
+		return new Tuple3f(x, y, z);
+	}
+
 }

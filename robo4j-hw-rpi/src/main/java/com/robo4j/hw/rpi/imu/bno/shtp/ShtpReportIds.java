@@ -15,18 +15,24 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu.bno;
+package com.robo4j.hw.rpi.imu.bno.shtp;
+
+import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
 
 /**
- * ShtpReport represent report Id and the channel
+ * Helper for report types.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface DeviceReport {
-
+public interface ShtpReportIds {
+	/**
+	 * @return the id of the report.
+	 */
 	int getId();
 
+	/**
+	 * @return the channel which can report such a report.
+	 */
 	DeviceChannel getChannel();
-
 }

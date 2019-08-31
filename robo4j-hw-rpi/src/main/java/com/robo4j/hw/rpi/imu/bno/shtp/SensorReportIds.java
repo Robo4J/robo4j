@@ -15,12 +15,14 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu.bno;
+package com.robo4j.hw.rpi.imu.bno.shtp;
+
+import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
 
 /**
  * Sensor reports received on ShtpChannel 3
  */
-public enum DeviceSensorReport implements DeviceReport {
+public enum SensorReportIds implements ShtpReportIds {
     //@formatter:off
     NONE                            (-1),
     ACCELEROMETER                   (0x01),
@@ -63,7 +65,7 @@ public enum DeviceSensorReport implements DeviceReport {
     private final int id;
     private final DeviceChannel deviceChannel = DeviceChannel.REPORTS;
 
-    DeviceSensorReport(int id) {
+    SensorReportIds(int id) {
         this.id = id;
     }
 
@@ -77,8 +79,8 @@ public enum DeviceSensorReport implements DeviceReport {
         return deviceChannel;
     }
 
-    public static DeviceSensorReport getById(int code) {
-        for (DeviceSensorReport r : values()) {
+    public static SensorReportIds getById(int code) {
+        for (SensorReportIds r : values()) {
             if ((code & 0xFF) == r.getId()) {
                 return r;
             }

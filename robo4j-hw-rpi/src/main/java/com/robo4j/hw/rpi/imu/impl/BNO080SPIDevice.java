@@ -17,8 +17,8 @@
 
 package com.robo4j.hw.rpi.imu.impl;
 
-import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.calculateNumberOfBytesInPacket;
 import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.EMPTY_EVENT;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.calculateNumberOfBytesInPacket;
 import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.intToFloat;
 import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.printArray;
 import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.toInt8U;
@@ -43,17 +43,17 @@ import com.pi4j.io.spi.impl.SpiDeviceImpl;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataEventType;
 import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
-import com.robo4j.hw.rpi.imu.bno.DeviceDeviceReport;
 import com.robo4j.hw.rpi.imu.bno.DeviceListener;
-import com.robo4j.hw.rpi.imu.bno.DeviceReport;
-import com.robo4j.hw.rpi.imu.bno.DeviceSensorReport;
-import com.robo4j.hw.rpi.imu.bno.Tuple3fBuilder;
 import com.robo4j.hw.rpi.imu.bno.VectorEvent;
+import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportIds;
+import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperation;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationBuilder;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationResponse;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketResponse;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpReportIds;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils;
 import com.robo4j.math.geometry.Tuple3f;
 
 /**
@@ -116,7 +116,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	}
 
 	@Override
-	public boolean start(DeviceSensorReport report, int reportDelay) {
+	public boolean start(SensorReportIds report, int reportDelay) {
 		if (reportDelay > 0) {
 			final CountDownLatch latch = new CountDownLatch(1);
 			System.out.println(String.format("START: ready:%s, active:%s", ready.get(), active.get()));
@@ -173,7 +173,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	private ShtpPacketRequest createCalibrateCommandAll() {
 		DeviceChannel deviceChannel = DeviceChannel.COMMAND;
 		ShtpPacketRequest packet = prepareShtpPacketRequest(deviceChannel, 12);
-		packet.addBody(0, DeviceDeviceReport.COMMAND_REQUEST.getId());
+		packet.addBody(0, ControlReportIds.COMMAND_REQUEST.getId());
 		packet.addBody(0, commandSequenceNumber.getAndIncrement());
 		packet.addBody(2, DeviceCommand.ME_CALIBRATE.getId());
 		packet.addBody(3, 1);
@@ -191,8 +191,8 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 *            time delay for sensor report
 	 * @return operation head
 	 */
-	private ShtpOperation getSensorReportOperation(DeviceSensorReport report, int reportDelay) {
-		ShtpOperationResponse response = new ShtpOperationResponse(DeviceDeviceReport.GET_FEATURE_RESPONSE);
+	private ShtpOperation getSensorReportOperation(SensorReportIds report, int reportDelay) {
+		ShtpOperationResponse response = new ShtpOperationResponse(ControlReportIds.GET_FEATURE_RESPONSE);
 		ShtpPacketRequest request = createFeatureRequest(report, reportDelay, 0);
 		return new ShtpOperation(request, response);
 	}
@@ -206,7 +206,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 *            necessary delay between the request and device response
 	 * @return status
 	 */
-	private boolean enableSensorReport(DeviceSensorReport report, int reportDelay) {
+	private boolean enableSensorReport(SensorReportIds report, int reportDelay) {
 		final ShtpOperation enableSensorReportOp = getSensorReportOperation(report, reportDelay);
 		try {
 			return processOperationChainByHead(enableSensorReportOp);
@@ -267,13 +267,13 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			waitForSPI();
 			ShtpPacketResponse receivedPacket = receivePacket(true, RECEIVE_WRITE_BYTE_CONTINUAL);
 			DeviceChannel channel = DeviceChannel.getByChannel(receivedPacket.getHeaderChannel());
-			DeviceReport reportType = getReportType(channel, receivedPacket);
+			ShtpReportIds reportType = getReportType(channel, receivedPacket);
 
 			switch (channel) {
 			case CONTROL:
 				break;
 			case REPORTS:
-				if (DeviceSensorReport.BASE_TIMESTAMP.equals(reportType)) {
+				if (SensorReportIds.BASE_TIMESTAMP.equals(reportType)) {
 					return parseInputReport(receivedPacket);
 				}
 				break;
@@ -289,14 +289,14 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		}
 	}
 
-	private DeviceReport getReportType(DeviceChannel channel, ShtpPacketResponse response) {
+	private ShtpReportIds getReportType(DeviceChannel channel, ShtpPacketResponse response) {
 		switch (channel) {
 		case CONTROL:
-			return DeviceDeviceReport.getById(response.getBodyFirst());
+			return ControlReportIds.getById(response.getBodyFirst());
 		case REPORTS:
-			return DeviceSensorReport.getById(response.getBodyFirst());
+			return SensorReportIds.getById(response.getBodyFirst());
 		default:
-			return DeviceDeviceReport.NONE;
+			return ControlReportIds.NONE;
 		}
 	}
 
@@ -327,11 +327,11 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		ShtpOperation headAdvertisementOp = new ShtpOperation(initRequest, advResponse);
 		ShtpOperationBuilder builder = new ShtpOperationBuilder(headAdvertisementOp);
 
-		ShtpOperationResponse reportIdResponse = new ShtpOperationResponse(DeviceDeviceReport.PRODUCT_ID_RESPONSE);
+		ShtpOperationResponse reportIdResponse = new ShtpOperationResponse(ControlReportIds.PRODUCT_ID_RESPONSE);
 		ShtpOperation productIdOperation = new ShtpOperation(getProductIdRequest(), reportIdResponse);
 		builder.addOperation(productIdOperation);
 
-		ShtpOperationResponse resetResponse = new ShtpOperationResponse(DeviceDeviceReport.COMMAND_RESPONSE);
+		ShtpOperationResponse resetResponse = new ShtpOperationResponse(ControlReportIds.COMMAND_RESPONSE);
 		ShtpOperation resetOperation = new ShtpOperation(null, resetResponse);
 		builder.addOperation(resetOperation);
 
@@ -412,7 +412,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 *
 	 * @return error request packet
 	 */
-	private ShtpPacketRequest getErrorRequest() {
+	public ShtpPacketRequest getErrorRequest() {
 		ShtpPacketRequest result = prepareShtpPacketRequest(DeviceChannel.COMMAND, 1);
 		result.addBody(0, 0x01 & 0xFF);
 		return result;
@@ -473,8 +473,8 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 */
 	private void parseCommandReport(ShtpPacketResponse packet) {
 		int[] payload = packet.getBody();
-		DeviceDeviceReport report = DeviceDeviceReport.getById(payload[0] & 0xFF);
-		if (report.equals(DeviceDeviceReport.COMMAND_RESPONSE)) {
+		ControlReportIds report = ControlReportIds.getById(payload[0] & 0xFF);
+		if (report.equals(ControlReportIds.COMMAND_RESPONSE)) {
 			// The BNO080 responds with this report to command requests. It's up
 			// to use to
 			// remember which command we issued.
@@ -525,7 +525,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			data5 = (payload[18] & 0xFFFF) << 8 | payload[17] & 0xFF;
 		}
 
-		final DeviceSensorReport sensorReport = DeviceSensorReport.getById(sensor);
+		final SensorReportIds sensorReport = SensorReportIds.getById(sensor);
 
 		switch (sensorReport) {
 		case ACCELEROMETER:
@@ -551,15 +551,14 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			return EMPTY_EVENT;
 		}
 		final int status = data[0] & 0xFFFF;
-		final int qX = data[1] & 0xFFFF;
-		final int qY = data[2] & 0xFFFF;
-		final int qZ = data[3] & 0xFFFF;
+		final int x = data[1] & 0xFFFF;
+		final int y = data[2] & 0xFFFF;
+		final int z = data[3] & 0xFFFF;
 		final int qReal = data[4] & 0xFFFF;
 		final int qRadianAccuracy = data[5] & 0xFFFF; // Only available on
 														// rotation vector, not
 														// game rot vector
-
-		final Tuple3f tuple3f = new Tuple3fBuilder(type.getQ()).setX(qX).setY(qY).setZ(qZ).build();
+		final Tuple3f tuple3f = ShtpUtils.createTupleFromFixed(type.getQ(), x, y, z);
 
 		return new VectorEvent(type, status, tuple3f, timeStamp, intToFloat(qReal, type.getQ()), intToFloat(qRadianAccuracy, type.getQ()));
 	}
@@ -572,7 +571,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		final int x = data[1] & 0xFFFF;
 		final int y = data[2] & 0xFFFF;
 		final int z = data[3] & 0xFFFF;
-		final Tuple3f tuple3f = new Tuple3fBuilder(type.getQ()).setX(x).setY(y).setZ(z).build();
+		final Tuple3f tuple3f = ShtpUtils.createTupleFromFixed(type.getQ(), x, y, z);
 		return new DataEvent3f(type, status, tuple3f, timeStamp);
 	}
 
@@ -633,13 +632,13 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 * @param specificConfig
 	 *            - contains specific config (uint32_t)
 	 */
-	private ShtpPacketRequest createFeatureRequest(DeviceSensorReport report, int timeBetweenReports, int specificConfig) {
+	private ShtpPacketRequest createFeatureRequest(SensorReportIds report, int timeBetweenReports, int specificConfig) {
 		final long microsBetweenReports = timeBetweenReports * 1000L;
 		final ShtpPacketRequest request = prepareShtpPacketRequest(DeviceChannel.CONTROL, 17);
 
 		//@formatter:off
 		int[] packetBody = new ShtpPacketBodyBuilder(request.getBodySize())
-				.addElement(DeviceDeviceReport.SET_FEATURE_COMMAND.getId())
+				.addElement(ControlReportIds.SET_FEATURE_COMMAND.getId())
 				.addElement(report.getId()) 			// Feature Report ID. 0x01 = Accelerometer, 0x05 = Rotation vector
 				.addElement(0) // Change sensitivity (LSB)
 				.addElement(0) // Change sensitivity (MSB)
@@ -661,7 +660,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		return request;
 	}
 
-	private ShtpPacketRequest createSensorReportRequest(DeviceDeviceReport type, DeviceSensorReport sensor)
+	private ShtpPacketRequest createSensorReportRequest(ControlReportIds type, SensorReportIds sensor)
 			throws InterruptedException, IOException {
 		DeviceChannel deviceChannel = DeviceChannel.CONTROL;
 		ShtpPacketRequest packetRequest = prepareShtpPacketRequest(deviceChannel, 2);
@@ -723,7 +722,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		return true;
 	}
 
-	public static void printShtpPacketPart(DeviceDeviceReport report, String prefix, int[] data) {
+	public static void printShtpPacketPart(ControlReportIds report, String prefix, int[] data) {
 		switch (report) {
 		case PRODUCT_ID_RESPONSE:
 			System.out.println(String.format("printShtpPacketPart:%s:report=%s:value=%s", prefix, report, Integer.toHexString(data[0])));
@@ -780,7 +779,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		return response;
 	}
 
-	private void initAndActive(final CountDownLatch latch, DeviceSensorReport report, int reportDelay) {
+	private void initAndActive(final CountDownLatch latch, SensorReportIds report, int reportDelay) {
 		executor.submit(() -> {
 			boolean initState = initiate();
 			if (initState && enableSensorReport(report, reportDelay)) {
@@ -790,7 +789,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		});
 	}
 
-	private void reactivate(final CountDownLatch latch, DeviceSensorReport report, int reportDelay) {
+	private void reactivate(final CountDownLatch latch, SensorReportIds report, int reportDelay) {
 		executor.submit(() -> {
 
 			try {

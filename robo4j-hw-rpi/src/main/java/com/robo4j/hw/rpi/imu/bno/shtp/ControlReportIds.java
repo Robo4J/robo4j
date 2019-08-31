@@ -15,17 +15,19 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu.bno;
+package com.robo4j.hw.rpi.imu.bno.shtp;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
 
 /**
  * All the ways we can configure or talk to the BNO080, figure 34, page 36
  * reference manual These are used for low level communication with the sensor,
  * on DeviceChannel 2 (CONTROL)
  */
-public enum DeviceDeviceReport implements DeviceReport {
+public enum ControlReportIds implements ShtpReportIds {
     //@formatter:off
     NONE                                    (-1),
     ADVERTISEMENT                           (0x00),
@@ -43,11 +45,11 @@ public enum DeviceDeviceReport implements DeviceReport {
     FLUSH_COMPLETED                         (0xEF);
     //@formatter:on
 
-    private final static Map<Integer, DeviceDeviceReport> map = getMap();
+    private final static Map<Integer, ControlReportIds> map = getMap();
     private final int id;
     private final DeviceChannel deviceChannel = DeviceChannel.CONTROL;
 
-    DeviceDeviceReport(int id) {
+    ControlReportIds(int id) {
         this.id = id;
     }
 
@@ -61,14 +63,14 @@ public enum DeviceDeviceReport implements DeviceReport {
         return deviceChannel;
     }
 
-    public static DeviceDeviceReport getById(int id) {
-        DeviceDeviceReport report = map.get(id);
+    public static ControlReportIds getById(int id) {
+        ControlReportIds report = map.get(id);
         return report == null ? NONE : report;
     }
 
-    private static Map<Integer, DeviceDeviceReport> getMap() {
-        Map<Integer, DeviceDeviceReport> map = new HashMap<>();
-        for (DeviceDeviceReport r : values()) {
+    private static Map<Integer, ControlReportIds> getMap() {
+        Map<Integer, ControlReportIds> map = new HashMap<>();
+        for (ControlReportIds r : values()) {
             map.put(r.getId(), r);
         }
         return map;

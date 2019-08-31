@@ -17,6 +17,7 @@
 
 package com.robo4j.hw.rpi.imu.bno;
 
+import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportIds;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperation;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationBuilder;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationResponse;
@@ -39,8 +40,8 @@ class ShtpOperationBuilderTests {
 
 		ShtpOperationResponse advResponse = new ShtpOperationResponse(DeviceChannel.COMMAND, 0);
 		ShtpOperationResponse reportIdResponse = new ShtpOperationResponse(
-				DeviceDeviceReport.PRODUCT_ID_RESPONSE);
-		ShtpOperationResponse resetResponse = new ShtpOperationResponse(DeviceDeviceReport.COMMAND_RESPONSE);
+				ControlReportIds.PRODUCT_ID_RESPONSE);
+		ShtpOperationResponse resetResponse = new ShtpOperationResponse(ControlReportIds.COMMAND_RESPONSE);
 
 		ShtpPacketRequest req1 = new ShtpPacketRequest(1, 1);
 		req1.createHeader(DeviceChannel.CONTROL);

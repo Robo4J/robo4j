@@ -25,7 +25,7 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.imu.BNO080Device;
 import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
 import com.robo4j.hw.rpi.imu.bno.DeviceListener;
-import com.robo4j.hw.rpi.imu.bno.DeviceSensorReport;
+import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
 import com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice;
 import com.robo4j.logging.SimpleLoggingUtil;
 
@@ -68,14 +68,14 @@ public class BNO080EmitterUnit extends RoboUnit<BNORequest> {
 	}
 
 	private int reportDelay;
-	private DeviceSensorReport report;
+	private SensorReportIds report;
 
 	@Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
 
         final String reportType = configuration.getString(PROPERTY_REPORT_TYPE, null);
-        report = DeviceSensorReport.valueOf(reportType.toUpperCase());
-        if(report.equals(DeviceSensorReport.NONE)){
+        report = SensorReportIds.valueOf(reportType.toUpperCase());
+        if(report.equals(SensorReportIds.NONE)){
             throw new ConfigurationException(PROPERTY_REPORT_TYPE);
         }
 
