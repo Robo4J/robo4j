@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu.bno.shtp;
+package com.robo4j.hw.rpi.imu.bno;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,9 +23,9 @@ import java.util.Map;
 /**
  * All the ways we can configure or talk to the BNO080, figure 34, page 36
  * reference manual These are used for low level communication with the sensor,
- * on ShtpChannel 2 (CONTROL)
+ * on DeviceChannel 2 (CONTROL)
  */
-public enum ShtpDeviceReport implements ShtpReport {
+public enum DeviceDeviceReport implements DeviceReport {
     //@formatter:off
     NONE                                    (-1),
     ADVERTISEMENT                           (0x00),
@@ -43,11 +43,11 @@ public enum ShtpDeviceReport implements ShtpReport {
     FLUSH_COMPLETED                         (0xEF);
     //@formatter:on
 
-    private final static Map<Integer, ShtpDeviceReport> map = getMap();
+    private final static Map<Integer, DeviceDeviceReport> map = getMap();
     private final int id;
-    private final ShtpChannel shtpChannel = ShtpChannel.CONTROL;
+    private final DeviceChannel deviceChannel = DeviceChannel.CONTROL;
 
-    ShtpDeviceReport(int id) {
+    DeviceDeviceReport(int id) {
         this.id = id;
     }
 
@@ -57,18 +57,18 @@ public enum ShtpDeviceReport implements ShtpReport {
     }
 
     @Override
-    public ShtpChannel getChannel() {
-        return shtpChannel;
+    public DeviceChannel getChannel() {
+        return deviceChannel;
     }
 
-    public static ShtpDeviceReport getById(int id) {
-        ShtpDeviceReport report = map.get(id);
+    public static DeviceDeviceReport getById(int id) {
+        DeviceDeviceReport report = map.get(id);
         return report == null ? NONE : report;
     }
 
-    private static Map<Integer, ShtpDeviceReport> getMap() {
-        Map<Integer, ShtpDeviceReport> map = new HashMap<>();
-        for (ShtpDeviceReport r : values()) {
+    private static Map<Integer, DeviceDeviceReport> getMap() {
+        Map<Integer, DeviceDeviceReport> map = new HashMap<>();
+        for (DeviceDeviceReport r : values()) {
             map.put(r.getId(), r);
         }
         return map;

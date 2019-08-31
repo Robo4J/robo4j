@@ -19,7 +19,7 @@ package com.robo4j.hw.rpi.imu;
 
 import com.robo4j.hw.rpi.imu.bno.DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
-import com.robo4j.hw.rpi.imu.bno.shtp.ShtpSensorReport;
+import com.robo4j.hw.rpi.imu.bno.DeviceSensorReport;
 import com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice;
 
 /**
@@ -35,7 +35,7 @@ public class BNO080SPIExample {
 		System.out.println("BNO080 SPI Example");
 		BNO080SPIDevice device = new BNO080SPIDevice();
 		device.addListener(listener);
-		device.start(ShtpSensorReport.ACCELEROMETER, 100);
+		device.start(DeviceSensorReport.ACCELEROMETER, 100);
 		System.out.println("CLICK TO END...");
 		System.in.read();
 		device.shutdown();

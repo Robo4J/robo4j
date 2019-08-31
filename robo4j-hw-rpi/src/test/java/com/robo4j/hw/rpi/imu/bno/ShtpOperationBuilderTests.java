@@ -17,8 +17,6 @@
 
 package com.robo4j.hw.rpi.imu.bno;
 
-import com.robo4j.hw.rpi.imu.bno.shtp.ShtpChannel;
-import com.robo4j.hw.rpi.imu.bno.shtp.ShtpDeviceReport;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperation;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationBuilder;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationResponse;
@@ -39,21 +37,21 @@ class ShtpOperationBuilderTests {
 	@Test
 	void testShtpOperationBuilder() {
 
-		ShtpOperationResponse advResponse = new ShtpOperationResponse(ShtpChannel.COMMAND, 0);
+		ShtpOperationResponse advResponse = new ShtpOperationResponse(DeviceChannel.COMMAND, 0);
 		ShtpOperationResponse reportIdResponse = new ShtpOperationResponse(
-				ShtpDeviceReport.PRODUCT_ID_RESPONSE);
-		ShtpOperationResponse resetResponse = new ShtpOperationResponse(ShtpDeviceReport.COMMAND_RESPONSE);
+				DeviceDeviceReport.PRODUCT_ID_RESPONSE);
+		ShtpOperationResponse resetResponse = new ShtpOperationResponse(DeviceDeviceReport.COMMAND_RESPONSE);
 
 		ShtpPacketRequest req1 = new ShtpPacketRequest(1, 1);
-		req1.createHeader(ShtpChannel.CONTROL);
+		req1.createHeader(DeviceChannel.CONTROL);
 		req1.addBody(new int[] { 1 });
 
 		ShtpPacketRequest req2 = new ShtpPacketRequest(2, 2);
-		req2.createHeader(ShtpChannel.COMMAND);
+		req2.createHeader(DeviceChannel.COMMAND);
 		req2.addBody(new int[] { 1, 2 });
 
 		ShtpPacketRequest req3 = new ShtpPacketRequest(3, 2);
-		req3.createHeader(ShtpChannel.EXECUTABLE);
+		req3.createHeader(DeviceChannel.EXECUTABLE);
 		req3.addBody(new int[] { 1, 2, 3 });
 
 		ShtpOperation op1 = new ShtpOperation(req1, advResponse);
