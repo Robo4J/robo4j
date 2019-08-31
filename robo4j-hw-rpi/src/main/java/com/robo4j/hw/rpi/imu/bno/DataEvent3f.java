@@ -19,6 +19,7 @@ package com.robo4j.hw.rpi.imu.bno;
 
 import com.robo4j.math.geometry.Tuple3f;
 
+import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.Objects;
 
@@ -29,31 +30,31 @@ import java.util.Objects;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class XYZAccuracyEvent implements DeviceEvent {
+public class DataEvent3f implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private static final EnumSet<DeviceEventType> ALLOWED = EnumSet.range(DeviceEventType.MAGNETOMETER, DeviceEventType.GYROSCOPE);
+	private static final EnumSet<DataEventType> ALLOWED = EnumSet.range(DataEventType.MAGNETOMETER, DataEventType.GYROSCOPE);
 
-	private final DeviceEventType type;
+	private final DataEventType type;
 	private final int status;
 	private final Tuple3f data;
 	private final long timestamp;
 
-	public XYZAccuracyEvent(DeviceEventType type, int status, Tuple3f data, long timestamp) {
+	public DataEvent3f(DataEventType type, int status, Tuple3f data, long timestamp) {
 		if (ALLOWED.contains(type)) {
 			this.type = type;
 			this.status = status;
 			this.data = data;
 			this.timestamp = timestamp;
 		} else {
-			this.type = DeviceEventType.NONE;
+			this.type = DataEventType.NONE;
 			this.status = 0;
 			this.data = null;
 			this.timestamp = 0;
 		}
 	}
 
-	public DeviceEventType getType() {
+	public DataEventType getType() {
 		return type;
 	}
 
@@ -65,8 +66,7 @@ public class XYZAccuracyEvent implements DeviceEvent {
 		return data;
 	}
 
-	@Override
-	public long timestampMicro() {
+	public long getTimestamp() {
 		return timestamp;
 	}
 
@@ -76,7 +76,7 @@ public class XYZAccuracyEvent implements DeviceEvent {
 			return true;
 		if (o == null || getClass() != o.getClass())
 			return false;
-		XYZAccuracyEvent that = (XYZAccuracyEvent) o;
+		DataEvent3f that = (DataEvent3f) o;
 		return status == that.status && timestamp == that.timestamp && type == that.type && Objects.equals(data, that.data);
 	}
 

@@ -28,45 +28,22 @@ import java.util.Objects;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class VectorEvent implements DeviceEvent {
+public class VectorEvent extends DataEvent3f {
 	private static final long serialVersionUID = 1L;
-	private static final EnumSet<DeviceEventType> ALLOWED = EnumSet.of(DeviceEventType.VECTOR_ROTATION, DeviceEventType.VECTOR_GAME);
-	private final DeviceEventType type;
-	private final int status;
-	private final Tuple3f data;
+	private static final EnumSet<DataEventType> ALLOWED = EnumSet.of(DataEventType.VECTOR_ROTATION, DataEventType.VECTOR_GAME);
+
 	private final float quatReal;
 	private final float radianAccuracy;
-	private final long timestamp;
 
-	public VectorEvent(DeviceEventType type, int status, Tuple3f data, float quatReal, float radianAccuracy, long timestamp) {
+	public VectorEvent(DataEventType type, int status, Tuple3f data, long timestamp, float quatReal, float radianAccuracy) {
+		super(type, status, data, timestamp);
 		if (ALLOWED.contains(type)) {
-			this.status = status;
-			this.type = type;
-			this.data = data;
 			this.quatReal = quatReal;
 			this.radianAccuracy = radianAccuracy;
-			this.timestamp = timestamp;
 		} else {
-			this.type = DeviceEventType.NONE;
-			this.status = 0;
-			this.data = null;
 			this.quatReal = 0;
 			this.radianAccuracy = 0;
-			this.timestamp = 0;
 		}
-
-	}
-
-	public DeviceEventType getType() {
-		return type;
-	}
-
-	public int getStatus() {
-		return status;
-	}
-
-	public Tuple3f getData() {
-		return data;
 	}
 
 	public float getQuatReal() {
@@ -78,30 +55,23 @@ public class VectorEvent implements DeviceEvent {
 	}
 
 	@Override
-	public long timestampMicro() {
-		return timestamp;
-	}
-
-	@Override
 	public boolean equals(Object o) {
 		if (this == o)
 			return true;
 		if (o == null || getClass() != o.getClass())
 			return false;
 		VectorEvent that = (VectorEvent) o;
-		return status == that.status && Float.compare(that.quatReal, quatReal) == 0
-				&& Float.compare(that.radianAccuracy, radianAccuracy) == 0 && timestamp == that.timestamp && type == that.type
-				&& Objects.equals(data, that.data);
+		return super.equals(o) && Float.compare(that.quatReal, quatReal) == 0 && Float.compare(that.radianAccuracy, radianAccuracy) == 0;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(type, status, data, quatReal, radianAccuracy, timestamp);
+		return Objects.hash(getType(), getStatus(), getData(), quatReal, radianAccuracy, getTimestamp());
 	}
 
 	@Override
 	public String toString() {
-		return "VectorEvent{" + "type=" + type + ", status=" + status + ", data=" + data + ", quatReal=" + quatReal + ", radianAccuracy="
-				+ radianAccuracy + ", timestamp=" + timestamp + '}';
+		return "VectorEvent{" + "type=" + getType() + ", status=" + getStatus() + ", data=" + getData() + ", quatReal=" + quatReal
+				+ ", radianAccuracy=" + radianAccuracy + ", timestamp=" + getTimestamp() + '}';
 	}
 }

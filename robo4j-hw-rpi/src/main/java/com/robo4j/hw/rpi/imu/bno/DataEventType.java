@@ -23,7 +23,7 @@ package com.robo4j.hw.rpi.imu.bno;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public enum DeviceEventType {
+public enum DataEventType {
     //@formatter:off
     NONE                    (-1),
     MAGNETOMETER			(4),
@@ -35,7 +35,7 @@ public enum DeviceEventType {
     //@formatter:on
     private final int qPoint;
 
-    DeviceEventType(int qPoint) {
+    DataEventType(int qPoint) {
         this.qPoint = qPoint;
     }
 

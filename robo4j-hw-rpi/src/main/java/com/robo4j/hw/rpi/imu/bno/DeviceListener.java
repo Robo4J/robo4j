@@ -25,5 +25,5 @@ package com.robo4j.hw.rpi.imu.bno;
  */
 public interface DeviceListener {
 
-    void onResponse(DeviceEvent event);
+    void onResponse(DataEvent3f event);
 }

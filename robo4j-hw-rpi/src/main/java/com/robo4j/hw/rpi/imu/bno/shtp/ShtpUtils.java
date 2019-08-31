@@ -17,8 +17,8 @@
 
 package com.robo4j.hw.rpi.imu.bno.shtp;
 
-import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
-import com.robo4j.hw.rpi.imu.bno.DeviceEventType;
+import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
+import com.robo4j.hw.rpi.imu.bno.DataEventType;
 
 /**
  * ShtpUtils collection of useful utils
@@ -76,19 +76,7 @@ public final class ShtpUtils {
 	/**
 	 * Empty Shtp Device Event
 	 */
-	public static final DeviceEvent emptyEvent = new DeviceEvent() {
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public DeviceEventType getType() {
-			return DeviceEventType.NONE;
-		}
-
-		@Override
-		public long timestampMicro() {
-			return 0;
-		}
-	};
+	public static final DataEvent3f EMPTY_EVENT = new DataEvent3f(DataEventType.NONE, 0, null, 0);
 
 	/**
 	 * Calculate packet length.
