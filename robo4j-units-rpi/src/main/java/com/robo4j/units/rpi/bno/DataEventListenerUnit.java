@@ -19,25 +19,25 @@ package com.robo4j.units.rpi.bno;
 
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
-import com.robo4j.hw.rpi.imu.bno.XYZAccuracyEvent;
+import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.logging.SimpleLoggingUtil;
 
 /**
- * BNOXYZAccuracyEventListenerUnit listen only to {@link XYZAccuracyEvent} event types produced by
- * the emitter.
+ * BNOXYZAccuracyEventListenerUnit listen only to {@link XYZAccuracyEvent} event
+ * types produced by the emitter.
  *
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BNOXYZAccuracyEventListenerUnit extends RoboUnit<XYZAccuracyEvent> {
+public class DataEventListenerUnit extends RoboUnit<DataEvent3f> {
 
-	public BNOXYZAccuracyEventListenerUnit(RoboContext context, String id) {
-		super(XYZAccuracyEvent.class, context, id);
+	public DataEventListenerUnit(RoboContext context, String id) {
+		super(DataEvent3f.class, context, id);
 	}
 
 	@Override
-	public void onMessage(XYZAccuracyEvent message) {
+	public void onMessage(DataEvent3f message) {
 		SimpleLoggingUtil.info(getClass(), "received:" + message);
 	}
 }

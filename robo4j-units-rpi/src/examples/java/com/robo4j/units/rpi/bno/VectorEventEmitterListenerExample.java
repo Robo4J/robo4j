@@ -17,16 +17,16 @@
 
 package com.robo4j.units.rpi.bno;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
+import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.net.LookupService;
 import com.robo4j.net.LookupServiceProvider;
 import com.robo4j.util.SystemUtil;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * VectorEventEmitterListenerExample is simple robo4j system displaying Rotation Vector event from
@@ -62,10 +62,10 @@ public class VectorEventEmitterListenerExample {
         System.out.println("State after start:");
         System.out.println(SystemUtil.printStateReport(ctx));
 
-        RoboReference<BNORequest> bnoUnit = ctx.getReference("bno");
-        RoboReference<DeviceEvent> bnoListenerUnit = ctx.getReference("listener");
+        RoboReference<BnoRequest> bnoUnit = ctx.getReference("bno");
+        RoboReference<DataEvent3f> bnoListenerUnit = ctx.getReference("listener");
 
-        BNORequest requestToRegister = new BNORequest(bnoListenerUnit, BNORequest.ListenerAction.REGISTER);
+        BnoRequest requestToRegister = new BnoRequest(bnoListenerUnit, BnoRequest.ListenerAction.REGISTER);
         bnoUnit.sendMessage(requestToRegister);
 
         System.out.println("Press <Enter> to start!");

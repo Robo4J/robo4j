@@ -18,7 +18,7 @@
 package com.robo4j.units.rpi.bno;
 
 import com.robo4j.RoboReference;
-import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
+import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 
 /**
  * BNORequest allows to register listener unit as the destination of values
@@ -26,11 +26,11 @@ import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BNORequest {
+public class BnoRequest {
 	/**
 	 * target represents the receiver of the DeviceEvent
 	 */
-	private final RoboReference<DeviceEvent> target;
+	private final RoboReference<DataEvent3f> target;
 	private final ListenerAction listenerAction;
 
 	public enum ListenerAction {
@@ -52,24 +52,21 @@ public class BNORequest {
 	 * @param listenerAction
 	 *            listener action
 	 */
-	public BNORequest(RoboReference<DeviceEvent> target, ListenerAction listenerAction) {
+	public BnoRequest(RoboReference<DataEvent3f> target, ListenerAction listenerAction) {
 		this.target = target;
 		this.listenerAction = listenerAction;
 	}
 
-    public RoboReference<DeviceEvent> getTarget() {
-        return target;
-    }
+	public RoboReference<DataEvent3f> getTarget() {
+		return target;
+	}
 
-    public ListenerAction getListenerAction() {
-        return listenerAction;
-    }
+	public ListenerAction getListenerAction() {
+		return listenerAction;
+	}
 
-    @Override
-    public String toString() {
-        return "BNORequest{" +
-                "target=" + target +
-                ", listenerAction=" + listenerAction +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "BNORequest{" + "target=" + target + ", listenerAction=" + listenerAction + '}';
+	}
 }

@@ -27,17 +27,17 @@ import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.net.LookupServiceProvider;
 
 /**
- * BNOVectorEventListenerUnit listen to VectorEvent events produced by {@link BNO080EmitterUnit}
+ * BNOVectorEventListenerUnit listen to VectorEvent events produced by {@link Bno080EmitterUnit}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BNOVectorEventListenerUnit extends RoboUnit<VectorEvent> {
+public class VectorEventListenerUnit extends RoboUnit<VectorEvent> {
 	
 	public static final String ATTR_TARGET_CONTEXT = "targetContext";
 	public static final String ATTR_REMOTE_UNIT = "remoteUnit";
 
-	public BNOVectorEventListenerUnit(RoboContext context, String id) {
+	public VectorEventListenerUnit(RoboContext context, String id) {
 		super(VectorEvent.class, context, id);
 	}
 
