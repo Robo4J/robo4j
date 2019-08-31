@@ -17,23 +17,24 @@
 
 package com.robo4j.units.rpi.bno;
 
-import java.io.InputStream;
-
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
+import com.robo4j.hw.rpi.imu.impl.Bno080SPIDevice;
 import com.robo4j.util.SystemUtil;
 
+import java.io.InputStream;
+
 /**
- * XYZEventEmiterListenerExample is an example displaying received data from
+ * DataEventEmitterListenerExample is an example displaying received data from
  * GYROSCOPE. Data are provided by
- * {@link com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice}
+ * {@link Bno080SPIDevice}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class DataEventEmiterListenerExample {
+public class DataEventEmitterListenerExample {
 
 	public static void main(String[] args) throws Exception {
 		RoboBuilder builder = new RoboBuilder();

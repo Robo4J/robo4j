@@ -29,7 +29,7 @@ import java.util.Map;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface BNO080Device {
+public interface Bno080Device {
 
 	/**
 	 * Record IDs from figure 29, page 29 reference manual These are used to read

@@ -19,7 +19,7 @@ package com.robo4j.hw.rpi.imu.bno.shtp;
 
 import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
 
-import static com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice.SHTP_HEADER_SIZE;
+import static com.robo4j.hw.rpi.imu.impl.Bno080SPIDevice.SHTP_HEADER_SIZE;
 
 /**
  * ShtpPacketRequest represent SHTP request format used by SPI devices

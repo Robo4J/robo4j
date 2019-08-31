@@ -17,20 +17,21 @@
 
 package com.robo4j.units.rpi.bno;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
+import com.robo4j.hw.rpi.imu.impl.Bno080SPIDevice;
 import com.robo4j.net.LookupService;
 import com.robo4j.net.LookupServiceProvider;
 import com.robo4j.util.SystemUtil;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  * VectorEventEmitterListenerExample is simple robo4j system displaying Rotation Vector event from
- * {@link com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice}
+ * {@link Bno080SPIDevice}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

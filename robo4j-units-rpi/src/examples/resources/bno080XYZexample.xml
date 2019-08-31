@@ -17,14 +17,14 @@
 
 <robo4j>
     <roboUnit id="bno">
-        <class>com.robo4j.units.rpi.bno.BNO080EmitterUnit</class>
+        <class>com.robo4j.units.rpi.bno.Bno080EmitterUnit</class>
         <config name="com.robo4j.root">
             <value name="reportType" type="String">GYROSCOPE</value>
             <value name="reportDelay" type="int">60</value>
         </config>
     </roboUnit>
     <roboUnit id="listener">
-        <class>com.robo4j.units.rpi.bno.BNOXYZAccuracyEventListenerUnit</class>
+        <class>com.robo4j.units.rpi.bno.DataEventListenerUnit</class>
         <config name="com.robo4j.root">
         </config>
     </roboUnit>
