@@ -17,8 +17,6 @@
 
 package com.robo4j.hw.rpi.imu.bno.shtp;
 
-import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
-
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -33,7 +31,7 @@ import java.util.Objects;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ShtpOperationResponse {
-	private final DeviceChannel channel;
+	private final ShtpChannel channel;
 	private final int report;
 	private final int[] values;
 
@@ -41,7 +39,7 @@ public class ShtpOperationResponse {
 		this(report.getChannel(), report.getId());
 	}
 
-	public ShtpOperationResponse(DeviceChannel channel, int report, int... array) {
+	public ShtpOperationResponse(ShtpChannel channel, int report, int... array) {
 		this.channel = channel;
 		this.report = report;
 		if (array == null) {
@@ -54,7 +52,7 @@ public class ShtpOperationResponse {
 		}
 	}
 
-	public DeviceChannel getChannel() {
+	public ShtpChannel getChannel() {
 		return channel;
 	}
 

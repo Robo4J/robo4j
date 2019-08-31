@@ -20,7 +20,7 @@ import com.pi4j.concurrent.ExecutorServiceFactory;
 import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialFactory;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
-import com.robo4j.hw.rpi.imu.BNO055Device;
+import com.robo4j.hw.rpi.imu.Bno055Device;
 import com.robo4j.math.geometry.Tuple3f;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ import java.io.IOException;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class BNO055SerialDevice extends AbstractBNO055Device implements ReadableDevice<Tuple3f>, BNO055Device {
+public class Bno055SerialDevice extends AbstractBno055Device implements ReadableDevice<Tuple3f>, Bno055Device {
 	private static final byte BUFFER_OVERRUN = 0x07;
 	private static final byte START_BYTE = (byte) 0xAA;
 	private static final byte CMD_READ = 0x01;
@@ -73,7 +73,7 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 	 * @throws IOException
 	 *             exception
 	 */
-	public BNO055SerialDevice() throws IOException {
+	public Bno055SerialDevice() throws IOException {
 		this(DEFAULT_SERIAL_PORT, OperatingMode.NDOF, DEFAULT_RETRY_TIMEOUT, DEFAULT_NO_OF_RETRIES);
 	}
 
@@ -90,7 +90,7 @@ public class BNO055SerialDevice extends AbstractBNO055Device implements Readable
 	 * @throws IOException
 	 *             exception
 	 */
-	public BNO055SerialDevice(String serialPort, OperatingMode operatingMode, long retryTimeout, int noOfRetries)
+	public Bno055SerialDevice(String serialPort, OperatingMode operatingMode, long retryTimeout, int noOfRetries)
 			throws IOException {
 		this.serialPort = serialPort;
 		this.retryTimeout = retryTimeout;

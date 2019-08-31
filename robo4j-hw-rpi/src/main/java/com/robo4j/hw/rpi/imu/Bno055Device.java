@@ -28,7 +28,7 @@ import java.io.IOException;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface BNO055Device {
+public interface Bno055Device {
 	/**
 	 * The power mode can be used to
 	 */
@@ -308,16 +308,16 @@ public interface BNO055Device {
 	 * @throws IOException
 	 *             exception
 	 * 
-	 * @see BNO055CalibrationStatus
+	 * @see Bno055CalibrationStatus
 	 */
-	BNO055CalibrationStatus getCalibrationStatus() throws IOException;
+	Bno055CalibrationStatus getCalibrationStatus() throws IOException;
 
 	/**
 	 * @return the system status.
 	 * @throws IOException
 	 *             exception
 	 */
-	BNO055SystemStatus getSystemStatus() throws IOException;
+	Bno055SystemStatus getSystemStatus() throws IOException;
 
 	/**
 	 * Returns the temperature.
@@ -336,7 +336,7 @@ public interface BNO055Device {
 	 * @throws IOException
 	 *             exception
 	 */
-	BNO055SelfTestResult performSelfTest() throws IOException;
+	Bno055SelfTestResult performSelfTest() throws IOException;
 
 	/**
 	 * Sets the units to be used. By default m/s^2, angular degrees per second,

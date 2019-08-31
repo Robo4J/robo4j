@@ -20,7 +20,7 @@ import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
-import com.robo4j.hw.rpi.imu.BNO055Device;
+import com.robo4j.hw.rpi.imu.Bno055Device;
 import com.robo4j.math.geometry.Tuple3f;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ import java.io.IOException;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class BNO055I2CDevice extends AbstractBNO055Device implements ReadableDevice<Tuple3f>, BNO055Device {
+public class Bno055I2CDevice extends AbstractBno055Device implements ReadableDevice<Tuple3f>, Bno055Device {
 	private static final int DEFAULT_I2C_ADDRESS = 0x28;
 
 	private final int bus;
@@ -47,7 +47,7 @@ public class BNO055I2CDevice extends AbstractBNO055Device implements ReadableDev
 	 * @see PowerMode
 	 * @see OperatingMode
 	 */
-	public BNO055I2CDevice() throws IOException {
+	public Bno055I2CDevice() throws IOException {
 		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, OperatingMode.NDOF);
 	}
 
@@ -63,7 +63,7 @@ public class BNO055I2CDevice extends AbstractBNO055Device implements ReadableDev
 	 * @throws IOException
 	 *             exception
 	 */
-	public BNO055I2CDevice(int bus, int address, OperatingMode operatingMode) throws IOException {
+	public Bno055I2CDevice(int bus, int address, OperatingMode operatingMode) throws IOException {
 		this.bus = bus;
 		this.address = address;
 		try {

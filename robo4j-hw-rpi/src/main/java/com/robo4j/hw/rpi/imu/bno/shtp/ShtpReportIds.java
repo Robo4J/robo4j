@@ -17,8 +17,6 @@
 
 package com.robo4j.hw.rpi.imu.bno.shtp;
 
-import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
-
 /**
  * Helper for report types.
  * 
@@ -34,5 +32,5 @@ public interface ShtpReportIds {
 	/**
 	 * @return the channel which can report such a report.
 	 */
-	DeviceChannel getChannel();
+	ShtpChannel getChannel();
 }

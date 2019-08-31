@@ -29,7 +29,7 @@ class BNOSerialTests {
 
 	@Test
 	void testBNOSerialReadRequest() {
-		byte[] readRequest = BNO055SerialDevice.createReadRequest(0x20, 2);
+		byte[] readRequest = Bno055SerialDevice.createReadRequest(0x20, 2);
 		assertEquals(0xAA, 0xFF & readRequest[0]);
 		assertEquals(0x01, readRequest[1]);
 		assertEquals(0x20, readRequest[2]);

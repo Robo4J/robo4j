@@ -20,8 +20,6 @@ package com.robo4j.hw.rpi.imu.bno.shtp;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
-
 /**
  * All the ways we can configure or talk to the BNO080, figure 34, page 36
  * reference manual These are used for low level communication with the sensor,
@@ -47,7 +45,7 @@ public enum ControlReportIds implements ShtpReportIds {
 
     private final static Map<Integer, ControlReportIds> map = getMap();
     private final int id;
-    private final DeviceChannel deviceChannel = DeviceChannel.CONTROL;
+    private final ShtpChannel shtpChannel = ShtpChannel.CONTROL;
 
     ControlReportIds(int id) {
         this.id = id;
@@ -59,8 +57,8 @@ public enum ControlReportIds implements ShtpReportIds {
     }
 
     @Override
-    public DeviceChannel getChannel() {
-        return deviceChannel;
+    public ShtpChannel getChannel() {
+        return shtpChannel;
     }
 
     public static ControlReportIds getById(int id) {
