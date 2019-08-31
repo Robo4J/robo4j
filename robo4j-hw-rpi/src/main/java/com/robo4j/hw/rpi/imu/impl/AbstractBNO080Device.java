@@ -18,8 +18,11 @@
 package com.robo4j.hw.rpi.imu.impl;
 
 import com.robo4j.hw.rpi.imu.BNO080Device;
+import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
+import com.robo4j.hw.rpi.imu.bno.DeviceDeviceReport;
 import com.robo4j.hw.rpi.imu.bno.DeviceListener;
-import com.robo4j.hw.rpi.imu.bno.ShtpPacketRequest;
+import com.robo4j.hw.rpi.imu.bno.DeviceSensorReport;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -75,7 +78,7 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 
 
 	@Override
-	public abstract boolean start(ShtpSensorReport report, int reportDelay);
+	public abstract boolean start(DeviceSensorReport report, int reportDelay);
 
 	@Override
 	public void shutdown() {
@@ -96,24 +99,24 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 		listeners.remove(listener);
 	}
 
-	ShtpPacketRequest prepareShtpPacketRequest(ShtpChannel shtpChannel, int size) {
-		ShtpPacketRequest packet = new ShtpPacketRequest(size, sequenceByChannel[shtpChannel.getChannel()]++);
-		packet.createHeader(shtpChannel);
+	ShtpPacketRequest prepareShtpPacketRequest(DeviceChannel deviceChannel, int size) {
+		ShtpPacketRequest packet = new ShtpPacketRequest(size, sequenceByChannel[deviceChannel.getChannel()]++);
+		packet.createHeader(deviceChannel);
 		return packet;
 	} 
 
 	ShtpPacketRequest getProductIdRequest() {
 		// Check communication with device
 		// bytes: Request the product ID and reset info, Reserved
-		ShtpPacketRequest result = prepareShtpPacketRequest(ShtpChannel.CONTROL, 2);
-		result.addBody(0, ShtpDeviceReport.PRODUCT_ID_REQUEST.getId());
+		ShtpPacketRequest result = prepareShtpPacketRequest(DeviceChannel.CONTROL, 2);
+		result.addBody(0, DeviceDeviceReport.PRODUCT_ID_REQUEST.getId());
 		result.addBody(1, 0);
 		return result;
 	}
 
 	ShtpPacketRequest getSoftResetPacket() {
-		ShtpChannel shtpChannel = ShtpChannel.EXECUTABLE;
-		ShtpPacketRequest packet = prepareShtpPacketRequest(shtpChannel, 1);
+		DeviceChannel deviceChannel = DeviceChannel.EXECUTABLE;
+		ShtpPacketRequest packet = prepareShtpPacketRequest(deviceChannel, 1);
 		packet.addBody(0, 1);
 		return packet;
 	}
@@ -125,6 +128,19 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 		} catch (InterruptedException e) {
 			System.err.println(String.format("awaitTermination e: %s", e));
 		}
+	}
+
+	/**
+	 * SHTP packet contains 1 byte to get Error report. Packet is send to the
+	 * COMMAND channel
+	 *
+	 *
+	 * @return error request packet
+	 */
+	private ShtpPacketRequest getErrorRequest() {
+		ShtpPacketRequest result = prepareShtpPacketRequest(DeviceChannel.COMMAND, 1);
+		result.addBody(0, 0x01 & 0xFF);
+		return result;
 	}
 
 }

@@ -15,9 +15,12 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu.bno;
+package com.robo4j.hw.rpi.imu.bno.shtp;
 
-import com.robo4j.hw.rpi.imu.BNO080Device;
+import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
+import com.robo4j.hw.rpi.imu.bno.DeviceDeviceReport;
+import com.robo4j.hw.rpi.imu.bno.DeviceReport;
+import com.robo4j.hw.rpi.imu.bno.DeviceSensorReport;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -33,15 +36,15 @@ import java.util.Objects;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ShtpOperationResponse {
-	private final BNO080Device.ShtpChannel channel;
+	private final DeviceChannel channel;
 	private final int report;
 	private final int[] values;
 
-	public ShtpOperationResponse(BNO080Device.ShtpReport report) {
+	public ShtpOperationResponse(DeviceReport report) {
 		this(report.getChannel(), report.getId());
 	}
 
-	public ShtpOperationResponse(BNO080Device.ShtpChannel channel, int report, int... array) {
+	public ShtpOperationResponse(DeviceChannel channel, int report, int... array) {
 		this.channel = channel;
 		this.report = report;
 		if (array == null) {
@@ -54,16 +57,16 @@ public class ShtpOperationResponse {
 		}
 	}
 
-	public BNO080Device.ShtpChannel getChannel() {
+	public DeviceChannel getChannel() {
 		return channel;
 	}
 
-	public BNO080Device.ShtpReport getReport() {
+	public DeviceReport getReport() {
 		switch (channel) {
 		case CONTROL:
-			return BNO080Device.ShtpDeviceReport.getById(report);
+			return DeviceDeviceReport.getById(report);
 		case REPORTS:
-			return BNO080Device.ShtpSensorReport.getById(report);
+			return DeviceSensorReport.getById(report);
 		default:
 			return null;
 		}

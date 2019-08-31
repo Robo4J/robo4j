@@ -29,10 +29,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * VectorEventEmitterListenerExample is simple robo4j system displaying Rotation Vector event from
+ * {@link com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice}
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class VectorEventEmiterListenerExample {
+public class VectorEventEmitterListenerExample {
     public static void main(String[] args) throws Exception{
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
