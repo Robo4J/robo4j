@@ -17,10 +17,6 @@
 
 package com.robo4j.units.rpi.bno;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
@@ -33,11 +29,13 @@ import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
 import com.robo4j.hw.rpi.imu.impl.Bno080SPIDevice;
 import com.robo4j.logging.SimpleLoggingUtil;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * BNO080EmitterUnit emits desired information produced by
- * {@link com.robo4j.hw.rpi.imu.impl.Bno080SPIDevice } to the target provided by
- * {@link BnoRequest}
- *
+ * {@link Bno080SPIDevice } to the target provided by {@link BnoRequest}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -47,10 +45,10 @@ public class Bno080EmitterUnit extends RoboUnit<BnoRequest> {
 	public static final String PROPERTY_REPORT_TYPE = "reportType";
 	public static final String PROPERTY_REPORT_DELAY = "reportDelay";
 
-	private static final class BNOListenerEvent implements DataListener {
+	private static final class BnoListenerEvent implements DataListener {
 		private final RoboReference<DataEvent3f> target;
 
-		BNOListenerEvent(RoboReference<DataEvent3f> target) {
+		BnoListenerEvent(RoboReference<DataEvent3f> target) {
 			this.target = target;
 		}
 
@@ -61,7 +59,7 @@ public class Bno080EmitterUnit extends RoboUnit<BnoRequest> {
 	}
 
 	private Bno080Device device;
-	private List<BNOListenerEvent> listeners = new ArrayList<>();
+	private List<BnoListenerEvent> listeners = new ArrayList<>();
 
 	public Bno080EmitterUnit(RoboContext context, String id) {
 		super(BnoRequest.class, context, id);
@@ -71,28 +69,28 @@ public class Bno080EmitterUnit extends RoboUnit<BnoRequest> {
 	private SensorReportIds report;
 
 	@Override
-    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 
-        final String reportType = configuration.getString(PROPERTY_REPORT_TYPE, null);
-        report = SensorReportIds.valueOf(reportType.toUpperCase());
-        if(report.equals(SensorReportIds.NONE)){
-            throw new ConfigurationException(PROPERTY_REPORT_TYPE);
-        }
+		final String reportType = configuration.getString(PROPERTY_REPORT_TYPE, null);
+		report = SensorReportIds.valueOf(reportType.toUpperCase());
+		if (report.equals(SensorReportIds.NONE)) {
+			throw new ConfigurationException(PROPERTY_REPORT_TYPE);
+		}
 
-        final Integer delay = configuration.getInteger(PROPERTY_REPORT_DELAY, null);
-        if(delay == null || delay <= 0){
-            throw new ConfigurationException(PROPERTY_REPORT_DELAY);
-        }
-        this.reportDelay = delay;
+		final Integer delay = configuration.getInteger(PROPERTY_REPORT_DELAY, null);
+		if (delay == null || delay <= 0) {
+			throw new ConfigurationException(PROPERTY_REPORT_DELAY);
+		}
+		this.reportDelay = delay;
 
-        try {
-            //TODO: make device configurable
-            device = new Bno080SPIDevice();
-        } catch (IOException e) {
-            throw new ConfigurationException("not possible initiate", e);
-        }
-        device.start(report, reportDelay);
-    }
+		try {
+			// TODO: make device configurable
+			device = new Bno080SPIDevice();
+		} catch (IOException e) {
+			throw new ConfigurationException("not possible initiate", e);
+		}
+		device.start(report, reportDelay);
+	}
 
 	@Override
 	public void onMessage(BnoRequest message) {
@@ -102,7 +100,7 @@ public class Bno080EmitterUnit extends RoboUnit<BnoRequest> {
 			register(target);
 			break;
 		case UNREGISTER:
-		    unregister(target);
+			unregister(target);
 			break;
 		default:
 			SimpleLoggingUtil.error(getClass(), String.format("Unknown operation: %s", message));
@@ -110,24 +108,24 @@ public class Bno080EmitterUnit extends RoboUnit<BnoRequest> {
 
 	}
 
-    @Override
-    public void shutdown() {
-        super.shutdown();
-        device.shutdown();
-    }
+	@Override
+	public void shutdown() {
+		super.shutdown();
+		device.shutdown();
+	}
 
-    private synchronized void register(RoboReference<DataEvent3f> target){
-		BNOListenerEvent event = new BNOListenerEvent(target);
+	private synchronized void register(RoboReference<DataEvent3f> target) {
+		BnoListenerEvent event = new BnoListenerEvent(target);
 		listeners.add(event);
 		device.addListener(event);
 	}
 
-    private synchronized void unregister(RoboReference<DataEvent3f> target){
-	    for(BNOListenerEvent l: new ArrayList<>(listeners)){
-	        if(target.equals(l.target)){
-	            listeners.remove(l);
-	            device.removeListener(l);
-            }
-        }
-    }
+	private synchronized void unregister(RoboReference<DataEvent3f> target) {
+		for (BnoListenerEvent l : new ArrayList<>(listeners)) {
+			if (target.equals(l.target)) {
+				listeners.remove(l);
+				device.removeListener(l);
+			}
+		}
+	}
 }
