@@ -26,10 +26,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.robo4j.hw.rpi.imu.BNO080Device;
-import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
 import com.robo4j.hw.rpi.imu.bno.DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportIds;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpChannel;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
 
 /**
@@ -106,30 +106,30 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 	 * @return error request packet
 	 */
 	public ShtpPacketRequest getErrorRequest() {
-		ShtpPacketRequest result = prepareShtpPacketRequest(DeviceChannel.COMMAND, 1);
+		ShtpPacketRequest result = prepareShtpPacketRequest(ShtpChannel.COMMAND, 1);
 		result.addBody(0, 0x01 & 0xFF);
 		return result;
 	}
 
 	
-	ShtpPacketRequest prepareShtpPacketRequest(DeviceChannel deviceChannel, int size) {
-		ShtpPacketRequest packet = new ShtpPacketRequest(size, sequenceByChannel[deviceChannel.getChannel()]++);
-		packet.createHeader(deviceChannel);
+	ShtpPacketRequest prepareShtpPacketRequest(ShtpChannel shtpChannel, int size) {
+		ShtpPacketRequest packet = new ShtpPacketRequest(size, sequenceByChannel[shtpChannel.getChannel()]++);
+		packet.createHeader(shtpChannel);
 		return packet;
 	}
 
 	ShtpPacketRequest getProductIdRequest() {
 		// Check communication with device
 		// bytes: Request the product ID and reset info, Reserved
-		ShtpPacketRequest result = prepareShtpPacketRequest(DeviceChannel.CONTROL, 2);
+		ShtpPacketRequest result = prepareShtpPacketRequest(ShtpChannel.CONTROL, 2);
 		result.addBody(0, ControlReportIds.PRODUCT_ID_REQUEST.getId());
 		result.addBody(1, 0);
 		return result;
 	}
 
 	ShtpPacketRequest getSoftResetPacket() {
-		DeviceChannel deviceChannel = DeviceChannel.EXECUTABLE;
-		ShtpPacketRequest packet = prepareShtpPacketRequest(deviceChannel, 1);
+		ShtpChannel shtpChannel = ShtpChannel.EXECUTABLE;
+		ShtpPacketRequest packet = prepareShtpPacketRequest(shtpChannel, 1);
 		packet.addBody(0, 1);
 		return packet;
 	}

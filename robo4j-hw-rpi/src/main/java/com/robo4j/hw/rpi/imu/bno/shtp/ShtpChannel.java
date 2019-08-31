@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu.bno;
+package com.robo4j.hw.rpi.imu.bno.shtp;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * available registers
  */
-public enum DeviceChannel {
+public enum ShtpChannel {
 	//@formatter:off
     NONE            (-1),
     COMMAND         (0),
@@ -34,10 +34,10 @@ public enum DeviceChannel {
     GYRO            (5);
     //@formatter:on
 
-	private static final Map<Byte, DeviceChannel> map = getMap();
+	private static final Map<Byte, ShtpChannel> map = getMap();
 	private byte channel;
 
-	DeviceChannel(int channel) {
+	ShtpChannel(int channel) {
 		this.channel = (byte) channel;
 	}
 
@@ -45,14 +45,14 @@ public enum DeviceChannel {
 		return channel;
 	}
 
-	public static DeviceChannel getByChannel(byte channel) {
-		DeviceChannel result = map.get(channel);
+	public static ShtpChannel getByChannel(byte channel) {
+		ShtpChannel result = map.get(channel);
 		return result == null ? NONE : result;
 	}
 
-	private static Map<Byte, DeviceChannel> getMap() {
-		Map<Byte, DeviceChannel> map = new HashMap<>();
-		for (DeviceChannel ch : values()) {
+	private static Map<Byte, ShtpChannel> getMap() {
+		Map<Byte, ShtpChannel> map = new HashMap<>();
+		for (ShtpChannel ch : values()) {
 			map.put(ch.channel, ch);
 		}
 		return map;

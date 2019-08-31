@@ -42,11 +42,11 @@ import com.pi4j.io.spi.SpiMode;
 import com.pi4j.io.spi.impl.SpiDeviceImpl;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataEventType;
-import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
 import com.robo4j.hw.rpi.imu.bno.DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.VectorEvent;
 import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportIds;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpChannel;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperation;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationBuilder;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationResponse;
@@ -171,8 +171,8 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 * calibration command
 	 */
 	private ShtpPacketRequest createCalibrateCommandAll() {
-		DeviceChannel deviceChannel = DeviceChannel.COMMAND;
-		ShtpPacketRequest packet = prepareShtpPacketRequest(deviceChannel, 12);
+		ShtpChannel shtpChannel = ShtpChannel.COMMAND;
+		ShtpPacketRequest packet = prepareShtpPacketRequest(shtpChannel, 12);
 		packet.addBody(0, ControlReportIds.COMMAND_REQUEST.getId());
 		packet.addBody(0, commandSequenceNumber.getAndIncrement());
 		packet.addBody(2, DeviceCommand.ME_CALIBRATE.getId());
@@ -240,7 +240,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			boolean waitForResponse = true;
 			while (waitForResponse && counter < MAX_COUNTER) {
 				ShtpPacketResponse response = receivePacket(false, RECEIVE_WRITE_BYTE);
-				ShtpOperationResponse opResponse = new ShtpOperationResponse(DeviceChannel.getByChannel(response.getHeaderChannel()),
+				ShtpOperationResponse opResponse = new ShtpOperationResponse(ShtpChannel.getByChannel(response.getHeaderChannel()),
 						response.getBodyFirst());
 				if (head.getResponse().equals(opResponse)) {
 					waitForResponse = false;
@@ -266,7 +266,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		try {
 			waitForSPI();
 			ShtpPacketResponse receivedPacket = receivePacket(true, RECEIVE_WRITE_BYTE_CONTINUAL);
-			DeviceChannel channel = DeviceChannel.getByChannel(receivedPacket.getHeaderChannel());
+			ShtpChannel channel = ShtpChannel.getByChannel(receivedPacket.getHeaderChannel());
 			ShtpReportIds reportType = getReportType(channel, receivedPacket);
 
 			switch (channel) {
@@ -289,7 +289,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		}
 	}
 
-	private ShtpReportIds getReportType(DeviceChannel channel, ShtpPacketResponse response) {
+	private ShtpReportIds getReportType(ShtpChannel channel, ShtpPacketResponse response) {
 		switch (channel) {
 		case CONTROL:
 			return ControlReportIds.getById(response.getBodyFirst());
@@ -323,7 +323,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 * @return head of operations
 	 */
 	private ShtpOperation getInitSequence(ShtpPacketRequest initRequest) {
-		ShtpOperationResponse advResponse = new ShtpOperationResponse(DeviceChannel.COMMAND, 0);
+		ShtpOperationResponse advResponse = new ShtpOperationResponse(ShtpChannel.COMMAND, 0);
 		ShtpOperation headAdvertisementOp = new ShtpOperation(initRequest, advResponse);
 		ShtpOperationBuilder builder = new ShtpOperationBuilder(headAdvertisementOp);
 
@@ -386,8 +386,8 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			sendPacket(errorRequest);
 			while (active) {
 				ShtpPacketResponse response = receivePacket(false, RECEIVE_WRITE_BYTE);
-				DeviceChannel deviceChannel = DeviceChannel.getByChannel(response.getHeaderChannel());
-				if (deviceChannel.equals(DeviceChannel.COMMAND) && (response.getBody()[0] == 0x01)) {
+				ShtpChannel shtpChannel = ShtpChannel.getByChannel(response.getHeaderChannel());
+				if (shtpChannel.equals(ShtpChannel.COMMAND) && (response.getBody()[0] == 0x01)) {
 					active = false;
 					errorCounts = response.getBody().length - 1; // subtract -1
 																	// byte for
@@ -413,7 +413,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 * @return error request packet
 	 */
 	public ShtpPacketRequest getErrorRequest() {
-		ShtpPacketRequest result = prepareShtpPacketRequest(DeviceChannel.COMMAND, 1);
+		ShtpPacketRequest result = prepareShtpPacketRequest(ShtpChannel.COMMAND, 1);
 		result.addBody(0, 0x01 & 0xFF);
 		return result;
 	}
@@ -634,7 +634,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 */
 	private ShtpPacketRequest createFeatureRequest(SensorReportIds report, int timeBetweenReports, int specificConfig) {
 		final long microsBetweenReports = timeBetweenReports * 1000L;
-		final ShtpPacketRequest request = prepareShtpPacketRequest(DeviceChannel.CONTROL, 17);
+		final ShtpPacketRequest request = prepareShtpPacketRequest(ShtpChannel.CONTROL, 17);
 
 		//@formatter:off
 		int[] packetBody = new ShtpPacketBodyBuilder(request.getBodySize())
@@ -662,8 +662,8 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 
 	private ShtpPacketRequest createSensorReportRequest(ControlReportIds type, SensorReportIds sensor)
 			throws InterruptedException, IOException {
-		DeviceChannel deviceChannel = DeviceChannel.CONTROL;
-		ShtpPacketRequest packetRequest = prepareShtpPacketRequest(deviceChannel, 2);
+		ShtpChannel shtpChannel = ShtpChannel.CONTROL;
+		ShtpPacketRequest packetRequest = prepareShtpPacketRequest(shtpChannel, 2);
 
 		//@formatter:off
 		int[] packetBody = new ShtpPacketBodyBuilder(packetRequest.getBodySize())

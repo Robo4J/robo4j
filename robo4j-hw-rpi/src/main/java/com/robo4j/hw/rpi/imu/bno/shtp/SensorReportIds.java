@@ -17,8 +17,6 @@
 
 package com.robo4j.hw.rpi.imu.bno.shtp;
 
-import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
-
 /**
  * Sensor reports received on ShtpChannel 3
  */
@@ -63,7 +61,7 @@ public enum SensorReportIds implements ShtpReportIds {
     //@formatter:on
 
     private final int id;
-    private final DeviceChannel deviceChannel = DeviceChannel.REPORTS;
+    private final ShtpChannel shtpChannel = ShtpChannel.REPORTS;
 
     SensorReportIds(int id) {
         this.id = id;
@@ -75,8 +73,8 @@ public enum SensorReportIds implements ShtpReportIds {
     }
 
     @Override
-    public DeviceChannel getChannel() {
-        return deviceChannel;
+    public ShtpChannel getChannel() {
+        return shtpChannel;
     }
 
     public static SensorReportIds getById(int code) {
