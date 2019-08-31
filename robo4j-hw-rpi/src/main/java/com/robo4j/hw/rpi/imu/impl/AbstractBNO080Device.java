@@ -18,11 +18,11 @@
 package com.robo4j.hw.rpi.imu.impl;
 
 import com.robo4j.hw.rpi.imu.BNO080Device;
-import com.robo4j.hw.rpi.imu.bno.DeviceListener;
-import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
 import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
 import com.robo4j.hw.rpi.imu.bno.DeviceDeviceReport;
+import com.robo4j.hw.rpi.imu.bno.DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.DeviceSensorReport;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -128,6 +128,19 @@ public abstract class AbstractBNO080Device implements BNO080Device {
 		} catch (InterruptedException e) {
 			System.err.println(String.format("awaitTermination e: %s", e));
 		}
+	}
+
+	/**
+	 * SHTP packet contains 1 byte to get Error report. Packet is send to the
+	 * COMMAND channel
+	 *
+	 *
+	 * @return error request packet
+	 */
+	private ShtpPacketRequest getErrorRequest() {
+		ShtpPacketRequest result = prepareShtpPacketRequest(DeviceChannel.COMMAND, 1);
+		result.addBody(0, 0x01 & 0xFF);
+		return result;
 	}
 
 }

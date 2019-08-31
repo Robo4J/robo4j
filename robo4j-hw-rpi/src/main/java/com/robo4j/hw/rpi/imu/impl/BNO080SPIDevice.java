@@ -29,21 +29,21 @@ import com.pi4j.io.spi.SpiChannel;
 import com.pi4j.io.spi.SpiDevice;
 import com.pi4j.io.spi.SpiMode;
 import com.pi4j.io.spi.impl.SpiDeviceImpl;
+import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
+import com.robo4j.hw.rpi.imu.bno.DeviceDeviceReport;
 import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
 import com.robo4j.hw.rpi.imu.bno.DeviceEventType;
 import com.robo4j.hw.rpi.imu.bno.DeviceListener;
+import com.robo4j.hw.rpi.imu.bno.DeviceReport;
+import com.robo4j.hw.rpi.imu.bno.DeviceSensorReport;
+import com.robo4j.hw.rpi.imu.bno.Tuple3fBuilder;
+import com.robo4j.hw.rpi.imu.bno.VectorEvent;
+import com.robo4j.hw.rpi.imu.bno.XYZAccuracyEvent;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperation;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationBuilder;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationResponse;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketResponse;
-import com.robo4j.hw.rpi.imu.bno.Tuple3fBuilder;
-import com.robo4j.hw.rpi.imu.bno.VectorEvent;
-import com.robo4j.hw.rpi.imu.bno.XYZAccuracyEvent;
-import com.robo4j.hw.rpi.imu.bno.DeviceChannel;
-import com.robo4j.hw.rpi.imu.bno.DeviceDeviceReport;
-import com.robo4j.hw.rpi.imu.bno.DeviceReport;
-import com.robo4j.hw.rpi.imu.bno.DeviceSensorReport;
 import com.robo4j.math.geometry.Tuple3f;
 
 import java.io.IOException;
@@ -61,10 +61,13 @@ import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.toInt8U;
  * Abstraction for a BNO080 absolute orientation device.
  *
  * <p>
- * Channel 0: the SHTP command channel Channel 1: executable Channel 2: sensor
- * hub control channel Channel 3: input sensor reports (non-wake, not gyroRV)
- * Channel 4: wake input sensor reports (for sensors configured as wake
- * upsensors) Channel 5: gyro rotation vector
+ * Channel 0: command channel<br>
+ * Channel 1: executable<br>
+ * Channel 2: sensor hub control channel<br>
+ * Channel 3: input sensor reports (non-wake, not gyroRV) <br>
+ * Channel 4: wake input sensor reports (for sensors configured as wakeup
+ * sensors)<br>
+ * Channel 5: gyro rotation vector<br>
  * </p>
  *
  * https://github.com/sparkfun/SparkFun_BNO080_Arduino_Library/blob/master/src/SparkFun_BNO080_Arduino_Library.cpp
@@ -94,13 +97,8 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	private GpioPinDigitalOutput rstGpio;
 	private GpioPinDigitalOutput csGpio; // select slave SS = chip select CS
 
-	private int stabilityClassifier;
-	private int activityClassifier;
-	private int[] activityConfidences = new int[9]; // Array that store the confidences of the 9 possible activities
-	private int calibrationStatus; // Byte R0 of ME Calibration Response
+	private int calibrationStatus;		// Byte R0 of ME Calibration Response
 	private AtomicInteger spiWaitCounter = new AtomicInteger();
-	private DeviceSensorReport activeReport;
-	private int activeReportDelay;
 
 	// uint32_t
 	private long sensorReportDelayMicroSec = 0;
@@ -376,7 +374,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 
 	/**
 	 * Get reported shtp errors
-	 * 
+	 *
 	 * @return receive number of errors
 	 */
 	private int getShtpError() {
@@ -470,15 +468,15 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 * Unit responds with packet that contains the following
 	 */
 	private void parseCommandReport(ShtpPacketResponse packet) {
-		int[] shtpData = packet.getBody();
-		DeviceDeviceReport report = DeviceDeviceReport.getById(shtpData[0] & 0xFF);
+		int[] payload = packet.getBody();
+		DeviceDeviceReport report = DeviceDeviceReport.getById(payload[0] & 0xFF);
 		if (report.equals(DeviceDeviceReport.COMMAND_RESPONSE)) {
 			// The BNO080 responds with this report to command requests. It's up to use to
 			// remember which command we issued.
-			DeviceCommand command = DeviceCommand.getById(shtpData[2] & 0xFF); // This is the Command byte of the
+			DeviceCommand command = DeviceCommand.getById(payload[2] & 0xFF); // This is the Command byte of the
 			System.out.println("parseCommandReport: commandResponse: " + command);
 			if (DeviceCommand.ME_CALIBRATE.equals(command)) {
-				calibrationStatus = shtpData[5] & 0xFF; // R0 - Status (0 = success, non-zero = fail)
+				calibrationStatus = payload[5] & 0xFF; // R0 - Status (0 = success, non-zero = fail)
 			}
 		} else {
 			System.out.println("parseCommandReport: This sensor report ID is unhandled");
@@ -490,28 +488,28 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 * Unit responds with packet that contains the following:
 	 */
 	private DeviceEvent parseInputReport(ShtpPacketResponse packet) {
-		int[] shtpData = packet.getBody();
+		int[] payload = packet.getBody();
 
 		// Calculate the number of data bytes in this packet
 		final int dataLength = packet.getBodySize();
-		long timeStamp = (shtpData[4] << 24) | (shtpData[3] << 16) | (shtpData[2] << 8) | (shtpData[1]);
+		long timeStamp = (payload[4] << 24) | (payload[3] << 16) | (payload[2] << 8) | (payload[1]);
 
 		long accDelay = 17;
 		sensorReportDelayMicroSec = timeStamp + accDelay;
 
-		int sensor = shtpData[5];
-		int status = (shtpData[7] & 0x03) & 0xFF; // Get status bits
-		int data1 = ((shtpData[10] << 8) & 0xFFFF) | shtpData[9] & 0xFF;
-		int data2 = (shtpData[12] << 8 & 0xFFFF | (shtpData[11]) & 0xFF);
-		int data3 = (shtpData[14] << 8 & 0xFFFF) | (shtpData[13] & 0xFF);
+		int sensor = payload[5];
+		int status = (payload[7] & 0x03) & 0xFF; // Get status bits
+		int data1 = ((payload[10] << 8) & 0xFFFF) | payload[9] & 0xFF;
+		int data2 = (payload[12] << 8 & 0xFFFF | (payload[11]) & 0xFF);
+		int data3 = (payload[14] << 8 & 0xFFFF) | (payload[13] & 0xFF);
 		int data4 = 0;
 		int data5 = 0;
 
-		if (shtpData.length > 15 && dataLength - 5 > 9) {
-			data4 = (shtpData[16] & 0xFFFF) << 8 | shtpData[15] & 0xFF;
+		if (payload.length > 15 && dataLength - 5 > 9) {
+			data4 = (payload[16] & 0xFFFF) << 8 | payload[15] & 0xFF;
 		}
-		if (shtpData.length > 17 && dataLength - 5 > 11) {
-			data5 = (shtpData[18] & 0xFFFF) << 8 | shtpData[17] & 0xFF;
+		if (payload.length > 17 && dataLength - 5 > 11) {
+			data5 = (payload[18] & 0xFFFF) << 8 | payload[17] & 0xFF;
 		}
 
 		final DeviceSensorReport sensorReport = DeviceSensorReport.getById(sensor);
@@ -576,7 +574,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 * @param deviceCommand
 	 *            device command in response
 	 */
-	private void parseReportCommandResponse(DeviceCommand deviceCommand, int[] shtpData) {
+	private void parseReportCommandResponse(DeviceCommand deviceCommand, int[] payload) {
 		switch (deviceCommand) {
 		case ERRORS:
 			System.out.println("parseInputReport: deviceCommand=" + deviceCommand);
@@ -594,7 +592,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			System.out.println("parseInputReport: DCD deviceCommand=" + deviceCommand);
 			break;
 		case ME_CALIBRATE:
-			calibrationStatus = shtpData[10] & 0xFF; // R0 - Status (0 = success, non-zero = fail)
+			calibrationStatus = payload[10] & 0xFF; // R0 - Status (0 = success, non-zero = fail)
 			System.out.println("parseInputReport: command response: command= " + deviceCommand + " calibrationStatus= "
 					+ calibrationStatus);
 			break;
@@ -626,7 +624,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	 *            - contains specific config (uint32_t)
 	 */
 	private ShtpPacketRequest createFeatureRequest(DeviceSensorReport report, int timeBetweenReports,
-												   int specificConfig) {
+			int specificConfig) {
 		final long microsBetweenReports = timeBetweenReports * 1000L;
 		final ShtpPacketRequest request = prepareShtpPacketRequest(DeviceChannel.CONTROL, 17);
 
@@ -772,8 +770,6 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	}
 
 	private void initAndActive(final CountDownLatch latch, DeviceSensorReport report, int reportDelay) {
-		activeReport = report;
-		activeReportDelay = reportDelay;
 		executor.submit(() -> {
 			boolean initState = initiate();
 			if (initState && enableSensorReport(report, reportDelay)) {
