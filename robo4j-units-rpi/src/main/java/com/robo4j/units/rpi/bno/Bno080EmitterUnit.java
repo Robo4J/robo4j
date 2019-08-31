@@ -23,6 +23,7 @@ import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.imu.bno.Bno080Device;
+import com.robo4j.hw.rpi.imu.bno.Bno080Factory;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataListener;
 import com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice;
@@ -85,9 +86,9 @@ public class Bno080EmitterUnit extends RoboUnit<BnoRequest> {
 
 		try {
 			// TODO: make device configurable
-			device = new Bno080SPIDevice();
-		} catch (IOException e) {
-			throw new ConfigurationException("not possible initiate", e);
+			device = Bno080Factory.createDefaultSPIDevice();
+		} catch (IOException | InterruptedException e) {
+			throw new ConfigurationException("Could not initiate device", e);
 		}
 		device.start(report, reportDelay);
 	}

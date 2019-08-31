@@ -103,12 +103,31 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	// uint32_t
 	private long sensorReportDelayMicroSec = 0;
 
-	public Bno080SPIDevice() throws IOException {
-		this(DEFAULT_SPI_CHANNEL, DEFAULT_SPI_SPEED, DEFAULT_SPI_MODE);
+	public Bno080SPIDevice() throws IOException, InterruptedException {
+		this(DEFAULT_SPI_CHANNEL, DEFAULT_SPI_MODE, DEFAULT_SPI_SPEED);
 	}
 
-	public Bno080SPIDevice(SpiChannel spiChannel, int speed, SpiMode mode) throws IOException {
-		spiDevice = new SpiDeviceImpl(spiChannel, speed, mode);
+	public Bno080SPIDevice(SpiChannel channel, SpiMode mode, int speed) throws IOException, InterruptedException {
+		this(channel, mode, speed, RaspiPin.GPIO_00, RaspiPin.GPIO_25, RaspiPin.GPIO_02, RaspiPin.GPIO_03);
+	}
+
+	/**
+	 * @param wake
+	 *            Active low, Used to wake the processor from a sleep mode.
+	 * @param cs
+	 *            Chip select, active low, used as chip select/slave select on
+	 *            SPI
+	 * @param rst
+	 *            Reset signal, active low, pull low to reset IC
+	 * @param inter
+	 *            Interrupt, active low, pulls low when the BNO080 is ready for
+	 *            communication.
+	 **/
+	public Bno080SPIDevice(SpiChannel channel, SpiMode mode, int speed, Pin wake, Pin cs, Pin reset, Pin interrupt)
+			throws IOException, InterruptedException {
+		spiDevice = new SpiDeviceImpl(channel, speed, mode);
+		configureSpiPins(wake, cs, reset, interrupt);
+
 	}
 
 	public boolean isActive() {
@@ -358,18 +377,17 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 * Initiate BNO080 unit and return the state
 	 *
 	 * @return BNO080 initial state
+	 * @throws IOException
+	 * @throws InterruptedException
 	 */
 	private boolean initiate() {
+		ShtpOperation opHead = getInitSequence(null);
 		try {
-			if (configureSpiPins()) {
-				ShtpOperation opHead = getInitSequence(null);
-				active.set(processOperationChainByHead(opHead));
-				return active.get();
-			}
-		} catch (IOException | InterruptedException e) {
-			throw new IllegalStateException("pins are not available: " + e);
+			active.set(processOperationChainByHead(opHead));
+		} catch (InterruptedException | IOException e) {
+			throw new IllegalStateException("Problem initializing device!");
 		}
-		return false;
+		return active.get();
 	}
 
 	/**
@@ -419,18 +437,6 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	}
 
 	/**
-	 * Configure SPI default configuration
-	 *
-	 * @throws IOException
-	 *             exception
-	 * @throws InterruptedException
-	 *             exception
-	 */
-	private boolean configureSpiPins() throws IOException, InterruptedException {
-		return configureSpiPins(RaspiPin.GPIO_00, RaspiPin.GPIO_25, RaspiPin.GPIO_02, RaspiPin.GPIO_03);
-	}
-
-	/**
 	 * Configure SPI by Pins
 	 *
 	 * @param wake
@@ -464,7 +470,6 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		rstGpio.setState(PinState.LOW); // Reset BNO080
 		TimeUnit.SECONDS.sleep(2); // Min length not specified in datasheet?
 		rstGpio.setState(PinState.HIGH); // Bring out of reset
-
 		return true;
 	}
 
@@ -476,15 +481,9 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		ControlReportIds report = ControlReportIds.getById(payload[0] & 0xFF);
 		if (report.equals(ControlReportIds.COMMAND_RESPONSE)) {
 			// The BNO080 responds with this report to command requests. It's up
-			// to use to
-			// remember which command we issued.
-			DeviceCommand command = DeviceCommand.getById(payload[2] & 0xFF); // This
-																				// is
-																				// the
-																				// Command
-																				// byte
-																				// of
-																				// the
+			// to use to remember which command we issued.
+
+			DeviceCommand command = DeviceCommand.getById(payload[2] & 0xFF);
 			System.out.println("parseCommandReport: commandResponse: " + command);
 			if (DeviceCommand.ME_CALIBRATE.equals(command)) {
 				calibrationStatus = payload[5] & 0xFF; // R0 - Status (0 =
@@ -791,7 +790,6 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 
 	private void reactivate(final CountDownLatch latch, SensorReportIds report, int reportDelay) {
 		executor.submit(() -> {
-
 			try {
 				ShtpOperation opHead = getInitSequence(null);
 				active.set(processOperationChainByHead(opHead));
