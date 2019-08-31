@@ -84,12 +84,12 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	public static final SpiChannel DEFAULT_SPI_CHANNEL = SpiChannel.CS0;
 
 	public static final int MAX_PACKET_SIZE = 32762;
-	private static final int MAX_COUNTER = 255;
 	public static final int DEFAULT_TIMEOUT_MS = 1000;
 	public static final int UNIT_TICK_MICRO = 100;
 	public static final int TIMEBASE_REFER_DELTA = 120;
 	public static final int MAX_SPI_COUNT = 255;
 	public static final int MAX_SPI_WAIT_CYCLES = 2;
+	private static final int MAX_COUNTER = 255;
 
 	private SpiDevice spiDevice;
 	private GpioPinDigitalInput intGpio;
@@ -168,7 +168,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	}
 
 	/**
-	 * calibration commmand
+	 * calibration command
 	 */
 	private ShtpPacketRequest createCalibrateCommandAll() {
 		DeviceChannel deviceChannel = DeviceChannel.COMMAND;
