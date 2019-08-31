@@ -109,7 +109,6 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		spiDevice = new SpiDeviceImpl(spiChannel, speed, mode);
 	}
 
-
 	public boolean isActive() {
 		return active.get();
 	}
@@ -121,7 +120,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 			System.out.println(String.format("START: ready:%s, active:%s", ready.get(), active.get()));
 			spiWaitCounter.set(0);
 			synchronized (executor) {
-				if (!ready.get()){
+				if (!ready.get()) {
 					initAndActive(latch, report, reportDelay);
 				} else {
 					reactivate(latch, report, reportDelay);
@@ -140,57 +139,10 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 
 	}
 
-	private void initAndActive(final CountDownLatch latch, ShtpSensorReport report, int reportDelay) {
-		activeReport = report;
-		activeReportDelay = reportDelay;
-		executor.submit(() -> {
-			boolean initState = initiate();
-			if (initState && enableSensorReport(report, reportDelay)) {
-				latch.countDown();
-				ready.set(initState);
-			}
-		});
-	}
-
-	private void reactivate(final CountDownLatch latch, ShtpSensorReport report, int reportDelay){
-		executor.submit(() -> {
-
-			try {
-				ShtpOperation opHead = getInitSequence(null);
-				active.set(processOperationChainByHead(opHead));
-				if(active.get() && enableSensorReport(report, reportDelay)){
-					latch.countDown();
-				}
-			} catch (InterruptedException | IOException e) {
-				throw new IllegalStateException("not activated");
-			}
-		});
-	}
-
-	private void executeListenerJob() {
-		executor.execute(() -> {
-			if (ready.get()) {
-				active.set(ready.get());
-				while (active.get()) {
-					forwardReceivedPacketToListeners();
-				}
-			} else {
-				throw new IllegalStateException("not initiated");
-			}
-		});
-	}
-
-	private void forwardReceivedPacketToListeners() {
-		DeviceEvent deviceEvent = processReceivedPacket();
-		if (!deviceEvent.getType().equals(DeviceEventType.NONE)) {
-			for (DeviceListener l : listeners) {
-				l.onResponse(deviceEvent);
-			}
-		}
-	}
-
 	/**
-	 * stop forces a soft reset command unit needs 700 millis to become to be available
+	 * stop forces a soft reset command unit needs 700 millis to become to be
+	 * available
+	 * 
 	 * @return status
 	 */
 	@Override
@@ -214,7 +166,7 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 	}
 
 	/**
-	 *
+	 * calibration commmand
 	 */
 	private ShtpPacketRequest createCalibrateCommandAll() {
 		ShtpChannel shtpChannel = ShtpChannel.COMMAND;
@@ -243,8 +195,17 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		return new ShtpOperation(request, response);
 	}
 
+	/**
+	 * Enable device report
+	 * 
+	 * @param report
+	 *            detailed report intent
+	 * @param reportDelay
+	 *            necessary delay between the request and device response
+	 * @return status
+	 */
 	private boolean enableSensorReport(ShtpSensorReport report, int reportDelay) {
-		ShtpOperation enableSensorReportOp = getSensorReportOperation(report, reportDelay);
+		final ShtpOperation enableSensorReportOp = getSensorReportOperation(report, reportDelay);
 		try {
 			return processOperationChainByHead(enableSensorReportOp);
 		} catch (InterruptedException | IOException e) {
@@ -253,6 +214,20 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		}
 	}
 
+	/**
+	 * process chain of defined operations. The operation represent
+	 * {@link ShtpPacketRequest} and expected {@link ShtpOperationResponse}. It is
+	 * possible that noise packet can be delivered in between, or packets that
+	 * belongs to another listeners
+	 * 
+	 * @param head
+	 *            initial operation in the operation chain
+	 * @return status of the all process information
+	 * @throws InterruptedException
+	 *             process has been interrupted
+	 * @throws IOException
+	 *             IOException
+	 */
 	private boolean processOperationChainByHead(ShtpOperation head) throws InterruptedException, IOException {
 		int counter = 0;
 		boolean state = true;
@@ -280,6 +255,11 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		return state;
 	}
 
+	/**
+	 * receive packet and convert into DeviceEvent
+	 * 
+	 * @return created event based on received date
+	 */
 	private DeviceEvent processReceivedPacket() {
 		try {
 			waitForSPI();
@@ -357,6 +337,11 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 
 	}
 
+	/**
+	 * initiate soft reset
+	 * 
+	 * @return state
+	 */
 	private boolean softReset() {
 		try {
 			ShtpOperation opHead = softResetSequence();
@@ -385,6 +370,11 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		return false;
 	}
 
+	/**
+	 * Get reported shtp errors
+	 * 
+	 * @return receive number of errors
+	 */
 	private int getShtpError() {
 		ShtpPacketRequest errorRequest = getErrorRequest();
 
@@ -775,6 +765,55 @@ public class BNO080SPIDevice extends AbstractBNO080Device {
 		csGpio.setState(PinState.HIGH);
 
 		return response;
+	}
+
+	private void initAndActive(final CountDownLatch latch, ShtpSensorReport report, int reportDelay) {
+		activeReport = report;
+		activeReportDelay = reportDelay;
+		executor.submit(() -> {
+			boolean initState = initiate();
+			if (initState && enableSensorReport(report, reportDelay)) {
+				latch.countDown();
+				ready.set(initState);
+			}
+		});
+	}
+
+	private void reactivate(final CountDownLatch latch, ShtpSensorReport report, int reportDelay) {
+		executor.submit(() -> {
+
+			try {
+				ShtpOperation opHead = getInitSequence(null);
+				active.set(processOperationChainByHead(opHead));
+				if (active.get() && enableSensorReport(report, reportDelay)) {
+					latch.countDown();
+				}
+			} catch (InterruptedException | IOException e) {
+				throw new IllegalStateException("not activated");
+			}
+		});
+	}
+
+	private void executeListenerJob() {
+		executor.execute(() -> {
+			if (ready.get()) {
+				active.set(ready.get());
+				while (active.get()) {
+					forwardReceivedPacketToListeners();
+				}
+			} else {
+				throw new IllegalStateException("not initiated");
+			}
+		});
+	}
+
+	private void forwardReceivedPacketToListeners() {
+		DeviceEvent deviceEvent = processReceivedPacket();
+		if (!deviceEvent.getType().equals(DeviceEventType.NONE)) {
+			for (DeviceListener l : listeners) {
+				l.onResponse(deviceEvent);
+			}
+		}
 	}
 
 }

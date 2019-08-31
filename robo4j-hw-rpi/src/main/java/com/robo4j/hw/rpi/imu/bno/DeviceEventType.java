@@ -18,7 +18,7 @@
 package com.robo4j.hw.rpi.imu.bno;
 
 /**
- * Type of BNO080 Event
+ * DeviceEventType event type {@link DeviceEvent}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

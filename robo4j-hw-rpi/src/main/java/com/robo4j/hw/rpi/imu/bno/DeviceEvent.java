@@ -20,6 +20,8 @@ package com.robo4j.hw.rpi.imu.bno;
 import java.io.Serializable;
 
 /**
+ * DeviceEvent event produced by BNO device see {@link com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice}
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */

@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class AbstractBNO080Device implements BNO080Device {
 
-	class ShtpPacketBodyBuilder {
+	static class ShtpPacketBodyBuilder {
 		private int[] body;
 		private final AtomicInteger counter = new AtomicInteger();
 
