@@ -27,8 +27,8 @@ import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.imu.Bno080Device;
+import com.robo4j.hw.rpi.imu.DataListener;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
-import com.robo4j.hw.rpi.imu.bno.DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
 import com.robo4j.hw.rpi.imu.impl.Bno080SPIDevice;
 import com.robo4j.logging.SimpleLoggingUtil;
@@ -47,7 +47,7 @@ public class Bno080EmitterUnit extends RoboUnit<BnoRequest> {
 	public static final String PROPERTY_REPORT_TYPE = "reportType";
 	public static final String PROPERTY_REPORT_DELAY = "reportDelay";
 
-	private static final class BNOListenerEvent implements DeviceListener {
+	private static final class BNOListenerEvent implements DataListener {
 		private final RoboReference<DataEvent3f> target;
 
 		BNOListenerEvent(RoboReference<DataEvent3f> target) {

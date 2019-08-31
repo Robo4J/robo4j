@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.robo4j.hw.rpi.imu.Bno080Device;
-import com.robo4j.hw.rpi.imu.bno.DeviceListener;
+import com.robo4j.hw.rpi.imu.DataListener;
 import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportIds;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpChannel;
@@ -43,14 +43,14 @@ public abstract class AbstractBno080Device implements Bno080Device {
 
 	static byte RECEIVE_WRITE_BYTE = (byte) 0xFF;
 	static byte RECEIVE_WRITE_BYTE_CONTINUAL = (byte) 0;
-	final List<DeviceListener> listeners = new CopyOnWriteArrayList<>();
+	final List<DataListener> listeners = new CopyOnWriteArrayList<>();
 	final AtomicBoolean active = new AtomicBoolean(false);
 	final AtomicBoolean ready = new AtomicBoolean(false);
 	final AtomicInteger commandSequenceNumber = new AtomicInteger(0);
 	
 	private static final short CHANNEL_COUNT = 6; // BNO080 supports 6 channels
 	private static final int AWAIT_TERMINATION = 10;
-	private final int[] sequenceByChannel = new int[CHANNEL_COUNT];
+	private final int[] sequenceNumberByChannel = new int[CHANNEL_COUNT];
 
 	static class ShtpPacketBodyBuilder {
 		private int[] body;
@@ -72,7 +72,7 @@ public abstract class AbstractBno080Device implements Bno080Device {
 
 
 	final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, (r) -> {
-		Thread t = new Thread(r, "BNO080 Internal Executor");
+		Thread t = new Thread(r, "Bno080 Internal Executor");
 		t.setDaemon(true);
 		return t;
 	});
@@ -90,12 +90,12 @@ public abstract class AbstractBno080Device implements Bno080Device {
 	}
 
 	@Override
-	public void addListener(DeviceListener listener) {
+	public void addListener(DataListener listener) {
 		listeners.add(listener);
 	}
 
 	@Override
-	public void removeListener(DeviceListener listener) {
+	public void removeListener(DataListener listener) {
 		listeners.remove(listener);
 	}
 
@@ -113,7 +113,7 @@ public abstract class AbstractBno080Device implements Bno080Device {
 
 	
 	ShtpPacketRequest prepareShtpPacketRequest(ShtpChannel shtpChannel, int size) {
-		ShtpPacketRequest packet = new ShtpPacketRequest(size, sequenceByChannel[shtpChannel.getChannel()]++);
+		ShtpPacketRequest packet = new ShtpPacketRequest(size, sequenceNumberByChannel[shtpChannel.getChannel()]++);
 		packet.createHeader(shtpChannel);
 		return packet;
 	}

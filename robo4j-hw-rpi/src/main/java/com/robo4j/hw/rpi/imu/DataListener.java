@@ -15,7 +15,9 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu.bno;
+package com.robo4j.hw.rpi.imu;
+
+import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 
 /**
  * DeviceListener reacts on produced event
@@ -23,7 +25,13 @@ package com.robo4j.hw.rpi.imu.bno;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface DeviceListener {
-
-    void onResponse(DataEvent3f event);
+public interface DataListener {
+	
+	/**
+	 * Called when there is a new result available.
+	 * 
+	 * @param event
+	 *            the event with data from the bno device.
+	 */
+	void onResponse(DataEvent3f event);
 }

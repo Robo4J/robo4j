@@ -17,7 +17,6 @@
 
 package com.robo4j.hw.rpi.imu;
 
-import com.robo4j.hw.rpi.imu.bno.DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.impl.Bno080SPIDevice;
@@ -29,7 +28,7 @@ import com.robo4j.hw.rpi.imu.impl.Bno080SPIDevice;
 public class Bno080Example {
 	public static void main(String[] args) throws Exception {
 
-		DeviceListener listener = (DataEvent3f event) -> System.out.println("ShtpPacketResponse: " + event);
+		DataListener listener = (DataEvent3f event) -> System.out.println("ShtpPacketResponse: " + event);
 
 		SensorReportIds sensorReport = SensorReportIds.ACCELEROMETER;
 		System.out.println("BNO080 Example: " + sensorReport);

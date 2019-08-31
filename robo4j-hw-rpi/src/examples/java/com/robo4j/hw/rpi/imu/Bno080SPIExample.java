@@ -17,7 +17,6 @@
 
 package com.robo4j.hw.rpi.imu;
 
-import com.robo4j.hw.rpi.imu.bno.DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.impl.Bno080SPIDevice;
@@ -30,7 +29,7 @@ public class Bno080SPIExample {
 
 	public static void main(String[] args) throws Exception {
 
-		DeviceListener listener = (DataEvent3f event) -> System.out.println("ShtpPacketResponse: " + event);
+		DataListener listener = (DataEvent3f event) -> System.out.println("ShtpPacketResponse: " + event);
 
 		System.out.println("BNO080 SPI Example");
 		Bno080SPIDevice device = new Bno080SPIDevice();

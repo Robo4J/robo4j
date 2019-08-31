@@ -40,9 +40,9 @@ import com.pi4j.io.spi.SpiChannel;
 import com.pi4j.io.spi.SpiDevice;
 import com.pi4j.io.spi.SpiMode;
 import com.pi4j.io.spi.impl.SpiDeviceImpl;
+import com.robo4j.hw.rpi.imu.DataListener;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataEventType;
-import com.robo4j.hw.rpi.imu.bno.DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.VectorEvent;
 import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportIds;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
@@ -820,7 +820,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	private void forwardReceivedPacketToListeners() {
 		DataEvent3f deviceEvent = processReceivedPacket();
 		if (!deviceEvent.getType().equals(DataEventType.NONE)) {
-			for (DeviceListener l : listeners) {
+			for (DataListener l : listeners) {
 				l.onResponse(deviceEvent);
 			}
 		}

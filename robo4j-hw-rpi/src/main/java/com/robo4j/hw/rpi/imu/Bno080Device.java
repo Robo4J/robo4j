@@ -17,7 +17,6 @@
 
 package com.robo4j.hw.rpi.imu;
 
-import com.robo4j.hw.rpi.imu.bno.DeviceListener;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
 
 import java.util.HashMap;
@@ -139,9 +138,9 @@ public interface Bno080Device {
 		}
 	}
 
-	void addListener(DeviceListener listener);
+	void addListener(DataListener listener);
 
-	void removeListener(DeviceListener listener);
+	void removeListener(DataListener listener);
 
 	boolean start(SensorReportIds report, int reportDelay);
 
