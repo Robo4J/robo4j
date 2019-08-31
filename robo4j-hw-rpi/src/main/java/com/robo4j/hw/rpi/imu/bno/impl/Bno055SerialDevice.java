@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.imu.impl;
+package com.robo4j.hw.rpi.imu.bno.impl;
 
 import com.pi4j.concurrent.ExecutorServiceFactory;
 import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialFactory;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
-import com.robo4j.hw.rpi.imu.Bno055Device;
+import com.robo4j.hw.rpi.imu.bno.Bno055Device;
 import com.robo4j.math.geometry.Tuple3f;
 
 import java.io.IOException;

@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu.impl;
+package com.robo4j.hw.rpi.imu.bno.impl;
 
 import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.EMPTY_EVENT;
 import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.calculateNumberOfBytesInPacket;
@@ -40,9 +40,9 @@ import com.pi4j.io.spi.SpiChannel;
 import com.pi4j.io.spi.SpiDevice;
 import com.pi4j.io.spi.SpiMode;
 import com.pi4j.io.spi.impl.SpiDeviceImpl;
-import com.robo4j.hw.rpi.imu.DataListener;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataEventType;
+import com.robo4j.hw.rpi.imu.bno.DataListener;
 import com.robo4j.hw.rpi.imu.bno.VectorEvent;
 import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportIds;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;

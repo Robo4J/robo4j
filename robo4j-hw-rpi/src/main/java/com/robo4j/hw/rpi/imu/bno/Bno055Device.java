@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.imu;
+package com.robo4j.hw.rpi.imu.bno;
 
 import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.math.geometry.Tuple4d;

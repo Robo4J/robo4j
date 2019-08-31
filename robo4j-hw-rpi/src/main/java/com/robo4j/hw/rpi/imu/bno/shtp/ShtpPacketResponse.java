@@ -17,10 +17,10 @@
 
 package com.robo4j.hw.rpi.imu.bno.shtp;
 
-import static com.robo4j.hw.rpi.imu.impl.Bno080SPIDevice.SHTP_HEADER_SIZE;
+import static com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice.SHTP_HEADER_SIZE;
 
 /**
- * ShtpPacketResponse represent SPI device response see {@link com.robo4j.hw.rpi.imu.impl.Bno080SPIDevice}
+ * ShtpPacketResponse represent SPI device response see {@link com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

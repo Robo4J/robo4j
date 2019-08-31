@@ -16,7 +16,11 @@
  */
 package com.robo4j.hw.rpi.imu;
 
-import com.robo4j.hw.rpi.imu.Bno055Device.OperatingMode;
+import com.robo4j.hw.rpi.imu.bno.Bno055CalibrationStatus;
+import com.robo4j.hw.rpi.imu.bno.Bno055Device;
+import com.robo4j.hw.rpi.imu.bno.Bno055Factory;
+import com.robo4j.hw.rpi.imu.bno.Bno055SelfTestResult;
+import com.robo4j.hw.rpi.imu.bno.Bno055Device.OperatingMode;
 import com.robo4j.math.geometry.Tuple3f;
 
 import java.io.IOException;

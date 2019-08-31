@@ -22,11 +22,11 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.hw.rpi.imu.Bno080Device;
-import com.robo4j.hw.rpi.imu.DataListener;
+import com.robo4j.hw.rpi.imu.bno.Bno080Device;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
+import com.robo4j.hw.rpi.imu.bno.DataListener;
+import com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
-import com.robo4j.hw.rpi.imu.impl.Bno080SPIDevice;
 import com.robo4j.logging.SimpleLoggingUtil;
 
 import java.io.IOException;

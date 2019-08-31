@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu.impl;
+package com.robo4j.hw.rpi.imu.bno.impl;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -25,8 +25,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.robo4j.hw.rpi.imu.Bno080Device;
-import com.robo4j.hw.rpi.imu.DataListener;
+import com.robo4j.hw.rpi.imu.bno.Bno080Device;
+import com.robo4j.hw.rpi.imu.bno.DataListener;
 import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportIds;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpChannel;

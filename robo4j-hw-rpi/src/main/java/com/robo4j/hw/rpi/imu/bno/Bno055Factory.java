@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.imu;
+package com.robo4j.hw.rpi.imu.bno;
 
-import com.robo4j.hw.rpi.imu.Bno055Device.OperatingMode;
-import com.robo4j.hw.rpi.imu.impl.Bno055I2CDevice;
-import com.robo4j.hw.rpi.imu.impl.Bno055SerialDevice;
+import com.robo4j.hw.rpi.imu.bno.Bno055Device.OperatingMode;
+import com.robo4j.hw.rpi.imu.bno.impl.Bno055I2CDevice;
+import com.robo4j.hw.rpi.imu.bno.impl.Bno055SerialDevice;
 
 import java.io.IOException;
 

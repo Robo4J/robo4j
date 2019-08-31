@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.imu.impl;
+package com.robo4j.hw.rpi.imu.bno.impl;
 
-import com.robo4j.hw.rpi.imu.Bno055CalibrationStatus;
-import com.robo4j.hw.rpi.imu.Bno055Device;
-import com.robo4j.hw.rpi.imu.Bno055SelfTestResult;
-import com.robo4j.hw.rpi.imu.Bno055SystemStatus;
+import com.robo4j.hw.rpi.imu.bno.Bno055CalibrationStatus;
+import com.robo4j.hw.rpi.imu.bno.Bno055Device;
+import com.robo4j.hw.rpi.imu.bno.Bno055SelfTestResult;
+import com.robo4j.hw.rpi.imu.bno.Bno055SystemStatus;
 import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.math.geometry.Tuple4d;
 

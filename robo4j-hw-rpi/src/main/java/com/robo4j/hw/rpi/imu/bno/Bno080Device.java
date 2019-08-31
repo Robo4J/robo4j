@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu;
+package com.robo4j.hw.rpi.imu.bno;
 
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
 

@@ -19,7 +19,8 @@ package com.robo4j.hw.rpi.imu;
 
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
-import com.robo4j.hw.rpi.imu.impl.Bno080SPIDevice;
+import com.robo4j.hw.rpi.imu.bno.DataListener;
+import com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice;
 
 /**
  * @author Marcus Hirt (@hirt)

@@ -15,9 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu;
-
-import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
+package com.robo4j.hw.rpi.imu.bno;
 
 /**
  * DeviceListener reacts on produced event

@@ -14,32 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.imu;
+package com.robo4j.hw.rpi.imu.bno.impl;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.robo4j.hw.rpi.imu.bno.impl.Bno055SerialDevice;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-class BNOSystemStatusTests {
+class BnoSerialTests {
 
 	@Test
-	void testFlags() {
-		Bno055SystemStatus status = new Bno055SystemStatus(1);
-		assertTrue(status.getStatusFlags().length == 1);
-		assertArrayEquals(createFlags(Bno055SystemStatus.StatusFlag.IDLE), status.getStatusFlags());
-		status = new Bno055SystemStatus(65);
-		assertTrue(status.getStatusFlags().length == 2);
-		assertArrayEquals(createFlags(Bno055SystemStatus.StatusFlag.IDLE, Bno055SystemStatus.StatusFlag.RUNNING_NO_SENSOR_FUSION), status.getStatusFlags());
-
-	}
-
-	private Bno055SystemStatus.StatusFlag[] createFlags(Bno055SystemStatus.StatusFlag... flags) {
-		return flags;
+	void testBNOSerialReadRequest() {
+		byte[] readRequest = Bno055SerialDevice.createReadRequest(0x20, 2);
+		assertEquals(0xAA, 0xFF & readRequest[0]);
+		assertEquals(0x01, readRequest[1]);
+		assertEquals(0x20, readRequest[2]);
+		assertEquals(2, readRequest[3]);
 	}
 }
