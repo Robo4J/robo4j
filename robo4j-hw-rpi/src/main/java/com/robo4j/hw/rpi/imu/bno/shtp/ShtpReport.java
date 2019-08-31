@@ -15,31 +15,18 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu.bno;
+package com.robo4j.hw.rpi.imu.bno.shtp;
 
 /**
- * ShtpOperationBuilder provides a chain of operation needs to by processed in desired order
- *
+ * ShtpReport represent report Id and the channel
+ * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class ShtpOperationBuilder {
+public interface ShtpReport {
 
-    private final ShtpOperation head;
-    private ShtpOperation current;
+	int getId();
 
-    public ShtpOperationBuilder(ShtpOperation head) {
-        this.head = head;
-        this.current = head;
-    }
+	ShtpChannel getChannel();
 
-    public ShtpOperationBuilder addOperation(ShtpOperation operation){
-        current.setNext(operation);
-        current = operation;
-        return this;
-    }
-
-    public ShtpOperation build(){
-        return head;
-    }
 }

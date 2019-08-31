@@ -19,7 +19,10 @@ package com.robo4j.hw.rpi.imu.impl;
 
 import com.robo4j.hw.rpi.imu.BNO080Device;
 import com.robo4j.hw.rpi.imu.bno.DeviceListener;
-import com.robo4j.hw.rpi.imu.bno.ShtpPacketRequest;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpChannel;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpDeviceReport;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpSensorReport;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

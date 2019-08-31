@@ -15,30 +15,31 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu;
-
-import com.robo4j.hw.rpi.imu.bno.DeviceListener;
-import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
-import com.robo4j.hw.rpi.imu.bno.shtp.ShtpSensorReport;
-import com.robo4j.hw.rpi.imu.impl.BNO080SPIDevice;
+package com.robo4j.hw.rpi.imu.bno.shtp;
 
 /**
+ * ShtpOperationBuilder provides a chain of operation needs to by processed in desired order
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BNO080SPIExample {
+public class ShtpOperationBuilder {
 
-	public static void main(String[] args) throws Exception {
+    private final ShtpOperation head;
+    private ShtpOperation current;
 
-		DeviceListener listener = (DeviceEvent event) -> System.out.println("ShtpPacketResponse: " + event);
+    public ShtpOperationBuilder(ShtpOperation head) {
+        this.head = head;
+        this.current = head;
+    }
 
-		System.out.println("BNO080 SPI Example");
-		BNO080SPIDevice device = new BNO080SPIDevice();
-		device.addListener(listener);
-		device.start(ShtpSensorReport.ACCELEROMETER, 100);
-		System.out.println("CLICK TO END...");
-		System.in.read();
-		device.shutdown();
+    public ShtpOperationBuilder addOperation(ShtpOperation operation){
+        current.setNext(operation);
+        current = operation;
+        return this;
+    }
 
-	}
+    public ShtpOperation build(){
+        return head;
+    }
 }

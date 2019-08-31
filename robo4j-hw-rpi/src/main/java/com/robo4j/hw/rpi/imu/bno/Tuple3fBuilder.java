@@ -17,6 +17,7 @@
 
 package com.robo4j.hw.rpi.imu.bno;
 
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils;
 import com.robo4j.math.geometry.Tuple3f;
 
 /**

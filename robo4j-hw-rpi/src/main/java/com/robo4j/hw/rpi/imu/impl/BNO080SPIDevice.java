@@ -32,14 +32,18 @@ import com.pi4j.io.spi.impl.SpiDeviceImpl;
 import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
 import com.robo4j.hw.rpi.imu.bno.DeviceEventType;
 import com.robo4j.hw.rpi.imu.bno.DeviceListener;
-import com.robo4j.hw.rpi.imu.bno.ShtpOperation;
-import com.robo4j.hw.rpi.imu.bno.ShtpOperationBuilder;
-import com.robo4j.hw.rpi.imu.bno.ShtpOperationResponse;
-import com.robo4j.hw.rpi.imu.bno.ShtpPacketRequest;
-import com.robo4j.hw.rpi.imu.bno.ShtpPacketResponse;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperation;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationBuilder;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationResponse;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketResponse;
 import com.robo4j.hw.rpi.imu.bno.Tuple3fBuilder;
 import com.robo4j.hw.rpi.imu.bno.VectorEvent;
 import com.robo4j.hw.rpi.imu.bno.XYZAccuracyEvent;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpChannel;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpDeviceReport;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpReport;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpSensorReport;
 import com.robo4j.math.geometry.Tuple3f;
 
 import java.io.IOException;
@@ -47,11 +51,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.calculateNumberOfBytesInPacket;
-import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.emptyEvent;
-import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.intToFloat;
-import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.printArray;
-import static com.robo4j.hw.rpi.imu.bno.ShtpUtils.toInt8U;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.calculateNumberOfBytesInPacket;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.emptyEvent;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.intToFloat;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.printArray;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.toInt8U;
 
 /**
  * Abstraction for a BNO080 absolute orientation device.

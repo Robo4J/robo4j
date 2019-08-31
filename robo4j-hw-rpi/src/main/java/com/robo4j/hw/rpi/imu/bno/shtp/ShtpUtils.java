@@ -15,7 +15,10 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.imu.bno;
+package com.robo4j.hw.rpi.imu.bno.shtp;
+
+import com.robo4j.hw.rpi.imu.bno.DeviceEvent;
+import com.robo4j.hw.rpi.imu.bno.DeviceEventType;
 
 /**
  * ShtpUtils collection of useful utils
