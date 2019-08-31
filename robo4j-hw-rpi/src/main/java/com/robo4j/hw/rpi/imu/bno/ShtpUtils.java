@@ -42,7 +42,7 @@ public final class ShtpUtils {
 	}
 
 	/**
-	 * Print hexadecimal values of int array to system output s
+	 * Print hexadecimal values of int array to system out.
 	 * 
 	 * @param message
 	 *            message
@@ -58,10 +58,13 @@ public final class ShtpUtils {
 	}
 
 	/**
+	 * Reads the first byte in the array as an unsigned byte, represented as an
+	 * int.
 	 *
 	 * @param array
-	 *            byte array
-	 * @return unsigned 8-bit int
+	 *            byte array from which to read the first element.
+	 * @return the first byte in the array read as an unsigned byte, represented
+	 *         as an int.
 	 */
 	public static int toInt8U(byte[] array) {
 		return array[0] & 0xFF;
@@ -85,7 +88,7 @@ public final class ShtpUtils {
 	};
 
 	/**
-	 * calculate packet length
+	 * Calculate packet length.
 	 * 
 	 * @param packetMSB
 	 *            uint8
