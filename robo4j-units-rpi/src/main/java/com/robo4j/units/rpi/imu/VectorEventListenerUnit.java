@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.rpi.bno;
+package com.robo4j.units.rpi.imu;
 
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
@@ -27,7 +27,7 @@ import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.net.LookupServiceProvider;
 
 /**
- * BNOVectorEventListenerUnit listen to VectorEvent events produced by {@link Bno080EmitterUnit}
+ * BNOVectorEventListenerUnit listen to VectorEvent events produced by {@link Bno080Unit}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

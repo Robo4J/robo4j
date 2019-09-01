@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.rpi.bno;
+package com.robo4j.units.rpi.imu;
 
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;

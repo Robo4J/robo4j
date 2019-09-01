@@ -16,7 +16,7 @@
   -->
 
 <robo4j>
-    <roboSystem id="bno080Emitter">
+    <roboSystem id="bno080">
         <config name="com.robo4j.root">
             <value name="poolSizeScheduler" type="int">10</value>
             <value name="poolSizeWorker" type="int">10</value>

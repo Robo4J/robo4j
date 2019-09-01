@@ -21,6 +21,7 @@ import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
+import com.robo4j.units.rpi.imu.BnoRequest;
 import com.robo4j.util.SystemUtil;
 
 import java.io.InputStream;
@@ -33,11 +34,11 @@ import java.io.InputStream;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class DataEventEmitterListenerExample {
+public class DataEventListenerExample {
 
 	public static void main(String[] args) throws Exception {
 		RoboBuilder builder = new RoboBuilder();
-		InputStream settings = Thread.currentThread().getContextClassLoader().getResourceAsStream("bno080XYZexample.xml");
+		InputStream settings = Thread.currentThread().getContextClassLoader().getResourceAsStream("bno080GyroExample.xml");
 		if (settings == null) {
 			System.out.println("Could not find the settings for the BNO080 Example!");
 			System.exit(2);

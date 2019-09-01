@@ -15,7 +15,7 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.rpi.bno;
+package com.robo4j.units.rpi.imu;
 
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
@@ -35,13 +35,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * BNO080EmitterUnit emits desired information produced by
- * {@link Bno080SPIDevice } to the target provided by {@link BnoRequest}
+ * IMU unit emitting data produced by {@link Bno080SPIDevice } to the target
+ * provided by {@link BnoRequest}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Bno080EmitterUnit extends RoboUnit<BnoRequest> {
+public class Bno080Unit extends RoboUnit<BnoRequest> {
 
 	public static final String PROPERTY_REPORT_TYPE = "reportType";
 	public static final String PROPERTY_REPORT_DELAY = "reportDelay";
@@ -62,7 +62,7 @@ public class Bno080EmitterUnit extends RoboUnit<BnoRequest> {
 	private Bno080Device device;
 	private List<BnoListenerEvent> listeners = new ArrayList<>();
 
-	public Bno080EmitterUnit(RoboContext context, String id) {
+	public Bno080Unit(RoboContext context, String id) {
 		super(BnoRequest.class, context, id);
 	}
 

@@ -17,14 +17,14 @@
 
 <robo4j>
     <roboUnit id="bno">
-        <class>com.robo4j.units.rpi.bno.Bno080EmitterUnit</class>
+        <class>com.robo4j.units.rpi.imu.Bno080Unit</class>
         <config name="com.robo4j.root">
             <value name="reportType" type="String">ROTATION_VECTOR</value>
             <value name="reportDelay" type="int">100</value>
         </config>
     </roboUnit>
     <roboUnit id="listener">
-        <class>com.robo4j.units.rpi.bno.VectorEventListenerUnit</class>
+        <class>com.robo4j.units.rpi.imu.VectorEventListenerUnit</class>
         <config name="com.robo4j.root">
             <value name="targetContext" type="String">cubeVizSystem</value>
             <value name="remoteUnit" type="String">bnoReceiver</value>
