@@ -24,22 +24,23 @@ package com.robo4j.hw.rpi.imu.bno;
  * @author Miroslav Wengner (@miragemiko)
  */
 public enum DataEventType {
-    //@formatter:off
+	//@formatter:off
     NONE                    (-1),
     MAGNETOMETER			(4),
+    ACCELEROMETER 			(8),
     ACCELEROMETER_RAW 		(8),
     ACCELEROMETER_LINEAR 	(8),
     GYROSCOPE				(9),
     VECTOR_GAME             (14),
     VECTOR_ROTATION         (14);
     //@formatter:on
-    private final int qPoint;
+	private final int qPoint;
 
-    DataEventType(int qPoint) {
-        this.qPoint = qPoint;
-    }
+	DataEventType(int qPoint) {
+		this.qPoint = qPoint;
+	}
 
-    public int getQ(){
-        return qPoint;
-    }
+	public int getQ() {
+		return qPoint;
+	}
 }

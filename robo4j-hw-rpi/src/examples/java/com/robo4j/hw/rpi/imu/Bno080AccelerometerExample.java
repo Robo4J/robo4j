@@ -17,28 +17,27 @@
 
 package com.robo4j.hw.rpi.imu;
 
-import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportId;
+import com.robo4j.hw.rpi.imu.bno.Bno080Device;
+import com.robo4j.hw.rpi.imu.bno.Bno080Factory;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataListener;
-import com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice;
+import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportId;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Bno080SPIExample {
+public class Bno080AccelerometerExample {
 
 	public static void main(String[] args) throws Exception {
-
 		DataListener listener = (DataEvent3f event) -> System.out.println("ShtpPacketResponse: " + event);
-
-		System.out.println("BNO080 SPI Example");
-		Bno080SPIDevice device = new Bno080SPIDevice();
+		System.out.println("BNO080 SPI Accelerometer Example");
+		// Change here to use other modes of communication
+		Bno080Device device = Bno080Factory.createDefaultSPIDevice();
 		device.addListener(listener);
-		device.start(SensorReportId.ROTATION_VECTOR, 100);
-		System.out.println("CLICK TO END...");
+		device.start(SensorReportId.ACCELEROMETER, 100);
+		System.out.println("Press <Enter> to quit!");
 		System.in.read();
 		device.shutdown();
-
 	}
 }

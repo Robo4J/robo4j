@@ -211,7 +211,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	}
 
 	/**
-	 * calibration command
+	 * Calibration command
 	 */
 	private ShtpPacketRequest createCalibrateCommandAll() {
 		ShtpChannel shtpChannel = ShtpChannel.COMMAND;
@@ -260,7 +260,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	}
 
 	/**
-	 * process chain of defined operations. The operation represent
+	 * Process chain of defined operations. The operation represent
 	 * {@link ShtpPacketRequest} and expected {@link ShtpOperationResponse}. It
 	 * is possible that noise packet can be delivered in between, or packets
 	 * that belongs to another listeners
@@ -552,13 +552,15 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 
 		switch (sensorReport) {
 		case ACCELEROMETER:
-			return createXYZAccuracyEvent(DataEventType.ACCELEROMETER_RAW, timeStamp, status, data1, data2, data3, data4);
+			return createDataEvent(DataEventType.ACCELEROMETER, timeStamp, status, data1, data2, data3, data4);
+		case RAW_ACCELEROMETER:
+			return createDataEvent(DataEventType.ACCELEROMETER_RAW, timeStamp, status, data1, data2, data3, data4);			
 		case LINEAR_ACCELERATION:
-			return createXYZAccuracyEvent(DataEventType.ACCELEROMETER_LINEAR, timeStamp, status, data1, data2, data3, data4);
+			return createDataEvent(DataEventType.ACCELEROMETER_LINEAR, timeStamp, status, data1, data2, data3, data4);
 		case GYROSCOPE:
-			return createXYZAccuracyEvent(DataEventType.GYROSCOPE, timeStamp, status, data1, data2, data3, data4);
+			return createDataEvent(DataEventType.GYROSCOPE, timeStamp, status, data1, data2, data3, data4);
 		case MAGNETIC_FIELD:
-			return createXYZAccuracyEvent(DataEventType.MAGNETOMETER, timeStamp, status, data1, data2, data3, data4);
+			return createDataEvent(DataEventType.MAGNETOMETER, timeStamp, status, data1, data2, data3, data4);
 		case GAME_ROTATION_VECTOR:
 			return createVectorEvent(DataEventType.VECTOR_GAME, timeStamp, status, data1, data2, data3, data4, data5);
 		case ROTATION_VECTOR:
@@ -586,7 +588,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		return new VectorEvent(type, status, tuple3f, timeStamp, intToFloat(qReal, type.getQ()), intToFloat(qRadianAccuracy, type.getQ()));
 	}
 
-	private DataEvent3f createXYZAccuracyEvent(DataEventType type, long timeStamp, int... data) {
+	private DataEvent3f createDataEvent(DataEventType type, long timeStamp, int... data) {
 		if (data == null || data.length < 4) {
 			return EMPTY_EVENT;
 		}
@@ -708,7 +710,6 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 			if (intGpio.isLow()) {
 				return true;
 			} else {
-				System.out.println("SPI Wait: " + counter);
 				counter++;
 			}
 			TimeUnit.MICROSECONDS.sleep(1);
@@ -716,7 +717,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		if (spiWaitCounter.getAndIncrement() == MAX_SPI_WAIT_CYCLES) {
 			stop();
 		}
-		System.out.println("waitForSPI: ERROR counter: " + counter);
+		System.out.println("waitForSPI failed. Counter: " + counter);
 		return false;
 	}
 
