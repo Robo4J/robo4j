@@ -211,7 +211,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	}
 
 	/**
-	 * calibration command
+	 * Calibration command
 	 */
 	private ShtpPacketRequest createCalibrateCommandAll() {
 		ShtpChannel shtpChannel = ShtpChannel.COMMAND;
@@ -260,7 +260,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	}
 
 	/**
-	 * process chain of defined operations. The operation represent
+	 * Process chain of defined operations. The operation represent
 	 * {@link ShtpPacketRequest} and expected {@link ShtpOperationResponse}. It
 	 * is possible that noise packet can be delivered in between, or packets
 	 * that belongs to another listeners
@@ -552,7 +552,9 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 
 		switch (sensorReport) {
 		case ACCELEROMETER:
-			return createDataEvent(DataEventType.ACCELEROMETER_RAW, timeStamp, status, data1, data2, data3, data4);
+			return createDataEvent(DataEventType.ACCELEROMETER, timeStamp, status, data1, data2, data3, data4);
+		case RAW_ACCELEROMETER:
+			return createDataEvent(DataEventType.ACCELEROMETER_RAW, timeStamp, status, data1, data2, data3, data4);			
 		case LINEAR_ACCELERATION:
 			return createDataEvent(DataEventType.ACCELEROMETER_LINEAR, timeStamp, status, data1, data2, data3, data4);
 		case GYROSCOPE:
