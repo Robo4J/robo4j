@@ -111,4 +111,19 @@ public final class ShtpUtils {
 		return new Tuple3f(x, y, z);
 	}
 
+	/**
+	 * Pretty prints a packet.
+	 */
+	public static void printShtpPacket(ControlReportId reportId, String prefix, int[] data) {
+		switch (reportId) {
+		case PRODUCT_ID_RESPONSE:
+			System.out.println(String.format("printShtpPacketPart:%s:report=%s:value=%s", prefix, reportId, Integer.toHexString(data[0])));
+			break;
+		default:
+			System.out.println(String.format("printShtpPacketPart:%s:NO IMPL=%s:value=%s", prefix, reportId, Integer.toHexString(data[0])));
+		}
+		for (int i = 0; i < data.length; i++) {
+			System.out.println("printShtpPacketPart" + prefix + "::[" + i + "]:" + Integer.toHexString(data[i]));
+		}
+	}
 }

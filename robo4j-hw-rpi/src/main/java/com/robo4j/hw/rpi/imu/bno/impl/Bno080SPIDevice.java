@@ -722,7 +722,6 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	}
 
 	private boolean sendPacket(ShtpPacketRequest packet) throws InterruptedException, IOException {
-
 		// Wait for BNO080 to indicate it is available for communication
 		if (!waitForSPI()) {
 			System.out.println("sendPacket SPI not available for communication");
@@ -746,21 +745,6 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		return true;
 	}
 
-	public static void printShtpPacketPart(ControlReportId report, String prefix, int[] data) {
-		switch (report) {
-		case PRODUCT_ID_RESPONSE:
-			System.out.println(String.format("printShtpPacketPart:%s:report=%s:value=%s", prefix, report, Integer.toHexString(data[0])));
-			break;
-		default:
-			System.out.println(String.format("printShtpPacketPart:%s:NO IMPL=%s:value=%s", prefix, report, Integer.toHexString(data[0])));
-
-		}
-		for (int i = 0; i < data.length; i++) {
-			System.out.println("printShtpPacketPart" + prefix + "::[" + i + "]:" + Integer.toHexString(data[i]));
-		}
-
-	}
-
 	private ShtpPacketResponse receivePacket(boolean delay, byte writeByte) throws IOException, InterruptedException {
 		if (intGpio.isHigh()) {
 			System.out.println("receivedPacketContinual: no interrupt");
@@ -775,12 +759,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		int packetLSB = toInt8U(spiDevice.write(writeByte));
 		int packetMSB = toInt8U(spiDevice.write(writeByte));
 		int channelNumber = toInt8U(spiDevice.write(writeByte));
-		int sequenceNumber = toInt8U(spiDevice.write(writeByte)); // Not sure if
-																	// we need
-																	// to store
-																	// this or
-																	// not
-
+		int sequenceNumber = toInt8U(spiDevice.write(writeByte));
 		// Calculate the number of data bytes in this packet
 		int dataLength = calculateNumberOfBytesInPacket(packetMSB, packetLSB) - SHTP_HEADER_SIZE;
 		if (dataLength <= 0) {
