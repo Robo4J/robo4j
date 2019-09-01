@@ -87,6 +87,6 @@ public class DataEvent3f implements Serializable {
 
 	@Override
 	public String toString() {
-		return "XYZAccuracyEvent{" + "type=" + type + ", status=" + status + ", data=" + data + ", timestamp=" + timestamp + '}';
+		return "DataEvent3f{" + "type=" + type + ", status=" + status + ", data=" + data + ", timestamp=" + timestamp + '}';
 	}
 }

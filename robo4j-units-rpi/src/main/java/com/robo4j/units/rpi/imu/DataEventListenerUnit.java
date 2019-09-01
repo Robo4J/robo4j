@@ -23,9 +23,8 @@ import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.logging.SimpleLoggingUtil;
 
 /**
- * BNOXYZAccuracyEventListenerUnit listen only to {@link XYZAccuracyEvent} event
- * types produced by the emitter.
- *
+ * DataEventListener unit listens to {@link DataEvent3f} event types produced by
+ * the {@link Bno080Unit}.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

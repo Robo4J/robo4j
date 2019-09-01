@@ -552,13 +552,13 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 
 		switch (sensorReport) {
 		case ACCELEROMETER:
-			return createXYZAccuracyEvent(DataEventType.ACCELEROMETER_RAW, timeStamp, status, data1, data2, data3, data4);
+			return createDataEvent(DataEventType.ACCELEROMETER_RAW, timeStamp, status, data1, data2, data3, data4);
 		case LINEAR_ACCELERATION:
-			return createXYZAccuracyEvent(DataEventType.ACCELEROMETER_LINEAR, timeStamp, status, data1, data2, data3, data4);
+			return createDataEvent(DataEventType.ACCELEROMETER_LINEAR, timeStamp, status, data1, data2, data3, data4);
 		case GYROSCOPE:
-			return createXYZAccuracyEvent(DataEventType.GYROSCOPE, timeStamp, status, data1, data2, data3, data4);
+			return createDataEvent(DataEventType.GYROSCOPE, timeStamp, status, data1, data2, data3, data4);
 		case MAGNETIC_FIELD:
-			return createXYZAccuracyEvent(DataEventType.MAGNETOMETER, timeStamp, status, data1, data2, data3, data4);
+			return createDataEvent(DataEventType.MAGNETOMETER, timeStamp, status, data1, data2, data3, data4);
 		case GAME_ROTATION_VECTOR:
 			return createVectorEvent(DataEventType.VECTOR_GAME, timeStamp, status, data1, data2, data3, data4, data5);
 		case ROTATION_VECTOR:
@@ -586,7 +586,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		return new VectorEvent(type, status, tuple3f, timeStamp, intToFloat(qReal, type.getQ()), intToFloat(qRadianAccuracy, type.getQ()));
 	}
 
-	private DataEvent3f createXYZAccuracyEvent(DataEventType type, long timeStamp, int... data) {
+	private DataEvent3f createDataEvent(DataEventType type, long timeStamp, int... data) {
 		if (data == null || data.length < 4) {
 			return EMPTY_EVENT;
 		}
