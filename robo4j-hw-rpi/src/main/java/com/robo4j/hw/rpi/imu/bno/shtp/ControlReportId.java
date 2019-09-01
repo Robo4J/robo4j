@@ -25,7 +25,7 @@ import java.util.Map;
  * reference manual These are used for low level communication with the sensor,
  * on DeviceChannel 2 (CONTROL)
  */
-public enum ControlReportIds implements ShtpReportIds {
+public enum ControlReportId implements ShtpReportIds {
     //@formatter:off
     NONE                                    (-1),
     ADVERTISEMENT                           (0x00),
@@ -43,11 +43,11 @@ public enum ControlReportIds implements ShtpReportIds {
     FLUSH_COMPLETED                         (0xEF);
     //@formatter:on
 
-    private final static Map<Integer, ControlReportIds> map = getMap();
+    private final static Map<Integer, ControlReportId> map = getMap();
     private final int id;
     private final ShtpChannel shtpChannel = ShtpChannel.CONTROL;
 
-    ControlReportIds(int id) {
+    ControlReportId(int id) {
         this.id = id;
     }
 
@@ -61,14 +61,14 @@ public enum ControlReportIds implements ShtpReportIds {
         return shtpChannel;
     }
 
-    public static ControlReportIds getById(int id) {
-        ControlReportIds report = map.get(id);
+    public static ControlReportId getById(int id) {
+        ControlReportId report = map.get(id);
         return report == null ? NONE : report;
     }
 
-    private static Map<Integer, ControlReportIds> getMap() {
-        Map<Integer, ControlReportIds> map = new HashMap<>();
-        for (ControlReportIds r : values()) {
+    private static Map<Integer, ControlReportId> getMap() {
+        Map<Integer, ControlReportId> map = new HashMap<>();
+        for (ControlReportId r : values()) {
             map.put(r.getId(), r);
         }
         return map;

@@ -17,10 +17,7 @@
 
 package com.robo4j.hw.rpi.imu.bno;
 
-import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportId;
 
 /**
  * Interface for BNO080 Devices.
@@ -31,121 +28,42 @@ import java.util.Map;
 public interface Bno080Device {
 
 	/**
-	 * Record IDs from figure 29, page 29 reference manual These are used to read
-	 * the metadata for each sensor type
+	 * Add a listener for new data.
+	 * 
+	 * @param listener
+	 *            the listener to accept new data.
 	 */
-	enum FrsRecord {
-
-		//@formatter:off
-        NONE                        (-1),
-        ACCELEROMETER               (0xE302),
-        GYROSCOPE_CALIBRATED        (0xE306),
-        MAGNETIC_FIELD_CALIBRATED   (0xE309),
-        ROTATION_VECTOR             (0xE30B);
-        //@formatter:on
-
-		private final int id;
-
-		FrsRecord(int recordId) {
-			this.id = recordId;
-		}
-
-		public int getId() {
-			return id;
-		}
-
-		public static FrsRecord getById(int id) {
-			for (FrsRecord r : values()) {
-				if (id == r.getId()) {
-					return r;
-				}
-			}
-			return NONE;
-		}
-	}
-
-	/**
-	 * Command IDs from section 6.4, page 42 These are used to calibrate,
-	 * initialize, set orientation, tare etc the sensor
-	 */
-	enum DeviceCommand {
-		//@formatter:off
-        NONE            (0),
-        ERRORS          (1),
-        COUNTER         (2),
-        TARE            (3),
-        INITIALIZE      (4),
-        DCD             (6),
-        ME_CALIBRATE    (7),
-        DCD_PERIOD_SAVE (9),
-        OSCILLATOR      (10),
-        CLEAR_DCD       (11);
-        //@formatter:on
-
-		private static Map<Integer, DeviceCommand> map = getMap();
-		private final int id;
-
-		DeviceCommand(int id) {
-			this.id = id;
-		}
-
-		public int getId() {
-			return id;
-		}
-
-		public static DeviceCommand getById(int id) {
-			DeviceCommand command = map.get(id);
-			return command == null ? NONE : command;
-		}
-
-		private static Map<Integer, DeviceCommand> getMap() {
-			Map<Integer, DeviceCommand> map = new HashMap<>();
-			for (DeviceCommand c : values()) {
-				map.put(c.id, c);
-			}
-			return map;
-		}
-	}
-
-	enum DeviceCalibrate {
-		//@formatter:off
-        NONE            (-1),
-        ACCEL           (0),
-        GYRO            (1),
-        MAG             (2),
-        PLANAR_ACCEL    (3),
-        ACCEL_GYRO_MAG  (4),
-        STOP            (5);
-        //@formatter:on
-
-		private int id;
-
-		DeviceCalibrate(int id) {
-			this.id = id;
-		}
-
-		public int getId() {
-			return id;
-		}
-
-		public static DeviceCalibrate getById(int id) {
-			for (DeviceCalibrate r : values()) {
-				if (id == r.getId()) {
-					return r;
-				}
-			}
-			return NONE;
-		}
-	}
-
 	void addListener(DataListener listener);
 
+	/**
+	 * Remove a listener for new data.
+	 * 
+	 * @param listener
+	 *            the listener to remove.
+	 */
 	void removeListener(DataListener listener);
 
-	boolean start(SensorReportIds report, int reportDelay);
+	/**
+	 * Starts listening for specific data.
+	 * 
+	 * @param report
+	 *            the kind of data to start listening for.
+	 * @param reportPeriod
+	 *            report period in ms.
+	 * @return
+	 */
+	boolean start(SensorReportId report, int reportPeriod);
 
+	/**
+	 * Stop listening for all kinds of reports.
+	 * 
+	 * @return true if successfully stopped.
+	 */
 	boolean stop();
 
+	/**
+	 * Shuts down the device. There is no coming back. ;)
+	 */
 	void shutdown();
 
 }

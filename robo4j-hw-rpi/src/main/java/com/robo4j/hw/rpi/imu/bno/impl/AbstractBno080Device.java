@@ -17,7 +17,9 @@
 
 package com.robo4j.hw.rpi.imu.bno.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -27,8 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.robo4j.hw.rpi.imu.bno.Bno080Device;
 import com.robo4j.hw.rpi.imu.bno.DataListener;
-import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportIds;
-import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
+import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportId;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpChannel;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
 
@@ -47,10 +48,121 @@ public abstract class AbstractBno080Device implements Bno080Device {
 	final AtomicBoolean active = new AtomicBoolean(false);
 	final AtomicBoolean ready = new AtomicBoolean(false);
 	final AtomicInteger commandSequenceNumber = new AtomicInteger(0);
-	
+
 	private static final short CHANNEL_COUNT = 6; // BNO080 supports 6 channels
 	private static final int AWAIT_TERMINATION = 10;
 	private final int[] sequenceNumberByChannel = new int[CHANNEL_COUNT];
+
+	/**
+	 * Record IDs (figure 29, page 29 reference manual). These are used to read
+	 * the metadata for each sensor type.
+	 */
+	enum FrsRecord {
+
+		//@formatter:off
+        NONE                        (-1),
+        ACCELEROMETER               (0xE302),
+        GYROSCOPE_CALIBRATED        (0xE306),
+        MAGNETIC_FIELD_CALIBRATED   (0xE309),
+        ROTATION_VECTOR             (0xE30B);
+        //@formatter:on
+
+		private final int id;
+
+		FrsRecord(int recordId) {
+			this.id = recordId;
+		}
+
+		public int getId() {
+			return id;
+		}
+
+		public static FrsRecord getById(int id) {
+			for (FrsRecord r : values()) {
+				if (id == r.getId()) {
+					return r;
+				}
+			}
+			return NONE;
+		}
+	}
+
+	/**
+	 * Command IDs (section 6.4, page 42 in the manual). These are used to
+	 * calibrate, initialize, set orientation, tare etc the sensor.
+	 */
+	enum DeviceCommand {
+		//@formatter:off
+        NONE            (0),
+        ERRORS          (1),
+        COUNTER         (2),
+        TARE            (3),
+        INITIALIZE      (4),
+        DCD             (6),
+        ME_CALIBRATE    (7),
+        DCD_PERIOD_SAVE (9),
+        OSCILLATOR      (10),
+        CLEAR_DCD       (11);
+        //@formatter:on
+
+		private static Map<Integer, DeviceCommand> map = getMap();
+		private final int id;
+
+		DeviceCommand(int id) {
+			this.id = id;
+		}
+
+		public int getId() {
+			return id;
+		}
+
+		public static DeviceCommand getById(int id) {
+			DeviceCommand command = map.get(id);
+			return command == null ? NONE : command;
+		}
+
+		private static Map<Integer, DeviceCommand> getMap() {
+			Map<Integer, DeviceCommand> map = new HashMap<>();
+			for (DeviceCommand c : values()) {
+				map.put(c.id, c);
+			}
+			return map;
+		}
+	}
+
+	/**
+	 * Sensor calibration targets.
+	 */
+	enum DeviceCalibrate {
+		//@formatter:off
+        NONE            (-1),
+        ACCEL           (0),
+        GYRO            (1),
+        MAG             (2),
+        PLANAR_ACCEL    (3),
+        ACCEL_GYRO_MAG  (4),
+        STOP            (5);
+        //@formatter:on
+
+		private int id;
+
+		DeviceCalibrate(int id) {
+			this.id = id;
+		}
+
+		public int getId() {
+			return id;
+		}
+
+		public static DeviceCalibrate getById(int id) {
+			for (DeviceCalibrate r : values()) {
+				if (id == r.getId()) {
+					return r;
+				}
+			}
+			return NONE;
+		}
+	}
 
 	static class ShtpPacketBodyBuilder {
 		private int[] body;
@@ -70,15 +182,11 @@ public abstract class AbstractBno080Device implements Bno080Device {
 		}
 	}
 
-
 	final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, (r) -> {
 		Thread t = new Thread(r, "Bno080 Internal Executor");
 		t.setDaemon(true);
 		return t;
 	});
-	
-	@Override
-	public abstract boolean start(SensorReportIds report, int reportDelay);
 
 	@Override
 	public void shutdown() {
@@ -111,7 +219,6 @@ public abstract class AbstractBno080Device implements Bno080Device {
 		return result;
 	}
 
-	
 	ShtpPacketRequest prepareShtpPacketRequest(ShtpChannel shtpChannel, int size) {
 		ShtpPacketRequest packet = new ShtpPacketRequest(size, sequenceNumberByChannel[shtpChannel.getChannel()]++);
 		packet.createHeader(shtpChannel);
@@ -122,7 +229,7 @@ public abstract class AbstractBno080Device implements Bno080Device {
 		// Check communication with device
 		// bytes: Request the product ID and reset info, Reserved
 		ShtpPacketRequest result = prepareShtpPacketRequest(ShtpChannel.CONTROL, 2);
-		result.addBody(0, ControlReportIds.PRODUCT_ID_REQUEST.getId());
+		result.addBody(0, ControlReportId.PRODUCT_ID_REQUEST.getId());
 		result.addBody(1, 0);
 		return result;
 	}

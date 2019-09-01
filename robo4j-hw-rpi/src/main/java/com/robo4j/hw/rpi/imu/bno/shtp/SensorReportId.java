@@ -20,7 +20,7 @@ package com.robo4j.hw.rpi.imu.bno.shtp;
 /**
  * Sensor reports received on ShtpChannel 3
  */
-public enum SensorReportIds implements ShtpReportIds {
+public enum SensorReportId implements ShtpReportIds {
     //@formatter:off
     NONE                            (-1),
     ACCELEROMETER                   (0x01),
@@ -63,7 +63,7 @@ public enum SensorReportIds implements ShtpReportIds {
     private final int id;
     private final ShtpChannel shtpChannel = ShtpChannel.REPORTS;
 
-    SensorReportIds(int id) {
+    SensorReportId(int id) {
         this.id = id;
     }
 
@@ -77,8 +77,8 @@ public enum SensorReportIds implements ShtpReportIds {
         return shtpChannel;
     }
 
-    public static SensorReportIds getById(int code) {
-        for (SensorReportIds r : values()) {
+    public static SensorReportId getById(int code) {
+        for (SensorReportId r : values()) {
             if ((code & 0xFF) == r.getId()) {
                 return r;
             }

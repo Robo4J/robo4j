@@ -44,8 +44,8 @@ import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataEventType;
 import com.robo4j.hw.rpi.imu.bno.DataListener;
 import com.robo4j.hw.rpi.imu.bno.VectorEvent;
-import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportIds;
-import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
+import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportId;
+import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportId;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpChannel;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperation;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationBuilder;
@@ -103,17 +103,43 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	// uint32_t
 	private long sensorReportDelayMicroSec = 0;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public Bno080SPIDevice() throws IOException, InterruptedException {
 		this(DEFAULT_SPI_CHANNEL, DEFAULT_SPI_MODE, DEFAULT_SPI_SPEED);
 	}
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param channel
+	 *            the {@link SpiChannel} to use.
+	 * @param mode
+	 *            the {@link SpiMode} to use.
+	 * @param speed
+	 *            the speed in Hz to use for communication.
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public Bno080SPIDevice(SpiChannel channel, SpiMode mode, int speed) throws IOException, InterruptedException {
 		this(channel, mode, speed, RaspiPin.GPIO_00, RaspiPin.GPIO_25, RaspiPin.GPIO_02, RaspiPin.GPIO_03);
 	}
 
 	/**
+	 * Constructor.
+	 * 
+	 * @param channel
+	 *            the {@link SpiChannel} to use.
+	 * @param mode
+	 *            the {@link SpiMode} to use.
+	 * @param speed
+	 *            the speed in Hz to use for communication.
 	 * @param wake
-	 *            Active low, Used to wake the processor from a sleep mode.
+	 *            Used to wake the processor from a sleep mode. Active low.
 	 * @param cs
 	 *            Chip select, active low, used as chip select/slave select on
 	 *            SPI
@@ -127,7 +153,6 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 			throws IOException, InterruptedException {
 		spiDevice = new SpiDeviceImpl(channel, speed, mode);
 		configureSpiPins(wake, cs, reset, interrupt);
-
 	}
 
 	public boolean isActive() {
@@ -135,16 +160,16 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	}
 
 	@Override
-	public boolean start(SensorReportIds report, int reportDelay) {
-		if (reportDelay > 0) {
+	public boolean start(SensorReportId report, int reportPeriod) {
+		if (reportPeriod > 0) {
 			final CountDownLatch latch = new CountDownLatch(1);
 			System.out.println(String.format("START: ready:%s, active:%s", ready.get(), active.get()));
 			spiWaitCounter.set(0);
 			synchronized (executor) {
 				if (!ready.get()) {
-					initAndActive(latch, report, reportDelay);
+					initAndActive(latch, report, reportPeriod);
 				} else {
-					reactivate(latch, report, reportDelay);
+					reactivate(latch, report, reportPeriod);
 				}
 				if (waitForLatch(latch)) {
 					executor.execute(() -> {
@@ -154,7 +179,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 				}
 			}
 		} else {
-			System.out.println(String.format("start: not valid sensor:%s delay: %d", report, reportDelay));
+			System.out.println(String.format("start: not valid sensor:%s delay: %d", report, reportPeriod));
 		}
 		return active.get();
 
@@ -192,7 +217,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	private ShtpPacketRequest createCalibrateCommandAll() {
 		ShtpChannel shtpChannel = ShtpChannel.COMMAND;
 		ShtpPacketRequest packet = prepareShtpPacketRequest(shtpChannel, 12);
-		packet.addBody(0, ControlReportIds.COMMAND_REQUEST.getId());
+		packet.addBody(0, ControlReportId.COMMAND_REQUEST.getId());
 		packet.addBody(0, commandSequenceNumber.getAndIncrement());
 		packet.addBody(2, DeviceCommand.ME_CALIBRATE.getId());
 		packet.addBody(3, 1);
@@ -210,8 +235,8 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 *            time delay for sensor report
 	 * @return operation head
 	 */
-	private ShtpOperation getSensorReportOperation(SensorReportIds report, int reportDelay) {
-		ShtpOperationResponse response = new ShtpOperationResponse(ControlReportIds.GET_FEATURE_RESPONSE);
+	private ShtpOperation getSensorReportOperation(SensorReportId report, int reportDelay) {
+		ShtpOperationResponse response = new ShtpOperationResponse(ControlReportId.GET_FEATURE_RESPONSE);
 		ShtpPacketRequest request = createFeatureRequest(report, reportDelay, 0);
 		return new ShtpOperation(request, response);
 	}
@@ -225,7 +250,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 *            necessary delay between the request and device response
 	 * @return status
 	 */
-	private boolean enableSensorReport(SensorReportIds report, int reportDelay) {
+	private boolean enableSensorReport(SensorReportId report, int reportDelay) {
 		final ShtpOperation enableSensorReportOp = getSensorReportOperation(report, reportDelay);
 		try {
 			return processOperationChainByHead(enableSensorReportOp);
@@ -292,7 +317,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 			case CONTROL:
 				break;
 			case REPORTS:
-				if (SensorReportIds.BASE_TIMESTAMP.equals(reportType)) {
+				if (SensorReportId.BASE_TIMESTAMP.equals(reportType)) {
 					return parseInputReport(receivedPacket);
 				}
 				break;
@@ -311,11 +336,11 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	private ShtpReportIds getReportType(ShtpChannel channel, ShtpPacketResponse response) {
 		switch (channel) {
 		case CONTROL:
-			return ControlReportIds.getById(response.getBodyFirst());
+			return ControlReportId.getById(response.getBodyFirst());
 		case REPORTS:
-			return SensorReportIds.getById(response.getBodyFirst());
+			return SensorReportId.getById(response.getBodyFirst());
 		default:
-			return ControlReportIds.NONE;
+			return ControlReportId.NONE;
 		}
 	}
 
@@ -346,11 +371,11 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		ShtpOperation headAdvertisementOp = new ShtpOperation(initRequest, advResponse);
 		ShtpOperationBuilder builder = new ShtpOperationBuilder(headAdvertisementOp);
 
-		ShtpOperationResponse reportIdResponse = new ShtpOperationResponse(ControlReportIds.PRODUCT_ID_RESPONSE);
+		ShtpOperationResponse reportIdResponse = new ShtpOperationResponse(ControlReportId.PRODUCT_ID_RESPONSE);
 		ShtpOperation productIdOperation = new ShtpOperation(getProductIdRequest(), reportIdResponse);
 		builder.addOperation(productIdOperation);
 
-		ShtpOperationResponse resetResponse = new ShtpOperationResponse(ControlReportIds.COMMAND_RESPONSE);
+		ShtpOperationResponse resetResponse = new ShtpOperationResponse(ControlReportId.COMMAND_RESPONSE);
 		ShtpOperation resetOperation = new ShtpOperation(null, resetResponse);
 		builder.addOperation(resetOperation);
 
@@ -478,8 +503,8 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 */
 	private void parseCommandReport(ShtpPacketResponse packet) {
 		int[] payload = packet.getBody();
-		ControlReportIds report = ControlReportIds.getById(payload[0] & 0xFF);
-		if (report.equals(ControlReportIds.COMMAND_RESPONSE)) {
+		ControlReportId report = ControlReportId.getById(payload[0] & 0xFF);
+		if (report.equals(ControlReportId.COMMAND_RESPONSE)) {
 			// The BNO080 responds with this report to command requests. It's up
 			// to use to remember which command we issued.
 
@@ -524,7 +549,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 			data5 = (payload[18] & 0xFFFF) << 8 | payload[17] & 0xFF;
 		}
 
-		final SensorReportIds sensorReport = SensorReportIds.getById(sensor);
+		final SensorReportId sensorReport = SensorReportId.getById(sensor);
 
 		switch (sensorReport) {
 		case ACCELEROMETER:
@@ -631,13 +656,13 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 * @param specificConfig
 	 *            - contains specific config (uint32_t)
 	 */
-	private ShtpPacketRequest createFeatureRequest(SensorReportIds report, int timeBetweenReports, int specificConfig) {
+	private ShtpPacketRequest createFeatureRequest(SensorReportId report, int timeBetweenReports, int specificConfig) {
 		final long microsBetweenReports = timeBetweenReports * 1000L;
 		final ShtpPacketRequest request = prepareShtpPacketRequest(ShtpChannel.CONTROL, 17);
 
 		//@formatter:off
 		int[] packetBody = new ShtpPacketBodyBuilder(request.getBodySize())
-				.addElement(ControlReportIds.SET_FEATURE_COMMAND.getId())
+				.addElement(ControlReportId.SET_FEATURE_COMMAND.getId())
 				.addElement(report.getId()) 			// Feature Report ID. 0x01 = Accelerometer, 0x05 = Rotation vector
 				.addElement(0) // Change sensitivity (LSB)
 				.addElement(0) // Change sensitivity (MSB)
@@ -659,7 +684,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		return request;
 	}
 
-	private ShtpPacketRequest createSensorReportRequest(ControlReportIds type, SensorReportIds sensor)
+	private ShtpPacketRequest createSensorReportRequest(ControlReportId type, SensorReportId sensor)
 			throws InterruptedException, IOException {
 		ShtpChannel shtpChannel = ShtpChannel.CONTROL;
 		ShtpPacketRequest packetRequest = prepareShtpPacketRequest(shtpChannel, 2);
@@ -721,7 +746,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		return true;
 	}
 
-	public static void printShtpPacketPart(ControlReportIds report, String prefix, int[] data) {
+	public static void printShtpPacketPart(ControlReportId report, String prefix, int[] data) {
 		switch (report) {
 		case PRODUCT_ID_RESPONSE:
 			System.out.println(String.format("printShtpPacketPart:%s:report=%s:value=%s", prefix, report, Integer.toHexString(data[0])));
@@ -778,22 +803,22 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		return response;
 	}
 
-	private void initAndActive(final CountDownLatch latch, SensorReportIds report, int reportDelay) {
+	private void initAndActive(final CountDownLatch latch, SensorReportId report, int reportPeriod) {
 		executor.submit(() -> {
 			boolean initState = initiate();
-			if (initState && enableSensorReport(report, reportDelay)) {
+			if (initState && enableSensorReport(report, reportPeriod)) {
 				latch.countDown();
 				ready.set(initState);
 			}
 		});
 	}
 
-	private void reactivate(final CountDownLatch latch, SensorReportIds report, int reportDelay) {
+	private void reactivate(final CountDownLatch latch, SensorReportId report, int reportPeriod) {
 		executor.submit(() -> {
 			try {
 				ShtpOperation opHead = getInitSequence(null);
 				active.set(processOperationChainByHead(opHead));
-				if (active.get() && enableSensorReport(report, reportDelay)) {
+				if (active.get() && enableSensorReport(report, reportPeriod)) {
 					latch.countDown();
 				}
 			} catch (InterruptedException | IOException e) {

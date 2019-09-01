@@ -59,9 +59,9 @@ public class ShtpOperationResponse {
 	public ShtpReportIds getReport() {
 		switch (channel) {
 		case CONTROL:
-			return ControlReportIds.getById(report);
+			return ControlReportId.getById(report);
 		case REPORTS:
-			return SensorReportIds.getById(report);
+			return SensorReportId.getById(report);
 		default:
 			return null;
 		}

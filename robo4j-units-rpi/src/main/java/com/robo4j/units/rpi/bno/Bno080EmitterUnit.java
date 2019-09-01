@@ -27,7 +27,7 @@ import com.robo4j.hw.rpi.imu.bno.Bno080Factory;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataListener;
 import com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice;
-import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportIds;
+import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportId;
 import com.robo4j.logging.SimpleLoggingUtil;
 
 import java.io.IOException;
@@ -67,14 +67,14 @@ public class Bno080EmitterUnit extends RoboUnit<BnoRequest> {
 	}
 
 	private int reportDelay;
-	private SensorReportIds report;
+	private SensorReportId report;
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
 
 		final String reportType = configuration.getString(PROPERTY_REPORT_TYPE, null);
-		report = SensorReportIds.valueOf(reportType.toUpperCase());
-		if (report.equals(SensorReportIds.NONE)) {
+		report = SensorReportId.valueOf(reportType.toUpperCase());
+		if (report.equals(SensorReportId.NONE)) {
 			throw new ConfigurationException(PROPERTY_REPORT_TYPE);
 		}
 
