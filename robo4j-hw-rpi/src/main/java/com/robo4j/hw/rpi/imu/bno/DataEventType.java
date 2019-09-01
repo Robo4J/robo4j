@@ -18,7 +18,7 @@
 package com.robo4j.hw.rpi.imu.bno;
 
 /**
- * DeviceEventType event type {@link DeviceEvent}
+ * The various types of {@link DataEvent3f}.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
