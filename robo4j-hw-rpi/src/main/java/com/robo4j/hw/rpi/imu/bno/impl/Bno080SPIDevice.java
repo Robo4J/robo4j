@@ -140,9 +140,9 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 * @param cs
 	 *            Chip select, active low, used as chip select/slave select on
 	 *            SPI
-	 * @param rst
+	 * @param reset
 	 *            Reset signal, active low, pull low to reset IC
-	 * @param inter
+	 * @param interrupt
 	 *            Interrupt, active low, pulls low when the BNO080 is ready for
 	 *            communication.
 	 **/
@@ -499,9 +499,9 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 * @param cs
 	 *            Chip select, active low, used as chip select/slave select on
 	 *            SPI
-	 * @param rst
+	 * @param reset
 	 *            Reset signal, active low, pull low to reset IC
-	 * @param inter
+	 * @param interrupt
 	 *            Interrupt, active low, pulls low when the BNO080 is ready for
 	 *            communication.
 	 * @return process done
@@ -510,13 +510,13 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 * @throws InterruptedException
 	 *             exception
 	 */
-	private boolean configureSpiPins(Pin wake, Pin cs, Pin rst, Pin inter) throws InterruptedException {
-		System.out.println(String.format("configurePins: wak=%s, cs=%s, rst=%s, inter=%s", wake, cs, rst, inter));
+	private boolean configureSpiPins(Pin wake, Pin cs, Pin reset, Pin interrupt) throws InterruptedException {
+		System.out.println(String.format("configurePins: wak=%s, cs=%s, rst=%s, inter=%s", wake, cs, reset, interrupt));
 		GpioController gpioController = GpioFactory.getInstance();
 		csGpio = gpioController.provisionDigitalOutputPin(cs, "CS");
 		wakeGpio = gpioController.provisionDigitalOutputPin(wake);
-		intGpio = gpioController.provisionDigitalInputPin(inter, PinPullResistance.PULL_UP);
-		rstGpio = gpioController.provisionDigitalOutputPin(rst);
+		intGpio = gpioController.provisionDigitalInputPin(interrupt, PinPullResistance.PULL_UP);
+		rstGpio = gpioController.provisionDigitalOutputPin(reset);
 
 		csGpio.setState(PinState.HIGH); // Deselect BNO080
 
