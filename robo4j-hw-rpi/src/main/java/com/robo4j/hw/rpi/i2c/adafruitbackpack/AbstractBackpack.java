@@ -23,12 +23,14 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import java.io.IOException;
 
 /**
- * LED Backpack
+ * AbstractBackpack is the abstraction for all Adafruit Backpack devices
+ * https://learn.adafruit.com/adafruit-led-backpack/overview
+ *
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public abstract class AbstractLedBackpack extends AbstractI2CDevice {
+public abstract class AbstractBackpack extends AbstractI2CDevice {
 
 	public static final int DEFAULT_BRIGHTNESS = 15;
 	private static final int OSCILLATOR_TURN_ON = 0x21;
@@ -39,11 +41,11 @@ public abstract class AbstractLedBackpack extends AbstractI2CDevice {
 	private static final int HT16K33_BLINK_OFF = 0x00;
 	private final short[] buffer = new short[8]; // uint16_t
 
-	AbstractLedBackpack() throws IOException {
+	AbstractBackpack() throws IOException {
 		this(I2CBus.BUS_1, 0x70, DEFAULT_BRIGHTNESS);
 	}
 
-	AbstractLedBackpack(int bus, int address, int brightness) throws IOException {
+	AbstractBackpack(int bus, int address, int brightness) throws IOException {
 		super(bus, address);
 		initiate(brightness);
 	}

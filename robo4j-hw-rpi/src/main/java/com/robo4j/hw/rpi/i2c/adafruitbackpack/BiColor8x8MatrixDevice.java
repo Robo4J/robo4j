@@ -27,7 +27,7 @@ import java.util.Collection;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BiColor8x8MatrixDevice extends AbstractLedBackpack {
+public class BiColor8x8MatrixDevice extends AbstractBackpack {
 
 	private static final short MATRIX_SIZE = 8;
 	private MatrixRotation rotation;

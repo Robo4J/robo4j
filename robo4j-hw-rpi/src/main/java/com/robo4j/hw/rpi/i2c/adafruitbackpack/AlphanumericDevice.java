@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class AlphanumericDevice extends AbstractLedBackpack {
+public class AlphanumericDevice extends AbstractBackpack {
 
 	public static final int POSITION_START = 0;
 	public static final int POSITION_MAX = 3;

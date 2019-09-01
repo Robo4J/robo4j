@@ -20,7 +20,7 @@ package com.robo4j.units.rpi.led;
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractLedBackpack;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractBackpack;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AlphanumericDevice;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AsciElement;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.LedBackpackType;
@@ -57,7 +57,7 @@ public class AdafruitAlphanumericUnit extends AbstractI2CBackpackUnit<Alphanumer
 		Integer address = configuration.getInteger(ATTRIBUTE_ADDRESS, null);
 		Integer bus = configuration.getInteger(ATTRIBUTE_BUS, null);
 		validateConfiguration(address, bus);
-		int brightness = configuration.getInteger(ATTRIBUTE_BRIGHTNESS, AbstractLedBackpack.DEFAULT_BRIGHTNESS);
+		int brightness = configuration.getInteger(ATTRIBUTE_BRIGHTNESS, AbstractBackpack.DEFAULT_BRIGHTNESS);
 
 		device = getBackpackDevice(LedBackpackType.ALPHANUMERIC, bus, address, brightness);
 	}

@@ -20,7 +20,7 @@ package com.robo4j.units.rpi.led;
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractLedBackpack;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractBackpack;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.LedBackpackFactory;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.LedBackpackType;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.PackElement;
@@ -39,7 +39,7 @@ import java.util.List;
  * @author Miroslav Wengner (@miragemiko)
  */
 @SuppressWarnings("rawtypes")
-abstract class AbstractI2CBackpackUnit<T1 extends AbstractLedBackpack, T2 extends PackElement> extends RoboUnit<LedBackpackMessages> {
+abstract class AbstractI2CBackpackUnit<T1 extends AbstractBackpack, T2 extends PackElement> extends RoboUnit<LedBackpackMessages> {
 
 	static final String ATTRIBUTE_ADDRESS = "address";
 	static final String ATTRIBUTE_BUS = "bus";
@@ -76,7 +76,7 @@ abstract class AbstractI2CBackpackUnit<T1 extends AbstractLedBackpack, T2 extend
 		return (T1) device;
 	}
 
-	void processMessage(AbstractLedBackpack device, LedBackpackMessages<T2> message) {
+	void processMessage(AbstractBackpack device, LedBackpackMessages<T2> message) {
 		switch (message.getType()) {
 		case CLEAR:
 			device.clear();

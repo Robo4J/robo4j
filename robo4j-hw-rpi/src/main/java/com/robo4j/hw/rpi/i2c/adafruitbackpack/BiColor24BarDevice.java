@@ -28,7 +28,7 @@ import java.util.Collection;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BiColor24BarDevice extends AbstractLedBackpack {
+public class BiColor24BarDevice extends AbstractBackpack {
 
 	public static final int MAX_BARS = 24;
 

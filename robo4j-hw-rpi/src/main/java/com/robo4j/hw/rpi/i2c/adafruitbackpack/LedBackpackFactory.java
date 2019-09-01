@@ -27,7 +27,7 @@ import java.io.IOException;
  */
 public final class LedBackpackFactory {
 
-	public static AbstractLedBackpack createDevice(int bus, int address, LedBackpackType type, int brightness)
+	public static AbstractBackpack createDevice(int bus, int address, LedBackpackType type, int brightness)
 			throws IOException {
 		switch (type) {
 		case BI_COLOR_BAR_24:
