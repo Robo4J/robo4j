@@ -15,7 +15,11 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.i2c.adafruitbackpack;
+package com.robo4j.hw.rpi.i2c.adafruitoled;
+
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor8x8MatrixDevice;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.LEDBackpackUtils;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.PackElement;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,15 +32,15 @@ import java.util.concurrent.TimeUnit;
 public class BiColor8x8MatrixFaceExample {
 
 	public static void main(String[] args) throws Exception {
-		System.out.println("=== BiColor 8x8 Matrix Face Example ===");
+		System.out.println("... BiColor 8x8 Matrix Example...");
 
 		BiColor8x8MatrixDevice matrix = new BiColor8x8MatrixDevice();
 
-		char[] faceSmile = "00333300,03000030,30300303,30000003,30300303,30033003,03000030,00333300".toCharArray();
-		char[] faceNeutral = "00222200,02000020,20200202,20000002,20222202,20000002,02000020,00222200".toCharArray();
-		char[] faceSad = "00111100,01000010,10100101,10000001,10011001,10100101,01000010,00111100".toCharArray();
+		char[] face_smile = "00333300,03000030,30300303,30000003,30300303,30033003,03000030,00333300".toCharArray();
+		char[] face_neutral = "00222200,02000020,20200202,20000002,20222202,20000002,02000020,00222200".toCharArray();
+		char[] face_frown = "00111100,01000010,10100101,10000001,10011001,10100101,01000010,00111100".toCharArray();
 
-		List<char[]> availableFaces = Arrays.asList(faceSad, faceNeutral, faceSmile);
+		List<char[]> availableFaces = Arrays.asList(face_frown, face_neutral, face_smile);
 
 		for (char[] face : availableFaces) {
 			matrix.clear();
@@ -49,7 +53,7 @@ public class BiColor8x8MatrixFaceExample {
 			TimeUnit.SECONDS.sleep(1);
 		}
 
-		System.out.println("Press <Enter> to quit!");
+		System.out.println("...Click to quit...");
 		System.in.read();
 		matrix.clear();
 		matrix.display();

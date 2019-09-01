@@ -20,11 +20,11 @@ package com.robo4j.units.rpi.led;
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.hw.rpi.i2c.adafruitoled.BiColor8x8MatrixDevice;
-import com.robo4j.hw.rpi.i2c.adafruitoled.LEDBackpack;
-import com.robo4j.hw.rpi.i2c.adafruitoled.LEDBackpackType;
-import com.robo4j.hw.rpi.i2c.adafruitoled.MatrixRotation;
-import com.robo4j.hw.rpi.i2c.adafruitoled.PackElement;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor8x8MatrixDevice;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.LEDBackpack;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.LEDBackpackType;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.MatrixRotation;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.PackElement;
 
 import java.util.List;
 

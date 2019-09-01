@@ -15,7 +15,11 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.i2c.adafruitbackpack;
+package com.robo4j.hw.rpi.i2c.adafruitoled;
+
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor24BarDevice;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.PackElement;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,28 +32,28 @@ import java.util.concurrent.TimeUnit;
 public class BiColor24BargraphExample {
 
 	public static void main(String[] args) throws Exception {
-		System.out.println("=== Bi-BiColor 24 Bargraph ===");
+		System.out.println("...Bi-BiColor 24 Bargraph... ");
 
 		BiColor24BarDevice device = new BiColor24BarDevice();
 		device.clear();
 		device.display();
 
-		for(int i=0; i< device.getMaxBar(); i++){
+		for (int i = 0; i < device.getMaxBar(); i++) {
 			device.addBar(i, BiColor.GREEN);
 			device.display();
 			TimeUnit.MILLISECONDS.sleep(200);
 		}
 
-		for(int i=device.getMaxBar()-1; i >= 0; i--){
+		for (int i = device.getMaxBar() - 1; i >= 0; i--) {
 			device.addBar(new PackElement(i));
 			device.display();
 			TimeUnit.MILLISECONDS.sleep(100);
 		}
 
 		int counter = 0;
-		while(counter < 3){
-			for (int i=0; i<12; i++){
-				int colorNumber = (i+counter) % 3 + 1;
+		while (counter < 3) {
+			for (int i = 0; i < 12; i++) {
+				int colorNumber = (i + counter) % 3 + 1;
 				PackElement element = new PackElement(i, BiColor.getByValue(colorNumber));
 				device.addBar(element);
 				TimeUnit.MILLISECONDS.sleep(200);
@@ -58,7 +62,7 @@ public class BiColor24BargraphExample {
 			counter++;
 		}
 
-		System.out.println("Press <Enter> to quit!");
+		System.out.println("...Click to quit...");
 		System.in.read();
 		device.clear();
 		device.display();

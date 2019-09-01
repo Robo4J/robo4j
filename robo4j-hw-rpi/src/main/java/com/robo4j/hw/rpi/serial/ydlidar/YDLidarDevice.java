@@ -59,12 +59,12 @@ import jdk.jfr.StackTrace;
  * Next you can cat the device to list what it is saying, for example cat to
  * file:
  * <p>
- * cat /dev/ttyUSB0 > mytest
+ * cat /dev/ttyUSB0 &gt; mytest
  * <p>
  * Of course, to make it say something, you will need to send it a command, for
  * example:
  * <p>
- * echo -en "\xA5\x90" > /dev/ttyUSB0
+ * echo -en "\xA5\x90" &gt; /dev/ttyUSB0
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)

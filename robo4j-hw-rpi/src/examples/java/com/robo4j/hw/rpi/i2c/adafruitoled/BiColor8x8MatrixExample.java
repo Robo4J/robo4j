@@ -15,7 +15,12 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.hw.rpi.i2c.adafruitbackpack;
+package com.robo4j.hw.rpi.i2c.adafruitoled;
+
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor8x8MatrixDevice;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.MatrixRotation;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.PackElement;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,15 +33,13 @@ import java.util.concurrent.TimeUnit;
 public class BiColor8x8MatrixExample {
 
 	public static void main(String[] args) throws Exception {
-		System.out.println("=== BiColor 8x8 Matrix Example ===");
+		System.out.println("... BiColor 8x8 Matrix Example...");
 
 		BiColor8x8MatrixDevice matrix = new BiColor8x8MatrixDevice();
 		matrix.clear();
 		matrix.display();
 
-		MatrixRotation[] rotations = { MatrixRotation.DEFAULT_X_Y, MatrixRotation.RIGHT_90, MatrixRotation.RIGHT_180,
-				MatrixRotation.RIGHT_270, MatrixRotation.LEFT_90 };
-		for (MatrixRotation rotation : rotations) {
+		for (MatrixRotation rotation : MatrixRotation.values()) {
 			matrix.setRotation(rotation);
 			matrix.addPixel(new PackElement(0, 0, BiColor.RED));
 			matrix.addPixel(new PackElement(1, 0, BiColor.GREEN));
@@ -51,7 +54,7 @@ public class BiColor8x8MatrixExample {
 			matrix.clear();
 		}
 
-		System.out.println("Press <Enter> to quit!");
+		System.out.println("...Click to quit...");
 		System.in.read();
 		matrix.clear();
 		matrix.display();
