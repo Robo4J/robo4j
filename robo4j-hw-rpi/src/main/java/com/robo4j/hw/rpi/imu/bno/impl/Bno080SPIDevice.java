@@ -20,7 +20,6 @@ package com.robo4j.hw.rpi.imu.bno.impl;
 import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.EMPTY_EVENT;
 import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.calculateNumberOfBytesInPacket;
 import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.intToFloat;
-import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.printArray;
 import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.toInt8U;
 
 import java.io.IOException;
@@ -96,7 +95,6 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	private GpioPinDigitalOutput rstGpio;
 	private GpioPinDigitalOutput csGpio; // select slave SS = chip select CS
 
-	private int calibrationStatus; // Byte R0 of ME Calibration Response
 	private AtomicInteger spiWaitCounter = new AtomicInteger();
 
 	// uint32_t
@@ -210,20 +208,55 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		return false;
 	}
 
+	@Override
+	public void calibrate(long timeout) {
+		ShtpPacketRequest createCalibrateCommandAll = createCalibrateCommandAll();
+		final CountDownLatch latch = new CountDownLatch(1);
+		executor.submit(() -> {
+			// TODO - track initialization better
+			try {
+				sendPacket(createCalibrateCommandAll);
+			} catch (InterruptedException | IOException e) {
+				System.out.println("Calibration failed!");
+				e.printStackTrace();
+			}
+			// TODO - wait for calibration to be good enough...
+			// TODO - stop calibration
+			latch.countDown();
+		});
+	}
+
 	/**
-	 * Calibration command
+	 * Calibration command.
 	 */
 	private ShtpPacketRequest createCalibrateCommandAll() {
 		ShtpChannel shtpChannel = ShtpChannel.COMMAND;
 		ShtpPacketRequest packet = prepareShtpPacketRequest(shtpChannel, 12);
 		packet.addBody(0, ControlReportId.COMMAND_REQUEST.getId());
 		packet.addBody(0, commandSequenceNumber.getAndIncrement());
-		packet.addBody(2, DeviceCommand.ME_CALIBRATE.getId());
+		packet.addBody(2, CommandId.ME_CALIBRATE.getId());
 		packet.addBody(3, 1);
 		packet.addBody(4, 1);
 		packet.addBody(5, 1);
 		return packet;
 	}
+
+	// private ShtpPacketRequest createSensorReportRequest(ControlReportId type,
+	// SensorReportId sensor)
+	// throws InterruptedException, IOException {
+	// ShtpChannel shtpChannel = ShtpChannel.CONTROL;
+	// ShtpPacketRequest packetRequest = prepareShtpPacketRequest(shtpChannel,
+	// 2);
+	//
+//		//@formatter:off
+//		int[] packetBody = new ShtpPacketBodyBuilder(packetRequest.getBodySize())
+//				.addElement(type.getId())
+//				.addElement(sensor.getId())
+//				.build();
+//		//@formatter:on
+	// packetRequest.addBody(packetBody);
+	// return packetRequest;
+	// }
 
 	/**
 	 * Get request to enable sensor report operation
@@ -419,7 +452,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 *
 	 * @return receive number of errors
 	 */
-	private int getShtpError() {
+	public int getShtpError() {
 		ShtpPacketRequest errorRequest = getErrorRequest();
 
 		int errorCounts = -1;
@@ -431,10 +464,8 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 				ShtpChannel shtpChannel = ShtpChannel.getByChannel(response.getHeaderChannel());
 				if (shtpChannel.equals(ShtpChannel.COMMAND) && (response.getBody()[0] == 0x01)) {
 					active = false;
-					errorCounts = response.getBody().length - 1; // subtract -1
-																	// byte for
-																	// the
-																	// error.
+					// subtract - byte for the error.
+					errorCounts = response.getBody().length - 1;
 				} else {
 					TimeUnit.MICROSECONDS.sleep(UNIT_TICK_MICRO);
 				}
@@ -498,29 +529,6 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	}
 
 	/**
-	 * Unit responds with packet that contains the following
-	 */
-	private void parseCommandReport(ShtpPacketResponse packet) {
-		int[] payload = packet.getBody();
-		ControlReportId report = ControlReportId.getById(payload[0] & 0xFF);
-		if (report.equals(ControlReportId.COMMAND_RESPONSE)) {
-			// The BNO080 responds with this report to command requests. It's up
-			// to use to remember which command we issued.
-
-			DeviceCommand command = DeviceCommand.getById(payload[2] & 0xFF);
-			System.out.println("parseCommandReport: commandResponse: " + command);
-			if (DeviceCommand.ME_CALIBRATE.equals(command)) {
-				calibrationStatus = payload[5] & 0xFF; // R0 - Status (0 =
-														// success, non-zero =
-														// fail)
-			}
-		} else {
-			System.out.println("parseCommandReport: This sensor report ID is unhandled");
-		}
-
-	}
-
-	/**
 	 * Unit responds with packet that contains the following:
 	 */
 	private DataEvent3f parseInputReport(ShtpPacketResponse packet) {
@@ -554,7 +562,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		case ACCELEROMETER:
 			return createDataEvent(DataEventType.ACCELEROMETER, timeStamp, status, data1, data2, data3, data4);
 		case RAW_ACCELEROMETER:
-			return createDataEvent(DataEventType.ACCELEROMETER_RAW, timeStamp, status, data1, data2, data3, data4);			
+			return createDataEvent(DataEventType.ACCELEROMETER_RAW, timeStamp, status, data1, data2, data3, data4);
 		case LINEAR_ACCELERATION:
 			return createDataEvent(DataEventType.ACCELEROMETER_LINEAR, timeStamp, status, data1, data2, data3, data4);
 		case GYROSCOPE:
@@ -601,51 +609,6 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	}
 
 	/**
-	 * The BNO080 responds with this report to command requests. It's up to use
-	 * to remember which command we issued
-	 *
-	 * @param deviceCommand
-	 *            device command in response
-	 */
-	private void parseReportCommandResponse(DeviceCommand deviceCommand, int[] payload) {
-		switch (deviceCommand) {
-		case ERRORS:
-			System.out.println("parseInputReport: deviceCommand=" + deviceCommand);
-			break;
-		case COUNTER:
-			System.out.println("parseInputReport: COUNTER deviceCommand=" + deviceCommand);
-			break;
-		case TARE:
-			System.out.println("parseInputReport: TARE deviceCommand=" + deviceCommand);
-			break;
-		case INITIALIZE:
-			System.out.println("parseInputReport: INITIALIZE deviceCommand=" + deviceCommand);
-			break;
-		case DCD:
-			System.out.println("parseInputReport: DCD deviceCommand=" + deviceCommand);
-			break;
-		case ME_CALIBRATE:
-			calibrationStatus = payload[10] & 0xFF; // R0 - Status (0 = success,
-													// non-zero = fail)
-			System.out
-					.println("parseInputReport: command response: command= " + deviceCommand + " calibrationStatus= " + calibrationStatus);
-			break;
-		case DCD_PERIOD_SAVE:
-			System.out.println("parseInputReport: deviceCommand=" + deviceCommand);
-			break;
-		case OSCILLATOR:
-			System.out.println("parseInputReport: deviceCommand=" + deviceCommand);
-			break;
-		case CLEAR_DCD:
-			System.out.println("parseInputReport: deviceCommand=" + deviceCommand);
-			break;
-		default:
-			System.out.println("parseInputReport: not available deviceCommand=" + deviceCommand);
-			break;
-		}
-	}
-
-	/**
 	 * Given a sensor's report ID, this tells the BNO080 to begin reporting the
 	 * values Also sets the specific config word. Useful for personal activity
 	 * classifier
@@ -683,21 +646,6 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		request.addBody(packetBody);
 		//@formatter:on
 		return request;
-	}
-
-	private ShtpPacketRequest createSensorReportRequest(ControlReportId type, SensorReportId sensor)
-			throws InterruptedException, IOException {
-		ShtpChannel shtpChannel = ShtpChannel.CONTROL;
-		ShtpPacketRequest packetRequest = prepareShtpPacketRequest(shtpChannel, 2);
-
-		//@formatter:off
-		int[] packetBody = new ShtpPacketBodyBuilder(packetRequest.getBodySize())
-				.addElement(type.getId())
-				.addElement(sensor.getId())
-				.build();
-		//@formatter:on
-		packetRequest.addBody(packetBody);
-		return packetRequest;
 	}
 
 	/**
@@ -740,8 +688,6 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 			spiDevice.write(packet.getBodyByte(i));
 		}
 		csGpio.setState(PinState.HIGH);
-		printArray("sendPacket HEADER:", packet.getHeader());
-		printArray("sendPacket BODY:", packet.getBody());
 		return true;
 	}
 
@@ -827,5 +773,4 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 			}
 		}
 	}
-
 }

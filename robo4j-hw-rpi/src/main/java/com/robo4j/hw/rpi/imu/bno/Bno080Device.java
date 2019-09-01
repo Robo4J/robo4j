@@ -66,4 +66,9 @@ public interface Bno080Device {
 	 */
 	void shutdown();
 
+	/**
+	 * Do calibration cycle. Will block until calibration results are good
+	 * enough, or the time out is reached.
+	 */
+	void calibrate(long timeout);
 }

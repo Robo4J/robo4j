@@ -31,6 +31,7 @@ import java.util.List;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class LEDBackpackMessage implements Serializable {
+	private static final long serialVersionUID = 1L;
 
 	private final LEDBackpackMessageType type;
 	private List<PackElement> elements = new ArrayList<>();
@@ -51,7 +52,7 @@ public class LEDBackpackMessage implements Serializable {
 		return elements;
 	}
 
-	public void addElement(PackElement element){
+	public void addElement(PackElement element) {
 		this.elements.add(element);
 	}
 
