@@ -20,7 +20,7 @@
         <class>com.robo4j.units.rpi.imu.Bno080Unit</class>
         <config name="com.robo4j.root">
             <value name="reportType" type="String">ROTATION_VECTOR</value>
-            <value name="reportDelay" type="int">100</value>
+            <value name="reportDelay" type="int">1000</value>
         </config>
     </roboUnit>
     <roboUnit id="listener">
