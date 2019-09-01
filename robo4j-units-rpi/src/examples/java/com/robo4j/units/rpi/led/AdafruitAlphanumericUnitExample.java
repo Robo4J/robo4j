@@ -49,9 +49,9 @@ public class AdafruitAlphanumericUnitExample {
 
 
         ctx.start();
-        RoboReference<LEDBackpackMessage> alphaUnit = ctx.getReference("alphanumeric");
-        LEDBackpackMessage<AsciElement> clearMessage = new LEDBackpackMessage<>();
-        LEDBackpackMessage<AsciElement> displayMessage = new LEDBackpackMessage<>(LEDBackpackMessageType.DISPLAY);
+        RoboReference<LedBackpackMessages<AsciElement>> alphaUnit = ctx.getReference("alphanumeric");
+        LedBackpackMessages<AsciElement> clearMessage = new LedBackpackMessages<>();
+        LedBackpackMessages<AsciElement> displayMessage = new LedBackpackMessages<>(LedBackpackMessageType.DISPLAY);
         AtomicInteger textPosition = new AtomicInteger();
 
 
@@ -63,7 +63,7 @@ public class AdafruitAlphanumericUnitExample {
 
 
             alphaUnit.sendMessage(clearMessage);
-            LEDBackpackMessage<AsciElement> messageAdd = new LEDBackpackMessage<>(LEDBackpackMessageType.ADD);
+            LedBackpackMessages<AsciElement> messageAdd = new LedBackpackMessages<>(LedBackpackMessageType.ADD);
             char currentChar =  MESSAGE[textPosition.get()];
             adjustBuffer(currentChar);
             messageAdd.addElement(new AsciElement(0, BUFFER[0], false));

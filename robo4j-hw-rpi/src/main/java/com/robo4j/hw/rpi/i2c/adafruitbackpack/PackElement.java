@@ -18,7 +18,7 @@
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
 /**
- * PackElement is a marker for Backpack devices elements
+ * PackElement is a marker for Backpack message types see: {@link AsciElement}, {@link XYElement}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

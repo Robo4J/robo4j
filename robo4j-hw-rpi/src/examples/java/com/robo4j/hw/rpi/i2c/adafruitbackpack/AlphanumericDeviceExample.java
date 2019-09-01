@@ -20,6 +20,8 @@ package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Simple example of displaying characters on {@link AlphanumericDevice}
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */

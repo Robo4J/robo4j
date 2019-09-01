@@ -20,7 +20,8 @@ package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 import java.util.concurrent.TimeUnit;
 
 /**
- * https://learn.adafruit.com/adafruit-led-backpack/bi-color-24-bargraph
+ * Simple example of using Adafruit BiColor Bargraph {@link BiColor24BarDevice}
+ *
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

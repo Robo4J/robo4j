@@ -16,13 +16,15 @@
  */
 package com.robo4j.math.geometry;
 
+import java.io.Serializable;
+
 /**
  * A tuple of floats.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Tuple3f {
+public class Tuple3f implements Serializable {
 	public float x;
 	public float y;
 	public float z;

@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Simple example using {@link BiColor8x8MatrixDevice}
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
@@ -42,12 +44,11 @@ public class BiColor8x8MatrixFaceRotationExample {
             (byte)0b0011_1100};
         //@formatter:on
 
-		int color = 1;
 		for (int i = 0; i < faceSmile.length; i++) {
 			matrix.clear();
 			matrix.display();
 			matrix.addPixels(
-					LEDBackpackUtils.create2DMatrixByRowArraysAndColor(faceSmile, BiColor.getByValue(i % 2 + 1)));
+					LedBackpackUtils.create2DMatrixByRowArraysAndColor(faceSmile, BiColor.getByValue(i % 2 + 1)));
 			matrix.display();
 			matrix.setRotation(MatrixRotation.getById(i % 5 + 1));
 			TimeUnit.SECONDS.sleep(1);

@@ -21,12 +21,13 @@ import java.io.IOException;
 import java.util.Collection;
 
 /**
+ * Implementation of Adafruit BiColor 8x8 Matrix
  * https://learn.adafruit.com/adafruit-led-backpack/bi-color-8x8-matrix
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BiColor8x8MatrixDevice extends AbstractLEDBackpack {
+public class BiColor8x8MatrixDevice extends AbstractLedBackpack {
 
 	private static final short MATRIX_SIZE = 8;
 	private MatrixRotation rotation;

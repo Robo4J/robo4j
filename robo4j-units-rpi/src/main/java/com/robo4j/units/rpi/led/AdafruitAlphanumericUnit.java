@@ -20,10 +20,10 @@ package com.robo4j.units.rpi.led;
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractLEDBackpack;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractLedBackpack;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AlphanumericDevice;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AsciElement;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.LEDBackpackType;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.LedBackpackType;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ import java.util.List;
 public class AdafruitAlphanumericUnit extends AbstractI2CBackpackUnit<AlphanumericDevice, AsciElement> {
 
 	public AdafruitAlphanumericUnit(RoboContext context, String id) {
-		super(LEDBackpackMessage.class, context, id);
+		super(LedBackpackMessages.class, context, id);
 	}
 
 	private AlphanumericDevice device;
@@ -57,13 +57,14 @@ public class AdafruitAlphanumericUnit extends AbstractI2CBackpackUnit<Alphanumer
 		Integer address = configuration.getInteger(ATTRIBUTE_ADDRESS, null);
 		Integer bus = configuration.getInteger(ATTRIBUTE_BUS, null);
 		validateConfiguration(address, bus);
-		int brightness = configuration.getInteger(ATTRIBUTE_BRIGHTNESS, AbstractLEDBackpack.DEFAULT_BRIGHTNESS);
+		int brightness = configuration.getInteger(ATTRIBUTE_BRIGHTNESS, AbstractLedBackpack.DEFAULT_BRIGHTNESS);
 
-		device = getBackpackDevice(LEDBackpackType.ALPHANUMERIC, bus, address, brightness);
+		device = getBackpackDevice(LedBackpackType.ALPHANUMERIC, bus, address, brightness);
 	}
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
-	public void onMessage(LEDBackpackMessage message) {
+	public void onMessage(LedBackpackMessages message) {
 		processMessage(device, message);
 	}
 

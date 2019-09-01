@@ -28,6 +28,8 @@ import java.io.Serializable;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class LcdMessage implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	public static LcdMessage MESSAGE_CLEAR = new LcdMessage(LcdMessageType.CLEAR, null, null, null);
 	public static LcdMessage MESSAGE_STOP = new LcdMessage(LcdMessageType.STOP, null, null, null);
 	public static LcdMessage MESSAGE_TURN_ON = new LcdMessage(LcdMessageType.DISPLAY_ENABLE, null, null, "true");

@@ -51,8 +51,8 @@ public class AdafruitBiColor24BackpackExample {
 		RoboContext ctx = new RoboBuilder().add(settings).build();
 
 		ctx.start();
-		RoboReference<LEDBackpackMessage> barUnit = ctx.getReference("bargraph");
-		LEDBackpackMessage<XYElement> clearMessage = new LEDBackpackMessage<>();
+		RoboReference<LedBackpackMessages<XYElement>> barUnit = ctx.getReference("bargraph");
+		LedBackpackMessages<XYElement> clearMessage = new LedBackpackMessages<>();
 		AtomicInteger position = new AtomicInteger();
 		executor.scheduleAtFixedRate(() -> {
 			if (position.get() > BiColor24BarDevice.MAX_BARS - 1) {
@@ -62,7 +62,7 @@ public class AdafruitBiColor24BackpackExample {
 
 			XYElement element = new XYElement(position.getAndIncrement(),
 					BiColor.getByValue(position.get() % 3 + 1));
-			LEDBackpackMessage<XYElement> addMessage = new LEDBackpackMessage<>(LEDBackpackMessageType.DISPLAY);
+			LedBackpackMessages<XYElement> addMessage = new LedBackpackMessages<>(LedBackpackMessageType.DISPLAY);
 			addMessage.addElement(element);
 			barUnit.sendMessage(addMessage);
 

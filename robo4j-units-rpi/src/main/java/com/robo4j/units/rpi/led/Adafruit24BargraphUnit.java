@@ -21,8 +21,8 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor24BarDevice;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractLEDBackpack;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.LEDBackpackType;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractLedBackpack;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.LedBackpackType;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.XYElement;
 
 import java.util.List;
@@ -44,7 +44,7 @@ import java.util.List;
 public class Adafruit24BargraphUnit extends AbstractI2CBackpackUnit<BiColor24BarDevice, XYElement> {
 
 	public Adafruit24BargraphUnit(RoboContext context, String id) {
-		super(LEDBackpackMessage.class, context, id);
+		super(LedBackpackMessages.class, context, id);
 	}
 
 	private BiColor24BarDevice device;
@@ -54,20 +54,20 @@ public class Adafruit24BargraphUnit extends AbstractI2CBackpackUnit<BiColor24Bar
 		Integer address = configuration.getInteger(ATTRIBUTE_ADDRESS, null);
 		Integer bus = configuration.getInteger(ATTRIBUTE_BUS, null);
 		validateConfiguration(address, bus);
-		int brightness = configuration.getInteger(ATTRIBUTE_BRIGHTNESS, AbstractLEDBackpack.DEFAULT_BRIGHTNESS);
+		int brightness = configuration.getInteger(ATTRIBUTE_BRIGHTNESS, AbstractLedBackpack.DEFAULT_BRIGHTNESS);
 
-		device = getBackpackDevice(LEDBackpackType.BI_COLOR_BAR_24, bus, address, brightness);
+		device = getBackpackDevice(LedBackpackType.BI_COLOR_BAR_24, bus, address, brightness);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
-	public void onMessage(LEDBackpackMessage message) {
+	public void onMessage(LedBackpackMessages message) {
 		processMessage(device, message);
 	}
 
 	@Override
 	void addElements(List<XYElement> elements) {
-		int size = elements.size() > BiColor24BarDevice.MAX_BARS ? BiColor24BarDevice.MAX_BARS : elements.size();
+		int size = Math.min(elements.size(), BiColor24BarDevice.MAX_BARS);
 		for (int i = 0; i < size; i++) {
 			XYElement element = elements.get(i);
 			device.addBar(element);

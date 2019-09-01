@@ -20,8 +20,8 @@ package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 import java.util.concurrent.TimeUnit;
 
 /**
- * https://learn.adafruit.com/adafruit-led-backpack/bi-color-8x8-matrix
- * 
+ * Simple example using {@link BiColor8x8MatrixDevice}
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */

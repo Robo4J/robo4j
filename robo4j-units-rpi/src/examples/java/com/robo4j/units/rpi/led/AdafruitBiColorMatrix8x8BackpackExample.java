@@ -52,8 +52,8 @@ public class AdafruitBiColorMatrix8x8BackpackExample {
 		ctx.start();
 		System.out.println("State after start:");
 		System.out.println(SystemUtil.printStateReport(ctx));
-		RoboReference<LEDBackpackMessage> barUnit = ctx.getReference("matrix");
-		LEDBackpackMessage<XYElement> clearMessage = new LEDBackpackMessage<>();
+		RoboReference<LedBackpackMessages<XYElement>> barUnit = ctx.getReference("matrix");
+		LedBackpackMessages<XYElement> clearMessage = new LedBackpackMessages<>();
 		AtomicInteger position = new AtomicInteger();
 		executor.scheduleAtFixedRate(() -> {
 			if (position.get() > 7) {
@@ -63,7 +63,7 @@ public class AdafruitBiColorMatrix8x8BackpackExample {
 
 			XYElement element = new XYElement(position.get(), position.getAndIncrement(),
 					BiColor.getByValue(position.get() % 3 + 1));
-			LEDBackpackMessage<XYElement> addMessage = new LEDBackpackMessage<>(LEDBackpackMessageType.DISPLAY);
+			LedBackpackMessages<XYElement> addMessage = new LedBackpackMessages<>(LedBackpackMessageType.DISPLAY);
 			addMessage.addElement(element);
 			barUnit.sendMessage(addMessage);
 
@@ -73,7 +73,5 @@ public class AdafruitBiColorMatrix8x8BackpackExample {
 		System.in.read();
 		executor.shutdown();
 		ctx.shutdown();
-
-
 	}
 }

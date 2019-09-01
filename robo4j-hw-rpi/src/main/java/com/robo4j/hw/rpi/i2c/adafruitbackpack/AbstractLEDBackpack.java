@@ -28,7 +28,7 @@ import java.io.IOException;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public abstract class AbstractLEDBackpack extends AbstractI2CDevice {
+public abstract class AbstractLedBackpack extends AbstractI2CDevice {
 
 	public static final int DEFAULT_BRIGHTNESS = 15;
 	private static final int OSCILLATOR_TURN_ON = 0x21;
@@ -39,11 +39,11 @@ public abstract class AbstractLEDBackpack extends AbstractI2CDevice {
 	private static final int HT16K33_BLINK_OFF = 0x00;
 	private final short[] buffer = new short[8]; // uint16_t
 
-	AbstractLEDBackpack() throws IOException {
+	AbstractLedBackpack() throws IOException {
 		this(I2CBus.BUS_1, 0x70, DEFAULT_BRIGHTNESS);
 	}
 
-	AbstractLEDBackpack(int bus, int address, int brightness) throws IOException {
+	AbstractLedBackpack(int bus, int address, int brightness) throws IOException {
 		super(bus, address);
 		initiate(brightness);
 	}

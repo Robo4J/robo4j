@@ -21,12 +21,14 @@ import java.io.IOException;
 import java.util.Collection;
 
 /**
+ * The implementation of Adafruit BiColor bargraph
+ *
  * https://learn.adafruit.com/adafruit-led-backpack/bi-color-24-bargraph
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BiColor24BarDevice extends AbstractLEDBackpack {
+public class BiColor24BarDevice extends AbstractLedBackpack {
 
 	public static final int MAX_BARS = 24;
 
