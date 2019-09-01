@@ -35,12 +35,12 @@ public class BnoRequest {
 
 	public enum ListenerAction {
 		/**
-		 * Register target destination for {@link DeviceEvent}
+		 * Register target destination for {@link DataEvent3f}
 		 */
 		REGISTER,
 
 		/**
-		 * Unregister target destination for {@link DeviceEvent}
+		 * Unregister target destination for {@link DataEvent3f}
 		 */
 		UNREGISTER
 	}
@@ -48,7 +48,7 @@ public class BnoRequest {
 	/**
 	 * 
 	 * @param target
-	 *            receiver of {@link DeviceEvent}
+	 *            receiver of {@link DataEvent3f}
 	 * @param listenerAction
 	 *            listener action
 	 */
