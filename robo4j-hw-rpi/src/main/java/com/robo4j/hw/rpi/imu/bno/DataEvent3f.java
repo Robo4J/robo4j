@@ -17,15 +17,13 @@
 
 package com.robo4j.hw.rpi.imu.bno;
 
-import com.robo4j.math.geometry.Tuple3f;
-
 import java.io.Serializable;
-import java.util.EnumSet;
 import java.util.Objects;
 
+import com.robo4j.math.geometry.Tuple3f;
+
 /**
- * XYZAccuracyEvent BNO Accelerometer Event used for Raw, Linear Accelerometer,
- * Gyroscope, Magnetometer
+ * Event used for data produced by the Bno080.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -33,25 +31,16 @@ import java.util.Objects;
 public class DataEvent3f implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private static final EnumSet<DataEventType> ALLOWED = EnumSet.range(DataEventType.MAGNETOMETER, DataEventType.GYROSCOPE);
-
 	private final DataEventType type;
 	private final int status;
 	private final Tuple3f data;
 	private final long timestamp;
 
 	public DataEvent3f(DataEventType type, int status, Tuple3f data, long timestamp) {
-		if (ALLOWED.contains(type)) {
-			this.type = type;
-			this.status = status;
-			this.data = data;
-			this.timestamp = timestamp;
-		} else {
-			this.type = DataEventType.NONE;
-			this.status = 0;
-			this.data = null;
-			this.timestamp = 0;
-		}
+		this.type = type;
+		this.status = status;
+		this.data = data;
+		this.timestamp = timestamp;
 	}
 
 	public DataEventType getType() {
