@@ -27,15 +27,15 @@ import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportId;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Bno080Example {
+public class Bno080AccelerometerExample {
 
 	public static void main(String[] args) throws Exception {
 		DataListener listener = (DataEvent3f event) -> System.out.println("ShtpPacketResponse: " + event);
-		System.out.println("BNO080 SPI Rotation Vector Example");
+		System.out.println("BNO080 SPI Accelerometer Example");
 		// Change here to use other modes of communication
 		Bno080Device device = Bno080Factory.createDefaultSPIDevice();
 		device.addListener(listener);
-		device.start(SensorReportId.ROTATION_VECTOR, 250);
+		device.start(SensorReportId.ACCELEROMETER, 100);
 		System.out.println("Press <Enter> to quit!");
 		System.in.read();
 		device.shutdown();
