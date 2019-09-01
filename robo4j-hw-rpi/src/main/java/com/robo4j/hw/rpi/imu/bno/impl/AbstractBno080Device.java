@@ -91,7 +91,7 @@ public abstract class AbstractBno080Device implements Bno080Device {
 	 * Command IDs (section 6.4, page 42 in the manual). These are used to
 	 * calibrate, initialize, set orientation, tare etc the sensor.
 	 */
-	enum DeviceCommand {
+	public enum CommandId {
 		//@formatter:off
         NONE            (0),
         ERRORS          (1),
@@ -105,10 +105,10 @@ public abstract class AbstractBno080Device implements Bno080Device {
         CLEAR_DCD       (11);
         //@formatter:on
 
-		private static Map<Integer, DeviceCommand> map = getMap();
+		private static Map<Integer, CommandId> map = getMap();
 		private final int id;
 
-		DeviceCommand(int id) {
+		CommandId(int id) {
 			this.id = id;
 		}
 
@@ -116,14 +116,14 @@ public abstract class AbstractBno080Device implements Bno080Device {
 			return id;
 		}
 
-		public static DeviceCommand getById(int id) {
-			DeviceCommand command = map.get(id);
+		public static CommandId getById(int id) {
+			CommandId command = map.get(id);
 			return command == null ? NONE : command;
 		}
 
-		private static Map<Integer, DeviceCommand> getMap() {
-			Map<Integer, DeviceCommand> map = new HashMap<>();
-			for (DeviceCommand c : values()) {
+		private static Map<Integer, CommandId> getMap() {
+			Map<Integer, CommandId> map = new HashMap<>();
+			for (CommandId c : values()) {
 				map.put(c.id, c);
 			}
 			return map;
