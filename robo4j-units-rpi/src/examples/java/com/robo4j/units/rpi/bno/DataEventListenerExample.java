@@ -25,6 +25,9 @@ import com.robo4j.units.rpi.imu.BnoRequest;
 import com.robo4j.util.SystemUtil;
 
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * DataEventEmitterListenerExample is an example displaying received data from
@@ -37,13 +40,39 @@ import java.io.InputStream;
 public class DataEventListenerExample {
 
 	public static void main(String[] args) throws Exception {
-		RoboBuilder builder = new RoboBuilder();
-		InputStream settings = Thread.currentThread().getContextClassLoader().getResourceAsStream("bno080GyroExample.xml");
-		if (settings == null) {
-			System.out.println("Could not find the settings for the BNO080 Example!");
-			System.exit(2);
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+		final InputStream systemIS;
+		final InputStream contextIS;
+
+		switch (args.length) {
+			case 0:
+				systemIS = classLoader.getResourceAsStream("bno080DataSystemEmitterExample.xml");
+				contextIS = classLoader.getResourceAsStream("bno080GyroExample.xml");
+				System.out.println("Default configuration used");
+				break;
+			case 1:
+				systemIS = classLoader.getResourceAsStream("bno080DataSystemEmitterExample.xml");
+				Path contextPath = Paths.get(args[0]);
+				contextIS = Files.newInputStream(contextPath);
+				System.out.println("Robo4j config file has been used: " + args[0]);
+				break;
+			case 2:
+				Path systemPath2 = Paths.get(args[0]);
+				Path contextPath2 = Paths.get(args[1]);
+				systemIS = Files.newInputStream(systemPath2);
+				contextIS = Files.newInputStream(contextPath2);
+				System.out.println(String.format("Custom configuration used system: %s, context: %s", args[0], args[1]));
+				break;
+			default:
+				System.out.println("Could not find the *.xml settings for the CameraClient!");
+				System.out.println("java -jar camera.jar system.xml context.xml");
+				System.exit(2);
+				throw new IllegalStateException("see configuration");
 		}
-		builder.add(settings);
+
+		RoboBuilder builder = new RoboBuilder(systemIS);
+		builder.add(contextIS);
 		RoboContext ctx = builder.build();
 
 		ctx.start();

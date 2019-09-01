@@ -35,7 +35,7 @@ public class Bno080SPIExample {
 		System.out.println("BNO080 SPI Example");
 		Bno080SPIDevice device = new Bno080SPIDevice();
 		device.addListener(listener);
-		device.start(SensorReportId.ACCELEROMETER, 100);
+		device.start(SensorReportId.ROTATION_VECTOR, 100);
 		System.out.println("CLICK TO END...");
 		System.in.read();
 		device.shutdown();
