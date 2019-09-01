@@ -708,7 +708,6 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 			if (intGpio.isLow()) {
 				return true;
 			} else {
-				System.out.println("SPI Wait: " + counter);
 				counter++;
 			}
 			TimeUnit.MICROSECONDS.sleep(1);
@@ -716,7 +715,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		if (spiWaitCounter.getAndIncrement() == MAX_SPI_WAIT_CYCLES) {
 			stop();
 		}
-		System.out.println("waitForSPI: ERROR counter: " + counter);
+		System.out.println("waitForSPI failed. Counter: " + counter);
 		return false;
 	}
 
