@@ -55,10 +55,25 @@ public final class ShtpUtils {
 	 */
 	public static void printArray(String message, int[] array) {
 		System.out.print("printArray: " + message);
-		for (int i = 0; i < array.length; i++) {
-			System.out.print(" " + Integer.toHexString(array[i] & 0xFF) + ",");
+		System.out.print(toHexString(array));
+		System.out.println("");
+	}
+
+	/**
+	 * Pretty prints an array of ints representing unsigned bytes as hex.
+	 * 
+	 * @param array
+	 *            the array to pretty print.
+	 * @return the string representing the pretty printed array.
+	 */
+	public static String toHexString(int[] array) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < array.length - 1; i++) {
+			builder.append(Integer.toHexString(array[i] & 0xFF));
+			builder.append(", ");
 		}
-		System.out.print("\n");
+		builder.append(Integer.toHexString(array[array.length - 1] & 0xFF));
+		return builder.toString();
 	}
 
 	/**

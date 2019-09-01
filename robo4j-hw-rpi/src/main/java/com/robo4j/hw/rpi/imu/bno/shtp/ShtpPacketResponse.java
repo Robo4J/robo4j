@@ -20,7 +20,8 @@ package com.robo4j.hw.rpi.imu.bno.shtp;
 import static com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice.SHTP_HEADER_SIZE;
 
 /**
- * ShtpPacketResponse represent SPI device response see {@link com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice}
+ * ShtpPacketResponse represent SPI device response see
+ * {@link com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -77,5 +78,10 @@ public final class ShtpPacketResponse {
 
 	public boolean dataAvailable() {
 		return body.length > 0;
+	}
+
+	public String toString() {
+		return "ShtpPacketResponse channel: " + getHeaderChannel() + "\n\theader: " + ShtpUtils.toHexString(getHeader()) + "\n\tbody: "
+				+ ShtpUtils.toHexString(getBody());
 	}
 }
