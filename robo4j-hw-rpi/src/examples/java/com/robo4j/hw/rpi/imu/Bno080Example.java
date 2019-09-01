@@ -35,7 +35,7 @@ public class Bno080Example {
 		// Change here to use other modes of communication
 		Bno080Device device = Bno080Factory.createDefaultSPIDevice();
 		device.addListener(listener);
-		device.start(SensorReportId.ROTATION_VECTOR, 250);
+		device.start(SensorReportId.ROTATION_VECTOR, 1000);
 		System.out.println("Press <Enter> to quit!");
 		System.in.read();
 		device.shutdown();
