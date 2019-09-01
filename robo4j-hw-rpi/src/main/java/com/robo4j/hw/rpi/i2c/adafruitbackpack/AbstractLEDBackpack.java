@@ -28,7 +28,7 @@ import java.io.IOException;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-abstract class AbstractLedBackpack extends AbstractI2CDevice {
+public abstract class AbstractLedBackpack extends AbstractI2CDevice {
 
 	public static final int DEFAULT_BRIGHTNESS = 15;
 	private static final int OSCILLATOR_TURN_ON = 0x21;
