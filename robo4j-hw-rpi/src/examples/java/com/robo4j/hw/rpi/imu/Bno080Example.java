@@ -24,6 +24,8 @@ import com.robo4j.hw.rpi.imu.bno.DataListener;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportId;
 
 /**
+ * Prints out rotation vector information to the console.
+ * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
