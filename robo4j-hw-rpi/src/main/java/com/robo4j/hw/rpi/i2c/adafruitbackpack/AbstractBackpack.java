@@ -17,10 +17,10 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
+import java.io.IOException;
+
 import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
-
-import java.io.IOException;
 
 /**
  * AbstractBackpack is the abstraction for all Adafruit Backpack devices
@@ -36,7 +36,6 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
 	private static final int OSCILLATOR_TURN_ON = 0x21;
 	private static final int HT16K33_BLINK_CMD = 0x80;
 	private static final int HT16K33_BLINK_DISPLAY_ON = 0x01;
-	private static final int HT16K33_BLINK_DISPLAY_OFF = 0;
 	private static final int HT16K33_CMD_BRIGHTNESS = 0xE0;
 	private static final int HT16K33_BLINK_OFF = 0x00;
 	private final short[] buffer = new short[8]; // uint16_t
@@ -114,7 +113,7 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
 	 * @param c
 	 *            character to be displayed
 	 * @param dp
-	 *            point
+	 *            the dot next to the character
 	 */
 	void setCharacter(int n, int c, boolean dp) {
 		short value = (short) c;
@@ -128,7 +127,7 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
 	 * @param v
 	 *            value 16-bits
 	 * @param dp
-	 *            point
+	 *            the dot next to the character
 	 */
 	void setValue(int n, short v, boolean dp) {
 		buffer[n] = dp ? (v |= (1 << 14)) : v;

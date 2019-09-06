@@ -35,24 +35,23 @@ public class BiColor24BargraphExample {
 		device.clear();
 		device.display();
 
-		for(int i=0; i< device.getMaxBar(); i++){
-			device.addBar(i, BiColor.GREEN);
+		for (int i = 0; i < device.getMaxBar(); i++) {
+			device.setBar(i, BiColor.GREEN);
 			device.display();
 			TimeUnit.MILLISECONDS.sleep(200);
 		}
 
-		for(int i=device.getMaxBar()-1; i >= 0; i--){
-			device.addBar(new XYElement(i));
+		for (int i = device.getMaxBar() - 1; i >= 0; i--) {
+			device.setBar(i, BiColor.OFF);
 			device.display();
 			TimeUnit.MILLISECONDS.sleep(100);
 		}
 
 		int counter = 0;
-		while(counter < 3){
-			for (int i=0; i<12; i++){
-				int colorNumber = (i+counter) % 3 + 1;
-				XYElement element = new XYElement(i, BiColor.getByValue(colorNumber));
-				device.addBar(element);
+		while (counter < 3) {
+			for (int i = 0; i < 12; i++) {
+				int colorNumber = (i + counter) % 3 + 1;
+				device.setBar(i, BiColor.getByValue(colorNumber));
 				TimeUnit.MILLISECONDS.sleep(200);
 				device.display();
 			}

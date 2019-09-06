@@ -17,15 +17,13 @@
 
 package com.robo4j.units.rpi.led;
 
+import java.io.IOException;
+
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor24BarDevice;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractBackpack;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.LedBackpackType;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.XYElement;
-
-import java.util.List;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor24BarDevice;
 
 /**
  * Adafruit Bi-Color 24 Bargraph Unit This version of the LED backpack is
@@ -36,41 +34,37 @@ import java.util.List;
  *
  * https://learn.adafruit.com/adafruit-led-backpack/bi-color-24-bargraph
  *
- *
- *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Adafruit24BargraphUnit extends AbstractI2CBackpackUnit<BiColor24BarDevice, XYElement> {
+public class Adafruit24BargraphUnit extends AbstractI2CBackpackUnit {
+	private BiColor24BarDevice device;
 
 	public Adafruit24BargraphUnit(RoboContext context, String id) {
-		super(LedBackpackMessages.class, context, id);
+		super(DrawMessage.class, context, id);
 	}
-
-	private BiColor24BarDevice device;
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		Integer address = configuration.getInteger(ATTRIBUTE_ADDRESS, null);
-		Integer bus = configuration.getInteger(ATTRIBUTE_BUS, null);
-		validateConfiguration(address, bus);
+		super.onInitialization(configuration);
 		int brightness = configuration.getInteger(ATTRIBUTE_BRIGHTNESS, AbstractBackpack.DEFAULT_BRIGHTNESS);
 
-		device = getBackpackDevice(LedBackpackType.BI_COLOR_BAR_24, bus, address, brightness);
+		try {
+			device = new BiColor24BarDevice(getBus(), getAddress(), brightness);
+		} catch (IOException e) {
+			throw new ConfigurationException("Failed to instantiate device", e);
+		}
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
-	public void onMessage(LedBackpackMessages message) {
+	public void onMessage(DrawMessage message) {
 		processMessage(device, message);
 	}
 
 	@Override
-	void addElements(List<XYElement> elements) {
-		int size = Math.min(elements.size(), BiColor24BarDevice.MAX_BARS);
-		for (int i = 0; i < size; i++) {
-			XYElement element = elements.get(i);
-			device.addBar(element);
+	void paint(DrawMessage message) {
+		for (int i = 0; i < message.getXs().length; i++) {
+			device.setBar(message.getXs()[i], message.getColors()[i]);
 		}
 	}
 }

@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
- *
+ * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
+ * 
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -8,20 +8,44 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
 /**
- * PackElement is a marker for Backpack message types see: {@link AsciElement}, {@link XYElement}
- *
+ * An LED device with addressable pixels.
+ * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public interface PackElement {
+public interface MatrixLedDevice {
+
+	/**
+	 * Draws a pixel on the led matrix.
+	 */
+	void drawPixel(short x, short y, BiColor color);
+
+	/**
+	 * Draws a pixel on the led matrix.
+	 */
+	void drawPixel(int x, int y, BiColor color);
+
+	/**
+	 * Draws pixels on the led matrix.
+	 */
+	void drawPixels(short[] xs, short[] ys, BiColor[] colors);
+
+	/**
+	 * @return the available number of rows.
+	 */
+	int getHeight();
+
+	/**
+	 * @return the available number of rows.
+	 */
+	int getWidth();
 }

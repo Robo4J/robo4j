@@ -32,7 +32,7 @@ public class BiColor8x8MatrixFaceExample {
 	public static void main(String[] args) throws Exception {
 		System.out.println("=== BiColor 8x8 Matrix Face Example ===");
 
-		BiColor8x8MatrixDevice matrix = new BiColor8x8MatrixDevice();
+		BiColor8x8MatrixDevice led = new BiColor8x8MatrixDevice();
 
 		char[] faceSmile = "00333300,03000030,30300303,30000003,30300303,30033003,03000030,00333300".toCharArray();
 		char[] faceNeutral = "00222200,02000020,20200202,20000002,20222202,20000002,02000020,00222200".toCharArray();
@@ -41,20 +41,18 @@ public class BiColor8x8MatrixFaceExample {
 		List<char[]> availableFaces = Arrays.asList(faceSad, faceNeutral, faceSmile);
 
 		for (char[] face : availableFaces) {
-			matrix.clear();
-			matrix.display();
-			byte[] faceByte = LedBackpackUtils.createMatrixBiColorArrayByCharSequence(matrix.getMatrixSize(), ',',
-					face);
-			XYElement[] faceElements = LedBackpackUtils.createMatrixByBiColorByteArray(matrix.getMatrixSize(), faceByte);
-			matrix.addPixels(faceElements);
-			matrix.display();
+			led.clear();
+			led.display();
+			byte[] faceBytes = LedBackpackUtils.createMatrixBiColorArrayByCharSequence(led.getWidth(), ',', face);
+			LedBackpackUtils.paintByBiColorByteArray(led, faceBytes);
+			led.display();
 			TimeUnit.SECONDS.sleep(1);
 		}
 
 		System.out.println("Press <Enter> to quit!");
 		System.in.read();
-		matrix.clear();
-		matrix.display();
+		led.clear();
+		led.display();
 
 	}
 }

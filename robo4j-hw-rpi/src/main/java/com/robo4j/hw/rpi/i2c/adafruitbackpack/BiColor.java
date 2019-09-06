@@ -21,32 +21,31 @@ package com.robo4j.hw.rpi.i2c.adafruitbackpack;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public enum  BiColor {
+public enum BiColor {
 
-    //@formatter:off
+	//@formatter:off
     OFF     (0),
     RED     (1),
     YELLOW  (2),
-    GREEN   (3)
-    ;
+    GREEN   (3);
     //@formatter:on
 
-    private final int value;
+	private final int value;
 
-    BiColor(int value) {
-        this.value = value;
-    }
+	BiColor(int value) {
+		this.value = value;
+	}
 
-    public int getValue() {
-        return value;
-    }
+	public int getValue() {
+		return value;
+	}
 
-    public static BiColor getByValue(int code) {
-        for (BiColor r : values()) {
-            if (code == r.value) {
-                return r;
-            }
-        }
-        return OFF;
-    }
+	public static BiColor getByValue(int code) {
+		for (BiColor r : values()) {
+			if (code == r.value) {
+				return r;
+			}
+		}
+		return OFF;
+	}
 }

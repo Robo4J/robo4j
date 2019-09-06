@@ -17,18 +17,17 @@
 
 package com.robo4j.units.rpi.led;
 
-import com.robo4j.RoboBuilder;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboReference;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.XYElement;
-import com.robo4j.util.SystemUtil;
-
 import java.io.InputStream;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor;
+import com.robo4j.util.SystemUtil;
 
 /**
  * Adafruit Bi-Color 8x8 Matrix example
@@ -45,28 +44,22 @@ public class AdafruitBiColorMatrix8x8BackpackExample {
 	public static void main(String[] args) throws Exception {
 
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-		InputStream settings = AdafruitBiColorMatrix8x8BackpackExample.class.getClassLoader()
-				.getResourceAsStream("matrix8x8example.xml");
+		InputStream settings = AdafruitBiColorMatrix8x8BackpackExample.class.getClassLoader().getResourceAsStream("matrix8x8example.xml");
 		RoboContext ctx = new RoboBuilder().add(settings).build();
 
 		ctx.start();
 		System.out.println("State after start:");
 		System.out.println(SystemUtil.printStateReport(ctx));
-		RoboReference<LedBackpackMessages<XYElement>> barUnit = ctx.getReference("matrix");
-		LedBackpackMessages<XYElement> clearMessage = new LedBackpackMessages<>();
+		RoboReference<DrawMessage> matrixUnit = ctx.getReference("matrix");
 		AtomicInteger position = new AtomicInteger();
 		executor.scheduleAtFixedRate(() -> {
 			if (position.get() > 7) {
 				position.set(0);
 			}
-			barUnit.sendMessage(clearMessage);
+			matrixUnit.sendMessage(DrawMessage.MESSAGE_CLEAR);
 
-			XYElement element = new XYElement(position.get(), position.getAndIncrement(),
-					BiColor.getByValue(position.get() % 3 + 1));
-			LedBackpackMessages<XYElement> addMessage = new LedBackpackMessages<>(LedBackpackMessageType.DISPLAY);
-			addMessage.addElement(element);
-			barUnit.sendMessage(addMessage);
-
+			matrixUnit.sendMessage(new DrawMessage(BackpackMessageCommand.PAINT, new short[] { (short) position.get() },
+					new short[] { (short) position.getAndIncrement() }, new BiColor[] { BiColor.getByValue(position.get() % 3 + 1) }));
 		}, 2, 1, TimeUnit.SECONDS);
 
 		System.out.println("Press enter to quit\n");
