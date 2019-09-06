@@ -29,7 +29,7 @@ package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 public final class LedBackpackUtils {
 
 	/**
-	 * create a BiColor byte array for given matrix size example: sequence =
+	 * Create a BiColor byte array for given matrix size example: sequence =
 	 * "00123300,03000030,30200301,30000003,30300303,30033003,03000030,00333300"
 	 * where number are according to {@link BiColor}
 	 *
@@ -49,19 +49,21 @@ public final class LedBackpackUtils {
 	}
 
 	/**
-	 * Create matrix by defining array of defined bytes array and selected color
-	 * example: byte[] face_smile = { 0b0011_1100, 0b0100_0010,
+	 * Paint the byte array by defining array of bytes array and selected color.
+	 * 
+	 * Example: byte[] face_smile = { 0b0011_1100, 0b0100_0010,
 	 * (byte)0b1010_0101, (byte)0b1000_0001, (byte)0b1010_0101,
 	 * (byte)0b1001_1001, (byte)0b0100_0010, (byte)0b0011_1100};
 	 *
+	 * @param ledDevice
+	 *            the LED matrix to paint on.
 	 * @param array
 	 *            unsigned byte array represented by 8-bits, represent the
-	 *            matrix of size array.length
+	 *            matrix of size array.length.
 	 * @param color
-	 *            desired color
-	 * @return matrix
+	 *            the desired color.
 	 */
-	public static void paintToByRowArraysAndColor(MatrixLedDevice led, byte[] array, BiColor color) {
+	public static void paintToByRowArraysAndColor(MatrixLedDevice ledDevice, byte[] array, BiColor color) {
 		int size = array.length * array.length;
 
 		for (int i = 0; i < size; i++) {
@@ -71,30 +73,30 @@ public final class LedBackpackUtils {
 
 			byte shift = (byte) (array[y] >> (array.length - x - 1));
 			boolean on = (shift & 0x01) == 1;
-			led.drawPixel(x, y, on ? color : BiColor.OFF);
+			ledDevice.drawPixel(x, y, on ? color : BiColor.OFF);
 		}
 	}
 
 	/**
-	 * based on byte array creates PackElements
+	 * Paints the information in the byte array on the provide LED matrix
+	 * device.
 	 *
-	 * @param matrixSize
-	 *            matrix size
+	 * @param ledDevice
+	 *            the LED matrix to paint on.
 	 * @param array
 	 *            BiColor array values of the matrix, matrix started from
 	 *            position 0
-	 * @return PackElements array
 	 */
-	public static void paintByBiColorByteArray(MatrixLedDevice led, byte[] array) {
+	public static void paintByBiColorByteArray(MatrixLedDevice ledDevice, byte[] array) {
 		int y = 0;
-		int matrixWidth = led.getWidth();
+		int matrixWidth = ledDevice.getWidth();
 		for (int i = 1; i < array.length; i++) {
 			if (i % matrixWidth == 0) {
 				y++;
 			}
 			int x = i % matrixWidth;
 			BiColor color = BiColor.getByValue(array[i]);
-			led.drawPixel(x, y, color);
+			ledDevice.drawPixel(x, y, color);
 		}
 	}
 }
