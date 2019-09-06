@@ -61,7 +61,7 @@ public final class LedBackpackUtils {
 	 *            desired color
 	 * @return matrix
 	 */
-	public static void paintToByRowArraysAndColor(BiColor8x8MatrixDevice led, byte[] array, BiColor color) {
+	public static void paintToByRowArraysAndColor(MatrixLedDevice led, byte[] array, BiColor color) {
 		int size = array.length * array.length;
 
 		for (int i = 0; i < size; i++) {
@@ -85,14 +85,14 @@ public final class LedBackpackUtils {
 	 *            position 0
 	 * @return PackElements array
 	 */
-	public static void paintByBiColorByteArray(BiColor8x8MatrixDevice led, byte[] array) {
+	public static void paintByBiColorByteArray(MatrixLedDevice led, byte[] array) {
 		int y = 0;
-		int matrixSize = led.getMatrixSize();
+		int matrixWidth = led.getWidth();
 		for (int i = 1; i < array.length; i++) {
-			if (i % matrixSize == 0) {
+			if (i % matrixWidth == 0) {
 				y++;
 			}
-			int x = i % matrixSize;
+			int x = i % matrixWidth;
 			BiColor color = BiColor.getByValue(array[i]);
 			led.drawPixel(x, y, color);
 		}

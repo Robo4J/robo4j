@@ -23,7 +23,6 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor24BarDevice;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractBackpack;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.LedBackpackType;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.XYElement;
 
 import java.util.List;
 
@@ -35,8 +34,6 @@ import java.util.List;
  * (48 total LEDs)
  *
  * https://learn.adafruit.com/adafruit-led-backpack/bi-color-24-bargraph
- *
- *
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

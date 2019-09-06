@@ -26,7 +26,7 @@ import java.io.IOException;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BiColor8x8MatrixDevice extends AbstractBackpack {
+public class BiColor8x8MatrixDevice extends AbstractBackpack implements MatrixLedDevice {
 
 	private static final short MATRIX_SIZE = 8;
 	private MatrixRotation rotation;
@@ -46,10 +46,6 @@ public class BiColor8x8MatrixDevice extends AbstractBackpack {
 	public BiColor8x8MatrixDevice() throws IOException {
 		super();
 		this.rotation = MatrixRotation.DEFAULT_X_Y;
-	}
-
-	public int getMatrixSize() {
-		return MATRIX_SIZE;
 	}
 
 	/**
@@ -128,6 +124,16 @@ public class BiColor8x8MatrixDevice extends AbstractBackpack {
 
 	private short flipPosition(int v) {
 		return (short) (MATRIX_SIZE - v - 1);
+	}
+
+	@Override
+	public int getHeight() {
+		return MATRIX_SIZE;
+	}
+
+	@Override
+	public int getWidth() {
+		return MATRIX_SIZE;
 	}
 
 }
