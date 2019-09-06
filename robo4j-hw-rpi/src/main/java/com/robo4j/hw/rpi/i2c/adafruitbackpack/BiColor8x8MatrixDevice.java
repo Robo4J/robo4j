@@ -66,6 +66,7 @@ public class BiColor8x8MatrixDevice extends AbstractBackpack {
 		if (!validate(x, y)) {
 			throw new IllegalArgumentException("x and/or y out of bounds. x=" + x + " y=" + y);
 		}
+
 		switch (rotation) {
 		case DEFAULT_X_Y:
 			break;

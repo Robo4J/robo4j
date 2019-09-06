@@ -168,6 +168,7 @@ public class AlphanumericDevice extends AbstractBackpack {
 
 	public void addValue(short v, boolean dp) {
 		int p = incrementPosition();
+
 		setValue(p, v, dp);
 	}
 

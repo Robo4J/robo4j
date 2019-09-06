@@ -63,6 +63,7 @@ public final class LedBackpackUtils {
 	 */
 	public static void paintToByRowArraysAndColor(BiColor8x8MatrixDevice led, byte[] array, BiColor color) {
 		int size = array.length * array.length;
+
 		for (int i = 0; i < size; i++) {
 
 			int x = i % array.length;
