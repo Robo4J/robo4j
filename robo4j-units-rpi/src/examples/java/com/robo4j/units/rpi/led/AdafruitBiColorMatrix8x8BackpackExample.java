@@ -21,7 +21,7 @@ import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.PackElement;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.XYElement;
 import com.robo4j.util.SystemUtil;
 
 import java.io.InputStream;
@@ -52,8 +52,8 @@ public class AdafruitBiColorMatrix8x8BackpackExample {
 		ctx.start();
 		System.out.println("State after start:");
 		System.out.println(SystemUtil.printStateReport(ctx));
-		RoboReference<LEDBackpackMessage> barUnit = ctx.getReference("matrix");
-		LEDBackpackMessage clearMessage = new LEDBackpackMessage();
+		RoboReference<LedBackpackMessages<XYElement>> barUnit = ctx.getReference("matrix");
+		LedBackpackMessages<XYElement> clearMessage = new LedBackpackMessages<>();
 		AtomicInteger position = new AtomicInteger();
 		executor.scheduleAtFixedRate(() -> {
 			if (position.get() > 7) {
@@ -61,9 +61,9 @@ public class AdafruitBiColorMatrix8x8BackpackExample {
 			}
 			barUnit.sendMessage(clearMessage);
 
-			PackElement element = new PackElement(position.get(), position.getAndIncrement(),
+			XYElement element = new XYElement(position.get(), position.getAndIncrement(),
 					BiColor.getByValue(position.get() % 3 + 1));
-			LEDBackpackMessage addMessage = new LEDBackpackMessage(LEDBackpackMessageType.DISPLAY);
+			LedBackpackMessages<XYElement> addMessage = new LedBackpackMessages<>(LedBackpackMessageType.DISPLAY);
 			addMessage.addElement(element);
 			barUnit.sendMessage(addMessage);
 
@@ -73,6 +73,5 @@ public class AdafruitBiColorMatrix8x8BackpackExample {
 		System.in.read();
 		executor.shutdown();
 		ctx.shutdown();
-
 	}
 }

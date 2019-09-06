@@ -19,32 +19,33 @@ package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
 import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor;
 
 import java.io.IOException;
 
 /**
- * LED Backpack
+ * AbstractBackpack is the abstraction for all Adafruit Backpack devices
+ * https://learn.adafruit.com/adafruit-led-backpack/overview
+ *
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public abstract class LEDBackpack extends AbstractI2CDevice {
+public abstract class AbstractBackpack extends AbstractI2CDevice {
 
 	public static final int DEFAULT_BRIGHTNESS = 15;
 	private static final int OSCILLATOR_TURN_ON = 0x21;
 	private static final int HT16K33_BLINK_CMD = 0x80;
 	private static final int HT16K33_BLINK_DISPLAY_ON = 0x01;
-	// private static final int HT16K33_BLINK_DISPLAY_OFF = 0;
+	private static final int HT16K33_BLINK_DISPLAY_OFF = 0;
 	private static final int HT16K33_CMD_BRIGHTNESS = 0xE0;
 	private static final int HT16K33_BLINK_OFF = 0x00;
 	private final short[] buffer = new short[8]; // uint16_t
 
-	LEDBackpack() throws IOException {
+	AbstractBackpack() throws IOException {
 		this(I2CBus.BUS_1, 0x70, DEFAULT_BRIGHTNESS);
 	}
 
-	LEDBackpack(int bus, int address, int brightness) throws IOException {
+	AbstractBackpack(int bus, int address, int brightness) throws IOException {
 		super(bus, address);
 		initiate(brightness);
 	}
@@ -69,6 +70,16 @@ public abstract class LEDBackpack extends AbstractI2CDevice {
 		return (short) (value & 0xFFFF);
 	}
 
+	/**
+	 * turn on of the position on the matrix grid
+	 * 
+	 * @param x
+	 *            x position on the matrix
+	 * @param y
+	 *            y position on the matrix
+	 * @param color
+	 *            led color
+	 */
 	void setColorByMatrixToBuffer(short x, short y, BiColor color) {
 		switch (color) {
 		case RED:
@@ -96,6 +107,43 @@ public abstract class LEDBackpack extends AbstractI2CDevice {
 		}
 	}
 
+	/**
+	 * 
+	 * @param n
+	 *            position on alphanumeric display
+	 * @param c
+	 *            character to be displayed
+	 * @param dp
+	 *            point
+	 */
+	void setCharacter(int n, int c, boolean dp) {
+		short value = (short) c;
+		setValue(n, value, dp);
+	}
+
+	/**
+	 * 
+	 * @param n
+	 *            position
+	 * @param v
+	 *            value 16-bits
+	 * @param dp
+	 *            point
+	 */
+	void setValue(int n, short v, boolean dp) {
+		buffer[n] = dp ? (v |= (1 << 14)) : v;
+	}
+
+	/**
+	 * Turn off/on the a led on the bar
+	 * 
+	 * @param a
+	 *            position on the bar
+	 * @param c
+	 *            position on the bar
+	 * @param color
+	 *            color on the bar
+	 */
 	void setColorToBarBuffer(short a, short c, BiColor color) {
 		switch (color) {
 		case RED:

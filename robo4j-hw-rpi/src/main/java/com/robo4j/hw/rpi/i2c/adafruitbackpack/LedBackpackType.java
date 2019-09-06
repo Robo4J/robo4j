@@ -15,18 +15,20 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robo4j.units.rpi.led;
+package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
 /**
+ * LEDBackpackType available Adafruit backpack types
+ *
+ * https://learn.adafruit.com/adafruit-led-backpack/overview
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public enum LEDBackpackMessageType {
-
+public enum LedBackpackType {
     //@formatter:off
-    CLEAR,
-    ADD,
-    DISPLAY
+    BI_COLOR_BAR_24,
+    BI_COLOR_MATRIX_8x8,
+    ALPHANUMERIC
     //@formatter:on
-
 }

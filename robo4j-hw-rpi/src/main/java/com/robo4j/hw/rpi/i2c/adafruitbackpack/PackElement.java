@@ -17,73 +17,11 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
-import java.io.Serializable;
-import java.util.Objects;
-
 /**
+ * PackElement is a marker for Backpack message types see: {@link AsciElement}, {@link XYElement}
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class PackElement implements Serializable {
-	private static final long serialVersionUID = 1L;
-
-	private final int x;
-	private final int y;
-	private final BiColor color;
-
-	public PackElement(int x, int y, BiColor color) {
-		this.x = x;
-		this.y = y;
-		this.color = color;
-	}
-
-	public PackElement(int x, int y) {
-		this.x = x;
-		this.y = y;
-		this.color = BiColor.OFF;
-	}
-
-	public PackElement(int x, BiColor color) {
-		this.x = x;
-		this.y = 0;
-		this.color = color;
-	}
-
-	public PackElement(int x) {
-		this.x = x;
-		this.y = 0;
-		this.color = BiColor.OFF;
-	}
-
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	public BiColor getColor() {
-		return color;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		PackElement that = (PackElement) o;
-		return x == that.x && y == that.y && color == that.color;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(x, y, color);
-	}
-
-	@Override
-	public String toString() {
-		return "PackElement{" + "x=" + x + ", y=" + y + ", color=" + color + '}';
-	}
+public interface PackElement {
 }

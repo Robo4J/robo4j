@@ -21,12 +21,14 @@ import java.io.IOException;
 import java.util.Collection;
 
 /**
+ * The implementation of Adafruit BiColor bargraph
+ *
  * https://learn.adafruit.com/adafruit-led-backpack/bi-color-24-bargraph
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class BiColor24BarDevice extends LEDBackpack {
+public class BiColor24BarDevice extends AbstractBackpack {
 
 	public static final int MAX_BARS = 24;
 
@@ -39,11 +41,11 @@ public class BiColor24BarDevice extends LEDBackpack {
 	}
 
 	public void addBar(int pos, BiColor color) {
-		final PackElement element = new PackElement(pos, color);
+		final XYElement element = new XYElement(pos, color);
 		addBar(element);
 	}
 
-	public void addBar(PackElement element) {
+	public void addBar(XYElement element) {
 		if (validatePositions(element.getX())) {
 			setBar(element);
 		} else {
@@ -51,21 +53,21 @@ public class BiColor24BarDevice extends LEDBackpack {
 		}
 	}
 
-	public void addBars(Collection<PackElement> elements) {
+	public void addBars(Collection<XYElement> elements) {
 		if (elements == null || elements.size() > MAX_BARS) {
 			System.out.println("addBars: not allowed state!");
 		} else {
-			for (PackElement e : elements) {
+			for (XYElement e : elements) {
 				addBar(e);
 			}
 		}
 	}
 
-	public void addBars(PackElement... elements) {
+	public void addBars(XYElement... elements) {
 		if (elements == null || elements.length > MAX_BARS) {
 			System.out.println("addBars: not allowed state!");
 		} else {
-			for (PackElement e : elements) {
+			for (XYElement e : elements) {
 				addBar(e);
 			}
 		}
@@ -77,7 +79,7 @@ public class BiColor24BarDevice extends LEDBackpack {
 
 
 	// private void setBar(int bar, BiColor color) {
-	private void setBar(PackElement element) {
+	private void setBar(XYElement element) {
 		final int bar = element.getX();
 		short a, c;
 

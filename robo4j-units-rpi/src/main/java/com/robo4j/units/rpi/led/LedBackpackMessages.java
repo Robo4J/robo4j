@@ -25,38 +25,40 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * LedBackpackMessage is the container for backpack messages
  *
+ * @param <T> represents type of used messages see {@link PackElement}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class LEDBackpackMessage implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class LedBackpackMessages<T extends PackElement> implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-	private final LEDBackpackMessageType type;
-	private List<PackElement> elements = new ArrayList<>();
+	private final LedBackpackMessageType type;
+	private List<T> elements = new ArrayList<>();
 
-	public LEDBackpackMessage() {
-		this.type = LEDBackpackMessageType.CLEAR;
+	public LedBackpackMessages() {
+		this.type = LedBackpackMessageType.CLEAR;
 	}
 
-	public LEDBackpackMessage(LEDBackpackMessageType type) {
+	public LedBackpackMessages(LedBackpackMessageType type) {
 		this.type = type;
 	}
 
-	public LEDBackpackMessageType getType() {
+	public LedBackpackMessageType getType() {
 		return type;
 	}
 
-	public List<PackElement> getElements() {
+	public List<T> getElements() {
 		return elements;
 	}
 
-	public void addElement(PackElement element) {
+	public void addElement(T element){
 		this.elements.add(element);
 	}
 
-	public void setElements(Collection<PackElement> elements) {
+	public void setElements(Collection<T> elements) {
 		this.elements.addAll(elements);
 	}
 

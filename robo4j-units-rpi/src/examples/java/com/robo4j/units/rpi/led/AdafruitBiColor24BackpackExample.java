@@ -22,7 +22,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor24BarDevice;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.PackElement;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.XYElement;
 
 import java.io.InputStream;
 import java.util.concurrent.Executors;
@@ -51,8 +51,8 @@ public class AdafruitBiColor24BackpackExample {
 		RoboContext ctx = new RoboBuilder().add(settings).build();
 
 		ctx.start();
-		RoboReference<LEDBackpackMessage> barUnit = ctx.getReference("bargraph");
-		LEDBackpackMessage clearMessage = new LEDBackpackMessage();
+		RoboReference<LedBackpackMessages<XYElement>> barUnit = ctx.getReference("bargraph");
+		LedBackpackMessages<XYElement> clearMessage = new LedBackpackMessages<>();
 		AtomicInteger position = new AtomicInteger();
 		executor.scheduleAtFixedRate(() -> {
 			if (position.get() > BiColor24BarDevice.MAX_BARS - 1) {
@@ -60,9 +60,9 @@ public class AdafruitBiColor24BackpackExample {
 			}
 			barUnit.sendMessage(clearMessage);
 
-			PackElement element = new PackElement(position.getAndIncrement(),
+			XYElement element = new XYElement(position.getAndIncrement(),
 					BiColor.getByValue(position.get() % 3 + 1));
-			LEDBackpackMessage addMessage = new LEDBackpackMessage(LEDBackpackMessageType.DISPLAY);
+			LedBackpackMessages<XYElement> addMessage = new LedBackpackMessages<>(LedBackpackMessageType.DISPLAY);
 			addMessage.addElement(element);
 			barUnit.sendMessage(addMessage);
 

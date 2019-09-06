@@ -17,16 +17,6 @@
 
 package com.robo4j.hw.rpi.imu.bno.impl;
 
-import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.EMPTY_EVENT;
-import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.calculateNumberOfBytesInPacket;
-import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.intToFloat;
-import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.toInt8U;
-
-import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
@@ -54,6 +44,16 @@ import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketResponse;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpReportIds;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils;
 import com.robo4j.math.geometry.Tuple3f;
+
+import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.EMPTY_EVENT;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.calculateNumberOfBytesInPacket;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.intToFloat;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.toInt8U;
 
 /**
  * Abstraction for a BNO080 absolute orientation device.

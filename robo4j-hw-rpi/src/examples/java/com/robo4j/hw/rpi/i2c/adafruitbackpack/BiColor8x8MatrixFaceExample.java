@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Simple example using {@link BiColor8x8MatrixDevice}
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
@@ -41,9 +43,9 @@ public class BiColor8x8MatrixFaceExample {
 		for (char[] face : availableFaces) {
 			matrix.clear();
 			matrix.display();
-			byte[] faceByte = LEDBackpackUtils.createMatrixBiColorArrayByCharSequence(matrix.getMatrixSize(), ',',
+			byte[] faceByte = LedBackpackUtils.createMatrixBiColorArrayByCharSequence(matrix.getMatrixSize(), ',',
 					face);
-			PackElement[] faceElements = LEDBackpackUtils.createMatrixByBiColorByteArray(matrix.getMatrixSize(), faceByte);
+			XYElement[] faceElements = LedBackpackUtils.createMatrixByBiColorByteArray(matrix.getMatrixSize(), faceByte);
 			matrix.addPixels(faceElements);
 			matrix.display();
 			TimeUnit.SECONDS.sleep(1);

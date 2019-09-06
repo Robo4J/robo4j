@@ -21,10 +21,10 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor8x8MatrixDevice;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.LEDBackpack;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.LEDBackpackType;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractBackpack;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.LedBackpackType;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.MatrixRotation;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.PackElement;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.XYElement;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ import java.util.List;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Adafruit8x8MatrixUnit extends AbstractI2CBackpackUnit<BiColor8x8MatrixDevice> {
+public class Adafruit8x8MatrixUnit extends AbstractI2CBackpackUnit<BiColor8x8MatrixDevice, XYElement> {
 
 	public static final String DEFAULT_MATRIX_ROTATION = "DEFAULT_X_Y";
 	public static final String ATTRIBUTE_ROTATION = "rotation";
@@ -44,7 +44,7 @@ public class Adafruit8x8MatrixUnit extends AbstractI2CBackpackUnit<BiColor8x8Mat
 	private BiColor8x8MatrixDevice device;
 
 	public Adafruit8x8MatrixUnit(RoboContext context, String id) {
-		super(LEDBackpackMessage.class, context, id);
+		super(LedBackpackMessages.class, context, id);
 	}
 
 	@Override
@@ -52,20 +52,21 @@ public class Adafruit8x8MatrixUnit extends AbstractI2CBackpackUnit<BiColor8x8Mat
 		Integer address = configuration.getInteger(ATTRIBUTE_ADDRESS, null);
 		Integer bus = configuration.getInteger(ATTRIBUTE_BUS, null);
 		validateConfiguration(address, bus);
-		int brightness = configuration.getInteger(ATTRIBUTE_BRIGHTNESS, LEDBackpack.DEFAULT_BRIGHTNESS);
+		int brightness = configuration.getInteger(ATTRIBUTE_BRIGHTNESS, AbstractBackpack.DEFAULT_BRIGHTNESS);
 		MatrixRotation rotation = MatrixRotation
 				.valueOf(configuration.getString(ATTRIBUTE_ROTATION, DEFAULT_MATRIX_ROTATION).toUpperCase());
-		device = getBackpackDevice(LEDBackpackType.BI_COLOR_MATRIX_8x8, bus, address, brightness);
+		device = getBackpackDevice(LedBackpackType.BI_COLOR_MATRIX_8x8, bus, address, brightness);
 		device.setRotation(rotation);
 	}
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
-	public void onMessage(LEDBackpackMessage message) {
+	public void onMessage(LedBackpackMessages message) {
 		processMessage(device, message);
 	}
 
 	@Override
-	void addElements(List<PackElement> elements) {
+	void addElements(List<XYElement> elements) {
 		device.addPixels(elements);
 	}
 }

@@ -26,7 +26,7 @@ package com.robo4j.hw.rpi.i2c.adafruitbackpack;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public final class LEDBackpackUtils {
+public final class LedBackpackUtils {
 
 	/**
 	 * Create matrix by defining array of defined bytes array and selected color
@@ -47,9 +47,9 @@ public final class LEDBackpackUtils {
 	 *            desired color
 	 * @return matrix
 	 */
-	public static PackElement[] create2DMatrixByRowArraysAndColor(byte[] array, BiColor color) {
+	public static XYElement[] create2DMatrixByRowArraysAndColor(byte[] array, BiColor color) {
 		int size = array.length * array.length;
-		PackElement[] result = new PackElement[size];
+		XYElement[] result = new XYElement[size];
 		for (int i = 0; i < size; i++) {
 
 			int x = i % array.length;
@@ -57,7 +57,7 @@ public final class LEDBackpackUtils {
 
 			byte shift = (byte) (array[y] >> (array.length - x - 1));
 			boolean on = (shift & 0x01) == 1;
-			result[i] = new PackElement(x, y, on ? color : BiColor.OFF);
+			result[i] = new XYElement(x, y, on ? color : BiColor.OFF);
 		}
 		return result;
 	}
@@ -91,11 +91,11 @@ public final class LEDBackpackUtils {
 	 *            BiColor array values of the matrix, matrix started from position 0
 	 * @return PackElements array
 	 */
-	public static PackElement[] createMatrixByBiColorByteArray(int matrixSize, byte[] array) {
+	public static XYElement[] createMatrixByBiColorByteArray(int matrixSize, byte[] array) {
 
-		PackElement[] result = new PackElement[matrixSize * matrixSize];
+		XYElement[] result = new XYElement[matrixSize * matrixSize];
 		int y = 0;
-		PackElement firstElement = new PackElement(0, 0, BiColor.getByValue(array[0]));
+		XYElement firstElement = new XYElement(0, 0, BiColor.getByValue(array[0]));
 		result[0] = firstElement;
 		for (int i = 1; i < array.length; i++) {
 			if (i % matrixSize == 0) {
@@ -103,7 +103,7 @@ public final class LEDBackpackUtils {
 			}
 			int x = i % matrixSize;
 			BiColor color = BiColor.getByValue(array[i]);
-			result[i] = new PackElement(x, y, color);
+			result[i] = new XYElement(x, y, color);
 		}
 		return result;
 	}

@@ -20,8 +20,8 @@ package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 import java.util.concurrent.TimeUnit;
 
 /**
- * https://learn.adafruit.com/adafruit-led-backpack/bi-color-8x8-matrix
- * 
+ * Simple example using {@link BiColor8x8MatrixDevice}
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
@@ -38,14 +38,14 @@ public class BiColor8x8MatrixExample {
 				MatrixRotation.RIGHT_270, MatrixRotation.LEFT_90 };
 		for (MatrixRotation rotation : rotations) {
 			matrix.setRotation(rotation);
-			matrix.addPixel(new PackElement(0, 0, BiColor.RED));
-			matrix.addPixel(new PackElement(1, 0, BiColor.GREEN));
-			matrix.addPixel(new PackElement(2, 0, BiColor.YELLOW));
-			matrix.addPixel(new PackElement(3, 0, BiColor.RED));
-			matrix.addPixel(new PackElement(0, 1, BiColor.GREEN));
-			matrix.addPixel(new PackElement(0, 2, BiColor.YELLOW));
-			matrix.addPixel(new PackElement(7, 7, BiColor.GREEN));
-			matrix.addPixel(new PackElement(7, 6, BiColor.GREEN));
+			matrix.addPixel(new XYElement(0, 0, BiColor.RED));
+			matrix.addPixel(new XYElement(1, 0, BiColor.GREEN));
+			matrix.addPixel(new XYElement(2, 0, BiColor.YELLOW));
+			matrix.addPixel(new XYElement(3, 0, BiColor.RED));
+			matrix.addPixel(new XYElement(0, 1, BiColor.GREEN));
+			matrix.addPixel(new XYElement(0, 2, BiColor.YELLOW));
+			matrix.addPixel(new XYElement(7, 7, BiColor.GREEN));
+			matrix.addPixel(new XYElement(7, 6, BiColor.GREEN));
 			matrix.display();
 			TimeUnit.SECONDS.sleep(1);
 			matrix.clear();
