@@ -18,7 +18,6 @@
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
 import java.io.IOException;
-import java.util.Collection;
 
 /**
  * The implementation of Adafruit BiColor bargraph
@@ -40,47 +39,11 @@ public class BiColor24BarDevice extends AbstractBackpack {
 		super();
 	}
 
-	public void addBar(int pos, BiColor color) {
-		final XYElement element = new XYElement(pos, color);
-		addBar(element);
-	}
-
-	public void addBar(XYElement element) {
-		if (validatePositions(element.getX())) {
-			setBar(element);
-		} else {
-			System.out.println(String.format("addBar: not allowed bar= %s", element));
+	public void setBar(int bar, BiColor color) {
+		if (!validatePosition(bar)) {
+			System.out.println("addBar: not allowed bar= %s" + bar);
+			return;
 		}
-	}
-
-	public void addBars(Collection<XYElement> elements) {
-		if (elements == null || elements.size() > MAX_BARS) {
-			System.out.println("addBars: not allowed state!");
-		} else {
-			for (XYElement e : elements) {
-				addBar(e);
-			}
-		}
-	}
-
-	public void addBars(XYElement... elements) {
-		if (elements == null || elements.length > MAX_BARS) {
-			System.out.println("addBars: not allowed state!");
-		} else {
-			for (XYElement e : elements) {
-				addBar(e);
-			}
-		}
-	}
-
-	public int getMaxBar() {
-		return MAX_BARS;
-	}
-
-
-	// private void setBar(int bar, BiColor color) {
-	private void setBar(XYElement element) {
-		final int bar = element.getX();
 		short a, c;
 
 		if (bar < 12) {
@@ -94,11 +57,25 @@ public class BiColor24BarDevice extends AbstractBackpack {
 			a = intToShort(a + 4);
 		}
 
-		setColorToBarBuffer(a, c, element.getColor());
+		setColorToBarBuffer(a, c, color);
 	}
 
-	private boolean validatePositions(int pos) {
+	public void setBars(int[] bars, BiColor[] colors) {
+		if (bars.length != colors.length) {
+			throw new IllegalArgumentException(
+					"Length of the arrays must be equal! bars.length=" + bars.length + " colors.length=" + colors.length);
+		}
+
+		for (int i = 0; i < bars.length; i++) {
+			setBar(bars[i], colors[i]);
+		}
+	}
+
+	public int getMaxBar() {
+		return MAX_BARS;
+	}
+
+	private boolean validatePosition(int pos) {
 		return pos >= 0 && pos < MAX_BARS;
 	}
-
 }

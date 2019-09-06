@@ -39,12 +39,11 @@ public class AlphanumericDevice extends AbstractBackpack {
 
 	public static final int POSITION_START = 0;
 	public static final int POSITION_MAX = 3;
-	private static int[] FONTS = { 0b0000000000000001, 0b0000000000000010, 0b0000000000000100, 0b0000000000001000,
-			0b0000000000010000, 0b0000000000100000, 0b0000000001000000, 0b0000000010000000, 0b0000000100000000,
-			0b0000001000000000, 0b0000010000000000, 0b0000100000000000, 0b0001000000000000, 0b0010000000000000,
-			0b0100000000000000, 0b1000000000000000, 0b0000000000000000, 0b0000000000000000, 0b0000000000000000,
-			0b0000000000000000, 0b0000000000000000, 0b0000000000000000, 0b0000000000000000, 0b0000000000000000,
-			0b0001001011001001, 0b0001010111000000, 0b0001001011111001, 0b0000000011100011, 0b0000010100110000,
+	private static int[] FONTS = { 0b0000000000000001, 0b0000000000000010, 0b0000000000000100, 0b0000000000001000, 0b0000000000010000,
+			0b0000000000100000, 0b0000000001000000, 0b0000000010000000, 0b0000000100000000, 0b0000001000000000, 0b0000010000000000,
+			0b0000100000000000, 0b0001000000000000, 0b0010000000000000, 0b0100000000000000, 0b1000000000000000, 0b0000000000000000,
+			0b0000000000000000, 0b0000000000000000, 0b0000000000000000, 0b0000000000000000, 0b0000000000000000, 0b0000000000000000,
+			0b0000000000000000, 0b0001001011001001, 0b0001010111000000, 0b0001001011111001, 0b0000000011100011, 0b0000010100110000,
 			0b0001001011001000, 0b0011101000000000, 0b0001011100000000, 0b0000000000000000, //
 			0b0000000000000110, // !
 			0b0000001000100000, // "
@@ -155,26 +154,27 @@ public class AlphanumericDevice extends AbstractBackpack {
 	}
 
 	public void addCharacter(char c, boolean dp) {
-		int p = currentPosition();
+		int p = incrementPosition();
 		setCharacter(p, FONTS[c], dp);
 	}
 
-	public void addCharacter(int pos, char c, boolean dp) {
-		if (validPosition(pos)) {
-			setCharacter(pos, FONTS[c], dp);
-			position.set(pos);
+	public void setCharacter(int pos, char c, boolean dp) {
+		if (!validPosition(pos)) {
+			throw new IllegalArgumentException("Position out of bounds. pos=" + pos);
 		}
+		setCharacter(pos, FONTS[c], dp);
+		position.set(pos);
 	}
 
 	public void addValue(short v, boolean dp) {
-		int p = currentPosition();
+		int p = incrementPosition();
 		setValue(p, v, dp);
 	}
 
 	public void addValue(int pos, short v, boolean dp) {
 		if (validPosition(pos)) {
 			setValue(pos, v, dp);
-			position.set(pos) ;
+			position.set(pos);
 		}
 	}
 
@@ -182,7 +182,7 @@ public class AlphanumericDevice extends AbstractBackpack {
 		return p >= POSITION_START && p <= POSITION_MAX;
 	}
 
-	private int currentPosition() {
+	private int incrementPosition() {
 		if (position.get() > POSITION_MAX) {
 			position.set(POSITION_START);
 		}

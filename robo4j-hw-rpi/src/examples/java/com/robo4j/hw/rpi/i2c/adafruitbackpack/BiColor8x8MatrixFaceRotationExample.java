@@ -31,7 +31,7 @@ public class BiColor8x8MatrixFaceRotationExample {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		System.out.println("=== BiColor 8x8 Matrix Face Rotation Example ===");
 
-		BiColor8x8MatrixDevice matrix = new BiColor8x8MatrixDevice();
+		BiColor8x8MatrixDevice ledMatrix = new BiColor8x8MatrixDevice();
 		//@formatter:off
         byte[] faceSmile = {
                   0b0011_1100,
@@ -45,18 +45,17 @@ public class BiColor8x8MatrixFaceRotationExample {
         //@formatter:on
 
 		for (int i = 0; i < faceSmile.length; i++) {
-			matrix.clear();
-			matrix.display();
-			matrix.addPixels(
-					LedBackpackUtils.create2DMatrixByRowArraysAndColor(faceSmile, BiColor.getByValue(i % 2 + 1)));
-			matrix.display();
-			matrix.setRotation(MatrixRotation.getById(i % 5 + 1));
+			ledMatrix.clear();
+			ledMatrix.display();
+			LedBackpackUtils.paintToByRowArraysAndColor(ledMatrix, faceSmile, BiColor.getByValue(i % 2 + 1));
+			ledMatrix.display();
+			ledMatrix.setRotation(MatrixRotation.getById(i % 5 + 1));
 			TimeUnit.SECONDS.sleep(1);
 		}
 
 		System.out.println("Press <Enter> to quit!");
 		System.in.read();
-		matrix.clear();
-		matrix.display();
+		ledMatrix.clear();
+		ledMatrix.display();
 	}
 }

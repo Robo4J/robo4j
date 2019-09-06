@@ -18,7 +18,6 @@
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
 import java.io.IOException;
-import java.util.Collection;
 
 /**
  * Implementation of Adafruit BiColor 8x8 Matrix
@@ -53,31 +52,68 @@ public class BiColor8x8MatrixDevice extends AbstractBackpack {
 		return MATRIX_SIZE;
 	}
 
-	public void addPixel(XYElement element) {
-		if (validateElement(element.getX(), element.getY())) {
-			setPixel(element);
-		} else {
-			System.out.println(String.format("addPixel: not allowed element= %s", element));
+	/**
+	 * Draws the selected pixel in the selected color
+	 * 
+	 * @param x
+	 *            the x coordinate
+	 * @param y
+	 *            the y coordinate
+	 * @param color
+	 *            the color to draw
+	 */
+	public void drawPixel(short x, short y, BiColor color) {
+		if (!validate(x, y)) {
+			throw new IllegalArgumentException("x and/or y out of bounds. x=" + x + " y=" + y);
 		}
+		switch (rotation) {
+		case DEFAULT_X_Y:
+			break;
+		case RIGHT_90:
+			x = flipPosition(y);
+			y = flipPosition(x);
+			break;
+		case RIGHT_180:
+			x = flipPosition(x);
+			y = flipPosition(y);
+			break;
+		case RIGHT_270:
+			x = y;
+			y = flipPosition(x);
+			break;
+		case INVERSION:
+			x = y;
+			y = x;
+			break;
+		case LEFT_90:
+			y = flipPosition(y);
+			break;
+		case LEFT_180:
+			x = flipPosition(y);
+			y = flipPosition(x);
+			break;
+		case LEFT_270:
+			x = flipPosition(x);
+			break;
+		default:
+			x = MATRIX_SIZE;
+			y = MATRIX_SIZE;
+		}
+		setColorByMatrixToBuffer(x, y, color);
 	}
 
-	public void addPixels(Collection<XYElement> elements) {
-		if (elements == null) {
-			System.out.println("addPixels: not allowed state!");
-		} else {
-			for (XYElement e : elements) {
-				addPixels(e);
-			}
-		}
+	public void drawPixel(int x, int y, BiColor color) {
+		drawPixel((short) x, (short) y, color);
 	}
 
-	public void addPixels(XYElement... elements) {
-		if (elements == null || elements.length == 0) {
-			System.out.println("addPixels: not allowed state!");
-		} else {
-			for (XYElement e : elements) {
-				addPixel(e);
-			}
+	public void drawPixels(short[] xs, short[] ys, BiColor[] colors) {
+		if (xs.length != ys.length || ys.length != colors.length) {
+			throw new IllegalArgumentException("All arrays must be same length. xs.length=" + xs.length + " ys.length=" + ys.length
+					+ " colors.length" + colors.length);
+		}
+
+		for (int i = 0; i < xs.length; i++) {
+			drawPixel(xs[i], ys[i], colors[i]);
 		}
 	}
 
@@ -85,48 +121,7 @@ public class BiColor8x8MatrixDevice extends AbstractBackpack {
 		this.rotation = rotation;
 	}
 
-	private void setPixel(XYElement element) {
-		short x;
-		short y;
-		switch (rotation) {
-		case DEFAULT_X_Y:
-			x = (short) element.getX();
-			y = (short) element.getY();
-			break;
-		case RIGHT_90:
-			x = flipPosition(element.getY());
-			y = flipPosition(element.getX());
-			break;
-		case RIGHT_180:
-			x = flipPosition(element.getX());
-			y = flipPosition(element.getY());
-			break;
-		case RIGHT_270:
-			x = (short) element.getY();
-			y = flipPosition(element.getX());
-			break;
-		case INVERSION:
-			x = (short) element.getY();
-			y = (short) element.getX();
-			break;
-		case LEFT_90:
-			x = (short) element.getX();
-			y = flipPosition(element.getY());
-			break;
-		case LEFT_180:
-			x = flipPosition(element.getY());
-			y = flipPosition(element.getX());
-		case LEFT_270:
-			x = flipPosition(element.getX());
-			y = (short) element.getY();
-		default:
-			x = MATRIX_SIZE;
-			y = MATRIX_SIZE;
-		}
-		setColorByMatrixToBuffer(x, y, element.getColor());
-	}
-
-	private boolean validateElement(int x, int y) {
+	private boolean validate(int x, int y) {
 		return x >= 0 && x < MATRIX_SIZE && y >= 0 && y < MATRIX_SIZE;
 	}
 
