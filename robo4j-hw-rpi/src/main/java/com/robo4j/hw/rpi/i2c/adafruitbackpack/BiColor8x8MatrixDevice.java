@@ -67,20 +67,23 @@ public class BiColor8x8MatrixDevice extends AbstractBackpack implements MatrixLe
 		case DEFAULT_X_Y:
 			break;
 		case RIGHT_90:
+			short originalX = x;
 			x = flipPosition(y);
-			y = flipPosition(x);
+			y = flipPosition(originalX);
 			break;
 		case RIGHT_180:
 			x = flipPosition(x);
 			y = flipPosition(y);
 			break;
 		case RIGHT_270:
+			originalX = x;
 			x = y;
-			y = flipPosition(x);
+			y = flipPosition(originalX);
 			break;
 		case INVERSION:
+			originalX = x;
 			x = y;
-			y = x;
+			y = originalX;
 			break;
 		case LEFT_90:
 			y = flipPosition(y);
