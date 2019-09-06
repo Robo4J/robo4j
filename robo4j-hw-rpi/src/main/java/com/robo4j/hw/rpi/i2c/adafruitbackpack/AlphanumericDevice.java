@@ -154,8 +154,7 @@ public class AlphanumericDevice extends AbstractBackpack {
 	}
 
 	public void addCharacter(char c, boolean dp) {
-		int p = incrementPosition();
-		setCharacter(p, FONTS[c], dp);
+		setCharacter(incrementPosition(), FONTS[c], dp);
 	}
 
 	public void setCharacter(int pos, char c, boolean dp) {
@@ -167,9 +166,7 @@ public class AlphanumericDevice extends AbstractBackpack {
 	}
 
 	public void addValue(short v, boolean dp) {
-		int p = incrementPosition();
-
-		setValue(p, v, dp);
+		setValue(incrementPosition(), v, dp);
 	}
 
 	public void addValue(int pos, short v, boolean dp) {
@@ -177,6 +174,13 @@ public class AlphanumericDevice extends AbstractBackpack {
 			setValue(pos, v, dp);
 			position.set(pos);
 		}
+	}
+
+	/**
+	 * @return the number of characters on the display.
+	 */
+	public int getNumberOfCharacters() {
+		return POSITION_MAX + 1;
 	}
 
 	private boolean validPosition(int p) {

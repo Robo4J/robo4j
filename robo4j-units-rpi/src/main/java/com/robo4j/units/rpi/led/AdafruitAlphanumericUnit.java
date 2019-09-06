@@ -17,16 +17,15 @@
 
 package com.robo4j.units.rpi.led;
 
-import java.util.List;
+import java.io.IOException;
 
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractBackpack;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AlphanumericDevice;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.AsciElement;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.LedBackpackType;
+import com.robo4j.logging.SimpleLoggingUtil;
+import com.robo4j.units.rpi.I2CRoboUnit;
 
 /**
  * AdafruitAlphanumericUnit
@@ -45,38 +44,54 @@ import com.robo4j.hw.rpi.i2c.adafruitbackpack.LedBackpackType;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class AdafruitAlphanumericUnit extends AbstractI2CDevice<DrawMessage> {
+public class AdafruitAlphanumericUnit extends I2CRoboUnit<AlphaNumericMessage> {
+	private AlphanumericDevice device;
 
 	public AdafruitAlphanumericUnit(RoboContext context, String id) {
-		super(DrawMessage.class, context, id);
+		super(AlphaNumericMessage.class, context, id);
 	}
-
-	private AlphanumericDevice device;
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		Integer address = configuration.getInteger(ATTRIBUTE_ADDRESS, null);
-		Integer bus = configuration.getInteger(ATTRIBUTE_BUS, null);
-		validateConfiguration(address, bus);
-		int brightness = configuration.getInteger(ATTRIBUTE_BRIGHTNESS, AbstractBackpack.DEFAULT_BRIGHTNESS);
+		super.onInitialization(configuration);
+		int brightness = configuration.getInteger(AbstractI2CBackpackUnit.ATTRIBUTE_BRIGHTNESS, AbstractBackpack.DEFAULT_BRIGHTNESS);
 
-		device = getBackpackDevice(LedBackpackType.ALPHANUMERIC, bus, address, brightness);
-	}
-
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	@Override
-	public void onMessage(LedBackpackMessages message) {
-		processMessage(device, message);
+		try {
+			device = new AlphanumericDevice(getBus(), getAddress(), brightness);
+		} catch (IOException e) {
+			throw new ConfigurationException("Failed to instantiate device", e);
+		}
 	}
 
 	@Override
-	void addElements(List<DrawMessage> elements) {
-		for (AsciElement e : elements) {
-			if (e.getPosition() == null) {
-				device.addCharacter(e.getValue(), e.getDot());
-			} else {
-				device.addCharacter(e.getPosition(), e.getValue(), e.getDot());
+	public void onMessage(AlphaNumericMessage message) {
+		switch (message.getCommand()) {
+		case CLEAR:
+			device.clear();
+			break;
+		case PAINT:
+			render(message);
+			break;
+		case DISPLAY:
+			render(message);
+			device.display();
+			break;
+		default:
+			SimpleLoggingUtil.error(getClass(), String.format("Illegal message: %s", message));
+		}
+	}
+
+	private void render(AlphaNumericMessage message) {
+		if (message.getStartPosition() == -1) {
+			for (int i = 0; i < message.getCharacters().length; i++) {
+				device.addCharacter((char) message.getCharacters()[i], message.getDots()[i]);
+			}
+		} else {
+			for (int i = 0; i < message.getCharacters().length; i++) {
+				device.setCharacter((message.getStartPosition() + i) % device.getNumberOfCharacters(), (char) message.getCharacters()[i],
+						message.getDots()[i]);
 			}
 		}
+
 	}
 }

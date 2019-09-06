@@ -18,42 +18,53 @@ package com.robo4j.units.rpi.led;
 
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor;
 
+/**
+ * Message for pixel based LEDs.
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
 public class DrawMessage {
-	private final short [] xs;
-	private final short [] ys;
-	private final BiColor [] colors;
-	private final MessageType type;
+	public static final DrawMessage MESSAGE_CLEAR = new DrawMessage(BackpackMessageCommand.CLEAR);
 
-	public enum MessageType {
+	private final short[] xs;
+	private final short[] ys;
+	private final BiColor[] colors;
+	private final BackpackMessageCommand command;
 
-	    //@formatter:off
-	    CLEAR,
-	    PAINT,
-	    DISPLAY
-	    //@formatter:on
-
+	/**
+	 * Constructor to only send a command.
+	 * 
+	 * @param command
+	 *            the command to send.
+	 */
+	public DrawMessage(BackpackMessageCommand command) {
+		this(command, new short[0], new short[0], new BiColor[0]);
 	}
-	
-	public DrawMessage(MessageType type, short[] xs, short[] ys, BiColor[] colors) {
-		this.type = type;
+
+	/**
+	 * Constructor.
+	 */
+	public DrawMessage(BackpackMessageCommand command, short[] xs, short[] ys, BiColor[] colors) {
+		this.command = command;
 		this.xs = xs;
 		this.ys = ys;
 		this.colors = colors;
 	}
 
-	public short [] getXs() {
+	public short[] getXs() {
 		return xs;
 	}
 
-	public short [] getYs() {
+	public short[] getYs() {
 		return ys;
 	}
 
-	public BiColor [] getColors() {
+	public BiColor[] getColors() {
 		return colors;
 	}
 
-	public MessageType getType() {
-		return type;
+	public BackpackMessageCommand getType() {
+		return command;
 	}
 }

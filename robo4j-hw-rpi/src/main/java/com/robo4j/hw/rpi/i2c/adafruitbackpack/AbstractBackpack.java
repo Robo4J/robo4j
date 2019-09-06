@@ -113,7 +113,7 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
 	 * @param c
 	 *            character to be displayed
 	 * @param dp
-	 *            point
+	 *            the dot next to the character
 	 */
 	void setCharacter(int n, int c, boolean dp) {
 		short value = (short) c;
@@ -127,7 +127,7 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
 	 * @param v
 	 *            value 16-bits
 	 * @param dp
-	 *            point
+	 *            the dot next to the character
 	 */
 	void setValue(int n, short v, boolean dp) {
 		buffer[n] = dp ? (v |= (1 << 14)) : v;

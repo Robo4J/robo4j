@@ -16,6 +16,18 @@
  */
 package com.robo4j.units.rpi.led;
 
-public class BarMessage {
+/**
+ * Types of messages for the LED backpacks.
+ * 
+ * @author Marcus Hirt (@hirt)
+ * @author Miroslav Wengner (@miragemiko)
+ */
+public enum BackpackMessageCommand {
+
+    //@formatter:off
+    CLEAR,
+    PAINT,
+    DISPLAY
+    //@formatter:on
 
 }
