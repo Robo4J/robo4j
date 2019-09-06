@@ -44,8 +44,8 @@ public class BiColor8x8MatrixExample {
 			matrix.drawPixel(3, 0, BiColor.RED);
 			matrix.drawPixel(0, 1, BiColor.GREEN);
 			matrix.drawPixel(0, 2, BiColor.YELLOW);
-			matrix.drawPixel(7, 7, BiColor.YELLOW);
-			matrix.drawPixel(7, 6, BiColor.YELLOW);
+			matrix.drawPixel(7, 7, BiColor.GREEN);
+			matrix.drawPixel(7, 6, BiColor.GREEN);
 			matrix.display();
 			TimeUnit.SECONDS.sleep(1);
 			matrix.clear();
