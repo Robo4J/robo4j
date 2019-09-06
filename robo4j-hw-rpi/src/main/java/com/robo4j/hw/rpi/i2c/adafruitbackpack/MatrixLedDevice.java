@@ -37,7 +37,7 @@ public interface MatrixLedDevice {
 	/**
 	 * Draws pixels on the led matrix.
 	 */
-	public void drawPixels(short[] xs, short[] ys, BiColor[] colors);
+	void drawPixels(short[] xs, short[] ys, BiColor[] colors);
 
 	/**
 	 * @return the available number of rows.

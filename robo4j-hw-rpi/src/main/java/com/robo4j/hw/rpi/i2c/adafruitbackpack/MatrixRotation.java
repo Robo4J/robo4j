@@ -33,8 +33,7 @@ public enum MatrixRotation {
 	INVERSION    		(5,"default inversion"),
 	LEFT_90				(6,"90d  to default, left"),
 	LEFT_180 			(7, "180d to default, left "),
-	LEFT_270			(8, "270d to default, left")
-    ;
+	LEFT_270			(8, "270d to default, left");
     //@formatter:on
 
 	private int id;

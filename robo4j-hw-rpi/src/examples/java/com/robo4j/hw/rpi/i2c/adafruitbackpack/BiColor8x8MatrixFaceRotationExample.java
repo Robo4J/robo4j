@@ -34,14 +34,15 @@ public class BiColor8x8MatrixFaceRotationExample {
 		BiColor8x8MatrixDevice ledMatrix = new BiColor8x8MatrixDevice();
 		//@formatter:off
         byte[] faceSmile = {
-                  0b0011_1100,
-                  0b0100_0010,
-            (byte)0b1010_0101,
-            (byte)0b1000_0001,
-            (byte)0b1010_0101,
-            (byte)0b1001_1001,
-            (byte)0b0100_0010,
-            (byte)0b0011_1100};
+        		0b0011_1100,
+        		0b0100_0010,
+        		(byte)0b1010_0101,
+        		(byte)0b1000_0001,
+        		(byte)0b1010_0101,
+        		(byte)0b1001_1001,
+	        	(byte)0b0100_0010,
+	            (byte)0b0011_1100
+        };
         //@formatter:on
 
 		for (int i = 0; i < faceSmile.length; i++) {
