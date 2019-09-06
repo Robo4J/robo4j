@@ -106,6 +106,9 @@ allprojects {
     repositories {
         jcenter()
         maven {
+            url 'https://oss.sonatype.org/content/groups/public'
+        }
+        maven {
             url mavenSnapshotRepositoryUrl
         }
     }
@@ -178,8 +181,7 @@ project("robo4j-hw-rpi") {
 
     dependencies {
         implementation(project(":robo4j-math"))
-//        implementation "com.pi4j:pi4j-core:${pi4jVersion}"
-        implementation fileTree(dir: "${rootDir}/libs", include: 'pi4j-core-2.0-SNAPSHOT.jar')
+        implementation "com.pi4j:pi4j-core:${pi4jVersion}"
     }
 
     configureExampleSources(project)
