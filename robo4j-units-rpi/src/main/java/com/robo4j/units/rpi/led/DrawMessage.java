@@ -16,6 +16,44 @@
  */
 package com.robo4j.units.rpi.led;
 
-public class MatrixMessage {
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor;
 
+public class DrawMessage {
+	private final short [] xs;
+	private final short [] ys;
+	private final BiColor [] colors;
+	private final MessageType type;
+
+	public enum MessageType {
+
+	    //@formatter:off
+	    CLEAR,
+	    PAINT,
+	    DISPLAY
+	    //@formatter:on
+
+	}
+	
+	public DrawMessage(MessageType type, short[] xs, short[] ys, BiColor[] colors) {
+		this.type = type;
+		this.xs = xs;
+		this.ys = ys;
+		this.colors = colors;
+	}
+
+	public short [] getXs() {
+		return xs;
+	}
+
+	public short [] getYs() {
+		return ys;
+	}
+
+	public BiColor [] getColors() {
+		return colors;
+	}
+
+	public MessageType getType() {
+		return type;
+	}
 }

@@ -17,16 +17,14 @@
 
 package com.robo4j.units.rpi.led;
 
+import java.io.IOException;
+
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor8x8MatrixDevice;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractBackpack;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.LedBackpackType;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor8x8MatrixDevice;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.MatrixRotation;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.XYElement;
-
-import java.util.List;
 
 /**
  * Adafruit Bi-Color 8x8 Matrix
@@ -36,7 +34,7 @@ import java.util.List;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Adafruit8x8MatrixUnit extends AbstractI2CBackpackUnit<BiColor8x8MatrixDevice, XYElement> {
+public class Adafruit8x8MatrixUnit extends AbstractI2CBackpackUnit {
 
 	public static final String DEFAULT_MATRIX_ROTATION = "DEFAULT_X_Y";
 	public static final String ATTRIBUTE_ROTATION = "rotation";
@@ -44,29 +42,30 @@ public class Adafruit8x8MatrixUnit extends AbstractI2CBackpackUnit<BiColor8x8Mat
 	private BiColor8x8MatrixDevice device;
 
 	public Adafruit8x8MatrixUnit(RoboContext context, String id) {
-		super(LedBackpackMessages.class, context, id);
+		super(DrawMessage.class, context, id);
 	}
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		Integer address = configuration.getInteger(ATTRIBUTE_ADDRESS, null);
-		Integer bus = configuration.getInteger(ATTRIBUTE_BUS, null);
-		validateConfiguration(address, bus);
+		super.onInitialization(configuration);
 		int brightness = configuration.getInteger(ATTRIBUTE_BRIGHTNESS, AbstractBackpack.DEFAULT_BRIGHTNESS);
 		MatrixRotation rotation = MatrixRotation
 				.valueOf(configuration.getString(ATTRIBUTE_ROTATION, DEFAULT_MATRIX_ROTATION).toUpperCase());
-		device = getBackpackDevice(LedBackpackType.BI_COLOR_MATRIX_8x8, bus, address, brightness);
+		try {
+			device = new BiColor8x8MatrixDevice(getBus(), getAddress(), brightness);
+		} catch (IOException e) {
+			throw new ConfigurationException("Failed to instantiate device", e);
+		}
 		device.setRotation(rotation);
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
-	public void onMessage(LedBackpackMessages message) {
+	public void onMessage(DrawMessage message) {
 		processMessage(device, message);
 	}
 
 	@Override
-	void addElements(List<XYElement> elements) {
-		device.addPixels(elements);
+	void paint(DrawMessage message) {
+		device.drawPixels(message.getXs(), message.getYs(), message.getColors());
 	}
 }

@@ -17,15 +17,16 @@
 
 package com.robo4j.units.rpi.led;
 
+import java.util.List;
+
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
+import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractBackpack;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AlphanumericDevice;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AsciElement;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.LedBackpackType;
-
-import java.util.List;
 
 /**
  * AdafruitAlphanumericUnit
@@ -44,10 +45,10 @@ import java.util.List;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class AdafruitAlphanumericUnit extends AbstractI2CBackpackUnit<AlphanumericDevice, AsciElement> {
+public class AdafruitAlphanumericUnit extends AbstractI2CDevice<DrawMessage> {
 
 	public AdafruitAlphanumericUnit(RoboContext context, String id) {
-		super(LedBackpackMessages.class, context, id);
+		super(DrawMessage.class, context, id);
 	}
 
 	private AlphanumericDevice device;
@@ -69,7 +70,7 @@ public class AdafruitAlphanumericUnit extends AbstractI2CBackpackUnit<Alphanumer
 	}
 
 	@Override
-	void addElements(List<AsciElement> elements) {
+	void addElements(List<DrawMessage> elements) {
 		for (AsciElement e : elements) {
 			if (e.getPosition() == null) {
 				device.addCharacter(e.getValue(), e.getDot());

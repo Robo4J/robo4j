@@ -17,82 +17,46 @@
 
 package com.robo4j.units.rpi.led;
 
-import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
-import com.robo4j.RoboUnit;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractBackpack;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.LedBackpackFactory;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.LedBackpackType;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.PackElement;
 import com.robo4j.logging.SimpleLoggingUtil;
-import com.robo4j.units.rpi.I2CEndPoint;
-import com.robo4j.units.rpi.I2CRegistry;
-
-import java.util.List;
+import com.robo4j.units.rpi.I2CRoboUnit;
 
 /**
  * AbstractI2CBackpackUnit abstract I2C LedBackpack unit
  *
- * @param <T> backpack unit type
+ * @param <T>
+ *            backpack unit type
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-@SuppressWarnings("rawtypes")
-abstract class AbstractI2CBackpackUnit<T1 extends AbstractBackpack, T2 extends PackElement> extends RoboUnit<LedBackpackMessages> {
+abstract class AbstractI2CBackpackUnit extends I2CRoboUnit<DrawMessage> {
 
 	static final String ATTRIBUTE_ADDRESS = "address";
 	static final String ATTRIBUTE_BUS = "bus";
 	static final String ATTRIBUTE_BRIGHTNESS = "brightness";
 
-	@SuppressWarnings("rawtypes")
-	AbstractI2CBackpackUnit(Class<LedBackpackMessages> messageType, RoboContext context, String id) {
+	AbstractI2CBackpackUnit(Class<DrawMessage> messageType, RoboContext context, String id) {
 		super(messageType, context, id);
 	}
 
-	void validateConfiguration(Integer address, Integer bus) throws ConfigurationException {
-		if (address == null) {
-			throw new ConfigurationException(ATTRIBUTE_ADDRESS);
-		}
-		if (bus == null) {
-			throw new ConfigurationException(ATTRIBUTE_BUS);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	T1 getBackpackDevice(LedBackpackType type, int bus, int address, int brightness) throws ConfigurationException {
-		I2CEndPoint endPoint = new I2CEndPoint(bus, address);
-		Object device = I2CRegistry.getI2CDeviceByEndPoint(endPoint);
-		if (device == null) {
-			try {
-				device = LedBackpackFactory.createDevice(bus, address, type, brightness);
-				// Note that we cannot catch hardware specific exceptions here,
-				// since they will be loaded when we run as mocked.
-			} catch (Exception e) {
-				throw new ConfigurationException(e.getMessage());
-			}
-			I2CRegistry.registerI2CDevice(device, new I2CEndPoint(bus, address));
-		}
-		return (T1) device;
-	}
-
-	void processMessage(AbstractBackpack device, LedBackpackMessages<T2> message) {
+	void processMessage(AbstractBackpack device, DrawMessage message) {
 		switch (message.getType()) {
 		case CLEAR:
 			device.clear();
 			break;
-		case ADD:
-			addElements(message.getElements());
+		case PAINT:
+			paint(message);
 			break;
 		case DISPLAY:
-			addElements(message.getElements());
+			paint(message);
 			device.display();
 			break;
 		default:
 			SimpleLoggingUtil.error(getClass(), String.format("Illegal message: %s", message));
-
 		}
 	}
 
-	abstract void addElements(List<T2> elements);
+	abstract void paint(DrawMessage message);
 }
