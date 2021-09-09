@@ -12,7 +12,7 @@ Robo4J provides an easy way of getting started with building custom hardware and
 The current [Robo4j.io][] version is 0.5
 
 <a href="https://foojay.io/today/works-with-openjdk"><img align="left" src="https://github.com/foojayio/badges/raw/main/works_with_openjdk/Works-with-OpenJDK.png" width="100"></a>
-#
+<br>
 
 ## Requirements
 [Git][], [Gradle][], [OpenJDK 11][]
