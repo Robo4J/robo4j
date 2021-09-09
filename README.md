@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/Robo4J/robo4j.svg?branch=master)](https://travis-ci.org/Robo4J/robo4j)
 
+
 # Robo4J
 Robo4J provides an easy way of getting started with building custom hardware and creating software for it running on the JVM.
 
@@ -10,8 +11,11 @@ Robo4J provides an easy way of getting started with building custom hardware and
 
 The current [Robo4j.io][] version is 0.5
 
+<a href="https://foojay.io/today/works-with-openjdk"><img align="left" src="https://github.com/foojayio/badges/raw/main/works_with_openjdk/Works-with-OpenJDK.png" width="100"></a>
+#
+
 ## Requirements
-[Git][], [Gradle][], [Java JDK 11][]
+[Git][], [Gradle][], [OpenJDK 11][]
 
 If you are looking for a JDK 11 ARM hard float build for Raspbian, we recommend looking into [Liberica JDK][] or [Azul Zulu Embedded][].
 
@@ -54,7 +58,7 @@ Robo4J is released under [General Public License][] v3.
 [@miragemiko]: https://twitter.com/miragemiko
 [@hirt]: https://twitter.com/hirt
 [Gradle]: http://gradle.org
-[Java JDK 11]: http://jdk.java.net/
+[OpenJDK 11]: https://openjdk.java.net/projects/jdk/11/
 [Git]: http://help.github.com/set-up-git-redirect
 [Gradle]: http://www.gradle.org
 [Robo4j documentation]: http://www.robo4j.io/p/documentation.html
