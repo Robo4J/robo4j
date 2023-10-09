@@ -10,14 +10,12 @@ Contributions to this project are [released](https://help.github.com/articles/gi
 ## Solving created issues
 
 Thank you for taking the time to read an issues, your feedback helps make Robo4j/Hacktoberfest better.
-Before working on the specific issue, please be sure that your issue hasn't already been asked by 
+Before working on the specific issue, please be sure that selected issue hasn't been already taken.
 
-Here are a few things that will help us help resolve your issues:
+Here are a few things that will help to resolve the issues:
 
-- A descriptive title that gives an idea of what your issue refers to
-- A thorough description of the issue, (one word descriptions are very hard to understand)
-- Screenshots (if appropriate)
-- Links (if appropriate)
+- Read description
+- Ask contact maintainers in case it's not well understood
 
 Please feel free to discuss with us any of your proposal.
 http://robo4j.io 
