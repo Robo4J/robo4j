@@ -20,6 +20,7 @@ import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.scheduler.RoboThreadFactory;
 import com.robo4j.util.SystemUtil;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
@@ -113,7 +114,7 @@ public final class RoboApplication {
 		final InputStream is = classLoader.getResourceAsStream("banner.txt");
 		final byte[] logoBytes;
 		try {
-			logoBytes = is == null ? new byte[0] : is.readAllBytes();
+			logoBytes = is == null ? new byte[0] : readInputStream(is);
 		} catch (IOException e) {
 			throw new IllegalStateException("not allowed");
 		}
@@ -121,6 +122,13 @@ public final class RoboApplication {
 		return new StringBuilder().append(BREAK).append(DELIMITER_HORIZONTAL)
 				.append(new String(logoBytes)).append(BREAK).append(DELIMITER_HORIZONTAL)
 				.toString();
+	}
+
+	private byte[] readInputStream(final InputStream is) throws IOException {
+		final byte[] bytes = new byte[is.available()];
+		DataInputStream dis = new DataInputStream(is);
+		dis.readFully(bytes);
+		return bytes;
 	}
 
 }
