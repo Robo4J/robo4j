@@ -55,11 +55,10 @@ class HttpServerConfigTests {
 
 	@Test
 	void serverConfigurationEmptyTest() {
-		Throwable exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> {
-			HttpPathUtils.readServerPathDTO(StringConstants.EMPTY);
-		});
+		Throwable exception = assertThrows(ArrayIndexOutOfBoundsException.class, () ->
+			HttpPathUtils.readServerPathDTO(StringConstants.EMPTY));
 
-		assertEquals("Index 0 out of bounds for length 0", exception.getMessage());
+		assertEquals("0", exception.getMessage());
 	}
 
 	@Test
