@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/Robo4J/robo4j.svg?branch=master)](https://travis-ci.org/Robo4J/robo4j)
+![Robo4j-master](https://github.com/Robo4j/robo4j/actions/workflows/robo4j-build-actions.yml/badge.svg?branch=master)
+![Robo4j-master-jdk8](https://github.com/Robo4j/robo4j/actions/workflows/robo4j-build-actions.yml/badge.svg?branch=master-jdk8)
 
 
 # Robo4J
