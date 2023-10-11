@@ -31,4 +31,15 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>messages.properties</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
 </project>

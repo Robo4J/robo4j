@@ -45,6 +45,7 @@ public class Messages {
 	 */
 	public static String getString(String key) {
 		try {
+			System.out.println("LOCALE:" + RESOURCE_BUNDLE);
 			return RESOURCE_BUNDLE.getString(key);
 		} catch (MissingResourceException e) {
 			return '!' + key + '!';

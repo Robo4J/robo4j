@@ -89,24 +89,22 @@
         </repository>
     </repositories>
 
-
-
     <properties>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <maven.release.plugin.version>3.0.0-M6</maven.release.plugin.version>
-        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
-        <maven.surefire.plugin.version>3.0.0-M5</maven.surefire.plugin.version>
-        <maven.jar.plugin.version>3.2.0</maven.jar.plugin.version>
-        <maven.source.plugin.version>3.2.0</maven.source.plugin.version>
-        <maven.resource.plugin.version>3.2.0</maven.resource.plugin.version>
-        <pi4j.version>2.0</pi4j.version>
+        <maven.release.plugin.version>3.0.1</maven.release.plugin.version>
+        <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+        <maven.surefire.plugin.version>3.1.2</maven.surefire.plugin.version>
+        <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
+        <maven.source.plugin.version>3.3.0</maven.source.plugin.version>
+        <maven.resource.plugin.version>3.3.1</maven.resource.plugin.version>
+        <pi4j.version>2.0-SNAPSHOT</pi4j.version>
 
         <!-- Test -->
-        <junit.jupiter.version>5.3.2</junit.jupiter.version>
+        <junit.jupiter.version>5.10.0</junit.jupiter.version>
     </properties>
 
     <dependencyManagement>
@@ -142,6 +140,7 @@
                 <artifactId>robo4j-hw-lego</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
             <!-- Test -->
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
@@ -204,9 +203,6 @@
                             <arg>-Xlint:unchecked</arg>
                             <arg>-Xlint:rawtypes</arg>
                         </compilerArgs>
-<!--                        <testCompilerArguments>-->
-<!--                            Xlint:deprecation,Xlint:unchecked,Xlint:rawtypes-->
-<!--                        </testCompilerArguments>-->
                     </configuration>
                 </plugin>
 
