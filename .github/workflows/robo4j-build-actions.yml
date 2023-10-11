@@ -1,6 +1,11 @@
 name: robo4j-build-actions
 run-name: ${{ github.actor }} is robo4j runner
-on: [push]
+on:
+  push:
+    branches:
+      - 'master'
+      - 'master-jdk8'
+      - 'feature/**'
 jobs:
   robo4j-install:
     runs-on: ubuntu-latest
@@ -12,5 +17,5 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
           cache: 'maven'
-      - name: Run install
+      - name: mvn clean install
         run: mvn clean install
