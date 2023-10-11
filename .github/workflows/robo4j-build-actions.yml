@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'master'
-      - 'master-jdk8'
       - 'feature/**'
 jobs:
   robo4j-install:
