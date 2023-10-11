@@ -9,7 +9,6 @@ on:
 jobs:
   robo4j-install:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/feature/45_github_actions'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v3
