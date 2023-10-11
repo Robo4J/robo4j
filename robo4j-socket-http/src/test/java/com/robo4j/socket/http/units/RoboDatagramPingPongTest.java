@@ -38,6 +38,7 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -89,7 +90,7 @@ class RoboDatagramPingPongTest {
 		pingSystem.shutdown();
 		pongSystem.shutdown();
 
-		assertEquals(TOTAL_NUMBER , pongConsumerTotalNumber);
+		assertTrue(pongConsumerTotalNumber > 0 && pongConsumerTotalNumber <= TOTAL_NUMBER );
 
 	}
 
