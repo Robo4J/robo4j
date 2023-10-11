@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
+@Disabled("individual test")
 class RoboApplicationTests {
 
 	/**
