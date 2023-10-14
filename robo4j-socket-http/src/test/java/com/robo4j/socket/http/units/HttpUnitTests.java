@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -148,7 +148,7 @@ class HttpUnitTests {
 	void testHttpCameraMessage() {
 		final String jsonCammeraMessageCorrupted = "{ \"type\"  :  \"jpg\" ,  \"value\"   :  \"description\"  ,\"image\":\"12345\"}";
 		final String jsonCammeraMessage = "{\"type\":\"jpg\",\"value\":\"description\",\"image\":\"12345\"}";
-		CodecRegistry registry = new CodecRegistry("com.robo4j.socket.http.codec");
+		CodecRegistry registry = new CodecRegistry("com.robo4j.socket.http.units.test.codec");
 		SocketEncoder<CameraMessage, String> encoder = registry.getEncoder(CameraMessage.class);
 		SocketDecoder<String, CameraMessage> decoder = registry.getDecoder(CameraMessage.class);
 		assertNotNull(encoder);

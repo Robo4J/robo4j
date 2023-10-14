@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,26 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j;
+package com.robo4j.socket.http.codec;
+
+import com.robo4j.socket.http.units.HttpProducer;
 
 /**
- * The descriptor for an attribute.
- * 
+ * Camera Image codec
+ *
  * @author Marcus Hirt (@hirt)
- * @author Miroslav Wengner (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  */
-public interface AttributeDescriptor<T> {
-	/**
-	 * Returns the type of the attribute.
-	 * 
-	 * @return the attribute type.
-	 */
-	Class<T> getAttributeType();
+@HttpProducer
+public class CameraMessageCodec extends AbstractHttpMessageCodec<CameraMessage> {
 
-	/**
-	 * Returns the name of the attribute.
-	 * 
-	 * @return the attribute name.
-	 */
-	String getAttributeName();
+	public CameraMessageCodec() {
+		super(CameraMessage.class);
+	}
+
 }
