@@ -25,14 +25,14 @@
         </config>
     </roboUnit>
     <roboUnit id="decoratedProducer">
-        <class>com.robo4j.socket.http.units.test.SocketMessageDecoratedProducerUnit</class>
+        <class>com.robo4j.socket.http.test.units.config.SocketMessageDecoratedProducerUnit</class>
         <config name="com.robo4j.root">
             <value name="target" type="String">httpClient</value>
             <value name="unitPathsConfig" type="String">[{"roboUnit":"","method":"GET","callbacks":["stringConsumer"]}]</value>
         </config>
     </roboUnit>
     <roboUnit id="stringConsumer">
-        <class>com.robo4j.socket.http.units.test.StringConsumer</class>
+        <class>com.robo4j.socket.http.test.units.config.StringConsumer</class>
         <config name="com.robo4j.root">
             <value name="totalNumberMessages" type="int">20</value>
         </config>

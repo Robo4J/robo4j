@@ -113,7 +113,8 @@ public final class ReflectionScan {
     }
 
     private List<String> scanPackageOnDisk(ClassLoader loader, String packageName) throws IOException {
-        Enumeration<URL> resources = loader.getResources(slashify(packageName));
+        final var packagePathStr =  slashify(packageName);
+        Enumeration<URL> resources = loader.getResources(packagePathStr);
         return StreamUtils.streamOfEnumeration(resources, false).map(URL::getFile).map(File::new)
                 .map(f -> findClasses(f, packageName)).flatMap(List::stream).collect(Collectors.toList());
     }
