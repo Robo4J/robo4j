@@ -72,6 +72,7 @@ public final class ReflectionScan {
                     result.addAll(classesInPackage);
                 }
             } catch (IOException e) {
+                // TODO: provide robust logging
                 e.printStackTrace();
             }
         }
@@ -114,8 +115,8 @@ public final class ReflectionScan {
 
     private List<String> scanPackageOnDisk(ClassLoader loader, String packageName) throws IOException {
         final var packagePathStr =  slashify(packageName);
-        Enumeration<URL> resources = loader.getResources(packagePathStr);
-        return StreamUtils.streamOfEnumeration(resources, false).map(URL::getFile).map(File::new)
+        // TODO: improve reflection, review usage
+        return loader.resources(packagePathStr).map(URL::getFile).map(File::new)
                 .map(f -> findClasses(f, packageName)).flatMap(List::stream).collect(Collectors.toList());
     }
 
@@ -134,7 +135,7 @@ public final class ReflectionScan {
                 final StringBuilder sb = new StringBuilder();
                 sb.append(path.replace(File.separatorChar, DOT))
                     .append(DOT)
-                    .append(file.getName().substring(0, file.getName().length() - SUFFIX.length()));
+                    .append(file.getName(), 0, file.getName().length() - SUFFIX.length());
 
                 result.add(sb.toString());
             }
