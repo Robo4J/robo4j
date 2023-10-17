@@ -34,7 +34,8 @@ public final class JsonDocument {
 	private final Map<String, Object> map = new LinkedHashMap<>();
 	private final Type type;
 
-	JsonDocument(Type type) {
+	// TODO: review the public constructor caused by JPMS
+	public JsonDocument(Type type) {
 		this.type = type;
 	}
 

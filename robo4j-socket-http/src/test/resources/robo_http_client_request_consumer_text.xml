@@ -26,7 +26,7 @@
         </config>
     </roboUnit>
     <roboUnit id="stringConsumer">
-        <class>com.robo4j.socket.http.units.test.StringConsumer</class>
+        <class>com.robo4j.socket.http.test.units.config.StringConsumer</class>
         <config name="com.robo4j.root">
             <value name="totalNumberMessages" type="int">20</value>
         </config>

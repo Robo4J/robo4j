@@ -30,7 +30,7 @@ import static com.robo4j.util.Utf8Constant.UTF8_COMMA;
 public class CodeRegistryUtils {
 
 	public static CodecRegistry getCodecRegistry(String packages) throws ConfigurationException {
-		if (RoboHttpUtils.validatePackages(packages)) {
+		if (RoboHttpUtils.validatePackages(packages.trim())) {
 			return new CodecRegistry(Thread.currentThread().getContextClassLoader(), packages.split(UTF8_COMMA));
 		} else {
 			throw new ConfigurationException("not valid code package");

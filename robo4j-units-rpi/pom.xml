@@ -35,16 +35,10 @@
             <systemPath>${project.basedir}/../libs/pi4j-core-2.0-SNAPSHOT.jar</systemPath>
         </dependency>
 
-
         <!--   TEST     -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

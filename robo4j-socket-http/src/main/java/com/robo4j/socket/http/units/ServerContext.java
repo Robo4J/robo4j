@@ -42,7 +42,8 @@ public final class ServerContext implements SocketContext<ServerPathConfig> {
 	 */
 	private final Map<String, Object> properties = new HashMap<>();
 
-	ServerContext() {
+	// TODO: review context creation public modifier due to the JPMS
+	public ServerContext() {
 	}
 
 	@Override

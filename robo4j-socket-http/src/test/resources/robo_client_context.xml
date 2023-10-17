@@ -18,6 +18,6 @@
 -->
 <robo4j>
     <roboUnit id="stringConsumer">
-        <class>com.robo4j.socket.http.units.test.StringConsumer</class>
+        <class>com.robo4j.socket.http.test.units.config.StringConsumer</class>
     </roboUnit>
 </robo4j>
