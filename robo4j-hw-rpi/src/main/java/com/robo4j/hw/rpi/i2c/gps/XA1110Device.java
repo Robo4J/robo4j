@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -16,14 +16,16 @@
  */
 package com.robo4j.hw.rpi.i2c.gps;
 
+import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
+import com.robo4j.hw.rpi.utils.I2cBus;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import com.pi4j.io.i2c.I2CBus;
-import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 
 /**
  * Abstraction to read the Titan X1 as delivered in SparFuns XA1110 break-out
@@ -33,8 +35,8 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
  * @author Miro Wengner (@miragemiko)
  */
 class XA1110Device extends AbstractI2CDevice {
-	public enum NmeaSentenceType {
-		//@formatter:off
+    public enum NmeaSentenceType {
+        //@formatter:off
 		GEOPOS("GLL", "Geographic Position - Latitude longitude", 0),
 		RECOMMENDED_MIN_SPEC("RMC", "Recomended Minimum Specific GNSS Sentence", 1),
 		COURSE_AND_SPEED("VTG", "Course Over Ground and Ground Speed", 2),
@@ -56,19 +58,19 @@ class XA1110Device extends AbstractI2CDevice {
 		CHANNEL("MCHN", "Channel Status", 18);
 		//@formatter:on
 
-		String nmeaCode;
-		String description;
-		int parameterIndex;
+        String nmeaCode;
+        String description;
+        int parameterIndex;
 
-		NmeaSentenceType(String nmeaCode, String description, int parameterIndex) {
-			this.nmeaCode = nmeaCode;
-			this.description = description;
-			this.parameterIndex = parameterIndex;
-		}
-	}
+        NmeaSentenceType(String nmeaCode, String description, int parameterIndex) {
+            this.nmeaCode = nmeaCode;
+            this.description = description;
+            this.parameterIndex = parameterIndex;
+        }
+    }
 
-	public enum PacketType {
-		//@formatter:off
+    public enum PacketType {
+        //@formatter:off
 		TEST(0),
 		ACK(1),
 		SYS_MSG(10),
@@ -156,164 +158,161 @@ class XA1110Device extends AbstractI2CDevice {
 		NAVIGATION_MODE(886);
 		//@formatter:on
 
-		private int code;
+        private int code;
 
-		PacketType(int code) {
-			this.code = code;
-		}
+        PacketType(int code) {
+            this.code = code;
+        }
 
-		public int getCode() {
-			return code;
-		}
+        public int getCode() {
+            return code;
+        }
 
-		public String getCodeString() {
-			String codeString = "";
-			if (code < 100) {
-				codeString += "0";
-			}
-			if (code < 10) {
-				codeString += "0";
-			}
-			codeString += code;
-			return codeString;
-		}
-	}
+        public String getCodeString() {
+            String codeString = "";
+            if (code < 100) {
+                codeString += "0";
+            }
+            if (code < 10) {
+                codeString += "0";
+            }
+            codeString += code;
+            return codeString;
+        }
+    }
 
-	public static class NmeaSetting {
-		private final NmeaSentenceType type;
-		private final int period;
+    public static class NmeaSetting {
+        private final NmeaSentenceType type;
+        private final int period;
 
-		/**
-		 * @param type
-		 *            the type of sentence to output.
-		 * @param period
-		 *            how often to output the sentence. 1 means every period, 2
-		 *            means every other etc.
-		 */
-		public NmeaSetting(NmeaSentenceType type, int period) {
-			this.type = type;
-			this.period = period;
-		}
-	}
+        /**
+         * @param type   the type of sentence to output.
+         * @param period how often to output the sentence. 1 means every period, 2
+         *               means every other etc.
+         */
+        public NmeaSetting(NmeaSentenceType type, int period) {
+            this.type = type;
+            this.period = period;
+        }
+    }
 
-	// I'll assume it's ASCII, didn't find any documentation.
-	private static final Charset CHARSET = Charset.forName("ASCII");
-	private static final int DEFAULT_I2C_ADDRESS = 0x10;
-	private static final int READ_BUFFER_SIZE = 64;
+    // I'll assume it's ASCII, didn't find any documentation.
+    private static final Charset CHARSET = StandardCharsets.US_ASCII;
+    private static final int DEFAULT_I2C_ADDRESS = 0x10;
+    private static final int READ_BUFFER_SIZE = 64;
 
-	public XA1110Device() throws IOException {
-		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS);
-	}
+    public XA1110Device() throws IOException {
+        this(I2cBus.BUS_1.address(), DEFAULT_I2C_ADDRESS);
+    }
 
-	public XA1110Device(int bus, int address) throws IOException {
-		super(bus, address);
-		init();
-	}
+    public XA1110Device(int bus, int address) throws IOException {
+        super(bus, address);
+        init();
+    }
 
-	static String createNmeaSentencesAndFrequenciesMtkPacket(NmeaSetting ... nmeaSettings) {
-		return createMtkPacket(PacketType.NMEA_SENTENCES_AND_FREQUENCES, createDataField(nmeaSettings));
-	}
+    static String createNmeaSentencesAndFrequenciesMtkPacket(NmeaSetting... nmeaSettings) {
+        return createMtkPacket(PacketType.NMEA_SENTENCES_AND_FREQUENCES, createDataField(nmeaSettings));
+    }
 
-	private static String createDataField(NmeaSetting... nmeaSettings) {
-		Map<Integer, NmeaSetting> map = Arrays.stream(nmeaSettings)
-				.collect(Collectors.toMap(setting -> setting.type.parameterIndex, setting -> setting));
-		String dataField = "";
-		for (int i = 0; i < 19; i++) {
-			NmeaSetting setting = map.get(i);
-			int period = 0;
-			if (setting != null) {
-				period = setting.period;
-			}
-			dataField += "," + period;
-		}
-		return dataField;
-	}
+    private static String createDataField(NmeaSetting... nmeaSettings) {
+        Map<Integer, NmeaSetting> map = Arrays.stream(nmeaSettings)
+                .collect(Collectors.toMap(setting -> setting.type.parameterIndex, setting -> setting));
+        StringBuilder dataField = new StringBuilder();
+        for (int i = 0; i < 19; i++) {
+            NmeaSetting setting = map.get(i);
+            int period = 0;
+            if (setting != null) {
+                period = setting.period;
+            }
+            dataField.append(",").append(period);
+        }
+        return dataField.toString();
+    }
 
-	public static String createMtkPacket(PacketType packetType, String dataField) {
-		String packet = "PMTK";
-		packet += packetType.getCodeString();
+    public static String createMtkPacket(PacketType packetType, String dataField) {
+        String packet = "PMTK";
+        packet += packetType.getCodeString();
 
-		if (dataField != null && dataField.length() > 0) {
-			packet += dataField;
-		}
-		packet = "$" + packet + '*' + calcCRCforMTK(packet);
+        if (dataField != null && !dataField.isEmpty()) {
+            packet += dataField;
+        }
+        packet = "$" + packet + '*' + calcCRCforMTK(packet);
 
-		packet += '\r';
-		packet += '\n';
+        packet += '\r';
+        packet += '\n';
 
-		return packet;
-	}
+        return packet;
+    }
 
-	public void sendMtkPacket(String mtkPacket) throws IOException {
-		writeBytes(mtkPacket.getBytes(CHARSET));
-	}
+    public void sendMtkPacket(String mtkPacket) throws IOException {
+        writeBytes(mtkPacket.getBytes(CHARSET));
+    }
 
-	private static String calcCRCforMTK(String string) {
-		int crc = 0;
-		byte[] sentence = string.getBytes(CHARSET);
+    private static String calcCRCforMTK(String string) {
+        int crc = 0;
+        byte[] sentence = string.getBytes(CHARSET);
 
-		for (int i = 0; i < sentence.length; i++) {
-			crc ^= sentence[i];
-		}
+        for (byte b : sentence) {
+            crc ^= b;
+        }
 
-		String output = "";
-		if (crc < 10) {
-			output += "0";
-		}
-		output += Integer.toHexString(crc);
-		return output;
-	}
+        String output = "";
+        if (crc < 10) {
+            output += "0";
+        }
+        output += Integer.toHexString(crc);
+        return output;
+    }
 
-	/**
-	 * Reads all the GPS data that could be found into the StringBuilder.
-	 *
-	 * @param builder
-	 *            the Builder to read data into.
-	 *
-	 * @throws IOException
-	 *             if there was a communication problem.
-	 */
-	void readGpsData(StringBuilder builder) throws IOException {
-		byte[] buffer = new byte[READ_BUFFER_SIZE];
-		int bytesRead = 0;
-		while ((bytesRead = i2cDevice.read(buffer, 0, buffer.length)) > 0) {
-			String readStr = new String(buffer, 0, bytesRead, CHARSET).trim();
-			if (readStr.isEmpty()) {
-				break;
-			}
-			builder.append(readStr);
-		}
-	}
+    /**
+     * Reads all the GPS data that could be found into the StringBuilder.
+     *
+     * @param builder the Builder to read data into.
+     * @throws IOException if there was a communication problem.
+     */
+    void readGpsData(StringBuilder builder) throws IOException {
+        byte[] buffer = new byte[READ_BUFFER_SIZE];
+        int bytesRead = 0;
+//		while ((bytesRead = i2CConfig.read(buffer, 0, buffer.length)) > 0) {
+        while ((bytesRead = readBuffer(buffer, 0, buffer.length)) > 0) {
+            String readStr = new String(buffer, 0, bytesRead, CHARSET).trim();
+            if (readStr.isEmpty()) {
+                break;
+            }
+            builder.append(readStr);
+        }
+    }
 
-	private void init() throws IOException {
-		System.out.println("Initializing device");
-		sendMtkPacket(createNmeaSentencesAndFrequenciesMtkPacket(new NmeaSetting(NmeaSentenceType.FIX_DATA, 1),
-				new NmeaSetting(NmeaSentenceType.COURSE_AND_SPEED, 1)));
+    private void init() throws IOException {
+        System.out.println("Initializing device");
+        sendMtkPacket(createNmeaSentencesAndFrequenciesMtkPacket(new NmeaSetting(NmeaSentenceType.FIX_DATA, 1),
+                new NmeaSetting(NmeaSentenceType.COURSE_AND_SPEED, 1)));
 
-	}
+    }
 
-	public static void main(String[] args) throws IOException, InterruptedException {
-		XA1110Device device = new XA1110Device();
-		Thread t = new Thread(() -> {
-			while (true) {
-				StringBuilder builder = new StringBuilder();
-				try {
-					System.out.println("=== Reading GPS-data from i2c bus to builder ===");
-					device.readGpsData(builder);
-					String gpsData = builder.toString();
-					System.out.println("Got data of length " + gpsData.length());
-					gpsData = gpsData.replace("$", "\n$");
-					System.out.print(gpsData);
-					System.out.println("\n===<end>===");
-					Thread.sleep(1000);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		t.setDaemon(true);
-		System.out.println("Starting reading from GPS. Press <Enter> to quit!");
-		t.start();
-		System.in.read();
-	}
+    public static void main(String[] args) throws IOException, InterruptedException {
+        XA1110Device device = new XA1110Device();
+        Thread t = new Thread(() -> {
+            while (true) {
+                StringBuilder builder = new StringBuilder();
+                try {
+                    System.out.println("=== Reading GPS-data from i2c bus to builder ===");
+                    device.readGpsData(builder);
+                    String gpsData = builder.toString();
+                    System.out.println("Got data of length " + gpsData.length());
+                    gpsData = gpsData.replace("$", "\n$");
+                    System.out.print(gpsData);
+                    System.out.println("\n===<end>===");
+                    TimeUnit.MILLISECONDS.sleep(1000);
+                } catch (Exception e) {
+                    // TODO improve
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.setDaemon(true);
+        System.out.println("Starting reading from GPS. Press <Enter> to quit!");
+        t.start();
+        System.in.read();
+    }
 }

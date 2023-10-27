@@ -28,9 +28,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import com.pi4j.io.gpio.RaspiPin;
-import com.pi4j.io.gpio.Pin;
 import com.robo4j.hw.rpi.i2c.adafruitoled.SSD1306Device.OLEDVariant;
+import com.robo4j.hw.rpi.utils.GpioPin;
 
 /**
  * Example which prints Hello World and draws a little. It also shows the image
@@ -43,7 +42,7 @@ import com.robo4j.hw.rpi.i2c.adafruitoled.SSD1306Device.OLEDVariant;
  */
 public class SSD1306DeviceTest {
 	private static final String DEFAULT_LINES = "32";
-	private static final Pin RESET_PIN = RaspiPin.GPIO_25;
+	private static final GpioPin RESET_PIN = GpioPin.GPIO_25;
 
 	/**
 	 * Start the example with either 32 or 64 as argument to select the number

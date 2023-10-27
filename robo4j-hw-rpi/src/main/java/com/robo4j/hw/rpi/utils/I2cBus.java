@@ -14,19 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.hw.rpi.i2c;
 
-import java.io.IOException;
+package com.robo4j.hw.rpi.utils;
 
-/**
- * A device which provides a readable value.
- * 
- * @author Marcus Hirt (@hirt)
- * @author Miro Wengner (@miragemiko)
- *
- * @param <E>
- *            the kind of data which can be read from the device.
- */
-public interface ReadableDevice<E> {
-	E read() throws IOException;
+import java.util.stream.Stream;
+
+public enum I2cBus {
+    BUS_UNKNOWN(-1),
+    BUS_0(0),
+    BUS_1(1)
+    ;
+
+    private final int address;
+    I2cBus(int address) {
+        this.address = address;
+    }
+
+    public int address(){
+        return address;
+    }
+
+    public I2cBus getByAddress(int address) {
+        return Stream.of(values()).filter(p -> p.address == address).findFirst().orElse(BUS_UNKNOWN);
+    }
 }

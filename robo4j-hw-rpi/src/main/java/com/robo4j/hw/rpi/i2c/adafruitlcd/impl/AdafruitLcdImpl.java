@@ -181,11 +181,11 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 	}
 
 	private synchronized void write(int i, byte[] registers, int j, int length) throws IOException {
-		i2cDevice.write(i, registers, j, length);
+		i2CConfig.write(i, registers, j, length);
 	}
 
 	private synchronized void write(int bank, byte b) throws IOException {
-		i2cDevice.write(bank, b);
+		i2CConfig.write(bank, b);
 	}
 
 	private synchronized void write(int value) throws IOException {
@@ -193,14 +193,14 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 		int bitmask = portB & 0x01; // Mask out PORTB LCD control bits
 
 		byte[] data = out4(bitmask, value);
-		i2cDevice.write(MCP23017_GPIOB, data, 0, 4);
+		i2CConfig.write(MCP23017_GPIOB, data, 0, 4);
 		portB = data[3];
 
 		// If a poll-worthy instruction was issued, reconfigure D7
 		// pin as input to indicate need for polling on next call.
 		if (value == LCD_CLEARDISPLAY || value == LCD_RETURNHOME) {
 			ddrB |= 0x10;
-			i2cDevice.write(MCP23017_IODIRB, (byte) ddrB);
+			i2CConfig.write(MCP23017_IODIRB, (byte) ddrB);
 		}
 	}
 
@@ -221,11 +221,11 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 		if ((ddrB & 0x10) != 0) {
 			int lo = (portB & 0x01) | 0x40;
 			int hi = lo | 0x20; // E=1 (strobe)
-			i2cDevice.write(MCP23017_GPIOB, (byte) lo);
+			i2CConfig.write(MCP23017_GPIOB, (byte) lo);
 			while (true) {
-				i2cDevice.write((byte) hi); // Strobe high (enable)
-				int bits = i2cDevice.read(); // First nybble contains busy state
-				i2cDevice.write(MCP23017_GPIOB, new byte[] { (byte) lo, (byte) hi, (byte) lo }, 0, 3); // Strobe
+				i2CConfig.write((byte) hi); // Strobe high (enable)
+				int bits = i2CConfig.read(); // First nybble contains busy state
+				i2CConfig.write(MCP23017_GPIOB, new byte[] { (byte) lo, (byte) hi, (byte) lo }, 0, 3); // Strobe
 																										// low,
 																										// high,
 																										// low.
@@ -239,7 +239,7 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 			}
 			portB = lo;
 			ddrB &= 0xEF; // Polling complete, change D7 pin to output
-			i2cDevice.write(MCP23017_IODIRB, (byte) ddrB);
+			i2CConfig.write(MCP23017_IODIRB, (byte) ddrB);
 		}
 	}
 
@@ -453,8 +453,8 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 		portA = (portA & 0x3F) | ((c & 0x03) << 6);
 		portB = (portB & 0xFE) | ((c & 0x04) >> 2);
 		// Has to be done as two writes because sequential operation is off.
-		i2cDevice.write(MCP23017_GPIOA, (byte) portA);
-		i2cDevice.write(MCP23017_GPIOB, (byte) portB);
+		i2CConfig.write(MCP23017_GPIOA, (byte) portA);
+		i2CConfig.write(MCP23017_GPIOB, (byte) portB);
 		this.color = color;
 	}
 
@@ -536,7 +536,7 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 	}
 
 	private synchronized int read(int bank) throws IOException {
-		return i2cDevice.read(bank);
+		return i2CConfig.read(bank);
 	}
 
 	/*

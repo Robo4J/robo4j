@@ -16,38 +16,39 @@
  */
 package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
-import java.io.IOException;
-
-import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
+import com.pi4j.exception.InitializeException;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.mockup.AdafruitLcdMockup;
+
+import java.io.IOException;
+
 /**
  * FIXME(Marcus/Dec 20, 2016): We should probably not let the mockup etc be part of the standard API.
  * FIXME(Miro/Jan 29, 2017): we should move it to the test
  * Let's keep it clean?
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public final class LcdFactory {
-	/**
-	 * Set this system property to true to make the factory return a Swing mockup
-	 * instead of an i2c LCD device.
-	 */
-	private  static final String SYSTEM_PROPERTY_MOCK = "com.robo4j.hw.rpi.i2c.adafruitlcd.mock";
+    /**
+     * Set this system property to true to make the factory return a Swing mockup
+     * instead of an i2c LCD device.
+     */
+    private static final String SYSTEM_PROPERTY_MOCK = "com.robo4j.hw.rpi.i2c.adafruitlcd.mock";
 
-	public static AdafruitLcd createLCD() throws IOException, UnsupportedBusNumberException {
-		if (Boolean.getBoolean(SYSTEM_PROPERTY_MOCK)) {
-			return new AdafruitLcdMockup();
-		}
-		return new AdafruitLcdImpl();
-	}
+    public static AdafruitLcd createLCD() throws IOException, InitializeException {
+        if (Boolean.getBoolean(SYSTEM_PROPERTY_MOCK)) {
+            return new AdafruitLcdMockup();
+        }
+        return new AdafruitLcdImpl();
+    }
 
-	public static AdafruitLcd createLCD(int bus, int address) throws IOException, UnsupportedBusNumberException {
-		if (Boolean.getBoolean(SYSTEM_PROPERTY_MOCK)) {
-			return new AdafruitLcdMockup(bus, address);
-		}
-		return new AdafruitLcdImpl(bus, address);
-	}
+    public static AdafruitLcd createLCD(int bus, int address) throws IOException, InitializeException {
+        if (Boolean.getBoolean(SYSTEM_PROPERTY_MOCK)) {
+            return new AdafruitLcdMockup(bus, address);
+        }
+        return new AdafruitLcdImpl(bus, address);
+    }
 
 }

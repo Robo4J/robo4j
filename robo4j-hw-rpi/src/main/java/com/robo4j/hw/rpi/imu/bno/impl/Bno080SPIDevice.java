@@ -17,18 +17,24 @@
 
 package com.robo4j.hw.rpi.imu.bno.impl;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinDigitalInput;
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.PinPullResistance;
-import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiPin;
-import com.pi4j.io.spi.SpiChannel;
-import com.pi4j.io.spi.SpiDevice;
+import com.pi4j.Pi4J;
+import com.pi4j.context.Context;
+//import com.pi4j.io.gpio.GpioController;
+//import com.pi4j.io.gpio.GpioFactory;
+//import com.pi4j.io.gpio.GpioPinDigitalInput;
+//import com.pi4j.io.gpio.GpioPinDigitalOutput;
+//import com.pi4j.io.gpio.Pin;
+//import com.pi4j.io.gpio.PinPullResistance;
+//import com.pi4j.io.gpio.PinState;
+//import com.pi4j.io.gpio.RaspiPin;
+import com.pi4j.io.gpio.digital.DigitalOutput;
+import com.pi4j.io.gpio.digital.DigitalState;
+import com.pi4j.io.spi.Spi;
+//import com.pi4j.io.spi.SpiChannel;
+import com.pi4j.io.spi.SpiChipSelect;
+//import com.pi4j.io.spi.SpiDevice;
 import com.pi4j.io.spi.SpiMode;
-import com.pi4j.io.spi.impl.SpiDeviceImpl;
+//import com.pi4j.io.spi.impl.SpiDeviceImpl;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataEventType;
 import com.robo4j.hw.rpi.imu.bno.DataListener;
@@ -43,6 +49,7 @@ import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketResponse;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpReportIds;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils;
+import com.robo4j.hw.rpi.utils.GpioPin;
 import com.robo4j.math.geometry.Tuple3f;
 
 import java.io.IOException;
@@ -79,7 +86,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	public static final SpiMode DEFAULT_SPI_MODE = SpiMode.MODE_3;
 	// 3MHz maximum SPI speed
 	public static final int DEFAULT_SPI_SPEED = 3000000;
-	public static final SpiChannel DEFAULT_SPI_CHANNEL = SpiChannel.CS0;
+	public static final SpiChipSelect DEFAULT_SPI_CHANNEL = SpiChipSelect.CS_0;
 
 	public static final int MAX_PACKET_SIZE = 32762;
 	public static final int DEFAULT_TIMEOUT_MS = 1000;
@@ -88,14 +95,18 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	public static final int MAX_SPI_COUNT = 255;
 	public static final int MAX_SPI_WAIT_CYCLES = 2;
 	private static final int MAX_COUNTER = 255;
+	private final AtomicInteger spiWaitCounter = new AtomicInteger();
 
-	private SpiDevice spiDevice;
-	private GpioPinDigitalInput intGpio;
-	private GpioPinDigitalOutput wakeGpio;
-	private GpioPinDigitalOutput rstGpio;
-	private GpioPinDigitalOutput csGpio; // select slave SS = chip select CS
+	private final Spi spiDevice;
+//	private GpioPinDigitalInput intGpio;
+//	private GpioPinDigitalOutput wakeGpio;
+//	private GpioPinDigitalOutput rstGpio;
+//	private GpioPinDigitalOutput csGpio; // select slave SS = chip select CS
 
-	private AtomicInteger spiWaitCounter = new AtomicInteger();
+	private DigitalOutput intGpio;
+	private DigitalOutput wakeGpio;
+	private DigitalOutput rstGpio;
+	private DigitalOutput csGpio; // select slave SS = chip select CS
 
 	// uint32_t
 	private long sensorReportDelayMicroSec = 0;
@@ -114,7 +125,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 * Constructor.
 	 * 
 	 * @param channel
-	 *            the {@link SpiChannel} to use.
+	 *            the {@link SpiChipSelect} to use.
 	 * @param mode
 	 *            the {@link SpiMode} to use.
 	 * @param speed
@@ -122,15 +133,16 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public Bno080SPIDevice(SpiChannel channel, SpiMode mode, int speed) throws IOException, InterruptedException {
-		this(channel, mode, speed, RaspiPin.GPIO_00, RaspiPin.GPIO_25, RaspiPin.GPIO_02, RaspiPin.GPIO_03);
+	public Bno080SPIDevice(SpiChipSelect channel, SpiMode mode, int speed) throws IOException, InterruptedException {
+//		this(channel, mode, speed, RaspiPin.GPIO_00, RaspiPin.GPIO_25, RaspiPin.GPIO_02, RaspiPin.GPIO_03);
+		this(channel, mode, speed, GpioPin.GPIO_00, GpioPin.GPIO_25, GpioPin.GPIO_02, GpioPin.GPIO_03);
 	}
 
 	/**
 	 * Constructor.
 	 * 
 	 * @param channel
-	 *            the {@link SpiChannel} to use.
+	 *            the {@link SpiChipSelect} to use.
 	 * @param mode
 	 *            the {@link SpiMode} to use.
 	 * @param speed
@@ -146,10 +158,18 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 *            Interrupt, active low, pulls low when the BNO080 is ready for
 	 *            communication.
 	 **/
-	public Bno080SPIDevice(SpiChannel channel, SpiMode mode, int speed, Pin wake, Pin cs, Pin reset, Pin interrupt)
+	public Bno080SPIDevice(SpiChipSelect channel, SpiMode mode, int speed, GpioPin wake, GpioPin cs, GpioPin reset, GpioPin interrupt)
 			throws IOException, InterruptedException {
-		spiDevice = new SpiDeviceImpl(channel, speed, mode);
-		configureSpiPins(wake, cs, reset, interrupt);
+		var pi4jRpiContext = Pi4J.newAutoContext();
+		var spiConfig  = Spi.newConfigBuilder(pi4jRpiContext)
+				.id("rpi-spi")
+				.chipSelect(channel)
+				.baud(speed)
+				.mode(mode)
+				.build();
+//		spiDevice = new SpiDeviceImpl(channel, speed, mode);
+		spiDevice = pi4jRpiContext.spi().create(spiConfig);
+		configureSpiPins(pi4jRpiContext, wake, cs, reset, interrupt);
 	}
 
 	public boolean isActive() {
@@ -510,21 +530,33 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 * @throws InterruptedException
 	 *             exception
 	 */
-	private boolean configureSpiPins(Pin wake, Pin cs, Pin reset, Pin interrupt) throws InterruptedException {
+	private boolean configureSpiPins(Context pi4jRpiContext, GpioPin wake, GpioPin cs, GpioPin reset, GpioPin interrupt) throws InterruptedException {
 		System.out.println(String.format("configurePins: wak=%s, cs=%s, rst=%s, inter=%s", wake, cs, reset, interrupt));
-		GpioController gpioController = GpioFactory.getInstance();
-		csGpio = gpioController.provisionDigitalOutputPin(cs, "CS");
-		wakeGpio = gpioController.provisionDigitalOutputPin(wake);
-		intGpio = gpioController.provisionDigitalInputPin(interrupt, PinPullResistance.PULL_UP);
-		rstGpio = gpioController.provisionDigitalOutputPin(reset);
+//		GpioController gpioController = GpioFactory.getInstance();
+		var digitalOutputBuilder = DigitalOutput.newConfigBuilder(pi4jRpiContext);
+		var csGpioConfig = digitalOutputBuilder.address(cs.address()).name("CS").build();
+		var wakeGpioConfig = digitalOutputBuilder.address(wake.address()).onState(DigitalState.HIGH).build();
+		// Pull up/down resistence is set to 2
+		var intGpioConfig = digitalOutputBuilder.address(interrupt.address())
+				.name(interrupt.name()).build();
+		var rstGpioConfig = digitalOutputBuilder.address(reset.address()).onState(DigitalState.LOW).build();
+		//csGpio = gpioController.provisionDigitalOutputPin(cs, "CS");
+		//wakeGpio = gpioController.provisionDigitalOutputPin(wake);
+		//intGpio = gpioController.provisionDigitalInputPin(interrupt, PinPullResistance.PULL_UP);
+		//rstGpio = gpioController.provisionDigitalOutputPin(reset);
 
-		csGpio.setState(PinState.HIGH); // Deselect BNO080
+		csGpio = pi4jRpiContext.dout().create(csGpioConfig);
+		wakeGpio = pi4jRpiContext.dout().create(wakeGpioConfig);
+		intGpio = pi4jRpiContext.dout().create(intGpioConfig);
+		rstGpio = pi4jRpiContext.dout().create(rstGpioConfig);
+
+		csGpio.setState(DigitalState.HIGH.value().intValue()); // Deselect BNO080
 
 		// Configure the BNO080 for SPI communication
-		wakeGpio.setState(PinState.HIGH); // Before boot up the PS0/Wake
-		rstGpio.setState(PinState.LOW); // Reset BNO080
+		//wakeGpio.setState(PinState.HIGH); // Before boot up the PS0/Wake
+		//rstGpio.setState(PinState.LOW); // Reset BNO080
 		TimeUnit.SECONDS.sleep(2); // Min length not specified in datasheet?
-		rstGpio.setState(PinState.HIGH); // Bring out of reset
+		rstGpio.setState(DigitalState.HIGH.value().intValue()); // Bring out of reset
 		return true;
 	}
 
@@ -678,7 +710,8 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 
 		// BNO080 has max CLK of 3MHz, MSB first,
 		// The BNO080 uses CPOL = 1 and CPHA = 1. This is mode3
-		csGpio.setState(PinState.LOW);
+		//csGpio.setState(PinState.LOW);
+		csGpio.setState(DigitalState.LOW.value().intValue());
 
 		for (int i = 0; i < packet.getHeaderSize(); i++) {
 			spiDevice.write(packet.getHeaderByte(i));
@@ -687,7 +720,8 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		for (int i = 0; i < packet.getBodySize(); i++) {
 			spiDevice.write(packet.getBodyByte(i));
 		}
-		csGpio.setState(PinState.HIGH);
+		// csGpio.setState(PinState.HIGH);
+		csGpio.setState(DigitalState.HIGH.value().intValue());
 		return true;
 	}
 
@@ -700,7 +734,8 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		if (delay && sensorReportDelayMicroSec > 0) {
 			TimeUnit.MICROSECONDS.sleep(TIMEBASE_REFER_DELTA - sensorReportDelayMicroSec);
 		}
-		csGpio.setState(PinState.LOW);
+		//csGpio.setState(PinState.LOW);
+		csGpio.setState(DigitalState.LOW.value().intValue());
 
 		int packetLSB = toInt8U(spiDevice.write(writeByte));
 		int packetMSB = toInt8U(spiDevice.write(writeByte));

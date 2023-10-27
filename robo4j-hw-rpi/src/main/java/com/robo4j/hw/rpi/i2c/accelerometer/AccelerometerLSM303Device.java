@@ -122,7 +122,7 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 	public synchronized Tuple3f read() throws IOException {
 		Tuple3f rawData = new Tuple3f();
 		byte[] data = new byte[6];
-		int n = i2cDevice.read(OUT_X_L_A | 0x80, data, 0, 6);
+		int n = i2CConfig.read(OUT_X_L_A | 0x80, data, 0, 6);
 		if (n != 6) {
 			getLogger().warning("Failed to read all data from accelerometer. Should have read 6, could only read " + n);
 		}

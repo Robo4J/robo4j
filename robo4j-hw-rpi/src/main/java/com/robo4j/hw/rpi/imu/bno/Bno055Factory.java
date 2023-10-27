@@ -19,6 +19,7 @@ package com.robo4j.hw.rpi.imu.bno;
 import com.robo4j.hw.rpi.imu.bno.Bno055Device.OperatingMode;
 import com.robo4j.hw.rpi.imu.bno.impl.Bno055I2CDevice;
 import com.robo4j.hw.rpi.imu.bno.impl.Bno055SerialDevice;
+import com.robo4j.hw.rpi.utils.I2cBus;
 
 import java.io.IOException;
 
@@ -68,7 +69,7 @@ public final class Bno055Factory {
 	 * @throws IOException
 	 *             exception
 	 */
-	public static Bno055Device createDevice(int bus, int address, OperatingMode operatingMode) throws IOException {
+	public static Bno055Device createDevice(I2cBus bus, int address, OperatingMode operatingMode) throws IOException {
 		return new Bno055I2CDevice(bus, address, operatingMode);
 	}
 

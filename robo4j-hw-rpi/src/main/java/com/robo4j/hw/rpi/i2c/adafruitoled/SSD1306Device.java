@@ -16,13 +16,12 @@
  */
 package com.robo4j.hw.rpi.i2c.adafruitoled;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.i2c.I2CBus;
+import com.pi4j.Pi4J;
+import com.pi4j.io.gpio.digital.DigitalOutput;
+import com.pi4j.io.gpio.digital.DigitalState;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
+import com.robo4j.hw.rpi.utils.GpioPin;
+import com.robo4j.hw.rpi.utils.I2cBus;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -43,9 +42,10 @@ public class SSD1306Device extends AbstractI2CDevice {
 	private static final int DEFAULT_CONTRAST = 0x88;
 
 	private final BufferedImage image;
-	private final GpioController gpio = GpioFactory.getInstance();
-	private final GpioPinDigitalOutput resetPin;
-	private final boolean useExtenalVCC;
+	//private final GpioController gpio = GpioFactory.getInstance();
+	//private final GpioPinDigitalOutput resetPin;
+	private final DigitalOutput gpioResetPin;
+	private final boolean useExternalVCC;
 	private final OLEDVariant oledType;
 
 	public enum OLEDVariant {
@@ -143,8 +143,8 @@ public class SSD1306Device extends AbstractI2CDevice {
 	 * @throws IOException
 	 *             if there was a communication problem.
 	 */
-	public SSD1306Device(OLEDVariant variant, Pin resetPin) throws IOException {
-		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, variant, resetPin, false);
+	public SSD1306Device(OLEDVariant variant, GpioPin resetPin) throws IOException {
+		this(I2cBus.BUS_1, DEFAULT_I2C_ADDRESS, variant, resetPin, false);
 	}
 
 	/**
@@ -166,11 +166,18 @@ public class SSD1306Device extends AbstractI2CDevice {
 	 * @throws IOException
 	 *             if there was a communication problem.
 	 */
-	public SSD1306Device(int bus, int address, OLEDVariant oledType, Pin resetPinId, boolean useExternalVCC) throws IOException {
+	public SSD1306Device(I2cBus bus, int address, OLEDVariant oledType, GpioPin resetPinId, boolean useExternalVCC) throws IOException {
 		super(bus, address);
 		this.image = new BufferedImage(oledType.getWidth(), oledType.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
-		this.resetPin = gpio.provisionDigitalOutputPin(resetPinId, "reset", PinState.HIGH);
-		this.useExtenalVCC = useExternalVCC;
+
+		var pi4jRpiContext = Pi4J.newAutoContext();
+		var digitalOutputBuilder = DigitalOutput.newConfigBuilder(pi4jRpiContext);
+		var gpioResetPinConfig = digitalOutputBuilder.address(resetPinId.address()).onState(DigitalState.HIGH).build();
+
+		this.gpioResetPin = pi4jRpiContext.dout().create(gpioResetPinConfig);
+
+		//this.resetPin = gpio.provisionDigitalOutputPin(resetPinId, "reset", PinState.HIGH);
+		this.useExternalVCC = useExternalVCC;
 		this.oledType = oledType;
 		initialize();
 	}
@@ -197,7 +204,8 @@ public class SSD1306Device extends AbstractI2CDevice {
 		// Transmitting image data in one write
 		byte[] byteArray = toByteArray();
 		System.out.println(Arrays.toString(byteArray));
-		i2cDevice.write(0x40, byteArray);
+		// TODO : const
+		writeByteBufferByAddress(0x40, byteArray);
 	}
 
 	/**
@@ -256,12 +264,12 @@ public class SSD1306Device extends AbstractI2CDevice {
 
 	private void initialize() throws IOException {
 		sleep(1);
-		resetPin.setState(PinState.LOW);
+		gpioResetPin.setState(DigitalState.LOW.value().intValue());
 		sleep(10);
-		resetPin.setState(PinState.HIGH);
+		gpioResetPin.setState(DigitalState.HIGH.value().intValue());
 		executeCommand(Commands.DISPLAY_OFF);
 		executeCommand(Commands.SET_DISPLAY_CLOCK_DIV, 0x80);
-		if (!useExtenalVCC) {
+		if (!useExternalVCC) {
 			executeCommand(Commands.CHARGE_PUMP, CHARGE_PUMP_VALUE_ENABLE);
 		} else {
 			executeCommand(Commands.CHARGE_PUMP, CHARGE_PUMP_VALUE_DISABLE);
@@ -274,7 +282,7 @@ public class SSD1306Device extends AbstractI2CDevice {
 		executeCommand(Commands.COM_OUTPUT_SCAN_DIR_DESCENDING);
 		executeCommand(Commands.SET_COM_PINS, oledType.getComPins());
 		executeCommand(Commands.SET_CONTRAST, DEFAULT_CONTRAST);
-		executeCommand(Commands.SET_PRE_CHARGE_PERIOD, useExtenalVCC ? 0x22 : 0xf1);
+		executeCommand(Commands.SET_PRE_CHARGE_PERIOD, useExternalVCC ? 0x22 : 0xf1);
 		executeCommand(Commands.SET_VCOM_DESELECT_LEVEL, 0x40);
 		executeCommand(Commands.RAM_CONTENT_DISPLAY);
 		executeCommand(Commands.INVERTED_OFF);
@@ -298,7 +306,8 @@ public class SSD1306Device extends AbstractI2CDevice {
 	}
 
 	private void writeCommand(byte commandValue) throws IOException {
-		i2cDevice.write(0x00, commandValue);
+		// TODO: correct
+		writeByte(0x00, commandValue);
 	}
 
 	private void setMemoryMode(MemoryModes mode) throws IOException {

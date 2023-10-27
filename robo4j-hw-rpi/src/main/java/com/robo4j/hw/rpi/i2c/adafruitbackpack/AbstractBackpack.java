@@ -172,16 +172,16 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
 	}
 
 	private void initiate(int brightness) throws IOException {
-		i2cDevice.write((byte) (OSCILLATOR_TURN_ON)); // Turn on oscilator
-		i2cDevice.write(blinkRate(HT16K33_BLINK_OFF));
-		i2cDevice.write(setBrightness(brightness));
+		i2CConfig.write((byte) (OSCILLATOR_TURN_ON)); // Turn on oscilator
+		i2CConfig.write(blinkRate(HT16K33_BLINK_OFF));
+		i2CConfig.write(setBrightness(brightness));
 	}
 
 	private void writeDisplay() throws IOException {
 		int address = 0;
 		for (int i = 0; i < buffer.length; i++) {
-			i2cDevice.write(address++, (byte) (buffer[i] & 0xFF));
-			i2cDevice.write(address++, (byte) (buffer[i] >> 8));
+			i2CConfig.write(address++, (byte) (buffer[i] & 0xFF));
+			i2CConfig.write(address++, (byte) (buffer[i] >> 8));
 		}
 	}
 

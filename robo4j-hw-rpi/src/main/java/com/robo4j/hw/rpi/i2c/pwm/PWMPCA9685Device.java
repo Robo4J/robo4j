@@ -18,8 +18,8 @@ package com.robo4j.hw.rpi.i2c.pwm;
 
 import java.io.IOException;
 
-import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
+import com.robo4j.hw.rpi.utils.I2cBus;
 
 /**
  * Abstraction for talking to a PCA9685 PWM/Servo driver. For example an
@@ -67,7 +67,8 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 	 */
 	public PWMPCA9685Device() throws IOException {
 		// 0x40 is the default address used by the AdaFruit PWM board.
-		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS);
+		//this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS);
+		this(I2cBus.BUS_1.address(), DEFAULT_I2C_ADDRESS);
 	}
 
 	/**
@@ -120,7 +121,8 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 		double prescaleval = PRESCALE_FACTOR / frequency;
 		prescaleval -= 1.0;
 		double prescale = Math.floor(prescaleval + 0.5);
-		int oldmode = i2cDevice.read(MODE1);
+		//int oldmode = i2CConfig.read(MODE1);
+		int oldmode = readByte(MODE1);
 		int newmode = (oldmode & 0x7F) | 0x10;
 		writeByte(MODE1, (byte) newmode);
 		writeByte(PRESCALE, (byte) (Math.floor(prescale)));
@@ -179,10 +181,15 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 		 *             exception
 		 */
 		public void setPWM(int on, int off) throws IOException {
-			i2cDevice.write(LED0_ON_L + 4 * channel, (byte) (on & 0xFF));
-			i2cDevice.write(LED0_ON_H + 4 * channel, (byte) (on >> 8));
-			i2cDevice.write(LED0_OFF_L + 4 * channel, (byte) (off & 0xFF));
-			i2cDevice.write(LED0_OFF_H + 4 * channel, (byte) (off >> 8));
+//			i2CConfig.write(LED0_ON_L + 4 * channel, (byte) (on & 0xFF));
+//			i2CConfig.write(LED0_ON_H + 4 * channel, (byte) (on >> 8));
+//			i2CConfig.write(LED0_OFF_L + 4 * channel, (byte) (off & 0xFF));
+//			i2CConfig.write(LED0_OFF_H + 4 * channel, (byte) (off >> 8));
+
+			writeByte(LED0_ON_L + 4 * channel, (byte) (on & 0xFF));
+			writeByte(LED0_ON_H + 4 * channel, (byte) (on >> 8));
+			writeByte(LED0_OFF_L + 4 * channel, (byte) (off & 0xFF));
+			writeByte(LED0_OFF_H + 4 * channel, (byte) (off >> 8));
 		}
 
 		/**

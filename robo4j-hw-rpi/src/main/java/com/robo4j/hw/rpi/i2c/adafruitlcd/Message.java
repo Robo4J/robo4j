@@ -16,38 +16,38 @@
  */
 package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
-import java.io.IOException;
+import com.pi4j.exception.InitializeException;
 
-import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
+import java.io.IOException;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class Message {
-	private static final String COLOR_PREFIX = "-c";
-	
-	public static void main(String [] params) throws IOException, UnsupportedBusNumberException {
-		if (params == null || params.length == 0) {
-			System.out.println("Usage: [-c<COLORNAME>] <message>\nValid COLORNAME values are: OFF, RED, GREEN, BLUE, YELLOW, TEAL, VIOLET, WHITE, ON\n");
-		}
-		Color color = Color.GREEN;
-		String message = "";
-		for(int i = 0; i < params.length; i++) {
-			if (params[i].startsWith(COLOR_PREFIX)) {
-				color = Color.getByName(params[i].substring(COLOR_PREFIX.length()));
-			} else {
-				message = params[i];
-			}
-		}
-		AdafruitLcd lcd = LcdFactory.createLCD();
-		lcd.setBacklight(color);
-		message = massage(message);
-		lcd.setText(message);
-		System.out.println(message);
-	}
+    private static final String COLOR_PREFIX = "-c";
 
-	private static String massage(String message) {
-		return message.replace("\\n", "\n");
-	}
+    public static void main(String[] params) throws IOException, InitializeException {
+        if (params == null || params.length == 0) {
+            System.out.println("Usage: [-c<COLORNAME>] <message>\nValid COLORNAME values are: OFF, RED, GREEN, BLUE, YELLOW, TEAL, VIOLET, WHITE, ON\n");
+        }
+        Color color = Color.GREEN;
+        String message = "";
+        for (int i = 0; i < params.length; i++) {
+            if (params[i].startsWith(COLOR_PREFIX)) {
+                color = Color.getByName(params[i].substring(COLOR_PREFIX.length()));
+            } else {
+                message = params[i];
+            }
+        }
+        AdafruitLcd lcd = LcdFactory.createLCD();
+        lcd.setBacklight(color);
+        message = massage(message);
+        lcd.setText(message);
+        System.out.println(message);
+    }
+
+    private static String massage(String message) {
+        return message.replace("\\n", "\n");
+    }
 }

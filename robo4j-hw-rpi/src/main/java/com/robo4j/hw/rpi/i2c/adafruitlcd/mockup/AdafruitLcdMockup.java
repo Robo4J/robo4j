@@ -37,6 +37,7 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonPressedObserver;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl.Direction;
+import com.robo4j.hw.rpi.utils.I2cBus;
 
 /**
  * Swing mockup for the LCD.
@@ -52,7 +53,7 @@ public class AdafruitLcdMockup implements AdafruitLcd {
 	private final char[] FIRST_ROW = new char[DDRAM_SIZE];
 	private final char[] SECOND_ROW = new char[DDRAM_SIZE];
 
-	private final int bus;
+	private final I2cBus bus;
 	private final int address;
 	private final JTextArea textArea = new JTextArea(2, 16);
 	private JFrame frame;
@@ -62,10 +63,10 @@ public class AdafruitLcdMockup implements AdafruitLcd {
 
 	public AdafruitLcdMockup() {
 		// This seems to be the default for AdaFruit 1115.
-		this(I2CBus.BUS_1, 0x20);
+		this(I2cBus.BUS_1, 0x20);
 	}
 
-	public AdafruitLcdMockup(int bus, int address) {
+	public AdafruitLcdMockup(I2cBus bus, int address) {
 		this.bus = bus;
 		this.address = address;
 		initialize();
@@ -73,7 +74,7 @@ public class AdafruitLcdMockup implements AdafruitLcd {
 
 	private void initialize() {
 		textArea.setEditable(false);
-		frame = new JFrame(String.format("LCD %d@%xd", bus, address));
+		frame = new JFrame(String.format("LCD %d@%xd", bus.address(), address));
 		frame.setSize(200, 150);
 		frame.getContentPane().add(textArea, BorderLayout.CENTER);
 		frame.getContentPane().add(createButtonArea(), BorderLayout.SOUTH);

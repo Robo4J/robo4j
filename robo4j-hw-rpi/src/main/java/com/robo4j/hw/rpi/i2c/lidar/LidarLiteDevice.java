@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@ package com.robo4j.hw.rpi.i2c.lidar;
 
 import java.io.IOException;
 
-import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
+import com.robo4j.hw.rpi.utils.I2cBus;
 
 /**
  * Abstraction for the Garmin/PulsedLight LidarLite device.
@@ -35,6 +35,7 @@ public final class LidarLiteDevice extends AbstractI2CDevice {
 	private static final int REGISTER_RESULT = 0x8f;
 	private static final byte COMMAND_ACQUIRE_RANGE = 0x4;
 
+
 	/**
 	 * Constructs a LidarDevice using the default settings. (I2CBUS.BUS_1, 0x62)
 	 * 
@@ -42,7 +43,7 @@ public final class LidarLiteDevice extends AbstractI2CDevice {
 	 *             if there was communication problem
 	 */
 	public LidarLiteDevice() throws IOException {
-		super(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS);
+		super(I2cBus.BUS_1.address(), DEFAULT_I2C_ADDRESS);
 	}
 
 	/**
@@ -69,7 +70,8 @@ public final class LidarLiteDevice extends AbstractI2CDevice {
 	 *             if there was communication problem
 	 */
 	public void acquireRange() throws IOException {
-		i2cDevice.write(REGISTER_COMMAND, COMMAND_ACQUIRE_RANGE);
+		//i2CConfig.write(REGISTER_COMMAND, COMMAND_ACQUIRE_RANGE);
+		writeByte(REGISTER_COMMAND, COMMAND_ACQUIRE_RANGE);
 	}
 
 	/**
