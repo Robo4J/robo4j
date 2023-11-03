@@ -93,11 +93,11 @@ public class Bno055SerialDevice extends AbstractBno055Device implements Readable
         this.serial = pi4jRpiContext.create(Serial.newConfigBuilder(pi4jRpiContext)
                 .id(serialPort)
                 .baud(Baud._115200).build());
-        initializeComms();
+        initializeConnection();
         super.initialize(operatingMode);
     }
 
-    private void initializeComms() throws IOException {
+    private void initializeConnection() throws IOException {
         serial.open();
     }
 
@@ -145,7 +145,10 @@ public class Bno055SerialDevice extends AbstractBno055Device implements Readable
         byte[] writeRequest = createWriteRequest(register, b);
         serial.write(writeRequest);
 //        byte[] response = serial.read(2);
-        byte[] response = serial.read(2);
+
+//        byte[] response = serial.read(2);
+        //TODO : review correctness byte[] read(int fd, int length), fd – The file descriptor of the serial port/device
+        byte[] response = serial.readNBytes(2);
         if ((0xFF & response[0]) != WRITE_RESPONSE_HEADER) {
             throw new IOException("Communication error - expected write response!");
         } else if (isRetryable(response[1]) && retryCount < noOfRetries) {
@@ -223,6 +226,7 @@ public class Bno055SerialDevice extends AbstractBno055Device implements Readable
 
     @Override
     public void shutdown() {
-        serviceFactory.shutdown();
+        // TODO review necessity
+//        serviceFactory.shutdown();
     }
 }

@@ -21,6 +21,7 @@ import com.robo4j.hw.rpi.gps.GPSListener;
 import com.robo4j.hw.rpi.gps.NmeaUtils;
 import com.robo4j.hw.rpi.gps.PositionEvent;
 import com.robo4j.hw.rpi.gps.VelocityEvent;
+import com.robo4j.hw.rpi.utils.I2cBus;
 
 import java.io.IOException;
 import java.util.List;
@@ -59,7 +60,7 @@ public class TitanX1GPS implements GPS {
 		this.device = new XA1110Device();
 	}
 
-	public TitanX1GPS(int bus, int address) throws IOException {
+	public TitanX1GPS(I2cBus bus, int address) throws IOException {
 		this.device = new XA1110Device(bus, address);
 	}
 

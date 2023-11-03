@@ -100,11 +100,11 @@ public class GyroL3GD20Device extends AbstractI2CDevice implements ReadableDevic
     }
 
     public GyroL3GD20Device(Sensitivity sensitivity) throws IOException {
-        this(I2cBus.BUS_1.address(), DEFAULT_I2C_ADDRESS, sensitivity, true);
+        this(I2cBus.BUS_1, DEFAULT_I2C_ADDRESS, sensitivity, true);
     }
 
-    public GyroL3GD20Device(int busAddress, int address, Sensitivity sensitivity, boolean enableHighPassFilter) throws IOException {
-        super(busAddress, address);
+    public GyroL3GD20Device(I2cBus bus, int address, Sensitivity sensitivity, boolean enableHighPassFilter) throws IOException {
+        super(bus, address);
         this.sensitivity = sensitivity;
         initialize(enableHighPassFilter);
     }

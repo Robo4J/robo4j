@@ -16,6 +16,8 @@
  */
 package com.robo4j.units.rpi;
 
+import com.robo4j.hw.rpi.utils.I2cBus;
+
 /**
  * Identifying an I2C device. Useful together with the {@link I2CRegistry} for
  * sharing I2C hardware between units.
@@ -24,10 +26,10 @@ package com.robo4j.units.rpi;
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class I2CEndPoint {
-	private int bus;
+	private I2cBus bus;
 	private int address;
 
-	public I2CEndPoint(int bus, int address) {
+	public I2CEndPoint(I2cBus bus, int address) {
 		this.bus = bus;
 		this.address = address;
 	}
@@ -37,7 +39,7 @@ public final class I2CEndPoint {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + address;
-		result = prime * result + bus;
+		result = prime * result + bus.address();
 		return result;
 	}
 

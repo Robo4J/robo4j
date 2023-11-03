@@ -17,6 +17,8 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
+import com.robo4j.hw.rpi.utils.I2cBus;
+
 import java.io.IOException;
 
 /**
@@ -31,7 +33,7 @@ public class BiColor24BarDevice extends AbstractBackpack {
 
 	public static final int MAX_BARS = 24;
 
-	public BiColor24BarDevice(int bus, int address, int brightness) throws IOException {
+	public BiColor24BarDevice(I2cBus bus, int address, int brightness) throws IOException {
 		super(bus, address, brightness);
 	}
 

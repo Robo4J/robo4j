@@ -16,6 +16,8 @@
  */
 package com.robo4j.units.rpi;
 
+import com.robo4j.hw.rpi.utils.I2cBus;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -37,7 +39,7 @@ public class I2CRegistry {
 		devices.put(endPoint, device);
 	}
 
-	public static <T> T createAndRegisterIfAbsent(int bus, int address, Supplier<T> supplier) {
+	public static <T> T createAndRegisterIfAbsent(I2cBus bus, int address, Supplier<T> supplier) {
 		I2CEndPoint endPoint = new I2CEndPoint(bus, address);
 		@SuppressWarnings("unchecked")
 		T pwmDevice = (T) I2CRegistry.getI2CDeviceByEndPoint(endPoint);

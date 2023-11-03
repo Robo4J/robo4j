@@ -43,7 +43,7 @@ public final class LidarLiteDevice extends AbstractI2CDevice {
 	 *             if there was communication problem
 	 */
 	public LidarLiteDevice() throws IOException {
-		super(I2cBus.BUS_1.address(), DEFAULT_I2C_ADDRESS);
+		super(I2cBus.BUS_1, DEFAULT_I2C_ADDRESS);
 	}
 
 	/**
@@ -54,12 +54,12 @@ public final class LidarLiteDevice extends AbstractI2CDevice {
 	 * @param address
 	 *            the address to use.
 	 * 
-	 * @see I2CBus
+	 * @see I2cBus
 	 * 
 	 * @throws IOException
 	 *             if there was communication problem
 	 */
-	public LidarLiteDevice(int bus, int address) throws IOException {
+	public LidarLiteDevice(I2cBus bus, int address) throws IOException {
 		super(bus, address);
 	}
 

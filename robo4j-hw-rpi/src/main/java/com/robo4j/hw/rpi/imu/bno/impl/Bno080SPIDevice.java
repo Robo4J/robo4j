@@ -17,24 +17,23 @@
 
 package com.robo4j.hw.rpi.imu.bno.impl;
 
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.EMPTY_EVENT;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.calculateNumberOfBytesInPacket;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.intToFloat;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.toInt8U;
+
+import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
-//import com.pi4j.io.gpio.GpioController;
-//import com.pi4j.io.gpio.GpioFactory;
-//import com.pi4j.io.gpio.GpioPinDigitalInput;
-//import com.pi4j.io.gpio.GpioPinDigitalOutput;
-//import com.pi4j.io.gpio.Pin;
-//import com.pi4j.io.gpio.PinPullResistance;
-//import com.pi4j.io.gpio.PinState;
-//import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.digital.DigitalOutput;
 import com.pi4j.io.gpio.digital.DigitalState;
 import com.pi4j.io.spi.Spi;
-//import com.pi4j.io.spi.SpiChannel;
 import com.pi4j.io.spi.SpiChipSelect;
-//import com.pi4j.io.spi.SpiDevice;
 import com.pi4j.io.spi.SpiMode;
-//import com.pi4j.io.spi.impl.SpiDeviceImpl;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataEventType;
 import com.robo4j.hw.rpi.imu.bno.DataListener;
@@ -51,16 +50,6 @@ import com.robo4j.hw.rpi.imu.bno.shtp.ShtpReportIds;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils;
 import com.robo4j.hw.rpi.utils.GpioPin;
 import com.robo4j.math.geometry.Tuple3f;
-
-import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.EMPTY_EVENT;
-import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.calculateNumberOfBytesInPacket;
-import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.intToFloat;
-import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.toInt8U;
 
 /**
  * Abstraction for a BNO080 absolute orientation device.
@@ -98,10 +87,10 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	private final AtomicInteger spiWaitCounter = new AtomicInteger();
 
 	private final Spi spiDevice;
-//	private GpioPinDigitalInput intGpio;
-//	private GpioPinDigitalOutput wakeGpio;
-//	private GpioPinDigitalOutput rstGpio;
-//	private GpioPinDigitalOutput csGpio; // select slave SS = chip select CS
+	// private GpioPinDigitalInput intGpio;
+	// private GpioPinDigitalOutput wakeGpio;
+	// private GpioPinDigitalOutput rstGpio;
+	// private GpioPinDigitalOutput csGpio; // select slave SS = chip select CS
 
 	private DigitalOutput intGpio;
 	private DigitalOutput wakeGpio;
@@ -134,7 +123,8 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 * @throws InterruptedException
 	 */
 	public Bno080SPIDevice(SpiChipSelect channel, SpiMode mode, int speed) throws IOException, InterruptedException {
-//		this(channel, mode, speed, RaspiPin.GPIO_00, RaspiPin.GPIO_25, RaspiPin.GPIO_02, RaspiPin.GPIO_03);
+		// this(channel, mode, speed, RaspiPin.GPIO_00, RaspiPin.GPIO_25,
+		// RaspiPin.GPIO_02, RaspiPin.GPIO_03);
 		this(channel, mode, speed, GpioPin.GPIO_00, GpioPin.GPIO_25, GpioPin.GPIO_02, GpioPin.GPIO_03);
 	}
 
@@ -150,24 +140,19 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 * @param wake
 	 *            Used to wake the processor from a sleep mode. Active low.
 	 * @param cs
-	 *            Chip select, active low, used as chip select/slave select on
-	 *            SPI
+	 *            Chip select, active low, used as chip select/slave select on SPI
 	 * @param reset
 	 *            Reset signal, active low, pull low to reset IC
 	 * @param interrupt
 	 *            Interrupt, active low, pulls low when the BNO080 is ready for
 	 *            communication.
 	 **/
-	public Bno080SPIDevice(SpiChipSelect channel, SpiMode mode, int speed, GpioPin wake, GpioPin cs, GpioPin reset, GpioPin interrupt)
-			throws IOException, InterruptedException {
+	public Bno080SPIDevice(SpiChipSelect channel, SpiMode mode, int speed, GpioPin wake, GpioPin cs, GpioPin reset,
+			GpioPin interrupt) throws IOException, InterruptedException {
 		var pi4jRpiContext = Pi4J.newAutoContext();
-		var spiConfig  = Spi.newConfigBuilder(pi4jRpiContext)
-				.id("rpi-spi")
-				.chipSelect(channel)
-				.baud(speed)
-				.mode(mode)
+		var spiConfig = Spi.newConfigBuilder(pi4jRpiContext).id("rpi-spi").chipSelect(channel).baud(speed).mode(mode)
 				.build();
-//		spiDevice = new SpiDeviceImpl(channel, speed, mode);
+		// spiDevice = new SpiDeviceImpl(channel, speed, mode);
 		spiDevice = pi4jRpiContext.spi().create(spiConfig);
 		configureSpiPins(pi4jRpiContext, wake, cs, reset, interrupt);
 	}
@@ -180,7 +165,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	public boolean start(SensorReportId report, int reportPeriod) {
 		if (reportPeriod > 0) {
 			final CountDownLatch latch = new CountDownLatch(1);
-			System.out.println(String.format("START: ready:%s, active:%s", ready.get(), active.get()));
+			System.out.printf("START: ready:%s, active:%s%n", ready.get(), active.get());
 			spiWaitCounter.set(0);
 			synchronized (executor) {
 				if (!ready.get()) {
@@ -196,7 +181,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 				}
 			}
 		} else {
-			System.out.println(String.format("start: not valid sensor:%s delay: %d", report, reportPeriod));
+			System.out.printf("start: not valid sensor:%s delay: %d%n", report, reportPeriod);
 		}
 		return active.get();
 
@@ -238,6 +223,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 				sendPacket(createCalibrateCommandAll);
 			} catch (InterruptedException | IOException e) {
 				System.out.println("Calibration failed!");
+				// TODO : correct exceptions
 				e.printStackTrace();
 			}
 			// TODO - wait for calibration to be good enough...
@@ -314,9 +300,9 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 
 	/**
 	 * Process chain of defined operations. The operation represent
-	 * {@link ShtpPacketRequest} and expected {@link ShtpOperationResponse}. It
-	 * is possible that noise packet can be delivered in between, or packets
-	 * that belongs to another listeners
+	 * {@link ShtpPacketRequest} and expected {@link ShtpOperationResponse}. It is
+	 * possible that noise packet can be delivered in between, or packets that
+	 * belongs to another listeners
 	 * 
 	 * @param head
 	 *            initial operation in the operation chain
@@ -336,8 +322,8 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 			boolean waitForResponse = true;
 			while (waitForResponse && counter < MAX_COUNTER) {
 				ShtpPacketResponse response = receivePacket(false, RECEIVE_WRITE_BYTE);
-				ShtpOperationResponse opResponse = new ShtpOperationResponse(ShtpChannel.getByChannel(response.getHeaderChannel()),
-						response.getBodyFirst());
+				ShtpOperationResponse opResponse = new ShtpOperationResponse(
+						ShtpChannel.getByChannel(response.getHeaderChannel()), response.getBodyFirst());
 				if (head.getResponse().equals(opResponse)) {
 					waitForResponse = false;
 				} else {
@@ -376,7 +362,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 			default:
 
 			}
-			System.out.println(String.format("not implemented channel: %s, report: %s", channel, reportType));
+			System.out.printf("not implemented channel: %s, report: %s%n", channel, reportType);
 			return EMPTY_EVENT;
 
 		} catch (IOException | InterruptedException e) {
@@ -412,9 +398,9 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	}
 
 	/**
-	 * Initiation operation sequence: 1. BNO080 is restarted and sends
-	 * advertisement packet 2. BNO080 is requested for product id (product id)
-	 * 3. BNO080 wait until reset is finished (reset response)
+	 * Initiation operation sequence: 1. BNO080 is restarted and sends advertisement
+	 * packet 2. BNO080 is requested for product id (product id) 3. BNO080 wait
+	 * until reset is finished (reset response)
 	 *
 	 * @return head of operations
 	 */
@@ -445,7 +431,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 			ShtpOperation opHead = softResetSequence();
 			return processOperationChainByHead(opHead);
 		} catch (InterruptedException | IOException e) {
-			System.out.println(String.format("softReset error: %s", e.getMessage()));
+			System.out.printf("softReset error: %s%n", e.getMessage());
 		}
 		return false;
 	}
@@ -517,8 +503,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 * @param wake
 	 *            Active low, Used to wake the processor from a sleep mode.
 	 * @param cs
-	 *            Chip select, active low, used as chip select/slave select on
-	 *            SPI
+	 *            Chip select, active low, used as chip select/slave select on SPI
 	 * @param reset
 	 *            Reset signal, active low, pull low to reset IC
 	 * @param interrupt
@@ -530,20 +515,21 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 	 * @throws InterruptedException
 	 *             exception
 	 */
-	private boolean configureSpiPins(Context pi4jRpiContext, GpioPin wake, GpioPin cs, GpioPin reset, GpioPin interrupt) throws InterruptedException {
+	private boolean configureSpiPins(Context pi4jRpiContext, GpioPin wake, GpioPin cs, GpioPin reset, GpioPin interrupt)
+			throws InterruptedException {
 		System.out.println(String.format("configurePins: wak=%s, cs=%s, rst=%s, inter=%s", wake, cs, reset, interrupt));
-//		GpioController gpioController = GpioFactory.getInstance();
+		// GpioController gpioController = GpioFactory.getInstance();
 		var digitalOutputBuilder = DigitalOutput.newConfigBuilder(pi4jRpiContext);
 		var csGpioConfig = digitalOutputBuilder.address(cs.address()).name("CS").build();
 		var wakeGpioConfig = digitalOutputBuilder.address(wake.address()).onState(DigitalState.HIGH).build();
 		// Pull up/down resistence is set to 2
-		var intGpioConfig = digitalOutputBuilder.address(interrupt.address())
-				.name(interrupt.name()).build();
+		var intGpioConfig = digitalOutputBuilder.address(interrupt.address()).name(interrupt.name()).build();
 		var rstGpioConfig = digitalOutputBuilder.address(reset.address()).onState(DigitalState.LOW).build();
-		//csGpio = gpioController.provisionDigitalOutputPin(cs, "CS");
-		//wakeGpio = gpioController.provisionDigitalOutputPin(wake);
-		//intGpio = gpioController.provisionDigitalInputPin(interrupt, PinPullResistance.PULL_UP);
-		//rstGpio = gpioController.provisionDigitalOutputPin(reset);
+		// csGpio = gpioController.provisionDigitalOutputPin(cs, "CS");
+		// wakeGpio = gpioController.provisionDigitalOutputPin(wake);
+		// intGpio = gpioController.provisionDigitalInputPin(interrupt,
+		// PinPullResistance.PULL_UP);
+		// rstGpio = gpioController.provisionDigitalOutputPin(reset);
 
 		csGpio = pi4jRpiContext.dout().create(csGpioConfig);
 		wakeGpio = pi4jRpiContext.dout().create(wakeGpioConfig);
@@ -553,8 +539,8 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		csGpio.setState(DigitalState.HIGH.value().intValue()); // Deselect BNO080
 
 		// Configure the BNO080 for SPI communication
-		//wakeGpio.setState(PinState.HIGH); // Before boot up the PS0/Wake
-		//rstGpio.setState(PinState.LOW); // Reset BNO080
+		// wakeGpio.setState(PinState.HIGH); // Before boot up the PS0/Wake
+		// rstGpio.setState(PinState.LOW); // Reset BNO080
 		TimeUnit.SECONDS.sleep(2); // Min length not specified in datasheet?
 		rstGpio.setState(DigitalState.HIGH.value().intValue()); // Bring out of reset
 		return true;
@@ -605,7 +591,8 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 			return createVectorEvent(DataEventType.VECTOR_GAME, timeStamp, status, data1, data2, data3, data4, data5);
 		case ROTATION_VECTOR:
 		case GEOMAGNETIC_ROTATION_VECTOR:
-			return createVectorEvent(DataEventType.VECTOR_ROTATION, timeStamp, status, data1, data2, data3, data4, data5);
+			return createVectorEvent(DataEventType.VECTOR_ROTATION, timeStamp, status, data1, data2, data3, data4,
+					data5);
 		default:
 			return EMPTY_EVENT;
 		}
@@ -625,7 +612,8 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 														// game rot vector
 		final Tuple3f tuple3f = ShtpUtils.createTupleFromFixed(type.getQ(), x, y, z);
 
-		return new VectorEvent(type, status, tuple3f, timeStamp, intToFloat(qReal, type.getQ()), intToFloat(qRadianAccuracy, type.getQ()));
+		return new VectorEvent(type, status, tuple3f, timeStamp, intToFloat(qReal, type.getQ()),
+				intToFloat(qRadianAccuracy, type.getQ()));
 	}
 
 	private DataEvent3f createDataEvent(DataEventType type, long timeStamp, int... data) {
@@ -710,7 +698,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 
 		// BNO080 has max CLK of 3MHz, MSB first,
 		// The BNO080 uses CPOL = 1 and CPHA = 1. This is mode3
-		//csGpio.setState(PinState.LOW);
+		// csGpio.setState(PinState.LOW);
 		csGpio.setState(DigitalState.LOW.value().intValue());
 
 		for (int i = 0; i < packet.getHeaderSize(); i++) {
@@ -734,13 +722,20 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		if (delay && sensorReportDelayMicroSec > 0) {
 			TimeUnit.MICROSECONDS.sleep(TIMEBASE_REFER_DELTA - sensorReportDelayMicroSec);
 		}
-		//csGpio.setState(PinState.LOW);
+		// csGpio.setState(PinState.LOW);
 		csGpio.setState(DigitalState.LOW.value().intValue());
 
-		int packetLSB = toInt8U(spiDevice.write(writeByte));
-		int packetMSB = toInt8U(spiDevice.write(writeByte));
-		int channelNumber = toInt8U(spiDevice.write(writeByte));
-		int sequenceNumber = toInt8U(spiDevice.write(writeByte));
+		final byte[] writeBuffer1 = new byte[1];
+		writeBuffer1[0] = writeByte;
+		spiDevice.write(writeBuffer1);
+		// int packetLSB = toInt8U(spiDevice.write(writeByte));
+		int packetLSB = toInt8U(writeBuffer1);
+		// int packetMSB = toInt8U(spiDevice.write(writeByte));
+		int packetMSB = toInt8U(writeBuffer1);
+		// int channelNumber = toInt8U(spiDevice.write(writeByte));
+		int channelNumber = toInt8U(writeBuffer1);
+		// int sequenceNumber = toInt8U(spiDevice.write(writeByte));
+		int sequenceNumber = toInt8U(writeBuffer1);
 		// Calculate the number of data bytes in this packet
 		int dataLength = calculateNumberOfBytesInPacket(packetMSB, packetLSB) - SHTP_HEADER_SIZE;
 		if (dataLength <= 0) {
@@ -751,14 +746,18 @@ public class Bno080SPIDevice extends AbstractBno080Device {
 		response.addHeader(packetLSB, packetMSB, channelNumber, sequenceNumber);
 
 		for (int i = 0; i < dataLength; i++) {
-			byte[] inArray = spiDevice.write((byte) 0xFF);
-			byte incoming = inArray[0];
+			byte[] writeBuffer2 = new byte[1];
+			writeBuffer2[0] = (byte) 0xFF;
+			// byte[] inArray = spiDevice.write((byte) 0xFF);
+			spiDevice.write(writeBuffer2);
+			byte incoming = writeBuffer2[0];
 			if (i < MAX_PACKET_SIZE) {
 				response.addBody(i, (incoming & 0xFF));
 			}
 		}
 		// Get first four bytes to find out how much data we need to read
-		csGpio.setState(PinState.HIGH);
+		// csGpio.setState(PinState.HIGH);
+		csGpio.setState(DigitalState.HIGH.value().intValue());
 
 		return response;
 	}

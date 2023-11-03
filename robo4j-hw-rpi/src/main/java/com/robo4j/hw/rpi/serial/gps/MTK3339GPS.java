@@ -28,9 +28,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.pi4j.concurrent.ExecutorServiceFactory;
+import com.pi4j.Pi4J;
+import com.pi4j.io.serial.Baud;
 import com.pi4j.io.serial.Serial;
-import com.pi4j.io.serial.SerialFactory;
 import com.robo4j.hw.rpi.gps.GPS;
 import com.robo4j.hw.rpi.gps.GPSListener;
 import com.robo4j.hw.rpi.gps.NmeaUtils;
@@ -70,7 +70,7 @@ public class MTK3339GPS implements GPS {
 
 	private final String serialPort;
 	private final Serial serial;
-	private final ExecutorServiceFactory serviceFactory;
+//	private final ExecutorServiceFactory serviceFactory;
 	private final GPSDataRetriever dataRetriever;
 	private final int readInterval;
 
@@ -110,8 +110,15 @@ public class MTK3339GPS implements GPS {
 	public MTK3339GPS(String serialPort, int readInterval) throws IOException {
 		this.serialPort = serialPort;
 		this.readInterval = readInterval;
-		serial = SerialFactory.createInstance();
-		serviceFactory = SerialFactory.getExecutorServiceFactory();
+//		serial = SerialFactory.createInstance();
+//		serviceFactory = SerialFactory.getExecutorServiceFactory();
+
+		var pi4jRpiContext = Pi4J.newAutoContext();
+		this.serial = pi4jRpiContext.create(Serial.newConfigBuilder(pi4jRpiContext)
+				.id(serialPort)
+				//TODO review default baud
+				.baud(Baud._9600).build());
+
 		dataRetriever = new GPSDataRetriever();
 		initialize();
 	}
@@ -141,8 +148,9 @@ public class MTK3339GPS implements GPS {
 			serial.close();
 			// // FIXME(Marcus/Jul 30, 2017): This is kinda scary to do in a
 			// component!
-			serviceFactory.shutdown();
-		} catch (IllegalStateException | IOException e) {
+			// TODO review
+//			serviceFactory.shutdown();
+		} catch (IllegalStateException e) {
 			// Don't care, we're shutting down.
 		}
 	}
@@ -177,7 +185,8 @@ public class MTK3339GPS implements GPS {
 	}
 
 	private void initialize() throws IOException {
-		serial.open(serialPort, BAUD_DEFAULT);
+		serial.open();
+//		serial.open(serialPort, BAUD_DEFAULT);
 	}
 
 	private void notifyListeners(MTK3339PositionEvent event) {
@@ -233,7 +242,11 @@ public class MTK3339GPS implements GPS {
 		}
 
 		private String readNext(StringBuilder builder) throws IllegalStateException, IOException {
-			builder.append(new String(serial.read(), StandardCharsets.US_ASCII));
+//			builder.append(new String(serial.read(), StandardCharsets.US_ASCII));
+			// TODO : improve
+			var buffer = new byte[serial.available()];
+			serial.read(buffer);
+			builder.append(new String(buffer, StandardCharsets.US_ASCII));
 			return builder.toString();
 		}
 	}

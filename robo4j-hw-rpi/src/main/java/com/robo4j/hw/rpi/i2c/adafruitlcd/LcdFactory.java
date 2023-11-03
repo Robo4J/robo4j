@@ -19,6 +19,7 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
 import com.pi4j.exception.InitializeException;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.mockup.AdafruitLcdMockup;
+import com.robo4j.hw.rpi.utils.I2cBus;
 
 import java.io.IOException;
 
@@ -44,7 +45,7 @@ public final class LcdFactory {
         return new AdafruitLcdImpl();
     }
 
-    public static AdafruitLcd createLCD(int bus, int address) throws IOException, InitializeException {
+    public static AdafruitLcd createLCD(I2cBus bus, int address) throws IOException, InitializeException {
         if (Boolean.getBoolean(SYSTEM_PROPERTY_MOCK)) {
             return new AdafruitLcdMockup(bus, address);
         }

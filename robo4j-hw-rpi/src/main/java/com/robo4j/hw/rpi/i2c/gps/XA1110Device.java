@@ -202,10 +202,10 @@ class XA1110Device extends AbstractI2CDevice {
     private static final int READ_BUFFER_SIZE = 64;
 
     public XA1110Device() throws IOException {
-        this(I2cBus.BUS_1.address(), DEFAULT_I2C_ADDRESS);
+        this(I2cBus.BUS_1, DEFAULT_I2C_ADDRESS);
     }
 
-    public XA1110Device(int bus, int address) throws IOException {
+    public XA1110Device(I2cBus bus, int address) throws IOException {
         super(bus, address);
         init();
     }

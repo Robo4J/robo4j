@@ -34,7 +34,7 @@ public enum I2cBus {
         return address;
     }
 
-    public I2cBus getByAddress(int address) {
+    public static I2cBus getByAddress(int address) {
         return Stream.of(values()).filter(p -> p.address == address).findFirst().orElse(BUS_UNKNOWN);
     }
 }

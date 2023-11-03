@@ -17,6 +17,8 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
+import com.robo4j.hw.rpi.utils.I2cBus;
+
 import java.io.IOException;
 
 /**
@@ -27,7 +29,7 @@ import java.io.IOException;
  */
 public final class LedBackpackFactory {
 
-	public static AbstractBackpack createDevice(int bus, int address, LedBackpackType type, int brightness)
+	public static AbstractBackpack createDevice(I2cBus bus, int address, LedBackpackType type, int brightness)
 			throws IOException {
 		switch (type) {
 		case BI_COLOR_BAR_24:

@@ -328,7 +328,6 @@ public class YDLidarDevice {
         serial = pi4jRpiContext.create(Serial.newConfigBuilder(pi4jRpiContext)
                 .id(this.serialPort)
                 .baud(BAUD_RATE)
-
                 .build());
         serial.open();
     }
@@ -515,16 +514,20 @@ public class YDLidarDevice {
         }
     }
 
+    //TODO: review
     private void stopMotor() throws IllegalStateException, IOException, InterruptedException {
         synchronized (this) {
-            serial.setDTR(false);
+//            serial.setDTR(false);
+            serial.close();
             Thread.sleep(500);
         }
     }
 
+    //TODO: review
     private void startMotor() throws IllegalStateException, IOException, InterruptedException {
         synchronized (this) {
-            serial.setDTR(true);
+//            serial.setDTR(true);
+            serial.open();
             Thread.sleep(500);
         }
     }
@@ -575,7 +578,8 @@ public class YDLidarDevice {
             serial.write(payload);
             serial.write((byte) checksum);
         }
-        serial.flush();
+//        serial.flush();
+        serial.drain();
     }
 
     /*

@@ -30,12 +30,11 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import com.pi4j.io.i2c.I2CBus;
+import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Button;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonListener;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonPressedObserver;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
-import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl.Direction;
 import com.robo4j.hw.rpi.utils.I2cBus;
 

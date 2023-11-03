@@ -454,6 +454,7 @@ public interface Bno055Device {
 	 */
 	OrientationMode getCurrentOrientation();
 
+	// TODO : review necessity
 	/**
 	 * Shutdown the device, releasing any resources.
 	 */

@@ -68,7 +68,7 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 	public PWMPCA9685Device() throws IOException {
 		// 0x40 is the default address used by the AdaFruit PWM board.
 		//this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS);
-		this(I2cBus.BUS_1.address(), DEFAULT_I2C_ADDRESS);
+		this(I2cBus.BUS_1, DEFAULT_I2C_ADDRESS);
 	}
 
 	/**
@@ -80,12 +80,12 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 	 * @param address
 	 *            the address to use.
 	 * 
-	 * @see I2CBus
+	 * @see I2cBus
 	 * 
 	 * @throws IOException
 	 *             if there was communication problem
 	 */
-	public PWMPCA9685Device(int bus, int address) throws IOException {
+	public PWMPCA9685Device(I2cBus bus, int address) throws IOException {
 		super(bus, address);
 		initialize();
 	}
@@ -236,11 +236,11 @@ public class PWMPCA9685Device extends AbstractI2CDevice {
 	 *            the address
 	 * @return the device if it all worked out, null if it failed.
 	 */
-	public static PWMPCA9685Device createDevice(int bus, int address) {
+	public static PWMPCA9685Device createDevice(I2cBus bus, int address) {
 		return createDevice(bus, address, DEFAULT_FREQUENCY);
 	}
 
-	public static PWMPCA9685Device createDevice(int bus, int address, int frequency) {
+	public static PWMPCA9685Device createDevice(I2cBus bus, int address, int frequency) {
 		try {
 			PWMPCA9685Device result = new PWMPCA9685Device(bus, address);
 			result.setPWMFrequency(frequency);

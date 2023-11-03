@@ -27,6 +27,7 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.LcdFactory;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl.Direction;
+import com.robo4j.hw.rpi.utils.I2cBus;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.rpi.I2CEndPoint;
 import com.robo4j.units.rpi.I2CRegistry;
@@ -69,7 +70,7 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	 * @return
 	 * @throws IOException
 	 */
-	static AdafruitLcd getLCD(int bus, int address) throws IOException {
+	static AdafruitLcd getLCD(I2cBus bus, int address) throws IOException {
 		Object lcd = I2CRegistry.getI2CDeviceByEndPoint(new I2CEndPoint(bus, address));
 		if (lcd == null) {
 			try {

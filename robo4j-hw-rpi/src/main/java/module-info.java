@@ -4,8 +4,9 @@ module robo4j.hw.rpi {
     requires java.logging;
     requires java.desktop;
     requires robo4j.math;
-    requires transitive com.pi4j;
-    requires transitive com.pi4j.plugin.raspberrypi;
+    requires com.pi4j;
+    requires com.pi4j.plugin.pigpio;
+    requires com.pi4j.plugin.raspberrypi;
 
     exports com.robo4j.hw.rpi.camera;
     exports com.robo4j.hw.rpi.gps;
@@ -36,5 +37,4 @@ module robo4j.hw.rpi {
     uses java.awt.Component;
     uses java.awt.event.MouseAdapter;
     uses java.awt.event.MouseEvent;
-
 }

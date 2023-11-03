@@ -19,8 +19,8 @@ package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
 import java.io.IOException;
 
-import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
+import com.robo4j.hw.rpi.utils.I2cBus;
 
 /**
  * AbstractBackpack is the abstraction for all Adafruit Backpack devices
@@ -33,6 +33,7 @@ import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 public abstract class AbstractBackpack extends AbstractI2CDevice {
 
 	public static final int DEFAULT_BRIGHTNESS = 15;
+	private static final int DEFAULT_ADDRESS = 0x70;
 	private static final int OSCILLATOR_TURN_ON = 0x21;
 	private static final int HT16K33_BLINK_CMD = 0x80;
 	private static final int HT16K33_BLINK_DISPLAY_ON = 0x01;
@@ -41,10 +42,10 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
 	private final short[] buffer = new short[8]; // uint16_t
 
 	AbstractBackpack() throws IOException {
-		this(I2CBus.BUS_1, 0x70, DEFAULT_BRIGHTNESS);
+		this(I2cBus.BUS_1, DEFAULT_ADDRESS, DEFAULT_BRIGHTNESS);
 	}
 
-	AbstractBackpack(int bus, int address, int brightness) throws IOException {
+	AbstractBackpack(I2cBus bus, int address, int brightness) throws IOException {
 		super(bus, address);
 		initiate(brightness);
 	}
@@ -53,7 +54,7 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
 		try {
 			writeDisplay();
 		} catch (IOException e) {
-			System.out.println(String.format("error display: %s", e.getMessage()));
+			System.out.printf("error display: %s%n", e.getMessage());
 		}
 	}
 
@@ -61,7 +62,7 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
 		try {
 			clearBuffer();
 		} catch (IOException e) {
-			System.out.println(String.format("error clear: %s", e.getMessage()));
+			System.out.printf("error clear: %s%n", e.getMessage());
 		}
 	}
 
@@ -172,16 +173,21 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
 	}
 
 	private void initiate(int brightness) throws IOException {
-		i2CConfig.write((byte) (OSCILLATOR_TURN_ON)); // Turn on oscilator
-		i2CConfig.write(blinkRate(HT16K33_BLINK_OFF));
-		i2CConfig.write(setBrightness(brightness));
+//		i2CConfig.write((byte) (OSCILLATOR_TURN_ON)); // Turn on oscilator
+//		i2CConfig.write(blinkRate(HT16K33_BLINK_OFF));
+//		i2CConfig.write(setBrightness(brightness));
+		writeByte((byte) (OSCILLATOR_TURN_ON)); // Turn on oscilator
+		writeByte(blinkRate(HT16K33_BLINK_OFF));
+		writeByte(setBrightness(brightness));
 	}
 
 	private void writeDisplay() throws IOException {
 		int address = 0;
 		for (int i = 0; i < buffer.length; i++) {
-			i2CConfig.write(address++, (byte) (buffer[i] & 0xFF));
-			i2CConfig.write(address++, (byte) (buffer[i] >> 8));
+//			i2CConfig.write(address++, (byte) (buffer[i] & 0xFF));
+//			i2CConfig.write(address++, (byte) (buffer[i] >> 8));
+			writeByte(address++, (byte) (buffer[i] & 0xFF));
+			writeByte(address++, (byte) (buffer[i] >> 8));
 		}
 	}
 
