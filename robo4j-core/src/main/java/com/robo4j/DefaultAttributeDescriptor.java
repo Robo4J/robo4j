@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import java.io.Serializable;
 public class DefaultAttributeDescriptor<T> implements AttributeDescriptor<T>, Serializable {
 	private static final long serialVersionUID = 1L;
 	private final Class<T> attributeType;
-	private String attributeName;
+	private final String attributeName;
 
 	/**
 	 * Constructor.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,6 @@ public class Messages {
 	 */
 	public static String getString(String key) {
 		try {
-			System.out.println("LOCALE:" + RESOURCE_BUNDLE);
 			return RESOURCE_BUNDLE.getString(key);
 		} catch (MissingResourceException e) {
 			return '!' + key + '!';

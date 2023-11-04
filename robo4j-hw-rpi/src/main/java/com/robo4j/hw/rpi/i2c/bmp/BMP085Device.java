@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,6 +59,7 @@ public final class BMP085Device extends AbstractI2CDevice {
 	private short MC;
 	private short MD;
 
+	// TODO review enum placement
 	/**
 	 * Available operating modes for the BMP085.
 	 */
@@ -80,8 +81,8 @@ public final class BMP085Device extends AbstractI2CDevice {
 		 */
 		ULTRA_HIGH_RES(255, 12);
 
-		int waitTime;
-		int currentDraw;
+		private final int waitTime;
+		private final int currentDraw;
 
 		OperatingMode(int maxConversionTime, int currentDraw) {
 			this.waitTime = (maxConversionTime + 5) / 10;

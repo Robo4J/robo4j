@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl.Direction;
 import com.robo4j.hw.rpi.utils.I2cBus;
 
+// TODO maybe move to examples
 /**
  * Swing mockup for the LCD.
  * 
@@ -96,6 +97,7 @@ public class AdafruitLcdMockup implements AdafruitLcd {
 	private void internalWrite(String s) {
 		char[] buffer = cursorRow == 0 ? FIRST_ROW : SECOND_ROW;
 		for (int i = 0; i < s.length() && cursorColumn < DDRAM_SIZE; i++) {
+			// TODO review non-atomic operation on volatile field
 			buffer[cursorColumn++] = s.charAt(i);
 		}
 		text = s;

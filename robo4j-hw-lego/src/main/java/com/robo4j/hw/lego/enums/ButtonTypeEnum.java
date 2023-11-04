@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,9 +43,9 @@ public enum ButtonTypeEnum implements ILegoHardware<KeyWrapper> {
 	;
 	//@formatter:on
 
-    private static Map<String, ButtonTypeEnum> internMapByName;
-    private String name;
-    private KeyWrapper key;
+    private static final Map<String, ButtonTypeEnum> internMapByName = initMapping();
+    private final String name;
+    private final KeyWrapper key;
 
     ButtonTypeEnum(String name, KeyWrapper key) {
         this.name = name;
@@ -53,9 +53,6 @@ public enum ButtonTypeEnum implements ILegoHardware<KeyWrapper> {
     }
 
     public static ButtonTypeEnum getByName(String type) {
-        if (internMapByName == null) {
-            internMapByName = initMapping();
-        }
         return internMapByName.get(type);
     }
 

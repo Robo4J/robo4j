@@ -58,9 +58,9 @@ class XA1110Device extends AbstractI2CDevice {
 		CHANNEL("MCHN", "Channel Status", 18);
 		//@formatter:on
 
-        String nmeaCode;
-        String description;
-        int parameterIndex;
+        private final String nmeaCode;
+        private final String description;
+        private final int parameterIndex;
 
         NmeaSentenceType(String nmeaCode, String description, int parameterIndex) {
             this.nmeaCode = nmeaCode;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,22 +27,22 @@ import java.io.Serializable;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class ReferenceDesciptor implements Serializable {
+public class ReferenceDescriptor implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private transient static final ThreadLocal<ServerRemoteRoboContext> activeContex = new ThreadLocal<>();
+	private static final ThreadLocal<ServerRemoteRoboContext> ACTIVE_CONTEXT = new ThreadLocal<>();
 
-	private String ctxId;
-	private String id;
-	private String fqn;
+	private final String ctxId;
+	private final String id;
+	private final String fqn;
 
-	public ReferenceDesciptor(String ctxId, String id, String fqn) {
+	public ReferenceDescriptor(String ctxId, String id, String fqn) {
 		this.ctxId = ctxId;
 		this.id = id;
 		this.fqn = fqn;
 	}
 
 	Object readResolve() throws ObjectStreamException {
-		ServerRemoteRoboContext remoteRoboContext = activeContex.get();
+		ServerRemoteRoboContext remoteRoboContext = ACTIVE_CONTEXT.get();
 		if (remoteRoboContext == null) {
 			SimpleLoggingUtil.error(getClass(), "No remote context set!");
 			return null;
@@ -51,6 +51,6 @@ public class ReferenceDesciptor implements Serializable {
 	}
 
 	public static void setCurrentContext(ServerRemoteRoboContext context) {
-		activeContex.set(context);
+		ACTIVE_CONTEXT.set(context);
 	}
 }

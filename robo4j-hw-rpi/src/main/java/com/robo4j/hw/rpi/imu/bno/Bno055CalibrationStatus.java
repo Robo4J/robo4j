@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ public final class Bno055CalibrationStatus {
 	public enum CalibrationStatus {
 		NOT_CALIBRATED(0), MINIMALLY_CALIBRATED(1), SOMEWHAT_CALIBRATED(2), FULLY_CALIBRATED(3);
 
-		private int statusValue;
+		private final int statusValue;
 
 		private CalibrationStatus(int statusValue) {
 			this.statusValue = statusValue;

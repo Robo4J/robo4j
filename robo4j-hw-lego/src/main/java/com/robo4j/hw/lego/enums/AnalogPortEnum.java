@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,13 +39,13 @@ public enum AnalogPortEnum implements ILegoHardware<String> {
 	;
 	// @formatter:on
 
-	private volatile static Map<String, AnalogPortEnum> internMapByType;
-	private String type;
-	private String name;
+	private static final Map<String, AnalogPortEnum> internMapByType = initMapping();
+	private final String type;
+	private final String name;
 
 	/**
 	 *
-	 * @param type - define Analog LegoMindstorm port
+	 * @param type - define Analog Lego MindStorm port
 	 * @param name - description
      */
 	AnalogPortEnum(String type, String name) {
@@ -54,9 +54,6 @@ public enum AnalogPortEnum implements ILegoHardware<String> {
 	}
 
 	public static AnalogPortEnum getByType(String type) {
-		if (internMapByType == null) {
-			internMapByType = initMapping();
-		}
 		return internMapByType.get(type);
 	}
 

@@ -49,7 +49,7 @@ public class XA1110PositionEvent extends AbstractGPSEvent implements PositionEve
 	public enum FixQualityEnum {
 		NA("Not available"), GPS("GPS fix"), DGPS("Differential GPS fix");
 
-		String description;
+		private final String description;
 
 		FixQualityEnum(String description) {
 			this.description = description;

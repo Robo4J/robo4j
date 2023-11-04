@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,46 +25,49 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static com.robo4j.util.StreamUtils.STREAM_END;
+
 /**
  * Useful IO utilities.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class IOUtil {
-	private IOUtil() {
-		throw new UnsupportedOperationException("Toolkit!");
-	}
 
-	public static String readStringFromUTF8Stream(InputStream is) throws IOException {
-		return readString(is, StandardCharsets.UTF_8.name());
-	}
+    private IOUtil() {
+        throw new UnsupportedOperationException("Toolkit!");
+    }
 
-	public static String readString(InputStream is, String charSetName) throws IOException {
-		BufferedInputStream bis = new BufferedInputStream(is);
-		ByteArrayOutputStream buf = new ByteArrayOutputStream();
-		int result = bis.read();
-		while (result != -1) {
-			buf.write((byte) result);
-			result = bis.read();
-		}
-		return buf.toString(charSetName);
-	}
+    public static String readStringFromUTF8Stream(InputStream is) throws IOException {
+        return readString(is, StandardCharsets.UTF_8.name());
+    }
 
-	public static void storeBytesAsFile(Path path, byte[] bytes) throws IOException {
-		if(Files.exists(path)){
-			Files.delete(path);
-		}
-		Path tmpFilePath = Files.createFile(path);
-		Files.write(tmpFilePath, bytes);
-	}
+    public static String readString(InputStream is, String charSetName) throws IOException {
+        BufferedInputStream bis = new BufferedInputStream(is);
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        int result = bis.read();
+        while (result != STREAM_END) {
+            buf.write((byte) result);
+            result = bis.read();
+        }
+        return buf.toString(charSetName);
+    }
 
-	public static void close(Closeable c) {
-		try {
-			c.close();
-		} catch (IOException e) {
-			// Ignore
-		}
-	}
-	
+    public static void storeBytesAsFile(Path path, byte[] bytes) throws IOException {
+        if (Files.exists(path)) {
+            Files.delete(path);
+        }
+        Path tmpFilePath = Files.createFile(path);
+        Files.write(tmpFilePath, bytes);
+    }
+
+    public static void close(Closeable c) {
+        try {
+            c.close();
+        } catch (IOException e) {
+            // Ignore
+        }
+    }
+
 }

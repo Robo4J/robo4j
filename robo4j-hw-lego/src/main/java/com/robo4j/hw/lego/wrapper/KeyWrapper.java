@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ import java.util.function.Consumer;
 public class KeyWrapper {
 
 	private final Key key;
-	private KeyListenerWrapper keyListenerWrapper;
 
 	public KeyWrapper(Key key) {
 		this.key = key;
@@ -60,7 +59,7 @@ public class KeyWrapper {
 	}
 
 	public void addKeyListener(Consumer<KeyWrapper> pressed, Consumer<KeyWrapper> released){
-        keyListenerWrapper = new KeyListenerWrapper(this);
+		KeyListenerWrapper keyListenerWrapper = new KeyListenerWrapper(this);
         keyListenerWrapper.setKeyPressed(pressed);
         keyListenerWrapper.setKeyReleased(released);
     }

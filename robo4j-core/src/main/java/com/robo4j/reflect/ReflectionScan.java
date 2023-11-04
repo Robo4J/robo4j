@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -130,6 +130,7 @@ public final class ReflectionScan {
         Objects.requireNonNull(files, "files not allowed null");
         Stream.of(files).forEach(file -> {
             if (file.isDirectory()) {
+                // TODO review StringBuilders
                 result.addAll(findClassesIntern(file, new StringBuilder().append(path).append(DOT).append(file.getName()).toString()));
             } else if (file.getName().endsWith(SUFFIX)) {
                 final StringBuilder sb = new StringBuilder();

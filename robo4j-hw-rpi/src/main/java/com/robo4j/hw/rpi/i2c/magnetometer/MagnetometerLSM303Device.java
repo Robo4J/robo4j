@@ -58,10 +58,10 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 		GAIN_8_1	(8.1f, 0xE0, 230, 205);
 		//@formatter:on
 
-        private float gain;
-        private byte ctrlCode;
-        private float xy;
-        private float z;
+        private final float gain;
+        private final byte ctrlCode;
+        private final float xy;
+        private final float z;
 
         Gain(float gain, int ctrlCode, float xy, float z) {
             this.gain = gain;
@@ -99,8 +99,8 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 		RATE_220(220f, 0x07);
 		//@formatter:on
 
-        private float rate;
-        private int ctrlCode;
+        private final float rate;
+        private final int ctrlCode;
 
         Rate(float rate, int ctrlCode) {
             this.rate = rate;
@@ -123,7 +123,7 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 		SINGLE_CONVERSION		(0x1),
 		SLEEP					(0x2);
 		//@formatter:on
-        private int ctrlCode;
+        private final int ctrlCode;
 
         Mode(int ctrlCode) {
             this.ctrlCode = ctrlCode;
