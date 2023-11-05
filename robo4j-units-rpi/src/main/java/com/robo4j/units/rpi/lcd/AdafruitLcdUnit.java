@@ -50,12 +50,12 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	private static final String ATTRIBUTE_NAME_COLOR = "color";
 	private static final String ATTRIBUTE_NAME_TEXT = "text";
 
-	public static Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
+	public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
 			.unmodifiableCollection(Arrays.asList(DefaultAttributeDescriptor.create(String.class, ATTRIBUTE_NAME_TEXT),
 					DefaultAttributeDescriptor.create(Color.class, ATTRIBUTE_NAME_COLOR)));
 
+	private final AtomicReference<String> stringMessage = new AtomicReference<>(StringConstants.EMPTY);
 	private AdafruitLcd lcd;
-	private AtomicReference<String> stringMessage = new AtomicReference<>(StringConstants.EMPTY);
 
 	public AdafruitLcdUnit(RoboContext context, String id) {
 		super(LcdMessage.class, context, id);
@@ -67,9 +67,7 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
 	 *            used bus
 	 * @param address
 	 *            desired address
-	 * @return
-	 * @throws IOException
-	 */
+     */
 	static AdafruitLcd getLCD(I2cBus bus, int address) throws IOException {
 		Object lcd = I2CRegistry.getI2CDeviceByEndPoint(new I2CEndPoint(bus, address));
 		if (lcd == null) {

@@ -29,7 +29,7 @@ import java.util.function.Supplier;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class I2CRegistry {
-	private static Map<I2CEndPoint, Object> devices = new HashMap<>();
+	private static final Map<I2CEndPoint, Object> devices = new HashMap<>();
 
 	public static Object getI2CDeviceByEndPoint(I2CEndPoint endPoint) {
 		return devices.get(endPoint);

@@ -76,6 +76,7 @@ public class AlphaNumericMessage implements Serializable {
 	 * @param dots
 	 *            the dots on/off after each character
 	 * @param startPosition
+	 * 			  start position
 	 */
 	public AlphaNumericMessage(BackpackMessageCommand command, byte[] characters, boolean[] dots, int startPosition) {
 		this.command = command;

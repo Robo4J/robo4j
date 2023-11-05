@@ -30,6 +30,7 @@ import com.robo4j.hw.rpi.gps.VelocityEvent;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GPSTest {
+	// TODO : review duplicates
 	public static void main(String[] args) throws InterruptedException, IOException {
 		GPS mtk3339gps = new MTK3339GPS();
 		mtk3339gps.addListener(new GPSListener() {

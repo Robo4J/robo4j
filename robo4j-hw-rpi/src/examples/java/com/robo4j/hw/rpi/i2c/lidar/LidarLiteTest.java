@@ -33,7 +33,7 @@ public class LidarLiteTest {
 		while (true) {
 			ld.acquireRange();
 			Thread.sleep(100);
-			System.out.println(String.format("Distance: %.02fm", ld.readDistance()));
+			System.out.printf("Distance: %.02fm%n", ld.readDistance());
 			Thread.sleep(500);
 		}
 	}

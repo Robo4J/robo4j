@@ -43,8 +43,8 @@ public class RaspistillUnit extends RoboUnit<RaspistillRequest> {
 	private static final EnumSet<LifecycleState> acceptedStates = EnumSet.of(LifecycleState.STARTING,
 			LifecycleState.STARTED);
 	private static final String PROPERTY_TARGET = "target";
-	private AtomicBoolean continualMode = new AtomicBoolean(false);
-	private AtomicBoolean cameraProgress = new AtomicBoolean(false);
+	private final AtomicBoolean continualMode = new AtomicBoolean(false);
+	private final AtomicBoolean cameraProgress = new AtomicBoolean(false);
 
 	private final RaspiDevice device = new RaspiDevice();
 	private String target;

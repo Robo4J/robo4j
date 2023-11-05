@@ -119,8 +119,6 @@ public class Tuple4f {
 			return false;
 		if (Float.floatToIntBits(y) != Float.floatToIntBits(other.y))
 			return false;
-		if (Float.floatToIntBits(z) != Float.floatToIntBits(other.z))
-			return false;
-		return true;
-	}
+        return Float.floatToIntBits(z) == Float.floatToIntBits(other.z);
+    }
 }

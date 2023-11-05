@@ -19,7 +19,7 @@ package com.robo4j.hw.rpi.serial.ydlidar;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-import com.pi4j.io.serial.SerialFactory;
+//import com.pi4j.io.serial.SerialFactory;
 import com.robo4j.hw.rpi.serial.ydlidar.ScanReceiver;
 import com.robo4j.hw.rpi.serial.ydlidar.YDLidarDevice;
 import com.robo4j.math.geometry.ScanResult2D;
@@ -55,7 +55,7 @@ public class YDLidarTest {
 		device.shutdown();
 		System.out.println("Done!");
 		// Naughty that this has to be done... Perhaps fix Pi4J?
-		SerialFactory.shutdown();
+//		SerialFactory.shutdown();
 	}
 
 }

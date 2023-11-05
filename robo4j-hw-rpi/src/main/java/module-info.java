@@ -8,6 +8,7 @@ module robo4j.hw.rpi {
     requires com.pi4j.plugin.pigpio;
     requires com.pi4j.plugin.raspberrypi;
 
+    exports com.robo4j.hw.rpi;
     exports com.robo4j.hw.rpi.camera;
     exports com.robo4j.hw.rpi.gps;
     exports com.robo4j.hw.rpi.i2c;

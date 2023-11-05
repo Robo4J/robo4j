@@ -38,8 +38,8 @@ public class PCA9685TruckPlatformExample {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		if (args.length != 5) {
-			System.out.println(String.format("Usage: %s <throttle> <steering> <leg> <shift> <duration>",
-					PCA9685TruckPlatformExample.class.getSimpleName()));
+			System.out.printf("Usage: %s <throttle> <steering> <leg> <shift> <duration>%n",
+					PCA9685TruckPlatformExample.class.getSimpleName());
 			System.out.flush();
 			System.exit(2);
 		}

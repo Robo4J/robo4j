@@ -26,8 +26,8 @@ import com.robo4j.hw.rpi.utils.I2cBus;
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class I2CEndPoint {
-	private I2cBus bus;
-	private int address;
+	private final I2cBus bus;
+	private final int address;
 
 	public I2CEndPoint(I2cBus bus, int address) {
 		this.bus = bus;
@@ -54,8 +54,6 @@ public final class I2CEndPoint {
 		I2CEndPoint other = (I2CEndPoint) obj;
 		if (address != other.address)
 			return false;
-		if (bus != other.bus)
-			return false;
-		return true;
-	}
+        return bus == other.bus;
+    }
 }

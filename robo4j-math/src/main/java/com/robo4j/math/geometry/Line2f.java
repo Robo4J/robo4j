@@ -63,10 +63,7 @@ public class Line2f {
 		} else if (!p1.equals(other.p1))
 			return false;
 		if (p2 == null) {
-			if (other.p2 != null)
-				return false;
-		} else if (!p2.equals(other.p2))
-			return false;
-		return true;
-	}
+            return other.p2 == null;
+		} else return p2.equals(other.p2);
+    }
 }

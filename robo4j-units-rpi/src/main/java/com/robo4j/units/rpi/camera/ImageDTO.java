@@ -25,10 +25,10 @@ import java.util.Objects;
  */
 public class ImageDTO {
 
-    private int width;
-    private int height;
-    private String encoding;
-    private byte[] content;
+    private final int width;
+    private final int height;
+    private final String encoding;
+    private final byte[] content;
 
     public ImageDTO(int width, int height, String encoding, byte[] content) {
         this.width = width;

@@ -117,10 +117,8 @@ public class Point2f {
 		Point2f other = (Point2f) obj;
 		if (Float.floatToIntBits(angle) != Float.floatToIntBits(other.angle))
 			return false;
-		if (Float.floatToIntBits(range) != Float.floatToIntBits(other.range))
-			return false;
-		return true;
-	}
+        return Float.floatToIntBits(range) == Float.floatToIntBits(other.range);
+    }
 
 	/**
 	 * A positive value denoting the difference in range to the two points.

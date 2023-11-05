@@ -32,10 +32,10 @@ public class BMP085Test {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		BMP085Device bmp = new BMP085Device(OperatingMode.STANDARD);
 		while (true) {
-			System.out.println(String.format("Temperature: %.1fC, Pressure: %dhPa, Altitude: %.1fm", 
+			System.out.printf("Temperature: %.1fC, Pressure: %dhPa, Altitude: %.1fm%n",
 					bmp.readTemperature(),
-					bmp.readPressure() / 100, 
-					bmp.readAltitude()));
+					bmp.readPressure() / 100,
+					bmp.readAltitude());
 			Thread.sleep(2000);
 		}
 	}

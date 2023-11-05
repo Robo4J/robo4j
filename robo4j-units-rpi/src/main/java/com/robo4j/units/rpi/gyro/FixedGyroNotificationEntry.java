@@ -70,9 +70,7 @@ class FixedGyroNotificationEntry extends AbstractNotificationEntry implements Gy
 			}
 		}
 		if (notificationThreshold.z != 0) {
-			if (checkNotify(notificationThreshold.z, delta.z)) {
-				return true;
-			}
+            return checkNotify(notificationThreshold.z, delta.z);
 		}
 		return false;
 	}

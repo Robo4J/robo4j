@@ -68,9 +68,9 @@ public enum RpiCameraProperty {
     ;
     //@formatter:on
 
-	private static Map<String, RpiCameraProperty> nameToProperty;
-	private String name;
-	private String property;
+	private static final Map<String, RpiCameraProperty> nameToProperty = initMapping();
+	private final String name;
+	private final String property;
 
 	RpiCameraProperty(String name, String property) {
 		this.name = name;
@@ -82,9 +82,6 @@ public enum RpiCameraProperty {
 	}
 
 	public static RpiCameraProperty getByName(String name) {
-		if (nameToProperty == null) {
-			nameToProperty = initMapping();
-		}
 		return nameToProperty.get(name.toLowerCase());
 	}
 

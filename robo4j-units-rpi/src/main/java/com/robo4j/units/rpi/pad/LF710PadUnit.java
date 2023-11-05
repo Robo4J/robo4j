@@ -43,6 +43,7 @@ public class LF710PadUnit extends RoboUnit<Object>{
     private LF710ButtonObserver observer;
     private PadInputResponseListener listener;
 
+    // TODO : review fields purpose
     private String input;
     private String target;
 

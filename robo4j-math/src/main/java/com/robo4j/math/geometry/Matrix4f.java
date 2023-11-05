@@ -281,10 +281,8 @@ public class Matrix4f implements Matrix {
 			return false;
 		if (Float.floatToIntBits(m43) != Float.floatToIntBits(other.m43))
 			return false;
-		if (Float.floatToIntBits(m44) != Float.floatToIntBits(other.m44))
-			return false;
-		return true;
-	}
+        return Float.floatToIntBits(m44) == Float.floatToIntBits(other.m44);
+    }
 	
 	@Override
 	public int getRows() {

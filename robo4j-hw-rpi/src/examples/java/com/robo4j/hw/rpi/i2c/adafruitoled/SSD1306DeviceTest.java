@@ -61,7 +61,7 @@ public class SSD1306DeviceTest {
 		System.out.println("If the number of lines do not match your device,"); 
 		System.out.println("please add the number of lines as the first argument!");
 		
-		String text = args.length > 0 ? Stream.of(args).collect(Collectors.joining(" ")) : "Hello World!";
+		String text = args.length > 0 ? String.join(" ", args) : "Hello World!";
 		Graphics2D gc = oled.getGraphicsContext();
 		gc.setColor(Color.white);
 		gc.setBackground(Color.black);

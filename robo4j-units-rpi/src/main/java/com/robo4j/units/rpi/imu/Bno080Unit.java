@@ -59,13 +59,14 @@ public class Bno080Unit extends RoboUnit<BnoRequest> {
 		}
 	}
 
+	private final List<BnoListenerEvent> listeners = new ArrayList<>();
 	private Bno080Device device;
-	private List<BnoListenerEvent> listeners = new ArrayList<>();
 
 	public Bno080Unit(RoboContext context, String id) {
 		super(BnoRequest.class, context, id);
 	}
 
+	// TODO review field purpose
 	private int reportDelay;
 	private SensorReportId report;
 

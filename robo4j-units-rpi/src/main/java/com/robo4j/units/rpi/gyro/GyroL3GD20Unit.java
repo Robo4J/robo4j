@@ -83,6 +83,7 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
 
 	private final GyroScanner scanner = new GyroScanner();
 
+	// TODO review field purpose
 	private Sensitivity sensitivity;
 	private boolean highPassFilter;
 	private int period;

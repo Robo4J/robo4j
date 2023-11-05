@@ -51,6 +51,7 @@ public class AccelerometerLSM303Test {
 	}
 
 	private static Stats readValues(ReadableDevice<Tuple3f> device) throws IOException, InterruptedException {
+		// TODO: change print...
 		Stats stats = new Stats();
 		for (int i = 0; i < 250; i++) {
 			Tuple3f fl = device.read();

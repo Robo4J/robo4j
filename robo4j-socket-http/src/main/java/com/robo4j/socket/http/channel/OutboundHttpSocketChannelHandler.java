@@ -39,11 +39,11 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class OutboundHttpSocketChannelHandler implements ChannelHandler, AutoCloseable {
 
-	private ByteChannel byteChannel;
-	private HttpDecoratedRequest message;
+	private final ByteChannel byteChannel;
+	private final HttpDecoratedRequest message;
+	private final ChannelResponseBuffer channelResponseBuffer = new ChannelResponseBuffer();
+	private final Lock lock = new ReentrantLock();
 	private HttpDecoratedResponse decoratedResponse;
-	private ChannelResponseBuffer channelResponseBuffer = new ChannelResponseBuffer();
-	private Lock lock = new ReentrantLock();
 
 	public OutboundHttpSocketChannelHandler(ByteChannel byteChannel, HttpDecoratedRequest message) {
 		this.byteChannel = byteChannel;

@@ -50,7 +50,7 @@ public class MC33926Example {
         HBridgeMC33926Device engine = new HBridgeMC33926Device("Engine", pwm.getChannel(4),
                 GpioPin.GPIO_02, GpioPin.GPIO_03, true);
 
-        System.out.println(String.format("Running for %d ms at speed %f...", duration, speed));
+        System.out.printf("Running for %d ms at speed %f...%n", duration, speed);
 
         engine.setSpeed(speed);
         Thread.sleep(duration);

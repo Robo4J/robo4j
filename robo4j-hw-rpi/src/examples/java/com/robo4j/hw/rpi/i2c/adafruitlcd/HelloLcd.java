@@ -18,8 +18,6 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
 import java.io.IOException;
 
-import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
-
 /**
  * Simple hello world-style example.
  * 
@@ -28,7 +26,7 @@ import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
  */
 public class HelloLcd {
 	
-	public static void main(String[] args) throws IOException, UnsupportedBusNumberException {
+	public static void main(String[] args) throws IOException {
 		 AdafruitLcd lcd = LcdFactory.createLCD();
 		 lcd.setBacklight(Color.TEAL);
 		 lcd.setText("Hello World!\n-----Robo4J-----");

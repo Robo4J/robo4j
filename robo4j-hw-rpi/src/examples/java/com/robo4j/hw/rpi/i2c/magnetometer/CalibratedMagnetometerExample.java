@@ -37,7 +37,7 @@ public class CalibratedMagnetometerExample {
 	private final static ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(1);
 
 	private static class MagnetometerPoller implements Runnable {
-		private MagnetometerLSM303Device magDevice;
+		private final MagnetometerLSM303Device magDevice;
 
 		public MagnetometerPoller(MagnetometerLSM303Device magDevice) {
 			this.magDevice = magDevice;
@@ -47,7 +47,7 @@ public class CalibratedMagnetometerExample {
 		public void run() {
 			try {
 				Tuple3f magResult = magDevice.read();
-				System.out.println(String.format("Heading: %3.2f", MagnetometerLSM303Device.getCompassHeading(magResult)));
+				System.out.printf("Heading: %3.2f%n", MagnetometerLSM303Device.getCompassHeading(magResult));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
