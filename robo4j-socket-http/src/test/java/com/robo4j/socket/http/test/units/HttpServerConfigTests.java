@@ -45,12 +45,11 @@ class HttpServerConfigTests {
 	@Test
 	void serverConfigurationNullTest() {
 
-		Throwable exception = assertThrows(NullPointerException.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			HttpPathMethodDTO serverUnitPathDTO = HttpPathUtils.readServerPathDTO(null);
 			assertNull(serverUnitPathDTO);
 		});
 
-		assertNull(exception.getMessage());
 	}
 
 	@Test

@@ -5,6 +5,7 @@ module robo4j.http.test {
     requires org.junit.jupiter.api;
     requires org.junit.jupiter.engine;
 
+
     exports com.robo4j.socket.http.test.utils;
     exports com.robo4j.socket.http.test.units.config to robo4j.core;
     exports com.robo4j.socket.http.test.units.config.codec to robo4j.http;
