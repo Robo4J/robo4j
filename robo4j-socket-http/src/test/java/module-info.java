@@ -2,7 +2,6 @@ module robo4j.http.test {
     requires robo4j.core;
     requires robo4j.http;
 
-    requires org.junit.jupiter;
     requires org.junit.jupiter.api;
     requires org.junit.jupiter.engine;
 
