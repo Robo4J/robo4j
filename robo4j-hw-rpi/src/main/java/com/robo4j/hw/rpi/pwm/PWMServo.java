@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,15 +16,20 @@
  */
 package com.robo4j.hw.rpi.pwm;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinPwmOutput;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.RaspiPin;
-import com.pi4j.wiringpi.Gpio;
-import com.robo4j.hw.rpi.Servo;
+//import com.pi4j.io.gpio.GpioController;
+//import com.pi4j.io.gpio.GpioFactory;
+//import com.pi4j.io.gpio.GpioPinPwmOutput;
+//import com.pi4j.io.gpio.Pin;
+//import com.pi4j.io.gpio.RaspiPin;
+//import com.pi4j.wiringpi.Gpio;
 
 import java.io.IOException;
+
+import com.pi4j.Pi4J;
+import com.pi4j.io.pwm.Pwm;
+import com.pi4j.io.pwm.PwmType;
+import com.robo4j.hw.rpi.Servo;
+import com.robo4j.hw.rpi.utils.GpioPin;
 
 /**
  * Abstraction for talking to a servo over one of the hardware PWM GPIO pins on
@@ -62,7 +67,8 @@ public class PWMServo implements Servo {
 	private final static float ACTUAL_FREQUENCY = BASE_FREQUENCY / (float) (RANGE * CLOCK_DIVISOR);
 	private final static float ACTUAL_PERIOD = 1 / ACTUAL_FREQUENCY;
 
-	private GpioPinPwmOutput pwmPin;
+//	private GpioPinPwmOutput pwmPin;
+	private final Pwm pwm;
 
 	private boolean inverted;
 	private float input;
@@ -75,19 +81,31 @@ public class PWMServo implements Servo {
 	 * @param inverted
 	 *            if the servo input should be inverted.
 	 */
-	public PWMServo(Pin pin, boolean inverted) {
-		this.inverted = inverted;
-		GpioController gpio = GpioFactory.getInstance();
-		pwmPin = gpio.provisionPwmOutputPin(pin);
+	public PWMServo(GpioPin gpioPin, boolean inverted) {
 
-		if (!GpioFactory.getDefaultProvider().getName().equals(pin.getProvider())) {
-			throw new UnsupportedOperationException(
-					"Pin provider is set up to be " + GpioFactory.getDefaultProvider().getName() + ". You cannot use " + pin.getProvider());
-		}
+		var pi4jRpiContext = Pi4J.newAutoContext();
+		var pwmConfig = Pwm.newConfigBuilder(pi4jRpiContext)
+				.id("PWMServo-"+gpioPin.address())
+				.address(gpioPin.address())
+				.frequency(PWM_FREQUENCY)
+				.pwmType(PwmType.HARDWARE)
+				.dutyCycle(CLOCK_DIVISOR)
+				.build();
+		this.pwm = pi4jRpiContext.create(pwmConfig);
+
+
+//		this.inverted = inverted;
+//		GpioController gpio = GpioFactory.getInstance();
+//		pwmPin = gpio.provisionPwmOutputPin(pin);
+//
+//		if (!GpioFactory.getDefaultProvider().getName().equals(pin.getProvider())) {
+//			throw new UnsupportedOperationException(
+//					"Pin provider is set up to be " + GpioFactory.getDefaultProvider().getName() + ". You cannot use " + pin.getProvider());
+//		}
 		// Servo -> mark:space
-		Gpio.pwmSetMode(Gpio.PWM_MODE_MS);
-		Gpio.pwmSetClock(CLOCK_DIVISOR);
-		Gpio.pwmSetRange(RANGE);
+//		Gpio.pwmSetMode(Gpio.PWM_MODE_MS);
+//		Gpio.pwmSetClock(CLOCK_DIVISOR);
+//		Gpio.pwmSetRange(RANGE);
 	}
 
 	/**
@@ -99,7 +117,7 @@ public class PWMServo implements Servo {
 	 *            if the servo input should be inverted.
 	 */
 	public PWMServo(int pinAddress, boolean inverted) {
-		this(RaspiPin.getPinByAddress(pinAddress), inverted);
+		this(GpioPin.getByAddress(pinAddress), inverted);
 	}
 
 	@Override
@@ -127,12 +145,21 @@ public class PWMServo implements Servo {
 		return input;
 	}
 
+	/**
+	 *
+	 * @param input duty cycle
+	 *
+	 *
+	 * @throws IOException exception
+	 */
 	@Override
 	public void setInput(float input) throws IOException {
 		this.input = input;
 		float correctedInput = isInverted() ? -1 * input : input;
 		float targetOnTime = 0.0015f + (correctedInput * 0.001f) / 2;
-		int pwm = Math.round((RANGE_F * (targetOnTime / ACTUAL_PERIOD)));
-		pwmPin.setPwm(pwm);
+//		var pwm = Math.round((RANGE_F * (targetOnTime / ACTUAL_PERIOD)));
+		var dutyCycle = RANGE_F * (targetOnTime / ACTUAL_PERIOD);
+//		pwmPin.setPwm(pwm);
+		this.pwm.on(dutyCycle);
 	}
 }

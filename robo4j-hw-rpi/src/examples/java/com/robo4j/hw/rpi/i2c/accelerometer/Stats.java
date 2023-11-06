@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@ import com.robo4j.math.geometry.Tuple3f;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class Stats {
-	private Tuple3f min = new Tuple3f();
-	private Tuple3f max = new Tuple3f();
-	private Tuple3f sum = new Tuple3f();
+	private final Tuple3f min = new Tuple3f();
+	private final Tuple3f max = new Tuple3f();
+	private final Tuple3f sum = new Tuple3f();
 
 	private int count = 0;
 	
@@ -61,13 +61,14 @@ public class Stats {
 	}
 	
 	public Tuple3f getAvg() {
-		Tuple3f avg = new Tuple3f();
+		var avg = new Tuple3f();
 		avg.x = sum.x / count;
 		avg.y = sum.y / count;
 		avg.z = sum.z / count;
 		return avg;
 	}
-	
+
+	// TODO : usage export to utils?
 	private boolean updateMin(Tuple3f newVal) {
 		boolean isUpdated = false;
 		

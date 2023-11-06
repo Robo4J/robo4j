@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
+import com.robo4j.logging.SimpleLoggingUtil;
 
 /**
  * This is the default scheduler used in Robo4J.
@@ -35,7 +36,7 @@ import com.robo4j.RoboUnit;
  */
 public class DefaultScheduler implements Scheduler {
 	private static final int DEFAULT_NUMBER_OF_THREADS = 2;
-	private static final int TERMINATION_TIMEOUT = 4;
+	private static final int TERMINATION_TIMEOUT_SEC = 4;
 
 	private final ScheduledExecutorService executor;
 	private final RoboContext context;
@@ -92,7 +93,8 @@ public class DefaultScheduler implements Scheduler {
 	@Override
 	public void shutdown() throws InterruptedException {
 		executor.shutdown();
-		executor.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS);
+		var status = executor.awaitTermination(TERMINATION_TIMEOUT_SEC, TimeUnit.SECONDS);
+		SimpleLoggingUtil.debug(DefaultScheduler.class, "shutdown status:" + status);
 	}
 
 	static <T> void deliverMessage(final RoboReference<T> reference, final T message) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,10 +63,7 @@ public class Line2f {
 		} else if (!p1.equals(other.p1))
 			return false;
 		if (p2 == null) {
-			if (other.p2 != null)
-				return false;
-		} else if (!p2.equals(other.p2))
-			return false;
-		return true;
-	}
+            return other.p2 == null;
+		} else return p2.equals(other.p2);
+    }
 }

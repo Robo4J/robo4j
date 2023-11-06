@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd.impl;
 
 import java.io.IOException;
 
-import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Button;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
+import com.robo4j.hw.rpi.utils.I2cBus;
 
 /**
  * Javaification of the python script example for the Adafruit LCD shield. I
@@ -102,8 +102,8 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 	// that order. Because this sequence is 'reversed,' a direct shift
 	// won't work. This table remaps 4-bit data values to MCP PORTB
 	// outputs, incorporating both the reverse and shift.
-	private static final int[] SHIFT_REVERSE = { 0x00, 0x10, 0x08, 0x18, 0x04, 0x14, 0x0C, 0x1C, 0x02, 0x12, 0x0A, 0x1A, 0x06, 0x16, 0x0E,
-			0x1E };
+	private static final int[] SHIFT_REVERSE = { 0x00, 0x10, 0x08, 0x18, 0x04, 0x14, 0x0C, 0x1C, 0x02, 0x12, 0x0A, 0x1A,
+			0x06, 0x16, 0x0E, 0x1E };
 
 	private static final int[] ROW_OFFSETS = new int[] { 0x00, 0x40, 0x14, 0x54 };
 
@@ -115,12 +115,12 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 	private int displayControl = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF;
 	private Color color = Color.WHITE;
 
-	public AdafruitLcdImpl() throws IOException, UnsupportedBusNumberException {
+	public AdafruitLcdImpl() throws IOException {
 		// This seems to be the default for AdaFruit 1115.
 		this(AdafruitLcd.DEFAULT_BUS, AdafruitLcd.DEFAULT_ADDRESS);
 	}
 
-	public AdafruitLcdImpl(int bus, int address) throws IOException, UnsupportedBusNumberException {
+	public AdafruitLcdImpl(I2cBus bus, int address) throws IOException {
 		super(bus, address);
 		initialize();
 	}
@@ -181,11 +181,13 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 	}
 
 	private synchronized void write(int i, byte[] registers, int j, int length) throws IOException {
-		i2cDevice.write(i, registers, j, length);
+		// i2CConfig.write(i, registers, j, length);
+		writeByteBufferByAddress(i, registers, j, length);
 	}
 
 	private synchronized void write(int bank, byte b) throws IOException {
-		i2cDevice.write(bank, b);
+		// i2CConfig.write(bank, b);
+		writeByte(bank, b);
 	}
 
 	private synchronized void write(int value) throws IOException {
@@ -193,14 +195,17 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 		int bitmask = portB & 0x01; // Mask out PORTB LCD control bits
 
 		byte[] data = out4(bitmask, value);
-		i2cDevice.write(MCP23017_GPIOB, data, 0, 4);
+		// i2CConfig.write(MCP23017_GPIOB, data, 0, 4);
+		// TODO review
+		writeByteBufferByAddress(MCP23017_GPIOB, data, 0, 4);
 		portB = data[3];
 
 		// If a poll-worthy instruction was issued, reconfigure D7
 		// pin as input to indicate need for polling on next call.
 		if (value == LCD_CLEARDISPLAY || value == LCD_RETURNHOME) {
 			ddrB |= 0x10;
-			i2cDevice.write(MCP23017_IODIRB, (byte) ddrB);
+			// i2CConfig.write(MCP23017_IODIRB, (byte) ddrB);
+			writeByte(MCP23017_IODIRB, (byte) ddrB);
 		}
 	}
 
@@ -221,25 +226,32 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 		if ((ddrB & 0x10) != 0) {
 			int lo = (portB & 0x01) | 0x40;
 			int hi = lo | 0x20; // E=1 (strobe)
-			i2cDevice.write(MCP23017_GPIOB, (byte) lo);
+			// i2CConfig.write(MCP23017_GPIOB, (byte) lo);
+			writeByte(MCP23017_GPIOB, (byte) lo);
 			while (true) {
-				i2cDevice.write((byte) hi); // Strobe high (enable)
-				int bits = i2cDevice.read(); // First nybble contains busy state
-				i2cDevice.write(MCP23017_GPIOB, new byte[] { (byte) lo, (byte) hi, (byte) lo }, 0, 3); // Strobe
-																										// low,
-																										// high,
-																										// low.
-																										// Second
-																										// nybble
-																										// (A3)
-																										// is
-																										// ignored.
+				// i2CConfig.write((byte) hi); // Strobe high (enable)
+				writeByte((byte) hi); // Strobe high (enable)
+				// int bits = i2CConfig.read(); // First nybble contains busy state
+				// TODO: review
+				int bits = i2C.read(); // First nybble contains busy state
+				// i2CConfig.write(MCP23017_GPIOB, new byte[] { (byte) lo, (byte) hi, (byte) lo
+				// }, 0, 3); // Strobe
+				writeByteBufferByAddress(MCP23017_GPIOB, new byte[] { (byte) lo, (byte) hi, (byte) lo }, 0, 3); // Strobe
+																												// low,
+																												// high,
+																												// low.
+																												// Second
+																												// nybble
+																												// (A3)
+																												// is
+																												// ignored.
 				if ((bits & 0x02) == 0)
 					break; // D7=0, not busy
 			}
 			portB = lo;
 			ddrB &= 0xEF; // Polling complete, change D7 pin to output
-			i2cDevice.write(MCP23017_IODIRB, (byte) ddrB);
+			// i2CConfig.write(MCP23017_IODIRB, (byte) ddrB);
+			writeByte(MCP23017_IODIRB, (byte) ddrB);
 		}
 	}
 
@@ -453,16 +465,17 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 		portA = (portA & 0x3F) | ((c & 0x03) << 6);
 		portB = (portB & 0xFE) | ((c & 0x04) >> 2);
 		// Has to be done as two writes because sequential operation is off.
-		i2cDevice.write(MCP23017_GPIOA, (byte) portA);
-		i2cDevice.write(MCP23017_GPIOB, (byte) portB);
+//		i2CConfig.write(MCP23017_GPIOA, (byte) portA);
+		writeByte(MCP23017_GPIOA, (byte) portA);
+//		i2CConfig.write(MCP23017_GPIOB, (byte) portB);
+		writeByte(MCP23017_GPIOB, (byte) portB);
 		this.color = color;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * se.hirt.pi.adafruitlcd.ILCD#scrollDisplay(se.hirt.pi.adafruitlcd.LCD.
+	 * @see se.hirt.pi.adafruitlcd.ILCD#scrollDisplay(se.hirt.pi.adafruitlcd.LCD.
 	 * Direction)
 	 */
 	@Override
@@ -479,8 +492,7 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * se.hirt.pi.adafruitlcd.ILCD#setTextFlowDirection(se.hirt.pi.adafruitlcd.
+	 * @see se.hirt.pi.adafruitlcd.ILCD#setTextFlowDirection(se.hirt.pi.adafruitlcd.
 	 * LCD.Direction)
 	 */
 	@Override
@@ -536,7 +548,8 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 	}
 
 	private synchronized int read(int bank) throws IOException {
-		return i2cDevice.read(bank);
+//		return i2CConfig.read(bank);
+		return i2C.readRegister(bank);
 	}
 
 	/*
@@ -563,10 +576,12 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 	@Override
 	public void createChar(int location, byte[] pattern) throws IOException {
 		if (location < 0 || location > 7) {
-			throw new IllegalArgumentException("Location should be between 0 and 7, value supplied is invalid: " + location);
+			throw new IllegalArgumentException(
+					"Location should be between 0 and 7, value supplied is invalid: " + location);
 		}
 		if (pattern.length != 8) {
-			throw new IllegalArgumentException("Pattern length should be 8, array supplied has invalid length: " + pattern.length);
+			throw new IllegalArgumentException(
+					"Pattern length should be 8, array supplied has invalid length: " + pattern.length);
 		}
 
 		// Send ccgram update command

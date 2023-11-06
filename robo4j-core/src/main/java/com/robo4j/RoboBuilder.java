@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -190,7 +190,7 @@ public final class RoboBuilder {
 	/**
 	 * Separate handler for reading the system part.
 	 */
-	private class SystemXMLHandler extends DefaultHandler {
+	private static class SystemXMLHandler extends DefaultHandler {
 		private static final String ELEMENT_SYSTEM = "roboSystem";
 		private String currentId = StringConstants.EMPTY;
 		private String currentConfiguration = StringConstants.EMPTY;
@@ -223,7 +223,8 @@ public final class RoboBuilder {
 				SimpleLoggingUtil.debug(getClass(), "Loading system id=" + currentId);
 				Configuration config;
 				try {
-					config = currentConfiguration.trim().equals("") ? null : XmlConfigurationFactory.fromXml(currentConfiguration);
+					// TODO : review config = null
+					config = currentConfiguration.trim().isEmpty() ? null : XmlConfigurationFactory.fromXml(currentConfiguration);
 					if (currentId == null) {
 						system = new RoboSystem(config);
 					} else {

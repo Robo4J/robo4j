@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,13 +59,14 @@ public class Bno080Unit extends RoboUnit<BnoRequest> {
 		}
 	}
 
+	private final List<BnoListenerEvent> listeners = new ArrayList<>();
 	private Bno080Device device;
-	private List<BnoListenerEvent> listeners = new ArrayList<>();
 
 	public Bno080Unit(RoboContext context, String id) {
 		super(BnoRequest.class, context, id);
 	}
 
+	// TODO review field purpose
 	private int reportDelay;
 	private SensorReportId report;
 

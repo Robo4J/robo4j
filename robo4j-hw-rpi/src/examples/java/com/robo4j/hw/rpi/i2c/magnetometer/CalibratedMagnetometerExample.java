@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.magnetometer.MagnetometerLSM303Device.Mode;
 import com.robo4j.hw.rpi.i2c.magnetometer.MagnetometerLSM303Device.Rate;
+import com.robo4j.hw.rpi.utils.I2cBus;
 import com.robo4j.math.geometry.Matrix3f;
 import com.robo4j.math.geometry.Tuple3f;
 
@@ -37,7 +37,7 @@ public class CalibratedMagnetometerExample {
 	private final static ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(1);
 
 	private static class MagnetometerPoller implements Runnable {
-		private MagnetometerLSM303Device magDevice;
+		private final MagnetometerLSM303Device magDevice;
 
 		public MagnetometerPoller(MagnetometerLSM303Device magDevice) {
 			this.magDevice = magDevice;
@@ -47,7 +47,7 @@ public class CalibratedMagnetometerExample {
 		public void run() {
 			try {
 				Tuple3f magResult = magDevice.read();
-				System.out.println(String.format("Heading: %3.2f", MagnetometerLSM303Device.getCompassHeading(magResult)));
+				System.out.printf("Heading: %3.2f%n", MagnetometerLSM303Device.getCompassHeading(magResult));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -60,7 +60,7 @@ public class CalibratedMagnetometerExample {
 		// See the MagViz tool for more information.
 		Tuple3f bias = new Tuple3f(-44.689f, -2.0665f, -15.240f);
 		Matrix3f transform = new Matrix3f(1.887f, 5.987f, -5.709f, 5.987f, 1.528f, -2.960f, -5.709f, -2.960f, 9.761f);
-		MagnetometerLSM303Device magnetometer = new MagnetometerLSM303Device(I2CBus.BUS_1, 0x1e, Mode.CONTINUOUS_CONVERSION, Rate.RATE_7_5,
+		MagnetometerLSM303Device magnetometer = new MagnetometerLSM303Device(I2cBus.BUS_1, 0x1e, Mode.CONTINUOUS_CONVERSION, Rate.RATE_7_5,
 				false, bias, transform);
 		System.out.println(
 				"Starting to read and print the heading. Make sure the magnetometer is flat in the XY-plane (this example does not do tilt compensated heading).");

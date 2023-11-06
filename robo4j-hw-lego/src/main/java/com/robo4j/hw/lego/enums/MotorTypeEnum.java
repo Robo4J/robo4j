@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,9 +38,9 @@ public enum MotorTypeEnum implements ILegoHardware<Character> {
 	;
 	// @formatter:on
 
-	private volatile static Map<Character, MotorTypeEnum> internMapByType;
-	private char type;
-	private String name;
+	private static final  Map<Character, MotorTypeEnum> internMapByType = initMapping();
+	private final char type;
+	private final String name;
 
 	MotorTypeEnum(char type, String name) {
 		this.type = type;
@@ -48,9 +48,6 @@ public enum MotorTypeEnum implements ILegoHardware<Character> {
 	}
 
 	public static MotorTypeEnum getByType(Character type) {
-		if (internMapByType == null) {
-			internMapByType = initMapping();
-		}
 		return internMapByType.get(type);
 	}
 

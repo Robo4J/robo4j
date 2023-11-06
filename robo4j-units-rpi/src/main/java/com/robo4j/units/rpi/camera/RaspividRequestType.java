@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,10 +30,10 @@ public enum  RaspividRequestType {
 	STOP	    (1, "stop"),
 	CONFIG		(2, "config"),
 	;
-	private static Map<String, RaspividRequestType> defNameToTypeMapping;
+	private static final  Map<String, RaspividRequestType> defNameToTypeMapping = initMapping();
 	// @formatter:on
-    private int code;
-    private String name;
+    private final int code;
+    private final String name;
 
     RaspividRequestType(int code, String name) {
         this.code = code;
@@ -45,9 +45,6 @@ public enum  RaspividRequestType {
     }
 
     public static RaspividRequestType getByName(String name) {
-        if (defNameToTypeMapping == null) {
-            defNameToTypeMapping = initMapping();
-        }
         return defNameToTypeMapping.get(name);
     }
 

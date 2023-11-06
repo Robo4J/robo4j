@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
+import com.robo4j.hw.rpi.utils.I2cBus;
+
 import java.io.IOException;
 
 /**
@@ -31,13 +33,13 @@ public class BiColor8x8MatrixDevice extends AbstractBackpack implements MatrixLe
 	private static final short MATRIX_SIZE = 8;
 	private MatrixRotation rotation;
 
-	public BiColor8x8MatrixDevice(int bus, int address, int brightness, MatrixRotation rotation) throws IOException {
+	public BiColor8x8MatrixDevice(I2cBus bus, int address, int brightness, MatrixRotation rotation) throws IOException {
 		super(bus, address, brightness);
 		this.rotation = rotation;
 
 	}
 
-	public BiColor8x8MatrixDevice(int bus, int address, int brightness) throws IOException {
+	public BiColor8x8MatrixDevice(I2cBus bus, int address, int brightness) throws IOException {
 		super(bus, address, brightness);
 		this.rotation = MatrixRotation.DEFAULT_X_Y;
 

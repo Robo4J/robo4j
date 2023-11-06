@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,9 +51,10 @@ public class Bno055Example {
 				Tuple3f orientation = device.read();
 				float temperature = device.getTemperature();
 
-				System.out.println(String.format("heading: %f, roll: %f, pitch: %f - temp:%f", orientation.x,
-						orientation.y, orientation.z, temperature));
+				System.out.printf("heading: %f, roll: %f, pitch: %f - temp:%f%n", orientation.x,
+						orientation.y, orientation.z, temperature);
 			} catch (Throwable e) {
+				// TODO : improve exceptions
 				e.printStackTrace();
 			}
 		}

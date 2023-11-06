@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,13 +24,14 @@ package com.robo4j.hw.rpi.i2c.adafruitlcd;
  */
 
 import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl.Direction;
+import com.robo4j.hw.rpi.utils.I2cBus;
 
 import java.io.IOException;
 
 public interface AdafruitLcd {
 	// Not using the Pi4J bus specification here, since we may not be able to
 	// load the class (we can run with a mock up).
-	int DEFAULT_BUS = 1;
+	I2cBus DEFAULT_BUS = I2cBus.BUS_1;
 	int DEFAULT_ADDRESS = 0x20;
 
 	/**

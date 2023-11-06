@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,13 +18,12 @@ package com.robo4j.units.rpi.pwm;
 
 import java.io.IOException;
 
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.RaspiPin;
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.i2c.pwm.HBridgeMC33926Device;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
+import com.robo4j.hw.rpi.utils.GpioPin;
 import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.rpi.I2CRegistry;
 import com.robo4j.units.rpi.I2CRoboUnit;
@@ -96,18 +95,19 @@ public class MC33926HBridgeUnit extends I2CRoboUnit<Float> {
 		if (in1Name == null) {
 			throw ConfigurationException.createMissingConfigNameException(CONFIGURATION_KEY_GPIO_IN_1);
 		}
-		Pin in1 = RaspiPin.getPinByName(in1Name);
+		var gpioIn1 = GpioPin.getByName(in1Name);
 
 		String in2Name = configuration.getString(CONFIGURATION_KEY_GPIO_IN_1, null);
 		if (in2Name == null) {
 			throw ConfigurationException.createMissingConfigNameException(CONFIGURATION_KEY_GPIO_IN_1);
 		}
-		Pin in2 = RaspiPin.getPinByName(in2Name);
+		var gpioIn2 = GpioPin.getByName(in2Name);;
 
 		boolean invert = configuration.getBoolean(CONFIGURATION_KEY_INVERT, false);
 
-		engine = new HBridgeMC33926Device(configuration.getString(CONFIGURATION_KEY_NAME, "MC33926"), pcaDevice.getChannel(channel), in1,
-				in2, invert);
+		// TODO: improve configuraiton
+		engine = new HBridgeMC33926Device(configuration.getString(CONFIGURATION_KEY_NAME, "MC33926"), pcaDevice.getChannel(channel), gpioIn1,
+				gpioIn2, invert);
 	}
 
 	@Override

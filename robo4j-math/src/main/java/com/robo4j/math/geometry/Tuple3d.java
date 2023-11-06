@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -117,8 +117,6 @@ public class Tuple3d {
 			return false;
 		if (Double.doubleToLongBits(y) != Double.doubleToLongBits(other.y))
 			return false;
-		if (Double.doubleToLongBits(z) != Double.doubleToLongBits(other.z))
-			return false;
-		return true;
-	}
+        return Double.doubleToLongBits(z) == Double.doubleToLongBits(other.z);
+    }
 }

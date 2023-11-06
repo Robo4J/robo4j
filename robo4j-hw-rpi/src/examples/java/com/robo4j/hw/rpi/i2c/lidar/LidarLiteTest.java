@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ public class LidarLiteTest {
 		while (true) {
 			ld.acquireRange();
 			Thread.sleep(100);
-			System.out.println(String.format("Distance: %.02fm", ld.readDistance()));
+			System.out.printf("Distance: %.02fm%n", ld.readDistance());
 			Thread.sleep(500);
 		}
 	}

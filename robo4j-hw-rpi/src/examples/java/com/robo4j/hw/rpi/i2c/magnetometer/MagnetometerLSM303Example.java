@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,17 +56,18 @@ public class MagnetometerLSM303Example {
 			device = new MagnetometerLSM303Device();
 		}
 
+		// TODO : improve by simple logging
 		@Override
 		public void run() {
 			if (count % modulo == 0) {
 				switch (printStyle) {
 				case RAW:
 					Tuple3i raw = readRaw();
-					System.out.println(String.format("Raw Value %d = %s", count, raw.toString()));
+					System.out.printf("Raw Value %d = %s%n", count, raw.toString());
 					break;
 				case CSV:
 					Tuple3f val = read();
-					System.out.println(String.format("%f;%f;%f", val.x, val.y, val.z));
+					System.out.printf("%f;%f;%f%n", val.x, val.y, val.z);
 					break;
 				default:
 					val = read();

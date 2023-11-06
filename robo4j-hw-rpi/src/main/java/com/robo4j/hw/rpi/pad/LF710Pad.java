@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,18 +31,17 @@ public class LF710Pad implements RoboControlPad {
 
     private final Path gamepadPath;
     private InputStream inputStream;
-    private boolean active = false;
 
     public LF710Pad(Path gamepadPath) {
         this.gamepadPath = gamepadPath;
     }
 
     @Override
-    public boolean connect(){
+    public boolean connect() {
         try {
             inputStream = Files.newInputStream(gamepadPath);
-            active = true;
-            return active;
+            // TODO : check status = true ?
+            return true;
         } catch (IOException e) {
             throw new LF710Exception("gamepad problem", e);
         }

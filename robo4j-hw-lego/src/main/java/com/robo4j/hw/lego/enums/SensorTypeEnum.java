@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,14 +57,19 @@ public enum SensorTypeEnum {
 	/**
 	 * distance is measure in meter
 	 */
-	INFRA		(4, "Infra","lejos.hardware.sensor.EV3IRSensor", 0);
+	INFRA		(4, "Infra","lejos.hardware.sensor.EV3IRSensor", 0),
+
+	/**
+	 *  Unknown sensor
+	 */
+	UNKNOWN (-1, "", "", -1);
 	// @formatter:on
 
-	private volatile static Map<Integer, SensorTypeEnum> internMapById;
-	private int id;
-	private String mode;
-	private String source;
-	private int elements;
+	private static final Map<Integer, SensorTypeEnum> internMapById = initMapping();
+	private final int id;
+	private final String mode;
+	private final String source;
+	private final int elements;
 
 	SensorTypeEnum(final int id, final String mode, final String source, final int elements) {
 		this.id = id;
@@ -74,23 +79,14 @@ public enum SensorTypeEnum {
 	}
 
 	public static SensorTypeEnum getById(int id) {
-		if (internMapById == null) {
-			internMapById = initMapping();
-		}
 		return internMapById.get(id);
 	}
 
 	//@formatter:off
 	public static SensorTypeEnum getBySource(String source) {
-		if (internMapById == null) {
-			internMapById = initMapping();
-		}
-
-		return internMapById.entrySet().stream()
-				.filter(e -> e.getValue().getSource().equals(source))
-				.map(Map.Entry::getValue)
-				.findFirst()
-				.get();
+		return internMapById.values().stream()
+				.filter(sensorTypeEnum->sensorTypeEnum.getSource().equals(source))
+				.findFirst().orElse(UNKNOWN);
 	}
 	//@formatter:on
 

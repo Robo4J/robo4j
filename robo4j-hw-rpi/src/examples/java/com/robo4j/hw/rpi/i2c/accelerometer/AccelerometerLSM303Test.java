@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ public class AccelerometerLSM303Test {
 	}
 
 	private static Stats readValues(ReadableDevice<Tuple3f> device) throws IOException, InterruptedException {
+		// TODO: change print...
 		Stats stats = new Stats();
 		for (int i = 0; i < 250; i++) {
 			Tuple3f fl = device.read();

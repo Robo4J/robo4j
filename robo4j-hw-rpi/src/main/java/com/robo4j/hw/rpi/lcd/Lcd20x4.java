@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
  */
 package com.robo4j.hw.rpi.lcd;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiPin;
+import com.pi4j.Pi4J;
+import com.pi4j.io.gpio.digital.DigitalOutput;
+import com.pi4j.io.gpio.digital.DigitalOutputConfig;
+import com.pi4j.io.gpio.digital.DigitalOutputConfigBuilder;
+import com.pi4j.io.gpio.digital.DigitalState;
+import com.robo4j.hw.rpi.utils.GpioPin;
 
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +40,7 @@ public class Lcd20x4 {
 	//@formatter:off
 	/**
 	 * From the webpage:
-	 * 
+	 *
 		# The wiring for the LCD is as follows:
 		# 1 : GND
 		# 2 : 5V
@@ -60,13 +60,20 @@ public class Lcd20x4 {
 		# 16: LCD Backlight GND
 	**/
 	//@formatter:on
-	private final GpioPinDigitalOutput gpioE;
-	private final GpioPinDigitalOutput gpioRS;
-	private final GpioPinDigitalOutput gpioD4;
-	private final GpioPinDigitalOutput gpioD5;
-	private final GpioPinDigitalOutput gpioD6;
-	private final GpioPinDigitalOutput gpioD7;
-	private final GpioPinDigitalOutput gpioOn;
+//	private final GpioPinDigitalOutput gpioE;
+//	private final GpioPinDigitalOutput gpioRS;
+//	private final GpioPinDigitalOutput gpioD4;
+//	private final GpioPinDigitalOutput gpioD5;
+//	private final GpioPinDigitalOutput gpioD6;
+//	private final GpioPinDigitalOutput gpioD7;
+//	private final GpioPinDigitalOutput gpioOn;
+	private final DigitalOutput gpioRS;
+	private final DigitalOutput gpioE;
+	private final DigitalOutput gpioD4;
+	private final DigitalOutput gpioD5;
+	private final DigitalOutput gpioD6;
+	private final DigitalOutput gpioD7;
+	private final DigitalOutput gpioOn;
 
 	// Delay in nanos
 	private final static int E_DELAY = (int) TimeUnit.MICROSECONDS.toNanos(500);
@@ -95,8 +102,8 @@ public class Lcd20x4 {
 	 * Use this if you have used the default wiring in the example.
 	 */
 	public Lcd20x4() {
-		this(RaspiPin.GPIO_11, RaspiPin.GPIO_10, RaspiPin.GPIO_06, RaspiPin.GPIO_05, RaspiPin.GPIO_04, RaspiPin.GPIO_01,
-				RaspiPin.GPIO_16);
+		this(GpioPin.GPIO_11, GpioPin.GPIO_10, GpioPin.GPIO_06, GpioPin.GPIO_05, GpioPin.GPIO_04, GpioPin.GPIO_01,
+				GpioPin.GPIO_16);
 	}
 
 	/**
@@ -119,16 +126,38 @@ public class Lcd20x4 {
 	 * @param pinOn
 	 *            ping 0n
 	 */
-	public Lcd20x4(Pin pinRS, Pin pinE, Pin pinD4, Pin pinD5, Pin pinD6, Pin pinD7, Pin pinOn) {
-		GpioController gpio = GpioFactory.getInstance();
-		gpioRS = gpio.provisionDigitalOutputPin(pinRS, "RS", PinState.LOW);
-		gpioE = gpio.provisionDigitalOutputPin(pinE, "E", PinState.LOW);
-		gpioD4 = gpio.provisionDigitalOutputPin(pinD4, "D4", PinState.LOW);
-		gpioD5 = gpio.provisionDigitalOutputPin(pinD5, "D5", PinState.LOW);
-		gpioD6 = gpio.provisionDigitalOutputPin(pinD6, "D6", PinState.LOW);
-		gpioD7 = gpio.provisionDigitalOutputPin(pinD7, "D7", PinState.LOW);
-		gpioOn = gpio.provisionDigitalOutputPin(pinOn, "On", PinState.HIGH);
+	public Lcd20x4(GpioPin pinRS, GpioPin pinE, GpioPin pinD4, GpioPin pinD5, GpioPin pinD6, GpioPin pinD7, GpioPin pinOn) {
+		var pi4jRpiContext = Pi4J.newAutoContext();
+		var digitalOutputBuilder = DigitalOutput.newConfigBuilder(pi4jRpiContext);
+		var configPinRS =createPinConfig(digitalOutputBuilder, pinRS, DigitalState.LOW);
+		var configPinE =createPinConfig(digitalOutputBuilder, pinE, DigitalState.LOW);
+		var configPinD4 =createPinConfig(digitalOutputBuilder, pinD4, DigitalState.LOW);
+		var configPinD5 =createPinConfig(digitalOutputBuilder, pinD5, DigitalState.LOW);
+		var configPinD6 =createPinConfig(digitalOutputBuilder, pinD6, DigitalState.LOW);
+		var configPinD7 =createPinConfig(digitalOutputBuilder, pinD7, DigitalState.LOW);
+		var configPinOn =createPinConfig(digitalOutputBuilder, pinOn, DigitalState.LOW);
+
+		gpioRS = pi4jRpiContext.dout().create(configPinRS);
+		gpioE = pi4jRpiContext.dout().create(configPinE);
+		gpioD4 = pi4jRpiContext.dout().create(configPinD4);
+		gpioD5 = pi4jRpiContext.dout().create(configPinD5);
+		gpioD6 = pi4jRpiContext.dout().create(configPinD6);
+		gpioD7 = pi4jRpiContext.dout().create(configPinD7);
+		gpioOn = pi4jRpiContext.dout().create(configPinOn);
+
+//		GpioController gpio = GpioFactory.getInstance();
+//		gpioRS = gpio.provisionDigitalOutputPin(pinRS, "RS", PinState.LOW);
+//		gpioE = gpio.provisionDigitalOutputPin(pinE, "E", PinState.LOW);
+//		gpioD4 = gpio.provisionDigitalOutputPin(pinD4, "D4", PinState.LOW);
+//		gpioD5 = gpio.provisionDigitalOutputPin(pinD5, "D5", PinState.LOW);
+//		gpioD6 = gpio.provisionDigitalOutputPin(pinD6, "D6", PinState.LOW);
+//		gpioD7 = gpio.provisionDigitalOutputPin(pinD7, "D7", PinState.LOW);
+//		gpioOn = gpio.provisionDigitalOutputPin(pinOn, "On", PinState.HIGH);
 		initialize();
+	}
+
+	private DigitalOutputConfig createPinConfig(DigitalOutputConfigBuilder builder, GpioPin pin,  DigitalState state){
+		return 	builder.address(pin.address()).onState(state).build();
 	}
 
 	private void initialize() {
@@ -150,7 +179,7 @@ public class Lcd20x4 {
 	}
 
 	private void sendByte(int bits, Mode cmd) {
-		System.out.println(Integer.toString(bits));
+		System.out.println(bits);
 		gpioRS.setState(cmd.getSendValue());
 		dataLow();
 

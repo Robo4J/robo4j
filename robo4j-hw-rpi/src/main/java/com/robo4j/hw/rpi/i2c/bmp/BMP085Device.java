@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  */
 package com.robo4j.hw.rpi.i2c.bmp;
 
-import com.pi4j.io.i2c.I2CBus;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
+import com.robo4j.hw.rpi.utils.I2cBus;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -59,6 +59,7 @@ public final class BMP085Device extends AbstractI2CDevice {
 	private short MC;
 	private short MD;
 
+	// TODO review enum placement
 	/**
 	 * Available operating modes for the BMP085.
 	 */
@@ -80,8 +81,8 @@ public final class BMP085Device extends AbstractI2CDevice {
 		 */
 		ULTRA_HIGH_RES(255, 12);
 
-		int waitTime;
-		int currentDraw;
+		private final int waitTime;
+		private final int currentDraw;
 
 		OperatingMode(int maxConversionTime, int currentDraw) {
 			this.waitTime = (maxConversionTime + 5) / 10;
@@ -113,7 +114,7 @@ public final class BMP085Device extends AbstractI2CDevice {
 	/**
 	 * Constructs a BMPDevice using the default settings. (I2CBUS.BUS_1, 0x77)
 	 * 
-	 * @see #BMP085Device(int, int, OperatingMode)
+	 * @see BMP085Device
 	 *
 	 * @param mode
 	 *            operating mode
@@ -123,7 +124,7 @@ public final class BMP085Device extends AbstractI2CDevice {
 	 */
 	public BMP085Device(OperatingMode mode) throws IOException {
 		// 0x77 is the default address used by the AdaFruit BMP board.
-		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, mode);
+		this(I2cBus.BUS_1, DEFAULT_I2C_ADDRESS, mode);
 	}
 
 	/**
@@ -136,12 +137,12 @@ public final class BMP085Device extends AbstractI2CDevice {
 	 * @param mode
 	 *            operating mode
 	 * 
-	 * @see I2CBus documentation
+	 * @see I2cBus documentation
 	 * 
 	 * @throws IOException
 	 *             if there was communication problem
 	 */
-	public BMP085Device(int bus, int address, OperatingMode mode) throws IOException {
+	public BMP085Device(I2cBus bus, int address, OperatingMode mode) throws IOException {
 		super(bus, address);
 		this.mode = mode;
 		readCalibrationData();
@@ -223,7 +224,8 @@ public final class BMP085Device extends AbstractI2CDevice {
 	 *             if there was a communication problem
 	 */
 	public int readRawTemp() throws IOException {
-		i2cDevice.write(BMP085_CONTROL, BMP085_READTEMPCMD);
+//		i2CConfig.write(BMP085_CONTROL, BMP085_READTEMPCMD);
+		writeByte(BMP085_CONTROL, BMP085_READTEMPCMD);
 		sleep(50);
 		return readU2(BMP085_TEMPDATA);
 	}
@@ -236,7 +238,8 @@ public final class BMP085Device extends AbstractI2CDevice {
 	 *             if there was a communication problem
 	 */
 	public int readRawPressure() throws IOException {
-		i2cDevice.write(BMP085_CONTROL, BMP085_READPRESSURECMD);
+//		i2CConfig.write(BMP085_CONTROL, BMP085_READPRESSURECMD);
+		writeByte(BMP085_CONTROL, BMP085_READPRESSURECMD);
 		sleep(mode.getWaitTime());
 		return readU3(BMP085_PRESSUREDATA) >> (8 - mode.getOverSamplingSetting());
 	}
@@ -244,7 +247,8 @@ public final class BMP085Device extends AbstractI2CDevice {
 	private void readCalibrationData() throws IOException {
 		int totalBytes = CALIBRATION_END - CALIBRATION_START + 1;
 		byte[] bytes = new byte[totalBytes];
-		int bytesRead = i2cDevice.read(CALIBRATION_START, bytes, 0, totalBytes);
+//		int bytesRead = i2CConfig.read(CALIBRATION_START, bytes, 0, totalBytes);
+		int bytesRead = readBufferByAddress(CALIBRATION_START, bytes, 0, totalBytes);
 		if (bytesRead != totalBytes) {
 			throw new IOException("Could not read calibration data. Read " + Arrays.toString(bytes) + " of " + totalBytes);
 		}

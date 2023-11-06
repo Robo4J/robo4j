@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -21,6 +21,7 @@ import com.robo4j.hw.rpi.gps.GPSListener;
 import com.robo4j.hw.rpi.gps.NmeaUtils;
 import com.robo4j.hw.rpi.gps.PositionEvent;
 import com.robo4j.hw.rpi.gps.VelocityEvent;
+import com.robo4j.hw.rpi.utils.I2cBus;
 
 import java.io.IOException;
 import java.util.List;
@@ -59,7 +60,7 @@ public class TitanX1GPS implements GPS {
 		this.device = new XA1110Device();
 	}
 
-	public TitanX1GPS(int bus, int address) throws IOException {
+	public TitanX1GPS(I2cBus bus, int address) throws IOException {
 		this.device = new XA1110Device(bus, address);
 	}
 

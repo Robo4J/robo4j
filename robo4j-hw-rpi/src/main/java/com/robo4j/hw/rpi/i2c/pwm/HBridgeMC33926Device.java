@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,97 +16,114 @@
  */
 package com.robo4j.hw.rpi.i2c.pwm;
 
-import java.io.IOException;
-
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.PinState;
+import com.pi4j.Pi4J;
+import com.pi4j.io.gpio.digital.DigitalOutput;
+import com.pi4j.io.gpio.digital.DigitalState;
 import com.robo4j.hw.rpi.Motor;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
+import com.robo4j.hw.rpi.utils.GpioPin;
+
+import java.io.IOException;
 
 /**
  * Motor controller for the Pololu H-bridge motor controller based on
  * Freescale's MC33926.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class HBridgeMC33926Device implements Motor {
-	private final String name;
-	private final PWMChannel channel;
-	private final boolean invert;
-	private final GpioPinDigitalOutput in1;
-	private final GpioPinDigitalOutput in2;
+    private final String name;
+    private final PWMChannel channel;
+    private final boolean invert;
+    //    private final GpioPinDigitalOutput in1;
+//    private final GpioPinDigitalOutput in2;
+    private final DigitalOutput gpioOut1;
+    private final DigitalOutput gpioOut2;
 
-	private Direction direction = Direction.FORWARD;
-	private float speed = 0;
+    private Direction direction = Direction.FORWARD;
+    private float speed = 0;
 
-	public enum Direction {
-		FORWARD, REVERSE
-	}
+    public enum Direction {
+        FORWARD, REVERSE
+    }
 
-	public HBridgeMC33926Device(String name, PWMChannel channel, Pin in1, Pin in2, boolean invert) {
-		this.name = name;
-		this.channel = channel;
-		this.invert = invert;
-		GpioController gpio = GpioFactory.getInstance();
-		this.in1 = gpio.provisionDigitalOutputPin(in1, "IN1", PinState.LOW);
-		this.in2 = gpio.provisionDigitalOutputPin(in2, "IN2", PinState.HIGH);
-		setDirection(Direction.FORWARD);
-	}
+    public HBridgeMC33926Device(String name, PWMChannel channel, GpioPin pin1, GpioPin pin2, boolean invert) {
+        this.name = name;
+        this.channel = channel;
+        this.invert = invert;
 
-	public String getName() {
-		return name;
-	}
+        var pi4jRpiContext = Pi4J.newAutoContext();
+        var digitalOutputBuilder = DigitalOutput.newConfigBuilder(pi4jRpiContext);
+        var gpioConfig1 = digitalOutputBuilder.address(pin1.address()).onState(DigitalState.LOW).build();
+        var gpioConfig2 = digitalOutputBuilder.address(pin2.address()).onState(DigitalState.HIGH).build();
 
-	@Override
-	public float getSpeed() throws IOException {
-		return (this.getDirection() == Direction.FORWARD ? 1 : -1) * internalGetSpeed();
-	}
+//		GpioController gpio = GpioFactory.getInstance();
+//		this.in1 = gpio.provisionDigitalOutputPin(in1, "IN1", PinState.LOW);
+//		this.in2 = gpio.provisionDigitalOutputPin(in2, "IN2", PinState.HIGH);
+        gpioOut1 = pi4jRpiContext.dout().create(gpioConfig1);
+        gpioOut2 = pi4jRpiContext.dout().create(gpioConfig2);
+        setDirection(Direction.FORWARD);
+    }
 
-	@Override
-	public void setSpeed(float speed) throws IOException {
-		if (speed < 0) {
-			if (this.direction != Direction.REVERSE) {
-				setDirection(Direction.REVERSE);
-			}
-		} else {
-			if (this.direction != Direction.FORWARD) {
-				setDirection(Direction.FORWARD);
-			}
-		}
-		internalSetSpeed(speed);
-	}
-	
-	private void internalSetSpeed(float speed) throws IOException {
-		int width = Math.round(speed * 4095);
-		channel.setPWM(0, width);
-		this.speed = speed;
-	}
+    public String getName() {
+        return name;
+    }
 
-	private float internalGetSpeed() {
-		return speed;
-	}
+    @Override
+    public float getSpeed() throws IOException {
+        return (this.getDirection() == Direction.FORWARD ? 1 : -1) * internalGetSpeed();
+    }
 
-	private Direction getDirection() {
-		return direction;
-	}
+    @Override
+    public void setSpeed(float speed) throws IOException {
+        if (speed < 0) {
+            if (this.direction != Direction.REVERSE) {
+                setDirection(Direction.REVERSE);
+            }
+        } else {
+            if (this.direction != Direction.FORWARD) {
+                setDirection(Direction.FORWARD);
+            }
+        }
+        internalSetSpeed(speed);
+    }
 
-	private void setDirection(Direction direction) {
-		boolean forward = direction == Direction.FORWARD;
-		if (invert) {
-			forward = !forward;
-		}
+    private void internalSetSpeed(float speed) throws IOException {
+        int width = Math.round(speed * 4095);
+        channel.setPWM(0, width);
+        this.speed = speed;
+    }
 
-		if (forward) {
-			in1.setState(PinState.HIGH);
-			in2.setState(PinState.LOW);
-		} else {
-			in1.setState(PinState.LOW);
-			in2.setState(PinState.HIGH);
-		}
-		this.direction = direction;
-	}
+    private float internalGetSpeed() {
+        return speed;
+    }
+
+    private Direction getDirection() {
+        return direction;
+    }
+
+    private void setDirection(Direction direction) {
+        boolean forward = direction == Direction.FORWARD;
+        if (invert) {
+            forward = !forward;
+        }
+
+        if (forward) {
+//            in1.setState(PinState.HIGH);
+//            in2.setState(PinState.LOW);
+            gpioOut1.setState(digitalStateToByte(DigitalState.HIGH));
+            gpioOut2.setState(digitalStateToByte(DigitalState.LOW));
+        } else {
+//            in1.setState(PinState.LOW);
+//            in2.setState(PinState.HIGH);
+            gpioOut1.setState(digitalStateToByte(DigitalState.LOW));
+            gpioOut2.setState(digitalStateToByte(DigitalState.HIGH));
+        }
+        this.direction = direction;
+    }
+
+    private int digitalStateToByte(DigitalState state) {
+        return state.value().intValue();
+    }
 }

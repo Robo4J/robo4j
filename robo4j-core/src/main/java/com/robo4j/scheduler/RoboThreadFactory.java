@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,22 +29,22 @@ public class RoboThreadFactory implements ThreadFactory {
 	/**
 	 * The thread group to use.
 	 */
-	private ThreadGroup threadGroup;
+	private final ThreadGroup threadGroup;
 
 	/**
 	 * Attribute to store the number of threads created by the Factory
 	 */
-	private AtomicInteger counter;
+	private final AtomicInteger counter;
 
 	/**
 	 * Prefix to use in the name of the the threads create by the factory
 	 */
-	private String threadBaseName;
+	private final String threadBaseName;
 
 	/**
 	 * Create daemon threads?
 	 */
-	private boolean isDaemon;
+	private final boolean isDaemon;
 
 	/**
 	 * Constructor that initiates attributes

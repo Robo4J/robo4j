@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ public class RoboClawRCTankTest {
 	}
 
 	public static void testEngine(float speed, float direction, int duration) throws IOException, InterruptedException {
-		System.out.println(String.format("Running for %d ms with speed %f and direction %f.", duration, speed, direction));
+		System.out.printf("Running for %d ms with speed %f and direction %f.%n", duration, speed, direction);
 		PWMPCA9685Device device = new PWMPCA9685Device();
 		device.setPWMFrequency(SERVO_FREQUENCY);
 		Servo leftEngine = new PCA9685Servo(device.getChannel(6));

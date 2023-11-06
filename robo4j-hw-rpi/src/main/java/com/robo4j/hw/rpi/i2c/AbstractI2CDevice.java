@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,213 +16,224 @@
  */
 package com.robo4j.hw.rpi.i2c;
 
-import com.pi4j.io.i2c.I2CBus;
-import com.pi4j.io.i2c.I2CDevice;
-import com.pi4j.io.i2c.I2CFactory;
+import com.pi4j.Pi4J;
+import com.pi4j.exception.InitializeException;
+import com.pi4j.io.i2c.I2C;
+import com.pi4j.io.i2c.I2CConfig;
+import com.robo4j.hw.rpi.utils.I2cBus;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 /**
  * Abstract super class for I2C devices.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public abstract class AbstractI2CDevice {
-	private final int bus;
-	private final int address;
-	protected final I2CDevice i2cDevice;
+    private final I2cBus bus;
+    private final int address;
+    protected final I2C i2C;
 
-	/**
-	 * Creates an I2C device.
-	 * 
-	 * @param bus
-	 *            the I2C bus to use.
-	 * 
-	 * @param address
-	 *            the address to use.
-	 * 
-	 * @see I2CBus
-	 * 
-	 * @throws IOException
-	 *             if there was communication problem.
-	 */
-	public AbstractI2CDevice(int bus, int address) throws IOException {
-		this.bus = bus;
-		this.address = address;
-		try {
-			this.i2cDevice = I2CFactory.getInstance(bus).getDevice(address);
-		} catch (com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException e) {
-			throw new IOException("Unsupported bus", e);
-		}
-	}
+    /**
+     * Creates an I2C device.
+     *
+     * @param bus     the I2C bus to use.
+     * @param address the address to use.
+     * @throws IOException if there was communication problem.
+     * @see I2CConfig
+     */
+    public AbstractI2CDevice(I2cBus bus, int address) throws IOException {
+        this.bus = bus;
+        this.address = address;
+        try {
+            var pi4jRpiContext = Pi4J.newAutoContext();
+            // TODO: it should happen during the initiation
+            var i2CConfig = I2C.newConfigBuilder(pi4jRpiContext).bus(bus.address()).device(address).build();
+            this.i2C = pi4jRpiContext.i2c().create(i2CConfig);
+        } catch (InitializeException e) {
+            throw new IOException("Unsupported i2c config", e);
+        }
+    }
 
-	/**
-	 * Returns the bus used when communicating with this I2C device.
-	 * 
-	 * @return the bus used when communicating with this I2C device.
-	 */
-	public final int getBus() {
-		return bus;
-	}
+    /**
+     * Returns the bus used when communicating with this I2C device.
+     *
+     * @return the bus used when communicating with this I2C device.
+     */
+    public final I2cBus getBus() {
+        return bus;
+    }
 
-	/**
-	 * Returns the address used when communicating with this I2C device.
-	 * 
-	 * @return the address used when communicating with this I2C device.
-	 */
-	public final int getAddress() {
-		return address;
-	}
+    /**
+     * Returns the address used when communicating with this I2C device.
+     *
+     * @return the address used when communicating with this I2C device.
+     */
+    public final int getAddress() {
+        return address;
+    }
 
-	/**
-	 * Writes the bytes directly to the I2C device.
-	 * 
-	 * @param address
-	 *            the address local to the i2c device.
-	 * 
-	 * @param b
-	 *            the byte to write.
-	 * 
-	 * @throws IOException
-	 *             if there was communication problem
-	 */
-	protected void writeByte(int address, byte b) throws IOException {
-		i2cDevice.write(address, b);
-	}
+    /**
+     * Convenience method to get a logger for the specific class.
+     *
+     * @return a logger for this class.
+     */
+    public Logger getLogger() {
+        return Logger.getLogger(this.getClass().getName());
+    }
 
-	/**
-	 * Writes the bytes directly to the I2C device.
-	 * 
-	 * @param buffer
-	 *            the bytes to write.
-	 * 
-	 * @throws IOException
-	 *             if there was communication problem
-	 */
-	protected void writeBytes(byte[] buffer) throws IOException {
-		i2cDevice.write(buffer);
-	}
+    /**
+     * Writes the bytes directly to the I2C device.
+     *
+     * @param b       the byte to write.
+     * @throws IOException if there was communication problem
+     */
+    protected void writeByte(byte b) throws IOException {
+//		i2CConfig.write( b);
+        i2C.write(b);
+    }
 
-	/**
-	 * Reads the byte at the device local address.
-	 * 
-	 * @param address
-	 *            the address local to the i2c device.
-	 * 
-	 * @return the byte at the address.
-	 * 
-	 * @throws IOException
-	 *             if there was communication problem
-	 */
-	protected int readByte(int address) throws IOException {
-		return i2cDevice.read(address);
-	}
+    /**
+     * Writes the bytes directly to the I2C device by address.
+     *
+     * @param address the register address local to the i2c device.
+     * @param b       the byte to write.
+     * @throws IOException if there was communication problem
+     */
+    protected void writeByte(int address, byte b) throws IOException {
+//		i2CConfig.write(address, b);
+        i2C.getRegister(address).write(b);
+    }
 
-	protected void sleep(long millis) {
-		try {
-			Thread.sleep(millis);
-		} catch (InterruptedException e) {
-			// Don't care
-		}
-	}
+    /**
+     * Writes the bytes directly to the I2C device.
+     *
+     * @param buffer the bytes to write.
+     * @throws IOException if there was communication problem
+     */
+    protected void writeBytes(byte[] buffer) throws IOException {
+//		i2CConfig.write(buffer);
+        i2C.write(buffer);
+    }
 
-	/**
-	 * Convenience method to get a logger for the specific class.
-	 * 
-	 * @return a logger for this class.
-	 */
-	public Logger getLogger() {
-		return Logger.getLogger(this.getClass().getName());
-	}
+    protected void writeByteBufferByAddress(int address, byte[] buffer){
+        i2C.getRegister(address).write(buffer);
+    }
 
-	/**
-	 * Read 2 bytes as an unsigned int from the specified address.
-	 *
-	 * @param address
-	 *            address local to the i2c device.
-	 * 
-	 * @return the 2 bytes as an unsigned integer.
-	 * 
-	 * @throws IOException
-	 *             if there was communication problem
-	 */
-	protected int readU2(int address) throws IOException {
-		// Some profiling is in order to figure out if it is faster to do this
-		// by allocating an array and using the read method taking an array
-		// instead. TODO: Check Pi4j implementation - may become two reads.
-		int hi = i2cDevice.read(address);
-		int lo = i2cDevice.read(address + 1);
-		return (hi << 8) + lo & 0xff;
-	}
+    protected void writeByteBufferByAddress(int address, byte[] buffer, int offset, int length){
+        i2C.getRegister(address).write(buffer, offset, length);
+    }
 
-	/**
-	 * Reads 2 bytes unsigned directly from the i2cDevice.
-	 *
-	 * @return the 2 bytes read as an unsigned int.
-	 * 
-	 * @throws IOException
-	 *             exception
-	 */
-	protected int readU2Array() throws IOException {
-		byte[] result = new byte[2];
-		i2cDevice.read(result, 0, 2);
-		return (result[0] << 8) + (result[1] & 0xff);
-	}
+    /**
+     * Reads the byte at the device local address.
+     *
+     * @param address the address local to the i2c device.
+     * @return the byte at the address.
+     * @throws IOException if there was communication problem
+     */
+    protected int readByte(int address) throws IOException {
+//		return i2CConfig.read(address);
+        return i2C.getRegister(address).read();
+    }
 
-	/**
-	 * Read 2 bytes unsigned, array version.
-	 *
-	 * @param address
-	 *            bus address
-	 * @return reading
-	 * @throws IOException
-	 *             exception
-	 */
-	protected int readU2Array(int address) throws IOException {
-		// FIXME(Marcus/Dec 20, 2016): Need to check which methods is
-		// superior. Tmp allocation vs fewer read calls?
-		byte[] result = new byte[2];
-		i2cDevice.read(address, result, 0, 2);
-		return (result[0] << 8) + (result[1] & 0xff);
-	}
+    protected void sleep(long millis) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(millis);
+        } catch (InterruptedException e) {
+            // Don't care
+        }
+    }
 
-	/**
-	 * Read 3 bytes unsigned.
-	 *
-	 * @param address
-	 *            bus address
-	 * @return reading
-	 * @throws IOException
-	 *             exception
-	 */
-	protected int readU3(int address) throws IOException {
-		// TODO: Check if there is any potential performance benefit to reading
-		// them all at once into a byte array. It's probably translated to
-		// to consecutive byte reads anyways, so probably not.
-		int msb = i2cDevice.read(address);
-		int lsb = i2cDevice.read(address + 1);
-		int xlsb = i2cDevice.read(address + 2);
-		return (msb << 16) + (lsb << 8) + xlsb & 0xff;
-	}
+    protected int readBufferByAddress(int address, byte[] buffer, int offset, int length){
+//        i2CConfig.read(OUT_X_H_M, data, 0, RESULT_BUFFER_SIZE);
+        return i2C.getRegister(address).read(buffer, offset, length);
+    }
 
-	/**
-	 * Read 3 bytes unsigned.
-	 *
-	 * @param address
-	 *            bus address
-	 * @return reading
-	 * @throws IOException
-	 *             exception
-	 */
-	protected int readU3Array(int address) throws IOException {
-		// TODO: Check if there is any potential performance benefit to reading
-		// them all at once into a byte array. It's probably translated to
-		// to consecutive byte reads anyways, so probably not.
-		byte[] result = new byte[3];
-		i2cDevice.read(address, result, 0, 3);
-		return (result[0] << 16) + (result[1] << 8) + result[2] & 0xff;
-	}
+    protected int readBuffer(byte[] buffer, int offset, int length){
+//        i2CConfig.read(OUT_X_H_M, data, 0, RESULT_BUFFER_SIZE);
+        return i2C.read(buffer, offset, length);
+    }
+
+    /**
+     * Read 2 bytes as an unsigned int from the specified address.
+     *
+     * @param address address local to the i2c device.
+     * @return the 2 bytes as an unsigned integer.
+     * @throws IOException if there was communication problem
+     */
+    protected int readU2(int address) throws IOException {
+        // Some profiling is in order to figure out if it is faster to do this
+        // by allocating an array and using the read method taking an array
+        // instead. TODO: Check Pi4j implementation - may become two reads.
+        int hi = readByte(address);
+        int lo = readByte(address + 1);
+        return (hi << 8) + lo & 0xff;
+    }
+
+    /**
+     * Reads 2 bytes unsigned directly from the i2cDevice.
+     *
+     * @return the 2 bytes read as an unsigned int.
+     * @throws IOException exception
+     */
+    protected int readU2Array() throws IOException {
+        byte[] result = new byte[2];
+//		i2CConfig.read(result, 0, 2);
+        i2C.read(result, 0, 2);
+        return (result[0] << 8) + (result[1] & 0xff);
+    }
+
+    /**
+     * Read 2 bytes unsigned, array version.
+     *
+     * @param address bus address
+     * @return reading
+     * @throws IOException exception
+     */
+    protected int readU2Array(int address) throws IOException {
+        // FIXME(Marcus/Dec 20, 2016): Need to check which methods is
+        // superior. Tmp allocation vs fewer read calls?
+        byte[] result = new byte[2];
+//		i2CConfig.read(address, result, 0, 2);
+        i2C.getRegister(address).read(result, 0, 2);
+        return (result[0] << 8) + (result[1] & 0xff);
+    }
+
+    /**
+     * Read 3 bytes unsigned.
+     *
+     * @param address bus address
+     * @return reading
+     * @throws IOException exception
+     */
+    protected int readU3(int address) throws IOException {
+        // TODO: Check if there is any potential performance benefit to reading
+        // them all at once into a byte array. It's probably translated to
+        // to consecutive byte reads anyways, so probably not.
+        int msb = i2C.getRegister(address).read();
+        int lsb = i2C.getRegister(address + 1).read();
+        int xlsb = i2C.getRegister(address + 2).read();
+        return (msb << 16) + (lsb << 8) + xlsb & 0xff;
+    }
+
+    /**
+     * Read 3 bytes unsigned.
+     *
+     * @param address bus address
+     * @return reading
+     * @throws IOException exception
+     */
+    protected int readU3Array(int address) throws IOException {
+        // TODO: Check if there is any potential performance benefit to reading
+        // them all at once into a byte array. It's probably translated to
+        // to consecutive byte reads anyways, so probably not.
+        byte[] result = new byte[3];
+//		i2CConfig.read(address, result, 0, 3);
+        i2C.getRegister(address).read(result, 0, 3);
+        return (result[0] << 16) + (result[1] << 8) + result[2] & 0xff;
+    }
 
 }

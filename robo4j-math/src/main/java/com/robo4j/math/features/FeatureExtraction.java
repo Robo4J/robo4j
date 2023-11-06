@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ import com.robo4j.math.geometry.Point2f;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
+// TODO review usage
 public class FeatureExtraction {
 	/**
 	 * The residual variance of the Lidar Lite (25 mm).
@@ -155,8 +156,7 @@ public class FeatureExtraction {
 			corners.addAll(extractCorners(Point2fs, deltaAngles));
 		}
 
-		FeatureSet result = new FeatureSet(Line2fs, corners);
-		return result;
+        return new FeatureSet(Line2fs, corners);
 	}
 
 	@SuppressWarnings("unused")
@@ -281,7 +281,7 @@ public class FeatureExtraction {
 		return Point2DIndex - i;
 	}
 
-	public static final void main(String[] args) {
+	public static void main(String[] args) {
 		Point2f b = Point2f.fromPolar(18, 18);
 		Point2f center = Point2f.fromPolar(19, 19);
 		Point2f f = Point2f.fromPolar(20, 20);

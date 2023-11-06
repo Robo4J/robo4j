@@ -34,4 +34,9 @@ module robo4j.core {
     uses com.robo4j.util.Utf8Constant;
     uses com.robo4j.configuration.Configuration;
 
+    uses com.robo4j.net.LookupService;
+    uses com.robo4j.net.RoboContextDescriptor;
+    provides com.robo4j.net.LookupService with com.robo4j.net.LocalLookupServiceImpl;
+
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,8 +43,8 @@ public class RaspistillUnit extends RoboUnit<RaspistillRequest> {
 	private static final EnumSet<LifecycleState> acceptedStates = EnumSet.of(LifecycleState.STARTING,
 			LifecycleState.STARTED);
 	private static final String PROPERTY_TARGET = "target";
-	private AtomicBoolean continualMode = new AtomicBoolean(false);
-	private AtomicBoolean cameraProgress = new AtomicBoolean(false);
+	private final AtomicBoolean continualMode = new AtomicBoolean(false);
+	private final AtomicBoolean cameraProgress = new AtomicBoolean(false);
 
 	private final RaspiDevice device = new RaspiDevice();
 	private String target;

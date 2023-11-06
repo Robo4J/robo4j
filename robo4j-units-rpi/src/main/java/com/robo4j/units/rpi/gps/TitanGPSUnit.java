@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,16 +42,16 @@ import com.robo4j.logging.SimpleLoggingUtil;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class TitanGPSUnit extends RoboUnit<GPSRequest> {
+	private final List<GPSEventListener> listeners = new ArrayList<>();
 	private TitanX1GPS titangps;
-	private List<GPSEventListener> listeners = new ArrayList<>();
 
 	// The future, if scheduled with the platform scheduler
 	private volatile ScheduledFuture<?> scheduledFuture;
 
 	private static class GPSEventListener implements GPSListener {
-		private RoboReference<GPSEvent> target;
+		private final RoboReference<GPSEvent> target;
 
-		GPSEventListener(RoboReference<GPSEvent> target) {
+		private GPSEventListener(RoboReference<GPSEvent> target) {
 			this.target = target;
 		}
 
@@ -131,7 +131,7 @@ public class TitanGPSUnit extends RoboUnit<GPSRequest> {
 	}
 
 	private synchronized void register(RoboReference<GPSEvent> targetReference) {
-		GPSEventListener listener = new GPSEventListener(targetReference);
+		var listener = new GPSEventListener(targetReference);
 		listeners.add(listener);
 		titangps.addListener(listener);
 	}

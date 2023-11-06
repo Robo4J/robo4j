@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ import java.util.stream.StreamSupport;
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class StreamUtils {
-	private static final int CONTENT_END = -1;
+	public static final int STREAM_END = -1;
 
 	/**
 	 * convert Enumeration to the Stream
@@ -97,7 +97,7 @@ public final class StreamUtils {
 	public static byte[] inputStreamToByteArray(InputStream inputStream) {
 		try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 			int imageCh;
-			while ((imageCh = inputStream.read()) != CONTENT_END) {
+			while ((imageCh = inputStream.read()) != STREAM_END) {
 				baos.write(imageCh);
 			}
 			inputStream.close();

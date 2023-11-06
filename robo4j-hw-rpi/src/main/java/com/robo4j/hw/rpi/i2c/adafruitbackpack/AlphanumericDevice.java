@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
-import com.pi4j.io.i2c.I2CBus;
+import com.robo4j.hw.rpi.utils.I2cBus;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -146,10 +146,10 @@ public class AlphanumericDevice extends AbstractBackpack {
 	private final AtomicInteger position = new AtomicInteger(0);
 
 	public AlphanumericDevice() throws IOException {
-		this(I2CBus.BUS_1, 0x70, DEFAULT_BRIGHTNESS);
+		this(I2cBus.BUS_1, 0x70, DEFAULT_BRIGHTNESS);
 	}
 
-	public AlphanumericDevice(int bus, int address, int brightness) throws IOException {
+	public AlphanumericDevice(I2cBus bus, int address, int brightness) throws IOException {
 		super(bus, address, brightness);
 	}
 

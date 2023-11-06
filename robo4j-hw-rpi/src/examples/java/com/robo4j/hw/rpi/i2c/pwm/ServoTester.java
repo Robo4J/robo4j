@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -78,16 +78,16 @@ public class ServoTester {
 	}
 
 	private static void printPrompt() {
-		System.out.print(String.format("known servos=%d>", getNumberOfKnownServos()));
+		System.out.printf("known servos=%d>", getNumberOfKnownServos());
 	}
 
 	private static int getNumberOfKnownServos() {
 		int count = 0;
-		for (int i = 0; i < SERVOS.length; i++) {
-			if (SERVOS[i] != null) {
-				count++;
-			}
-		}
+        for (Servo servo : SERVOS) {
+            if (servo != null) {
+                count++;
+            }
+        }
 		return count;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,11 +40,12 @@ public enum LF710Button implements LF710Input {
     BACK                ((short)8,  "back"),
     START               ((short)9,  "start"),
     JOYSTICK_LEFT       ((short)10, "joystick left"),
-    JOYSTICK_RIGHT      ((short)11, "joystick right")
+    JOYSTICK_RIGHT      ((short)11, "joystick right"),
+    UNKNOWN((short)-1, "")
     ;
     //@formatter:on
 
-    private static volatile Map<Short, LF710Button> internMapByMask;
+    private static final Map<Short, LF710Button> internMapByMask = initMapping();
     private final short mask;
     private final String name;
 
@@ -66,10 +67,9 @@ public enum LF710Button implements LF710Input {
     }
 
     public static LF710Button getByMask(Short mask) {
-        if (internMapByMask == null)
-            internMapByMask = initMapping();
-        return internMapByMask.entrySet().stream().map(Map.Entry::getValue).filter(e -> e.getMask() == mask).findFirst()
-                .orElse(null);
+        return internMapByMask.values().stream()
+                .filter(e -> e.getMask() == mask).findFirst()
+                .orElse(UNKNOWN);
     }
 
     @Override

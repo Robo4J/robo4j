@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -117,10 +117,8 @@ public class Point2f {
 		Point2f other = (Point2f) obj;
 		if (Float.floatToIntBits(angle) != Float.floatToIntBits(other.angle))
 			return false;
-		if (Float.floatToIntBits(range) != Float.floatToIntBits(other.range))
-			return false;
-		return true;
-	}
+        return Float.floatToIntBits(range) == Float.floatToIntBits(other.range);
+    }
 
 	/**
 	 * A positive value denoting the difference in range to the two points.

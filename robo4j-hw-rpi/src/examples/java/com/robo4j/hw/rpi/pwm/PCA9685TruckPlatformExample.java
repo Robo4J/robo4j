@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,8 +38,8 @@ public class PCA9685TruckPlatformExample {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		if (args.length != 5) {
-			System.out.println(String.format("Usage: %s <throttle> <steering> <leg> <shift> <duration>",
-					PCA9685TruckPlatformExample.class.getSimpleName()));
+			System.out.printf("Usage: %s <throttle> <steering> <leg> <shift> <duration>%n",
+					PCA9685TruckPlatformExample.class.getSimpleName());
 			System.out.flush();
 			System.exit(2);
 		}

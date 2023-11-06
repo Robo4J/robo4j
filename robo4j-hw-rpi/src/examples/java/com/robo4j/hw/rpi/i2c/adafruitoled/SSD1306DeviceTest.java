@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,9 +28,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import com.pi4j.io.gpio.RaspiPin;
-import com.pi4j.io.gpio.Pin;
 import com.robo4j.hw.rpi.i2c.adafruitoled.SSD1306Device.OLEDVariant;
+import com.robo4j.hw.rpi.utils.GpioPin;
 
 /**
  * Example which prints Hello World and draws a little. It also shows the image
@@ -43,7 +42,7 @@ import com.robo4j.hw.rpi.i2c.adafruitoled.SSD1306Device.OLEDVariant;
  */
 public class SSD1306DeviceTest {
 	private static final String DEFAULT_LINES = "32";
-	private static final Pin RESET_PIN = RaspiPin.GPIO_25;
+	private static final GpioPin RESET_PIN = GpioPin.GPIO_25;
 
 	/**
 	 * Start the example with either 32 or 64 as argument to select the number
@@ -62,7 +61,7 @@ public class SSD1306DeviceTest {
 		System.out.println("If the number of lines do not match your device,"); 
 		System.out.println("please add the number of lines as the first argument!");
 		
-		String text = args.length > 0 ? Stream.of(args).collect(Collectors.joining(" ")) : "Hello World!";
+		String text = args.length > 0 ? String.join(" ", args) : "Hello World!";
 		Graphics2D gc = oled.getGraphicsContext();
 		gc.setColor(Color.white);
 		gc.setBackground(Color.black);

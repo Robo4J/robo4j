@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
+import com.robo4j.hw.rpi.utils.I2cBus;
 
 /**
  * Helpful base class for {@link RoboUnit} units using the I2C protocol.
@@ -33,7 +34,7 @@ public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
 	public static final String PROPERTY_KEY_BUS = "bus";
 	public static final String PROPERTY_KEY_ADDRESS = "address";
 
-	private Integer bus;
+	private I2cBus bus;
 	private Integer address;
 
 	/**
@@ -50,7 +51,8 @@ public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		bus = configuration.getInteger(PROPERTY_KEY_BUS, DEFAULT_BUS);
+		var busNumber = configuration.getInteger(PROPERTY_KEY_BUS, DEFAULT_BUS);
+		bus = I2cBus.getByAddress(busNumber);
 		address = configuration.getInteger(PROPERTY_KEY_ADDRESS, null);
 		if (address == null) {
 			throw ConfigurationException.createMissingConfigNameException(PROPERTY_KEY_ADDRESS);
@@ -61,7 +63,7 @@ public abstract class I2CRoboUnit<T> extends RoboUnit<T> {
 		return address;
 	}
 
-	public int getBus() {
+	public I2cBus getBus() {
 		return bus;
 	}
 

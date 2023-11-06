@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ package com.robo4j.hw.rpi.imu.bno;
 public class Bno055SystemStatus {
 	private final StatusFlag[] flags;
 
+	// TODO : review inner enums
 	public enum StatusFlag {
 		//@formatter:off
 		IDLE(0, "Idle"), 
@@ -36,8 +37,8 @@ public class Bno055SystemStatus {
 		RUNNING_NO_SENSOR_FUSION(6, "System running with no sensor fusion");
 		//@formatter:on
 
-		int bitPosition;
-		String statusMessage;
+		private final int bitPosition;
+		private final String statusMessage;
 
 		StatusFlag(int bitPosition, String errorMessage) {
 			this.bitPosition = bitPosition;

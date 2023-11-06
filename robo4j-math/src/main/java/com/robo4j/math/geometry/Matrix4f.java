@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -281,10 +281,8 @@ public class Matrix4f implements Matrix {
 			return false;
 		if (Float.floatToIntBits(m43) != Float.floatToIntBits(other.m43))
 			return false;
-		if (Float.floatToIntBits(m44) != Float.floatToIntBits(other.m44))
-			return false;
-		return true;
-	}
+        return Float.floatToIntBits(m44) == Float.floatToIntBits(other.m44);
+    }
 	
 	@Override
 	public int getRows() {

@@ -20,6 +20,7 @@
  */
 module robo4j.math {
     requires jdk.jfr;
+    exports com.robo4j.math.features;
     exports com.robo4j.math.geometry;
     exports com.robo4j.math.geometry.impl;
     exports com.robo4j.math.jfr;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
  */
 package com.robo4j.hw.rpi.i2c.gps;
 
-import java.io.IOException;
-
 import com.robo4j.hw.rpi.gps.GPS;
 import com.robo4j.hw.rpi.gps.GPSListener;
 import com.robo4j.hw.rpi.gps.PositionEvent;
 import com.robo4j.hw.rpi.gps.VelocityEvent;
+
+import java.io.IOException;
 
 /**
  * Listens for GPS event and prints them to stdout as they come.
@@ -30,6 +30,7 @@ import com.robo4j.hw.rpi.gps.VelocityEvent;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GPSTest {
+	// TODO remove duplicates
 	public static void main(String[] args) throws InterruptedException, IOException {
 		GPS sparkFunGPS = new TitanX1GPS();
 		sparkFunGPS.addListener(new GPSListener() {

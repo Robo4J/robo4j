@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import java.lang.reflect.Field;
  */
 public class RaspiDevice {
 
-	private static final int CONTENT_END = -1;
+	private static final int STREAM_END = -1;
 
 	public RaspiDevice() {
 	}
@@ -47,7 +47,7 @@ public class RaspiDevice {
 			InputStream imageArray = process.getInputStream();
 
 			int imageCh;
-			while ((imageCh = imageArray.read()) != CONTENT_END) {
+			while ((imageCh = imageArray.read()) != STREAM_END) {
 				baos.write(imageCh);
 			}
 			imageArray.close();

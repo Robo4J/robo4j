@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,9 +70,7 @@ class FixedGyroNotificationEntry extends AbstractNotificationEntry implements Gy
 			}
 		}
 		if (notificationThreshold.z != 0) {
-			if (checkNotify(notificationThreshold.z, delta.z)) {
-				return true;
-			}
+            return checkNotify(notificationThreshold.z, delta.z);
 		}
 		return false;
 	}

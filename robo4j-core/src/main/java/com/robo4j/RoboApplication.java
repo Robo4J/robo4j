@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,6 +71,7 @@ public final class RoboApplication {
 		// Create a new Launcher thread and then wait for that thread to finish
 		Runtime.getRuntime().addShutdownHook(new ShutdownThread(appLatch));
 		try {
+			// TODO : review, exception runtime?
 			Thread daemon = new Thread(() -> {
 					try {
 						System.in.read();

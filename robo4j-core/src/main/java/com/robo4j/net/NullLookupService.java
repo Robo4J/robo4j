@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ import java.util.Map;
  * @author Miroslav Wengner (@miragemiko)
  */
 final class NullLookupService implements LookupService {
-	private Map<String, RoboContextDescriptor> NULL_CONTEXTS = Collections.unmodifiableMap(new HashMap<>());
+	public static final Map<String, RoboContextDescriptor> NULL_CONTEXTS = Collections.unmodifiableMap(new HashMap<>());
 
 	@Override
 	public Map<String, RoboContextDescriptor> getDiscoveredContexts() {

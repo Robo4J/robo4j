@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  */
 package com.robo4j.units.rpi;
 
+import com.robo4j.hw.rpi.utils.I2cBus;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -27,7 +29,7 @@ import java.util.function.Supplier;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class I2CRegistry {
-	private static Map<I2CEndPoint, Object> devices = new HashMap<>();
+	private static final Map<I2CEndPoint, Object> devices = new HashMap<>();
 
 	public static Object getI2CDeviceByEndPoint(I2CEndPoint endPoint) {
 		return devices.get(endPoint);
@@ -37,7 +39,7 @@ public class I2CRegistry {
 		devices.put(endPoint, device);
 	}
 
-	public static <T> T createAndRegisterIfAbsent(int bus, int address, Supplier<T> supplier) {
+	public static <T> T createAndRegisterIfAbsent(I2cBus bus, int address, Supplier<T> supplier) {
 		I2CEndPoint endPoint = new I2CEndPoint(bus, address);
 		@SuppressWarnings("unchecked")
 		T pwmDevice = (T) I2CRegistry.getI2CDeviceByEndPoint(endPoint);

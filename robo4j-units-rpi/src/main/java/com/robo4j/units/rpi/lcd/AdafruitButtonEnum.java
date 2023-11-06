@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,35 +16,35 @@
  */
 package com.robo4j.units.rpi.lcd;
 
+import com.robo4j.hw.rpi.i2c.adafruitlcd.Button;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.robo4j.hw.rpi.i2c.adafruitlcd.Button;
-
 /**
  * This enum is sent as messages from the buttons of the Adafruit LCD.
  *
- * @see AdafruitButtonUnit
- *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
+ * @see AdafruitButtonUnit
  */
 public enum AdafruitButtonEnum {
 
     // @formatter:off
-	SELECT 			(Button.SELECT, "S", "select"),
+	SELECT 			(com.robo4j.hw.rpi.i2c.adafruitlcd.Button.SELECT, "S", "select"),
 	LEFT		    (Button.LEFT, "L", "left"),
 	RIGHT		    (Button.RIGHT, "R", "right"),
 	UP      		(Button.UP, "U", "up"),
-	DOWN    		(Button.DOWN, "D", "down");
+	DOWN    		(Button.DOWN, "D", "down"),
+    UNKNOWN         (null, "", "");
 	// @formatter:on
 
-    private static volatile Map<Button, AdafruitButtonEnum> buttonToEnum;
-    private Button button;
-    private String name;
-    private String text;
+    private static final Map<Button, AdafruitButtonEnum> buttonToEnum = initMapping();
+    private final Button button;
+    private final String name;
+    private final String text;
 
     AdafruitButtonEnum(Button button, String name, String text) {
         this.button = button;
@@ -59,24 +59,17 @@ public enum AdafruitButtonEnum {
 
     //@formatter:off
     public static AdafruitButtonEnum getByName(String def) {
-        if (buttonToEnum == null)
-            buttonToEnum = initMapping();
-
-        return buttonToEnum.entrySet().stream()
-                .map(Map.Entry::getValue)
+        return buttonToEnum.values().stream()
                 .filter(e -> e.getName().equals(def.toUpperCase()))
                 .findFirst()
-                .orElse(null);
+                .orElse(UNKNOWN);
     }
 
     public static AdafruitButtonEnum getByText(String text) {
-        if (buttonToEnum == null)
-            buttonToEnum = initMapping();
-        return buttonToEnum.entrySet().stream()
-                .map(Map.Entry::getValue)
+        return buttonToEnum.values().stream()
                 .filter(e -> e.getText().equals(text))
                 .findFirst()
-                .orElse(null);
+                .orElse(UNKNOWN);
     }
     //@formatter:on
 

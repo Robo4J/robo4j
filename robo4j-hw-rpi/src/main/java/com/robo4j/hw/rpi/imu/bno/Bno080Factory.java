@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@ package com.robo4j.hw.rpi.imu.bno;
 
 import java.io.IOException;
 
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.spi.SpiChannel;
+import com.pi4j.io.spi.SpiChipSelect;
 import com.pi4j.io.spi.SpiMode;
 import com.robo4j.hw.rpi.imu.bno.Bno055Device.OperatingMode;
 import com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice;
+import com.robo4j.hw.rpi.utils.GpioPin;
 
 /**
  * Factory for creating BNO080 devices
@@ -116,7 +116,7 @@ public final class Bno080Factory {
 	 *             exception
 	 * @throws InterruptedException 
 	 */
-	public static Bno080Device createDefaultSPIDevice(SpiChannel channel, SpiMode mode, int speed, Pin wake, Pin cs, Pin reset, Pin interrupt) throws IOException, InterruptedException {
+	public static Bno080Device createDefaultSPIDevice(SpiChipSelect channel, SpiMode mode, int speed, GpioPin wake, GpioPin cs, GpioPin reset, GpioPin interrupt) throws IOException, InterruptedException {
 		return new Bno080SPIDevice(channel, mode, speed, wake, cs, reset, interrupt);
 	}
 

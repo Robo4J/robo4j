@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.net.ContextEmitter;
 import com.robo4j.net.MessageCallback;
 import com.robo4j.net.MessageServer;
-import com.robo4j.net.ReferenceDesciptor;
+import com.robo4j.net.ReferenceDescriptor;
 import com.robo4j.net.RoboContextDescriptor;
 import com.robo4j.scheduler.DefaultScheduler;
 import com.robo4j.scheduler.RoboThreadFactory;
@@ -202,7 +202,7 @@ final class RoboSystem implements RoboContext {
 		}
 
 		Object writeReplace() throws ObjectStreamException {
-			return new ReferenceDesciptor(RoboSystem.this.getId(), getId(), getMessageType().getName());
+			return new ReferenceDescriptor(RoboSystem.this.getId(), getId(), getMessageType().getName());
 		}
 	}
 

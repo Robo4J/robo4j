@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,8 +94,7 @@ public class AccelerometerLSM303Unit extends I2CRoboUnit<AccelerometerRequest> {
 	 */
 	public static final String ATTRIBUTE_NAME_STATE = "state";
 
-	public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
-			.unmodifiableCollection(Arrays.asList(DefaultAttributeDescriptor.create(Tuple3f.class, ATTRIBUTE_NAME_STATE)));
+	public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = List.of(DefaultAttributeDescriptor.create(Tuple3f.class, ATTRIBUTE_NAME_STATE));
 
 	private final Scanner scanner = new Scanner();
 
@@ -103,7 +102,7 @@ public class AccelerometerLSM303Unit extends I2CRoboUnit<AccelerometerRequest> {
 	private Integer period;
 
 	private volatile ScheduledFuture<?> scannerTask;
-	private List<AccelerometerRequest> requests = new ArrayList<>();
+	private final List<AccelerometerRequest> requests = new ArrayList<>();
 
 	private class Scanner implements Runnable {
 		@Override

@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2014, 2017, Marcus Hirt, Miroslav Wengner
- * 
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -8,7 +8,7 @@
  *
  * Robo4J is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -26,18 +26,19 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
 import com.pi4j.io.serial.Serial;
-import com.pi4j.util.ExecUtil;
+//import com.pi4j.util.ExecUtil;
 
 public class SerialUtil {
 
+	// TODO, alternative to ExecUtil
 	public static Set<SerialDeviceDescriptor> getAvailableUSBSerialDevices() throws IOException, InterruptedException {
 		Set<SerialDeviceDescriptor> descriptors = new HashSet<>();
-		String[] devices = ExecUtil.execute("ls /sys/bus/usb-serial/devices/");
-		for (String device : devices) {
-			Map<String, String> metadata = asMetadata(ExecUtil.execute("cat /sys/bus/usb-serial/devices/" + device + "/../uevent"));
-			String path = "/dev/" + device;
-			descriptors.add(createSerialDescriptor(path, metadata));
-		}
+//		String[] devices = ExecUtil.execute("ls /sys/bus/usb-serial/devices/");
+//		for (String device : devices) {
+//			Map<String, String> metadata = asMetadata(ExecUtil.execute("cat /sys/bus/usb-serial/devices/" + device + "/../uevent"));
+//			String path = "/dev/" + device;
+//			descriptors.add(createSerialDescriptor(path, metadata));
+//		}
 		return descriptors;
 	}
 
@@ -83,7 +84,7 @@ public class SerialUtil {
 		int available = serial.available();
 
 		if (available >= bytes) {
-			serial.read(bytes, buffer);
+			serial.read(buffer, bytes);
 			return;
 		}
 
@@ -99,7 +100,7 @@ public class SerialUtil {
 				continue;
 			}
 			int nextRead = Math.min(leftToRead, available);
-			serial.read(nextRead, buffer);
+			serial.read(buffer, nextRead);
 			leftToRead -= nextRead;
 		}
 	}
@@ -136,7 +137,7 @@ public class SerialUtil {
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
 		Set<SerialDeviceDescriptor> descriptors = getAvailableUSBSerialDevices();
-		if (descriptors.size() == 0) {
+		if (descriptors.isEmpty()) {
 			System.out.println("No usb serial devices found!");
 		} else {
 			System.out.println("Printing usb serial devices found:");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,11 +25,11 @@ package com.robo4j.hw.rpi.pad;
  */
 public class LF710Message {
 
-    private Long time;
-    private Short amount;
-    private LF710Part part;
-    private LF710Input input;
-    private LF710State state;
+    private final Long time;
+    private final Short amount;
+    private final LF710Part part;
+    private final LF710Input input;
+    private final LF710State state;
 
     public LF710Message(Long time, Short amount, LF710Part part, LF710Input input, LF710State state) {
         this.time = time;

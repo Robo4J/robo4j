@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
  */
 package com.robo4j.hw.rpi.i2c.accelerometer;
 
-import com.pi4j.io.i2c.I2CBus;
+import java.io.IOException;
+
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
+import com.robo4j.hw.rpi.utils.I2cBus;
 import com.robo4j.math.geometry.Tuple3f;
-
-import java.io.IOException;
 
 /**
  * Abstraction for reading data from a LSM303 accelerometer, for example the one
@@ -65,6 +65,7 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 
 	public enum PowerMode {
 		NORMAL(0x0), LOW_POWER(0x8);
+
 		private int ctrlCode;
 
 		PowerMode(int ctrlCode) {
@@ -78,6 +79,7 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 
 	public enum FullScale {
 		G_2(0x0, 1), G_4(0x10, 1), G_8(0x20, 4), G_16(0x30, 12);
+
 		private int ctrlCode;
 		private int sensitivity;
 
@@ -104,10 +106,10 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 
 	public AccelerometerLSM303Device(PowerMode mode, DataRate rate, FullScale scale, boolean highres)
 			throws IOException {
-		this(I2CBus.BUS_1, DEFAULT_I2C_ADDRESS, mode, rate, AXIS_ENABLE_ALL, scale, highres);
+		this(I2cBus.BUS_1, DEFAULT_I2C_ADDRESS, mode, rate, AXIS_ENABLE_ALL, scale, highres);
 	}
 
-	public AccelerometerLSM303Device(int bus, int address, PowerMode mode, DataRate rate, int axisEnable,
+	public AccelerometerLSM303Device(I2cBus bus, int address, PowerMode mode, DataRate rate, int axisEnable,
 			FullScale scale, boolean highres) throws IOException {
 		super(bus, address);
 		this.scale = scale;
@@ -122,7 +124,8 @@ public class AccelerometerLSM303Device extends AbstractI2CDevice implements Read
 	public synchronized Tuple3f read() throws IOException {
 		Tuple3f rawData = new Tuple3f();
 		byte[] data = new byte[6];
-		int n = i2cDevice.read(OUT_X_L_A | 0x80, data, 0, 6);
+		// int n = i2CConfig.read(OUT_X_L_A | 0x80, data, 0, 6);
+		int n = readBufferByAddress(OUT_X_L_A | 0x80, data, 0, 6);
 		if (n != 6) {
 			getLogger().warning("Failed to read all data from accelerometer. Should have read 6, could only read " + n);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,11 +41,11 @@ public class ScanResultImpl implements ScanResult2D {
 
 	private final List<Point2f> points;
 
+	private final int scanId;
 	private double maxX;
 	private double minX;
 	private double maxY;
 	private double minY;
-	private int scanId;
 
 	private Point2f farthestPoint;
 	private Point2f closestPoint;
@@ -162,7 +162,7 @@ public class ScanResultImpl implements ScanResult2D {
 	}
 
 	public void sort() {
-		Collections.sort(points, POINT_COMPARATOR);
+		points.sort(POINT_COMPARATOR);
 	}
 
 	private static class PointComparator implements Comparator<Point2f> {

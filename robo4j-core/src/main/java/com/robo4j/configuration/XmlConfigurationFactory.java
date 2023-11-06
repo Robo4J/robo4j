@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,12 +38,12 @@ import com.robo4j.util.StringConstants;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class XmlConfigurationFactory {
-	private static final String ENCODING = "UTF-8";
 	public static final String ELEMENT_CONFIG = "config";
 	public static final String ATTRIBUTE_NAME = "name";
 	public static final String ATTRIBUTE_TYPE = "type";
 	public static final String ATTRIBUTE_PATH = "path";
 	public static final String ATTRIBUTE_METHOD = "method";
+	private static final String ENCODING = "UTF-8";
 	private static final String TYPE_BOOLEAN = "boolean";
 	private static final String TYPE_LONG = "long";
 	private static final String TYPE_DOUBLE = "double";
@@ -53,13 +53,13 @@ public class XmlConfigurationFactory {
 	private static final String ELEMENT_ROOT = "com.robo4j.root";
 	private static final String ELEMENT_VALUE = "value";
 
-	private static final Deque<ConfigurationBuilder> configStack = new ArrayDeque<>();
+	private static final Deque<ConfigurationBuilder> CONFIG_STACK = new ArrayDeque<>();
 
 	/*
 	 * Internal XML Handler class for parsing the XML.
 	 */
 	private static class ConfigurationHandler extends DefaultHandler {
-		private ConfigurationBuilder rootBuilder = new ConfigurationBuilder();
+		private final ConfigurationBuilder rootBuilder = new ConfigurationBuilder();
 		private ConfigurationBuilder currentBuilder;
 		private String lastElement = StringConstants.EMPTY;
 
@@ -76,7 +76,7 @@ public class XmlConfigurationFactory {
 			if (qName.equals(ELEMENT_CONFIG)) {
 				String value = attributes.getValue(ATTRIBUTE_NAME);
 				if (!value.equals(ELEMENT_ROOT)) {
-					configStack.push(currentBuilder);
+					CONFIG_STACK.push(currentBuilder);
 					ConfigurationBuilder tmpBuilder = new ConfigurationBuilder();
 					currentBuilder.addBuilder(value, tmpBuilder);
 					currentBuilder = tmpBuilder;
@@ -96,8 +96,8 @@ public class XmlConfigurationFactory {
 				currentValue = StringConstants.EMPTY;
 				break;
 			case ELEMENT_CONFIG:
-				if (!configStack.isEmpty()) { // Closing of the last config...
-					currentBuilder = configStack.pop();
+				if (!CONFIG_STACK.isEmpty()) { // Closing of the last config...
+					currentBuilder = CONFIG_STACK.pop();
 				}
 				break;
 			}
@@ -128,17 +128,14 @@ public class XmlConfigurationFactory {
 			}
 		}
 
+		// TODO : review exception
 		@Override
 		public void characters(char[] ch, int start, int length) throws SAXException {
 			// NOTE(Marcus/Jan 22, 2017): Seems these can be called repeatedly
 			// for a single text() node.
-			switch (lastElement) {
-			case ELEMENT_VALUE:
-				currentValue += String.valueOf(ch, start, length);
-				break;
-			default:
-				break;
-			}
+            if (lastElement.equals(ELEMENT_VALUE)) {
+                currentValue += String.valueOf(ch, start, length);
+            }
 		}
 		
 		public ConfigurationBuilder getBuilder() {
@@ -200,11 +197,7 @@ public class XmlConfigurationFactory {
 	}
 
 	private static String getIndentation(int level) {
-		String result = StringConstants.EMPTY;
-		for (int i = 0; i < level; i++) {
-			result += "   ";
-		}
-		return result;
+		return StringConstants.EMPTY + "   ".repeat(Math.max(0, level));
 	}
 
 	private static void writeValue(StringBuilder builder, String valueName, Object value, int level) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2019, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,10 +32,10 @@ public class BMP085Test {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		BMP085Device bmp = new BMP085Device(OperatingMode.STANDARD);
 		while (true) {
-			System.out.println(String.format("Temperature: %.1fC, Pressure: %dhPa, Altitude: %.1fm", 
+			System.out.printf("Temperature: %.1fC, Pressure: %dhPa, Altitude: %.1fm%n",
 					bmp.readTemperature(),
-					bmp.readPressure() / 100, 
-					bmp.readAltitude()));
+					bmp.readPressure() / 100,
+					bmp.readAltitude());
 			Thread.sleep(2000);
 		}
 	}
