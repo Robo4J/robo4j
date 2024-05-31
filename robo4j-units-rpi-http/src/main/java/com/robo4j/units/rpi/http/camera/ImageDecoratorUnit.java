@@ -21,6 +21,7 @@ import com.robo4j.CriticalSectionTrait;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
+import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.socket.http.units.ClientMessageWrapper;
@@ -71,7 +72,7 @@ public class ImageDecoratorUnit extends RoboUnit<ImageDTO> {
 				String.valueOf(imageNumber.incrementAndGet()), imageBase64);
 		final ClientMessageWrapper resultMessage = new ClientMessageWrapper(
 				HttpPathUtils.toPath(SystemPath.UNITS.getPath(), httpTarget), CameraMessage.class, cameraMessage);
-		System.out.println(getClass().getSimpleName() + " image target: "+ target + " resultMessage: " + resultMessage.getPath());
+		SimpleLoggingUtil.debug(ImageDecoratorUnit.class, "image target: "+ target + " resultMessage: " + resultMessage.getPath());
 		getContext().getReference(target).sendMessage(resultMessage);
 
 	}

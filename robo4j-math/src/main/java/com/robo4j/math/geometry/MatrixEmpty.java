@@ -14,16 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.math;
+
+package com.robo4j.math.geometry;
+
+import java.lang.System.Logger;
 
 /**
- * @author Marcus Hirt (@hirt)
- * @author Miro Wengner (@miragemiko)
+ *  Empty Matrix dimensions equal to zero
  */
-public class MainTest {
-
-    public static void main(String[] args) {
-        System.out.println("MAGIC");
+public class MatrixEmpty implements Matrix {
+    public static final int DIMENSION_ZERO = 0;
+    @Override
+    public int getRows() {
+        return DIMENSION_ZERO;
     }
 
+    @Override
+    public int getColumns() {
+        return DIMENSION_ZERO;
+    }
+
+    @Override
+    public Number getNumber(int row, int column) {
+        return DIMENSION_ZERO;
+    }
+
+    @Override
+    public void transpose() {
+        throw new IllegalStateException("not valid operation");
+    }
 }

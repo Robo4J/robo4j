@@ -1,9 +1,9 @@
 module robo4j.units.rpi {
     requires robo4j.core;
     requires robo4j.math;
-    requires robo4j.hw.rpi;
 
     requires transitive com.pi4j;
+    requires robo4j.hw.rpi;
 
     exports com.robo4j.units.rpi.accelerometer;
     exports com.robo4j.units.rpi.camera;

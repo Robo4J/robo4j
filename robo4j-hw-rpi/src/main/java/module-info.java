@@ -1,5 +1,7 @@
 
 module robo4j.hw.rpi {
+    opens com.robo4j.hw.rpi to com.pi4j.plugin.linuxfs;
+
     requires jdk.jfr;
     requires java.logging;
     requires java.desktop;
@@ -38,4 +40,5 @@ module robo4j.hw.rpi {
     uses java.awt.Component;
     uses java.awt.event.MouseAdapter;
     uses java.awt.event.MouseEvent;
+    uses java.nio.Buffer;
 }

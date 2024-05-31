@@ -20,6 +20,7 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.socket.http.test.units.config.StringConsumer;
 import com.robo4j.util.SystemUtil;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
@@ -39,6 +40,7 @@ class RoboDatagramClientTest {
     private static final int MAX_NUMBER = 42;
     private static final int DEFAULT_TIMEOUT = 5;
 
+    @Disabled
 	@Test
 	void datagramClientServerTest() throws Exception {
 

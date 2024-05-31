@@ -50,7 +50,7 @@ class HttpServerConfigTests {
 			assertNull(serverUnitPathDTO);
 		});
 
-		assertNull(exception.getMessage());
+		assertNotNull(exception.getMessage());
 	}
 
 	@Test

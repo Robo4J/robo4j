@@ -1,7 +1,7 @@
 plugins {
     id 'idea'
     id 'eclipse'
-    id 'org.kordamp.gradle.project'      version '0.12.0'
+    id 'org.kordamp.gradle.project'      version '0.54.0'
     id 'com.github.johnrengelman.shadow' version '4.0.4' apply false
 }
 
@@ -86,20 +86,20 @@ config {
         }
     }
 
-    license {
-        licenses {
-            license {
-            	enabled = false
-                id = 'GPL-3.0'
-            }
-        }
-    }
+//    license {
+//        licenses {
+//            license {
+//            	enabled = false
+//                id = 'GPL-3.0'
+//            }
+//        }
+//    }
 
-    publishing {
-        signing = true
-        releasesRepository = 'mavenRelease'
-        snapshotsRepository = 'mavenSnapshot'
-    }
+//    publishing {
+//        signing = true
+//        releasesRepository = 'mavenRelease'
+//        snapshotsRepository = 'mavenSnapshot'
+//    }
 }
 
 allprojects {

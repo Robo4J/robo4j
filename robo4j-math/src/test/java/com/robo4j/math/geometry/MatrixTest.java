@@ -104,7 +104,7 @@ class MatrixTest {
 	}
 
 	@Test
-	void testSysout() {
+	void testSysOut() {
 		System.out.println(createMatrix(TESTVALUES_3D_INT));
 		System.out.println(createMatrix(TESTVALUES_3D_FLOAT));
 		System.out.println(createMatrix(TESTVALUES_3D_DOUBLE));
