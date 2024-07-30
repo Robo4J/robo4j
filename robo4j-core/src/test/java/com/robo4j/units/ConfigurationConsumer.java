@@ -14,22 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j;
-
-import com.robo4j.configuration.Configuration;
+package com.robo4j.units;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.ConfigurationException;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboUnit;
+import com.robo4j.configuration.Configuration;
+
 /**
- * This one should schedule everything on the Worker pool.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-@WorkTrait
-public class StringConsumerWorker extends RoboUnit<String> {
+public class ConfigurationConsumer extends RoboUnit<String> {
 	private static final int DEFAULT = 0;
 	private AtomicInteger counter;
 	private List<String> receivedMessages = new ArrayList<>();
@@ -38,7 +40,7 @@ public class StringConsumerWorker extends RoboUnit<String> {
 	 * @param context
 	 * @param id
 	 */
-	public StringConsumerWorker(RoboContext context, String id) {
+	public ConfigurationConsumer(RoboContext context, String id) {
 		super(String.class, context, id);
 		this.counter = new AtomicInteger(DEFAULT);
 	}
@@ -46,7 +48,7 @@ public class StringConsumerWorker extends RoboUnit<String> {
 	public synchronized List<String> getReceivedMessages() {
 		return receivedMessages;
 	}
-
+	
 	@Override
 	public synchronized void onMessage(String message) {
 		counter.incrementAndGet();
@@ -55,15 +57,14 @@ public class StringConsumerWorker extends RoboUnit<String> {
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-
+		System.out.println(configuration);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals("getNumberOfSentMessages")
-				&& attribute.getAttributeType() == Integer.class) {
-			return (R) (Integer) counter.get();
+		if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
+			return (R) (Integer)counter.get();
 		}
 		if (attribute.getAttributeName().equals("getReceivedMessages")
 				&& attribute.getAttributeType() == ArrayList.class) {

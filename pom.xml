@@ -22,7 +22,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.robo4j</groupId>
     <artifactId>robo4j-parent</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>${robo4j.version}</version>
     <name>Robo4j - Parent POM</name>
     <url>https://www.robo4j.io</url>
     <modules>
@@ -107,6 +107,7 @@
     </repositories>
 
     <properties>
+        <robo4j.version>0.6-SNAPSHOT</robo4j.version>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -115,10 +116,13 @@
         <maven.release.plugin.version>3.0.1</maven.release.plugin.version>
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
         <maven.surefire.plugin.version>3.1.2</maven.surefire.plugin.version>
-        <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
+        <maven.jar.plugin.version>3.4.2</maven.jar.plugin.version>
         <maven.source.plugin.version>3.3.0</maven.source.plugin.version>
         <maven.resource.plugin.version>3.3.1</maven.resource.plugin.version>
+        <maven.build.helper.plugin.version>3.6.0</maven.build.helper.plugin.version>
+        <maven.shade.plugin.version>3.6.0</maven.shade.plugin.version>
         <pi4j.version>2.7.0-SNAPSHOT</pi4j.version>
+        <slf4j.version>2.0.13</slf4j.version>
 
         <!-- Test -->
         <junit.jupiter.version>5.10.0</junit.jupiter.version>
@@ -156,6 +160,16 @@
                 <groupId>com.robo4j</groupId>
                 <artifactId>robo4j-hw-lego</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
 
             <!-- Test -->
@@ -235,6 +249,25 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>${maven.jar.plugin.version}</version>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <addClasspath>true</addClasspath>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${maven.build.helper.plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>${maven.shade.plugin.version}</version>
                 </plugin>
 
                 <plugin>

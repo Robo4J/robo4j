@@ -18,6 +18,8 @@ package com.robo4j;
 
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
+import com.robo4j.units.StringConsumer;
+import com.robo4j.units.StringProducer;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

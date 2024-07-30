@@ -28,13 +28,21 @@
     <parent>
         <groupId>com.robo4j</groupId>
         <artifactId>robo4j-parent</artifactId>
-        <version>0.5-SNAPSHOT</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>com.robo4j</groupId>
             <artifactId>robo4j-math</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
         </dependency>
         <!-- Pi4j -->
         <dependency>
@@ -45,11 +53,6 @@
         <dependency>
             <groupId>com.pi4j</groupId>
             <artifactId>pi4j-plugin-raspberrypi</artifactId>
-            <version>${pi4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.pi4j</groupId>
-            <artifactId>pi4j-plugin-pigpio</artifactId>
             <version>${pi4j.version}</version>
         </dependency>
         <dependency>
@@ -70,4 +73,72 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <configuration>
+                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                    <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>module-info.class</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Main-Class>com.robo4j.hw.rpi.i2c.adafruitbackpack.AlphanumericDeviceExample</Main-Class>
+                                    </manifestEntries>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-jar-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    <archive>-->
+<!--                        <manifest>-->
+<!--                            <addClasspath>true</addClasspath>-->
+<!--                            <mainClass>com.robo4j.hw.rpi.i2c.adafruitbackpack.AlphanumericDeviceExample</mainClass>-->
+<!--                        </manifest>-->
+<!--                    </archive>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/examples/java/</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -18,6 +18,8 @@ package com.robo4j;
 
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
+import com.robo4j.units.StringConsumer;
+import com.robo4j.units.StringProducer;
 import com.robo4j.util.SystemUtil;
 import org.junit.jupiter.api.Test;
 

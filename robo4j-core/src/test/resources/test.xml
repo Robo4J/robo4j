@@ -17,7 +17,7 @@
 <!-- Robo4J Unit Definition file for JUnit Tests -->
 <robo4j>
 	<roboUnit id="producer">
-		<class>com.robo4j.StringProducer</class>
+		<class>com.robo4j.units.StringProducer</class>
 		<config name="com.robo4j.root">
 			<value name="target" type="String">consumer</value>
 			<value name="totalMessages" type="int">10</value>
@@ -25,7 +25,7 @@
 	</roboUnit>
 
 	<roboUnit id="consumer">
-		<class>com.robo4j.StringConsumer</class>
+		<class>com.robo4j.units.StringConsumer</class>
 		<config name="com.robo4j.root">
 			<value name="totalNumberMessages" type="int">10</value>
 		</config>

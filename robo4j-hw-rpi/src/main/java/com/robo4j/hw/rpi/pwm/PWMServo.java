@@ -16,13 +16,6 @@
  */
 package com.robo4j.hw.rpi.pwm;
 
-//import com.pi4j.io.gpio.GpioController;
-//import com.pi4j.io.gpio.GpioFactory;
-//import com.pi4j.io.gpio.GpioPinPwmOutput;
-//import com.pi4j.io.gpio.Pin;
-//import com.pi4j.io.gpio.RaspiPin;
-//import com.pi4j.wiringpi.Gpio;
-
 import java.io.IOException;
 
 import com.pi4j.Pi4J;
@@ -92,20 +85,6 @@ public class PWMServo implements Servo {
 				.dutyCycle(CLOCK_DIVISOR)
 				.build();
 		this.pwm = pi4jRpiContext.create(pwmConfig);
-
-
-//		this.inverted = inverted;
-//		GpioController gpio = GpioFactory.getInstance();
-//		pwmPin = gpio.provisionPwmOutputPin(pin);
-//
-//		if (!GpioFactory.getDefaultProvider().getName().equals(pin.getProvider())) {
-//			throw new UnsupportedOperationException(
-//					"Pin provider is set up to be " + GpioFactory.getDefaultProvider().getName() + ". You cannot use " + pin.getProvider());
-//		}
-		// Servo -> mark:space
-//		Gpio.pwmSetMode(Gpio.PWM_MODE_MS);
-//		Gpio.pwmSetClock(CLOCK_DIVISOR);
-//		Gpio.pwmSetRange(RANGE);
 	}
 
 	/**
@@ -157,9 +136,7 @@ public class PWMServo implements Servo {
 		this.input = input;
 		float correctedInput = isInverted() ? -1 * input : input;
 		float targetOnTime = 0.0015f + (correctedInput * 0.001f) / 2;
-//		var pwm = Math.round((RANGE_F * (targetOnTime / ACTUAL_PERIOD)));
 		var dutyCycle = RANGE_F * (targetOnTime / ACTUAL_PERIOD);
-//		pwmPin.setPwm(pwm);
 		this.pwm.on(dutyCycle);
 	}
 }

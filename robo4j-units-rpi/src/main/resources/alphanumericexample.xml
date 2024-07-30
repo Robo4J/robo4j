@@ -14,21 +14,14 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
   -->
-<!-- Erroneous Robo4J Unit Definition file for JUnit Tests -->
-<robo4j>
-	<roboUnit id="producer">
-		<class>com.robo4j.units.StringProducer</class>
-		<properties>
-			<property>
-				<key>target</key>
-				<value>consumer</value>
-			</property>
-		</properties>
-	</roboUnit>
 
-	<roboUnit id="producer">
-		<class>com.robo4j.units.StringConsumer</class>
-		<properties>
-		</properties>
-	</roboUnit>
+<robo4j>
+    <roboUnit id="alphanumeric">
+        <class>com.robo4j.units.rpi.led.AdafruitAlphanumericUnit</class>
+        <config name="com.robo4j.root">
+            <value name="bus" type="int">1</value>
+            <!-- 0x70 hex -->
+            <value name="address" type="int">0x70</value>
+        </config>
+    </roboUnit>
 </robo4j>

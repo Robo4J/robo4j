@@ -14,18 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.units;
+package com.robo4j;
 
-import com.robo4j.AttributeDescriptor;
-import com.robo4j.DefaultAttributeDescriptor;
-import com.robo4j.IntegerConsumer;
-import com.robo4j.LifecycleState;
-import com.robo4j.RoboBuilder;
-import com.robo4j.RoboBuilderException;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
+import com.robo4j.units.CounterCommand;
+import com.robo4j.units.CounterUnit;
+import com.robo4j.units.IntegerConsumer;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

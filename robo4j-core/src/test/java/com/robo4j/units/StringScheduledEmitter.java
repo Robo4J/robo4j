@@ -14,19 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j;
+package com.robo4j.units;
 
+import com.robo4j.*;
 import com.robo4j.configuration.Configuration;
+import com.robo4j.util.StringConstants;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class StringProducer extends RoboUnit<String> {
+public class StringScheduledEmitter extends RoboUnit<String> {
 
+    public static final String DEFAULT_UNIT_NAME = "scheduledEmitter";
     public static final String ATTR_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
     public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
     public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_TOTAL_MESSAGES = DefaultAttributeDescriptor
@@ -35,19 +41,23 @@ public class StringProducer extends RoboUnit<String> {
             .create(CountDownLatch.class, ATTR_COUNT_DOWN_LATCH);
     /* default sent messages */
     private static final int DEFAULT = 0;
-    public static final String PROPERTY_SEND_RANDOM_MESSAGE = "sendRandomMessage";
-    public static final String PROP_TOTAL_MESSAGES = "totalMessages";
+    private static final long DEFAULT_INIT_DELAY_MILLS = 10;
     public static final String PROP_TARGET = "target";
+    public static final String PROP_INIT_DELAY = "initSchedulerDelay";
+    public static final String PROP_PERIOD = "schedulerPeriod";
     private CountDownLatch latch;
     private AtomicInteger counter;
     private String target;
+    private Long initSchedulerDelayMillis;
+    private Long schedulerPeriodMillis;
+    private final Map<String, String> messages = new ConcurrentHashMap<>(10);
 
 
     /**
-     * @param context
-     * @param id
+     * @param context context
+     * @param id      identifier
      */
-    public StringProducer(RoboContext context, String id) {
+    public StringScheduledEmitter(RoboContext context, String id) {
         super(String.class, context, id);
     }
 
@@ -55,35 +65,27 @@ public class StringProducer extends RoboUnit<String> {
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
         target = configuration.getString(PROP_TARGET, null);
         if (target == null) {
-            throw ConfigurationException.createMissingConfigNameException("target");
+            throw ConfigurationException.createMissingConfigNameException(PROP_TARGET);
         }
-        Integer totalMessages = configuration.getInteger(PROP_TOTAL_MESSAGES, null);
-        if(totalMessages == null){
-            throw ConfigurationException.createMissingConfigNameException(PROP_TOTAL_MESSAGES);
-        }
-        counter = new AtomicInteger(DEFAULT);
-        latch = new CountDownLatch(totalMessages);
+        initSchedulerDelayMillis = configuration.getLong(PROP_INIT_DELAY, DEFAULT_INIT_DELAY_MILLS);
+        schedulerPeriodMillis = configuration.getLong(PROP_PERIOD, DEFAULT_INIT_DELAY_MILLS);
 
+        messages.put(target, StringConstants.EMPTY);
+    }
+
+    @Override
+    public void start() {
+        System.out.println("start scheduler");
+        getContext().getScheduler().scheduleAtFixedRate(() -> {
+            var messageForTarget = messages.get(target);
+            System.out.println("scheduler message: " + messageForTarget + ", target: " + target);
+            getContext().getReference(target).sendMessage(messageForTarget);
+        }, initSchedulerDelayMillis, schedulerPeriodMillis, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void onMessage(String message) {
-        if (message == null) {
-            System.out.println("No Message!");
-        } else {
-            counter.incrementAndGet();
-            String[] input = message.split("::");
-            String messageType = input[0];
-            switch (messageType) {
-                case PROPERTY_SEND_RANDOM_MESSAGE:
-                    sendRandomMessage();
-                    latch.countDown();
-                    break;
-                default:
-                    System.out.println("don't understand message: " + message);
-
-            }
-        }
+        messages.replace(target, message);
     }
 
     @SuppressWarnings("unchecked")
@@ -92,15 +94,9 @@ public class StringProducer extends RoboUnit<String> {
         if (attribute.getAttributeName().equals(ATTR_GET_NUMBER_OF_SENT_MESSAGES) && attribute.getAttributeType() == Integer.class) {
             return (R) (Integer) counter.get();
         }
-        if(attribute.getAttributeName().equals(ATTR_COUNT_DOWN_LATCH) && attribute.getAttributeType() == CountDownLatch.class){
+        if (attribute.getAttributeName().equals(ATTR_COUNT_DOWN_LATCH) && attribute.getAttributeType() == CountDownLatch.class) {
             return (R) latch;
         }
         return null;
     }
-
-    public void sendRandomMessage() {
-        final String message = StringToolkit.getRandomMessage(10);
-        getContext().getReference(target).sendMessage(message);
-    }
-
 }

@@ -17,7 +17,7 @@
 <!-- Robo4J Unit Definition file for JUnit Tests -->
 <robo4j>
 	<roboUnit id="consumer">
-		<class>com.robo4j.ConfigurationConsumer</class>
+		<class>com.robo4j.units.ConfigurationConsumer</class>
 		<config name="com.robo4j.root">
 			<value name="target" type="String">consumer</value>
 			<config name="offsets">

@@ -26,5 +26,7 @@ public interface LF710Input {
 
     short getMask();
 
-    String getName();
+    String getDesc();
+
+    String name();
 }

@@ -14,12 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j;
+package com.robo4j.units;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.ConfigurationException;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 
 /**
@@ -27,43 +30,38 @@ import com.robo4j.configuration.Configuration;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class ConfigurationConsumer extends RoboUnit<String> {
-	private static final int DEFAULT = 0;
-	private AtomicInteger counter;
-	private List<String> receivedMessages = new ArrayList<>();
+public class IntegerConsumer extends RoboUnit<Integer> {
+	private List<Integer> receivedMessages = new ArrayList<>();
 
 	/**
 	 * @param context
 	 * @param id
 	 */
-	public ConfigurationConsumer(RoboContext context, String id) {
-		super(String.class, context, id);
-		this.counter = new AtomicInteger(DEFAULT);
+	public IntegerConsumer(RoboContext context, String id) {
+		super(Integer.class, context, id);
 	}
 
-	public synchronized List<String> getReceivedMessages() {
+	public synchronized List<Integer> getReceivedMessages() {
 		return receivedMessages;
 	}
-	
+
 	@Override
-	public synchronized void onMessage(String message) {
-		counter.incrementAndGet();
+	public synchronized void onMessage(Integer message) {
 		receivedMessages.add(message);
 	}
 
 	@Override
 	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		System.out.println(configuration);
+
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
-			return (R) (Integer)counter.get();
+		if (attribute.getAttributeName().equals("NumberOfReceivedMessages") && attribute.getAttributeType() == Integer.class) {
+			return (R) (Integer) receivedMessages.size();
 		}
-		if (attribute.getAttributeName().equals("getReceivedMessages")
-				&& attribute.getAttributeType() == ArrayList.class) {
+		if (attribute.getAttributeName().equals("ReceivedMessages") && attribute.getAttributeType() == ArrayList.class) {
 			return (R) receivedMessages;
 		}
 		return null;

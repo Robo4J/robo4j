@@ -2,13 +2,13 @@
 module robo4j.hw.rpi {
     opens com.robo4j.hw.rpi to com.pi4j.plugin.linuxfs;
 
+    requires transitive robo4j.math;
     requires jdk.jfr;
     requires java.logging;
     requires java.desktop;
-    requires robo4j.math;
     requires com.pi4j;
-    requires com.pi4j.plugin.pigpio;
     requires com.pi4j.plugin.raspberrypi;
+    requires com.pi4j.plugin.linuxfs;
 
     exports com.robo4j.hw.rpi;
     exports com.robo4j.hw.rpi.camera;

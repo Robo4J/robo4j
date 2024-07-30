@@ -35,6 +35,7 @@ import com.robo4j.math.jfr.JfrUtils;
 import com.robo4j.math.jfr.ScanEvent;
 import com.robo4j.units.rpi.I2CRoboUnit;
 import com.robo4j.units.rpi.pwm.PCA9685ServoUnit;
+import jdk.jfr.Event;
 
 /**
  * This unit controls a servo to do laser range sweep.

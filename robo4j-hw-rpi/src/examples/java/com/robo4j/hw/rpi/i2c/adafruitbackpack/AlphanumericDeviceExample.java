@@ -32,6 +32,7 @@ public class AlphanumericDeviceExample {
 		AlphanumericDevice device = new AlphanumericDevice();
 		device.clear();
 		device.display();
+		System.out.println("Adding Characters");
 		device.addCharacter('A', false);
 		device.addCharacter('B', true);
 		device.addCharacter('C', false);

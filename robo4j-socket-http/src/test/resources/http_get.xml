@@ -26,6 +26,6 @@
         </config>
     </roboUnit>
     <roboUnit id="request_consumer">
-        <class>com.robo4j.StringConsumer</class>
+        <class>com.robo4j.units.StringConsumer</class>
     </roboUnit>
 </robo4j>

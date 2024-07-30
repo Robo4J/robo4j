@@ -43,8 +43,6 @@ public class LF710PadUnit extends RoboUnit<Object>{
     private LF710ButtonObserver observer;
     private PadInputResponseListener listener;
 
-    // TODO : review fields purpose
-    private String input;
     private String target;
 
     public LF710PadUnit(RoboContext context, String id) {
@@ -53,7 +51,7 @@ public class LF710PadUnit extends RoboUnit<Object>{
 
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
-        input = configuration.getString("input", null);
+        var input = configuration.getString("input", null);
         target = configuration.getString("target", null);
 
         if(input == null){

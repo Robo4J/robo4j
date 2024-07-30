@@ -1,9 +1,7 @@
 module robo4j.units.rpi {
-    requires robo4j.core;
-    requires robo4j.math;
-
-    requires transitive com.pi4j;
-    requires robo4j.hw.rpi;
+    requires jdk.jfr;
+    requires transitive robo4j.core;
+    requires transitive robo4j.hw.rpi;
 
     exports com.robo4j.units.rpi.accelerometer;
     exports com.robo4j.units.rpi.camera;
@@ -16,4 +14,12 @@ module robo4j.units.rpi {
     exports com.robo4j.units.rpi.pad;
     exports com.robo4j.units.rpi.pwm;
     exports com.robo4j.units.rpi.roboclaw;
+
+    uses com.robo4j.math.jfr.ScanEvent;
+    uses com.robo4j.math.jfr.JfrUtils;
+    uses com.robo4j.math.geometry.Tuple3d;
+    uses com.robo4j.math.geometry.Tuple3f;
+    uses com.robo4j.math.geometry.ScanResult2D;
+    uses com.robo4j.math.geometry.Point2f;
+    uses jdk.jfr.Event;
 }

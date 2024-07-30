@@ -58,7 +58,7 @@ public enum LF710Button implements LF710Input {
         return mask;
     }
 
-    public String getName() {
+    public String getDesc() {
         return name;
     }
 

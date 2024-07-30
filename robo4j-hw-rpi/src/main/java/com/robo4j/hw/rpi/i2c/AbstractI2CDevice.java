@@ -20,6 +20,8 @@ import com.pi4j.Pi4J;
 import com.pi4j.exception.InitializeException;
 import com.pi4j.io.i2c.I2C;
 import com.pi4j.io.i2c.I2CConfig;
+import com.pi4j.plugin.linuxfs.LinuxFsPlugin;
+import com.pi4j.plugin.linuxfs.provider.i2c.LinuxFsI2CProviderImpl;
 import com.robo4j.hw.rpi.utils.I2cBus;
 
 import java.io.IOException;
@@ -33,6 +35,7 @@ import java.util.logging.Logger;
  * @author Miro Wengner (@miragemiko)
  */
 public abstract class AbstractI2CDevice {
+    private static final String PROVIDER_NAME = "linuxfs-i2c";
     private final I2cBus bus;
     private final int address;
     protected final I2C i2C;
@@ -49,10 +52,24 @@ public abstract class AbstractI2CDevice {
         this.bus = bus;
         this.address = address;
         try {
-            var pi4jRpiContext = Pi4J.newAutoContext();
+//            var pi4jRpiContext = Pi4J.newContextBuilder().autoDetectProviders().autoDetectPlatforms().build();
+            var pi4jRpiContext = Pi4J.newContextBuilder()
+                    .add(new LinuxFsI2CProviderImpl())
+                    .build();
             // TODO: it should happen during the initiation
-            var i2CConfig = I2C.newConfigBuilder(pi4jRpiContext).bus(bus.address()).device(address).build();
-            this.i2C = pi4jRpiContext.i2c().create(i2CConfig);
+
+            var i2CConfig = I2C.newConfigBuilder(pi4jRpiContext)
+                    .bus(bus.address())
+                    .device(address)
+                    .id(PROVIDER_NAME + "robo4j")
+                    .build();
+
+
+//            this.i2C = pi4jRpiContext.create(i2CConfig);
+            var provider = new LinuxFsI2CProviderImpl();
+            provider.initialize(pi4jRpiContext);
+            this.i2C = provider.create(i2CConfig);
+            System.out.println("create i2c device");
         } catch (InitializeException e) {
             throw new IOException("Unsupported i2c config", e);
         }
@@ -88,7 +105,7 @@ public abstract class AbstractI2CDevice {
     /**
      * Writes the bytes directly to the I2C device.
      *
-     * @param b       the byte to write.
+     * @param b the byte to write.
      * @throws IOException if there was communication problem
      */
     protected void writeByte(byte b) throws IOException {
@@ -119,11 +136,11 @@ public abstract class AbstractI2CDevice {
         i2C.write(buffer);
     }
 
-    protected void writeByteBufferByAddress(int address, byte[] buffer){
+    protected void writeByteBufferByAddress(int address, byte[] buffer) {
         i2C.getRegister(address).write(buffer);
     }
 
-    protected void writeByteBufferByAddress(int address, byte[] buffer, int offset, int length){
+    protected void writeByteBufferByAddress(int address, byte[] buffer, int offset, int length) {
         i2C.getRegister(address).write(buffer, offset, length);
     }
 
@@ -147,12 +164,12 @@ public abstract class AbstractI2CDevice {
         }
     }
 
-    protected int readBufferByAddress(int address, byte[] buffer, int offset, int length){
+    protected int readBufferByAddress(int address, byte[] buffer, int offset, int length) {
 //        i2CConfig.read(OUT_X_H_M, data, 0, RESULT_BUFFER_SIZE);
         return i2C.getRegister(address).read(buffer, offset, length);
     }
 
-    protected int readBuffer(byte[] buffer, int offset, int length){
+    protected int readBuffer(byte[] buffer, int offset, int length) {
 //        i2CConfig.read(OUT_X_H_M, data, 0, RESULT_BUFFER_SIZE);
         return i2C.read(buffer, offset, length);
     }

@@ -41,20 +41,21 @@ public enum LF710JoystickButton implements LF710Input {
 
     private static final Map<Short, LF710JoystickButton> internMapByMask = initMapping();
     private final short mask;
-    private final String name;
+    private final String desc;
 
-    LF710JoystickButton(short mask, String name) {
+    LF710JoystickButton(short mask, String desc) {
         this.mask = mask;
-        this.name = name;
+        this.desc = desc;
     }
 
     public short getMask() {
         return mask;
     }
 
-    public String getName() {
-        return name;
+    public String getDesc() {
+        return this.desc;
     }
+
 
     private static Map<Short, LF710JoystickButton> initMapping() {
         return Stream.of(values()).collect(Collectors.toMap(LF710JoystickButton::getMask, e -> e));
@@ -68,6 +69,6 @@ public enum LF710JoystickButton implements LF710Input {
 
     @Override
     public String toString() {
-        return "LF710JoystickButton{" + "mask=" + mask + ", name='" + name + '\'' + '}';
+        return "LF710JoystickButton{" + "mask=" + mask + ", name='" + desc + '\'' + '}';
     }
 }
