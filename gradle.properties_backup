@@ -15,7 +15,7 @@
 # along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
 #
 group = com.robo4j
-version = 0.5-SNAPSHOT
+version = 0.6-SNAPSHOT
 org.gradle.daemon=true
 org.gradle.parallel=true
 

@@ -22,7 +22,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.robo4j</groupId>
     <artifactId>robo4j-parent</artifactId>
-    <version>${robo4j.version}</version>
+    <version>0.6-SNAPSHOT</version>
     <name>Robo4j - Parent POM</name>
     <url>https://www.robo4j.io</url>
     <modules>
@@ -107,7 +107,6 @@
     </repositories>
 
     <properties>
-        <robo4j.version>0.6-SNAPSHOT</robo4j.version>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
