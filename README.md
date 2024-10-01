@@ -8,7 +8,7 @@ Robo4J provides an easy way of getting started with building custom hardware and
 * [Robo4j.io][] provides a library of configurable units that allows hardware to be enabled and configured through XML
 * [Robo4j.io][] provides a threading model controlled by annotations
 
-The current [Robo4j.io][] version is 0.6
+The current [Robo4j.io][] version is 0.6-SNAPSHOT
 
 <a href="https://foojay.io/today/works-with-openjdk"><img align="left" src="https://github.com/foojayio/badges/raw/main/works_with_openjdk/Works-with-OpenJDK.png" width="100"></a>
 <br><br><br>
@@ -16,14 +16,14 @@ The current [Robo4j.io][] version is 0.6
 ## Requirements
 [Git][], [Maven][], [OpenJDK 21][]
 
-If you are looking for a JDK 11 ARM hard float build for Raspbian, we recommend looking into [Liberica JDK][] or [Azul Zulu Embedded][].
+If you are looking for a JDK 21 ARM hard float build for Raspbian, we recommend looking into [Liberica JDK][] or [Azul Zulu Embedded][].
 
 ## Documentation
 See current [Robo4j documentation][].
 > **Note:** Under construction.
 
 ## Building from Source
-The Robo4j framework uses [Gradle][] or [Maven][] for building.
+The Robo4j framework uses  [Maven][] for building.
 
 The following will build all components:
 
@@ -56,7 +56,6 @@ Robo4J is released under [General Public License][] v3.
 [@robo4j]: https://twitter.com/robo4j
 [@miragemiko]: https://twitter.com/miragemiko
 [@hirt]: https://twitter.com/hirt
-[Gradle]: https://gradle.org
 [Maven]: https://maven.apache.org/
 [OpenJDK 21]: https://openjdk.java.net/projects/jdk/21/
 [Git]: https://git-scm.com/
