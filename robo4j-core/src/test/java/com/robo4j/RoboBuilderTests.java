@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static com.robo4j.RoboUnitTestUtils.getAttributeOrTimeout;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -246,8 +247,4 @@ public class RoboBuilderTests {
         system.shutdown();
     }
 
-
-    <T, R> R getAttributeOrTimeout(RoboReference<T> roboReference, AttributeDescriptor<R> attributeDescriptor) throws InterruptedException, ExecutionException, TimeoutException {
-        return roboReference.getAttribute(attributeDescriptor).get(TIMEOUT, TimeUnit.MINUTES);
-    }
 }
