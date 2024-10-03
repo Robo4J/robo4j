@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ public class AlphanumericDeviceExample {
 		AlphanumericDevice device = new AlphanumericDevice();
 		device.clear();
 		device.display();
+		System.out.println("Adding Characters");
 		device.addCharacter('A', false);
 		device.addCharacter('B', true);
 		device.addCharacter('C', false);

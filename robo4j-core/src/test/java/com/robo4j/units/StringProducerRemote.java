@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,8 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j;
+package com.robo4j.units;
 
+import com.robo4j.ConfigurationException;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.net.LookupServiceProvider;
 
@@ -29,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class StringProducerRemote<T> extends RoboUnit<T> {
 
-    private AtomicInteger totalCounter = new AtomicInteger(0);
+    private final AtomicInteger totalCounter = new AtomicInteger(0);
     private String target;
     private String targetContext;
 
@@ -54,6 +57,6 @@ public class StringProducerRemote<T> extends RoboUnit<T> {
         int totalMessages = totalCounter.incrementAndGet();
         RoboContext ctx = LookupServiceProvider.getDefaultLookupService().getContext(targetContext);
         ctx.getReference(target).sendMessage(message);
-        System.out.println(String.format("class: %s, totalMessages: %d",getClass().getSimpleName(), totalMessages));
+        System.out.printf("class: %s, totalMessages: %d%n",getClass().getSimpleName(), totalMessages);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j;
+package com.robo4j.units;
 
+import com.robo4j.*;
 import com.robo4j.configuration.Configuration;
 
 import java.util.concurrent.CountDownLatch;
@@ -27,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class StringProducer extends RoboUnit<String> {
 
+    public static final String DEFAULT_UNIT_NAME = "producer";
     public static final String ATTR_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
     public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
     public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_TOTAL_MESSAGES = DefaultAttributeDescriptor
@@ -44,8 +46,8 @@ public class StringProducer extends RoboUnit<String> {
 
 
     /**
-     * @param context
-     * @param id
+     * @param context context
+     * @param id      identifier
      */
     public StringProducer(RoboContext context, String id) {
         super(String.class, context, id);
@@ -58,12 +60,11 @@ public class StringProducer extends RoboUnit<String> {
             throw ConfigurationException.createMissingConfigNameException("target");
         }
         Integer totalMessages = configuration.getInteger(PROP_TOTAL_MESSAGES, null);
-        if(totalMessages == null){
+        if (totalMessages == null) {
             throw ConfigurationException.createMissingConfigNameException(PROP_TOTAL_MESSAGES);
         }
         counter = new AtomicInteger(DEFAULT);
         latch = new CountDownLatch(totalMessages);
-
     }
 
     @Override
@@ -81,7 +82,6 @@ public class StringProducer extends RoboUnit<String> {
                     break;
                 default:
                     System.out.println("don't understand message: " + message);
-
             }
         }
     }
@@ -92,7 +92,7 @@ public class StringProducer extends RoboUnit<String> {
         if (attribute.getAttributeName().equals(ATTR_GET_NUMBER_OF_SENT_MESSAGES) && attribute.getAttributeType() == Integer.class) {
             return (R) (Integer) counter.get();
         }
-        if(attribute.getAttributeName().equals(ATTR_COUNT_DOWN_LATCH) && attribute.getAttributeType() == CountDownLatch.class){
+        if (attribute.getAttributeName().equals(ATTR_COUNT_DOWN_LATCH) && attribute.getAttributeType() == CountDownLatch.class) {
             return (R) latch;
         }
         return null;

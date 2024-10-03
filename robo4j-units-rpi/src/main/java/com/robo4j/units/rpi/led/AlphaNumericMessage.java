@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,10 @@
  */
 package com.robo4j.units.rpi.led;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Message for the alphanumeric display with dots after the characters.
@@ -29,6 +31,7 @@ public class AlphaNumericMessage implements Serializable {
 	public static final AlphaNumericMessage MESSAGE_CLEAR = new AlphaNumericMessage(BackpackMessageCommand.CLEAR);
 	public static final AlphaNumericMessage MESSAGE_DISPLAY = new AlphaNumericMessage(BackpackMessageCommand.DISPLAY);
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	private final BackpackMessageCommand command;
@@ -63,7 +66,7 @@ public class AlphaNumericMessage implements Serializable {
 	 *            -1 if do not care, otherwise the starting position.
 	 */
 	public AlphaNumericMessage(BackpackMessageCommand command, String message, int startPosition) {
-		this(command, message.getBytes(Charset.forName("ISO646-US")), new boolean[message.length()], startPosition);
+		this(command, message.getBytes(StandardCharsets.US_ASCII), new boolean[message.length()], startPosition);
 	}
 
 	/**

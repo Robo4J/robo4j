@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,15 +31,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
+// TODO : remove thread sleep
 public class MessageServerTest {
 	private static final String CONST_MYUUID = "myuuid";
 	private static final String PROPERTY_SERVER_NAME = "ServerName";
@@ -89,7 +88,8 @@ public class MessageServerTest {
 			client.sendMessage("test", message);
 		}
 
-		messageLatch.await(2, TimeUnit.SECONDS);
+		var receivedMessages =messageLatch.await(2, TimeUnit.SECONDS);
+		assertTrue(receivedMessages);
 		assertEquals(testMessage.size(), messages.size());
 		assertArrayEquals(testMessage.toArray(), messages.toArray());
 	}

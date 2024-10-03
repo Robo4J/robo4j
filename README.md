@@ -8,40 +8,38 @@ Robo4J provides an easy way of getting started with building custom hardware and
 * [Robo4j.io][] provides a library of configurable units that allows hardware to be enabled and configured through XML
 * [Robo4j.io][] provides a threading model controlled by annotations
 
-The current [Robo4j.io][] version is 0.5
+The current [Robo4j.io][] version is 0.6-SNAPSHOT
 
 <a href="https://foojay.io/today/works-with-openjdk"><img align="left" src="https://github.com/foojayio/badges/raw/main/works_with_openjdk/Works-with-OpenJDK.png" width="100"></a>
 <br><br><br>
 
 ## Requirements
-[Git][], [Gradle][], [Maven][], [OpenJDK 11][]
+[Git][], [Maven][], [OpenJDK 21][]
 
-If you are looking for a JDK 11 ARM hard float build for Raspbian, we recommend looking into [Liberica JDK][] or [Azul Zulu Embedded][].
+If you are looking for a JDK 21 ARM hard float build for Raspbian, we recommend looking into [Liberica JDK][] or [Azul Zulu][].
 
 ## Documentation
 See current [Robo4j documentation][].
 > **Note:** Under construction.
 
 ## Building from Source
-The Robo4j framework uses [Gradle][] or [Maven][] for building.
+The Robo4j framework uses build [Maven][] management tool.
 
 The following will build all components:
 
 ```bash
-./gradlew jar
+./mvn install
 ```
 The individual bundles will be available under robo4j/&lt;component&gt;/build/libs.
 To install the bundles and make them available to downstream dependencies, run the following:
 
 ```bash
-$ ./gradlew install
-or
 $ mvn clean install
 ```
 
 > **Note:** If you are not using Robo4J as the standard user (pi) on a Raspberry Pi, you will have to specify the path to the local maven repository in the file _**libraries.gradle**_, variable: _mavenRepository_
 
-> **Note:** Robo4J currently requires OpenJDK 11. Ensure that you build and run with OpenJDK 11.
+> **Note:** Robo4J currently requires OpenJDK 21. Ensure that you build and run with OpenJDK 21.
 
 ## Staying in Touch
 Follow [@robo4j][] or authors: [@miragemiko][], [@hirt][] on Twitter. 
@@ -58,11 +56,9 @@ Robo4J is released under [General Public License][] v3.
 [@robo4j]: https://twitter.com/robo4j
 [@miragemiko]: https://twitter.com/miragemiko
 [@hirt]: https://twitter.com/hirt
-[Gradle]: https://gradle.org
 [Maven]: https://maven.apache.org/
-[OpenJDK 11]: https://openjdk.java.net/projects/jdk/11/
+[OpenJDK 21]: https://openjdk.java.net/projects/jdk/21/
 [Git]: https://git-scm.com/
-[Gradle]: https://gradle.org/
 [Robo4j documentation]: https://www.robo4j.io/p/documentation.html
 [Liberica JDK]: https://www.bell-sw.com/java.html
 [Azul Zulu Embedded]: https://www.azul.com/downloads/zulu-embedded/

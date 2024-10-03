@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,11 +45,12 @@ class HttpServerConfigTests {
 	@Test
 	void serverConfigurationNullTest() {
 
-		assertThrows(NullPointerException.class, () -> {
+		Throwable exception = assertThrows(NullPointerException.class, () -> {
 			HttpPathMethodDTO serverUnitPathDTO = HttpPathUtils.readServerPathDTO(null);
 			assertNull(serverUnitPathDTO);
 		});
 
+		assertNotNull(exception.getMessage());
 	}
 
 	@Test

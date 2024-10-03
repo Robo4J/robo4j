@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package com.robo4j.units.rpi.led;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -38,8 +39,8 @@ import com.robo4j.RoboReference;
  */
 public class AdafruitAlphanumericUnitExample {
 
-	private static final byte[] MESSAGE = "Hello Robo4j World! ".getBytes(Charset.forName("ISO646-US"));
-	private static byte[] BUFFER = { ' ', ' ', ' ', ' ' };
+	private static final byte[] MESSAGE = "HelloMAMAPAPAMAXIELLA".getBytes(StandardCharsets.US_ASCII);
+	private static final byte[] BUFFER = { ' ', ' ', ' ', ' ' };
 
 	public static void main(String[] args) throws Exception {
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();

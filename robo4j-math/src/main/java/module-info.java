@@ -19,7 +19,8 @@
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
 module robo4j.math {
-    requires jdk.jfr;
+    requires transitive jdk.jfr;
+
     exports com.robo4j.math.features;
     exports com.robo4j.math.geometry;
     exports com.robo4j.math.geometry.impl;

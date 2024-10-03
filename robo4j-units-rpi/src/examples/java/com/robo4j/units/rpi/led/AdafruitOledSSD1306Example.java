@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,16 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.math;
 
-/**
- * @author Marcus Hirt (@hirt)
- * @author Miro Wengner (@miragemiko)
- */
-public class MainTest {
+package com.robo4j.units.rpi.led;
 
-    public static void main(String[] args) {
-        System.out.println("MAGIC");
-    }
-
+public class AdafruitOledSSD1306Example {
 }

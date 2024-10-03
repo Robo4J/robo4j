@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,8 +43,6 @@ public class LF710PadUnit extends RoboUnit<Object>{
     private LF710ButtonObserver observer;
     private PadInputResponseListener listener;
 
-    // TODO : review fields purpose
-    private String input;
     private String target;
 
     public LF710PadUnit(RoboContext context, String id) {
@@ -53,7 +51,7 @@ public class LF710PadUnit extends RoboUnit<Object>{
 
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
-        input = configuration.getString("input", null);
+        var input = configuration.getString("input", null);
         target = configuration.getString("target", null);
 
         if(input == null){

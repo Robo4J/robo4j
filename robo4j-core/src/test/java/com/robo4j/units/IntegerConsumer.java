@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,42 +14,39 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j;
-
-import com.robo4j.configuration.Configuration;
+package com.robo4j.units;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.ConfigurationException;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboUnit;
+import com.robo4j.configuration.Configuration;
 
 /**
- * This one should schedule everything on the Worker pool.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-@WorkTrait
-public class StringConsumerWorker extends RoboUnit<String> {
-	private static final int DEFAULT = 0;
-	private AtomicInteger counter;
-	private List<String> receivedMessages = new ArrayList<>();
+public class IntegerConsumer extends RoboUnit<Integer> {
+	private List<Integer> receivedMessages = new ArrayList<>();
 
 	/**
 	 * @param context
 	 * @param id
 	 */
-	public StringConsumerWorker(RoboContext context, String id) {
-		super(String.class, context, id);
-		this.counter = new AtomicInteger(DEFAULT);
+	public IntegerConsumer(RoboContext context, String id) {
+		super(Integer.class, context, id);
 	}
 
-	public synchronized List<String> getReceivedMessages() {
+	public synchronized List<Integer> getReceivedMessages() {
 		return receivedMessages;
 	}
 
 	@Override
-	public synchronized void onMessage(String message) {
-		counter.incrementAndGet();
+	public synchronized void onMessage(Integer message) {
 		receivedMessages.add(message);
 	}
 
@@ -61,12 +58,10 @@ public class StringConsumerWorker extends RoboUnit<String> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals("getNumberOfSentMessages")
-				&& attribute.getAttributeType() == Integer.class) {
-			return (R) (Integer) counter.get();
+		if (attribute.getAttributeName().equals("NumberOfReceivedMessages") && attribute.getAttributeType() == Integer.class) {
+			return (R) (Integer) receivedMessages.size();
 		}
-		if (attribute.getAttributeName().equals("getReceivedMessages")
-				&& attribute.getAttributeType() == ArrayList.class) {
+		if (attribute.getAttributeName().equals("ReceivedMessages") && attribute.getAttributeType() == ArrayList.class) {
 			return (R) receivedMessages;
 		}
 		return null;

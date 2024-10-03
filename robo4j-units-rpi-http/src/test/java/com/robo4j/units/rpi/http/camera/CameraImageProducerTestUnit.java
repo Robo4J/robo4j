@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 package com.robo4j.units.rpi.http.camera;
 
 import com.robo4j.RoboContext;
-import com.robo4j.units.rpi.camera.ImageDTO;
-import com.robo4j.units.rpi.camera.ImageDTOBuilder;
 import com.robo4j.util.StreamUtils;
 
 /**
@@ -36,12 +34,12 @@ public class CameraImageProducerTestUnit extends CameraImageProducerDesTestUnit 
 
         final byte[] image = StreamUtils
                 .inputStreamToByteArray(Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName));
-        final ImageDTO imageDTO = ImageDTOBuilder.Build()
+        final CameraImageDTO cameraImageDTO = CameraImageDTOBuilder.Build()
                 .setWidth(800)
                 .setHeight(600)
                 .setEncoding(IMAGE_ENCODING)
                 .setContent(image).build();
-        getContext().getReference(target).sendMessage(imageDTO);
+        getContext().getReference(target).sendMessage(cameraImageDTO);
         generatedImagesLatch.countDown();
         progress.set(false);
 

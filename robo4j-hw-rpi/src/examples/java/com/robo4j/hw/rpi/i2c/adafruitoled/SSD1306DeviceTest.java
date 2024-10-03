@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,6 +49,8 @@ public class SSD1306DeviceTest {
 	 * of lines. Will default to 32.
 	 */
 	public static void main(String[] args) throws IOException {
+		System.setProperty("java.awt.headless", "true");
+		System.out.println("Headless:" + System.getProperty("java.awt.headless"));
 		String lines = DEFAULT_LINES;
 		if (args.length > 0) {
 			lines = args[0];
@@ -61,7 +63,7 @@ public class SSD1306DeviceTest {
 		System.out.println("If the number of lines do not match your device,"); 
 		System.out.println("please add the number of lines as the first argument!");
 		
-		String text = args.length > 0 ? String.join(" ", args) : "Hello World!";
+		String text = args.length > 0 ? String.join(" ", args) : "Hello Maxi!";
 		Graphics2D gc = oled.getGraphicsContext();
 		gc.setColor(Color.white);
 		gc.setBackground(Color.black);
@@ -71,30 +73,32 @@ public class SSD1306DeviceTest {
 		gc.setBackground(Color.white);
 		gc.fillOval(127 - 16, -16, 32, 32);
 		oled.pushImage();
+		System.out.println("There is nothing");
 
-		JFrame frame = new JFrame();
-		frame.addWindowListener(new WindowAdapter() {
-
-			@Override
-			public void windowClosing(WindowEvent e) {
-				try {
-					oled.setEnabled(false);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-					// TODO: is it possible ?
-				} finally {
-					System.exit(0);
-				}
-			}
-		});
-		frame.setSize(256, 256);
-		frame.getContentPane().add(new JLabel(new ImageIcon(oled.getImage())));
-		frame.setVisible(true);
+		// TODO : create optional possibility to use JFrame as an output
+//		JFrame frame = new JFrame();
+//		frame.addWindowListener(new WindowAdapter() {
+//
+//			@Override
+//			public void windowClosing(WindowEvent e) {
+//				try {
+//					oled.setEnabled(false);
+//				} catch (IOException e1) {
+//					e1.printStackTrace();
+//					// TODO: is it possible ?
+//				} finally {
+//					System.exit(0);
+//				}
+//			}
+//		});
+//		frame.setSize(256, 256);
+//		frame.getContentPane().add(new JLabel(new ImageIcon(oled.getImage())));
+//		frame.setVisible(true);
 		System.out.println("Press <Enter> to quit!");
 		System.in.read();
 		oled.setEnabled(false);
-		frame.setVisible(false);
-		frame.dispose();
+//		frame.setVisible(false);
+//		frame.dispose();
 	}
 
 }

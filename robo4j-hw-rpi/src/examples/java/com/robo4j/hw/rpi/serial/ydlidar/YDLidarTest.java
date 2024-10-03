@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,9 @@ package com.robo4j.hw.rpi.serial.ydlidar;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+//import com.pi4j.io.serial.SerialFactory;
+import com.robo4j.hw.rpi.serial.ydlidar.ScanReceiver;
+import com.robo4j.hw.rpi.serial.ydlidar.YDLidarDevice;
 import com.robo4j.math.geometry.ScanResult2D;
 
 /**
@@ -51,7 +54,8 @@ public class YDLidarTest {
 		device.setScanning(false);
 		device.shutdown();
 		System.out.println("Done!");
-		// TODO : ticket https://github.com/Robo4J/robo4j/issues/63
+		// Naughty that this has to be done... Perhaps fix Pi4J?
+//		SerialFactory.shutdown();
 	}
 
 }

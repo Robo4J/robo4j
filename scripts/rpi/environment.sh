@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+# Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
 #
 # Robo4J is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,9 +22,6 @@
 #
 export ROBO4J_HOME=/home/pi/git/robo4j
 export ROBO4J_VERSION=0.5
-#export PI4J_HOME=/opt/pi4j/lib
-# Using the 2.0 SNAPSHOT until released
-# export PI4J_HOME=~/.m2/repository/com/pi4j/pi4j-core/2.0-SNAPSHOT/
 
 # Pre-defined debug flags
 export DEBUG="-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=*:9876,suspend=y"
@@ -38,7 +35,6 @@ export JFR="-XX:StartFlightRecording=settings=profile,dumponexit=true,filename=$
 function createRobo4jPath(){
     local buildLibs="build/libs"
     local moduleList=("robo4j-math" "robo4j-core" "robo4j-hw-rpi" "robo4j-units-rpi" "robo4j-socket-http")
-#   local robo4jPath="$PI4J_HOME/*"
     local robo4jPath="."
     for moduleName in "${moduleList[@]}"
     do
