@@ -75,6 +75,7 @@ public class SSD1306DeviceTest {
 		oled.pushImage();
 		System.out.println("There is nothing");
 
+		// TODO : create optional possibility to use JFrame as an output
 //		JFrame frame = new JFrame();
 //		frame.addWindowListener(new WindowAdapter() {
 //

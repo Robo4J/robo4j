@@ -16,7 +16,7 @@ The current [Robo4j.io][] version is 0.6-SNAPSHOT
 ## Requirements
 [Git][], [Maven][], [OpenJDK 21][]
 
-If you are looking for a JDK 21 ARM hard float build for Raspbian, we recommend looking into [Liberica JDK][] or [Azul Zulu Embedded][].
+If you are looking for a JDK 21 ARM hard float build for Raspbian, we recommend looking into [Liberica JDK][] or [Azul Zulu][].
 
 ## Documentation
 See current [Robo4j documentation][].
