@@ -23,7 +23,7 @@ See current [Robo4j documentation][].
 > **Note:** Under construction.
 
 ## Building from Source
-The Robo4j framework uses  [Maven][] for building.
+The Robo4j framework uses build [Maven][] management tool.
 
 The following will build all components:
 
