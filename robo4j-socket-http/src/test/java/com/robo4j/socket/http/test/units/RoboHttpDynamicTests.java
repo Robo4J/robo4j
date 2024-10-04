@@ -19,6 +19,7 @@ package com.robo4j.socket.http.test.units;
 import com.robo4j.*;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
+import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
@@ -86,6 +87,7 @@ class RoboHttpDynamicTests {
         /* client system sending a messages to the main system */
         RoboReference<Object> decoratedProducer = clientSystem.getReference(DECORATED_PRODUCER);
         decoratedProducer.sendMessage(MESSAGES_NUMBER);
+
         CountDownLatch countDownLatchDecoratedProducer = getAttributeOrTimeout(decoratedProducer, SocketMessageDecoratedProducerUnit.DESCRIPTOR_MESSAGES_LATCH);
         var messagesProduced = countDownLatchDecoratedProducer.await(TIMEOUT, TIME_UNIT);
 
@@ -194,7 +196,12 @@ class RoboHttpDynamicTests {
     }
 
     private static <T, R> R getAttributeOrTimeout(RoboReference<T> roboReference, AttributeDescriptor<R> attributeDescriptor) throws InterruptedException, ExecutionException, TimeoutException {
-        return roboReference.getAttribute(attributeDescriptor).get(TIMEOUT, TimeUnit.MINUTES);
+        var attribute = roboReference.getAttribute(attributeDescriptor).get(TIMEOUT, TimeUnit.MINUTES);
+        if (attribute == null) {
+            SimpleLoggingUtil.error(RoboHttpDynamicTests.class, "roboReference:" + roboReference.getId() + ", no attribute:" + attributeDescriptor.getAttributeName());
+            attribute = roboReference.getAttribute(attributeDescriptor).get(TIMEOUT, TimeUnit.MINUTES);
+        }
+        return attribute;
     }
 
 }

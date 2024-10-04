@@ -16,11 +16,7 @@
  */
 package com.robo4j.socket.http.test.units.config;
 
-import com.robo4j.AttributeDescriptor;
-import com.robo4j.ConfigurationException;
-import com.robo4j.DefaultAttributeDescriptor;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboUnit;
+import com.robo4j.*;
 import com.robo4j.configuration.Configuration;
 
 import java.util.ArrayList;
@@ -30,73 +26,68 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 
-@SuppressWarnings("rawtypes")
 public class StringConsumer extends RoboUnit<String> {
-	public static final String NAME = "stringConsumer";
-	public static final String ATTR_MESSAGES_TOTAL = "getNumberOfSentMessages";
-	public static final String ATTR_RECEIVED_MESSAGES = "getReceivedMessages";
-	public static final String ATTR_MESSAGES_LATCH = "messagesLatch";
-	public static final String PROP_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
+    public static final String NAME = "stringConsumer";
+    public static final String ATTR_MESSAGES_TOTAL = "getNumberOfSentMessages";
+    public static final String ATTR_RECEIVED_MESSAGES = "getReceivedMessages";
+    public static final String ATTR_MESSAGES_LATCH = "messagesLatch";
+    public static final String PROP_TOTAL_NUMBER_MESSAGES = "totalNumberMessages";
 
-	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_MESSAGES_LATCH = DefaultAttributeDescriptor
-			.create(CountDownLatch.class, ATTR_MESSAGES_LATCH);
-	public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_MESSAGES_TOTAL = DefaultAttributeDescriptor
-			.create(Integer.class, ATTR_MESSAGES_TOTAL);
-	public static final DefaultAttributeDescriptor<List> DESCRIPTOR_RECEIVED_MESSAGES = DefaultAttributeDescriptor
-			.create(List.class, ATTR_RECEIVED_MESSAGES);
+    public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_MESSAGES_LATCH = DefaultAttributeDescriptor
+            .create(CountDownLatch.class, ATTR_MESSAGES_LATCH);
+    public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_MESSAGES_TOTAL = DefaultAttributeDescriptor
+            .create(Integer.class, ATTR_MESSAGES_TOTAL);
 
-	private static final int DEFAULT = 0;
-	private volatile AtomicInteger counter;
-	private List<String> receivedMessages = Collections.synchronizedList(new ArrayList<>());
-	private CountDownLatch messagesLatch;
+    private static final int DEFAULT = 0;
+    private final AtomicInteger counter = new AtomicInteger(DEFAULT);
+    private final List<String> receivedMessages = Collections.synchronizedList(new ArrayList<>());
+    private CountDownLatch messagesLatch;
 
-	/**
-	 * @param context
-	 * @param id
-	 */
-	public StringConsumer(RoboContext context, String id) {
-		super(String.class, context, id);
-		this.counter = new AtomicInteger(DEFAULT);
-	}
+    /**
+     * @param context robo4j context
+     * @param id unit id
+     */
+    public StringConsumer(RoboContext context, String id) {
+        super(String.class, context, id);
+    }
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		int totalNumber = configuration.getInteger(PROP_TOTAL_NUMBER_MESSAGES, 0);
-		if (totalNumber > 0) {
-			messagesLatch = new CountDownLatch(totalNumber);
-		}
-	}
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        int totalNumber = configuration.getInteger(PROP_TOTAL_NUMBER_MESSAGES, 0);
+        if (totalNumber > 0) {
+            messagesLatch = new CountDownLatch(totalNumber);
+        }
+    }
 
-	@Override
-	public void onMessage(String message) {
-		counter.incrementAndGet();
-		receivedMessages.add(message);
-		if (messagesLatch != null) {
-			messagesLatch.countDown();
-		}
-	}
+    @Override
+    public void onMessage(String message) {
+        counter.incrementAndGet();
+        receivedMessages.add(message);
+        if (messagesLatch != null) {
+            messagesLatch.countDown();
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals(ATTR_MESSAGES_TOTAL)
-				&& attribute.getAttributeType() == Integer.class) {
-			return (R) Integer.valueOf(counter.get());
-		}
-		if (attribute.getAttributeName().equals(ATTR_RECEIVED_MESSAGES)
-				&& attribute.getAttributeType() == List.class) {
-			return (R) receivedMessages;
-		}
-		if (attribute.getAttributeName().equals(ATTR_MESSAGES_LATCH)
-				&& attribute.getAttributeType() == CountDownLatch.class) {
-			return (R) messagesLatch;
-		}
-		return null;
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
+        if (attribute.getAttributeName().equals(ATTR_MESSAGES_TOTAL)
+                && attribute.getAttributeType() == Integer.class) {
+            return (R) Integer.valueOf(counter.get());
+        }
+        if (attribute.getAttributeName().equals(ATTR_RECEIVED_MESSAGES)
+                && attribute.getAttributeType() == List.class) {
+            return (R) receivedMessages;
+        }
+        if (attribute.getAttributeName().equals(ATTR_MESSAGES_LATCH)
+                && attribute.getAttributeType() == CountDownLatch.class) {
+            return (R) messagesLatch;
+        }
+        return null;
+    }
 
 }

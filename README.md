@@ -1,4 +1,4 @@
-![Robo4j-master](https://github.com/Robo4j/robo4j/actions/workflows/robo4j-build-actions.yml/badge.svg?branch=master)
+![Robo4j-master](https://github.com/Robo4j/robo4j/actions/workflows/robo4j-verification.yml/badge.svg?branch=master)
 
 # Robo4J
 Robo4J provides an easy way of getting started with building custom hardware and creating software for it running on the JVM.
