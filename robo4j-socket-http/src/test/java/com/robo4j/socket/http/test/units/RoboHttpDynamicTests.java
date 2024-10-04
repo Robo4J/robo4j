@@ -88,6 +88,7 @@ class RoboHttpDynamicTests {
         RoboReference<Object> decoratedProducer = clientSystem.getReference(DECORATED_PRODUCER);
         decoratedProducer.sendMessage(MESSAGES_NUMBER);
 
+        // TODO: review how to receiving attributes
         CountDownLatch countDownLatchDecoratedProducer = getAttributeOrTimeout(decoratedProducer, SocketMessageDecoratedProducerUnit.DESCRIPTOR_MESSAGES_LATCH);
         var messagesProduced = countDownLatchDecoratedProducer.await(TIMEOUT, TIME_UNIT);
 

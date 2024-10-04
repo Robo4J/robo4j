@@ -61,4 +61,4 @@ Robo4J is released under [General Public License][] v3.
 [Git]: https://git-scm.com/
 [Robo4j documentation]: https://www.robo4j.io/p/documentation.html
 [Liberica JDK]: https://www.bell-sw.com/java.html
-[Azul Zulu Embedded]: https://www.azul.com/downloads/zulu-embedded/
+[Azul Zulu]: https://www.azul.com/downloads/zulu-embedded/
