@@ -1,4 +1,4 @@
-![Robo4j-master](https://github.com/Robo4j/robo4j/actions/workflows/robo4j-build-actions.yml/badge.svg?branch=master)
+![Robo4j-master](https://github.com/Robo4j/robo4j/actions/workflows/robo4j-verification.yml/badge.svg?branch=master)
 
 # Robo4J
 Robo4J provides an easy way of getting started with building custom hardware and creating software for it running on the JVM.
@@ -61,4 +61,4 @@ Robo4J is released under [General Public License][] v3.
 [Git]: https://git-scm.com/
 [Robo4j documentation]: https://www.robo4j.io/p/documentation.html
 [Liberica JDK]: https://www.bell-sw.com/java.html
-[Azul Zulu Embedded]: https://www.azul.com/downloads/zulu-embedded/
+[Azul Zulu]: https://www.azul.com/downloads/?package=jdk#zulu
