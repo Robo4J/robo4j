@@ -28,39 +28,40 @@ import java.util.stream.Stream;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
+@Deprecated
 public final class SimpleLoggingUtil {
-	// TODO(Marcus/Sep 6, 2017): Decide if we want to kill this...
-	public static void print(Class<?> clazz, String message) {
-		Logger.getLogger(clazz.getName()).log(Level.INFO, message);
-	}
+    // TODO(Marcus/Sep 6, 2017): Decide if we want to kill this...
+    public static void print(Class<?> clazz, String message) {
+        Logger.getLogger(clazz.getName()).log(Level.INFO, message);
+    }
 
-	public static void debug(Class<?> clazz, String message) {
-		Logger.getLogger(clazz.getName()).log(Level.FINE, message);
-	}
+    public static void debug(Class<?> clazz, String message) {
+        Logger.getLogger(clazz.getName()).log(Level.FINE, message);
+    }
 
-	public static void debug(Class<?> clazz, String... message) {
-		debug(clazz, clazz.getSimpleName() + " : "
-				+ Stream.of(message).reduce(StringConstants.EMPTY, (l, r) -> l.concat(StringConstants.SPACE).concat(r)));
-	}
+    public static void debug(Class<?> clazz, String... message) {
+        debug(clazz, clazz.getSimpleName() + " : "
+                + Stream.of(message).reduce(StringConstants.EMPTY, (l, r) -> l.concat(StringConstants.SPACE).concat(r)));
+    }
 
-	public static void debug(Class<?> clazz, String message, Throwable e) {
-		Logger.getLogger(clazz.getName()).log(Level.INFO, message, e);
-	}
+    public static void debug(Class<?> clazz, String message, Throwable e) {
+        Logger.getLogger(clazz.getName()).log(Level.INFO, message, e);
+    }
 
-	public static void info(Class<?> clazz, String message) {
-		Logger.getLogger(clazz.getName()).log(Level.INFO, message);
-	}
+    public static void info(Class<?> clazz, String message) {
+        Logger.getLogger(clazz.getName()).log(Level.INFO, message);
+    }
 
-	public static void info(Class<?> clazz, String message, Throwable e) {
-		Logger.getLogger(clazz.getName()).log(Level.INFO, message, e);
-	}
+    public static void info(Class<?> clazz, String message, Throwable e) {
+        Logger.getLogger(clazz.getName()).log(Level.INFO, message, e);
+    }
 
-	public static void error(Class<?> clazz, String message) {
-		Logger.getLogger(clazz.getName()).log(Level.SEVERE, message);
-	}
+    public static void error(Class<?> clazz, String message) {
+        Logger.getLogger(clazz.getName()).log(Level.SEVERE, message);
+    }
 
-	public static void error(Class<?> clazz, String string, Throwable e) {
-		Logger.getLogger(clazz.getName()).log(Level.SEVERE, string, e);
-	}
+    public static void error(Class<?> clazz, String string, Throwable e) {
+        Logger.getLogger(clazz.getName()).log(Level.SEVERE, string, e);
+    }
 
 }

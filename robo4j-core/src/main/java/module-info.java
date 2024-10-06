@@ -21,6 +21,7 @@
 module robo4j.core {
     requires java.logging;
     requires java.xml;
+    requires org.slf4j;
 
     exports com.robo4j;
     exports com.robo4j.util;

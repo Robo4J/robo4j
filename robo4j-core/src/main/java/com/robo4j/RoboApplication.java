@@ -16,9 +16,10 @@
  */
 package com.robo4j;
 
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.scheduler.RoboThreadFactory;
 import com.robo4j.util.SystemUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,91 +38,91 @@ import static com.robo4j.util.SystemUtil.DELIMITER_HORIZONTAL;
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class RoboApplication {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoboApplication.class);
+
+    private static final class ShutdownThread extends Thread {
+
+        private final CountDownLatch latch;
+
+        private ShutdownThread(CountDownLatch latch) {
+            this.latch = latch;
+        }
+
+        @Override
+        public void run() {
+            latch.countDown();
+        }
+    }
+
+    private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1,
+            new RoboThreadFactory(new ThreadGroup("Robo4J-Launcher"), "Robo4J-App-", false));
+    private static final CountDownLatch appLatch = new CountDownLatch(1);
 
 
-	private static final class ShutdownThread extends Thread {
+    public RoboApplication() {
+    }
 
-		private final CountDownLatch latch;
+    /**
+     * the method is called by standalone robo launcher.
+     *
+     * @param context robo context
+     */
+    public void launch(RoboContext context) {
+        // Create a new Launcher thread and then wait for that thread to finish
+        Runtime.getRuntime().addShutdownHook(new ShutdownThread(appLatch));
+        try {
+            // TODO : review, exception runtime?
+            Thread daemon = new Thread(() -> {
+                try {
+                    System.in.read();
+                    appLatch.countDown();
+                } catch (IOException e) {
+                    LOGGER.error("launch", e);
+                }
 
-		private ShutdownThread(CountDownLatch latch) {
-			this.latch = latch;
-		}
+            });
+            daemon.setName("Robo4J-Launcher-listener");
+            daemon.setDaemon(true);
+            daemon.start();
+            context.start();
 
-		@Override
-		public void run() {
-			latch.countDown();
-		}
-	}
+            String logo = getBanner(Thread.currentThread().getContextClassLoader());
+            LOGGER.info(logo);
+            LOGGER.info(SystemUtil.printStateReport(context));
+            LOGGER.info("Press <Enter>...");
+            // TODO : introduce timeout
+            appLatch.await();
+            LOGGER.info("Going down...");
+            context.shutdown();
+            LOGGER.info("Bye!");
+        } catch (InterruptedException e) {
+            throw new RoboApplicationException("unexpected", e);
+        }
+    }
 
-	private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1,
-			new RoboThreadFactory(new ThreadGroup("Robo4J-Launcher"), "Robo4J-App-", false));
-	private static final CountDownLatch appLatch = new CountDownLatch(1);
+    public void launchWithExit(RoboContext context, long delay, TimeUnit timeUnit) {
+        executor.schedule(() -> Runtime.getRuntime().exit(0), delay, timeUnit);
+        launch(context);
 
+    }
 
-	public RoboApplication() {
-	}
+    public void launchNoExit(RoboContext context, long delay, TimeUnit timeUnit) {
+        executor.schedule(appLatch::countDown, delay, timeUnit);
+        launch(context);
+    }
 
-	/**
-	 * the method is called by standalone robo launcher.
-	 *
-	 * @param context
-	 *            robo context
-	 */
-	public void launch(RoboContext context) {
-		// Create a new Launcher thread and then wait for that thread to finish
-		Runtime.getRuntime().addShutdownHook(new ShutdownThread(appLatch));
-		try {
-			// TODO : review, exception runtime?
-			Thread daemon = new Thread(() -> {
-					try {
-						System.in.read();
-						appLatch.countDown();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+    private String getBanner(ClassLoader classLoader) {
+        final InputStream is = classLoader.getResourceAsStream("banner.txt");
+        final byte[] logoBytes;
+        try {
+            logoBytes = is == null ? new byte[0] : is.readAllBytes();
+        } catch (IOException e) {
+            throw new IllegalStateException("not allowed");
+        }
 
-			});
-			daemon.setName("Robo4J-Launcher-listener");
-			daemon.setDaemon(true);
-			daemon.start();
-			context.start();
-
-			String logo = getBanner(Thread.currentThread().getContextClassLoader());
-			SimpleLoggingUtil.info(getClass(), logo);
-			SimpleLoggingUtil.info(RoboApplication.class, SystemUtil.printStateReport(context));
-			SimpleLoggingUtil.info(RoboApplication.class, "Press <Enter>...");
-			appLatch.await();
-			SimpleLoggingUtil.info(RoboApplication.class,"Going down...");
-			context.shutdown();
-			SimpleLoggingUtil.info(RoboApplication.class,"Bye!");
-		} catch (InterruptedException e) {
-			throw new RoboApplicationException("unexpected", e);
-		}
-	}
-
-	public void launchWithExit(RoboContext context, long delay, TimeUnit timeUnit) {
-		executor.schedule(() -> Runtime.getRuntime().exit(0), delay, timeUnit);
-		launch(context);
-
-	}
-
-	public void launchNoExit(RoboContext context, long delay, TimeUnit timeUnit) {
-		executor.schedule(appLatch::countDown, delay, timeUnit);
-		launch(context);
-	}
-
-	private String getBanner(ClassLoader classLoader){
-		final InputStream is = classLoader.getResourceAsStream("banner.txt");
-		final byte[] logoBytes;
-		try {
-			logoBytes = is == null ? new byte[0] : is.readAllBytes();
-		} catch (IOException e) {
-			throw new IllegalStateException("not allowed");
-		}
-
-		return new StringBuilder().append(BREAK).append(DELIMITER_HORIZONTAL)
-				.append(new String(logoBytes)).append(BREAK).append(DELIMITER_HORIZONTAL)
-				.toString();
-	}
+        return new StringBuilder().append(BREAK).append(DELIMITER_HORIZONTAL)
+                .append(new String(logoBytes)).append(BREAK).append(DELIMITER_HORIZONTAL)
+                .toString();
+    }
 
 }
