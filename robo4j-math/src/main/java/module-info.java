@@ -20,6 +20,7 @@
  */
 module robo4j.math {
     requires transitive jdk.jfr;
+    requires org.slf4j;
 
     exports com.robo4j.math.features;
     exports com.robo4j.math.geometry;
