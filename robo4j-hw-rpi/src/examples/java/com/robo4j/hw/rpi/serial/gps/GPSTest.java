@@ -16,37 +16,40 @@
  */
 package com.robo4j.hw.rpi.serial.gps;
 
-import java.io.IOException;
-
 import com.robo4j.hw.rpi.gps.GPS;
 import com.robo4j.hw.rpi.gps.GPSListener;
 import com.robo4j.hw.rpi.gps.PositionEvent;
 import com.robo4j.hw.rpi.gps.VelocityEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Listens for GPS event and prints them to stdout as they come.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GPSTest {
-	// TODO : review duplicates
-	public static void main(String[] args) throws InterruptedException, IOException {
-		GPS mtk3339gps = new MTK3339GPS();
-		mtk3339gps.addListener(new GPSListener() {
-			@Override
-			public void onPosition(PositionEvent event) {
-				System.out.println(event);
-			}
+    private static final Logger LOGGER = LoggerFactory.getLogger(GPSTest.class);
 
-			@Override
-			public void onVelocity(VelocityEvent event) {
-				System.out.println(event);
-			}
-		});
-		mtk3339gps.start();
-		System.out.println("Press <Enter> to quit!");
-		System.in.read();
-		mtk3339gps.shutdown();
-	}
+    public static void main(String[] args) throws InterruptedException, IOException {
+        GPS mtk3339gps = new MTK3339GPS();
+        mtk3339gps.addListener(new GPSListener() {
+            @Override
+            public void onPosition(PositionEvent event) {
+                LOGGER.info("onPosition, event:{}", event);
+            }
+
+            @Override
+            public void onVelocity(VelocityEvent event) {
+                LOGGER.info("onVelocity, event:{}", event);
+            }
+        });
+        mtk3339gps.start();
+        LOGGER.info("Press <Enter> to quit!");
+        System.in.read();
+        mtk3339gps.shutdown();
+    }
 }

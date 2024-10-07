@@ -16,6 +16,9 @@
  */
 package com.robo4j.hw.rpi.pad;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -25,14 +28,14 @@ import java.nio.file.Paths;
 /**
  * Java port of Logitech F710 Gamepad
  * optimised of raspberryPi
- *
+ * <p>
  * note: set the F710 pad to DirectInput by front button
  *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class LF710PadExample implements Runnable {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(LF710PadExample.class);
     private static final String REGISTERED_INPUT = "/dev/input/js0";
     private static final int ANDING_LEFT = 0x00ff;
     private static final int ANDING_LONG_LEFT = 0x00000000000000ff;
@@ -48,7 +51,7 @@ public class LF710PadExample implements Runnable {
     private final Path inputPath = Paths.get(REGISTERED_INPUT);
 
     public static void main(String[] args) {
-        System.out.println("start joystick logitech F710");
+        LOGGER.info("start joystick logitech F710");
         LF710PadExample pad = new LF710PadExample();
         new Thread(pad).start();
     }
@@ -63,24 +66,22 @@ public class LF710PadExample implements Runnable {
         try {
             final InputStream inputStream = Files.newInputStream(inputPath);
             int bytes;
-            while((bytes = inputStream.read(buffer)) > INDEX_START){
-                if(bytes == BUFFER_SIZE){
+            while ((bytes = inputStream.read(buffer)) > INDEX_START) {
+                if (bytes == BUFFER_SIZE) {
                     final long time = ((((((buffer[INDEX_TIME_3] & ANDING_LONG_LEFT) << BUFFER_SIZE) | (buffer[INDEX_TIME_2] &
                             ANDING_LEFT)) << BUFFER_SIZE) | (buffer[INDEX_TIME_1] & ANDING_LEFT)) << BUFFER_SIZE) |
                             (buffer[INDEX_START] & ANDING_LEFT);
                     final short amount = (short) (((buffer[INDEX_AMOUNT_5] & ANDING_LEFT) << BUFFER_SIZE) | (buffer[INDEX_AMOUNT_4] & ANDING_LEFT));
                     final short part = buffer[INDEX_PART];
                     final short element = buffer[INDEX_ELEMENT];
-                    if(part > 0){
+                    if (part > 0) {
                         final LF710Part lf710Part = LF710Part.getByMask(part);
-                        switch (lf710Part){
+                        switch (lf710Part) {
                             case BUTTON:
-                                System.out.println("BUTTON: " + LF710Button.getByMask(element) + " state: " +
-                                        getInputState(amount) + " time: " + time);
+                                LOGGER.info("BUTTON: {} state: {} time: {}", LF710Button.getByMask(element), getInputState(amount), time);
                                 break;
                             case JOYSTICK:
-                                System.out.println("JOYSTICK: " + LF710JoystickButton.getByMask(element) + " state: " +
-                                        getInputState(amount) + " time: " + time);
+                                LOGGER.info("JOYSTICK: {} state: {} time: {}", LF710JoystickButton.getByMask(element), getInputState(amount), time);
                                 break;
                             default:
                                 throw new RuntimeException("uknonw pad part:" + lf710Part);
@@ -94,7 +95,7 @@ public class LF710PadExample implements Runnable {
     }
 
     //Private Methods
-    private LF710State getInputState(short amount){
+    private LF710State getInputState(short amount) {
         return (amount == 0) ? LF710State.RELEASED : LF710State.PRESSED;
     }
 

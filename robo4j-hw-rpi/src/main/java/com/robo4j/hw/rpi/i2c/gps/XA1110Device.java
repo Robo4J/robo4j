@@ -18,6 +18,8 @@ package com.robo4j.hw.rpi.i2c.gps;
 
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import com.robo4j.hw.rpi.utils.I2cBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -35,6 +37,8 @@ import java.util.stream.Collectors;
  * @author Miro Wengner (@miragemiko)
  */
 class XA1110Device extends AbstractI2CDevice {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XA1110Device.class);
+
     public enum NmeaSentenceType {
         //@formatter:off
 		GEOPOS("GLL", "Geographic Position - Latitude longitude", 0),
@@ -284,7 +288,7 @@ class XA1110Device extends AbstractI2CDevice {
     }
 
     private void init() throws IOException {
-        System.out.println("Initializing device");
+        LOGGER.info("Initializing device");
         sendMtkPacket(createNmeaSentencesAndFrequenciesMtkPacket(new NmeaSetting(NmeaSentenceType.FIX_DATA, 1),
                 new NmeaSetting(NmeaSentenceType.COURSE_AND_SPEED, 1)));
 
@@ -296,22 +300,21 @@ class XA1110Device extends AbstractI2CDevice {
             while (true) {
                 StringBuilder builder = new StringBuilder();
                 try {
-                    System.out.println("=== Reading GPS-data from i2c bus to builder ===");
+                    LOGGER.info("=== Reading GPS-data from i2c bus to builder ===");
                     device.readGpsData(builder);
                     String gpsData = builder.toString();
-                    System.out.println("Got data of length " + gpsData.length());
+                    LOGGER.info("Got data of length {}", gpsData.length());
                     gpsData = gpsData.replace("$", "\n$");
-                    System.out.print(gpsData);
-                    System.out.println("\n===<end>===");
+                    LOGGER.info("gpsData:{}", gpsData);
+                    LOGGER.info("===<end>===");
                     TimeUnit.MILLISECONDS.sleep(1000);
                 } catch (Exception e) {
-                    // TODO improve
-                    e.printStackTrace();
+                    LOGGER.error(e.getMessage(), e);
                 }
             }
         });
         t.setDaemon(true);
-        System.out.println("Starting reading from GPS. Press <Enter> to quit!");
+        LOGGER.info("Starting reading from GPS. Press <Enter> to quit!");
         t.start();
         System.in.read();
     }
