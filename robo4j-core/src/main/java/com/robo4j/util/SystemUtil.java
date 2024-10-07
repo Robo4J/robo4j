@@ -18,7 +18,8 @@ package com.robo4j.util;
 
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.logging.SimpleLoggingUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -27,47 +28,48 @@ import java.util.List;
 
 /**
  * Some useful little utilities.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class SystemUtil {
-	public static final String BREAK = "\n";
-	public static final String DELIMITER_HORIZONTAL = "================================================";
-	private static final String SLASH = "/";
+    private static final Logger LOGGER = LoggerFactory.getLogger(SystemUtil.class);
+    public static final String BREAK = "\n";
+    public static final String DELIMITER_HORIZONTAL = "================================================";
+    private static final String SLASH = "/";
 
-	private SystemUtil() {
-		// no instances
-	}
+    private SystemUtil() {
+        // no instances
+    }
 
-	public static final Comparator<RoboReference<?>> ID_COMPARATOR = Comparator.comparing(RoboReference::getId);
+    public static final Comparator<RoboReference<?>> ID_COMPARATOR = Comparator.comparing(RoboReference::getId);
 
-	public static InputStream getInputStreamByResourceName(String resourceName){
-		return Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
-	}
+    public static InputStream getInputStreamByResourceName(String resourceName) {
+        return Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+    }
 
 
-	public static String printStateReport(RoboContext ctx) {
-		StringBuilder builder = new StringBuilder();
-		List<RoboReference<?>> references = new ArrayList<>(ctx.getUnits());
-		references.sort(ID_COMPARATOR);
-		// formatter:off
-		builder.append("RoboSystem state ").append(ctx.getState().getLocalizedName()).append(BREAK)
-				.append(DELIMITER_HORIZONTAL).append(BREAK);
-		for (RoboReference<?> reference : references) {
-			builder.append(
-					String.format("    %-25s   %13s", reference.getId(), reference.getState().getLocalizedName()))
-					.append(BREAK);
-		}
-		// formatter:on
-		return builder.toString();
-	}
+    public static String printStateReport(RoboContext ctx) {
+        StringBuilder builder = new StringBuilder();
+        List<RoboReference<?>> references = new ArrayList<>(ctx.getUnits());
+        references.sort(ID_COMPARATOR);
+        // formatter:off
+        builder.append("RoboSystem state ").append(ctx.getState().getLocalizedName()).append(BREAK)
+                .append(DELIMITER_HORIZONTAL).append(BREAK);
+        for (RoboReference<?> reference : references) {
+            builder.append(
+                            String.format("    %-25s   %13s", reference.getId(), reference.getState().getLocalizedName()))
+                    .append(BREAK);
+        }
+        // formatter:on
+        return builder.toString();
+    }
 
-	// TODO: 1/25/18 (miro) convert it to JSON message
-	public static String printSocketEndPoint(RoboReference<?> point, RoboReference<?> codecUnit) {
-		final int port = point.getConfiguration().getInteger("port", 0);
-		StringBuilder sb = new StringBuilder();
-		//@formatter:off
+    // TODO: 1/25/18 (miro) convert it to JSON message
+    public static String printSocketEndPoint(RoboReference<?> point, RoboReference<?> codecUnit) {
+        final int port = point.getConfiguration().getInteger("port", 0);
+        StringBuilder sb = new StringBuilder();
+        //@formatter:off
 		sb.append("RoboSystem end-points:")
 				.append(BREAK)
 				.append(DELIMITER_HORIZONTAL)
@@ -89,21 +91,23 @@ public final class SystemUtil {
 				sb.append(DELIMITER_HORIZONTAL)
 		.append(BREAK);
 		//@formatter:on
-		return sb.toString();
-	}
+        return sb.toString();
+    }
 
-	/**
-	 * Puts the current thread to sleep for the specified amount of time.
-	 * 
-	 * @param millis
-	 *            number of milliseconds to sleep.
-	 */
-	public static void sleep(int millis) {
-		try {
-			Thread.sleep(millis);
-		} catch (InterruptedException e) {
-			SimpleLoggingUtil.info(SystemUtil.class, "Sleep was interrupted.", e);
-		}
-	}
+
+    // TODO : review sleep usages
+
+    /**
+     * Puts the current thread to sleep for the specified amount of time.
+     *
+     * @param millis number of milliseconds to sleep.
+     */
+    public static void sleep(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            LOGGER.error("Sleep was interrupted:{}", e.getMessage(), e);
+        }
+    }
 
 }
