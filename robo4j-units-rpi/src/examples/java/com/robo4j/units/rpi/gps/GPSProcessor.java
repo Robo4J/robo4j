@@ -21,25 +21,29 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.gps.AbstractGPSEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Example recipient for GPS events.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GPSProcessor extends RoboUnit<AbstractGPSEvent> {
-	public GPSProcessor(RoboContext context, String id) {
-		super(AbstractGPSEvent.class, context, id);
-	}
+    private static final Logger LOGGER = LoggerFactory.getLogger(GPSProcessor.class);
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+    public GPSProcessor(RoboContext context, String id) {
+        super(AbstractGPSEvent.class, context, id);
+    }
 
-	}
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
 
-	@Override
-	public void onMessage(AbstractGPSEvent result) {
-		System.out.println("GPSEvent: " + result.toString());
-	}
+    }
+
+    @Override
+    public void onMessage(AbstractGPSEvent result) {
+        LOGGER.info("GPSEvent: {}", result.toString());
+    }
 }

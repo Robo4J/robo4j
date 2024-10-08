@@ -17,69 +17,67 @@
 
 package com.robo4j.units.rpi.led;
 
-import java.io.InputStream;
-import java.nio.charset.Charset;
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.robo4j.RoboBuilder;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboReference;
-
 /**
  * https://learn.adafruit.com/adafruit-led-backpack/0-54-alphanumeric
- *
+ * <p>
  * demo: Continually sending defined String
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class AdafruitAlphanumericUnitExample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdafruitAlphanumericUnitExample.class);
+    private static final byte[] MESSAGE = "HelloMAMAPAPAMAXIELLA".getBytes(StandardCharsets.US_ASCII);
+    private static final byte[] BUFFER = {' ', ' ', ' ', ' '};
 
-	private static final byte[] MESSAGE = "HelloMAMAPAPAMAXIELLA".getBytes(StandardCharsets.US_ASCII);
-	private static final byte[] BUFFER = { ' ', ' ', ' ', ' ' };
+    public static void main(String[] args) throws Exception {
+        var executor = Executors.newSingleThreadScheduledExecutor();
+        var settings = AdafruitBiColor24BackpackExample.class.getClassLoader().getResourceAsStream("alphanumericexample.xml");
+        var ctx = new RoboBuilder().add(settings).build();
 
-	public static void main(String[] args) throws Exception {
-		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-		InputStream settings = AdafruitBiColor24BackpackExample.class.getClassLoader().getResourceAsStream("alphanumericexample.xml");
-		RoboContext ctx = new RoboBuilder().add(settings).build();
+        ctx.start();
+        RoboReference<AlphaNumericMessage> alphaUnit = ctx.getReference("alphanumeric");
+        AtomicInteger textPosition = new AtomicInteger();
 
-		ctx.start();
-		RoboReference<AlphaNumericMessage> alphaUnit = ctx.getReference("alphanumeric");
-		AtomicInteger textPosition = new AtomicInteger();
+        executor.scheduleAtFixedRate(() -> {
 
-		executor.scheduleAtFixedRate(() -> {
+            if (textPosition.getAndIncrement() >= MESSAGE.length - 1) {
+                textPosition.set(0);
+            }
 
-			if (textPosition.getAndIncrement() >= MESSAGE.length - 1) {
-				textPosition.set(0);
-			}
+            alphaUnit.sendMessage(AlphaNumericMessage.MESSAGE_CLEAR);
 
-			alphaUnit.sendMessage(AlphaNumericMessage.MESSAGE_CLEAR);
+            byte currentChar = MESSAGE[textPosition.get()];
+            adjustBuffer(currentChar);
+            alphaUnit.sendMessage(new AlphaNumericMessage(BackpackMessageCommand.PAINT, BUFFER.clone(), new boolean[4], 0));
+            alphaUnit.sendMessage(AlphaNumericMessage.MESSAGE_DISPLAY);
+        }, 1, 500, TimeUnit.MILLISECONDS);
 
-			byte currentChar = MESSAGE[textPosition.get()];
-			adjustBuffer(currentChar);
-			alphaUnit.sendMessage(new AlphaNumericMessage(BackpackMessageCommand.PAINT, BUFFER.clone(), new boolean[4], 0));
-			alphaUnit.sendMessage(AlphaNumericMessage.MESSAGE_DISPLAY);
-		}, 1, 500, TimeUnit.MILLISECONDS);
+        LOGGER.info("Press enter to quit");
+        System.in.read();
+        alphaUnit.sendMessage(AlphaNumericMessage.MESSAGE_CLEAR);
+        alphaUnit.sendMessage(AlphaNumericMessage.MESSAGE_DISPLAY);
+        executor.shutdown();
+        ctx.shutdown();
 
-		System.out.println("Press enter to quit\n");
-		System.in.read();
-		alphaUnit.sendMessage(AlphaNumericMessage.MESSAGE_CLEAR);
-		alphaUnit.sendMessage(AlphaNumericMessage.MESSAGE_DISPLAY);
-		executor.shutdown();
-		ctx.shutdown();
+    }
 
-	}
+    private static void adjustBuffer(byte currentChar) {
 
-	private static void adjustBuffer(byte currentChar) {
+        BUFFER[3] = BUFFER[2];
+        BUFFER[2] = BUFFER[1];
+        BUFFER[1] = BUFFER[0];
+        BUFFER[0] = currentChar;
 
-		BUFFER[3] = BUFFER[2];
-		BUFFER[2] = BUFFER[1];
-		BUFFER[1] = BUFFER[0];
-		BUFFER[0] = currentChar;
-
-	}
+    }
 }

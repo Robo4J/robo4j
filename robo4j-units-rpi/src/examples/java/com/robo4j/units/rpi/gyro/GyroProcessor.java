@@ -20,25 +20,29 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Example recipient for gyro events.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GyroProcessor extends RoboUnit<GyroEvent> {
-	public GyroProcessor(RoboContext context, String id) {
-		super(GyroEvent.class, context, id);
-	}
+    private static final Logger LOGGER = LoggerFactory.getLogger(GyroProcessor.class);
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+    public GyroProcessor(RoboContext context, String id) {
+        super(GyroEvent.class, context, id);
+    }
 
-	}
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
 
-	@Override
-	public void onMessage(GyroEvent result) {
-		System.out.println("GyroEvent: " + result.toString());
-	}
+    }
+
+    @Override
+    public void onMessage(GyroEvent result) {
+        LOGGER.info("GyroEvent: {}", result.toString());
+    }
 }
