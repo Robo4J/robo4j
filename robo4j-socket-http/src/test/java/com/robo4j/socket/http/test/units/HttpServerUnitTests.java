@@ -19,13 +19,13 @@ package com.robo4j.socket.http.test.units;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
-import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.socket.http.units.HttpServerUnit;
 import com.robo4j.util.SystemUtil;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.robo4j.socket.http.test.units.HttpUnitTests.CODECS_UNITS_TEST_PACKAGE;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_PACKAGES;
@@ -38,50 +38,47 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Miroslav Wengner (@miragemiko)
  */
 class HttpServerUnitTests {
-	private static final int PORT = 9000;
-	private static final String ID_HTTP_SERVER = "empty_server";
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerUnitTests.class);
+    private static final int PORT = 9000;
+    private static final String ID_HTTP_SERVER = "empty_server";
 
-	@Test
-	void httpServerUnitNoCodecsPackageTest() throws Exception {
+    @Test
+    void httpServerUnitNoCodecsPackageTest() throws Exception {
 
-		Throwable exception = assertThrows(RoboBuilderException.class, () -> {
-			RoboBuilder builder = new RoboBuilder();
+        Throwable exception = assertThrows(RoboBuilderException.class, () -> {
+            var builder = new RoboBuilder();
+            var config = new ConfigurationBuilder().addInteger(PROPERTY_SOCKET_PORT, PORT).build();
+            builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
+            var system = builder.build();
 
-			Configuration config = new ConfigurationBuilder().addInteger(PROPERTY_SOCKET_PORT, PORT).build();
-			builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
-			RoboContext system = builder.build();
+            system.start();
+            LOGGER.info(SystemUtil.printStateReport(system));
+            var systemReference = system.getReference(ID_HTTP_SERVER);
+            system.shutdown();
 
-			system.start();
-			System.out.println("system: State after start:");
-			System.out.println(SystemUtil.printStateReport(system));
-			RoboReference<HttpServerUnit> systemReference = system.getReference(ID_HTTP_SERVER);
-			system.shutdown();
-			System.out.println("system: State after shutdown:");
-			System.out.println(SystemUtil.printStateReport(system));
-			assertEquals(LifecycleState.SHUTDOWN, systemReference.getState());
-		});
+            LOGGER.info(SystemUtil.printStateReport(system));
+            assertEquals(LifecycleState.SHUTDOWN, systemReference.getState());
+        });
 
-		assertEquals("Error initializing RoboUnit", exception.getMessage());
+        assertEquals("Error initializing RoboUnit", exception.getMessage());
 
-	}
+    }
 
-	@Test
-	void httpServerUnitNoPathTest() throws Exception {
-		RoboBuilder builder = new RoboBuilder();
+    @Test
+    void httpServerUnitNoPathTest() throws Exception {
+        var builder = new RoboBuilder();
+        var config = new ConfigurationBuilder().addInteger(PROPERTY_SOCKET_PORT, PORT)
+                .addString(PROPERTY_CODEC_PACKAGES, CODECS_UNITS_TEST_PACKAGE).build();
+        builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
+        var system = builder.build();
 
-		Configuration config = new ConfigurationBuilder().addInteger(PROPERTY_SOCKET_PORT, PORT)
-				.addString(PROPERTY_CODEC_PACKAGES, CODECS_UNITS_TEST_PACKAGE).build();
-		builder.add(HttpServerUnit.class, config, ID_HTTP_SERVER);
-		RoboContext system = builder.build();
+        system.start();
+        LOGGER.info(SystemUtil.printStateReport(system));
+        RoboReference<HttpServerUnit> systemReference = system.getReference(ID_HTTP_SERVER);
+        system.shutdown();
 
-		system.start();
-		System.out.println("system: State after start:");
-		System.out.println(SystemUtil.printStateReport(system));
-		RoboReference<HttpServerUnit> systemReference = system.getReference(ID_HTTP_SERVER);
-		system.shutdown();
-		System.out.println("system: State after shutdown:");
-		System.out.println(SystemUtil.printStateReport(system));
-		assertEquals(LifecycleState.SHUTDOWN, systemReference.getState());
-	}
+        LOGGER.info(SystemUtil.printStateReport(system));
+        assertEquals(LifecycleState.SHUTDOWN, systemReference.getState());
+    }
 
 }

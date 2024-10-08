@@ -17,8 +17,10 @@
 package com.robo4j.socket.http.test.units.config;
 
 import com.robo4j.RoboContext;
-import com.robo4j.socket.http.units.ExtendedRoboUnit;
 import com.robo4j.socket.http.test.units.config.service.NumberService;
+import com.robo4j.socket.http.units.ExtendedRoboUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
@@ -28,14 +30,15 @@ import java.util.Objects;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class ServiceContainerUnit extends ExtendedRoboUnit<Object, NumberService> {
-
+// TODO : review usage
+class ServiceContainerUnit extends ExtendedRoboUnit<Object, NumberService> {
     public static final String NAME = "containerUnit";
     public static final String NUMBER_SERVICE = "numberService";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceContainerUnit.class);
 
     public ServiceContainerUnit(RoboContext context, String id) {
-		super(Object.class, context, id);
-	}
+        super(Object.class, context, id);
+    }
 
     @Override
     public void start() {
@@ -46,8 +49,8 @@ public class ServiceContainerUnit extends ExtendedRoboUnit<Object, NumberService
 
     @Override
     public void onMessage(Object message) {
-        System.out.println(getClass().getSimpleName() + ":message:" + message);
-        System.out.println(getClass().getSimpleName() + ":number:" + getService().getNumber());
+        LOGGER.info("message:{}", message);
+        LOGGER.info("number:{}", getService().getNumber());
     }
 
 

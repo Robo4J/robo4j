@@ -170,40 +170,20 @@ class JsonCodecsTests {
     @Test
     void nestedJsonToObject() {
 
-        TestPerson testPerson2 = new TestPerson();
-        testPerson2.setName("name2");
-        testPerson2.setValue(5);
-
-        TestPerson testPerson111 = new TestPerson();
-        testPerson111.setName("name111");
-        testPerson111.setValue(42);
-
-        TestPerson testPerson11 = new TestPerson();
-        testPerson11.setName("name11");
-        testPerson11.setValue(0);
-        testPerson11.setChild(testPerson111);
-
-        TestPerson testPerson1 = new TestPerson();
-        testPerson1.setName("name1");
-        testPerson1.setValue(22);
-        testPerson1.setChild(testPerson11);
-
-        Map<String, TestPerson> personMap = new LinkedHashMap<>();
-        personMap.put("person1", testPerson1);
-        personMap.put("person2", testPerson2);
+        Map<String, TestPerson> personMap = getStringTestPersonMap();
 
         long start = System.nanoTime();
         NSBWithSimpleCollectionsTypesMessage obj1 = collectionsTypesMessageCodec.decode(testJson);
         TimeUtils.printTimeDiffNano("decodeFromJson", start);
 
+        LOGGER.info("Obj: {}", obj1);
+
         assertEquals(Integer.valueOf(42), obj1.getNumber());
         assertEquals("no message", obj1.getMessage());
-        assertTrue(!obj1.getActive());
+        assertFalse(obj1.getActive());
         assertArrayEquals(new String[]{"one", "two"}, obj1.getArray());
         assertTrue(obj1.getList().containsAll(Arrays.asList("text1", "text2")));
         assertEquals(personMap, obj1.getPersonMap());
-
-        System.out.println("Obj: " + obj1);
     }
 
     @Test
@@ -245,6 +225,31 @@ class JsonCodecsTests {
 
     private static void printJson(String resultJson) {
         LOGGER.debug("resultJson:{}", resultJson);
+    }
+
+    private static Map<String, TestPerson> getStringTestPersonMap() {
+        TestPerson testPerson2 = new TestPerson();
+        testPerson2.setName("name2");
+        testPerson2.setValue(5);
+
+        TestPerson testPerson111 = new TestPerson();
+        testPerson111.setName("name111");
+        testPerson111.setValue(42);
+
+        TestPerson testPerson11 = new TestPerson();
+        testPerson11.setName("name11");
+        testPerson11.setValue(0);
+        testPerson11.setChild(testPerson111);
+
+        TestPerson testPerson1 = new TestPerson();
+        testPerson1.setName("name1");
+        testPerson1.setValue(22);
+        testPerson1.setChild(testPerson11);
+
+        Map<String, TestPerson> personMap = new LinkedHashMap<>();
+        personMap.put("person1", testPerson1);
+        personMap.put("person2", testPerson2);
+        return personMap;
     }
 
 }

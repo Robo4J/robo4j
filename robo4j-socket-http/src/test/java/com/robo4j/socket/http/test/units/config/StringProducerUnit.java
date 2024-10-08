@@ -21,6 +21,8 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,47 +31,48 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class StringProducerUnit extends RoboUnit<String> {
-	/* default sent messages */
-	private static final int DEFAULT = 0;
-	private AtomicInteger counter;
-	private String target;
+    private static final Logger LOGGER = LoggerFactory.getLogger(StringProducerUnit.class);
+    /* default sent messages */
+    private static final int DEFAULT = 0;
+    private AtomicInteger counter;
+    private String target;
 
-	/**
-	 * @param context
-	 * @param id
-	 */
-	public StringProducerUnit(RoboContext context, String id) {
-		super(String.class, context, id);
-	}
+    /**
+     * @param context
+     * @param id
+     */
+    public StringProducerUnit(RoboContext context, String id) {
+        super(String.class, context, id);
+    }
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		target = configuration.getString("target", null);
-		if (target == null) {
-			throw ConfigurationException.createMissingConfigNameException("target");
-		}
-		counter = new AtomicInteger(DEFAULT);
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        target = configuration.getString("target", null);
+        if (target == null) {
+            throw ConfigurationException.createMissingConfigNameException("target");
+        }
+        counter = new AtomicInteger(DEFAULT);
 
-	}
+    }
 
-	@Override
-	public void onMessage(String message) {
-		if (message == null) {
-			System.out.println("No Message!");
-		} else {
-			counter.incrementAndGet();
-			getContext().getReference(target).sendMessage(message);
-		}
-	}
+    @Override
+    public void onMessage(String message) {
+        if (message == null) {
+            LOGGER.info("No Message!");
+        } else {
+            counter.incrementAndGet();
+            getContext().getReference(target).sendMessage(message);
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals("getNumberOfSentMessages")
-				&& attribute.getAttributeType() == Integer.class) {
-			return (R) (Integer) counter.get();
-		}
-		return null;
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
+        if (attribute.getAttributeName().equals("getNumberOfSentMessages")
+                && attribute.getAttributeType() == Integer.class) {
+            return (R) (Integer) counter.get();
+        }
+        return null;
+    }
 
 }

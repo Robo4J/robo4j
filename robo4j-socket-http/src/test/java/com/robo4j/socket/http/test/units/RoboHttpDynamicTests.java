@@ -33,6 +33,8 @@ import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
 import com.robo4j.util.SystemUtil;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -49,7 +51,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Miro Wengner (@miragemiko)
  */
 class RoboHttpDynamicTests {
-
     private static final int TIMEOUT = 20;
     private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
     private static final String ID_HTTP_SERVER = "http";
@@ -59,6 +60,7 @@ class RoboHttpDynamicTests {
     private static final int MESSAGES_NUMBER = 42;
     private static final String HOST_SYSTEM = "localhost";
     static final String JSON_STRING = "{\"value\":\"stop\"}";
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoboHttpDynamicTests.class);
     private static final String DECORATED_PRODUCER = "decoratedProducer";
 
     /**
@@ -73,34 +75,32 @@ class RoboHttpDynamicTests {
     void simpleHttpNonUnitTest() throws Exception {
 
         /* tested system configuration */
-        RoboContext mainSystem = getServerRoboSystem(MESSAGES_NUMBER);
+        var mainSystem = getServerRoboSystem(MESSAGES_NUMBER);
 
         /* system which is testing main system */
-        RoboContext clientSystem = getClientRoboSystem();
+        var clientSystem = getClientRoboSystem();
 
-        System.out.println("Client system state after start:");
-        System.out.println(SystemUtil.printStateReport(clientSystem));
-
-        System.out.println("Main system state after start:");
-        System.out.println(SystemUtil.printStateReport(mainSystem));
+        LOGGER.info("Client system state after start:");
+        LOGGER.info(SystemUtil.printStateReport(clientSystem));
+        LOGGER.info("Main system state after start:");
+        LOGGER.info(SystemUtil.printStateReport(mainSystem));
 
         /* client system sending a messages to the main system */
-        RoboReference<Object> decoratedProducer = clientSystem.getReference(DECORATED_PRODUCER);
+        var decoratedProducer = clientSystem.getReference(DECORATED_PRODUCER);
         decoratedProducer.sendMessage(MESSAGES_NUMBER);
 
         // TODO: review how to receiving attributes
-        CountDownLatch countDownLatchDecoratedProducer = getAttributeOrTimeout(decoratedProducer, SocketMessageDecoratedProducerUnit.DESCRIPTOR_MESSAGES_LATCH);
+        var countDownLatchDecoratedProducer = getAttributeOrTimeout(decoratedProducer, SocketMessageDecoratedProducerUnit.DESCRIPTOR_MESSAGES_LATCH);
         var messagesProduced = countDownLatchDecoratedProducer.await(TIMEOUT, TIME_UNIT);
-
-        final RoboReference<String> stringConsumer = mainSystem.getReference(StringConsumer.NAME);
-        final CountDownLatch countDownLatch = getAttributeOrTimeout(stringConsumer, StringConsumer.DESCRIPTOR_MESSAGES_LATCH);
+        var stringConsumer = mainSystem.getReference(StringConsumer.NAME);
+        var countDownLatch = getAttributeOrTimeout(stringConsumer, StringConsumer.DESCRIPTOR_MESSAGES_LATCH);
         var messagesReceived = countDownLatch.await(TIMEOUT, TIME_UNIT);
-        final int receivedMessages = getAttributeOrTimeout(stringConsumer, StringConsumer.DESCRIPTOR_MESSAGES_TOTAL);
+        var receivedMessages = getAttributeOrTimeout(stringConsumer, StringConsumer.DESCRIPTOR_MESSAGES_TOTAL);
 
         clientSystem.shutdown();
         mainSystem.shutdown();
 
-        System.out.println("System is Down!");
+        LOGGER.info("System is Down!");
         assertTrue(messagesProduced);
         assertTrue(messagesReceived);
         assertNotNull(mainSystem.getUnits());
@@ -121,8 +121,8 @@ class RoboHttpDynamicTests {
 
         RoboContext pingSystemContext = pingSystemBuilder.build();
         pingSystemContext.start();
-        System.out.println("PingSystem state after start:");
-        System.out.println(SystemUtil.printStateReport(pingSystemContext));
+        LOGGER.info("PingSystem state after start:");
+        LOGGER.info(SystemUtil.printStateReport(pingSystemContext));
 
         RoboReference<HttpDecoratedRequest> httpClient = pingSystemContext.getReference(ID_CLIENT_UNIT);
 
@@ -136,8 +136,8 @@ class RoboHttpDynamicTests {
         }
         Thread.sleep(1000);
         pingSystemContext.stop();
-        System.out.println("PingSystem state after stop:");
-        System.out.println(SystemUtil.printStateReport(pingSystemContext));
+        LOGGER.info("PingSystem state after stop:");
+        LOGGER.info(SystemUtil.printStateReport(pingSystemContext));
 
     }
 
@@ -166,7 +166,7 @@ class RoboHttpDynamicTests {
         assertEquals(LifecycleState.INITIALIZED, result.getState());
 
         result.start();
-        System.out.println(SystemUtil.printSocketEndPoint(result.getReference(ID_HTTP_SERVER),
+        LOGGER.info(SystemUtil.printSocketEndPoint(result.getReference(ID_HTTP_SERVER),
                 result.getReference(ID_TARGET_UNIT)));
         return result;
     }
