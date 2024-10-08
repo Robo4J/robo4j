@@ -17,7 +17,6 @@
 package com.robo4j.socket.http.test.utils;
 
 import com.robo4j.socket.http.HttpMethod;
-import com.robo4j.socket.http.dto.ClassGetSetDTO;
 import com.robo4j.socket.http.dto.HttpPathMethodDTO;
 import com.robo4j.socket.http.dto.PathAttributeDTO;
 import com.robo4j.socket.http.test.units.config.PropertyListBuilder;
@@ -26,42 +25,32 @@ import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.ReflectUtils;
 import com.robo4j.util.StringConstants;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.robo4j.socket.http.util.HttpPathUtils.ATTRIBUTES_PATH_VALUE;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class HttpPathUtilTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpPathUtilTests.class);
 
-	//String roboUnit;
-	//	private HttpMethod method;
-	//	private List<String> callbacks;
+    @SuppressWarnings("unchecked")
+    @Test
+    public void convertPathMethodToJson() {
 
-	@SuppressWarnings("unchecked")
-	@Test
-	public void convertPathMethodToJson() {
-
-		//@formatter:off
-		final String expectedResult = "[{\"roboUnit\":\"imageController\",\"method\":\"POST\",\"callbacks\":[\"callbackPOSTController\"]}," +
+        //@formatter:off
+		final var expectedResult = "[{\"roboUnit\":\"imageController\",\"method\":\"POST\",\"callbacks\":[\"callbackPOSTController\"]}," +
 				"{\"roboUnit\":\"imageController\",\"method\":\"GET\",\"callbacks\":[\"callbackGETController\"]}," +
 				"{\"roboUnit\":\"cameraController\",\"method\":\"POST\",\"callbacks\":[\"callbackPOSTController\"]}," +
 				"{\"roboUnit\":\"cameraController\",\"method\":\"GET\",\"callbacks\":[\"callbackGETController\"]}," +
 				"{\"roboUnit\":\"emptyController\",\"method\":\"GET\"}]";
-		List<HttpPathMethodDTO> pathMethodList = PropertyListBuilder.Builder()
+		final var pathMethodList = PropertyListBuilder.Builder()
 				.add(createPathMethodDTO("imageController", "POST","callbackPOSTController"))
 				.add(createPathMethodDTO("imageController", "GET","callbackGETController"))
 				.add(createPathMethodDTO("cameraController", "POST","callbackPOSTController"))
@@ -69,9 +58,9 @@ public class HttpPathUtilTests {
 				.add(createPathMethodDTO("emptyController", "GET"))
 				.build();
 
-		String result = JsonUtil.getJsonByPathMethodList(pathMethodList);
+		var result = JsonUtil.getJsonByPathMethodList(pathMethodList);
 
-		System.out.println("result: " + result);
+		printInfo(result);
 
 		assertNotNull(result);
 		assertEquals(expectedResult, result);
@@ -79,18 +68,18 @@ public class HttpPathUtilTests {
 
 	@Test
 	void parseJsonArrayPathMethodToList(){
-		final int observedElement = 2;
-		final String jsonArray = "[{\"roboUnit\":\"imageController\", \"method\":\"POST\",\"callbacks\":[\"callbackPOSTController\"]}," +
+		final var observedElement = 2;
+		final var jsonArray = "[{\"roboUnit\":\"imageController\", \"method\":\"POST\",\"callbacks\":[\"callbackPOSTController\"]}," +
 				"{\"roboUnit\":\"imageController\",\"method\":\"GET\",\"callbacks\":[\"callbackGETController\"]}," +
 				"{\"roboUnit\":\"cameraController\",\"method\":\"POST\",\"callbacks\":[\"callbackPOSTController\"]}," +
 				"{\"roboUnit\":\"cameraController\",\"method\":\"POST\",\"callbacks\":[\"callbackPOSTController\"]}," +
 				"{\"roboUnit\":\"cameraController\",\"method\":\"GET\",\"callbacks\":[\"callbackGETController\"]}," +
 				"{\"roboUnit\":\"emptyController\",\"method\":\"GET\"}]";
 
-		HttpPathMethodDTO duplicate = new HttpPathMethodDTO("cameraController", HttpMethod.POST, Collections.singletonList("callbackPOSTController"));
-		List<HttpPathMethodDTO> result = JsonUtil.toListFromJsonArray(HttpPathMethodDTO.class, jsonArray);
+		var duplicate = new HttpPathMethodDTO("cameraController", HttpMethod.POST, Collections.singletonList("callbackPOSTController"));
+		var result = JsonUtil.toListFromJsonArray(HttpPathMethodDTO.class, jsonArray);
 
-		System.out.println("result: " + result);
+		printInfo(result);
 
 		assertNotNull(result);
 		assertEquals(6, result.size());
@@ -103,7 +92,7 @@ public class HttpPathUtilTests {
 
 	@Test
 	void parseJsonPathMethod(){
-		List<String> jsonList = Arrays.asList(
+		final var jsonList = Arrays.asList(
 				"{\"roboUnit\":\"imageController\", \"method\":\"POST\", \"callbacks\":[\"callbackPOSTController\"]}",
 				"{\"roboUnit\":\"imageController\", \"method\" : \"POST\", \"callbacks\" : [ \"callbackPOSTController\" ]}",
 				"{ \"roboUnit\": \"imageController\", \"method\": \"POST\", \"callbacks\" :[\"callbackPOSTController\"] }"
@@ -120,7 +109,7 @@ public class HttpPathUtilTests {
 
 	@Test
 	void parseFullPathMethod() {
-		List<String> jsonList = Arrays.asList(
+		final var jsonList = Arrays.asList(
 				"{\"roboUnit\":\"\", \"method\":\"POST\", \"callbacks\":[\"callbackPOSTController\"]}",
 				"{\"roboUnit\":\"imageController\", \"method\":\"POST\",\"callbacks\":[\"callbackPOSTController\"]}",
 				"{\"roboUnit\":\"imageController\", \"method\":\"POST\",\"callbacks\":[\"callbackPOSTController\"]}",
@@ -129,7 +118,7 @@ public class HttpPathUtilTests {
 
 		jsonList.forEach(json -> {
 			HttpPathMethodDTO pathMethod = JsonUtil.getPathMethodByJson(json);
-			System.out.println("pathMethod: " + pathMethod);
+			printInfo(pathMethod);
 			assertNotNull(pathMethod, json);
 			assertNotNull(pathMethod.getRoboUnit(), json);
 			assertTrue(pathMethod.getRoboUnit().isEmpty() ?
@@ -139,33 +128,38 @@ public class HttpPathUtilTests {
 
 	@Test
 	void parseGetRequestWithAttributes(){
-		String path = "/units/controller?attributes=number,counter";
-		Map<String, Set<String>> expectedMap = new HashMap<>();
-		Set<String> expectedAttributesValues = new HashSet<>();
-		String attributeName = "attributes";
+		var path = "/units/controller?attributes=number,counter";
+		var expectedMap = new HashMap<String, Set<String>>();
+		var expectedAttributesValues = new HashSet<String>();
+		var attributeName = "attributes";
+
 		expectedAttributesValues.add("number");
 		expectedAttributesValues.add("counter");
 		expectedMap.put(ATTRIBUTES_PATH_VALUE, expectedAttributesValues);
 
 		HttpPathUtils.extractAttributesByPath(path);
-		Map<String, Set<String>> attributeMap = HttpPathUtils.extractAttributesByPath(path);
+		var attributeMap = HttpPathUtils.extractAttributesByPath(path);
+
 		assertArrayEquals(attributeMap.get(attributeName).toArray(), expectedMap.get(attributeName).toArray());
 	}
 
 	@Test
 	void createJsonArrayByList(){
+		var attributeDTO = new PathAttributeDTO("number", "42");
 
-		PathAttributeDTO attributeDTO = new PathAttributeDTO("number", "42");
+		var descriptorMap = ReflectUtils.getFieldsTypeMap(PathAttributeDTO.class);
 
-		Map<String, ClassGetSetDTO> descriptorMap = ReflectUtils.getFieldsTypeMap(PathAttributeDTO.class);
-
-		System.out.println("result: " + JsonUtil.toJson(descriptorMap, attributeDTO));
+		printInfo(JsonUtil.toJson(descriptorMap, attributeDTO));
 
 	}
 
 	private HttpPathMethodDTO createPathMethodDTO(String... args) {
-		List<String> properties = args.length > 2 ? Collections.singletonList(args[2]) : null;
+		var properties = args.length > 2 ? Collections.singletonList(args[2]) : null;
 		return new HttpPathMethodDTO(args[0], HttpMethod.getByName(args[1]), properties);
+	}
+
+	private static <T> void printInfo(T result) {
+		LOGGER.info("result: {}",result);
 	}
 
 }

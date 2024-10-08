@@ -223,10 +223,6 @@ class JsonCodecsTests {
         LOGGER.debug("decodedMessage:{}", decodedMessage);
     }
 
-    private static void printJson(String resultJson) {
-        LOGGER.debug("resultJson:{}", resultJson);
-    }
-
     private static Map<String, TestPerson> getStringTestPersonMap() {
         TestPerson testPerson2 = new TestPerson();
         testPerson2.setName("name2");
@@ -250,6 +246,10 @@ class JsonCodecsTests {
         personMap.put("person1", testPerson1);
         personMap.put("person2", testPerson2);
         return personMap;
+    }
+
+    private static void printJson(String resultJson) {
+        LOGGER.debug("json:{}", resultJson);
     }
 
 }
