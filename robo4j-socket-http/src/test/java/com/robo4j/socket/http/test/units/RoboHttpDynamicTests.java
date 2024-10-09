@@ -16,10 +16,13 @@
  */
 package com.robo4j.socket.http.test.units;
 
-import com.robo4j.*;
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.LifecycleState;
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.HttpVersion;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
@@ -36,13 +39,17 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static com.robo4j.socket.http.util.RoboHttpUtils.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_TARGET;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Dynamic HttpUnit request/method configuration
@@ -51,6 +58,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Miro Wengner (@miragemiko)
  */
 class RoboHttpDynamicTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoboHttpDynamicTests.class);
     private static final int TIMEOUT = 20;
     private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
     private static final String ID_HTTP_SERVER = "http";
@@ -60,7 +68,6 @@ class RoboHttpDynamicTests {
     private static final int MESSAGES_NUMBER = 42;
     private static final String HOST_SYSTEM = "localhost";
     static final String JSON_STRING = "{\"value\":\"stop\"}";
-    private static final Logger LOGGER = LoggerFactory.getLogger(RoboHttpDynamicTests.class);
     private static final String DECORATED_PRODUCER = "decoratedProducer";
 
     /**
@@ -199,8 +206,8 @@ class RoboHttpDynamicTests {
     private static <T, R> R getAttributeOrTimeout(RoboReference<T> roboReference, AttributeDescriptor<R> attributeDescriptor) throws InterruptedException, ExecutionException, TimeoutException {
         var attribute = roboReference.getAttribute(attributeDescriptor).get(TIMEOUT, TimeUnit.MINUTES);
         if (attribute == null) {
-            SimpleLoggingUtil.error(RoboHttpDynamicTests.class, "roboReference:" + roboReference.getId() + ", no attribute:" + attributeDescriptor.getAttributeName());
             attribute = roboReference.getAttribute(attributeDescriptor).get(TIMEOUT, TimeUnit.MINUTES);
+            LOGGER.error("roboReference:{}, no attribute:{}", roboReference.getId(), attributeDescriptor.getAttributeName());
         }
         return attribute;
     }
