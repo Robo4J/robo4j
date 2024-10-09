@@ -21,12 +21,13 @@ import com.robo4j.CriticalSectionTrait;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.socket.http.units.ClientMessageWrapper;
 import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.JsonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,6 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @CriticalSectionTrait
 public class ImageDecoratorUnit extends RoboUnit<CameraImageDTO> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImageDecoratorUnit.class);
     private static final String PROPERTY_TARGET = "target";
 
     private final AtomicInteger imageNumber = new AtomicInteger(0);
@@ -69,7 +71,7 @@ public class ImageDecoratorUnit extends RoboUnit<CameraImageDTO> {
                 String.valueOf(imageNumber.incrementAndGet()), imageBase64);
         final ClientMessageWrapper resultMessage = new ClientMessageWrapper(
                 HttpPathUtils.toPath(SystemPath.UNITS.getPath(), httpTarget), CameraMessage.class, cameraMessage);
-        SimpleLoggingUtil.debug(ImageDecoratorUnit.class, "image target: " + target + " resultMessage: " + resultMessage.getPath());
+        LOGGER.info("image target:{},resultMessage:{}", target, resultMessage.getPath());
         getContext().getReference(target).sendMessage(resultMessage);
 
     }

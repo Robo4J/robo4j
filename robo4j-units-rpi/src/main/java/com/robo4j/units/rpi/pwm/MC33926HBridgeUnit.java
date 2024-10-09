@@ -16,106 +16,106 @@
  */
 package com.robo4j.units.rpi.pwm;
 
-import java.io.IOException;
-
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.i2c.pwm.HBridgeMC33926Device;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
 import com.robo4j.hw.rpi.utils.GpioPin;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.rpi.I2CRegistry;
 import com.robo4j.units.rpi.I2CRoboUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Motor unit associated with the {@link HBridgeMC33926Device} driver.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class MC33926HBridgeUnit extends I2CRoboUnit<Float> {
-	/**
-	 * The key used to configure which channel to use.
-	 */
-	public static final String CONFIGURATION_KEY_CHANNEL = "channel";
+    /**
+     * The key used to configure which channel to use.
+     */
+    public static final String CONFIGURATION_KEY_CHANNEL = "channel";
 
-	/**
-	 * The key used to configure the symbolic name.
-	 */
-	public static final String CONFIGURATION_KEY_NAME = "name";
+    /**
+     * The key used to configure the symbolic name.
+     */
+    public static final String CONFIGURATION_KEY_NAME = "name";
 
-	/**
-	 * The key used to configure the gpio RaspiPin to use for "IN1". Use the
-	 * name, such as GPIO_01.
-	 */
-	public static final String CONFIGURATION_KEY_GPIO_IN_1 = "in1";
+    /**
+     * The key used to configure the gpio RaspiPin to use for "IN1". Use the
+     * name, such as GPIO_01.
+     */
+    public static final String CONFIGURATION_KEY_GPIO_IN_1 = "in1";
 
-	/**
-	 * The key used to configure the gpio pin to use for "IN2". Use the name,
-	 * such as GPIO_02.
-	 */
-	public static final String CONFIGURATION_KEY_GPIO_IN_2 = "in2";
+    /**
+     * The key used to configure the gpio pin to use for "IN2". Use the name,
+     * such as GPIO_02.
+     */
+    public static final String CONFIGURATION_KEY_GPIO_IN_2 = "in2";
 
-	/**
-	 * The key used to invert the direction of the motor. The value if the key
-	 * is not present defaults to false.
-	 */
-	public static final String CONFIGURATION_KEY_INVERT = "invert";
+    /**
+     * The key used to invert the direction of the motor. The value if the key
+     * is not present defaults to false.
+     */
+    public static final String CONFIGURATION_KEY_INVERT = "invert";
 
-	/**
-	 * The engine.
-	 */
-	private HBridgeMC33926Device engine;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MC33926HBridgeUnit.class);
+    /**
+     * The engine.
+     */
+    private HBridgeMC33926Device engine;
 
-	public MC33926HBridgeUnit(RoboContext context, String id) {
-		super(Float.class, context, id);
-	}
+    public MC33926HBridgeUnit(RoboContext context, String id) {
+        super(Float.class, context, id);
+    }
 
-	/**
-	 *
-	 * @param configuration
-	 *            unit configuration
-	 * @throws ConfigurationException
-	 *             exception
-	 */
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		super.onInitialization(configuration);
+    /**
+     * @param configuration unit configuration
+     * @throws ConfigurationException exception
+     */
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        super.onInitialization(configuration);
 
-		PWMPCA9685Device pcaDevice = I2CRegistry.createAndRegisterIfAbsent(getBus(), getAddress(),
-				() -> PWMPCA9685Device.createDevice(getBus(), getAddress()));
+        PWMPCA9685Device pcaDevice = I2CRegistry.createAndRegisterIfAbsent(getBus(), getAddress(),
+                () -> PWMPCA9685Device.createDevice(getBus(), getAddress()));
 
-		int channel = configuration.getInteger(CONFIGURATION_KEY_CHANNEL, -1);
-		if (channel == -1) {
-			throw ConfigurationException.createMissingConfigNameException(CONFIGURATION_KEY_CHANNEL);
-		}
+        int channel = configuration.getInteger(CONFIGURATION_KEY_CHANNEL, -1);
+        if (channel == -1) {
+            throw ConfigurationException.createMissingConfigNameException(CONFIGURATION_KEY_CHANNEL);
+        }
 
-		String in1Name = configuration.getString(CONFIGURATION_KEY_GPIO_IN_1, null);
-		if (in1Name == null) {
-			throw ConfigurationException.createMissingConfigNameException(CONFIGURATION_KEY_GPIO_IN_1);
-		}
-		var gpioIn1 = GpioPin.getByName(in1Name);
+        String in1Name = configuration.getString(CONFIGURATION_KEY_GPIO_IN_1, null);
+        if (in1Name == null) {
+            throw ConfigurationException.createMissingConfigNameException(CONFIGURATION_KEY_GPIO_IN_1);
+        }
+        var gpioIn1 = GpioPin.getByName(in1Name);
 
-		String in2Name = configuration.getString(CONFIGURATION_KEY_GPIO_IN_1, null);
-		if (in2Name == null) {
-			throw ConfigurationException.createMissingConfigNameException(CONFIGURATION_KEY_GPIO_IN_1);
-		}
-		var gpioIn2 = GpioPin.getByName(in2Name);;
+        String in2Name = configuration.getString(CONFIGURATION_KEY_GPIO_IN_1, null);
+        if (in2Name == null) {
+            throw ConfigurationException.createMissingConfigNameException(CONFIGURATION_KEY_GPIO_IN_1);
+        }
+        var gpioIn2 = GpioPin.getByName(in2Name);
+        ;
 
-		boolean invert = configuration.getBoolean(CONFIGURATION_KEY_INVERT, false);
+        boolean invert = configuration.getBoolean(CONFIGURATION_KEY_INVERT, false);
 
-		// TODO: improve configuraiton
-		engine = new HBridgeMC33926Device(configuration.getString(CONFIGURATION_KEY_NAME, "MC33926"), pcaDevice.getChannel(channel), gpioIn1,
-				gpioIn2, invert);
-	}
+        // TODO: improve configuraiton
+        engine = new HBridgeMC33926Device(configuration.getString(CONFIGURATION_KEY_NAME, "MC33926"), pcaDevice.getChannel(channel), gpioIn1,
+                gpioIn2, invert);
+    }
 
-	@Override
-	public void onMessage(Float message) {
-		try {
-			engine.setSpeed(message);
-		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "Failed to set motor speed to " + message, e);
-		}
-	}
+    @Override
+    public void onMessage(Float message) {
+        try {
+            engine.setSpeed(message);
+        } catch (IOException e) {
+            LOGGER.error("Failed to set motor speed to:{}", message, e);
+        }
+    }
 }
