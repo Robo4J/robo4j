@@ -17,7 +17,8 @@
 package com.robo4j.hw.lego.wrapper;
 
 import com.robo4j.hw.lego.ILcd;
-import com.robo4j.logging.SimpleLoggingUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple Lego Mindstorm LCD wrapper
@@ -26,24 +27,25 @@ import com.robo4j.logging.SimpleLoggingUtil;
  * @author Miro Wengner (@miragemiko)
  */
 public class LcdTestWrapper implements ILcd {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LcdTestWrapper.class);
 
     @Override
     public void initRobo4j(String title, String robotName) {
-        SimpleLoggingUtil.debug(getClass(), ":initRobo4j title: " + title + " name:" + robotName);
+        LOGGER.info("initRobo4j title:{}, name:{}", title, robotName);
     }
 
     @Override
     public void printText(int line, int increment, String text) {
-        SimpleLoggingUtil.debug(getClass(), ":printText line: " + line + ", text: " + text);
+        LOGGER.info("printText line:{}, text:{}", line, text);
     }
 
     @Override
     public void clear() {
-        SimpleLoggingUtil.debug(getClass(),":cleared");
+        LOGGER.info("cleared");
     }
 
     @Override
     public void printText(String text) {
-        SimpleLoggingUtil.debug(getClass(),":printText = " + text);
+        LOGGER.info("printText:{}", text);
     }
 }
