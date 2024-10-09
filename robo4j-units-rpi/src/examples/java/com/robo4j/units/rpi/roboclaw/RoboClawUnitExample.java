@@ -60,7 +60,7 @@ public class RoboClawUnitExample {
         LOGGER.info("State after start:");
         LOGGER.info(SystemUtil.printStateReport(ctx));
 
-        String lastCommand = "";
+        String lastCommand;
         Scanner scanner = new Scanner(System.in);
         LOGGER.info(
                 "Type the roboclaw unit to control and the speed [-1, 1] and angular direction[-180, 180]. For example:\ntank 1 0\nType q and enter to quit!\n");
@@ -68,12 +68,12 @@ public class RoboClawUnitExample {
             lastCommand = lastCommand.trim();
             String[] split = lastCommand.split(" ");
             if (split.length != 3) {
-                System.out.println("Could not parse " + lastCommand + ". Please try again!");
+                LOGGER.warn("Could not parse {}. Please try again!", lastCommand);
                 continue;
             }
             RoboReference<MotionEvent> servoRef = ctx.getReference(split[0]);
             if (servoRef == null) {
-                System.out.println("Could not find any robo unit named " + split[0] + ". Please try again!");
+                LOGGER.warn("Could not find any robo unit named {}. Please try again!", split[0]);
                 continue;
             }
             try {
