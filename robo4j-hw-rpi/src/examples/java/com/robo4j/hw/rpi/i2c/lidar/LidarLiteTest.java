@@ -16,26 +16,29 @@
  */
 package com.robo4j.hw.rpi.i2c.lidar;
 
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.robo4j.hw.rpi.i2c.lidar.LidarLiteDevice;
+import java.io.IOException;
 
 /**
  * This example will repeatedly acquire the range with the LidarLite. Good for
  * testing that it works.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class LidarLiteTest {
-	public static void main(String[] args) throws IOException, InterruptedException {
-		LidarLiteDevice ld = new LidarLiteDevice();
-		while (true) {
-			ld.acquireRange();
-			Thread.sleep(100);
-			System.out.printf("Distance: %.02fm%n", ld.readDistance());
-			Thread.sleep(500);
-		}
-	}
+    private static final Logger LOGGER = LoggerFactory.getLogger(LidarLiteTest.class);
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        LidarLiteDevice ld = new LidarLiteDevice();
+        while (true) {
+            ld.acquireRange();
+            Thread.sleep(100);
+            LOGGER.info("Distance: {}m", ld.readDistance());
+            Thread.sleep(500);
+        }
+    }
 
 }

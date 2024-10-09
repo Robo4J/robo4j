@@ -19,6 +19,8 @@ package com.robo4j.hw.rpi.pwm;
 import com.robo4j.hw.rpi.Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PCA9685Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -29,51 +31,51 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class PCA9685TruckPlatformExample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PCA9685TruckPlatformExample.class);
 
-	private static final int SERVO_THROTTLE = 0;
-	private static final int SERVO_STEERING = 5;
-	private static final int SERVO_LEG = 6;
-	private static final int SERVO_SHIFT = 7;
-	private static final int SERVO_FREQUENCY = 250;
+    private static final int SERVO_THROTTLE = 0;
+    private static final int SERVO_STEERING = 5;
+    private static final int SERVO_LEG = 6;
+    private static final int SERVO_SHIFT = 7;
+    private static final int SERVO_FREQUENCY = 250;
 
-	public static void main(String[] args) throws IOException, InterruptedException {
-		if (args.length != 5) {
-			System.out.printf("Usage: %s <throttle> <steering> <leg> <shift> <duration>%n",
-					PCA9685TruckPlatformExample.class.getSimpleName());
-			System.out.flush();
-			System.exit(2);
-		}
-		float throttle = Float.parseFloat(args[0]);
-		float steering = Float.parseFloat(args[1]);
-		float leg = Float.parseFloat(args[2]);
-		float shift = Float.parseFloat(args[3]);
-		int duration = Integer.parseInt(args[4]);
+    public static void main(String[] args) throws IOException, InterruptedException {
+        if (args.length != 5) {
+            LOGGER.info("Usage: <throttle> <steering> <leg> <shift> <duration>");
+            System.out.flush();
+            System.exit(2);
+        }
+        float throttle = Float.parseFloat(args[0]);
+        float steering = Float.parseFloat(args[1]);
+        float leg = Float.parseFloat(args[2]);
+        float shift = Float.parseFloat(args[3]);
+        int duration = Integer.parseInt(args[4]);
 
-		testMotor(throttle, steering, leg, shift, duration);
-		System.out.println("All done! Bye!");
-	}
+        testMotor(throttle, steering, leg, shift, duration);
+        LOGGER.info("All done! Bye!");
+    }
 
-	public static void testMotor(float throttle, float steering, float leg, float shift, int duration)
-			throws IOException, InterruptedException {
-		System.out.println(String.format("Running for %d ms with throttle %f, steering %f, leg %f, shift %f", duration,
-				throttle, steering, leg, shift));
-		PWMPCA9685Device device = new PWMPCA9685Device();
-		device.setPWMFrequency(SERVO_FREQUENCY);
-		Servo throttleEngine = new PCA9685Servo(device.getChannel(SERVO_THROTTLE));
-		Servo steeringEngine = new PCA9685Servo(device.getChannel(SERVO_STEERING));
-		Servo legEngine = new PCA9685Servo(device.getChannel(SERVO_LEG));
-		Servo shiftEngine = new PCA9685Servo(device.getChannel(SERVO_SHIFT));
+    public static void testMotor(float throttle, float steering, float leg, float shift, int duration)
+            throws IOException, InterruptedException {
+        LOGGER.debug("Running for {} ms with throttle {}, steering {}, leg {}, shift {}", duration,
+                throttle, steering, leg, shift);
+        PWMPCA9685Device device = new PWMPCA9685Device();
+        device.setPWMFrequency(SERVO_FREQUENCY);
+        Servo throttleEngine = new PCA9685Servo(device.getChannel(SERVO_THROTTLE));
+        Servo steeringEngine = new PCA9685Servo(device.getChannel(SERVO_STEERING));
+        Servo legEngine = new PCA9685Servo(device.getChannel(SERVO_LEG));
+        Servo shiftEngine = new PCA9685Servo(device.getChannel(SERVO_SHIFT));
 
-		VehiclePlatform vehicle = new VehiclePlatform(0, throttleEngine, steeringEngine, legEngine, shiftEngine);
-		vehicle.setThrottle(throttle);
-		vehicle.setSteering(steering);
-		vehicle.setLeg(leg);
-		vehicle.setShift(shift);
-		Thread.sleep(duration);
-		vehicle.setThrottle(0);
-		vehicle.setSteering(0);
-		vehicle.setLeg(0);
-		vehicle.setShift(0);
-	}
+        VehiclePlatform vehicle = new VehiclePlatform(0, throttleEngine, steeringEngine, legEngine, shiftEngine);
+        vehicle.setThrottle(throttle);
+        vehicle.setSteering(steering);
+        vehicle.setLeg(leg);
+        vehicle.setShift(shift);
+        Thread.sleep(duration);
+        vehicle.setThrottle(0);
+        vehicle.setSteering(0);
+        vehicle.setLeg(0);
+        vehicle.setShift(0);
+    }
 
 }

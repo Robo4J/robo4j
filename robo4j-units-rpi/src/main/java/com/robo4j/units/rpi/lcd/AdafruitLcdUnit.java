@@ -28,11 +28,12 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.LcdFactory;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl.Direction;
 import com.robo4j.hw.rpi.utils.I2cBus;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.rpi.I2CEndPoint;
 import com.robo4j.units.rpi.I2CRegistry;
 import com.robo4j.units.rpi.I2CRoboUnit;
 import com.robo4j.util.StringConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -42,176 +43,164 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A {@link RoboUnit} for the Adafruit 16x2 character LCD shield.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
-	private static final String ATTRIBUTE_NAME_COLOR = "color";
-	private static final String ATTRIBUTE_NAME_TEXT = "text";
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdafruitLcdUnit.class);
+    private static final String ATTRIBUTE_NAME_COLOR = "color";
+    private static final String ATTRIBUTE_NAME_TEXT = "text";
 
-	public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
-			.unmodifiableCollection(Arrays.asList(DefaultAttributeDescriptor.create(String.class, ATTRIBUTE_NAME_TEXT),
-					DefaultAttributeDescriptor.create(Color.class, ATTRIBUTE_NAME_COLOR)));
+    public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
+            .unmodifiableCollection(Arrays.asList(DefaultAttributeDescriptor.create(String.class, ATTRIBUTE_NAME_TEXT),
+                    DefaultAttributeDescriptor.create(Color.class, ATTRIBUTE_NAME_COLOR)));
 
-	private final AtomicReference<String> stringMessage = new AtomicReference<>(StringConstants.EMPTY);
-	private AdafruitLcd lcd;
+    private final AtomicReference<String> stringMessage = new AtomicReference<>(StringConstants.EMPTY);
+    private AdafruitLcd lcd;
 
-	public AdafruitLcdUnit(RoboContext context, String id) {
-		super(LcdMessage.class, context, id);
-	}
+    public AdafruitLcdUnit(RoboContext context, String id) {
+        super(LcdMessage.class, context, id);
+    }
 
-	/**
-	 *
-	 * @param bus
-	 *            used bus
-	 * @param address
-	 *            desired address
+    /**
+     * @param bus     used bus
+     * @param address desired address
      */
-	static AdafruitLcd getLCD(I2cBus bus, int address) throws IOException {
-		Object lcd = I2CRegistry.getI2CDeviceByEndPoint(new I2CEndPoint(bus, address));
-		if (lcd == null) {
-			try {
-				lcd = LcdFactory.createLCD(bus, address);
-				// Note that we cannot catch hardware specific exceptions here,
-				// since they will be loaded when we run as mocked.
-			} catch (Exception e) {
-				throw new IOException(e);
-			}
-			I2CRegistry.registerI2CDevice(lcd, new I2CEndPoint(bus, address));
-		}
-		return (AdafruitLcd) lcd;
-	}
+    static AdafruitLcd getLCD(I2cBus bus, int address) throws IOException {
+        Object lcd = I2CRegistry.getI2CDeviceByEndPoint(new I2CEndPoint(bus, address));
+        if (lcd == null) {
+            try {
+                lcd = LcdFactory.createLCD(bus, address);
+                // Note that we cannot catch hardware specific exceptions here,
+                // since they will be loaded when we run as mocked.
+            } catch (Exception e) {
+                throw new IOException(e);
+            }
+            I2CRegistry.registerI2CDevice(lcd, new I2CEndPoint(bus, address));
+        }
+        return (AdafruitLcd) lcd;
+    }
 
-	/**
-	 *
-	 * @param message
-	 *            the message received by this unit.
-	 *
-	 */
-	@Override
-	public void onMessage(LcdMessage message) {
-		try {
-			processLcdMessage(message);
-		} catch (Exception e) {
-			SimpleLoggingUtil.debug(getClass(), "Could not accept message" + message.toString(), e);
-		}
-	}
+    /**
+     * @param message the message received by this unit.
+     */
+    @Override
+    public void onMessage(LcdMessage message) {
+        try {
+            processLcdMessage(message);
+        } catch (Exception e) {
+            LOGGER.error("Could not accept message:{}", message, e);
+        }
+    }
 
-	/**
-	 *
-	 * @param configuration
-	 *            - unit configuration
-	 * @throws ConfigurationException
-	 *             exception
-	 */
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		super.onInitialization(configuration);
-		try {
-			lcd = getLCD(getBus(), getAddress());
-		} catch (IOException e) {
-			throw new ConfigurationException("Could not initialize LCD", e);
-		}
-	}
+    /**
+     * @param configuration - unit configuration
+     * @throws ConfigurationException exception
+     */
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        super.onInitialization(configuration);
+        try {
+            lcd = getLCD(getBus(), getAddress());
+        } catch (IOException e) {
+            throw new ConfigurationException("Could not initialize LCD", e);
+        }
+    }
 
-	@Override
-	public void stop() {
-		setState(LifecycleState.STOPPING);
-		try {
-			lcd.clear();
-			lcd.setDisplayEnabled(false);
-			lcd.stop();
-		} catch (IOException e) {
-			throw new AdafruitException("Could not disconnect LCD", e);
-		}
-		setState(LifecycleState.STOPPED);
-	}
+    @Override
+    public void stop() {
+        setState(LifecycleState.STOPPING);
+        try {
+            lcd.clear();
+            lcd.setDisplayEnabled(false);
+            lcd.stop();
+        } catch (IOException e) {
+            throw new AdafruitException("Could not disconnect LCD", e);
+        }
+        setState(LifecycleState.STOPPED);
+    }
 
-	/**
-	 * @param message
-	 *            accepted message type
-	 * @throws IOException
-	 */
-	private void processLcdMessage(LcdMessage message) throws IOException {
-		switch (message.getType()) {
-		case CLEAR:
-			lcd.clear();
-			break;
-		case DISPLAY_ENABLE:
-			final boolean disen = Boolean.valueOf(message.getText().trim());
-			lcd.setDisplayEnabled(disen);
-			break;
-		case SCROLL:
-			// TODO: consider enum as the constant
-			switch (message.getText().trim()) {
-			case "left":
-				lcd.scrollDisplay(Direction.LEFT);
-				break;
-			case "right":
-				lcd.scrollDisplay(Direction.RIGHT);
-				break;
-			default:
-				SimpleLoggingUtil.error(getClass(), "Scroll direction " + message.getText() + " is unknown");
-				break;
-			}
-			break;
-		case SET_TEXT:
-			if (message.getColor() != null) {
-				lcd.setBacklight(message.getColor());
-			}
-			if (message.getText() != null) {
-				String text = message.getText();
-				lcd.setText(text);
-				stringMessage.set(text);
-			}
-			break;
-		case STOP:
-			lcd.stop();
-			break;
-		default:
-			SimpleLoggingUtil.error(getClass(), message.getType() + "demo not supported!");
-			break;
-		}
-	}
+    /**
+     * @param message accepted message type
+     * @throws IOException
+     */
+    private void processLcdMessage(LcdMessage message) throws IOException {
+        switch (message.getType()) {
+            case CLEAR:
+                lcd.clear();
+                break;
+            case DISPLAY_ENABLE:
+                final boolean disen = Boolean.valueOf(message.getText().trim());
+                lcd.setDisplayEnabled(disen);
+                break;
+            case SCROLL:
+                // TODO: consider enum as the constant
+                switch (message.getText().trim()) {
+                    case "left":
+                        lcd.scrollDisplay(Direction.LEFT);
+                        break;
+                    case "right":
+                        lcd.scrollDisplay(Direction.RIGHT);
+                        break;
+                    default:
+                        LOGGER.warn("unknown scroll direction:{}", message.getText());
+                        break;
+                }
+                break;
+            case SET_TEXT:
+                if (message.getColor() != null) {
+                    lcd.setBacklight(message.getColor());
+                }
+                if (message.getText() != null) {
+                    String text = message.getText();
+                    lcd.setText(text);
+                    stringMessage.set(text);
+                }
+                break;
+            case STOP:
+                lcd.stop();
+                break;
+            default:
+                LOGGER.warn("demo not supported:{}", message.getType());
+                break;
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (ATTRIBUTE_NAME_TEXT.equals(attribute.getAttributeName())) {
-			return (R) stringMessage.get();
-		} else if (ATTRIBUTE_NAME_COLOR.equals(attribute.getAttributeName())) {
-			try {
-				return (R) lcd.getBacklight();
-			} catch (IOException e) {
-				SimpleLoggingUtil.error(getClass(), "Failed to read the color", e);
-			}
-		}
-		return null;
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
+        if (ATTRIBUTE_NAME_TEXT.equals(attribute.getAttributeName())) {
+            return (R) stringMessage.get();
+        } else if (ATTRIBUTE_NAME_COLOR.equals(attribute.getAttributeName())) {
+            try {
+                return (R) lcd.getBacklight();
+            } catch (IOException e) {
+                LOGGER.error("Failed to read the color:{}", e.getMessage(), e);
+            }
+        }
+        return null;
+    }
 
-	@Override
-	public Collection<AttributeDescriptor<?>> getKnownAttributes() {
-		return KNOWN_ATTRIBUTES;
-	}
+    @Override
+    public Collection<AttributeDescriptor<?>> getKnownAttributes() {
+        return KNOWN_ATTRIBUTES;
+    }
 
-	/**
-	 * Fill one of the first 8 CGRAM locations with custom characters. The location
-	 * parameter should be between 0 and 7 and pattern should provide an array of 8
-	 * bytes containing the pattern. e.g. you can design your custom character at
-	 * &lt;a
-	 * href=http://www.quinapalus.com/hd44780udg.html&gt; http://www.quinapalus.com/hd44780udg.html&lt;a/&gt; .
-	 * To show your custom character obtain the string representation for the
-	 * location e.g. String.format("custom char=%c", 0).
-	 * 
-	 * @param location
-	 *            storage location for this character, between 0 and 7
-	 * @param pattern
-	 *            array of 8 bytes containing the character's pattern
-	 * @throws IOException
-	 *             exception
-	 */
-	public void createChar(final int location, final byte[] pattern) throws IOException {
-		lcd.createChar(location, pattern);
-	}
+    /**
+     * Fill one of the first 8 CGRAM locations with custom characters. The location
+     * parameter should be between 0 and 7 and pattern should provide an array of 8
+     * bytes containing the pattern. e.g. you can design your custom character at
+     * &lt;a
+     * href=http://www.quinapalus.com/hd44780udg.html&gt; http://www.quinapalus.com/hd44780udg.html&lt;a/&gt; .
+     * To show your custom character obtain the string representation for the
+     * location e.g. String.format("custom char=%c", 0).
+     *
+     * @param location storage location for this character, between 0 and 7
+     * @param pattern  array of 8 bytes containing the character's pattern
+     * @throws IOException exception
+     */
+    public void createChar(final int location, final byte[] pattern) throws IOException {
+        lcd.createChar(location, pattern);
+    }
 }

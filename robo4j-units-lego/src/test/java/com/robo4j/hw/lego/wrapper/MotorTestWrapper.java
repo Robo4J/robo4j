@@ -19,6 +19,8 @@ package com.robo4j.hw.lego.wrapper;
 import com.robo4j.hw.lego.ILegoMotor;
 import com.robo4j.hw.lego.enums.AnalogPortEnum;
 import com.robo4j.hw.lego.enums.MotorTypeEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple LegoMindstorm Mock Motor
@@ -27,6 +29,8 @@ import com.robo4j.hw.lego.enums.MotorTypeEnum;
  * @author Miro Wengner (@miragemiko)
  */
 public class MotorTestWrapper implements ILegoMotor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MotorTestWrapper.class);
 
     private final AnalogPortEnum port;
     private final MotorTypeEnum type;
@@ -52,25 +56,25 @@ public class MotorTestWrapper implements ILegoMotor {
     @Override
     public void forward() {
         moving = true;
-        System.out.println(String.format("MotorTest.forward port:%s, type: %s, moving: %b ", port, type, moving));
+        LOGGER.info("MotorTest.forward port:{}, type: {}, moving: {} ", port, type, moving);
     }
 
     @Override
     public void backward() {
         moving = true;
-        System.out.println(String.format("MotorTest.backward port:%s, type: %s, moving: %b ", port, type, moving));
+        LOGGER.info("MotorTest.backward port:{}, type: {}, moving: {} ", port, type, moving);
     }
 
     @Override
     public void stop() {
         moving = false;
-        System.out.println(String.format("MotorTest.stop port:%s, type: %s, moving: %b ", port, type, moving));
+        LOGGER.info("MotorTest.stop port:{}, type: {}, moving: {} ", port, type, moving);
 
     }
 
     @Override
     public void rotate(int val) {
-        System.out.println("rotate: " + val);
+        LOGGER.info("rotate: {}", val);
     }
 
     @Override
@@ -80,14 +84,14 @@ public class MotorTestWrapper implements ILegoMotor {
 
     @Override
     public void setSpeed(int speed) {
-        System.out.println("speed: " + speed);
+        LOGGER.info("speed: {}", speed);
         this.speed = speed;
     }
 
     @Override
     public void close() {
         moving = false;
-        System.out.println(String.format("MotorTest.close port:%s, type: %s, moving: %b ", port, type, moving));
+        LOGGER.info("MotorTest.close port:{}, type: {}, moving: {} ", port, type, moving);
     }
 
     @Override

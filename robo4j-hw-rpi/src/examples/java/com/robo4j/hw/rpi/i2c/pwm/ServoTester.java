@@ -16,78 +16,81 @@
  */
 package com.robo4j.hw.rpi.i2c.pwm;
 
+import com.robo4j.hw.rpi.Servo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.Scanner;
-
-import com.robo4j.hw.rpi.Servo;
 
 /**
  * This is a simple example allowing you to try out the servos connected to a
  * PCA9685.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ServoTester {
-	// The internetz says 50Hz is the standard PWM frequency for operating RC
-	// servos.
-	private static final int SERVO_FREQUENCY = 50;
-	private static final Servo[] SERVOS = new Servo[16];
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServoTester.class);
+    // The internetz says 50Hz is the standard PWM frequency for operating RC
+    // servos.
+    private static final int SERVO_FREQUENCY = 50;
+    private static final Servo[] SERVOS = new Servo[16];
 
-	public static void main(String[] args) throws IOException, InterruptedException {
-		System.out.print("Creating device...");
-		PWMPCA9685Device device = new PWMPCA9685Device();
-		device.setPWMFrequency(SERVO_FREQUENCY);
-		System.out.println("done!");
-		System.out.println(
-				"Type the id of the channel of the servo to control and how much to move the servo,\nbetween -1 and 1. For example:\nknown servos=0>15 -1.0\nType q and enter to quit!\n");
-		System.out.flush();
-		Scanner scanner = new Scanner(System.in);
-		String lastCommand;
-		printPrompt();
-		while (!"q".equals(lastCommand = scanner.nextLine())) {
-			lastCommand = lastCommand.trim();
-			String[] split = lastCommand.split(" ");
-			if (split.length != 2) {
-				System.out.println("Could not parse " + lastCommand + ". Please try again!");
-				continue;
-			}
-			int channel = Integer.parseInt(split[0]);
-			float position = Float.parseFloat(split[1]);
+    public static void main(String[] args) throws IOException, InterruptedException {
+        LOGGER.info("Creating device...");
+        PWMPCA9685Device device = new PWMPCA9685Device();
+        device.setPWMFrequency(SERVO_FREQUENCY);
+        LOGGER.info("done!");
+        LOGGER.info(
+                "Type the id of the channel of the servo to control and how much to move the servo,\nbetween -1 and 1. For example:\nknown servos=0>15 -1.0\nType q and enter to quit!\n");
+        System.out.flush();
+        Scanner scanner = new Scanner(System.in);
+        String lastCommand;
+        printPrompt();
+        while (!"q".equals(lastCommand = scanner.nextLine())) {
+            lastCommand = lastCommand.trim();
+            String[] split = lastCommand.split(" ");
+            if (split.length != 2) {
+                LOGGER.debug("Could not parse {}. Please try again!", lastCommand);
+                continue;
+            }
+            int channel = Integer.parseInt(split[0]);
+            float position = Float.parseFloat(split[1]);
 
-			if (channel < 0 || channel > 15) {
-				System.out.println("Channel number " + channel + " is not allowed! Try again...");
-				continue;
-			}
-			Servo servo = SERVOS[channel];
+            if (channel < 0 || channel > 15) {
+                LOGGER.debug("Channel number {} is not allowed! Try again...", channel);
+                continue;
+            }
+            Servo servo = SERVOS[channel];
 
-			if (servo == null) {
-				servo = new PCA9685Servo(device.getChannel(channel));
-				SERVOS[channel] = servo;
-			}
+            if (servo == null) {
+                servo = new PCA9685Servo(device.getChannel(channel));
+                SERVOS[channel] = servo;
+            }
 
-			if (position < -1 || position > 1) {
-				System.out.println("Input " + position + " is not allowed! Try again...");
-				continue;
-			}
-			servo.setInput(position);
-			printPrompt();
-		}
-		scanner.close();
-		System.out.println("Bye!");
-	}
+            if (position < -1 || position > 1) {
+                LOGGER.debug("Input {} is not allowed! Try again...", position);
+                continue;
+            }
+            servo.setInput(position);
+            printPrompt();
+        }
+        scanner.close();
+        LOGGER.info("Bye!");
+    }
 
-	private static void printPrompt() {
-		System.out.printf("known servos=%d>", getNumberOfKnownServos());
-	}
+    private static void printPrompt() {
+        LOGGER.info("known servos={}", getNumberOfKnownServos());
+    }
 
-	private static int getNumberOfKnownServos() {
-		int count = 0;
+    private static int getNumberOfKnownServos() {
+        int count = 0;
         for (Servo servo : SERVOS) {
             if (servo != null) {
                 count++;
             }
         }
-		return count;
-	}
+        return count;
+    }
 }

@@ -23,13 +23,14 @@ import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.enums.SystemPath;
 import com.robo4j.socket.http.units.ClientMessageWrapper;
 import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.util.StreamUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.EnumSet;
 import java.util.concurrent.CountDownLatch;
@@ -43,85 +44,85 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CameraImageProducerDesTestUnit extends RoboUnit<Boolean> {
 
 
-	public static final String ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME = "numberOfSentImages";
-	public static final String ATTR_TOTAL_IMAGES = "numberOfImages";
-	public static final String ATTR_GENERATED_IMAGES_LATCH = "generatedImagesLatch";
-	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_GENERATED_IMAGES_LATCH = DefaultAttributeDescriptor
-			.create(CountDownLatch.class, ATTR_GENERATED_IMAGES_LATCH);
-	public static final AttributeDescriptor<Integer> DESCRIPTOR_TOTAL_IMAGES = new DefaultAttributeDescriptor<>(Integer.class,
-			CameraImageProducerDesTestUnit.ATTR_TOTAL_IMAGES);
-	protected static final String IMAGE_ENCODING = "jpg";
+    public static final String ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME = "numberOfSentImages";
+    public static final String ATTR_TOTAL_IMAGES = "numberOfImages";
+    public static final String ATTR_GENERATED_IMAGES_LATCH = "generatedImagesLatch";
+    public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_GENERATED_IMAGES_LATCH = DefaultAttributeDescriptor
+            .create(CountDownLatch.class, ATTR_GENERATED_IMAGES_LATCH);
+    public static final AttributeDescriptor<Integer> DESCRIPTOR_TOTAL_IMAGES = new DefaultAttributeDescriptor<>(Integer.class,
+            CameraImageProducerDesTestUnit.ATTR_TOTAL_IMAGES);
+    protected static final String IMAGE_ENCODING = "jpg";
+    private static final Logger LOGGER = LoggerFactory.getLogger(CameraImageProducerDesTestUnit.class);
+    protected final AtomicBoolean progress = new AtomicBoolean(false);
+    protected String target;
+    protected String httpTarget;
+    protected String fileName;
+    private volatile AtomicInteger counter = new AtomicInteger(0);
+    protected volatile CountDownLatch generatedImagesLatch;
+    private Integer numberOfImages;
 
-	protected final AtomicBoolean progress = new AtomicBoolean(false);
-	protected String target;
-	protected String httpTarget;
-	protected String fileName;
-	private volatile AtomicInteger counter = new AtomicInteger(0);
-	protected volatile CountDownLatch generatedImagesLatch;
-	private Integer numberOfImages;
+    public CameraImageProducerDesTestUnit(RoboContext context, String id) {
+        super(Boolean.class, context, id);
+    }
 
-	public CameraImageProducerDesTestUnit(RoboContext context, String id) {
-		super(Boolean.class, context, id);
-	}
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        target = configuration.getString("target", null);
+        httpTarget = configuration.getString("httpTarget", null);
+        fileName = configuration.getString("fileName", null);
+        numberOfImages = configuration.getInteger(ATTR_TOTAL_IMAGES, null);
+        generatedImagesLatch = new CountDownLatch(numberOfImages);
+    }
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		target = configuration.getString("target", null);
-		httpTarget = configuration.getString("httpTarget", null);
-		fileName = configuration.getString("fileName", null);
-		numberOfImages = configuration.getInteger(ATTR_TOTAL_IMAGES, null);
-		generatedImagesLatch = new CountDownLatch(numberOfImages);
-	}
+    @Override
+    public void onMessage(Boolean message) {
+        if (message) {
+            LOGGER.info("message:{}", message);
+            createImage(counter.get());
+        }
+    }
 
-	@Override
-	public void onMessage(Boolean message) {
-		if (message) {
-			SimpleLoggingUtil.debug(getClass(), "message: " + message);
-			createImage(counter.get());
-		}
-	}
+    @Override
+    public void start() {
+        EnumSet<LifecycleState> acceptedStates = EnumSet.of(LifecycleState.STARTING, LifecycleState.STARTED);
+        getContext().getScheduler().execute(() -> {
+            while (acceptedStates.contains(getState())) {
+                if (progress.compareAndSet(false, true) && counter.getAndIncrement() < numberOfImages) {
+                    createImage(counter.get());
+                }
+            }
+        });
+    }
 
-	@Override
-	public void start() {
-		EnumSet<LifecycleState> acceptedStates = EnumSet.of(LifecycleState.STARTING, LifecycleState.STARTED);
-		getContext().getScheduler().execute(() -> {
-			while (acceptedStates.contains(getState())) {
-				if (progress.compareAndSet(false, true) && counter.getAndIncrement() < numberOfImages) {
-					createImage(counter.get());
-				}
-			}
-		});
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    protected synchronized <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
+        if (descriptor.getAttributeType() == Integer.class) {
+            if (descriptor.getAttributeName().equals(ATTR_TOTAL_IMAGES)) {
+                return (R) numberOfImages;
+            } else if (descriptor.getAttributeName().equals(ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME)) {
+                return (R) Integer.valueOf(counter.get());
+            }
+        }
+        if (descriptor.getAttributeName().equals(ATTR_GENERATED_IMAGES_LATCH) && descriptor.getAttributeType() == CountDownLatch.class) {
+            return (R) generatedImagesLatch;
+        }
+        return super.onGetAttribute(descriptor);
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected synchronized <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
-		if (descriptor.getAttributeType() == Integer.class) {
-			if (descriptor.getAttributeName().equals(ATTR_TOTAL_IMAGES)) {
-				return (R) numberOfImages;
-			} else if (descriptor.getAttributeName().equals(ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME)) {
-				return (R) Integer.valueOf(counter.get());
-			}
-		}
-		if(descriptor.getAttributeName().equals(ATTR_GENERATED_IMAGES_LATCH) && descriptor.getAttributeType() == CountDownLatch.class ){
-			return (R) generatedImagesLatch;
-		}
-		return super.onGetAttribute(descriptor);
-	}
+    protected void countDonwSentImage() {
 
-	protected void countDonwSentImage(){
+    }
 
-	}
-
-	protected void createImage(int imageNumber) {
-		final byte[] image = StreamUtils
-				.inputStreamToByteArray(Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName));
-		final CameraMessage cameraMessage = new CameraMessage(IMAGE_ENCODING, String.valueOf(imageNumber),
-				JsonUtil.toBase64String(image));
-		final ClientMessageWrapper resultMessage = new ClientMessageWrapper(
-				HttpPathUtils.toPath(SystemPath.UNITS.getPath(), httpTarget), CameraMessage.class, cameraMessage);
-		getContext().getReference(target).sendMessage(resultMessage);
-		generatedImagesLatch.countDown();
-		progress.set(false);
-	}
+    protected void createImage(int imageNumber) {
+        final byte[] image = StreamUtils
+                .inputStreamToByteArray(Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName));
+        final CameraMessage cameraMessage = new CameraMessage(IMAGE_ENCODING, String.valueOf(imageNumber),
+                JsonUtil.toBase64String(image));
+        final ClientMessageWrapper resultMessage = new ClientMessageWrapper(
+                HttpPathUtils.toPath(SystemPath.UNITS.getPath(), httpTarget), CameraMessage.class, cameraMessage);
+        getContext().getReference(target).sendMessage(resultMessage);
+        generatedImagesLatch.countDown();
+        progress.set(false);
+    }
 }

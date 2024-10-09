@@ -16,14 +16,10 @@
  */
 package com.robo4j.net;
 
-import com.robo4j.AttributeDescriptor;
-import com.robo4j.ConfigurationException;
-import com.robo4j.DefaultAttributeDescriptor;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboUnit;
-import com.robo4j.StringToolkit;
-import com.robo4j.TestToolkit;
+import com.robo4j.*;
 import com.robo4j.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RemoteTestMessageProducer extends RoboUnit<String> {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteTestMessageProducer.class);
     public static final String ATTR_TOTAL_MESSAGES = "getNumberOfSentMessages";
     public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
     public static final String ATTR_ACK_LATCH = "ackLatch";
@@ -59,8 +55,8 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
 
 
     /**
-     * @param context
-     * @param id
+     * @param context RoboContext
+     * @param id      unit id
      */
     public RemoteTestMessageProducer(RoboContext context, String id) {
         super(String.class, context, id);
@@ -88,26 +84,26 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
     @Override
     public void onMessage(String message) {
         if (message == null) {
-            System.out.println("No Message!");
+            LOGGER.info("No Message!");
         } else {
             String[] input = message.split("::");
             String messageType = input[0];
             switch (messageType) {
                 case ATTR_SEND_MESSAGE:
                     totalCounter.incrementAndGet();
-                    if(countDownLatch != null){
+                    if (countDownLatch != null) {
                         countDownLatch.countDown();
                     }
                     sendRandomMessage();
                     break;
                 case ATTR_ACK:
-                	ackCounter.incrementAndGet();
-                	if(ackLatch != null){
+                    ackCounter.incrementAndGet();
+                    if (ackLatch != null) {
                         ackLatch.countDown();
                     }
-                	break;
+                    break;
                 default:
-                    System.out.println("don't understand message: " + message);
+                    LOGGER.error("don't understand message: {}", message);
             }
         }
     }
@@ -126,7 +122,7 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
                 && attribute.getAttributeType() == CountDownLatch.class) {
             return (R) ackLatch;
         }
-        if (attribute.getAttributeName().equals(ATTR_ACK) && attribute.getAttributeType() == Integer.class){
+        if (attribute.getAttributeName().equals(ATTR_ACK) && attribute.getAttributeType() == Integer.class) {
             return (R) Integer.valueOf(ackCounter.get());
         }
         return null;
@@ -135,14 +131,14 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
     public void sendRandomMessage() {
         final int number = TestToolkit.getRND().nextInt() % 100;
         final String text = StringToolkit.getRandomMessage(10);
-        
+
         // We're sending a reference to ourself for getting the acks...
         final TestMessageType message = new TestMessageType(number, text, getContext().getReference(getId()));
         RoboContext ctx = LookupServiceProvider.getDefaultLookupService().getContext(targetContext);
         ctx.getReference(target).sendMessage(message);
     }
 
-	public int getAckCount() {
-		return ackCounter.get();
-	}
+    public int getAckCount() {
+        return ackCounter.get();
+    }
 }

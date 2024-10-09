@@ -29,9 +29,9 @@ import com.robo4j.hw.lego.enums.SensorTypeEnum;
  */
 public interface ILegoSensor {
 
-	DigitalPortEnum getPort();
+	DigitalPortEnum port();
 
-	SensorTypeEnum getType();
+	SensorTypeEnum type();
 
 	String getData();
 

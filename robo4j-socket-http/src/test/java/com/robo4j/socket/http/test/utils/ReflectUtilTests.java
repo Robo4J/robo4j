@@ -25,18 +25,12 @@ import com.robo4j.socket.http.test.units.config.enums.TestCommandEnum;
 import com.robo4j.socket.http.util.ReflectUtils;
 import com.robo4j.socket.http.util.RoboReflectException;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -44,162 +38,171 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Miroslav Wengner (@miragemiko)
  */
 class ReflectUtilTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReflectUtilTests.class);
 
-	@Test
-	void objectWithEnumToJson() {
-		final String expectedJson = "{\"command\":\"MOVE\",\"desc\":\"some description\"}";
-		TestCommand command = new TestCommand();
-		command.setCommand(TestCommandEnum.MOVE);
-		command.setDesc("some description");
+    @Test
+    void objectWithEnumToJson() {
+        final var expectedJson = "{\"command\":\"MOVE\",\"desc\":\"some description\"}";
+        var command = new TestCommand();
+        command.setCommand(TestCommandEnum.MOVE);
+        command.setDesc("some description");
 
-		final String result = ReflectUtils.createJson(command);
+        var result = ReflectUtils.createJson(command);
 
-		System.out.println("result: " + result);
-		assertNotNull(result);
-		assertEquals(expectedJson, result);
+        printInfo(result);
+        assertNotNull(result);
+        assertEquals(expectedJson, result);
+    }
 
-	}
+    @Test
+    void objectWithEnumListToJson() {
 
-	@Test
-	void objectWithEnumListToJson() {
+        final var expectedJson = "{\"commands\":[\"MOVE\",\"STOP\",\"BACK\"],\"desc\":\"commands description\"}";
+        var commands = new TestCommandList();
+        commands.setCommands(Arrays.asList(TestCommandEnum.MOVE, TestCommandEnum.STOP, TestCommandEnum.BACK));
+        commands.setDesc("commands description");
 
-		final String expectedJson = "{\"commands\":[\"MOVE\",\"STOP\",\"BACK\"],\"desc\":\"commands description\"}";
-		TestCommandList commands = new TestCommandList();
-		commands.setCommands(Arrays.asList(TestCommandEnum.MOVE, TestCommandEnum.STOP, TestCommandEnum.BACK));
-		commands.setDesc("commands description");
+        final String result = ReflectUtils.createJson(commands);
 
-		final String result = ReflectUtils.createJson(commands);
-		System.out.println("result: " + result);
+        printInfo(result);
+        assertNotNull(result);
+        assertEquals(expectedJson, result);
 
-		assertNotNull(result);
-		assertEquals(expectedJson, result);
+    }
 
-	}
 
-	@Test
-	void pathAttributesListToJsonTest() {
-		final String expectedJson = "{\"attributes\":[{\"name\":\"name\",\"value\":\"java.lang.String\"},{\"name\":\"values\",\"value\":\"java.util.HashMap\"}]}";
-		PathAttributeListDTO attributes = new PathAttributeListDTO();
-		attributes.addAttribute(new PathAttributeDTO("name", "java.lang.String"));
-		attributes.addAttribute(new PathAttributeDTO("values", "java.util.HashMap"));
+    @Test
+    void pathAttributesListToJsonTest() {
+        final var expectedJson = "{\"attributes\":[{\"name\":\"name\",\"value\":\"java.lang.String\"},{\"name\":\"values\",\"value\":\"java.util.HashMap\"}]}";
+        var attributes = new PathAttributeListDTO();
+        attributes.addAttribute(new PathAttributeDTO("name", "java.lang.String"));
+        attributes.addAttribute(new PathAttributeDTO("values", "java.util.HashMap"));
 
-		String result = ReflectUtils.createJson(attributes);
-		System.out.println("result:" + result);
-		assertEquals(expectedJson, result);
-	}
+        String result = ReflectUtils.createJson(attributes);
 
-	@Test
-	void serverAttributesResponse(){
-		ResponseAttributeListDTO tmpAttr = new ResponseAttributeListDTO();
+        printInfo(result);
+        assertEquals(expectedJson, result);
+    }
 
-		tmpAttr.setType("Type");
-		tmpAttr.setId("ID");
-		//String roboUnit, HttpMethod method, List<String> callbacks
-		tmpAttr.addValue(new HttpPathMethodDTO("testUnit", HttpMethod.GET, Collections.singletonList("test")));
-		String result = ReflectUtils.createJson(tmpAttr);
-		System.out.println("result:" + result);
+    @Test
+    void serverAttributesResponse() {
+        var tmpAttr = new ResponseAttributeListDTO();
+        tmpAttr.setType("Type");
+        tmpAttr.setId("ID");
+        //String roboUnit, HttpMethod method, List<String> callbacks
+        tmpAttr.addValue(new HttpPathMethodDTO("testUnit", HttpMethod.GET, Collections.singletonList("test")));
+        String result = ReflectUtils.createJson(tmpAttr);
 
-	}
+        printInfo(result);
+    }
 
-	@Test
-    void complexObjectToJsonTest(){
-        String expectedJson = "{\"name\":\"object\",\"value\":42,\"textList\":[\"one\",\"two\"],\"dictionary\":{\"one\":\"one1\",\"two\":\"two2\"},\"attributes\":{\"one\":{\"name\":\"name\",\"value\":\"test name\"},\"two\":{\"name\":\"value\",\"value\":\"42\"}}}";
-        TestListMapValues obj = new TestListMapValues();
+    @Test
+    void complexObjectToJsonTest() {
+        final var expectedJson = "{\"name\":\"object\",\"value\":42,\"textList\":[\"one\",\"two\"],\"dictionary\":{\"one\":\"one1\",\"two\":\"two2\"},\"attributes\":{\"one\":{\"name\":\"name\",\"value\":\"test name\"},\"two\":{\"name\":\"value\",\"value\":\"42\"}}}";
+        var obj = new TestListMapValues();
         obj.setName("object");
         obj.setValue(42);
         obj.setTextList(Arrays.asList("one", "two"));
-        Map<String, String> textMap = new HashMap<>();
+        var textMap = new HashMap<String, String>();
         textMap.put("one", "one1");
         textMap.put("two", "two2");
         obj.setDictionary(textMap);
 
 
-        Map<String, PathAttributeDTO> attributes = new HashMap<>();
+        var attributes = new HashMap<String, PathAttributeDTO>();
         attributes.put("one", new PathAttributeDTO("name", "test name"));
         attributes.put("two", new PathAttributeDTO("value", "42"));
         obj.setAttributes(attributes);
 
-        String result = ReflectUtils.createJson(obj);
-        System.out.println("result:"+result);
+        var result = ReflectUtils.createJson(obj);
+
+        printInfo(result);
         assertEquals(expectedJson, result);
     }
 
     @Test
     void createJsonByStringListCollectionTest() {
-		String expectedJson = "[\"One\",\"Two\"]";
-        List<String> list = new ArrayList<>();
+        final var expectedJson = "[\"One\",\"Two\"]";
+        var list = new ArrayList<String>();
         list.add("One");
         list.add("Two");
 
         String result = ReflectUtils.createJson(list);
-        System.out.println("result: " + result);
+
+        printInfo(result);
+        assertEquals(expectedJson, result);
+    }
+
+    @Test
+    void createJsonByNumberListCollectionTest() {
+        final var expectedJson = "[1,2]";
+        var list = new ArrayList<Integer>();
+        list.add(1);
+        list.add(2);
+
+        var result = ReflectUtils.createJson(list);
+
+        printInfo(result);
         assertEquals(expectedJson, result);
 
     }
 
-	@Test
-	void createJsonByNumberListCollectionTest() {
-		String expectedJson = "[1,2]";
-		List<Integer> list = new ArrayList<>();
-		list.add(1);
-		list.add(2);
+    @Test
+    void createJsonByObjectListCollectionTest() {
 
-		String result = ReflectUtils.createJson(list);
-		System.out.println("result: " + result);
-		assertEquals(expectedJson, result);
+        Throwable exception = assertThrows(RoboReflectException.class, () -> {
+            List<PathAttributeDTO> list = new ArrayList<>();
+            list.add(new PathAttributeDTO("one", "1"));
+            list.add(new PathAttributeDTO("two", "2"));
+            ReflectUtils.createJson(list);
+        });
 
-	}
+        assertTrue(exception.getMessage().startsWith("object getter value"));
+    }
 
-	@Test
-	void createJsonByObjectListCollectionTest(){
+    @Test
+    void createJsonByStringMapCollection() {
+        final var expectedString = "{\"one\":\"1\",\"two\":\"2\"}";
+        var map = new HashMap<String, String>();
+        map.put("one", "1");
+        map.put("two", "2");
 
-		Throwable exception = assertThrows(RoboReflectException.class, () -> {
-			List<PathAttributeDTO> list = new ArrayList<>();
-			list.add(new PathAttributeDTO("one", "1"));
-			list.add(new PathAttributeDTO("two", "2"));
-			ReflectUtils.createJson(list);
-		});
+        var result = ReflectUtils.createJson(map);
 
-		assertTrue(exception.getMessage().startsWith("object getter value"));
-	}
+        printInfo(result);
+        assertEquals(expectedString, result);
 
-	@Test
-	void createJsonByStringMapCollection() {
-		String expectedString = "{\"one\":\"1\",\"two\":\"2\"}";
-		Map<String, String> map = new HashMap<>();
-		map.put("one", "1");
-		map.put("two", "2");
+    }
 
-		String result = ReflectUtils.createJson(map);
-		System.out.println("result: " + result);
-		assertEquals(expectedString, result);
+    @Test
+    void createJsonByNumberMapCollection() {
+        final var expectedString = "{\"one\":1,\"two\":2}";
+        var map = new HashMap<String, Integer>();
+        map.put("one", 1);
+        map.put("two", 2);
 
-	}
+        var result = ReflectUtils.createJson(map);
 
-	@Test
-	void createJsonByNumberMapCollection() {
-		String expectedString = "{\"one\":1,\"two\":2}";
-		Map<String, Integer> map = new HashMap<>();
-		map.put("one", 1);
-		map.put("two", 2);
-
-		String result = ReflectUtils.createJson(map);
-		System.out.println("result: " + result);
-		assertEquals(expectedString, result);
-	}
+        printInfo(result);
+        assertEquals(expectedString, result);
+    }
 
 
-	@Test
-	void createJsonByObjectMapCollection(){
+    @Test
+    void createJsonByObjectMapCollection() {
 
-		Throwable exception = assertThrows(RoboReflectException.class, () -> {
-			Map<String, PathAttributeDTO> map = new HashMap<>();
-			map.put("one", new PathAttributeDTO("one1", "1"));
-			map.put("two", new PathAttributeDTO("two2", "2"));
-			ReflectUtils.createJson(map);
-		});
+        Throwable exception = assertThrows(RoboReflectException.class, () -> {
+            Map<String, PathAttributeDTO> map = new HashMap<>();
+            map.put("one", new PathAttributeDTO("one1", "1"));
+            map.put("two", new PathAttributeDTO("two2", "2"));
+            ReflectUtils.createJson(map);
+        });
 
-		assertTrue(exception.getMessage().startsWith("object getter value"));
-	}
+        assertTrue(exception.getMessage().startsWith("object getter value"));
+    }
+
+    private static void printInfo(String result) {
+        LOGGER.info("result: {}", result);
+    }
 
 }

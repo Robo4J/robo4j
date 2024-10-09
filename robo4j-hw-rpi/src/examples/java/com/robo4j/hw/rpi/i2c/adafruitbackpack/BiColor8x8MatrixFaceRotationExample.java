@@ -17,6 +17,9 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -27,12 +30,13 @@ import java.util.concurrent.TimeUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class BiColor8x8MatrixFaceRotationExample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BiColor8x8MatrixFaceRotationExample.class);
 
-	public static void main(String[] args) throws IOException, InterruptedException {
-		System.out.println("=== BiColor 8x8 Matrix Face Rotation Example ===");
+    public static void main(String[] args) throws IOException, InterruptedException {
+        LOGGER.debug("=== BiColor 8x8 Matrix Face Rotation Example ===");
 
-		BiColor8x8MatrixDevice ledMatrix = new BiColor8x8MatrixDevice();
-		//@formatter:off
+        BiColor8x8MatrixDevice ledMatrix = new BiColor8x8MatrixDevice();
+        //@formatter:off
         byte[] faceSmile = {
         		0b0011_1100,
         		0b0100_0010,
@@ -45,18 +49,18 @@ public class BiColor8x8MatrixFaceRotationExample {
         };
         //@formatter:on
 
-		for (int i = 0; i < faceSmile.length; i++) {
-			ledMatrix.clear();
-			ledMatrix.display();
-			LedBackpackUtils.paintToByRowArraysAndColor(ledMatrix, faceSmile, BiColor.getByValue(i % 2 + 1));
-			ledMatrix.display();
-			ledMatrix.setRotation(MatrixRotation.getById(i % 5 + 1));
-			TimeUnit.SECONDS.sleep(1);
-		}
+        for (int i = 0; i < faceSmile.length; i++) {
+            ledMatrix.clear();
+            ledMatrix.display();
+            LedBackpackUtils.paintToByRowArraysAndColor(ledMatrix, faceSmile, BiColor.getByValue(i % 2 + 1));
+            ledMatrix.display();
+            ledMatrix.setRotation(MatrixRotation.getById(i % 5 + 1));
+            TimeUnit.SECONDS.sleep(1);
+        }
 
-		System.out.println("Press <Enter> to quit!");
-		System.in.read();
-		ledMatrix.clear();
-		ledMatrix.display();
-	}
+        LOGGER.debug("Press <Enter> to quit!");
+        System.in.read();
+        ledMatrix.clear();
+        ledMatrix.display();
+    }
 }

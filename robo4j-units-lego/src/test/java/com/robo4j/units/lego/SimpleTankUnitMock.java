@@ -23,12 +23,15 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.lego.enums.AnalogPortEnum;
 import com.robo4j.hw.lego.enums.MotorTypeEnum;
 import com.robo4j.hw.lego.wrapper.MotorTestWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class SimpleTankUnitMock extends SimpleTankUnit {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleTankUnitMock.class);
 
     public SimpleTankUnitMock(RoboContext context, String id) {
         super(context, id);
@@ -45,7 +48,7 @@ public class SimpleTankUnitMock extends SimpleTankUnit {
     @Override
     public void shutdown() {
         super.shutdown();
-        System.out.println("executor is down");
+        LOGGER.info("executor is down");
     }
 
     @SuppressWarnings("unchecked")

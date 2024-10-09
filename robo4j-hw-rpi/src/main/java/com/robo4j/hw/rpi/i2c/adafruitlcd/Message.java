@@ -17,6 +17,8 @@
 package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
 import com.pi4j.exception.InitializeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -25,11 +27,12 @@ import java.io.IOException;
  * @author Miro Wengner (@miragemiko)
  */
 public class Message {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Message.class);
     private static final String COLOR_PREFIX = "-c";
 
     public static void main(String[] params) throws IOException, InitializeException {
         if (params == null || params.length == 0) {
-            System.out.println("Usage: [-c<COLORNAME>] <message>\nValid COLORNAME values are: OFF, RED, GREEN, BLUE, YELLOW, TEAL, VIOLET, WHITE, ON\n");
+            LOGGER.info("Usage: [-c<COLORNAME>] <message>\nValid COLORNAME values are: OFF, RED, GREEN, BLUE, YELLOW, TEAL, VIOLET, WHITE, ON\n");
         }
         Color color = Color.GREEN;
         String message = "";
@@ -44,7 +47,7 @@ public class Message {
         lcd.setBacklight(color);
         message = massage(message);
         lcd.setText(message);
-        System.out.println(message);
+        LOGGER.debug(message);
     }
 
     private static String massage(String message) {

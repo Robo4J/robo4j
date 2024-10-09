@@ -18,11 +18,11 @@ package com.robo4j.units.rpi.pad;
 
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
-import com.robo4j.RoboContext;
 import com.robo4j.util.SystemUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Logitech F710 Pad Example
@@ -31,25 +31,25 @@ import java.io.InputStream;
  * @author Miro Wengner (@miragemiko)
  */
 public class LF710PadExample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LF710PadExample.class);
 
-	public static void main(String[] args) throws RoboBuilderException, IOException {
-		InputStream settings = Thread.currentThread().getContextClassLoader().getResourceAsStream("logitechF710.xml");
-		if (settings == null) {
-			System.out.println("Could not find the settings for the Gamepad!");
-			System.exit(2);
-		}
-		RoboBuilder builder = new RoboBuilder();
-		builder.add(settings);
-		RoboContext sytem = builder.build();
+    public static void main(String[] args) throws RoboBuilderException, IOException {
+        var settings = Thread.currentThread().getContextClassLoader().getResourceAsStream("logitechF710.xml");
+        if (settings == null) {
+            LOGGER.warn("Could not find the settings for the Gamepad!");
+            System.exit(2);
+        }
+        var builder = new RoboBuilder();
+        builder.add(settings);
+        var system = builder.build();
 
-		System.out.println("... Gamepad buttons Example ...");
-		sytem.start();
+        LOGGER.info("... Gamepad buttons Example ...");
+        system.start();
+        LOGGER.info(SystemUtil.printStateReport(system));
 
-		System.out.println(SystemUtil.printStateReport(sytem));
-
-		System.out.println("Press <Enter> to quit!");
-		System.in.read();
-		sytem.shutdown();
-		System.out.println("Bye!");
-	}
+        LOGGER.info("Press <Enter> to quit!");
+        System.in.read();
+        system.shutdown();
+        LOGGER.info("Bye!");
+    }
 }

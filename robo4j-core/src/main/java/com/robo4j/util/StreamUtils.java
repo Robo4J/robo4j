@@ -16,7 +16,8 @@
  */
 package com.robo4j.util;
 
-import com.robo4j.logging.SimpleLoggingUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -29,83 +30,75 @@ import java.util.stream.StreamSupport;
 
 /**
  * Streams related utils
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class StreamUtils {
-	public static final int STREAM_END = -1;
+    private static final Logger LOGGER = LoggerFactory.getLogger(StreamUtils.class);
+    public static final int STREAM_END = -1;
 
-	/**
-	 * convert Enumeration to the Stream
-	 * 
-	 * @param e
-	 *            enumeration of element E
-	 * @param parallel
-	 *            parallel
-	 * @param <E>
-	 *            element instance
-	 * @return stream of elements E
-	 */
-	public static <E> Stream<E> streamOfEnumeration(Enumeration<E> e, boolean parallel) {
-		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<E>() {
-			public E next() {
-				return e.nextElement();
-			}
+    /**
+     * convert Enumeration to the Stream
+     *
+     * @param e        enumeration of element E
+     * @param parallel parallel
+     * @param <E>      element instance
+     * @return stream of elements E
+     */
+    public static <E> Stream<E> streamOfEnumeration(Enumeration<E> e, boolean parallel) {
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<E>() {
+            public E next() {
+                return e.nextElement();
+            }
 
-			public boolean hasNext() {
-				return e.hasMoreElements();
-			}
-		}, Spliterator.ORDERED), parallel);
-	}
+            public boolean hasNext() {
+                return e.hasMoreElements();
+            }
+        }, Spliterator.ORDERED), parallel);
+    }
 
-	/**
-	 * convert iterable to the stream
-	 * 
-	 * @param iterable
-	 *            iterable of element E
-	 * @param parallel
-	 *            parallel
-	 * @param <E>
-	 *            element instance
-	 * @return Stream of elements
-	 */
-	public static <E> Stream<E> streamOf(Iterable<E> iterable, boolean parallel) {
-		return StreamSupport.stream(iterable.spliterator(), parallel);
-	}
+    /**
+     * convert iterable to the stream
+     *
+     * @param iterable iterable of element E
+     * @param parallel parallel
+     * @param <E>      element instance
+     * @return Stream of elements
+     */
+    public static <E> Stream<E> streamOf(Iterable<E> iterable, boolean parallel) {
+        return StreamSupport.stream(iterable.spliterator(), parallel);
+    }
 
-	/**
-	 * convert stream to iterable
-	 * 
-	 * @param stream
-	 *            stream of element E
-	 * @param <E>
-	 *            element instance
-	 * @return iterable of elements E
-	 */
-	public static <E> Iterable<E> iterableOf(Stream<E> stream) {
-		return stream::iterator;
-	}
+    /**
+     * convert stream to iterable
+     *
+     * @param stream stream of element E
+     * @param <E>    element instance
+     * @return iterable of elements E
+     */
+    public static <E> Iterable<E> iterableOf(Stream<E> stream) {
+        return stream::iterator;
+    }
 
-	/**
-	 * converting input stream to byte array
-	 * 
-	 * @param inputStream
-	 *            input stream
-	 * @return byte array
-	 */
-	public static byte[] inputStreamToByteArray(InputStream inputStream) {
-		try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-			int imageCh;
-			while ((imageCh = inputStream.read()) != STREAM_END) {
-				baos.write(imageCh);
-			}
-			inputStream.close();
-			baos.flush();
-			return baos.toByteArray();
-		} catch (Exception e) {
-			SimpleLoggingUtil.error(StreamUtils.class, e.getMessage());
-			return new byte[0];
-		}
-	}
+    /**
+     * converting input stream to byte array
+     *
+     * @param inputStream input stream
+     * @return byte array
+     */
+    public static byte[] inputStreamToByteArray(InputStream inputStream) {
+        try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            int imageCh;
+            while ((imageCh = inputStream.read()) != STREAM_END) {
+                baos.write(imageCh);
+            }
+            inputStream.close();
+            baos.flush();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return new byte[0];
+        }
+    }
 }

@@ -22,6 +22,8 @@ import com.robo4j.RoboReference;
 import com.robo4j.socket.http.codec.CameraMessage;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
@@ -34,59 +36,58 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Miro Wengner (@miragemiko)
  */
 class CameraImageProducerConsumerTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CameraImageProducerConsumerTests.class);
 
-	@Test
-	void cameraImageProdConTest() throws Exception {
+    @Test
+    void cameraImageProdConTest() throws Exception {
 
-		RoboBuilder builderProducer = new RoboBuilder(
-				Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemProducer.xml"));
-		InputStream clientConfigInputStream = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream("robo_camera_producer_test.xml");
-		builderProducer.add(clientConfigInputStream);
-		RoboContext producerSystem = builderProducer.build();
+        RoboBuilder builderProducer = new RoboBuilder(
+                Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemProducer.xml"));
+        InputStream clientConfigInputStream = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("robo_camera_producer_test.xml");
+        builderProducer.add(clientConfigInputStream);
+        RoboContext producerSystem = builderProducer.build();
 
-		RoboBuilder builderConsumer = new RoboBuilder(
-				Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemConsumer.xml"));
-		InputStream serverConfigInputStream = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream("robo_camera_consumer_test.xml");
-		builderConsumer.add(serverConfigInputStream);
+        RoboBuilder builderConsumer = new RoboBuilder(
+                Thread.currentThread().getContextClassLoader().getResourceAsStream("robo4jSystemConsumer.xml"));
+        InputStream serverConfigInputStream = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("robo_camera_consumer_test.xml");
+        builderConsumer.add(serverConfigInputStream);
 
-		RoboContext consumerSystem = builderConsumer.build();
+        RoboContext consumerSystem = builderConsumer.build();
 
-		long startTime = System.currentTimeMillis();
-		consumerSystem.start();
-		producerSystem.start();
+        long startTime = System.currentTimeMillis();
+        consumerSystem.start();
+        producerSystem.start();
 
         RoboReference<CameraMessage> imageConsumer = consumerSystem.getReference("imageProcessor");
-		RoboReference<Boolean> imageProducer = producerSystem.getReference("imageController");
+        RoboReference<Boolean> imageProducer = producerSystem.getReference("imageController");
 
         CountDownLatch startConsumerLatch = imageConsumer
                 .getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_START_LATCH).get();
         startConsumerLatch.await(5, TimeUnit.MINUTES);
 
-		Integer totalImagesProducer = imageProducer.getAttribute(CameraImageProducerDesTestUnit.DESCRIPTOR_TOTAL_IMAGES)
-				.get();
-		CountDownLatch imageProducerLatch = imageProducer
-				.getAttribute(CameraImageProducerDesTestUnit.DESCRIPTOR_GENERATED_IMAGES_LATCH).get();
-		CountDownLatch imageConsumerLatch = imageConsumer
-				.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_IMAGES_LATCH).get();
+        Integer totalImagesProducer = imageProducer.getAttribute(CameraImageProducerDesTestUnit.DESCRIPTOR_TOTAL_IMAGES)
+                .get();
+        CountDownLatch imageProducerLatch = imageProducer
+                .getAttribute(CameraImageProducerDesTestUnit.DESCRIPTOR_GENERATED_IMAGES_LATCH).get();
+        CountDownLatch imageConsumerLatch = imageConsumer
+                .getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_IMAGES_LATCH).get();
 
-        System.out.println("LATCH");
-		imageProducerLatch.await(5, TimeUnit.MINUTES);
-        System.out.println("ONE");
-		imageConsumerLatch.await(5, TimeUnit.MINUTES);
-        System.out.println("TWO");
+        LOGGER.info("LATCH");
+        imageProducerLatch.await(5, TimeUnit.MINUTES);
+        LOGGER.info("ONE");
+        imageConsumerLatch.await(5, TimeUnit.MINUTES);
+        LOGGER.info("TWO");
 
-		Integer receivedImagesConsumer = imageConsumer
-				.getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_RECEIVED_IMAGES).get();
-		assertEquals(totalImagesProducer, receivedImagesConsumer);
+        Integer receivedImagesConsumer = imageConsumer
+                .getAttribute(CameraImageConsumerTestUnit.DESCRIPTOR_RECEIVED_IMAGES).get();
+        assertEquals(totalImagesProducer, receivedImagesConsumer);
 
-		RoboHttpUtils.printMeasuredTime(getClass(), "duration", startTime);
-		System.out.println("receivedImagesConsumer: " + receivedImagesConsumer);
-		producerSystem.shutdown();
-		consumerSystem.shutdown();
+        RoboHttpUtils.printMeasuredTime(getClass(), "duration", startTime);
+        LOGGER.info("receivedImagesConsumer: " + receivedImagesConsumer);
+        producerSystem.shutdown();
+        consumerSystem.shutdown();
 
-		System.out.println("Press <Enter> to quit!");
-
-	}
+    }
 }

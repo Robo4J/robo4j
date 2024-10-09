@@ -16,30 +16,25 @@
  */
 package com.robo4j.net;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import com.robo4j.AttributeDescriptor;
-import com.robo4j.ConfigurationException;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboUnit;
-import com.robo4j.StringToolkit;
+import com.robo4j.*;
 import com.robo4j.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RemoteStringProducer extends RoboUnit<String> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteStringProducer.class);
     /* default sent messages */
     private static final int DEFAULT = 0;
     private AtomicInteger counter;
     private String target;
-	private String targetContext;
+    private String targetContext;
 
-    /**
-     * @param context
-     * @param id
-     */
     public RemoteStringProducer(RoboContext context, String id) {
         super(String.class, context, id);
     }
@@ -52,7 +47,7 @@ public class RemoteStringProducer extends RoboUnit<String> {
         }
         targetContext = configuration.getString("targetContext", null);
         if (targetContext == null) {
-            throw ConfigurationException.createMissingConfigNameException("targetContext");        	
+            throw ConfigurationException.createMissingConfigNameException("targetContext");
         }
         counter = new AtomicInteger(DEFAULT);
     }
@@ -60,7 +55,7 @@ public class RemoteStringProducer extends RoboUnit<String> {
     @Override
     public void onMessage(String message) {
         if (message == null) {
-            System.out.println("No Message!");
+            LOGGER.info("No Message!");
         } else {
             counter.incrementAndGet();
             String[] input = message.split("::");
@@ -70,7 +65,7 @@ public class RemoteStringProducer extends RoboUnit<String> {
                     sendRandomMessage();
                     break;
                 default:
-                    System.out.println("don't understand message: " + message);
+                    LOGGER.info("don't understand message: {}", message);
 
             }
         }

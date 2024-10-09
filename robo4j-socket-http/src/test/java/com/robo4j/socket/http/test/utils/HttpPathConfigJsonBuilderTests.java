@@ -19,6 +19,8 @@ package com.robo4j.socket.http.test.utils;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.util.HttpPathConfigJsonBuilder;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,14 +28,14 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 class HttpPathConfigJsonBuilderTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpPathConfigJsonBuilderTests.class);
 
     @Test
-    void simpleConfigurationTest(){
+    void simpleConfigurationTest() {
 
         String expectedJson = "[{\"roboUnit\":\"roboUnit1\",\"method\":\"GET\",\"callbacks\":[\"filter1\",\"filter2\"]}," +
                 "{\"roboUnit\":\"roboUnit2\",\"method\":\"POST\",\"callbacks\":[]},{\"roboUnit\":\"roboUnit3\",\"method\":\"GET\",\"callbacks\":[]}]";
@@ -45,7 +47,7 @@ class HttpPathConfigJsonBuilderTests {
 
         String resultJson = builder.build();
 
-        System.out.println("resultJson: " + resultJson);
+        LOGGER.info("resultJson: {}", resultJson);
         assertEquals(expectedJson, resultJson);
 
     }

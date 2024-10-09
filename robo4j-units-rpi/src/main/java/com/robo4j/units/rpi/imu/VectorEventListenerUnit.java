@@ -23,8 +23,9 @@ import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.imu.bno.VectorEvent;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.net.LookupServiceProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * BNOVectorEventListenerUnit listen to VectorEvent events produced by {@link Bno080Unit}
@@ -33,34 +34,34 @@ import com.robo4j.net.LookupServiceProvider;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class VectorEventListenerUnit extends RoboUnit<VectorEvent> {
-	
-	public static final String ATTR_TARGET_CONTEXT = "targetContext";
-	public static final String ATTR_REMOTE_UNIT = "remoteUnit";
+    public static final String ATTR_TARGET_CONTEXT = "targetContext";
+    public static final String ATTR_REMOTE_UNIT = "remoteUnit";
+    private static final Logger LOGGER = LoggerFactory.getLogger(VectorEventListenerUnit.class);
 
-	public VectorEventListenerUnit(RoboContext context, String id) {
-		super(VectorEvent.class, context, id);
-	}
+    public VectorEventListenerUnit(RoboContext context, String id) {
+        super(VectorEvent.class, context, id);
+    }
 
-	private String targetContext;
-	private String remoteUnit;
+    private String targetContext;
+    private String remoteUnit;
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		targetContext = configuration.getString(ATTR_TARGET_CONTEXT, null);
-		remoteUnit = configuration.getString(ATTR_REMOTE_UNIT, null);
-	}
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        targetContext = configuration.getString(ATTR_TARGET_CONTEXT, null);
+        remoteUnit = configuration.getString(ATTR_REMOTE_UNIT, null);
+    }
 
-	@Override
-	public void onMessage(VectorEvent message) {
-		SimpleLoggingUtil.info(getClass(), "received:" + message);
-		RoboContext remoteContext = LookupServiceProvider.getDefaultLookupService().getContext(targetContext);
-		if(remoteContext != null){
-			RoboReference<VectorEvent> roboReference = remoteContext.getReference(remoteUnit);
-			if(roboReference != null){
-				roboReference.sendMessage(message);
-			}
-		} else {
-			SimpleLoggingUtil.info(getClass(), String.format("context not found: %s", targetContext));
-		}
-	}
+    @Override
+    public void onMessage(VectorEvent message) {
+        LOGGER.info("received:{}", message);
+        RoboContext remoteContext = LookupServiceProvider.getDefaultLookupService().getContext(targetContext);
+        if (remoteContext != null) {
+            RoboReference<VectorEvent> roboReference = remoteContext.getReference(remoteUnit);
+            if (roboReference != null) {
+                roboReference.sendMessage(message);
+            }
+        } else {
+            LOGGER.warn("context not found: {}", targetContext);
+        }
+    }
 }

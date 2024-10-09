@@ -17,39 +17,42 @@
 package com.robo4j.units.lego;
 
 import com.robo4j.AttributeDescriptor;
-import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
 import com.robo4j.hw.lego.wrapper.SensorTestWrapper;
 import com.robo4j.units.lego.sonic.LegoSonicServoMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
+//  TODO : verify usage
 public class BasicSonicSensorServoUnitMock extends BasicSonicServoUnit {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BasicSonicSensorServoUnitMock.class);
 
     public BasicSonicSensorServoUnitMock(RoboContext context, String id) {
         super(context, id);
     }
 
     @Override
-    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+    protected void onInitialization(Configuration configuration) {
         super.sensor = new SensorTestWrapper(DigitalPortEnum.S3, SensorTypeEnum.SONIC);
-        System.out.println("on initialization");
+        LOGGER.info("on initialization");
     }
 
     @Override
     public void onMessage(LegoSonicServoMessage message) {
-        System.out.println("onMessage : " + message);
+        LOGGER.info("onMessage : {}", message);
     }
 
     @Override
     public void shutdown() {
         super.shutdown();
-        System.out.println("executor is down");
+        LOGGER.info("executor is down");
     }
 
     @SuppressWarnings("unchecked")
@@ -60,7 +63,6 @@ public class BasicSonicSensorServoUnitMock extends BasicSonicServoUnit {
         }
         return null;
     }
-
 
 
 }

@@ -22,6 +22,8 @@ import com.pi4j.io.gpio.digital.DigitalState;
 import com.robo4j.hw.rpi.i2c.AbstractI2CDevice;
 import com.robo4j.hw.rpi.utils.GpioPin;
 import com.robo4j.hw.rpi.utils.I2cBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -31,57 +33,59 @@ import java.util.Arrays;
 /**
  * Support for SSD1306 devices over I2C. A good example is the Adafruit 128x64
  * (or 128x32) monochrome OLED.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class SSD1306Device extends AbstractI2CDevice {
-	private static final int DEFAULT_I2C_ADDRESS = 0x3c;
-	private static final byte CHARGE_PUMP_VALUE_ENABLE = 0x14;
-	private static final byte CHARGE_PUMP_VALUE_DISABLE = 0x10;
-	private static final int DEFAULT_CONTRAST = 0x88;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SSD1306Device.class);
 
-	private final BufferedImage image;
-	//private final GpioController gpio = GpioFactory.getInstance();
-	//private final GpioPinDigitalOutput resetPin;
-	private final DigitalOutput gpioResetPin;
-	private final boolean useExternalVCC;
-	private final OLEDVariant oledType;
+    private static final int DEFAULT_I2C_ADDRESS = 0x3c;
+    private static final byte CHARGE_PUMP_VALUE_ENABLE = 0x14;
+    private static final byte CHARGE_PUMP_VALUE_DISABLE = 0x10;
+    private static final int DEFAULT_CONTRAST = 0x88;
 
-	public enum OLEDVariant {
-		Type96x16(96, 16, 0x2, 1), Type128x32(128, 32, 0x2, 3), Type128x64(128, 64, 0x12, 7);
+    private final BufferedImage image;
+    //private final GpioController gpio = GpioFactory.getInstance();
+    //private final GpioPinDigitalOutput resetPin;
+    private final DigitalOutput gpioResetPin;
+    private final boolean useExternalVCC;
+    private final OLEDVariant oledType;
 
-		private final int width;
-		private final int height;
-		private final int comPins;
-		private final int pageEnd;
+    public enum OLEDVariant {
+        Type96x16(96, 16, 0x2, 1), Type128x32(128, 32, 0x2, 3), Type128x64(128, 64, 0x12, 7);
 
-		OLEDVariant(int width, int height, int comPins, int pageEnd) {
-			this.width = width;
-			this.height = height;
-			this.comPins = comPins;
-			this.pageEnd = pageEnd;
-		}
+        private final int width;
+        private final int height;
+        private final int comPins;
+        private final int pageEnd;
 
-		public int getWidth() {
-			return width;
-		}
+        OLEDVariant(int width, int height, int comPins, int pageEnd) {
+            this.width = width;
+            this.height = height;
+            this.comPins = comPins;
+            this.pageEnd = pageEnd;
+        }
 
-		public int getHeight() {
-			return height;
-		}
+        public int getWidth() {
+            return width;
+        }
 
-		public int getComPins() {
-			return comPins;
-		}
+        public int getHeight() {
+            return height;
+        }
 
-		public int getPageEnd() {
-			return pageEnd;
-		}
-	}
+        public int getComPins() {
+            return comPins;
+        }
 
-	private enum Commands {
-		//@formatter:off
+        public int getPageEnd() {
+            return pageEnd;
+        }
+    }
+
+    private enum Commands {
+        //@formatter:off
 		DISPLAY_OFF((byte) 0xae), 
 		DISPLAY_ON((byte) 0xaf), 
 		INVERTED_ON((byte) 0xa7), 
@@ -106,212 +110,195 @@ public class SSD1306Device extends AbstractI2CDevice {
 		SET_COLUMN_ADDRESS((byte) 0x21), 
 		SET_PAGE_ADDRESS((byte) 0x22);
 		//@formatter:on
-		private final byte commandValue;
+        private final byte commandValue;
 
-		Commands(byte commandValue) {
-			this.commandValue = commandValue;
-		}
+        Commands(byte commandValue) {
+            this.commandValue = commandValue;
+        }
 
-		public byte getCommandValue() {
-			return commandValue;
-		}
-	}
+        public byte getCommandValue() {
+            return commandValue;
+        }
+    }
 
-	private enum MemoryModes {
-		HORIZONTAL((byte) 0), VERTICAL((byte) 1), PAGE((byte) 2);
+    private enum MemoryModes {
+        HORIZONTAL((byte) 0), VERTICAL((byte) 1), PAGE((byte) 2);
 
-		private byte value;
+        private byte value;
 
-		MemoryModes(byte value) {
-			this.value = value;
-		}
+        MemoryModes(byte value) {
+            this.value = value;
+        }
 
-		public byte getValue() {
-			return value;
-		}
+        public byte getValue() {
+            return value;
+        }
 
-	}
+    }
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param variant
-	 *            the oled variant, most commonly the 32 or 64 line version.
-	 * @param resetPin
-	 *            the GPIO pin used for the reset.
-	 * 
-	 * @throws IOException
-	 *             if there was a communication problem.
-	 */
-	public SSD1306Device(OLEDVariant variant, GpioPin resetPin) throws IOException {
-		this(I2cBus.BUS_1, DEFAULT_I2C_ADDRESS, variant, resetPin, false);
-	}
+    /**
+     * Constructor.
+     *
+     * @param variant  the oled variant, most commonly the 32 or 64 line version.
+     * @param resetPin the GPIO pin used for the reset.
+     * @throws IOException if there was a communication problem.
+     */
+    public SSD1306Device(OLEDVariant variant, GpioPin resetPin) throws IOException {
+        this(I2cBus.BUS_1, DEFAULT_I2C_ADDRESS, variant, resetPin, false);
+    }
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param bus
-	 *            the I2C bus used.
-	 * @param address
-	 *            the I2C address of the OLED device, most commonly 0x3c.
-	 * @param oledType
-	 *            the variant of the oled (depends on which version you own).
-	 * @param resetPinId
-	 *            the GPIO pin used for reset (depends on your wiring).
-	 * @param useExternalVCC
-	 *            use external VCC to drive the OLED. If false, the internal
-	 *            charge pump will be used to regulate to the necessary voltage.
-	 *            This is most commonly false.
-	 * 
-	 * @throws IOException
-	 *             if there was a communication problem.
-	 */
-	public SSD1306Device(I2cBus bus, int address, OLEDVariant oledType, GpioPin resetPinId, boolean useExternalVCC) throws IOException {
-		super(bus, address);
-		this.image = new BufferedImage(oledType.getWidth(), oledType.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
+    /**
+     * Constructor.
+     *
+     * @param bus            the I2C bus used.
+     * @param address        the I2C address of the OLED device, most commonly 0x3c.
+     * @param oledType       the variant of the oled (depends on which version you own).
+     * @param resetPinId     the GPIO pin used for reset (depends on your wiring).
+     * @param useExternalVCC use external VCC to drive the OLED. If false, the internal
+     *                       charge pump will be used to regulate to the necessary voltage.
+     *                       This is most commonly false.
+     * @throws IOException if there was a communication problem.
+     */
+    public SSD1306Device(I2cBus bus, int address, OLEDVariant oledType, GpioPin resetPinId, boolean useExternalVCC) throws IOException {
+        super(bus, address);
+        this.image = new BufferedImage(oledType.getWidth(), oledType.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
 
-		var pi4jRpiContext = Pi4J.newAutoContext();
-		var digitalOutputBuilder = DigitalOutput.newConfigBuilder(pi4jRpiContext);
-		var gpioResetPinConfig = digitalOutputBuilder.address(resetPinId.address()).onState(DigitalState.HIGH).build();
+        var pi4jRpiContext = Pi4J.newAutoContext();
+        var digitalOutputBuilder = DigitalOutput.newConfigBuilder(pi4jRpiContext);
+        var gpioResetPinConfig = digitalOutputBuilder.address(resetPinId.address()).onState(DigitalState.HIGH).build();
 
-		this.gpioResetPin = pi4jRpiContext.dout().create(gpioResetPinConfig);
+        this.gpioResetPin = pi4jRpiContext.dout().create(gpioResetPinConfig);
 
-		//this.resetPin = gpio.provisionDigitalOutputPin(resetPinId, "reset", PinState.HIGH);
-		this.useExternalVCC = useExternalVCC;
-		this.oledType = oledType;
-		initialize();
-	}
+        //this.resetPin = gpio.provisionDigitalOutputPin(resetPinId, "reset", PinState.HIGH);
+        this.useExternalVCC = useExternalVCC;
+        this.oledType = oledType;
+        initialize();
+    }
 
-	/**
-	 * @return the graphics context upon which to draw. This being a monochrome
-	 *         display, only the colors {@link Color}.black and {@link Color}
-	 *         .white should be used.
-	 */
-	public Graphics2D getGraphicsContext() {
-		return image.createGraphics();
-	}
+    /**
+     * @return the graphics context upon which to draw. This being a monochrome
+     * display, only the colors {@link Color}.black and {@link Color}
+     * .white should be used.
+     */
+    public Graphics2D getGraphicsContext() {
+        return image.createGraphics();
+    }
 
-	/**
-	 * Pushes the image data to the device over I2C.
-	 * 
-	 * @throws IOException
-	 *             exception
-	 */
-	public void pushImage() throws IOException {
-		executeCommand(Commands.SET_COLUMN_ADDRESS, 0, oledType.getWidth() - 1);
-		executeCommand(Commands.SET_PAGE_ADDRESS, 0, oledType.getPageEnd());
+    /**
+     * Pushes the image data to the device over I2C.
+     *
+     * @throws IOException exception
+     */
+    public void pushImage() throws IOException {
+        executeCommand(Commands.SET_COLUMN_ADDRESS, 0, oledType.getWidth() - 1);
+        executeCommand(Commands.SET_PAGE_ADDRESS, 0, oledType.getPageEnd());
 
-		// Transmitting image data in one write
-		byte[] byteArray = toByteArray();
-		System.out.println(Arrays.toString(byteArray));
-		// TODO : const
-		writeByteBufferByAddress(0x40, byteArray);
-	}
+        // Transmitting image data in one write
+        byte[] byteArray = toByteArray();
+        LOGGER.debug("pushImage:{}", Arrays.toString(byteArray));
+        // TODO : const
+        writeByteBufferByAddress(0x40, byteArray);
+    }
 
-	/**
-	 * @param enable
-	 *            false to disable (turn off), true to enable (turn on).
-	 * 
-	 * @throws IOException
-	 *             exception
-	 */
-	public void setEnabled(boolean enable) throws IOException {
-		if (enable) {
-			executeCommand(Commands.DISPLAY_ON);
-		} else {
-			executeCommand(Commands.DISPLAY_OFF);
-		}
-	}
+    /**
+     * @param enable false to disable (turn off), true to enable (turn on).
+     * @throws IOException exception
+     */
+    public void setEnabled(boolean enable) throws IOException {
+        if (enable) {
+            executeCommand(Commands.DISPLAY_ON);
+        } else {
+            executeCommand(Commands.DISPLAY_OFF);
+        }
+    }
 
-	/**
-	 * Sets the contrast between 0 (minimum) and 1.0 (max).
-	 * 
-	 * @param contrast
-	 *            a value between 0 and 1.0.
-	 * @throws IOException
-	 *             exception
-	 */
-	public void setContrast(float contrast) throws IOException {
-		executeCommand(Commands.SET_CONTRAST, Math.max(Math.round(contrast * 0xff), 0xff));
-	}
+    /**
+     * Sets the contrast between 0 (minimum) and 1.0 (max).
+     *
+     * @param contrast a value between 0 and 1.0.
+     * @throws IOException exception
+     */
+    public void setContrast(float contrast) throws IOException {
+        executeCommand(Commands.SET_CONTRAST, Math.max(Math.round(contrast * 0xff), 0xff));
+    }
 
-	/**
-	 * @return the image used to draw upon.
-	 */
-	public BufferedImage getImage() {
-		return image;
-	}
+    /**
+     * @return the image used to draw upon.
+     */
+    public BufferedImage getImage() {
+        return image;
+    }
 
-	private byte[] toByteArray() {
-		int byteCount = 0;
-		byte[] bytes = new byte[oledType.getHeight() * oledType.getWidth() / 8];
-		for (int y = 0; y < oledType.getHeight();) {
-			for (int x = 0; x < oledType.getWidth(); x++) {
-				int next = 0;
-				int step = 0;
-				for (; step < 8 && y + step < oledType.getHeight(); step++) {
-					if (image.getRGB(x, y + step) != Color.black.getRGB()) {
-						next |= (1 << step);
-					}
-				}
-				bytes[byteCount] = (byte) next;
-				byteCount++;
-			}
-			y += 8;
-		}
-		return bytes;
-	}
+    private byte[] toByteArray() {
+        int byteCount = 0;
+        byte[] bytes = new byte[oledType.getHeight() * oledType.getWidth() / 8];
+        for (int y = 0; y < oledType.getHeight(); ) {
+            for (int x = 0; x < oledType.getWidth(); x++) {
+                int next = 0;
+                int step = 0;
+                for (; step < 8 && y + step < oledType.getHeight(); step++) {
+                    if (image.getRGB(x, y + step) != Color.black.getRGB()) {
+                        next |= (1 << step);
+                    }
+                }
+                bytes[byteCount] = (byte) next;
+                byteCount++;
+            }
+            y += 8;
+        }
+        return bytes;
+    }
 
-	private void initialize() throws IOException {
-		sleep(1);
-		gpioResetPin.setState(DigitalState.LOW.value().intValue());
-		sleep(10);
-		gpioResetPin.setState(DigitalState.HIGH.value().intValue());
-		executeCommand(Commands.DISPLAY_OFF);
-		executeCommand(Commands.SET_DISPLAY_CLOCK_DIV, 0x80);
-		if (!useExternalVCC) {
-			executeCommand(Commands.CHARGE_PUMP, CHARGE_PUMP_VALUE_ENABLE);
-		} else {
-			executeCommand(Commands.CHARGE_PUMP, CHARGE_PUMP_VALUE_DISABLE);
-		}
-		setMemoryMode(MemoryModes.HORIZONTAL);
-		executeCommand(Commands.SEGMENT_REMAP_127);
-		executeCommand(Commands.SET_MULTIPLEX_RATIO, oledType.getHeight() - 1);
-		executeCommand(Commands.SET_DISPLAY_OFFSET, 0);
-		executeCommand(Commands.SET_START_LINE_ZERO);
-		executeCommand(Commands.COM_OUTPUT_SCAN_DIR_DESCENDING);
-		executeCommand(Commands.SET_COM_PINS, oledType.getComPins());
-		executeCommand(Commands.SET_CONTRAST, DEFAULT_CONTRAST);
-		executeCommand(Commands.SET_PRE_CHARGE_PERIOD, useExternalVCC ? 0x22 : 0xf1);
-		executeCommand(Commands.SET_VCOM_DESELECT_LEVEL, 0x40);
-		executeCommand(Commands.RAM_CONTENT_DISPLAY);
-		executeCommand(Commands.INVERTED_OFF);
-		executeCommand(Commands.DEACTIVATE_SCROLL);
-		executeCommand(Commands.DISPLAY_ON);
-	}
+    private void initialize() throws IOException {
+        sleep(1);
+        gpioResetPin.setState(DigitalState.LOW.value().intValue());
+        sleep(10);
+        gpioResetPin.setState(DigitalState.HIGH.value().intValue());
+        executeCommand(Commands.DISPLAY_OFF);
+        executeCommand(Commands.SET_DISPLAY_CLOCK_DIV, 0x80);
+        if (!useExternalVCC) {
+            executeCommand(Commands.CHARGE_PUMP, CHARGE_PUMP_VALUE_ENABLE);
+        } else {
+            executeCommand(Commands.CHARGE_PUMP, CHARGE_PUMP_VALUE_DISABLE);
+        }
+        setMemoryMode(MemoryModes.HORIZONTAL);
+        executeCommand(Commands.SEGMENT_REMAP_127);
+        executeCommand(Commands.SET_MULTIPLEX_RATIO, oledType.getHeight() - 1);
+        executeCommand(Commands.SET_DISPLAY_OFFSET, 0);
+        executeCommand(Commands.SET_START_LINE_ZERO);
+        executeCommand(Commands.COM_OUTPUT_SCAN_DIR_DESCENDING);
+        executeCommand(Commands.SET_COM_PINS, oledType.getComPins());
+        executeCommand(Commands.SET_CONTRAST, DEFAULT_CONTRAST);
+        executeCommand(Commands.SET_PRE_CHARGE_PERIOD, useExternalVCC ? 0x22 : 0xf1);
+        executeCommand(Commands.SET_VCOM_DESELECT_LEVEL, 0x40);
+        executeCommand(Commands.RAM_CONTENT_DISPLAY);
+        executeCommand(Commands.INVERTED_OFF);
+        executeCommand(Commands.DEACTIVATE_SCROLL);
+        executeCommand(Commands.DISPLAY_ON);
+    }
 
-	private void executeCommand(Commands command, int value1, int value2) throws IOException {
-		executeCommand(command);
-		writeCommand((byte) value1);
-		writeCommand((byte) value2);
-	}
+    private void executeCommand(Commands command, int value1, int value2) throws IOException {
+        executeCommand(command);
+        writeCommand((byte) value1);
+        writeCommand((byte) value2);
+    }
 
-	private void executeCommand(Commands command, int value) throws IOException {
-		executeCommand(command);
-		writeCommand((byte) value);
-	}
+    private void executeCommand(Commands command, int value) throws IOException {
+        executeCommand(command);
+        writeCommand((byte) value);
+    }
 
-	private void executeCommand(Commands command) throws IOException {
-		writeCommand(command.getCommandValue());
-	}
+    private void executeCommand(Commands command) throws IOException {
+        writeCommand(command.getCommandValue());
+    }
 
-	private void writeCommand(byte commandValue) throws IOException {
-		// TODO: correct
-		writeByte(0x00, commandValue);
-	}
+    private void writeCommand(byte commandValue) throws IOException {
+        // TODO: correct
+        writeByte(0x00, commandValue);
+    }
 
-	private void setMemoryMode(MemoryModes mode) throws IOException {
-		executeCommand(Commands.MEMORY_MODE, mode.getValue());
-	}
+    private void setMemoryMode(MemoryModes mode) throws IOException {
+        executeCommand(Commands.MEMORY_MODE, mode.getValue());
+    }
 
 }

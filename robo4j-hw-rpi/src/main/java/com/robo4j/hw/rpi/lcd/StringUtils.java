@@ -16,32 +16,36 @@
  */
 package com.robo4j.hw.rpi.lcd;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Some simple string utils.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 class StringUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(StringUtils.class);
 
-	public static String rightFormat(String string, int length) {
-		return String.format("%" + length + "s", string);
-	}
+    public static String rightFormat(String string, int length) {
+        return String.format("%" + length + "s", string);
+    }
 
-	public static String centerFormat(String string, int length) {
-		int diff = length - string.length();
-		return String.format("%-" + length + "s", getSpaces(diff / 2) + string);
-	}
-	
-	private static String getSpaces(int total) {
-		String tmp = "";
-		for (int i = 0; i < total; i++) {
-			tmp +=" ";
-		}
-		return tmp;
-	}
+    public static String centerFormat(String string, int length) {
+        int diff = length - string.length();
+        return String.format("%-" + length + "s", getSpaces(diff / 2) + string);
+    }
 
-	public static void main(String ... bla) {
-		System.out.println(centerFormat("Center me", 20));
-	}
+    private static String getSpaces(int total) {
+        String tmp = "";
+        for (int i = 0; i < total; i++) {
+            tmp += " ";
+        }
+        return tmp;
+    }
+
+    public static void main(String... bla) {
+        LOGGER.info(centerFormat("Center me", 20));
+    }
 }

@@ -18,6 +18,8 @@ package com.robo4j.configuration;
 
 import com.robo4j.util.IOUtil;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -27,31 +29,33 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * XML Tests for the configuration.
- * 
+ *
  * @author Marcus Hirt
  * @author Miroslav Wengner (@miragemiko)
  */
 class XmlConfigurationFactoryTest {
-	@Test
-	void testSerializeToString() throws ConfigurationFactoryException {
-		ConfigurationBuilder configBuilder = new ConfigurationBuilder().addString("firstString", "S1").addString("secondString", "S2").addBoolean("boolean", true).addBuilder("child1", new ConfigurationBuilder().addInteger("int", 1).addFloat("float", 1.0f)).addBuilder("child2", new ConfigurationBuilder().addInteger("int", 2).addFloat("float", 2.0f));
-		Configuration config = configBuilder.build();
-		String xml = XmlConfigurationFactory.toXml(config);
-		System.out.println(xml);
-		assertNotNull(xml);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmlConfigurationFactoryTest.class);
 
-		Configuration fromXml = XmlConfigurationFactory.fromXml(xml);
-		System.out.println(XmlConfigurationFactory.toXml(fromXml));
+    @Test
+    void testSerializeToString() throws ConfigurationFactoryException {
+        ConfigurationBuilder configBuilder = new ConfigurationBuilder().addString("firstString", "S1").addString("secondString", "S2").addBoolean("boolean", true).addBuilder("child1", new ConfigurationBuilder().addInteger("int", 1).addFloat("float", 1.0f)).addBuilder("child2", new ConfigurationBuilder().addInteger("int", 2).addFloat("float", 2.0f));
+        Configuration config = configBuilder.build();
+        String xml = XmlConfigurationFactory.toXml(config);
+        Configuration fromXml = XmlConfigurationFactory.fromXml(xml);
 
-		assertEquals(config, fromXml);
-	}
 
-	@Test
-	void testReadResource() throws IOException, ConfigurationFactoryException {
-		String configXml = IOUtil
-				.readStringFromUTF8Stream(XmlConfigurationFactoryTest.class.getClassLoader().getResourceAsStream("configurationtest.xml"));
-		Configuration config = XmlConfigurationFactory.fromXml(configXml);
-		assertNotNull(config.getChildConfiguration("multipliers"));
-		assertNotNull(config.getChildConfiguration("offsets"));
-	}
+        LOGGER.info("xml:{}", xml);
+        LOGGER.info("fromXml:{}", XmlConfigurationFactory.toXml(fromXml));
+        assertNotNull(xml);
+        assertEquals(config, fromXml);
+    }
+
+    @Test
+    void testReadResource() throws IOException, ConfigurationFactoryException {
+        String configXml = IOUtil
+                .readStringFromUTF8Stream(XmlConfigurationFactoryTest.class.getClassLoader().getResourceAsStream("configurationtest.xml"));
+        Configuration config = XmlConfigurationFactory.fromXml(configXml);
+        assertNotNull(config.getChildConfiguration("multipliers"));
+        assertNotNull(config.getChildConfiguration("offsets"));
+    }
 }

@@ -23,6 +23,8 @@ import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.lego.enums.AnalogPortEnum;
 import com.robo4j.hw.lego.enums.MotorTypeEnum;
 import com.robo4j.hw.lego.wrapper.MotorTestWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple Tank Test Platform Unit
@@ -31,10 +33,11 @@ import com.robo4j.hw.lego.wrapper.MotorTestWrapper;
  * @author Miro Wengner (@miragemiko)
  */
 public class SimpleTankTestUnit extends SimpleTankUnit {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleTankTestUnit.class);
 
     public SimpleTankTestUnit(RoboContext context, String id) {
         super(context, id);
-        System.out.println(getClass().getSimpleName() + " constructor: id: " + id);
+        LOGGER.info(" constructor: id: {}", id);
     }
 
     @Override
@@ -50,7 +53,6 @@ public class SimpleTankTestUnit extends SimpleTankUnit {
         leftMotor = new MotorTestWrapper(AnalogPortEnum.getByType(leftMotorPort), MotorTypeEnum.getByType(leftMotorType));
         setState(LifecycleState.INITIALIZED);
     }
-
 
 
 }

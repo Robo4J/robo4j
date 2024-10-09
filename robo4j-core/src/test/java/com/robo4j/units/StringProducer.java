@@ -18,6 +18,8 @@ package com.robo4j.units;
 
 import com.robo4j.*;
 import com.robo4j.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class StringProducer extends RoboUnit<String> {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(StringProducer.class);
     public static final String DEFAULT_UNIT_NAME = "producer";
     public static final String ATTR_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
     public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
@@ -70,7 +72,7 @@ public class StringProducer extends RoboUnit<String> {
     @Override
     public void onMessage(String message) {
         if (message == null) {
-            System.out.println("No Message!");
+            LOGGER.info("No Message!");
         } else {
             counter.incrementAndGet();
             String[] input = message.split("::");
@@ -81,7 +83,7 @@ public class StringProducer extends RoboUnit<String> {
                     latch.countDown();
                     break;
                 default:
-                    System.out.println("don't understand message: " + message);
+                    LOGGER.info("don't understand message: {}", message);
             }
         }
     }

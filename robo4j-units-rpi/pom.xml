@@ -50,8 +50,17 @@
             <artifactId>pi4j-plugin-linuxfs</artifactId>
             <version>${pi4j.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
 
         <!--   TEST     -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -96,9 +105,11 @@
                         </goals>
                         <configuration>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>com.robo4j.units.rpi.led.AdafruitAlphanumericUnitExample</Main-Class>
+                                        <Main-Class>com.robo4j.units.rpi.led.AdafruitAlphanumericUnitExample
+                                        </Main-Class>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>

@@ -16,8 +16,6 @@
  */
 package com.robo4j.units.rpi.lidarlite;
 
-import java.util.concurrent.TimeUnit;
-
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
@@ -25,26 +23,27 @@ import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.math.geometry.ScanResult2D;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Example controller for testing the laser scanner.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class LaserScanProcessor extends RoboUnit<ScanResult2D> {
-	public LaserScanProcessor(RoboContext context, String id) {
-		super(ScanResult2D.class, context, id);
-	}
+    public LaserScanProcessor(RoboContext context, String id) {
+        super(ScanResult2D.class, context, id);
+    }
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
 
-	}
+    }
 
-	@Override
-	public void onMessage(ScanResult2D result) {
-		// System.out.println(result.toString());
-		RoboReference<String> controller = getContext().getReference("controller");
-		getContext().getScheduler().schedule(controller, "scan", 5, 100, TimeUnit.SECONDS, 1);
-	}
+    @Override
+    public void onMessage(ScanResult2D result) {
+        RoboReference<String> controller = getContext().getReference("controller");
+        getContext().getScheduler().schedule(controller, "scan", 5, 100, TimeUnit.SECONDS, 1);
+    }
 }

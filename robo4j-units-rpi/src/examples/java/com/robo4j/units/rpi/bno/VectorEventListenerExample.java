@@ -18,13 +18,13 @@
 package com.robo4j.units.rpi.bno;
 
 import com.robo4j.RoboBuilder;
-import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
-import com.robo4j.net.LookupService;
 import com.robo4j.net.LookupServiceProvider;
 import com.robo4j.units.rpi.imu.BnoRequest;
 import com.robo4j.util.SystemUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,67 +40,68 @@ import java.nio.file.Paths;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class VectorEventListenerExample {
-	public static void main(String[] args) throws Exception {
-		final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    private static final Logger LOGGER = LoggerFactory.getLogger(VectorEventListenerExample.class);
 
-		final InputStream systemIS;
-		final InputStream contextIS;
+    public static void main(String[] args) throws Exception {
+        final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
-		switch (args.length) {
-		case 0:
-			systemIS = classLoader.getResourceAsStream("bno080VectorSystemEmitterExample.xml");
-			contextIS = classLoader.getResourceAsStream("bno080VectorExample.xml");
-			System.out.println("Default configuration used");
-			break;
-		case 1:
-			systemIS = classLoader.getResourceAsStream("bno080VectorSystemEmitterExample.xml");
-			Path contextPath = Paths.get(args[0]);
-			contextIS = Files.newInputStream(contextPath);
-			System.out.println("Robo4j config file has been used: " + args[0]);
-			break;
-		case 2:
-			Path systemPath2 = Paths.get(args[0]);
-			Path contextPath2 = Paths.get(args[1]);
-			systemIS = Files.newInputStream(systemPath2);
-			contextIS = Files.newInputStream(contextPath2);
-			System.out.println(String.format("Custom configuration used system: %s, context: %s", args[0], args[1]));
-			break;
-		default:
-			System.out.println("Could not find the *.xml settings for the CameraClient!");
-			System.out.println("java -jar camera.jar system.xml context.xml");
-			System.exit(2);
-			throw new IllegalStateException("see configuration");
-		}
+        final InputStream systemIS;
+        final InputStream contextIS;
 
-		if (systemIS == null && contextIS == null) {
-			System.out.println("Could not find the settings for the BNO080 Example!");
-			System.exit(2);
-		}
-		RoboBuilder builder = new RoboBuilder(systemIS);
-		builder.add(contextIS);
-		RoboContext ctx = builder.build();
+        switch (args.length) {
+            case 0:
+                systemIS = classLoader.getResourceAsStream("bno080VectorSystemEmitterExample.xml");
+                contextIS = classLoader.getResourceAsStream("bno080VectorExample.xml");
+                LOGGER.info("Default configuration used");
+                break;
+            case 1:
+                systemIS = classLoader.getResourceAsStream("bno080VectorSystemEmitterExample.xml");
+                Path contextPath = Paths.get(args[0]);
+                contextIS = Files.newInputStream(contextPath);
+                LOGGER.info("Robo4j config file has been used: {}", args[0]);
+                break;
+            case 2:
+                Path systemPath2 = Paths.get(args[0]);
+                Path contextPath2 = Paths.get(args[1]);
+                systemIS = Files.newInputStream(systemPath2);
+                contextIS = Files.newInputStream(contextPath2);
+                LOGGER.info("Custom configuration used system: {}, context: {}", args[0], args[1]);
+                break;
+            default:
+                LOGGER.warn("Could not find the *.xml settings for the CameraClient!");
+                LOGGER.warn("java -jar camera.jar system.xml context.xml");
+                System.exit(2);
+                throw new IllegalStateException("see configuration");
+        }
 
-		ctx.start();
+        if (systemIS == null && contextIS == null) {
+            LOGGER.info("Could not find the settings for the BNO080 Example!");
+            System.exit(2);
+        }
+        var builder = new RoboBuilder(systemIS);
+        builder.add(contextIS);
+        var ctx = builder.build();
 
-		LookupService service = LookupServiceProvider.getDefaultLookupService();
-		try {
-			service.start();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        ctx.start();
 
-		System.out.println("State after start:");
-		System.out.println(SystemUtil.printStateReport(ctx));
+        var service = LookupServiceProvider.getDefaultLookupService();
+        try {
+            service.start();
+        } catch (IOException e) {
+            LOGGER.error("error starting lookup service", e);
+        }
 
-		RoboReference<BnoRequest> bnoUnit = ctx.getReference("bno");
-		RoboReference<DataEvent3f> bnoListenerUnit = ctx.getReference("listener");
+        LOGGER.info("State after start:");
+        LOGGER.info(SystemUtil.printStateReport(ctx));
 
-		BnoRequest requestToRegister = new BnoRequest(bnoListenerUnit, BnoRequest.ListenerAction.REGISTER);
-		bnoUnit.sendMessage(requestToRegister);
+        RoboReference<BnoRequest> bnoUnit = ctx.getReference("bno");
+        RoboReference<DataEvent3f> bnoListenerUnit = ctx.getReference("listener");
 
-		System.out.println("Press <Enter> to start!");
-		System.in.read();
-		ctx.shutdown();
+        BnoRequest requestToRegister = new BnoRequest(bnoListenerUnit, BnoRequest.ListenerAction.REGISTER);
+        bnoUnit.sendMessage(requestToRegister);
 
-	}
+        LOGGER.info("Press <Enter> to start!");
+        System.in.read();
+        ctx.shutdown();
+    }
 }

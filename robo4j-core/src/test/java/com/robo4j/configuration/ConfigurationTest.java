@@ -19,36 +19,37 @@ package com.robo4j.configuration;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * Testing supported variables types potentially used for roboUnit configuration
- * 
+ *
  * @author Marcus Hirt
  * @author Miroslav Wengner (@miragemiko)
  */
 class ConfigurationTest {
-	@Test
-	void testBasicConfiguration() {
-		ConfigurationBuilder configBuilder = new ConfigurationBuilder().addInteger("MyInt", 1).addLong("MyLong", 2L)
-				.addFloat("MyFloat", 1.0f).addDouble("MyDouble", 2.0).addString("MyString", "toodiloo").addCharacter("MyCharacter", 'C')
-				.addBoolean("MyBoolean", true);
-		Configuration config = configBuilder.build();
-		assertEquals(1, (int) config.getInteger("MyInt", -1));
-		assertEquals(2L, (long) config.getLong("MyLong", -1L));
-		assertEquals(1.0f, config.getFloat("MyFloat", -1f), 0.000000001f);
-		assertEquals(2.0, config.getDouble("MyDouble", -1.0), 0.000000001f);
-		assertEquals("toodiloo", config.getString("MyString", "nope"));
-		assertEquals(Character.valueOf('C'), config.getCharacter("MyCharacter", 'A'));
-		assertEquals(true, config.getBoolean("MyBoolean", false));
-	}
+    @Test
+    void testBasicConfiguration() {
+        ConfigurationBuilder configBuilder = new ConfigurationBuilder().addInteger("MyInt", 1).addLong("MyLong", 2L)
+                .addFloat("MyFloat", 1.0f).addDouble("MyDouble", 2.0).addString("MyString", "toodiloo").addCharacter("MyCharacter", 'C')
+                .addBoolean("MyBoolean", true);
+        Configuration config = configBuilder.build();
+        assertEquals(1, (int) config.getInteger("MyInt", -1));
+        assertEquals(2L, (long) config.getLong("MyLong", -1L));
+        assertEquals(1.0f, config.getFloat("MyFloat", -1f), 0.000000001f);
+        assertEquals(2.0, config.getDouble("MyDouble", -1.0), 0.000000001f);
+        assertEquals("toodiloo", config.getString("MyString", "nope"));
+        assertEquals(Character.valueOf('C'), config.getCharacter("MyCharacter", 'A'));
+        assertEquals(true, config.getBoolean("MyBoolean", false));
+    }
 
-	@Test
-	void testSubConfigurations() {
-		// Children have their own namespace
-		ConfigurationBuilder configBuilder = new ConfigurationBuilder()
-				.addBuilder("sub", new ConfigurationBuilder().addString("c", "child")).addDouble("sub", 2.0);
-		Configuration config = configBuilder.build();
-		assertEquals(2.0, config.getDouble("sub", null), 0.000000001f);
-		assertEquals("child", config.getChildConfiguration("sub").getString("c", null));
-	}
+    @Test
+    void testSubConfigurations() {
+        // Children have their own namespace
+        ConfigurationBuilder configBuilder = new ConfigurationBuilder()
+                .addBuilder("sub", new ConfigurationBuilder().addString("c", "child")).addDouble("sub", 2.0);
+        Configuration config = configBuilder.build();
+        assertEquals(2.0, config.getDouble("sub", null), 0.000000001f);
+        assertEquals("child", config.getChildConfiguration("sub").getString("c", null));
+    }
 
 }

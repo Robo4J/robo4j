@@ -17,54 +17,56 @@
 
 package com.robo4j.units.rpi.led;
 
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor;
+import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor24BarDevice;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.robo4j.RoboBuilder;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboReference;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor;
-import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor24BarDevice;
-
 /**
  * Adafruit Bi-Color 24 Bargraph example
- *
+ * <p>
  * demo: Incrementally turning on a led light over 24 available diodes. The each
  * time with different Color {@link BiColor}. The color is changing circularly.
- *
+ * <p>
  * https://learn.adafruit.com/adafruit-led-backpack/bi-color-24-bargraph
- *
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class AdafruitBiColor24BackpackExample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdafruitBiColor24BackpackExample.class);
 
-	public static void main(String[] args) throws Exception {
-		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-		InputStream settings = AdafruitBiColor24BackpackExample.class.getClassLoader().getResourceAsStream("bargraph24example.xml");
-		RoboContext ctx = new RoboBuilder().add(settings).build();
+    public static void main(String[] args) throws Exception {
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        InputStream settings = AdafruitBiColor24BackpackExample.class.getClassLoader().getResourceAsStream("bargraph24example.xml");
+        RoboContext ctx = new RoboBuilder().add(settings).build();
 
-		ctx.start();
-		RoboReference<DrawMessage> barUnit = ctx.getReference("bargraph");
-		DrawMessage clearMessage = new DrawMessage(BackpackMessageCommand.CLEAR);
-		AtomicInteger position = new AtomicInteger();
-		executor.scheduleAtFixedRate(() -> {
-			if (position.get() > BiColor24BarDevice.MAX_BARS - 1) {
-				position.set(0);
-			}
-			barUnit.sendMessage(clearMessage);
-			barUnit.sendMessage(new DrawMessage(BackpackMessageCommand.PAINT, new short[] { (short) position.getAndIncrement() },
-					new short[] { 0 }, new BiColor[] { BiColor.getByValue(position.get() % 3 + 1) }));
-		}, 2, 1, TimeUnit.SECONDS);
+        ctx.start();
+        RoboReference<DrawMessage> barUnit = ctx.getReference("bargraph");
+        DrawMessage clearMessage = new DrawMessage(BackpackMessageCommand.CLEAR);
+        AtomicInteger position = new AtomicInteger();
+        executor.scheduleAtFixedRate(() -> {
+            if (position.get() > BiColor24BarDevice.MAX_BARS - 1) {
+                position.set(0);
+            }
+            barUnit.sendMessage(clearMessage);
+            barUnit.sendMessage(new DrawMessage(BackpackMessageCommand.PAINT, new short[]{(short) position.getAndIncrement()},
+                    new short[]{0}, new BiColor[]{BiColor.getByValue(position.get() % 3 + 1)}));
+        }, 2, 1, TimeUnit.SECONDS);
 
-		System.out.println("Press enter to quit\n");
-		System.in.read();
-		executor.shutdown();
-		ctx.shutdown();
+        LOGGER.info("Press enter to quit");
+        System.in.read();
+        executor.shutdown();
+        ctx.shutdown();
 
-	}
+    }
 }

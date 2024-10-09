@@ -22,6 +22,8 @@ import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
 import com.robo4j.hw.rpi.Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PCA9685Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This example assumes two servos connected to channel 0 and 1, and two H bridges controlling DC engines on channel 2 and 3. 
@@ -33,6 +35,7 @@ import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class PCA9685Example {
+	private static final Logger LOGGER = LoggerFactory.getLogger(PCA9685Example.class);
 	// The internetz says 50Hz is the standard PWM frequency for operating RC servos.  
 	private static final int SERVO_FREQUENCY = 50;
 	private static final int MOTOR_MIN = 0;
@@ -41,23 +44,23 @@ public class PCA9685Example {
 
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
-		System.out.println("Creating device...");
+		LOGGER.info("Creating device...");
 		PWMPCA9685Device device = new PWMPCA9685Device();
 		device.setPWMFrequency(SERVO_FREQUENCY);
 		Servo servo0 = new PCA9685Servo(device.getChannel(0));
 		Servo servo1 = new PCA9685Servo(device.getChannel(1));
 		PWMChannel motor0 = device.getChannel(2);
 		PWMChannel motor1 = device.getChannel(3);
-		
-		System.out.println("Setting start conditions...");
+
+		LOGGER.info("Setting start conditions...");
 		servo0.setInput(0);
 		servo1.setInput(0);
 		motor0.setPWM(0, MOTOR_MIN);
 		motor1.setPWM(0, MOTOR_MIN);
 
-		System.out.println("Press <Enter> to run loop!");
+		LOGGER.info("Press <Enter> to run loop!");
 		System.in.read();
-		System.out.println("Running perpetual loop...");
+		LOGGER.info("Running perpetual loop...");
 		while (true) {
 			servo0.setInput(-1);
 			servo1.setInput(-1);

@@ -18,12 +18,15 @@ package com.robo4j.units.lego.controller;
 
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ReportController extends RoboUnit<Object> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReportController.class);
 
     public ReportController(RoboContext context, String id) {
         super(Object.class, context, id);
@@ -31,6 +34,6 @@ public class ReportController extends RoboUnit<Object> {
 
     @Override
     public void onMessage(Object message) {
-        System.out.println(getClass().getSimpleName() + "report: " + message.toString());
+        LOGGER.info("report: {}", message.toString());
     }
 }

@@ -16,72 +16,73 @@
  */
 package com.robo4j.units.rpi.pwm;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.Scanner;
-
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.util.SystemUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 /**
  * Small calibration utility to help fine tune a servo.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class CalibrationUtility {
-	public static void main(String[] args) throws RoboBuilderException, FileNotFoundException {
-		InputStream settings = ServoUnitExample.class.getClassLoader().getResourceAsStream("calibration.xml");
-		if (args.length != 1) {
-			System.out.println("No file specified, using default calibration.xml");
-		} else {
-			settings = new FileInputStream(args[0]);
-		}
+    private static final Logger LOGGER = LoggerFactory.getLogger(CalibrationUtility.class);
 
-		RoboBuilder builder = new RoboBuilder();
-		if (settings == null) {
-			System.out.println("Could not find the settings for servo calibration test!");
-			System.exit(2);
-		}
-		builder.add(settings);
-		RoboContext ctx = builder.build();
-		System.out.println("State before start:");
-		System.out.println(SystemUtil.printStateReport(ctx));
-		ctx.start();
+    public static void main(String[] args) throws RoboBuilderException, FileNotFoundException {
+        var settings = ServoUnitExample.class.getClassLoader().getResourceAsStream("calibration.xml");
+        if (args.length != 1) {
+            LOGGER.warn("No file specified, using default calibration.xml");
+        } else {
+            settings = new FileInputStream(args[0]);
+        }
 
-		System.out.println("State after start:");
-		System.out.println(SystemUtil.printStateReport(ctx));
+        var builder = new RoboBuilder();
+        if (settings == null) {
+            LOGGER.warn("Could not find the settings for servo calibration test!");
+            System.exit(2);
+        }
+        builder.add(settings);
+        RoboContext ctx = builder.build();
+        LOGGER.info("State before start:");
+        LOGGER.info(SystemUtil.printStateReport(ctx));
+        ctx.start();
 
-		String lastCommand;
-		Scanner scanner = new Scanner(System.in);
-		System.out.println(
-				"Type the servo to control and how much to move the servo, between -1 and 1. For example:\npan -1.0\nType q and enter to quit!\n");
-		while (!"q".equals(lastCommand = scanner.nextLine())) {
-			lastCommand = lastCommand.trim();
-			String[] split = lastCommand.split(" ");
-			if (split.length != 2) {
-				System.out.println("Could not parse " + lastCommand + ". Please try again!");
-				continue;
-			}
-			RoboReference<Float> servoRef = ctx.getReference(split[0]);
-			if (servoRef == null) {
-				System.out.println("Could not find any robo unit named " + split[0] + ". Please try again!");
-				continue;
-			}
-			try {
-				float value = Float.parseFloat(split[1]);
-				servoRef.sendMessage(value);
-			} catch (Exception e) {
-				System.out.println(
-						"Could not parse " + split[1] + " as a float number. Error message was: " + e.getMessage() + ". Please try again!");
-				continue;
-			}
-		}
-		ctx.shutdown();
-		scanner.close();
-	}
+        LOGGER.info("State after start:");
+        LOGGER.info(SystemUtil.printStateReport(ctx));
+
+        String lastCommand;
+        Scanner scanner = new Scanner(System.in);
+        LOGGER.info(
+                "Type the servo to control and how much to move the servo, between -1 and 1. For example:\npan -1.0\nType q and enter to quit!\n");
+        while (!"q".equals(lastCommand = scanner.nextLine())) {
+            lastCommand = lastCommand.trim();
+            String[] split = lastCommand.split(" ");
+            if (split.length != 2) {
+                LOGGER.info("Could not parse {}. Please try again!", lastCommand);
+                continue;
+            }
+            RoboReference<Float> servoRef = ctx.getReference(split[0]);
+            if (servoRef == null) {
+                LOGGER.info("Could not find any robo unit named {}. Please try again!", split[0]);
+                continue;
+            }
+            try {
+                float value = Float.parseFloat(split[1]);
+                servoRef.sendMessage(value);
+            } catch (Exception e) {
+                LOGGER.error("Could not parse {} as a float number. Error message was: {}. Please try again!", split[1], e.getMessage());
+            }
+        }
+        ctx.shutdown();
+        scanner.close();
+    }
 }

@@ -20,25 +20,29 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Example recipient for testing the accelerometer.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class AccelerometerProcessor extends RoboUnit<AccelerometerEvent> {
-	public AccelerometerProcessor(RoboContext context, String id) {
-		super(AccelerometerEvent.class, context, id);
-	}
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccelerometerProcessor.class);
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+    public AccelerometerProcessor(RoboContext context, String id) {
+        super(AccelerometerEvent.class, context, id);
+    }
 
-	}
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
 
-	@Override
-	public void onMessage(AccelerometerEvent result) {
-		System.out.println("AccelerometerEvent: " + result.toString());
-	}
+    }
+
+    @Override
+    public void onMessage(AccelerometerEvent result) {
+        LOGGER.info("AccelerometerEvent: {}", result.toString());
+    }
 }

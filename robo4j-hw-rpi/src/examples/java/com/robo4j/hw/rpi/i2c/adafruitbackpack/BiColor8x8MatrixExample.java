@@ -17,6 +17,9 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,35 +29,36 @@ import java.util.concurrent.TimeUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class BiColor8x8MatrixExample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BiColor8x8MatrixExample.class);
 
-	public static void main(String[] args) throws Exception {
-		System.out.println("=== BiColor 8x8 Matrix Example ===");
+    public static void main(String[] args) throws Exception {
+        LOGGER.debug("=== BiColor 8x8 Matrix Example ===");
 
-		BiColor8x8MatrixDevice matrix = new BiColor8x8MatrixDevice();
-		matrix.clear();
-		matrix.display();
+        BiColor8x8MatrixDevice matrix = new BiColor8x8MatrixDevice();
+        matrix.clear();
+        matrix.display();
 
-		MatrixRotation[] rotations = { MatrixRotation.DEFAULT_X_Y, MatrixRotation.RIGHT_90, MatrixRotation.RIGHT_180,
-				MatrixRotation.RIGHT_270, MatrixRotation.LEFT_90 };
-		for (MatrixRotation rotation : rotations) {
-			matrix.setRotation(rotation);
-			matrix.drawPixel(0, 0, BiColor.RED);
-			matrix.drawPixel(1, 0, BiColor.GREEN);
-			matrix.drawPixel(2, 0, BiColor.YELLOW);
-			matrix.drawPixel(3, 0, BiColor.RED);
-			matrix.drawPixel(0, 1, BiColor.GREEN);
-			matrix.drawPixel(0, 2, BiColor.YELLOW);
-			matrix.drawPixel(7, 7, BiColor.GREEN);
-			matrix.drawPixel(7, 6, BiColor.GREEN);
-			matrix.display();
-			TimeUnit.SECONDS.sleep(1);
-			matrix.clear();
-		}
+        MatrixRotation[] rotations = {MatrixRotation.DEFAULT_X_Y, MatrixRotation.RIGHT_90, MatrixRotation.RIGHT_180,
+                MatrixRotation.RIGHT_270, MatrixRotation.LEFT_90};
+        for (MatrixRotation rotation : rotations) {
+            matrix.setRotation(rotation);
+            matrix.drawPixel(0, 0, BiColor.RED);
+            matrix.drawPixel(1, 0, BiColor.GREEN);
+            matrix.drawPixel(2, 0, BiColor.YELLOW);
+            matrix.drawPixel(3, 0, BiColor.RED);
+            matrix.drawPixel(0, 1, BiColor.GREEN);
+            matrix.drawPixel(0, 2, BiColor.YELLOW);
+            matrix.drawPixel(7, 7, BiColor.GREEN);
+            matrix.drawPixel(7, 6, BiColor.GREEN);
+            matrix.display();
+            TimeUnit.SECONDS.sleep(1);
+            matrix.clear();
+        }
 
-		System.out.println("Press <Enter> to quit!");
-		System.in.read();
-		matrix.clear();
-		matrix.display();
+        LOGGER.debug("Press <Enter> to quit!");
+        System.in.read();
+        matrix.clear();
+        matrix.display();
 
-	}
+    }
 }

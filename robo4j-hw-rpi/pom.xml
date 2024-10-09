@@ -36,14 +36,6 @@
             <groupId>com.robo4j</groupId>
             <artifactId>robo4j-math</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-        </dependency>
         <!-- Pi4j -->
         <dependency>
             <groupId>com.pi4j</groupId>
@@ -60,8 +52,17 @@
             <artifactId>pi4j-plugin-linuxfs</artifactId>
             <version>${pi4j.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
 
         <!--   TEST     -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>

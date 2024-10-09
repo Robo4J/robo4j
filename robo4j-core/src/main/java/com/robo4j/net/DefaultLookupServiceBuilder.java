@@ -16,7 +16,8 @@
  */
 package com.robo4j.net;
 
-import com.robo4j.logging.SimpleLoggingUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -28,18 +29,18 @@ import java.net.UnknownHostException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class DefaultLookupServiceBuilder {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLookupServiceBuilder.class);
     private String address;
     private Integer port;
     private Float missedHeartbeatsBeforeRemoval;
     private LocalLookupServiceImpl localContexts;
 
 
-    private DefaultLookupServiceBuilder(){
+    private DefaultLookupServiceBuilder() {
 
     }
 
-    public static DefaultLookupServiceBuilder Build(){
+    public static DefaultLookupServiceBuilder Build() {
         return new DefaultLookupServiceBuilder();
     }
 
@@ -63,12 +64,11 @@ public class DefaultLookupServiceBuilder {
         return this;
     }
 
-    public LookupService build(){
+    public LookupService build() {
         try {
             return new LookupServiceImpl(address, port, missedHeartbeatsBeforeRemoval, localContexts);
         } catch (SocketException | UnknownHostException e) {
-            SimpleLoggingUtil.error(LookupServiceProvider.class,
-                    "Failed to set up LookupService! No multicast route? Will use null provider...", e);
+            LOGGER.error("Failed to set up LookupService! No multicast route? Will use null provider...", e);
             return new NullLookupService();
         }
     }

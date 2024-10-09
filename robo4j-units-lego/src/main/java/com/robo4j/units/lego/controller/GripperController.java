@@ -26,8 +26,9 @@ import com.robo4j.hw.lego.enums.AnalogPortEnum;
 import com.robo4j.hw.lego.enums.MotorTypeEnum;
 import com.robo4j.hw.lego.provider.MotorProvider;
 import com.robo4j.hw.lego.wrapper.MotorWrapper;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.lego.gripper.GripperEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
@@ -39,76 +40,76 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GripperController extends RoboUnit<GripperEnum> {
+    public static final int ROTATION = 40;
+    public static final String MOTOR_PORT = "motorPort";
+    public static final String MOTOR_TYPE = "motorType";
+    private static final Logger LOGGER = LoggerFactory.getLogger(GripperController.class);
+    protected volatile ILegoMotor gripperMotor;
+    private volatile Lock processLock = new ReentrantLock();
+    private volatile Condition processCondition = processLock.newCondition();
+    private volatile AtomicBoolean active = new AtomicBoolean();
 
-	public static final int ROTATION = 40;
-	public static final String MOTOR_PORT = "motorPort";
-	public static final String MOTOR_TYPE = "motorType";
-	protected volatile ILegoMotor gripperMotor;
-	private volatile Lock processLock = new ReentrantLock();
-	private volatile Condition processCondition = processLock.newCondition();
-	private volatile AtomicBoolean active = new AtomicBoolean();
+    public GripperController(RoboContext context, String id) {
+        super(GripperEnum.class, context, id);
+    }
 
-	public GripperController(RoboContext context, String id) {
-		super(GripperEnum.class, context, id);
-	}
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        setState(LifecycleState.UNINITIALIZED);
+        String motorPort = configuration.getString(MOTOR_PORT, AnalogPortEnum.A.getType());
+        Character motorType = configuration.getCharacter(MOTOR_TYPE, MotorTypeEnum.NXT.getType());
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		setState(LifecycleState.UNINITIALIZED);
-		String motorPort = configuration.getString(MOTOR_PORT, AnalogPortEnum.A.getType());
-		Character motorType = configuration.getCharacter(MOTOR_TYPE, MotorTypeEnum.NXT.getType());
+        MotorProvider motorProvider = new MotorProvider();
+        gripperMotor = new MotorWrapper<>(motorProvider, AnalogPortEnum.getByType(motorPort),
+                MotorTypeEnum.getByType(motorType));
+        setState(LifecycleState.INITIALIZED);
+    }
 
-		MotorProvider motorProvider = new MotorProvider();
-		gripperMotor = new MotorWrapper<>(motorProvider, AnalogPortEnum.getByType(motorPort),
-				MotorTypeEnum.getByType(motorType));
-		setState(LifecycleState.INITIALIZED);
-	}
+    @Override
+    public void onMessage(GripperEnum message) {
+        if (!active.get()) {
+            processMessage(message);
+        }
+    }
 
-	@Override
-	public void onMessage(GripperEnum message) {
-		if (!active.get()) {
-			processMessage(message);
-		}
-	}
+    private void processMessage(GripperEnum message) {
+        active.set(true);
+        switch (message) {
+            case OPEN_CLOSE:
+                getContext().getScheduler().execute(() -> {
+                    rotateMotor(ROTATION);
+                    rotateMotor(-ROTATION);
+                    active.set(false);
+                });
+                break;
+            case OPEN:
+                getContext().getScheduler().execute(() -> {
+                    rotateMotor(ROTATION);
+                    active.set(false);
+                });
+                break;
+            case CLOSE:
+                getContext().getScheduler().execute(() -> {
+                    rotateMotor(-ROTATION);
+                    active.set(false);
+                });
+                break;
+            default:
+                LOGGER.error("not implemented option: {}", message);
+        }
+    }
 
-	private void processMessage(GripperEnum message) {
-		active.set(true);
-		switch (message) {
-		case OPEN_CLOSE:
-			getContext().getScheduler().execute(() -> {
-				rotateMotor(ROTATION);
-				rotateMotor(-ROTATION);
-				active.set(false);
-			});
-			break;
-		case OPEN:
-			getContext().getScheduler().execute(() -> {
-				rotateMotor(ROTATION);
-				active.set(false);
-			});
-			break;
-		case CLOSE:
-			getContext().getScheduler().execute(() -> {
-				rotateMotor(-ROTATION);
-				active.set(false);
-			});
-			break;
-		default:
-			SimpleLoggingUtil.error(getClass(), String.format("not implemented option: %s", message));
-		}
-	}
-
-	private void rotateMotor(int rotation) {
-		processLock.lock();
-		gripperMotor.rotate(rotation);
-		try {
-			while (gripperMotor.isMoving()) {
-				processCondition.await();
-			}
-		} catch (InterruptedException e) {
-			SimpleLoggingUtil.error(getClass(), e.getMessage());
-		} finally {
-			processLock.unlock();
-		}
-	}
+    private void rotateMotor(int rotation) {
+        processLock.lock();
+        gripperMotor.rotate(rotation);
+        try {
+            while (gripperMotor.isMoving()) {
+                processCondition.await();
+            }
+        } catch (InterruptedException e) {
+            LOGGER.error("error:{}", e.getMessage(), e);
+        } finally {
+            processLock.unlock();
+        }
+    }
 }

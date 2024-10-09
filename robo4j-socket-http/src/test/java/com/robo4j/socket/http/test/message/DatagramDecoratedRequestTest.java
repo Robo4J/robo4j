@@ -20,34 +20,36 @@ import com.robo4j.socket.http.message.DatagramDecoratedRequest;
 import com.robo4j.socket.http.message.DatagramDenominator;
 import com.robo4j.socket.http.util.DatagramBodyType;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * @see DatagramDecoratedRequest
- *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
+ * @see DatagramDecoratedRequest
  */
 class DatagramDecoratedRequestTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatagramDecoratedRequestTest.class);
 
-	@Test
-	void datagramDecoratedRequestTest() {
+    @Test
+    void datagramDecoratedRequestTest() {
 
-		DatagramDenominator denominator = new DatagramDenominator(DatagramBodyType.JSON.getType(),
-				"/units/stringConsumer");
-		DatagramDecoratedRequest request = new DatagramDecoratedRequest(denominator);
-		request.addMessage("{\"number\":22}".getBytes());
+        DatagramDenominator denominator = new DatagramDenominator(DatagramBodyType.JSON.getType(),
+                "/units/stringConsumer");
+        DatagramDecoratedRequest request = new DatagramDecoratedRequest(denominator);
+        request.addMessage("{\"number\":22}".getBytes());
 
-		byte[] requestBytes = request.toMessage();
+        byte[] requestBytes = request.toMessage();
 
-		String requestMessage = new String(requestBytes);
+        String requestMessage = new String(requestBytes);
 
-		System.out.println("requestMessage: " + requestMessage);
+        LOGGER.debug("requestMessage:{}", requestMessage);
 
-		assertNotNull(requestBytes);
-		assertTrue(requestBytes.length > 0);
+        assertNotNull(requestBytes);
+        assertTrue(requestBytes.length > 0);
 
-	}
+    }
 }

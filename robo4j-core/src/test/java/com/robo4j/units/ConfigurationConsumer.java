@@ -16,61 +16,63 @@
  */
 package com.robo4j.units;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ConfigurationConsumer extends RoboUnit<String> {
-	private static final int DEFAULT = 0;
-	private AtomicInteger counter;
-	private List<String> receivedMessages = new ArrayList<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationConsumer.class);
+    private static final int DEFAULT = 0;
+    private final AtomicInteger counter;
+    private final List<String> receivedMessages = new ArrayList<>();
 
-	/**
-	 * @param context
-	 * @param id
-	 */
-	public ConfigurationConsumer(RoboContext context, String id) {
-		super(String.class, context, id);
-		this.counter = new AtomicInteger(DEFAULT);
-	}
+    /**
+     * @param context RoboContext
+     * @param id      unit id
+     */
+    public ConfigurationConsumer(RoboContext context, String id) {
+        super(String.class, context, id);
+        this.counter = new AtomicInteger(DEFAULT);
+    }
 
-	public synchronized List<String> getReceivedMessages() {
-		return receivedMessages;
-	}
-	
-	@Override
-	public synchronized void onMessage(String message) {
-		counter.incrementAndGet();
-		receivedMessages.add(message);
-	}
+    public synchronized List<String> getReceivedMessages() {
+        return receivedMessages;
+    }
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		System.out.println(configuration);
-	}
+    @Override
+    public synchronized void onMessage(String message) {
+        counter.incrementAndGet();
+        receivedMessages.add(message);
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
-			return (R) (Integer)counter.get();
-		}
-		if (attribute.getAttributeName().equals("getReceivedMessages")
-				&& attribute.getAttributeType() == ArrayList.class) {
-			return (R) receivedMessages;
-		}
-		return null;
-	}
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        LOGGER.info("configuration:{}", configuration);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
+        if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
+            return (R) (Integer) counter.get();
+        }
+        if (attribute.getAttributeName().equals("getReceivedMessages")
+                && attribute.getAttributeType() == ArrayList.class) {
+            return (R) receivedMessages;
+        }
+        return null;
+    }
 
 }

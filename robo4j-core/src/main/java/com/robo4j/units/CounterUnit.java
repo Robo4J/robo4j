@@ -16,13 +16,10 @@
  */
 package com.robo4j.units;
 
-import com.robo4j.AttributeDescriptor;
-import com.robo4j.ConfigurationException;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboReference;
-import com.robo4j.RoboUnit;
+import com.robo4j.*;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.logging.SimpleLoggingUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -31,107 +28,105 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * A simple unit which will count upwards from zero. Useful, for example, as a
  * heart beat generator.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class CounterUnit extends RoboUnit<CounterCommand> {
-	private final AtomicInteger counter = new AtomicInteger(0);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CounterUnit.class);
+    private final AtomicInteger counter = new AtomicInteger(0);
 
-	private int interval;
+    private int interval;
 
-	/**
-	 * This configuration key controls the interval between the updates, in ms.
-	 */
-	public static final String KEY_INTERVAL = "interval";
+    /**
+     * This configuration key controls the interval between the updates, in ms.
+     */
+    public static final String KEY_INTERVAL = "interval";
 
-	/**
-	 * The default period, if no period is configured.
-	 */
-	public static final int DEFAULT_INTERVAL = 1000;
+    /**
+     * The default period, if no period is configured.
+     */
+    public static final int DEFAULT_INTERVAL = 1000;
 
-	/**
-	 * This configuration key controls the target of the counter updates. This
-	 * configuration key is mandatory. Also, the target must exist when the
-	 * counter unit is started, and any change whilst running will be ignored.
-	 */
-	public static final String KEY_TARGET = "target";
+    /**
+     * This configuration key controls the target of the counter updates. This
+     * configuration key is mandatory. Also, the target must exist when the
+     * counter unit is started, and any change whilst running will be ignored.
+     */
+    public static final String KEY_TARGET = "target";
 
-	/*
-	 * The currently running timer updater.
-	 */
-	private ScheduledFuture<?> scheduledFuture;
+    /*
+     * The currently running timer updater.
+     */
+    private ScheduledFuture<?> scheduledFuture;
 
-	/*
-	 * The id of the target.
-	 */
-	private String targetId;
+    /*
+     * The id of the target.
+     */
+    private String targetId;
 
-	private final class CounterUnitAction implements Runnable {
-		private RoboReference<Integer> target;
+    private final class CounterUnitAction implements Runnable {
+        private final RoboReference<Integer> target;
 
-		public CounterUnitAction(RoboReference<Integer> target) {
-			this.target = target;
-		}
+        public CounterUnitAction(RoboReference<Integer> target) {
+            this.target = target;
+        }
 
-		@Override
-		public void run() {
-			if (target != null) {
-				target.sendMessage(counter.getAndIncrement());
-			} else {
-				SimpleLoggingUtil.error(CounterUnit.class,
-						"The target " + targetId + " for the CounterUnit does not exist! Could not send count!");
-			}
-		}
-	}
+        @Override
+        public void run() {
+            if (target != null) {
+                target.sendMessage(counter.getAndIncrement());
+            } else {
+                LOGGER.error("The target {} for the CounterUnit does not exist! Could not send count!", targetId);
+            }
+        }
+    }
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param context
-	 *            the RoboContext.
-	 * @param id
-	 *            the id of the RoboUnit.
-	 */
-	public CounterUnit(RoboContext context, String id) {
-		super(CounterCommand.class, context, id);
-	}
+    /**
+     * Constructor.
+     *
+     * @param context the RoboContext.
+     * @param id      the id of the RoboUnit.
+     */
+    public CounterUnit(RoboContext context, String id) {
+        super(CounterCommand.class, context, id);
+    }
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		interval = configuration.getInteger(KEY_INTERVAL, DEFAULT_INTERVAL);
-		targetId = configuration.getString(KEY_TARGET, null);
-		if (targetId == null) {
-			throw ConfigurationException.createMissingConfigNameException(KEY_TARGET);
-		}
-	}
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        interval = configuration.getInteger(KEY_INTERVAL, DEFAULT_INTERVAL);
+        targetId = configuration.getString(KEY_TARGET, null);
+        if (targetId == null) {
+            throw ConfigurationException.createMissingConfigNameException(KEY_TARGET);
+        }
+    }
 
-	@Override
-	public void onMessage(CounterCommand message) {
-		synchronized (this) {
-			super.onMessage(message);
-			switch (message) {
-			case START:
-				scheduledFuture = getContext().getScheduler().scheduleAtFixedRate(
-						new CounterUnitAction(getContext().getReference(targetId)), 0, interval, TimeUnit.MILLISECONDS);
-				break;
-			case STOP:
-				scheduledFuture.cancel(false);
-				break;
-			case RESET:
-				counter.set(0);
-				break;
-			}
-		}
-	}
+    @Override
+    public void onMessage(CounterCommand message) {
+        synchronized (this) {
+            super.onMessage(message);
+            switch (message) {
+                case START:
+                    scheduledFuture = getContext().getScheduler().scheduleAtFixedRate(
+                            new CounterUnitAction(getContext().getReference(targetId)), 0, interval, TimeUnit.MILLISECONDS);
+                    break;
+                case STOP:
+                    scheduledFuture.cancel(false);
+                    break;
+                case RESET:
+                    counter.set(0);
+                    break;
+            }
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals("Counter") && attribute.getAttributeType() == Integer.class) {
-			return (R) (Integer) counter.get();
-		}
-		return null;
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
+        if (attribute.getAttributeName().equals("Counter") && attribute.getAttributeType() == Integer.class) {
+            return (R) (Integer) counter.get();
+        }
+        return null;
+    }
 
 }

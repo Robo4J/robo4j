@@ -53,12 +53,12 @@ public class SensorWrapper<Sensor extends BaseSensor> implements ILegoSensor {
 	}
 
 	@Override
-	public SensorTypeEnum getType() {
+	public SensorTypeEnum type() {
 		return sensorType;
 	}
 
 	@Override
-	public DigitalPortEnum getPort() {
+	public DigitalPortEnum port() {
 		return port;
 	}
 

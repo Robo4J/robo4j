@@ -19,44 +19,42 @@ package com.robo4j.units.rpi.led;
 
 import com.robo4j.RoboContext;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractBackpack;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.rpi.I2CRoboUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * AbstractI2CBackpackUnit abstract I2C LedBackpack unit
- *
- * @param <T>
- *            backpack unit type
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 abstract class AbstractI2CBackpackUnit extends I2CRoboUnit<DrawMessage> {
+    static final String ATTRIBUTE_ADDRESS = "address";
+    static final String ATTRIBUTE_BUS = "bus";
+    static final String ATTRIBUTE_BRIGHTNESS = "brightness";
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractI2CBackpackUnit.class);
 
-	static final String ATTRIBUTE_ADDRESS = "address";
-	static final String ATTRIBUTE_BUS = "bus";
-	static final String ATTRIBUTE_BRIGHTNESS = "brightness";
+    AbstractI2CBackpackUnit(Class<DrawMessage> messageType, RoboContext context, String id) {
+        super(messageType, context, id);
+    }
 
-	AbstractI2CBackpackUnit(Class<DrawMessage> messageType, RoboContext context, String id) {
-		super(messageType, context, id);
-	}
+    void processMessage(AbstractBackpack device, DrawMessage message) {
+        switch (message.getType()) {
+            case CLEAR:
+                device.clear();
+                break;
+            case PAINT:
+                paint(message);
+                break;
+            case DISPLAY:
+                paint(message);
+                device.display();
+                break;
+            default:
+                LOGGER.warn("Illegal message: {}", message);
+        }
+    }
 
-	void processMessage(AbstractBackpack device, DrawMessage message) {
-		switch (message.getType()) {
-		case CLEAR:
-			device.clear();
-			break;
-		case PAINT:
-			paint(message);
-			break;
-		case DISPLAY:
-			paint(message);
-			device.display();
-			break;
-		default:
-			SimpleLoggingUtil.error(getClass(), String.format("Illegal message: %s", message));
-		}
-	}
-
-	abstract void paint(DrawMessage message);
+    abstract void paint(DrawMessage message);
 }

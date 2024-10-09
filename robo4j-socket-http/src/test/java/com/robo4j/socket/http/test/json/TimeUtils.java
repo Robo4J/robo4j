@@ -16,14 +16,17 @@
  */
 package com.robo4j.socket.http.test.json;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class TimeUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimeUtils.class);
 
-	static void printTimeDiffNano(String message, long start) {
-
-        System.out.println(String.format("message: %s duration: %d", message, System.nanoTime() - start));
+    static void printTimeDiffNano(String message, long start) {
+        LOGGER.debug("message: {} duration: {}", message, System.nanoTime() - start);
     }
 }

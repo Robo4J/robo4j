@@ -17,54 +17,55 @@
 
 package com.robo4j.units.rpi.led;
 
-import java.io.InputStream;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.robo4j.RoboBuilder;
-import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.BiColor;
 import com.robo4j.util.SystemUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Adafruit Bi-Color 8x8 Matrix example
- * 
+ * <p>
  * demo: Incrementally turning on a led light over the matrix diagonal. The each
  * time with different Color {@link BiColor}. The color is changing circularly.
- * 
+ * <p>
  * https://learn.adafruit.com/adafruit-led-backpack/bi-color-8x8-matrix
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class AdafruitBiColorMatrix8x8BackpackExample {
-	public static void main(String[] args) throws Exception {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdafruitBiColorMatrix8x8BackpackExample.class);
 
-		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-		InputStream settings = AdafruitBiColorMatrix8x8BackpackExample.class.getClassLoader().getResourceAsStream("matrix8x8example.xml");
-		RoboContext ctx = new RoboBuilder().add(settings).build();
+    public static void main(String[] args) throws Exception {
 
-		ctx.start();
-		System.out.println("State after start:");
-		System.out.println(SystemUtil.printStateReport(ctx));
-		RoboReference<DrawMessage> matrixUnit = ctx.getReference("matrix");
-		AtomicInteger position = new AtomicInteger();
-		executor.scheduleAtFixedRate(() -> {
-			if (position.get() > 7) {
-				position.set(0);
-			}
-			matrixUnit.sendMessage(DrawMessage.MESSAGE_CLEAR);
+        var executor = Executors.newSingleThreadScheduledExecutor();
+        var settings = AdafruitBiColorMatrix8x8BackpackExample.class.getClassLoader().getResourceAsStream("matrix8x8example.xml");
+        var ctx = new RoboBuilder().add(settings).build();
 
-			matrixUnit.sendMessage(new DrawMessage(BackpackMessageCommand.PAINT, new short[] { (short) position.get() },
-					new short[] { (short) position.getAndIncrement() }, new BiColor[] { BiColor.getByValue(position.get() % 3 + 1) }));
-		}, 2, 1, TimeUnit.SECONDS);
+        ctx.start();
+        LOGGER.info("State after start:");
+        LOGGER.info(SystemUtil.printStateReport(ctx));
+        RoboReference<DrawMessage> matrixUnit = ctx.getReference("matrix");
+        AtomicInteger position = new AtomicInteger();
+        executor.scheduleAtFixedRate(() -> {
+            if (position.get() > 7) {
+                position.set(0);
+            }
+            matrixUnit.sendMessage(DrawMessage.MESSAGE_CLEAR);
 
-		System.out.println("Press enter to quit\n");
-		System.in.read();
-		executor.shutdown();
-		ctx.shutdown();
-	}
+            matrixUnit.sendMessage(new DrawMessage(BackpackMessageCommand.PAINT, new short[]{(short) position.get()},
+                    new short[]{(short) position.getAndIncrement()}, new BiColor[]{BiColor.getByValue(position.get() % 3 + 1)}));
+        }, 2, 1, TimeUnit.SECONDS);
+
+        LOGGER.info("Press enter to quit\n");
+        System.in.read();
+        executor.shutdown();
+        ctx.shutdown();
+    }
 }

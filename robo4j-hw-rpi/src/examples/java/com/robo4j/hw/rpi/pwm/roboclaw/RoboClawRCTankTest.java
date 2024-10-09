@@ -16,51 +16,55 @@
  */
 package com.robo4j.hw.rpi.pwm.roboclaw;
 
-import java.io.IOException;
-
 import com.robo4j.hw.rpi.Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PCA9685Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * This example assumes two servos connected to specific channels (6 and 7). It
  * is important to modify this example to match your setup.
- * 
+ *
  * <b>This example should be modified to suit your setup!</b>
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboClawRCTankTest {
-	// The internetz says 50Hz is the standard PWM frequency for operating RC
-	// servos.
-	private static final int SERVO_FREQUENCY = 50;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoboClawRCTankTest.class);
+    // The internetz says 50Hz is the standard PWM frequency for operating RC
+    // servos.
+    private static final int SERVO_FREQUENCY = 50;
 
-	public static void main(String[] args) throws IOException, InterruptedException {
-		if (args.length != 3) {
-			System.out.println("Usage: Tank <speed> <direction> <duration>");
-			System.out.flush();
-			System.exit(2);
-		}
-		float speed = Float.parseFloat(args[0]);
-		float direction = (float) Math.toRadians(Float.parseFloat(args[1]));
-		int duration = Integer.parseInt(args[2]);
+    public static void main(String[] args) throws IOException, InterruptedException {
+        if (args.length != 3) {
+            LOGGER.info("Usage: Tank <speed> <direction> <duration>");
+            System.out.flush();
+            System.exit(2);
+        }
+        float speed = Float.parseFloat(args[0]);
+        float direction = (float) Math.toRadians(Float.parseFloat(args[1]));
+        int duration = Integer.parseInt(args[2]);
 
-		testEngine(speed, direction, duration);
-		System.out.println("All done! Bye!");
-	}
+        testEngine(speed, direction, duration);
+        LOGGER.info("All done! Bye!");
+    }
 
-	public static void testEngine(float speed, float direction, int duration) throws IOException, InterruptedException {
-		System.out.printf("Running for %d ms with speed %f and direction %f.%n", duration, speed, direction);
-		PWMPCA9685Device device = new PWMPCA9685Device();
-		device.setPWMFrequency(SERVO_FREQUENCY);
-		Servo leftEngine = new PCA9685Servo(device.getChannel(6));
-		Servo rightEngine = new PCA9685Servo(device.getChannel(7));
+    public static void testEngine(float speed, float direction, int duration) throws IOException, InterruptedException {
+        // TODO: add measurement units
+        LOGGER.info("duration:{}ms with speed:{} and direction:{}", duration, speed, direction);
+        PWMPCA9685Device device = new PWMPCA9685Device();
+        device.setPWMFrequency(SERVO_FREQUENCY);
+        Servo leftEngine = new PCA9685Servo(device.getChannel(6));
+        Servo rightEngine = new PCA9685Servo(device.getChannel(7));
 
-		RoboClawRCTank tank = new RoboClawRCTank(leftEngine, rightEngine);
-		tank.setDirection(direction);
-		tank.setSpeed(speed);
-		Thread.sleep(duration);
-		tank.setSpeed(0);
-	}
+        RoboClawRCTank tank = new RoboClawRCTank(leftEngine, rightEngine);
+        tank.setDirection(direction);
+        tank.setSpeed(speed);
+        Thread.sleep(duration);
+        tank.setSpeed(0);
+    }
 }

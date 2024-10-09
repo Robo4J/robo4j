@@ -18,11 +18,12 @@
 package com.robo4j.units.rpi.bno;
 
 import com.robo4j.RoboBuilder;
-import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.units.rpi.imu.BnoRequest;
 import com.robo4j.util.SystemUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -38,57 +39,58 @@ import java.nio.file.Paths;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class DataEventListenerExample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataEventListenerExample.class);
 
-	public static void main(String[] args) throws Exception {
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    public static void main(String[] args) throws Exception {
+        var classLoader = Thread.currentThread().getContextClassLoader();
 
-		final InputStream systemIS;
-		final InputStream contextIS;
+        final InputStream systemIS;
+        final InputStream contextIS;
 
-		switch (args.length) {
-			case 0:
-				systemIS = classLoader.getResourceAsStream("bno080DataSystemEmitterExample.xml");
-				contextIS = classLoader.getResourceAsStream("bno080GyroExample.xml");
-				System.out.println("Default configuration used");
-				break;
-			case 1:
-				systemIS = classLoader.getResourceAsStream("bno080DataSystemEmitterExample.xml");
-				Path contextPath = Paths.get(args[0]);
-				contextIS = Files.newInputStream(contextPath);
-				System.out.println("Robo4j config file has been used: " + args[0]);
-				break;
-			case 2:
-				Path systemPath2 = Paths.get(args[0]);
-				Path contextPath2 = Paths.get(args[1]);
-				systemIS = Files.newInputStream(systemPath2);
-				contextIS = Files.newInputStream(contextPath2);
-				System.out.println(String.format("Custom configuration used system: %s, context: %s", args[0], args[1]));
-				break;
-			default:
-				System.out.println("Could not find the *.xml settings for the CameraClient!");
-				System.out.println("java -jar camera.jar system.xml context.xml");
-				System.exit(2);
-				throw new IllegalStateException("see configuration");
-		}
+        switch (args.length) {
+            case 0:
+                systemIS = classLoader.getResourceAsStream("bno080DataSystemEmitterExample.xml");
+                contextIS = classLoader.getResourceAsStream("bno080GyroExample.xml");
+                LOGGER.info("Default configuration used");
+                break;
+            case 1:
+                systemIS = classLoader.getResourceAsStream("bno080DataSystemEmitterExample.xml");
+                Path contextPath = Paths.get(args[0]);
+                contextIS = Files.newInputStream(contextPath);
+                LOGGER.info("Robo4j config file has been used: {}", args[0]);
+                break;
+            case 2:
+                Path systemPath2 = Paths.get(args[0]);
+                Path contextPath2 = Paths.get(args[1]);
+                systemIS = Files.newInputStream(systemPath2);
+                contextIS = Files.newInputStream(contextPath2);
+                LOGGER.info("Custom configuration used system: {}, context: {}", args[0], args[1]);
+                break;
+            default:
+                LOGGER.warn("Could not find the *.xml settings for the CameraClient!");
+                LOGGER.warn("java -jar camera.jar system.xml context.xml");
+                System.exit(2);
+                throw new IllegalStateException("see configuration");
+        }
 
-		RoboBuilder builder = new RoboBuilder(systemIS);
-		builder.add(contextIS);
-		RoboContext ctx = builder.build();
+        var builder = new RoboBuilder(systemIS);
+        builder.add(contextIS);
+        var ctx = builder.build();
 
-		ctx.start();
+        ctx.start();
 
-		System.out.println("State after start:");
-		System.out.println(SystemUtil.printStateReport(ctx));
+        LOGGER.info("State after start:");
+        LOGGER.info(SystemUtil.printStateReport(ctx));
 
-		RoboReference<BnoRequest> bnoUnit = ctx.getReference("bno");
-		RoboReference<DataEvent3f> bnoListenerUnit = ctx.getReference("listener");
+        var bnoUnit = ctx.getReference("bno");
+        RoboReference<DataEvent3f> bnoListenerUnit = ctx.getReference("listener");
 
-		BnoRequest requestToRegister = new BnoRequest(bnoListenerUnit, BnoRequest.ListenerAction.REGISTER);
-		bnoUnit.sendMessage(requestToRegister);
+        BnoRequest requestToRegister = new BnoRequest(bnoListenerUnit, BnoRequest.ListenerAction.REGISTER);
+        bnoUnit.sendMessage(requestToRegister);
 
-		System.out.println("Press <Enter> to start!");
-		System.in.read();
-		ctx.shutdown();
+        LOGGER.info("Press <Enter> to start!");
+        System.in.read();
+        ctx.shutdown();
 
-	}
+    }
 }

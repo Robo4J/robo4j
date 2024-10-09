@@ -22,6 +22,8 @@ import com.robo4j.socket.http.test.units.config.StringConsumer;
 import com.robo4j.util.SystemUtil;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author Miroslav Wengner (@miragemiko)
  */
 class RoboDatagramClientTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoboDatagramClientTest.class);
     private static final int TIMEOUT = 10;
     private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
     private static final int MAX_NUMBER = 42;
@@ -44,17 +47,14 @@ class RoboDatagramClientTest {
 	@Test
 	void datagramClientServerTest() throws Exception {
 
-		RoboContext producerSystem = RoboContextUtils.loadRoboContextByXml("robo_datagram_client_request_producer_text.xml");
-		RoboContext consumerSystem = RoboContextUtils.loadRoboContextByXml("robo_datagram_client_request_consumer_text.xml");
+		var producerSystem = RoboContextUtils.loadRoboContextByXml("robo_datagram_client_request_producer_text.xml");
+		var consumerSystem = RoboContextUtils.loadRoboContextByXml("robo_datagram_client_request_consumer_text.xml");
 
 		consumerSystem.start();
 		producerSystem.start();
 
-        System.out.println("consumer: State after start:");
-        System.out.println(SystemUtil.printStateReport(consumerSystem));
-
-        System.out.println("producer: State after start:");
-        System.out.println(SystemUtil.printStateReport(producerSystem));
+        LOGGER.info(SystemUtil.printStateReport(consumerSystem));
+        LOGGER.info(SystemUtil.printStateReport(producerSystem));
 
         RoboReference<Integer> decoratedProducer = producerSystem.getReference("decoratedProducer");
         decoratedProducer.sendMessage(MAX_NUMBER);

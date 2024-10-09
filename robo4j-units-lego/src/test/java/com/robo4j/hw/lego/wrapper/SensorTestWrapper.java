@@ -19,6 +19,8 @@ package com.robo4j.hw.lego.wrapper;
 import com.robo4j.hw.lego.ILegoSensor;
 import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple LegoMindstorm Mock Sensor
@@ -26,45 +28,28 @@ import com.robo4j.hw.lego.enums.SensorTypeEnum;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class SensorTestWrapper implements ILegoSensor {
+public record SensorTestWrapper(DigitalPortEnum port, SensorTypeEnum type) implements ILegoSensor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SensorTestWrapper.class);
 
-	private final DigitalPortEnum port;
-	private final SensorTypeEnum type;
+    @Override
+    public String getData() {
+        LOGGER.info("SensorTest.getData port:{}, type: {}", port, type);
+        return "data";
+    }
 
-	public SensorTestWrapper(DigitalPortEnum port, SensorTypeEnum type) {
-		this.port = port;
-		this.type = type;
-	}
+    @Override
+    public void activate(boolean status) {
+        LOGGER.info("SensorTest.activate {},  port:{}, type: {}", status, port, type);
+    }
 
-	@Override
-	public DigitalPortEnum getPort() {
-		return port;
-	}
+    @Override
+    public void close() {
+        LOGGER.info("SensorTest.close port:{}, type: {}", port, type);
+    }
 
-	@Override
-	public SensorTypeEnum getType() {
-		return type;
-	}
-
-	@Override
-	public String getData() {
-		System.out.println(String.format("SensorTest.getData port:%s, type: %s", port, type));
-		return "data";
-	}
-
-	@Override
-	public void activate(boolean status) {
-		System.out.println(String.format("SensorTest.activate %s,  port:%s, type: %s", status, port, type));
-	}
-
-	@Override
-	public void close() {
-		System.out.println(String.format("SensorTest.close port:%s, type: %s", port, type));
-	}
-
-	@Override
-	public String toString() {
-		return "SensorTestWrapper{" + "port=" + port + ", type=" + type + '}';
-	}
+    @Override
+    public String toString() {
+        return "SensorTestWrapper{" + "port=" + port + ", type=" + type + '}';
+    }
 
 }

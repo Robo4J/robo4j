@@ -18,6 +18,8 @@ package com.robo4j.socket.http.test.utils;
 
 import com.robo4j.socket.http.util.SystemPropertyUtils;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
@@ -29,12 +31,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author Miro Wengner (@miragemiko)
  */
 class InternalUtilTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(InternalUtilTests.class);
 
     @Test
-    void testSeparator(){
-        String separator = SystemPropertyUtils.get("line.separator", "\n\n");
-        System.out.println("Separator: " + Arrays.asList(separator.toCharArray()));
+    void testSeparator() {
+        var separator = SystemPropertyUtils.get("line.separator", "\n\n");
 
+        LOGGER.info("Separator: {}", Arrays.asList(separator.toCharArray()));
         assertNotNull(separator.toCharArray());
 
     }

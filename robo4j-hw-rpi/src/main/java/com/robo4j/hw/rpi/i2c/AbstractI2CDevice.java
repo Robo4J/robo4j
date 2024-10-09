@@ -20,13 +20,14 @@ import com.pi4j.Pi4J;
 import com.pi4j.exception.InitializeException;
 import com.pi4j.io.i2c.I2C;
 import com.pi4j.io.i2c.I2CConfig;
-import com.pi4j.plugin.linuxfs.LinuxFsPlugin;
 import com.pi4j.plugin.linuxfs.provider.i2c.LinuxFsI2CProviderImpl;
+import com.robo4j.hw.rpi.i2c.magnetometer.MagnetometerLSM303Device;
 import com.robo4j.hw.rpi.utils.I2cBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 /**
  * Abstract super class for I2C devices.
@@ -35,6 +36,7 @@ import java.util.logging.Logger;
  * @author Miro Wengner (@miragemiko)
  */
 public abstract class AbstractI2CDevice {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractI2CDevice.class);
     private static final String PROVIDER_NAME = "linuxfs-i2c";
     private final I2cBus bus;
     private final int address;
@@ -69,7 +71,7 @@ public abstract class AbstractI2CDevice {
             var provider = new LinuxFsI2CProviderImpl();
             provider.initialize(pi4jRpiContext);
             this.i2C = provider.create(i2CConfig);
-            System.out.println("create i2c device");
+            LOGGER.info("create i2c device");
         } catch (InitializeException e) {
             throw new IOException("Unsupported i2c config", e);
         }
@@ -91,15 +93,6 @@ public abstract class AbstractI2CDevice {
      */
     public final int getAddress() {
         return address;
-    }
-
-    /**
-     * Convenience method to get a logger for the specific class.
-     *
-     * @return a logger for this class.
-     */
-    public Logger getLogger() {
-        return Logger.getLogger(this.getClass().getName());
     }
 
     /**

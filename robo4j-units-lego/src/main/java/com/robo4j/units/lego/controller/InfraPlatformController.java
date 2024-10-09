@@ -20,10 +20,11 @@ import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.lego.enums.LegoPlatformMessageTypeEnum;
 import com.robo4j.units.lego.infra.InfraSensorMessage;
 import com.robo4j.units.lego.utils.LegoUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.EnumSet;
 import java.util.Random;
@@ -35,7 +36,6 @@ import java.util.Random;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class InfraPlatformController extends RoboUnit<InfraSensorMessage> {
-
     public static final String PROP_TARGET = "target";
     public static final String PROP_DISTANCE_MIN = "distanceMin";
     public static final String PROP_DISTANCE_OPTIMAL = "distanceOptimal";
@@ -44,18 +44,17 @@ public class InfraPlatformController extends RoboUnit<InfraSensorMessage> {
     private static final float DISTANCE_OPTIMAL = 50f;
     private static final float DISTANCE_MAX = 100f;
     private static final Random random = new Random();
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(InfraPlatformController.class);
     private static final EnumSet<LegoPlatformMessageTypeEnum> rotationTypes = EnumSet.of(LegoPlatformMessageTypeEnum.LEFT, LegoPlatformMessageTypeEnum.RIGHT);
-
     private float minDistance;
     private float optDistance;
     private float maxDistance;
     private String target;
     private LegoPlatformMessageTypeEnum currentMessage = LegoPlatformMessageTypeEnum.STOP;
 
-	public InfraPlatformController(RoboContext context, String id) {
-		super(InfraSensorMessage.class, context, id);
-	}
+    public InfraPlatformController(RoboContext context, String id) {
+        super(InfraSensorMessage.class, context, id);
+    }
 
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
@@ -74,9 +73,9 @@ public class InfraPlatformController extends RoboUnit<InfraSensorMessage> {
     public void onMessage(InfraSensorMessage message) {
         final String value = LegoUtils.parseOneElementString(message.getDistance());
         final float distanceValue = LegoUtils.parseFloatStringWithInfinityDefault(value, maxDistance);
-        if(rotationTypes.contains(currentMessage) && distanceValue < optDistance){
-            SimpleLoggingUtil.debug(getClass(), String.format("%s : adjusting platform distance: %f", getClass(), distanceValue));
-        } else if(distanceValue > minDistance){
+        if (rotationTypes.contains(currentMessage) && distanceValue < optDistance) {
+            LOGGER.info("adjusting platform distance: {}", distanceValue);
+        } else if (distanceValue > minDistance) {
             sendPlatformMessage(LegoPlatformMessageTypeEnum.MOVE);
         } else {
             int randomValue = random.nextInt(2) + 3;
@@ -92,8 +91,8 @@ public class InfraPlatformController extends RoboUnit<InfraSensorMessage> {
     }
 
 
-    private void sendPlatformMessage(LegoPlatformMessageTypeEnum type){
-        if(!currentMessage.equals(type)){
+    private void sendPlatformMessage(LegoPlatformMessageTypeEnum type) {
+        if (!currentMessage.equals(type)) {
             currentMessage = type;
             getContext().getReference(target).sendMessage(type);
         }

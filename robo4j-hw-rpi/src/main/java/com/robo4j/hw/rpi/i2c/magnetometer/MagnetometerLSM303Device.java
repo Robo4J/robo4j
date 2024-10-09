@@ -22,6 +22,8 @@ import com.robo4j.hw.rpi.utils.I2cBus;
 import com.robo4j.math.geometry.Matrix3f;
 import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.math.geometry.Tuple3i;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -34,6 +36,7 @@ import java.io.IOException;
  */
 // FIXME(Marcus/Dec 5, 2016): Verify that this one works.
 public class MagnetometerLSM303Device extends AbstractI2CDevice implements ReadableDevice<Tuple3f> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MagnetometerLSM303Device.class);
     private static final int DEFAULT_I2C_ADDRESS = 0x1e;
     private static final int CRA_REG_M = 0x00;
     private static final int CRB_REG_M = 0x01;
@@ -167,7 +170,7 @@ public class MagnetometerLSM303Device extends AbstractI2CDevice implements Reada
 //		int n = i2CConfig.read(OUT_X_H_M, data, 0, RESULT_BUFFER_SIZE);
         int n = readBufferByAddress(OUT_X_H_M, data, 0, RESULT_BUFFER_SIZE);
         if (n != RESULT_BUFFER_SIZE) {
-            getLogger().warning("Failed to read all data from accelerometer. Should have read 6, could only read " + n);
+            LOGGER.warn("Failed to read all data from accelerometer. Should have read 6, could only read {}", n);
         }
         // Yep, this is indeed the correct order ;)
         rawData.x = read16bitSigned(data, 0);

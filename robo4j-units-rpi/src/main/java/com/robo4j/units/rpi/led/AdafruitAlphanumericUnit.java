@@ -17,19 +17,20 @@
 
 package com.robo4j.units.rpi.led;
 
-import java.io.IOException;
-
 import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AbstractBackpack;
 import com.robo4j.hw.rpi.i2c.adafruitbackpack.AlphanumericDevice;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.rpi.I2CRoboUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * AdafruitAlphanumericUnit
- *
+ * <p>
  * This version of the LED backpack is designed for two dual 14-segment
  * "Alphanumeric" displays. These 14-segment displays normally require 18 pins
  * (4 'characters' and 14 total segments each) This backpack solves the
@@ -38,60 +39,61 @@ import com.robo4j.units.rpi.I2CRoboUnit;
  * controller chip takes care of everything, drawing all the LEDs in the
  * background. All you have to do is write data to it using the 2-pin I2C
  * interface
- *
+ * <p>
  * see https://learn.adafruit.com/adafruit-led-backpack/0-54-alphanumeric
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class AdafruitAlphanumericUnit extends I2CRoboUnit<AlphaNumericMessage> {
-	private AlphanumericDevice device;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdafruitAlphanumericUnit.class);
+    private AlphanumericDevice device;
 
-	public AdafruitAlphanumericUnit(RoboContext context, String id) {
-		super(AlphaNumericMessage.class, context, id);
-	}
+    public AdafruitAlphanumericUnit(RoboContext context, String id) {
+        super(AlphaNumericMessage.class, context, id);
+    }
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		super.onInitialization(configuration);
-		int brightness = configuration.getInteger(AbstractI2CBackpackUnit.ATTRIBUTE_BRIGHTNESS, AbstractBackpack.DEFAULT_BRIGHTNESS);
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        super.onInitialization(configuration);
+        int brightness = configuration.getInteger(AbstractI2CBackpackUnit.ATTRIBUTE_BRIGHTNESS, AbstractBackpack.DEFAULT_BRIGHTNESS);
 
-		try {
-			device = new AlphanumericDevice(getBus(), getAddress(), brightness);
-		} catch (IOException e) {
-			throw new ConfigurationException("Failed to instantiate device", e);
-		}
-	}
+        try {
+            device = new AlphanumericDevice(getBus(), getAddress(), brightness);
+        } catch (IOException e) {
+            throw new ConfigurationException("Failed to instantiate device", e);
+        }
+    }
 
-	@Override
-	public void onMessage(AlphaNumericMessage message) {
-		switch (message.getCommand()) {
-		case CLEAR:
-			device.clear();
-			break;
-		case PAINT:
-			render(message);
-			break;
-		case DISPLAY:
-			render(message);
-			device.display();
-			break;
-		default:
-			SimpleLoggingUtil.error(getClass(), String.format("Illegal message: %s", message));
-		}
-	}
+    @Override
+    public void onMessage(AlphaNumericMessage message) {
+        switch (message.getCommand()) {
+            case CLEAR:
+                device.clear();
+                break;
+            case PAINT:
+                render(message);
+                break;
+            case DISPLAY:
+                render(message);
+                device.display();
+                break;
+            default:
+                LOGGER.error("Illegal message: {}", message);
+        }
+    }
 
-	private void render(AlphaNumericMessage message) {
-		if (message.getStartPosition() == -1) {
-			for (int i = 0; i < message.getCharacters().length; i++) {
-				device.addCharacter((char) message.getCharacters()[i], message.getDots()[i]);
-			}
-		} else {
-			for (int i = 0; i < message.getCharacters().length; i++) {
-				device.setCharacter((message.getStartPosition() + i) % device.getNumberOfCharacters(), (char) message.getCharacters()[i],
-						message.getDots()[i]);
-			}
-		}
+    private void render(AlphaNumericMessage message) {
+        if (message.getStartPosition() == -1) {
+            for (int i = 0; i < message.getCharacters().length; i++) {
+                device.addCharacter((char) message.getCharacters()[i], message.getDots()[i]);
+            }
+        } else {
+            for (int i = 0; i < message.getCharacters().length; i++) {
+                device.setCharacter((message.getStartPosition() + i) % device.getNumberOfCharacters(), (char) message.getCharacters()[i],
+                        message.getDots()[i]);
+            }
+        }
 
-	}
+    }
 }

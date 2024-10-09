@@ -18,8 +18,8 @@ package com.robo4j.units.lego;
 
 import com.robo4j.units.lego.enums.PlateButtonEnum;
 import org.junit.jupiter.api.Test;
-
-import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -30,11 +30,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author Miro Wengner (@miragemiko)
  */
 class BrickButtonTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BrickButtonTests.class);
 
     @Test
-    void basicButtonPlateTest(){
-        Set<String> buttonNames = PlateButtonEnum.getButtonNames();
-        System.out.println("buttonNames: " + buttonNames);
+    void basicButtonPlateTest() {
+        var buttonNames = PlateButtonEnum.getButtonNames();
+
+        LOGGER.info("buttonNames: {}", buttonNames);
         assertNotNull(buttonNames);
 
     }

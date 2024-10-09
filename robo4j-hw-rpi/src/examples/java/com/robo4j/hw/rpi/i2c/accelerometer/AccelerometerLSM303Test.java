@@ -16,52 +16,55 @@
  */
 package com.robo4j.hw.rpi.i2c.accelerometer;
 
-import java.io.IOException;
-
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
 import com.robo4j.math.geometry.Tuple3f;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Example useful to check if your accelerometer is working properly.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class AccelerometerLSM303Test {
-	public static void main(String[] args) throws IOException, InterruptedException {
-		ReadableDevice<Tuple3f> device = new AccelerometerLSM303Device();		
-		getReading(device, "Place the device in the position(s) you want to measure");
-	}
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccelerometerLSM303Test.class);
 
-	private static void getReading(ReadableDevice<Tuple3f> device, String message)
-			throws IOException, InterruptedException {
-		prompt(message);
-		print(readValues(device));
-	}
+    public static void main(String[] args) throws IOException, InterruptedException {
+        ReadableDevice<Tuple3f> device = new AccelerometerLSM303Device();
+        getReading(device, "Place the device in the position(s) you want to measure");
+    }
 
-	private static void print(Stats stats) {
-		System.out.println("Result:");
-		System.out.println(stats);
-	}
+    private static void getReading(ReadableDevice<Tuple3f> device, String message)
+            throws IOException, InterruptedException {
+        prompt(message);
+        print(readValues(device));
+    }
 
-	private static void prompt(String msg) throws IOException {
-		System.out.println(msg);
-		System.out.println("Press <Enter> to continue!");
-		System.in.read();
-	}
+    private static void print(Stats stats) {
+        LOGGER.debug("Result:{}", stats);
+    }
 
-	private static Stats readValues(ReadableDevice<Tuple3f> device) throws IOException, InterruptedException {
-		// TODO: change print...
-		Stats stats = new Stats();
-		for (int i = 0; i < 250; i++) {
-			Tuple3f fl = device.read();
-			stats.addValue(fl);
-			Thread.sleep(20);
-			if (i % 25 == 0) {
-				System.out.print(".");
-			}
-		}
-		System.out.println("");
-		return stats;
-	}
+    private static void prompt(String msg) throws IOException {
+        LOGGER.debug(msg);
+        LOGGER.debug("Press <Enter> to continue!");
+        System.in.read();
+    }
+
+    private static Stats readValues(ReadableDevice<Tuple3f> device) throws IOException, InterruptedException {
+        // TODO: change print...
+        Stats stats = new Stats();
+        for (int i = 0; i < 250; i++) {
+            Tuple3f fl = device.read();
+            stats.addValue(fl);
+            Thread.sleep(20);
+            if (i % 25 == 0) {
+                LOGGER.debug(".");
+            }
+        }
+        LOGGER.debug("");
+        return stats;
+    }
 }
