@@ -16,8 +16,6 @@
  */
 package com.robo4j.units.rpi.lcd;
 
-import java.io.IOException;
-
 import com.robo4j.ConfigurationException;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
@@ -28,101 +26,105 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Button;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonListener;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonPressedObserver;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.rpi.I2CRoboUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * A {@link RoboUnit} for the button part of the Adafruit 16x2 character LCD
  * shield. Having a separate unit allows the buttons to be used independently of
  * the LCD.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class AdafruitButtonUnit extends I2CRoboUnit<Object> {
-	private AdafruitLcd lcd;
-	private ButtonPressedObserver observer;
-	private String target;
-	private ButtonListener buttonListener;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdafruitButtonUnit.class);
+    private AdafruitLcd lcd;
+    private ButtonPressedObserver observer;
+    private String target;
+    private ButtonListener buttonListener;
 
-	public AdafruitButtonUnit(RoboContext context, String id) {
-		super(Object.class, context, id);
-	}
+    public AdafruitButtonUnit(RoboContext context, String id) {
+        super(Object.class, context, id);
+    }
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		super.onInitialization(configuration);
-		target = configuration.getString("target", null);
-		if (target == null) {
-			throw ConfigurationException.createMissingConfigNameException("target");
-		}
-		try {
-			lcd = AdafruitLcdUnit.getLCD(getBus(), getAddress());
-		} catch (IOException e) {
-			throw new ConfigurationException("Could not initialize LCD shield", e);
-		}
-		setState(LifecycleState.INITIALIZED);
-	}
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        super.onInitialization(configuration);
+        target = configuration.getString("target", null);
+        if (target == null) {
+            throw ConfigurationException.createMissingConfigNameException("target");
+        }
+        try {
+            lcd = AdafruitLcdUnit.getLCD(getBus(), getAddress());
+        } catch (IOException e) {
+            throw new ConfigurationException("Could not initialize LCD shield", e);
+        }
+        setState(LifecycleState.INITIALIZED);
+    }
 
-	@Override
-	public void start() {
-		final RoboReference<AdafruitButtonEnum> targetRef = getContext().getReference(target);
-		setState(LifecycleState.STARTING);
-		observer = new ButtonPressedObserver(lcd);
-		buttonListener = (Button button) -> {
-			if (getState() == LifecycleState.STARTED) {
-				try {
-					switch (button) {
-					case UP:
-						targetRef.sendMessage(AdafruitButtonEnum.UP);
-						break;
-					case DOWN:
-						targetRef.sendMessage(AdafruitButtonEnum.DOWN);
-						break;
-					case RIGHT:
-						targetRef.sendMessage(AdafruitButtonEnum.LEFT);
-						break;
-					case LEFT:
-						targetRef.sendMessage(AdafruitButtonEnum.RIGHT);
-						break;
-					case SELECT:
-						targetRef.sendMessage(AdafruitButtonEnum.SELECT);
-						break;
-					default:
-						lcd.clear();
-						lcd.setText(String.format("Button %s\nis not in use...", button.toString()));
-					}
-				} catch (IOException e) {
-					handleException(e);
-				}
-			}
-		};
+    @Override
+    public void start() {
+        final RoboReference<AdafruitButtonEnum> targetRef = getContext().getReference(target);
+        setState(LifecycleState.STARTING);
+        observer = new ButtonPressedObserver(lcd);
+        buttonListener = (Button button) -> {
+            if (getState() == LifecycleState.STARTED) {
+                try {
+                    switch (button) {
+                        case UP:
+                            targetRef.sendMessage(AdafruitButtonEnum.UP);
+                            break;
+                        case DOWN:
+                            targetRef.sendMessage(AdafruitButtonEnum.DOWN);
+                            break;
+                        case RIGHT:
+                            targetRef.sendMessage(AdafruitButtonEnum.LEFT);
+                            break;
+                        case LEFT:
+                            targetRef.sendMessage(AdafruitButtonEnum.RIGHT);
+                            break;
+                        case SELECT:
+                            targetRef.sendMessage(AdafruitButtonEnum.SELECT);
+                            break;
+                        default:
+                            lcd.clear();
+                            lcd.setText(String.format("Button %s\nis not in use...", button.toString()));
+                    }
+                } catch (IOException e) {
+                    handleException(e);
+                }
+            }
+        };
 
-		observer.addButtonListener(buttonListener);
-		setState(LifecycleState.STARTED);
-	}
+        observer.addButtonListener(buttonListener);
+        setState(LifecycleState.STARTED);
+    }
 
-	@Override
-	public void stop() {
-		observer.removeButtonListener(buttonListener);
-		observer = null;
-		buttonListener = null;
-	}
+    @Override
+    public void stop() {
+        observer.removeButtonListener(buttonListener);
+        observer = null;
+        buttonListener = null;
+    }
 
-	@Override
-	public void shutdown() {
-		try {
-			lcd.stop();
-		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "Failed to disconnect LCD", e);
-		}
-	}
+    @Override
+    public void shutdown() {
+        try {
+            lcd.stop();
+        } catch (IOException e) {
+            LOGGER.error("Failed to disconnect LCD:{}", e.getMessage(), e);
+        }
+    }
 
 
-	//Private Methods
-	private void handleException(IOException e) {
-		setState(LifecycleState.STOPPING);
-		shutdown();
-		setState(LifecycleState.FAILED);
-	}
+    //Private Methods
+    private void handleException(IOException e) {
+        setState(LifecycleState.STOPPING);
+        shutdown();
+        setState(LifecycleState.FAILED);
+    }
 }

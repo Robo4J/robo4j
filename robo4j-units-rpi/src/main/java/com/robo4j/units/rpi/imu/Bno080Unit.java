@@ -28,7 +28,8 @@ import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataListener;
 import com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportId;
-import com.robo4j.logging.SimpleLoggingUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,92 +43,92 @@ import java.util.List;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class Bno080Unit extends RoboUnit<BnoRequest> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Bno080Unit.class);
+    public static final String PROPERTY_REPORT_TYPE = "reportType";
+    public static final String PROPERTY_REPORT_DELAY = "reportDelay";
 
-	public static final String PROPERTY_REPORT_TYPE = "reportType";
-	public static final String PROPERTY_REPORT_DELAY = "reportDelay";
+    private static final class BnoListenerEvent implements DataListener {
+        private final RoboReference<DataEvent3f> target;
 
-	private static final class BnoListenerEvent implements DataListener {
-		private final RoboReference<DataEvent3f> target;
+        BnoListenerEvent(RoboReference<DataEvent3f> target) {
+            this.target = target;
+        }
 
-		BnoListenerEvent(RoboReference<DataEvent3f> target) {
-			this.target = target;
-		}
+        @Override
+        public void onResponse(DataEvent3f event) {
+            target.sendMessage(event);
+        }
+    }
 
-		@Override
-		public void onResponse(DataEvent3f event) {
-			target.sendMessage(event);
-		}
-	}
+    private final List<BnoListenerEvent> listeners = new ArrayList<>();
+    private Bno080Device device;
 
-	private final List<BnoListenerEvent> listeners = new ArrayList<>();
-	private Bno080Device device;
+    public Bno080Unit(RoboContext context, String id) {
+        super(BnoRequest.class, context, id);
+    }
 
-	public Bno080Unit(RoboContext context, String id) {
-		super(BnoRequest.class, context, id);
-	}
+    // TODO review field purpose
+    private int reportDelay;
+    private SensorReportId report;
 
-	// TODO review field purpose
-	private int reportDelay;
-	private SensorReportId report;
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        final String reportType = configuration.getString(PROPERTY_REPORT_TYPE, null);
+        report = SensorReportId.valueOf(reportType.toUpperCase());
+        if (report.equals(SensorReportId.NONE)) {
+            throw new ConfigurationException(PROPERTY_REPORT_TYPE);
+        }
 
-		final String reportType = configuration.getString(PROPERTY_REPORT_TYPE, null);
-		report = SensorReportId.valueOf(reportType.toUpperCase());
-		if (report.equals(SensorReportId.NONE)) {
-			throw new ConfigurationException(PROPERTY_REPORT_TYPE);
-		}
+        final Integer delay = configuration.getInteger(PROPERTY_REPORT_DELAY, null);
+        if (delay == null || delay <= 0) {
+            throw new ConfigurationException(PROPERTY_REPORT_DELAY);
+        }
+        this.reportDelay = delay;
 
-		final Integer delay = configuration.getInteger(PROPERTY_REPORT_DELAY, null);
-		if (delay == null || delay <= 0) {
-			throw new ConfigurationException(PROPERTY_REPORT_DELAY);
-		}
-		this.reportDelay = delay;
+        try {
+            // TODO: make device configurable
+            device = Bno080Factory.createDefaultSPIDevice();
+        } catch (IOException | InterruptedException e) {
+            throw new ConfigurationException("Could not initiate device", e);
+        }
+        device.start(report, reportDelay);
+    }
 
-		try {
-			// TODO: make device configurable
-			device = Bno080Factory.createDefaultSPIDevice();
-		} catch (IOException | InterruptedException e) {
-			throw new ConfigurationException("Could not initiate device", e);
-		}
-		device.start(report, reportDelay);
-	}
+    @Override
+    public void onMessage(BnoRequest message) {
+        RoboReference<DataEvent3f> target = message.getTarget();
+        switch (message.getListenerAction()) {
+            case REGISTER:
+                register(target);
+                break;
+            case UNREGISTER:
+                unregister(target);
+                break;
+            default:
+                LOGGER.error("Unknown operation: {}", message);
+        }
 
-	@Override
-	public void onMessage(BnoRequest message) {
-		RoboReference<DataEvent3f> target = message.getTarget();
-		switch (message.getListenerAction()) {
-		case REGISTER:
-			register(target);
-			break;
-		case UNREGISTER:
-			unregister(target);
-			break;
-		default:
-			SimpleLoggingUtil.error(getClass(), String.format("Unknown operation: %s", message));
-		}
+    }
 
-	}
+    @Override
+    public void shutdown() {
+        super.shutdown();
+        device.shutdown();
+    }
 
-	@Override
-	public void shutdown() {
-		super.shutdown();
-		device.shutdown();
-	}
+    private synchronized void register(RoboReference<DataEvent3f> target) {
+        BnoListenerEvent event = new BnoListenerEvent(target);
+        listeners.add(event);
+        device.addListener(event);
+    }
 
-	private synchronized void register(RoboReference<DataEvent3f> target) {
-		BnoListenerEvent event = new BnoListenerEvent(target);
-		listeners.add(event);
-		device.addListener(event);
-	}
-
-	private synchronized void unregister(RoboReference<DataEvent3f> target) {
-		for (BnoListenerEvent l : new ArrayList<>(listeners)) {
-			if (target.equals(l.target)) {
-				listeners.remove(l);
-				device.removeListener(l);
-			}
-		}
-	}
+    private synchronized void unregister(RoboReference<DataEvent3f> target) {
+        for (BnoListenerEvent l : new ArrayList<>(listeners)) {
+            if (target.equals(l.target)) {
+                listeners.remove(l);
+                device.removeListener(l);
+            }
+        }
+    }
 }
