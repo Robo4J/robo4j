@@ -16,8 +16,9 @@
  */
 package com.robo4j.socket.http.units;
 
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.reflect.ReflectionScan;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -26,83 +27,85 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Registry for codecs.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class CodecRegistry {
-	private final Map<Class<?>, SocketEncoder<?, ?>> encoders = new ConcurrentHashMap<>();
-	private final Map<Class<?>, SocketDecoder<?, ?>> decoders = new ConcurrentHashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(CodecRegistry.class);
+    private final Map<Class<?>, SocketEncoder<?, ?>> encoders = new ConcurrentHashMap<>();
+    private final Map<Class<?>, SocketDecoder<?, ?>> decoders = new ConcurrentHashMap<>();
 
-	public CodecRegistry() {
-		registerDefaults();
-	}
+    public CodecRegistry() {
+        registerDefaults();
+    }
 
-	public CodecRegistry(String... packages) {
-		this();
-		scan(Thread.currentThread().getContextClassLoader(), packages);
-	}
+    public CodecRegistry(String... packages) {
+        this();
+        scan(Thread.currentThread().getContextClassLoader(), packages);
+    }
 
-	public CodecRegistry(ClassLoader classLoader, String... packages){
-		this();
-		scan(classLoader, packages);
-	}
+    public CodecRegistry(ClassLoader classLoader, String... packages) {
+        this();
+        scan(classLoader, packages);
+    }
 
-	private void scan(ClassLoader loader, String... packages) {
-		ReflectionScan scan = new ReflectionScan(loader);
-		processClasses(loader, scan.scanForEntities(packages));
-	}
+    private void scan(ClassLoader loader, String... packages) {
+        ReflectionScan scan = new ReflectionScan(loader);
+        processClasses(loader, scan.scanForEntities(packages));
+    }
 
-	public boolean containsEncoder(Class<?> clazz){
-		return encoders.containsKey(clazz);
-	}
+    public boolean containsEncoder(Class<?> clazz) {
+        return encoders.containsKey(clazz);
+    }
 
-	public boolean containsDecoced(Class<?> clazz){
-		return decoders.containsKey(clazz);
-	}
+    public boolean containsDecoced(Class<?> clazz) {
+        return decoders.containsKey(clazz);
+    }
 
-	public boolean isEmpty(){
-		return encoders.isEmpty() && decoders.isEmpty();
-	}
+    public boolean isEmpty() {
+        return encoders.isEmpty() && decoders.isEmpty();
+    }
 
-	@SuppressWarnings("unchecked")
-	public <T, R> SocketEncoder<T, R> getEncoder(Class<T> type) {
-		return (SocketEncoder<T, R>) encoders.get(type);
-	}
+    @SuppressWarnings("unchecked")
+    public <T, R> SocketEncoder<T, R> getEncoder(Class<T> type) {
+        return (SocketEncoder<T, R>) encoders.get(type);
+    }
 
-	@SuppressWarnings("unchecked")
-	public <T, R> SocketDecoder<R, T> getDecoder(Class<T> type) {
-		return (SocketDecoder<R, T>) decoders.get(type);
-	}
-	
-	private void registerDefaults() {
-		scan(CodecRegistry.class.getClassLoader(), "com.robo4j.socket.http.codec");
-	}
+    @SuppressWarnings("unchecked")
+    public <T, R> SocketDecoder<R, T> getDecoder(Class<T> type) {
+        return (SocketDecoder<R, T>) decoders.get(type);
+    }
 
-	private void processClasses(ClassLoader loader, List<String> allClasses) {
+    private void registerDefaults() {
+        scan(CodecRegistry.class.getClassLoader(), "com.robo4j.socket.http.codec");
+    }
 
-		for (String className : allClasses) {
-			try {
-				Class<?> loadedClass = loader.loadClass(className);
-				if (loadedClass.isAnnotationPresent(HttpProducer.class)) {
-					addInstance(loadedClass);
-				}
-			} catch (InstantiationException | ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-				SimpleLoggingUtil.error(getClass(), "Failed to load encoder/decoder", e);
-			}
-		}
-	}
+    private void processClasses(ClassLoader loader, List<String> allClasses) {
 
-	private void addInstance(Class<?> loadedClass) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-		Object instance = loadedClass.getDeclaredConstructor().newInstance();
-		if (instance instanceof SocketEncoder) {
-			SocketEncoder<?, ?> encoder = (SocketEncoder<?, ?>) instance;
-			encoders.put(encoder.getEncodedClass(), encoder);
-		}
-		// Note, not "else if". People are free to implement both in the same
-		if (instance instanceof SocketDecoder) {
-			SocketDecoder<?, ?> decoder = (SocketDecoder<?, ?>) instance;
-			decoders.put(decoder.getDecodedClass(), decoder);
-		}
-	}	
+        for (String className : allClasses) {
+            try {
+                Class<?> loadedClass = loader.loadClass(className);
+                if (loadedClass.isAnnotationPresent(HttpProducer.class)) {
+                    addInstance(loadedClass);
+                }
+            } catch (InstantiationException | ClassNotFoundException | IllegalAccessException | NoSuchMethodException |
+                     InvocationTargetException e) {
+                LOGGER.error("Failed to load encoder/decoder:{}", e.getMessage(), e);
+            }
+        }
+    }
+
+    private void addInstance(Class<?> loadedClass) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Object instance = loadedClass.getDeclaredConstructor().newInstance();
+        if (instance instanceof SocketEncoder) {
+            SocketEncoder<?, ?> encoder = (SocketEncoder<?, ?>) instance;
+            encoders.put(encoder.getEncodedClass(), encoder);
+        }
+        // Note, not "else if". People are free to implement both in the same
+        if (instance instanceof SocketDecoder) {
+            SocketDecoder<?, ?> decoder = (SocketDecoder<?, ?>) instance;
+            decoders.put(decoder.getDecodedClass(), decoder);
+        }
+    }
 }

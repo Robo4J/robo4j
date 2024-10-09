@@ -16,7 +16,8 @@
  */
 package com.robo4j.socket.http.channel;
 
-import com.robo4j.logging.SimpleLoggingUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
@@ -30,25 +31,26 @@ import java.nio.channels.SocketChannel;
  */
 public class AcceptSelectionKeyHandler implements SelectionKeyHandler {
 
-	private final SelectionKey key;
-	private final int bufferCapacity;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AcceptSelectionKeyHandler.class);
 
-	public AcceptSelectionKeyHandler(SelectionKey key, int bufferCapacity) {
-		this.key = key;
-		this.bufferCapacity = bufferCapacity;
-	}
+    private final SelectionKey key;
+    private final int bufferCapacity;
 
-	@Override
-	public SelectionKey handle() {
-		try {
-			ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
-			SocketChannel channel = serverChannel.accept();
-			serverChannel.socket().setReceiveBufferSize(bufferCapacity);
-			channel.configureBlocking(false);
-			channel.register(key.selector(), SelectionKey.OP_READ);
-		} catch (Exception e) {
-			SimpleLoggingUtil.error(getClass(), "handle accept", e);
-		}
-		return key;
-	}
+    public AcceptSelectionKeyHandler(SelectionKey key, int bufferCapacity) {
+        this.key = key;
+        this.bufferCapacity = bufferCapacity;
+    }
+
+    @Override
+    public SelectionKey handle() {
+        try (ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel()) {
+            SocketChannel channel = serverChannel.accept();
+            serverChannel.socket().setReceiveBufferSize(bufferCapacity);
+            channel.configureBlocking(false);
+            channel.register(key.selector(), SelectionKey.OP_READ);
+        } catch (Exception e) {
+            LOGGER.error("handle accept:{}", e.getMessage(), e);
+        }
+        return key;
+    }
 }

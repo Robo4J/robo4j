@@ -21,9 +21,10 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.util.RoboHttpUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -36,7 +37,7 @@ import java.util.Map;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class HttpClientNetConfigUnit extends RoboUnit<Map> {
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientNetConfigUnit.class);
     public static final String PROPERTY_TARGET = "target";
     private String target;
 
@@ -55,7 +56,7 @@ public class HttpClientNetConfigUnit extends RoboUnit<Map> {
 	@Override
 	public void onMessage(Map message) {
 		Map<String, String> map = (Map<String, String>) message;
-		SimpleLoggingUtil.info(getClass(), "RECEIVED: " + map);
+        LOGGER.info("RECEIVED: {}", map);
 
 		String host = map.get(RoboHttpUtils.PROPERTY_HOST);
 		Integer port = Integer.valueOf(map.get(RoboHttpUtils.PROPERTY_SOCKET_PORT));

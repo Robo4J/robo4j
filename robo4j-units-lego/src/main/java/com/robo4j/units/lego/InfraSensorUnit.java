@@ -26,9 +26,10 @@ import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
 import com.robo4j.hw.lego.provider.SensorProvider;
 import com.robo4j.hw.lego.wrapper.SensorWrapper;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.lego.infra.InfraSensorEnum;
 import com.robo4j.units.lego.infra.InfraSensorMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -40,14 +41,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class InfraSensorUnit extends RoboUnit<String> {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(InfraSensorUnit.class);
     public static final String PROPERTY_SENSOR_PORT = "sensorPort";
     public static final String PROPERTY_TARGET = "target";
     public static final String PROPERTY_SCAN_INIT_DELAY = "scanInitDelay";
     public static final String PROPERTY_SCAN_PERIOD = "scanPeriod";
     public static final int VALUE_SCAN_INIT_DELAY = 1000;
     public static final int VALUE_SCAN_PERIOD = 800;
-    private volatile AtomicBoolean active = new AtomicBoolean();
+    private final AtomicBoolean active = new AtomicBoolean();
     private ILegoSensor sensor;
     private String target;
     private int scanInitialDelay;
@@ -82,7 +83,7 @@ public class InfraSensorUnit extends RoboUnit<String> {
 
     }
 
-    private void processMessage(String message){
+    private void processMessage(String message) {
         final InfraSensorEnum type = InfraSensorEnum.parseValue(message);
         switch (type) {
             case START:
@@ -93,7 +94,7 @@ public class InfraSensorUnit extends RoboUnit<String> {
                 stopMeasurement();
                 break;
             default:
-                SimpleLoggingUtil.error(getClass(), String.format("not supported value: %s", message));
+                LOGGER.error("not supported value: {}", message);
         }
     }
 

@@ -26,70 +26,66 @@ import com.robo4j.hw.lego.enums.AnalogPortEnum;
 import com.robo4j.hw.lego.enums.MotorTypeEnum;
 import com.robo4j.hw.lego.provider.MotorProvider;
 import com.robo4j.hw.lego.wrapper.MotorWrapper;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.lego.enums.MotorRotationEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class SingleMotorUnit extends AbstractMotorUnit<MotorRotationEnum> implements RoboReference<MotorRotationEnum> {
-	protected volatile ILegoMotor motor;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SingleMotorUnit.class);
+    protected volatile ILegoMotor motor;
 
-	public SingleMotorUnit(RoboContext context, String id) {
-		super(MotorRotationEnum.class, context, id);
-	}
+    public SingleMotorUnit(RoboContext context, String id) {
+        super(MotorRotationEnum.class, context, id);
+    }
 
-	/**
-	 *
-	 * @param message
-	 *            the message received by this unit.
-	 *
-	 */
-	@Override
-	public void onMessage(MotorRotationEnum message) {
-		processPlatformMessage(message);
-	}
+    /**
+     * @param message the message received by this unit.
+     */
+    @Override
+    public void onMessage(MotorRotationEnum message) {
+        processPlatformMessage(message);
+    }
 
-	@Override
-	public void shutdown() {
-		setState(LifecycleState.SHUTTING_DOWN);
-		motor.close();
-		setState(LifecycleState.SHUTDOWN);
-	}
+    @Override
+    public void shutdown() {
+        setState(LifecycleState.SHUTTING_DOWN);
+        motor.close();
+        setState(LifecycleState.SHUTDOWN);
+    }
 
-	/**
-	 *
-	 * @param configuration
-	 *            the {@link Configuration} provided.
-	 * @throws ConfigurationException
-	 *             exception
-	 */
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		setState(LifecycleState.UNINITIALIZED);
+    /**
+     * @param configuration the {@link Configuration} provided.
+     * @throws ConfigurationException exception
+     */
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        setState(LifecycleState.UNINITIALIZED);
 
-		String motorPort = configuration.getString("motorPort", AnalogPortEnum.A.getType());
-		Character motorType = configuration.getCharacter("motorType", MotorTypeEnum.NXT.getType());
+        String motorPort = configuration.getString("motorPort", AnalogPortEnum.A.getType());
+        Character motorType = configuration.getCharacter("motorType", MotorTypeEnum.NXT.getType());
 
-		MotorProvider motorProvider = new MotorProvider();
-		motor = new MotorWrapper<>(motorProvider, AnalogPortEnum.getByType(motorPort),
-				MotorTypeEnum.getByType(motorType));
-		setState(LifecycleState.INITIALIZED);
-	}
+        MotorProvider motorProvider = new MotorProvider();
+        motor = new MotorWrapper<>(motorProvider, AnalogPortEnum.getByType(motorPort),
+                MotorTypeEnum.getByType(motorType));
+        setState(LifecycleState.INITIALIZED);
+    }
 
-	// Private Methods
-	private void processPlatformMessage(MotorRotationEnum message) {
-		switch (message) {
-		case BACKWARD:
-		case FORWARD:
-		case STOP:
-			runEngine(motor, message);
-			break;
-		default:
-			SimpleLoggingUtil.error(getClass(), message + " not supported!");
-			throw new LegoUnitException("single motor command: " + message);
-		}
+    // Private Methods
+    private void processPlatformMessage(MotorRotationEnum message) {
+        switch (message) {
+            case BACKWARD:
+            case FORWARD:
+            case STOP:
+                runEngine(motor, message);
+                break;
+            default:
+                LOGGER.error("message:{} not supported!", message);
+                throw new LegoUnitException("single motor command: " + message);
+        }
 
-	}
+    }
 }

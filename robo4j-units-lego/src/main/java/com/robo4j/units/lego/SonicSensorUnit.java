@@ -26,9 +26,10 @@ import com.robo4j.hw.lego.enums.DigitalPortEnum;
 import com.robo4j.hw.lego.enums.SensorTypeEnum;
 import com.robo4j.hw.lego.provider.SensorProvider;
 import com.robo4j.hw.lego.wrapper.SensorWrapper;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.units.lego.sonic.SonicSensorEnum;
 import com.robo4j.units.lego.sonic.SonicSensorMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -41,83 +42,85 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class SonicSensorUnit extends RoboUnit<String> {
 
-	public static final String PROPERTY_SENSOR_PORT = "sensorPort";
-	public static final String PROPERTY_TARGET = "target";
-	public static final String PROPERTY_SCAN_INIT_DELAY = "scanInitDelay";
-	public static final String PROPERTY_SCAN_PERIOD = "scanPeriod";
-	public static final int VALUE_SCAN_INIT_DELAY = 1000;
-	public static final int VALUE_SCAN_PERIOD = 800;
-	private final AtomicBoolean active = new AtomicBoolean();
-	private ILegoSensor sensor;
-	private String target;
-	private int scanInitialDelay;
-	private int scanPeriod;
+    public static final String PROPERTY_SENSOR_PORT = "sensorPort";
+    public static final String PROPERTY_TARGET = "target";
+    public static final String PROPERTY_SCAN_INIT_DELAY = "scanInitDelay";
+    public static final String PROPERTY_SCAN_PERIOD = "scanPeriod";
+    public static final int VALUE_SCAN_INIT_DELAY = 1000;
+    public static final int VALUE_SCAN_PERIOD = 800;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SonicSensorUnit.class);
 
-	public SonicSensorUnit(RoboContext context, String id) {
-		super(String.class, context, id);
-	}
+    private final AtomicBoolean active = new AtomicBoolean();
+    private ILegoSensor sensor;
+    private String target;
+    private int scanInitialDelay;
+    private int scanPeriod;
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		setState(LifecycleState.UNINITIALIZED);
-		scanInitialDelay = configuration.getInteger(PROPERTY_SCAN_INIT_DELAY, VALUE_SCAN_INIT_DELAY);
-		scanPeriod = configuration.getInteger(PROPERTY_SCAN_PERIOD, VALUE_SCAN_PERIOD);
-		String port = configuration.getString(PROPERTY_SENSOR_PORT, null);
-		DigitalPortEnum sensorPort = DigitalPortEnum.getByType(port);
-		target = configuration.getString(PROPERTY_TARGET, null);
-		if (sensorPort == null) {
-			throw new ConfigurationException("sonic sensor port required: {S1,S2,S3,S4}");
-		}
-		if (target == null) {
-			throw new ConfigurationException("sonic sensor target required");
-		}
-		SensorProvider provider = new SensorProvider();
-		sensor = new SensorWrapper<>(provider, sensorPort, SensorTypeEnum.SONIC);
-		setState(LifecycleState.INITIALIZED);
-	}
+    public SonicSensorUnit(RoboContext context, String id) {
+        super(String.class, context, id);
+    }
 
-	@Override
-	public void onMessage(String message) {
-		processMessage(message);
-	}
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        setState(LifecycleState.UNINITIALIZED);
+        scanInitialDelay = configuration.getInteger(PROPERTY_SCAN_INIT_DELAY, VALUE_SCAN_INIT_DELAY);
+        scanPeriod = configuration.getInteger(PROPERTY_SCAN_PERIOD, VALUE_SCAN_PERIOD);
+        String port = configuration.getString(PROPERTY_SENSOR_PORT, null);
+        DigitalPortEnum sensorPort = DigitalPortEnum.getByType(port);
+        target = configuration.getString(PROPERTY_TARGET, null);
+        if (sensorPort == null) {
+            throw new ConfigurationException("sonic sensor port required: {S1,S2,S3,S4}");
+        }
+        if (target == null) {
+            throw new ConfigurationException("sonic sensor target required");
+        }
+        SensorProvider provider = new SensorProvider();
+        sensor = new SensorWrapper<>(provider, sensorPort, SensorTypeEnum.SONIC);
+        setState(LifecycleState.INITIALIZED);
+    }
+
+    @Override
+    public void onMessage(String message) {
+        processMessage(message);
+    }
 
 
-	private void processMessage(String message){
-		final SonicSensorEnum type = SonicSensorEnum.parseValue(message);
-		switch (type) {
-			case START:
-				active.set(true);
-				scheduleMeasurement();
-				break;
-			case STOP:
-				stopMeasurement();
-				break;
-			default:
-				SimpleLoggingUtil.error(getClass(), String.format("not supported value: %s", message));
-		}
-	}
+    private void processMessage(String message) {
+        final SonicSensorEnum type = SonicSensorEnum.parseValue(message);
+        switch (type) {
+            case START:
+                active.set(true);
+                scheduleMeasurement();
+                break;
+            case STOP:
+                stopMeasurement();
+                break;
+            default:
+                LOGGER.error("not supported value: {}", message);
+        }
+    }
 
-	private void scheduleMeasurement() {
-		if (active.get()) {
-			getContext().getScheduler().scheduleAtFixedRate(this::startMeasurement, scanInitialDelay, scanPeriod,
-					TimeUnit.MILLISECONDS);
-		}
-	}
+    private void scheduleMeasurement() {
+        if (active.get()) {
+            getContext().getScheduler().scheduleAtFixedRate(this::startMeasurement, scanInitialDelay, scanPeriod,
+                    TimeUnit.MILLISECONDS);
+        }
+    }
 
-	private void startMeasurement() {
-		sensor.activate(true);
-		String data = sensor.getData();
-		sendTargetMessage(data);
-		sensor.activate(false);
-	}
+    private void startMeasurement() {
+        sensor.activate(true);
+        String data = sensor.getData();
+        sendTargetMessage(data);
+        sensor.activate(false);
+    }
 
-	private void stopMeasurement() {
-		active.set(false);
-		sensor.activate(false);
-	}
+    private void stopMeasurement() {
+        active.set(false);
+        sensor.activate(false);
+    }
 
-	private void sendTargetMessage(String distance) {
-		SonicSensorMessage message = new SonicSensorMessage(distance);
-		getContext().getReference(target).sendMessage(message);
-	}
+    private void sendTargetMessage(String distance) {
+        SonicSensorMessage message = new SonicSensorMessage(distance);
+        getContext().getReference(target).sendMessage(message);
+    }
 }

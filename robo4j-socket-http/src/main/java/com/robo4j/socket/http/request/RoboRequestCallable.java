@@ -19,7 +19,6 @@ package com.robo4j.socket.http.request;
 import com.robo4j.AttributeDescriptor;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.dto.ClassGetSetDTO;
 import com.robo4j.socket.http.dto.PathAttributeDTO;
 import com.robo4j.socket.http.dto.PathAttributeListDTO;
@@ -31,6 +30,8 @@ import com.robo4j.socket.http.units.ServerPathConfig;
 import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.ReflectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,113 +47,113 @@ import static com.robo4j.util.Utf8Constant.UTF8_SOLIDUS;
  * @author Miro Wengner (@miragemiko)
  */
 public class RoboRequestCallable implements Callable<HttpResponseProcess> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoboRequestCallable.class);
+    private final RoboContext context;
+    private final ServerContext serverContext;
+    private final HttpDecoratedRequest decoratedRequest;
+    private final DefaultRequestFactory<?> factory;
 
-	private final RoboContext context;
-	private final ServerContext serverContext;
-	private final HttpDecoratedRequest decoratedRequest;
-	private final DefaultRequestFactory<?> factory;
+    public RoboRequestCallable(RoboContext context, ServerContext serverContext, HttpDecoratedRequest decoratedRequest,
+                               DefaultRequestFactory<Object> factory) {
+        Objects.requireNonNull(context, "not allowed empty context");
+        Objects.requireNonNull(serverContext, "not allowed empty serverContext");
+        this.context = context;
+        this.serverContext = serverContext;
+        this.decoratedRequest = decoratedRequest;
+        this.factory = factory;
+    }
 
-	public RoboRequestCallable(RoboContext context, ServerContext serverContext, HttpDecoratedRequest decoratedRequest,
-			DefaultRequestFactory<Object> factory) {
-		Objects.requireNonNull(context, "not allowed empty context");
-		Objects.requireNonNull(serverContext, "not allowed empty serverContext");
-		this.context = context;
-		this.serverContext = serverContext;
-		this.decoratedRequest = decoratedRequest;
-		this.factory = factory;
-	}
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public HttpResponseProcess call() throws Exception {
 
-	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public HttpResponseProcess call() throws Exception {
+        final HttpResponseProcessBuilder resultBuilder = HttpResponseProcessBuilder.Builder();
+        final ServerPathConfig pathConfig = serverContext.getPathConfig(decoratedRequest.getPathMethod());
 
-		final HttpResponseProcessBuilder resultBuilder = HttpResponseProcessBuilder.Builder();
-		final ServerPathConfig pathConfig = serverContext.getPathConfig(decoratedRequest.getPathMethod());
+        if (isValidPath(pathConfig)) {
+            resultBuilder.setMethod(pathConfig.getMethod());
+            resultBuilder.setPath(pathConfig.getPath());
 
-		if (isValidPath(pathConfig)) {
-			resultBuilder.setMethod(pathConfig.getMethod());
-			resultBuilder.setPath(pathConfig.getPath());
+            switch (pathConfig.getMethod()) {
+                case GET:
+                    if (pathConfig.getPath().equals(UTF8_SOLIDUS)) {
+                        resultBuilder.setCode(StatusCode.OK);
+                        resultBuilder.setResult(factory.processGet(context));
+                    } else {
 
-			switch (pathConfig.getMethod()) {
-			case GET:
-				if (pathConfig.getPath().equals(UTF8_SOLIDUS)) {
-					resultBuilder.setCode(StatusCode.OK);
-					resultBuilder.setResult(factory.processGet(context));
-				} else {
+                        resultBuilder.setTarget(pathConfig.getRoboUnit().getId());
+                        final Object unitDescription;
+                        // the system needs to have one more worker thread to evaluate Future get
+                        final HttpRequestDenominator denominator = (HttpRequestDenominator) decoratedRequest
+                                .getDenominator();
+                        final Set<String> requestAttributes = denominator.getAttributes()
+                                .get(HttpPathUtils.ATTRIBUTES_PATH_VALUE);
+                        if (requestAttributes == null) {
+                            unitDescription = factory.processGet(pathConfig);
+                        } else if (requestAttributes.isEmpty()) {
+                            RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().getId());
 
-					resultBuilder.setTarget(pathConfig.getRoboUnit().getId());
-					final Object unitDescription;
-					// the system needs to have one more worker thread to evaluate Future get
-					final HttpRequestDenominator denominator = (HttpRequestDenominator) decoratedRequest
-							.getDenominator();
-					final Set<String> requestAttributes = denominator.getAttributes()
-							.get(HttpPathUtils.ATTRIBUTES_PATH_VALUE);
-					if (requestAttributes == null) {
-							unitDescription = factory.processGet(pathConfig);
-					} else if (requestAttributes.isEmpty()) {
-						RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().getId());
+                            PathAttributeListDTO pathAttributes = new PathAttributeListDTO();
+                            unit.getKnownAttributes().forEach(a -> {
+                                PathAttributeDTO attributeDescriptor = new PathAttributeDTO();
+                                attributeDescriptor.setName(a.getAttributeName());
+                                attributeDescriptor.setValue(a.getAttributeType().getCanonicalName());
+                                pathAttributes.addAttribute(attributeDescriptor);
+                            });
+                            unitDescription = ReflectUtils.createJson(pathAttributes);
+                        } else {
+                            RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().getId());
 
-						PathAttributeListDTO pathAttributes = new PathAttributeListDTO();
-						unit.getKnownAttributes().forEach(a -> {
-							PathAttributeDTO attributeDescriptor = new PathAttributeDTO();
-							attributeDescriptor.setName(a.getAttributeName());
-							attributeDescriptor.setValue(a.getAttributeType().getCanonicalName());
-							pathAttributes.addAttribute(attributeDescriptor);
-						});
-						unitDescription = ReflectUtils.createJson(pathAttributes);
-					} else {
-						RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().getId());
+                            List<PathAttributeDTO> attributes = new ArrayList<>();
+                            for (AttributeDescriptor attr : unit.getKnownAttributes()) {
+                                if (requestAttributes.contains(attr.getAttributeName())) {
+                                    PathAttributeDTO attribute = new PathAttributeDTO();
+                                    String valueString = String.valueOf(unit.getAttribute(attr).get());
+                                    attribute.setValue(valueString);
+                                    attribute.setName(attr.getAttributeName());
+                                    attributes.add(attribute);
+                                }
+                            }
+                            if (attributes.size() == 1) {
+                                Map<String, ClassGetSetDTO> responseAttributeDescriptorMap = ReflectUtils
+                                        .getFieldsTypeMap(PathAttributeDTO.class);
+                                unitDescription = JsonUtil.toJson(responseAttributeDescriptorMap, attributes.getFirst());
+                            } else {
+                                unitDescription = JsonUtil.toJsonArray(attributes);
+                            }
+                        }
 
-						List<PathAttributeDTO> attributes = new ArrayList<>();
-						for (AttributeDescriptor attr : unit.getKnownAttributes()) {
-							if (requestAttributes.contains(attr.getAttributeName())) {
-								PathAttributeDTO attribute = new PathAttributeDTO();
-								String valueString = String.valueOf(unit.getAttribute(attr).get());
-								attribute.setValue(valueString);
-								attribute.setName(attr.getAttributeName());
-								attributes.add(attribute);
-							}
-						}
-						if (attributes.size() == 1) {
-							Map<String, ClassGetSetDTO> responseAttributeDescriptorMap = ReflectUtils
-									.getFieldsTypeMap(PathAttributeDTO.class);
-							unitDescription = JsonUtil.toJson(responseAttributeDescriptorMap, attributes.get(0));
-						} else {
-							unitDescription = JsonUtil.toJsonArray(attributes);
-						}
-					}
+                        resultBuilder.setCode(StatusCode.OK);
+                        resultBuilder.setResult(unitDescription);
+                    }
+                    break;
+                case POST:
+                    if (pathConfig.getPath().equals(UTF8_SOLIDUS)) {
+                        resultBuilder.setCode(StatusCode.BAD_REQUEST);
+                    } else {
+                        resultBuilder.setTarget(pathConfig.getRoboUnit().getId());
+                        Object respObj = factory.processPost(pathConfig.getRoboUnit(), decoratedRequest.getMessage());
+                        if (respObj == null) {
+                            resultBuilder.setCode(StatusCode.BAD_REQUEST);
+                        } else {
+                            resultBuilder.setCode(StatusCode.ACCEPTED);
+                            resultBuilder.setResult(respObj);
+                        }
+                    }
+                    break;
+                default:
+                    resultBuilder.setCode(StatusCode.BAD_REQUEST);
+                    LOGGER.debug("not implemented method: {}", decoratedRequest.getPathMethod());
+            }
+        } else {
+            resultBuilder.setCode(StatusCode.BAD_REQUEST);
+        }
+        return resultBuilder.build();
+    }
 
-					resultBuilder.setCode(StatusCode.OK);
-					resultBuilder.setResult(unitDescription);
-				}
-				break;
-			case POST:
-				if (pathConfig.getPath().equals(UTF8_SOLIDUS)) {
-					resultBuilder.setCode(StatusCode.BAD_REQUEST);
-				} else {
-					resultBuilder.setTarget(pathConfig.getRoboUnit().getId());
-					Object respObj = factory.processPost(pathConfig.getRoboUnit(), decoratedRequest.getMessage());
-					if (respObj == null) {
-						resultBuilder.setCode(StatusCode.BAD_REQUEST);
-					} else {
-						resultBuilder.setCode(StatusCode.ACCEPTED);
-						resultBuilder.setResult(respObj);
-					}
-				}
-				break;
-			default:
-				resultBuilder.setCode(StatusCode.BAD_REQUEST);
-				SimpleLoggingUtil.debug(getClass(), "not implemented method: " + decoratedRequest.getPathMethod());
-			}
-		} else {
-			resultBuilder.setCode(StatusCode.BAD_REQUEST);
-		}
-		return resultBuilder.build();
-	}
-
-	private boolean isValidPath(ServerPathConfig pathConfig) {
-		return pathConfig != null && decoratedRequest.getPathMethod() != null
-				&& decoratedRequest.getPathMethod().getMethod().equals(pathConfig.getMethod());
-	}
+    private boolean isValidPath(ServerPathConfig pathConfig) {
+        return pathConfig != null && decoratedRequest.getPathMethod() != null
+                && decoratedRequest.getPathMethod().getMethod().equals(pathConfig.getMethod());
+    }
 
 }
