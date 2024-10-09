@@ -17,11 +17,12 @@
 package com.robo4j.socket.http.channel;
 
 import com.robo4j.RoboContext;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.request.HttpResponseProcess;
 import com.robo4j.socket.http.units.CodecRegistry;
 import com.robo4j.socket.http.units.ServerContext;
 import com.robo4j.socket.http.util.ChannelUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
@@ -32,8 +33,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.robo4j.socket.http.util.ChannelUtils.handleSelectorHandler;
-import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_REGISTRY;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_REGISTRY;
 
 /**
  * Inbound context co
@@ -42,71 +43,72 @@ import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_BUFFER_CAPACITY
  * @author Miro Wengner (@miragemiko)
  */
 public class InboundHttpSocketChannelHandler implements ChannelHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(InboundHttpSocketChannelHandler.class);
 
-	private final RoboContext context;
-	private final ServerContext serverContext;
-	private final Map<SelectionKey, HttpResponseProcess> outBuffers = new ConcurrentHashMap<>();
-	private ServerSocketChannel socketChannel;
-	private boolean active;
+    private final RoboContext context;
+    private final ServerContext serverContext;
+    private final Map<SelectionKey, HttpResponseProcess> outBuffers = new ConcurrentHashMap<>();
+    private ServerSocketChannel socketChannel;
+    private boolean active;
 
-	public InboundHttpSocketChannelHandler(RoboContext context, ServerContext serverContext) {
-		this.context = context;
-		this.serverContext = serverContext;
-	}
+    public InboundHttpSocketChannelHandler(RoboContext context, ServerContext serverContext) {
+        this.context = context;
+        this.serverContext = serverContext;
+    }
 
-	@Override
-	public void start() {
-		if (!active) {
-			active = true;
-			context.getScheduler().execute(() -> initSocketChannel(serverContext));
-		}
-	}
+    @Override
+    public void start() {
+        if (!active) {
+            active = true;
+            context.getScheduler().execute(() -> initSocketChannel(serverContext));
+        }
+    }
 
-	@Override
-	public void stop() {
-		try {
-			if (socketChannel != null && socketChannel.isOpen()) {
-				active = false;
-				socketChannel.close();
-			}
-		} catch (IOException e) {
-			SimpleLoggingUtil.error(getClass(), "server stop problem: ", e);
-		}
-	}
+    @Override
+    public void stop() {
+        try {
+            if (socketChannel != null && socketChannel.isOpen()) {
+                active = false;
+                socketChannel.close();
+            }
+        } catch (IOException e) {
+            LOGGER.error("server stop problem: {}", e.getMessage(), e);
+        }
+    }
 
-	private void initSocketChannel(ServerContext serverContext) {
-		socketChannel = ChannelUtils.initServerSocketChannel(serverContext);
-		final SelectionKey key = ChannelUtils.registerSelectionKey(socketChannel);
+    private void initSocketChannel(ServerContext serverContext) {
+        socketChannel = ChannelUtils.initServerSocketChannel(serverContext);
+        final SelectionKey key = ChannelUtils.registerSelectionKey(socketChannel);
 
-		final CodecRegistry codecRegistry = serverContext.getPropertySafe(CodecRegistry.class, PROPERTY_CODEC_REGISTRY);
-		final int bufferCapacity = serverContext.getPropertySafe(Integer.class, PROPERTY_BUFFER_CAPACITY);
+        final CodecRegistry codecRegistry = serverContext.getPropertySafe(CodecRegistry.class, PROPERTY_CODEC_REGISTRY);
+        final int bufferCapacity = serverContext.getPropertySafe(Integer.class, PROPERTY_BUFFER_CAPACITY);
 
-		while (active) {
-			int channelReady = ChannelUtils.getReadyChannelBySelectionKey(key);
-			if (channelReady == 0) {
-				continue;
-			}
+        while (active) {
+            int channelReady = ChannelUtils.getReadyChannelBySelectionKey(key);
+            if (channelReady == 0) {
+                continue;
+            }
 
-			Set<SelectionKey> selectedKeys = key.selector().selectedKeys();
-			Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
+            Set<SelectionKey> selectedKeys = key.selector().selectedKeys();
+            Iterator<SelectionKey> selectedIterator = selectedKeys.iterator();
 
-			while (selectedIterator.hasNext()) {
-				final SelectionKey selectedKey = selectedIterator.next();
+            while (selectedIterator.hasNext()) {
+                final SelectionKey selectedKey = selectedIterator.next();
 
-				selectedIterator.remove();
+                selectedIterator.remove();
 
-				if (selectedKey.isAcceptable()) {
-					handleSelectorHandler(new AcceptSelectionKeyHandler(selectedKey, bufferCapacity));
-				} else if (selectedKey.isConnectable()) {
-					handleSelectorHandler(new ConnectSelectionKeyHandler(selectedKey));
-				} else if (selectedKey.isReadable()) {
-					handleSelectorHandler(new ReadSelectionKeyHandler(context, serverContext, codecRegistry, outBuffers, selectedKey));
-				} else if (selectedKey.isWritable()) {
-					handleSelectorHandler(new WriteSelectionKeyHandler(context, serverContext, outBuffers, selectedKey));
-				}
-			}
-		}
-	}
+                if (selectedKey.isAcceptable()) {
+                    handleSelectorHandler(new AcceptSelectionKeyHandler(selectedKey, bufferCapacity));
+                } else if (selectedKey.isConnectable()) {
+                    handleSelectorHandler(new ConnectSelectionKeyHandler(selectedKey));
+                } else if (selectedKey.isReadable()) {
+                    handleSelectorHandler(new ReadSelectionKeyHandler(context, serverContext, codecRegistry, outBuffers, selectedKey));
+                } else if (selectedKey.isWritable()) {
+                    handleSelectorHandler(new WriteSelectionKeyHandler(context, serverContext, outBuffers, selectedKey));
+                }
+            }
+        }
+    }
 
 
 }
