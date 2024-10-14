@@ -21,22 +21,23 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.camera.RaspiDevice;
-import com.robo4j.logging.SimpleLoggingUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Unit generates the video stream on desired socket
- *
+ * <p>
  * https://www.raspberrypi.org/app/uploads/2013/07/RaspiCam-Documentation.pdf
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RaspividUnit extends RoboUnit<RaspividRequest> {
-
     public static final String NAME = "raspividUnit";
     public static final String PROPERTY_SERVER_IP = "serverIp";
     public static final String PROPERTY_SERVER_PORT = "serverPort";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RaspividUnit.class);
     private final RaspiDevice device = new RaspiDevice();
     private String output;
     private String processId;
@@ -62,27 +63,26 @@ public class RaspividUnit extends RoboUnit<RaspividRequest> {
 
     @Override
     public void onMessage(RaspividRequest message) {
-        switch (message.getType()){
+        switch (message.getType()) {
             case CONFIG:
                 message.put(RpiCameraProperty.OUTPUT, output);
                 processId = String.valueOf(device.executeCommandReturnPID(message.create()));
                 break;
             case START:
-                SimpleLoggingUtil.info(getClass(), "not necessary start message: " + message);
+                LOGGER.info("not necessary start message: {}", message);
                 break;
             case STOP:
                 stop();
                 break;
             default:
-                SimpleLoggingUtil.error(getClass(), "message: " + message);
+                LOGGER.error("message: {}", message);
         }
-
     }
 
     @Override
     public void stop() {
         super.stop();
         device.executeCommand("kill " + processId);
-        System.out.println("stop raspivid : " + processId);
+        LOGGER.info("stop raspivid : {}", processId);
     }
 }

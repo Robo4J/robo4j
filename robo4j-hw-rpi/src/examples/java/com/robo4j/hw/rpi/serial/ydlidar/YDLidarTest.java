@@ -16,46 +16,40 @@
  */
 package com.robo4j.hw.rpi.serial.ydlidar;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
-
-//import com.pi4j.io.serial.SerialFactory;
-import com.robo4j.hw.rpi.serial.ydlidar.ScanReceiver;
-import com.robo4j.hw.rpi.serial.ydlidar.YDLidarDevice;
-import com.robo4j.math.geometry.ScanResult2D;
 
 /**
  * Example. Gets some information from the lidar, prints it, and then captures
  * data for 10 seconds.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class YDLidarTest {
-	public static void main(String[] args) throws IOException, InterruptedException, TimeoutException {
-		YDLidarDevice device = new YDLidarDevice(new ScanReceiver() {
-			@Override
-			public void onScan(ScanResult2D scanResult) {
-				System.out.println("Got scan result: " + scanResult);
-			}
-		});
-		System.out.println("Restarting the device to make sure we start with a clean slate");
-		device.restart();
-		// Takes some serious time to restart this thing ;)
-		System.out.println("Waiting 4s for the device to properly boot up");
-		Thread.sleep(4000);
-		System.out.println(device);
-		System.out.println(device.getDeviceInfo());
-		System.out.println(device.getHealthInfo());
-		System.out.println("Ranging Frequency = " + device.getRangingFrequency());
-		System.out.println("Will capture data for 10 seconds...");
-		device.setScanning(true);
-		Thread.sleep(10000);
-		device.setScanning(false);
-		device.shutdown();
-		System.out.println("Done!");
-		// Naughty that this has to be done... Perhaps fix Pi4J?
-//		SerialFactory.shutdown();
-	}
+    private static final Logger LOGGER = LoggerFactory.getLogger(YDLidarTest.class);
+
+    //TODO: review example with sleep
+    public static void main(String[] args) throws IOException, InterruptedException, TimeoutException {
+        YDLidarDevice device = new YDLidarDevice(scanResult -> LOGGER.info("Got scan result:{}", scanResult));
+        LOGGER.info("Restarting the device to make sure we start with a clean slate");
+        device.restart();
+        // Takes some serious time to restart this thing ;)
+        LOGGER.info("Waiting 4s for the device to properly boot up");
+        Thread.sleep(4000);
+        LOGGER.info("device:{}", device);
+        LOGGER.info("deviceInfo:{}", device.getDeviceInfo());
+        LOGGER.info("deviceHealth:{}", device.getHealthInfo());
+        LOGGER.info("Ranging Frequency:{}", device.getRangingFrequency());
+        LOGGER.info("Will capture data for 10 seconds...");
+        device.setScanning(true);
+        Thread.sleep(10000);
+        device.setScanning(false);
+        device.shutdown();
+        LOGGER.info("Done!");
+    }
 
 }

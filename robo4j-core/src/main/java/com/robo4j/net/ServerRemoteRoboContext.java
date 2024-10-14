@@ -21,8 +21,9 @@ import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.scheduler.Scheduler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -38,157 +39,157 @@ import java.util.concurrent.Future;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ServerRemoteRoboContext implements RoboContext {
-	private final String uuid;
-	private final ObjectOutputStream outputStream;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerRemoteRoboContext.class);
+    private final String uuid;
+    private final ObjectOutputStream outputStream;
 
-	@SuppressWarnings("rawtypes")
-	private class ServerRemoteRoboReference implements RoboReference {
-		/**
-		 * Since references can come from any context discovered in the JVM or
-		 * in the lookup services, we need to always track the context id to
-		 * send off the message to.
-		 */
-		private final String ctxId;
-		private final String id;
-		private final Class<?> actualMessageClass;
+    @SuppressWarnings("rawtypes")
+    private class ServerRemoteRoboReference implements RoboReference {
+        /**
+         * Since references can come from any context discovered in the JVM or
+         * in the lookup services, we need to always track the context id to
+         * send off the message to.
+         */
+        private final String ctxId;
+        private final String id;
+        private final Class<?> actualMessageClass;
 
-		public ServerRemoteRoboReference(String ctxId, String id, String fqn) {
-			this.ctxId = ctxId;
-			this.id = id;
-			this.actualMessageClass = resolve(fqn);
-		}
+        public ServerRemoteRoboReference(String ctxId, String id, String fqn) {
+            this.ctxId = ctxId;
+            this.id = id;
+            this.actualMessageClass = resolve(fqn);
+        }
 
-		public String getTargetContextId() {
-			return ctxId;
-		}
+        public String getTargetContextId() {
+            return ctxId;
+        }
 
-		@Override
-		public String getId() {
-			return id;
-		}
+        @Override
+        public String getId() {
+            return id;
+        }
 
-		@Override
-		public LifecycleState getState() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+        @Override
+        public LifecycleState getState() {
+            // TODO Auto-generated method stub
+            return null;
+        }
 
-		@Override
-		public Class<?> getMessageType() {
-			return actualMessageClass;
-		}
+        @Override
+        public Class<?> getMessageType() {
+            return actualMessageClass;
+        }
 
-		@Override
-		public Configuration getConfiguration() {
-			return null;
-		}
+        @Override
+        public Configuration getConfiguration() {
+            return null;
+        }
 
-		@Override
-		public Collection<AttributeDescriptor<?>> getKnownAttributes() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+        @Override
+        public Collection<AttributeDescriptor<?>> getKnownAttributes() {
+            // TODO Auto-generated method stub
+            return null;
+        }
 
-		@Override
-		public Future<Map<AttributeDescriptor<?>, Object>> getAttributes() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+        @Override
+        public Future<Map<AttributeDescriptor<?>, Object>> getAttributes() {
+            // TODO Auto-generated method stub
+            return null;
+        }
 
-		@Override
-		public void sendMessage(Object message) {
-			try {
-				// FIXME: Change the serialization to be the same as for the
-				// client to server
-				outputStream.writeUTF(getTargetContextId());
-				outputStream.writeUTF(getId());
-				outputStream.writeObject(message);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+        @Override
+        public void sendMessage(Object message) {
+            try {
+                // FIXME: Change the serialization to be the same as for the
+                // client to server
+                outputStream.writeUTF(getTargetContextId());
+                outputStream.writeUTF(getId());
+                outputStream.writeObject(message);
+            } catch (IOException e) {
+                LOGGER.error("send message:{}", message, e);
+            }
+        }
 
-		@Override
-		public Future getAttribute(AttributeDescriptor attribute) {
-			// TODO Auto-generated method stub
-			return null;
-		}
+        @Override
+        public Future getAttribute(AttributeDescriptor attribute) {
+            // TODO Auto-generated method stub
+            return null;
+        }
 
-		private Class<?> resolve(String fqn) {
-			try {
-				return Class.forName(fqn);
-			} catch (ClassNotFoundException e) {
-				SimpleLoggingUtil.error(getClass(), "Could not use class for remote communication", e);
-				e.printStackTrace();
-			}
-			return null;
-		}
+        private Class<?> resolve(String fqn) {
+            try {
+                return Class.forName(fqn);
+            } catch (ClassNotFoundException e) {
+                LOGGER.error("Could not use class for remote communication", e);
+            }
+            return null;
+        }
 
-		public String toString() {
-			return "[RemoteRef id: " + id + " server: " + uuid + " messageType: " + actualMessageClass.getName() + "]";
-		}
-	}
+        public String toString() {
+            return "[RemoteRef id: " + id + " server: " + uuid + " messageType: " + actualMessageClass.getName() + "]";
+        }
+    }
 
-	public ServerRemoteRoboContext(String uuid, OutputStream out) throws IOException {
-		this.uuid = uuid;
-		this.outputStream = new ObjectOutputStream(out);
-	}
+    public ServerRemoteRoboContext(String uuid, OutputStream out) throws IOException {
+        this.uuid = uuid;
+        this.outputStream = new ObjectOutputStream(out);
+    }
 
-	@Override
-	public LifecycleState getState() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public LifecycleState getState() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public void shutdown() {
-		// TODO Auto-generated method stub
+    @Override
+    public void shutdown() {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void stop() {
-		// TODO Auto-generated method stub
+    @Override
+    public void stop() {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void start() {
-		// TODO Auto-generated method stub
+    @Override
+    public void start() {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public <T> RoboReference<T> getReference(String id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public <T> RoboReference<T> getReference(String id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public Collection<RoboReference<?>> getUnits() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Collection<RoboReference<?>> getUnits() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public Scheduler getScheduler() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Scheduler getScheduler() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public String getId() {
-		return uuid;
-	}
+    @Override
+    public String getId() {
+        return uuid;
+    }
 
-	@Override
-	public Configuration getConfiguration() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Configuration getConfiguration() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	public RoboReference<?> getRoboReference(String ctxId, String id, String fqn) {
-		// FIXME: Cache these?
-		return new ServerRemoteRoboReference(ctxId, id, fqn);
-	}
+    public RoboReference<?> getRoboReference(String ctxId, String id, String fqn) {
+        // FIXME: Cache these?
+        return new ServerRemoteRoboReference(ctxId, id, fqn);
+    }
 }

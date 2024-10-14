@@ -17,6 +17,10 @@
 
 package com.robo4j.hw.rpi.imu.bno.shtp;
 
+import com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice.SHTP_HEADER_SIZE;
 
 /**
@@ -27,8 +31,10 @@ import static com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice.SHTP_HEADER_SIZE;
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class ShtpPacketResponse {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ShtpPacketResponse.class);
+
 	private final int[] header = new int[SHTP_HEADER_SIZE];
-	private int[] body;
+	private final int[] body;
 
 	public ShtpPacketResponse(int size) {
 		this.body = new int[size];
@@ -36,7 +42,7 @@ public final class ShtpPacketResponse {
 
 	public void addHeader(int... header) {
 		if (header.length != this.header.length) {
-			System.out.println("ShtpPacketRequest: wrong header");
+			LOGGER.debug("ShtpPacketRequest: wrong header");
 		} else {
 			this.header[0] = header[0]; // LSB
 			this.header[1] = header[1]; // MSB

@@ -17,6 +17,9 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,18 +29,20 @@ import java.util.concurrent.TimeUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class AlphanumericDeviceExample {
-	public static void main(String[] args) throws Exception {
-		System.out.println("=== Alphanumeric Backpack Example ===");
+    private static final Logger LOGGER = LoggerFactory.getLogger(AlphanumericDeviceExample.class);
 
-		AlphanumericDevice device = new AlphanumericDevice();
-		device.clear();
-		device.display();
-		System.out.println("Adding Characters");
-		device.addCharacter('A', false);
-		device.addCharacter('B', true);
-		device.addCharacter('C', false);
-		device.addCharacter('D', true);
-		device.display();
+    public static void main(String[] args) throws Exception {
+        LOGGER.debug("=== Alphanumeric Backpack Example ===");
+
+        AlphanumericDevice device = new AlphanumericDevice();
+        device.clear();
+        device.display();
+        LOGGER.debug("Adding Characters");
+        device.addCharacter('A', false);
+        device.addCharacter('B', true);
+        device.addCharacter('C', false);
+        device.addCharacter('D', true);
+        device.display();
         TimeUnit.SECONDS.sleep(3);
         device.clear();
         device.display();
@@ -48,10 +53,10 @@ public class AlphanumericDeviceExample {
         device.display();
 
 
-        System.out.println("Press <Enter> to quit!");
+        LOGGER.debug("Press <Enter> to quit!");
         System.in.read();
         device.clear();
         device.display();
 
-	}
+    }
 }

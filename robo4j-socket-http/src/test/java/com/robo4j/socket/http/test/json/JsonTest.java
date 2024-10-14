@@ -19,11 +19,13 @@ package com.robo4j.socket.http.test.json;
 import com.robo4j.socket.http.json.JsonDocument;
 import com.robo4j.socket.http.json.JsonReader;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
+import static com.robo4j.socket.http.test.json.JsonReaderTests.printDocument;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -32,132 +34,135 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Miroslav Wengner (@miragemiko)
  */
 class JsonTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonTest.class);
 
-	private static final String jsonBasicValues = "{ \"number\"\n :  42, \"message\" \t: \"no message\", \"active\" : false , \"floatNumber\" : 0.42}";
-	private static final String jsonBasicValueWithStringArray = "{ \"floatNumber\" : 0.42, \"number\"\n :  42, \"active\" : false, "
-			+ "\"message\" \t: \"no message\", \"arrayOne\":[\"one\",\"two\"]}";
-	private static final String jsonBasicValueWithStringAndIntegerArrays = "{ \"floatNumber\" : 0.42, \"number\"\n :  42, "
-			+ "\"active\" : false, \"message\" \t: \"no message\", \"arrayOne\":[\"one\", \"two\"], \"arrayTwo\" : [1, 2 ,3 ]}";
-	private static final String jsonBasicValueWithStringAndIntegerAndObjectArrays = "{ \"floatNumber\" : 0.42, \"number\"\n :  42, "
-			+ "\"active\" : false,  \"arrayOne\":[\"one\", \"two\"], \"message\" \t: \"no message\", \"arrayTwo\" : [1, 2 ,3 ], "
-			+ "\"arrayThree\" : [{\"name\":\"name1\",\"value\": 22}, {\"name\":\"name2\",\"value\": 42}]}";
+    private static final String jsonBasicValues = "{ \"number\"\n :  42, \"message\" \t: \"no message\", \"active\" : false , \"floatNumber\" : 0.42}";
+    private static final String jsonBasicValueWithStringArray = "{ \"floatNumber\" : 0.42, \"number\"\n :  42, \"active\" : false, "
+            + "\"message\" \t: \"no message\", \"arrayOne\":[\"one\",\"two\"]}";
+    private static final String jsonBasicValueWithStringAndIntegerArrays = "{ \"floatNumber\" : 0.42, \"number\"\n :  42, "
+            + "\"active\" : false, \"message\" \t: \"no message\", \"arrayOne\":[\"one\", \"two\"], \"arrayTwo\" : [1, 2 ,3 ]}";
+    private static final String jsonBasicValueWithStringAndIntegerAndObjectArrays = "{ \"floatNumber\" : 0.42, \"number\"\n :  42, "
+            + "\"active\" : false,  \"arrayOne\":[\"one\", \"two\"], \"message\" \t: \"no message\", \"arrayTwo\" : [1, 2 ,3 ], "
+            + "\"arrayThree\" : [{\"name\":\"name1\",\"value\": 22}, {\"name\":\"name2\",\"value\": 42}]}";
 
-	private static final String jsonBasicObjectArrays = "{\"number\"\n :  42,\"arrayThree\" : [{\"name\":\"name1\",\"value\": 22}, {\"name\":\"name2\",\"value\": 42}],"
-			+ " \"active\" : false}";
+    private static final String jsonBasicObjectArrays = "{\"number\"\n :  42,\"arrayThree\" : [{\"name\":\"name1\",\"value\": 22}, {\"name\":\"name2\",\"value\": 42}],"
+            + " \"active\" : false}";
 
-	private static final String jsonBasicObjectArraysAndStringMap = "{\"number\"\n :  42,"
-			+ "\"arrayThree\" : [{\"name\":\"name1\",\"value\": 22}, {\"name\":\"name2\",\"value\": 42}],"
-			+ " \"active\" : false, \"simpleMap\": {\"one\":\"one1\",\"two\":\"two2\"}}";
+    private static final String jsonBasicObjectArraysAndStringMap = "{\"number\"\n :  42,"
+            + "\"arrayThree\" : [{\"name\":\"name1\",\"value\": 22}, {\"name\":\"name2\",\"value\": 42}],"
+            + " \"active\" : false, \"simpleMap\": {\"one\":\"one1\",\"two\":\"two2\"}}";
 
-	@Test
-	void basicValuesJsonParse() {
-		JsonReader parser = new JsonReader(jsonBasicValues);
-		JsonDocument document = parser.read();
-		Map<String, Object> map = document.getMap();
-		assertEquals(42, map.get("number"));
-		assertEquals("no message", map.get("message"));
-		assertEquals(false, map.get("active"));
-		assertEquals(0.42, map.get("floatNumber"));
-	}
+    @Test
+    void basicValuesJsonParse() {
+        JsonReader parser = new JsonReader(jsonBasicValues);
+        JsonDocument document = parser.read();
+        Map<String, Object> map = document.getMap();
+        assertEquals(42, map.get("number"));
+        assertEquals("no message", map.get("message"));
+        assertEquals(false, map.get("active"));
+        assertEquals(0.42, map.get("floatNumber"));
+    }
 
-	@Test
-	void jsonBasicValuesAndStringArrayTest() {
-		JsonReader parser = new JsonReader(jsonBasicValueWithStringArray);
-		JsonDocument document = parser.read();
-		Map<String, Object> map = document.getMap();
-		assertEquals(42, map.get("number"));
-		assertEquals(false, map.get("active"));
-		assertEquals("no message", map.get("message"));
-		assertEquals(0.42, map.get("floatNumber"));
-		List<Object> resultArray = ((JsonDocument) map.get("arrayOne")).getArray();
-		assertTrue(Arrays.asList("one", "two").containsAll(resultArray));
+    @Test
+    void jsonBasicValuesAndStringArrayTest() {
+        var parser = new JsonReader(jsonBasicValueWithStringArray);
+        var document = parser.read();
+        var map = document.getMap();
+        var resultArray = ((JsonDocument) map.get("arrayOne")).getArray();
 
-		System.out.println("document: " + document);
-	}
+        printDocument(document);
 
-	@Test
-	void jsonBasicValuesAndStringAndIntegerArraysTest() {
-		JsonReader parser = new JsonReader(jsonBasicValueWithStringAndIntegerArrays);
-		JsonDocument document = parser.read();
-		Map<String, Object> map = document.getMap();
-		List<Object> resultStringArray = ((JsonDocument) map.get("arrayOne")).getArray();
-		List<Object> resultIntegerArray = ((JsonDocument) map.get("arrayTwo")).getArray();
+        assertEquals(42, map.get("number"));
+        assertEquals(false, map.get("active"));
+        assertEquals("no message", map.get("message"));
+        assertEquals(0.42, map.get("floatNumber"));
+        assertTrue(Arrays.asList("one", "two").containsAll(resultArray));
 
-		assertEquals(42, map.get("number"));
-		assertEquals(false, map.get("active"));
-		assertEquals("no message", map.get("message"));
-		assertEquals(0.42, map.get("floatNumber"));
-		assertTrue(Arrays.asList("one", "two").containsAll(resultStringArray));
-		assertTrue(Arrays.asList(1, 2, 3).containsAll(resultIntegerArray));
+    }
 
-		System.out.println("document: " + document);
-	}
+    @Test
+    void jsonBasicValuesAndStringAndIntegerArraysTest() {
+        var parser = new JsonReader(jsonBasicValueWithStringAndIntegerArrays);
+        var document = parser.read();
+        var map = document.getMap();
+        var resultStringArray = ((JsonDocument) map.get("arrayOne")).getArray();
+        var resultIntegerArray = ((JsonDocument) map.get("arrayTwo")).getArray();
 
-	@Test
-	void jsonBasicValuesAndStringAndIntegerAndObjectArraysTest() {
-		JsonReader parser = new JsonReader(jsonBasicValueWithStringAndIntegerAndObjectArrays);
-		JsonDocument document = parser.read();
-		System.out.println("document: " + document);
-		Map<String, Object> map = document.getMap();
-		List<Object> resultStringArray = ((JsonDocument) map.get("arrayOne")).getArray();
-		List<Object> resultIntegerArray = ((JsonDocument) map.get("arrayTwo")).getArray();
+        printDocument(document);
 
-		assertEquals(42, map.get("number"));
-		assertEquals(false, map.get("active"));
-		assertEquals("no message", map.get("message"));
-		assertEquals(0.42, map.get("floatNumber"));
-		assertTrue(Arrays.asList("one", "two").containsAll(resultStringArray));
-		assertTrue(Arrays.asList(1, 2, 3).containsAll(resultIntegerArray));
+        assertEquals(42, map.get("number"));
+        assertEquals(false, map.get("active"));
+        assertEquals("no message", map.get("message"));
+        assertEquals(0.42, map.get("floatNumber"));
+        assertTrue(Arrays.asList("one", "two").containsAll(resultStringArray));
+        assertTrue(Arrays.asList(1, 2, 3).containsAll(resultIntegerArray));
+    }
 
-	}
+    @Test
+    void jsonBasicValuesAndStringAndIntegerAndObjectArraysTest() {
+        var parser = new JsonReader(jsonBasicValueWithStringAndIntegerAndObjectArrays);
+        var document = parser.read();
+        var map = document.getMap();
+        var resultStringArray = ((JsonDocument) map.get("arrayOne")).getArray();
+        var resultIntegerArray = ((JsonDocument) map.get("arrayTwo")).getArray();
 
-	@Test
-	void jsonBasicObjectArraysTest() {
+        printDocument(document);
 
-		JsonReader parser = new JsonReader(jsonBasicObjectArrays);
-		JsonDocument document = parser.read();
-		System.out.println("document: " + document);
-		Map<String, Object> map = document.getMap();
-		List<Object> resultObjectArray = ((JsonDocument) map.get("arrayThree")).getArray();
+        assertEquals(42, map.get("number"));
+        assertEquals(false, map.get("active"));
+        assertEquals("no message", map.get("message"));
+        assertEquals(0.42, map.get("floatNumber"));
+        assertTrue(Arrays.asList("one", "two").containsAll(resultStringArray));
+        assertTrue(Arrays.asList(1, 2, 3).containsAll(resultIntegerArray));
 
-		JsonDocument obj1 = (JsonDocument) resultObjectArray.get(0);
-		JsonDocument obj2 = (JsonDocument) resultObjectArray.get(1);
+    }
 
-		// [{"name":"name1","value": 22}, {"name":"name2","value": 42}]
-		assertEquals(42, map.get("number"));
-		assertEquals(false, map.get("active"));
-		assertEquals("name1", obj1.getMap().get("name").toString());
-		assertEquals(22, (int) obj1.getMap().get("value"));
-		assertEquals("name2", obj2.getMap().get("name").toString());
-		assertEquals(42, (int) obj2.getMap().get("value"));
-		assertEquals(2, resultObjectArray.size());
+    @Test
+    void jsonBasicObjectArraysTest() {
+        var parser = new JsonReader(jsonBasicObjectArrays);
+        var document = parser.read();
+        var map = document.getMap();
+        var resultObjectArray = ((JsonDocument) map.get("arrayThree")).getArray();
 
-	}
+        JsonDocument obj1 = (JsonDocument) resultObjectArray.get(0);
+        JsonDocument obj2 = (JsonDocument) resultObjectArray.get(1);
 
-	@Test
-	void jsonBasicObjectArraysAndSimpleMapTest() {
+        printDocument(document);
 
-		JsonReader parser = new JsonReader(jsonBasicObjectArraysAndStringMap);
-		JsonDocument document = parser.read();
-		System.out.println("document: " + document);
-		Map<String, Object> map = document.getMap();
-		List<Object> resultObjectArray = ((JsonDocument) map.get("arrayThree")).getArray();
-		Map<String, Object> simpleMap = ((JsonDocument) map.get("simpleMap")).getMap();
+        // [{"name":"name1","value": 22}, {"name":"name2","value": 42}]
+        assertEquals(42, map.get("number"));
+        assertEquals(false, map.get("active"));
+        assertEquals("name1", obj1.getMap().get("name").toString());
+        assertEquals(22, (int) obj1.getMap().get("value"));
+        assertEquals("name2", obj2.getMap().get("name").toString());
+        assertEquals(42, (int) obj2.getMap().get("value"));
+        assertEquals(2, resultObjectArray.size());
+    }
 
-		JsonDocument obj1 = (JsonDocument) resultObjectArray.get(0);
-		JsonDocument obj2 = (JsonDocument) resultObjectArray.get(1);
+    @Test
+    void jsonBasicObjectArraysAndSimpleMapTest() {
+        var parser = new JsonReader(jsonBasicObjectArraysAndStringMap);
+        var document = parser.read();
+        var map = document.getMap();
+        var resultObjectArray = ((JsonDocument) map.get("arrayThree")).getArray();
+        var simpleMap = ((JsonDocument) map.get("simpleMap")).getMap();
 
-		// [{"name":"name1","value": 22}, {"name":"name2","value": 42}]
-		assertEquals(42, map.get("number"));
-		assertEquals(false, map.get("active"));
-		assertEquals("name1", obj1.getMap().get("name").toString());
-		assertEquals(22, (int) obj1.getMap().get("value"));
-		assertEquals("name2", obj2.getMap().get("name").toString());
-		assertEquals(42, (int) obj2.getMap().get("value"));
-		assertEquals(2, resultObjectArray.size());
-		assertEquals("one1", simpleMap.get("one"));
-		assertEquals("two2", simpleMap.get("two"));
+        JsonDocument obj1 = (JsonDocument) resultObjectArray.get(0);
+        JsonDocument obj2 = (JsonDocument) resultObjectArray.get(1);
 
-	}
+        printDocument(document);
+
+        // [{"name":"name1","value": 22}, {"name":"name2","value": 42}]
+        assertEquals(42, map.get("number"));
+        assertEquals(false, map.get("active"));
+        assertEquals("name1", obj1.getMap().get("name").toString());
+        assertEquals(22, (int) obj1.getMap().get("value"));
+        assertEquals("name2", obj2.getMap().get("name").toString());
+        assertEquals(42, (int) obj2.getMap().get("value"));
+        assertEquals(2, resultObjectArray.size());
+        assertEquals("one1", simpleMap.get("one"));
+        assertEquals("two2", simpleMap.get("two"));
+
+    }
 
 }

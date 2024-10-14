@@ -17,13 +17,12 @@
 
 package com.robo4j.math.geometry;
 
-import java.lang.System.Logger;
-
 /**
- *  Empty Matrix dimensions equal to zero
+ * Empty Matrix dimensions equal to zero
  */
 public class MatrixEmpty implements Matrix {
     public static final int DIMENSION_ZERO = 0;
+
     @Override
     public int getRows() {
         return DIMENSION_ZERO;

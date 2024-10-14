@@ -16,27 +16,29 @@
  */
 package com.robo4j.hw.rpi.i2c.gyro;
 
-import java.io.IOException;
-
-import com.robo4j.hw.rpi.i2c.gyro.GyroL3GD20Device;
 import com.robo4j.hw.rpi.i2c.gyro.GyroL3GD20Device.Sensitivity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Simple example which repeatedly reads the gyro. Good for checking that your
  * gyro is working.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GyroL3GD20Test {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GyroL3GD20Test.class);
 
-	public static void main(String[] args) throws IOException, InterruptedException {
-		System.out.println("Initializing...");
-		GyroL3GD20Device device = new GyroL3GD20Device(Sensitivity.DPS_245);
+    public static void main(String[] args) throws IOException, InterruptedException {
+        LOGGER.info("Initializing...");
+        GyroL3GD20Device device = new GyroL3GD20Device(Sensitivity.DPS_245);
 
-		while (true) {
-			System.out.println(device.read());
-			Thread.sleep(200);
-		}
-	}
+        while (true) {
+            LOGGER.info("device,read:{}", device.read());
+            Thread.sleep(200);
+        }
+    }
 }

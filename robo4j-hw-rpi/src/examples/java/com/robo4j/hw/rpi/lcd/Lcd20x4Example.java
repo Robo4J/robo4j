@@ -16,66 +16,69 @@
  */
 package com.robo4j.hw.rpi.lcd;
 
-import java.io.IOException;
-
 import com.robo4j.hw.rpi.lcd.Lcd20x4.Alignment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Demo for the 20x4 LCD.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class Lcd20x4Example {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Lcd20x4Example.class);
 
-	private static class Demo implements Runnable {
-		private final Lcd20x4 lcd;
-		private volatile boolean shouldRun = true;
+    private static class Demo implements Runnable {
+        private final Lcd20x4 lcd;
+        private volatile boolean shouldRun = true;
 
-		Demo(Lcd20x4 lcd) {
-			this.lcd = lcd;
-		}
+        Demo(Lcd20x4 lcd) {
+            this.lcd = lcd;
+        }
 
-		@Override
-		public void run() {
-			while (shouldRun) {
-				lcd.sendMessage(1, "--------------------", Alignment.CENTER);
-				lcd.sendMessage(2, "Rasbperry Pi", Alignment.CENTER);
-				lcd.sendMessage(3, "Robo4J", Alignment.CENTER);
-				lcd.sendMessage(4, "--------------------", Alignment.CENTER);
-				sleep(3000);
-				lcd.sendMessage(1, "--------------------", Alignment.CENTER);
-				lcd.sendMessage(2, "This is a test", Alignment.CENTER);
-				lcd.sendMessage(3, "20x4 LCD Module", Alignment.CENTER);
-				lcd.sendMessage(4, "--------------------", Alignment.CENTER);
-				sleep(3000);
-			}
-			lcd.clearDisplay();
-			lcd.sendMessage(2, "Goodbye!", Alignment.CENTER);
-		}
+        @Override
+        public void run() {
+            while (shouldRun) {
+                lcd.sendMessage(1, "--------------------", Alignment.CENTER);
+                lcd.sendMessage(2, "Rasbperry Pi", Alignment.CENTER);
+                lcd.sendMessage(3, "Robo4J", Alignment.CENTER);
+                lcd.sendMessage(4, "--------------------", Alignment.CENTER);
+                sleep(3000);
+                lcd.sendMessage(1, "--------------------", Alignment.CENTER);
+                lcd.sendMessage(2, "This is a test", Alignment.CENTER);
+                lcd.sendMessage(3, "20x4 LCD Module", Alignment.CENTER);
+                lcd.sendMessage(4, "--------------------", Alignment.CENTER);
+                sleep(3000);
+            }
+            lcd.clearDisplay();
+            lcd.sendMessage(2, "Goodbye!", Alignment.CENTER);
+        }
 
-		private void sleep(int seconds) {
-			if (shouldRun) {
-				try {
-					Thread.sleep(seconds);
-				} catch (InterruptedException e) {
-					// Don't care
-				}
-			}
-		}
+        private void sleep(int seconds) {
+            if (shouldRun) {
+                try {
+                    Thread.sleep(seconds);
+                } catch (InterruptedException e) {
+                    // Don't care
+                }
+            }
+        }
 
-		public void quit() {
-			shouldRun = false;
-		}
-	}
+        public void quit() {
+            shouldRun = false;
+        }
+    }
 
-	public static void main(String[] args) throws IOException {
-		Lcd20x4 lcd = new Lcd20x4();
-		Demo demo = new Demo(lcd);
-		Thread t = new Thread(demo, "LCD Demo Thread");
-		t.start();
-		System.out.println("Running LCD demo. Press <Enter> to quit!");
-		System.in.read();
-		demo.quit();
-	}
+    public static void main(String[] args) throws IOException {
+        Lcd20x4 lcd = new Lcd20x4();
+        Demo demo = new Demo(lcd);
+        Thread t = new Thread(demo, "LCD Demo Thread");
+        t.start();
+        LOGGER.debug("Running LCD demo. Press <Enter> to quit!");
+        System.in.read();
+        demo.quit();
+    }
 }

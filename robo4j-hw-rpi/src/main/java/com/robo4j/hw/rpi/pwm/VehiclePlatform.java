@@ -17,62 +17,64 @@
 package com.robo4j.hw.rpi.pwm;
 
 import com.robo4j.hw.rpi.Servo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class VehiclePlatform {
+    private static final Logger LOGGER = LoggerFactory.getLogger(VehiclePlatform.class);
 
     private final int signalEquilibrium;
     private final Servo throttleServo;
     private final Servo steeringServo;
-	private final Servo legServo;
-	private final Servo shiftServo;
-	private float throttle;
-	private float steering;
-	private float leg;
-	private float shift;
+    private final Servo legServo;
+    private final Servo shiftServo;
+    private float throttle;
+    private float steering;
+    private float leg;
+    private float shift;
 
 
-	public VehiclePlatform(int signalEquilibrium, Servo throttleServo, Servo steeringServo, Servo legServo, Servo shiftServo)
-			throws IOException {
-	    this.signalEquilibrium = signalEquilibrium;
+    public VehiclePlatform(int signalEquilibrium, Servo throttleServo, Servo steeringServo, Servo legServo, Servo shiftServo)
+            throws IOException {
+        this.signalEquilibrium = signalEquilibrium;
         this.throttleServo = throttleServo;
         this.steeringServo = steeringServo;
-		this.legServo = legServo;
-		this.shiftServo = shiftServo;
-		resetServos();
-	}
+        this.legServo = legServo;
+        this.shiftServo = shiftServo;
+        resetServos();
+    }
 
-	private void resetServos() throws IOException {
-		this.throttleServo.setInput(signalEquilibrium);
+    private void resetServos() throws IOException {
+        this.throttleServo.setInput(signalEquilibrium);
         this.steeringServo.setInput(signalEquilibrium);
         this.legServo.setInput(signalEquilibrium);
-		this.shiftServo.setInput(signalEquilibrium);
-	}
+        this.shiftServo.setInput(signalEquilibrium);
+    }
 
-	public float getThrottle() throws IOException {
-		return throttle;
-	}
+    public float getThrottle() throws IOException {
+        return throttle;
+    }
 
-	public void setThrottle(float throttle) throws IOException {
-		this.throttle = throttle;
-		internalUpdateEngines();
-	}
-
-	public void setSteering(float steering) throws IOException {
-		this.steering = steering;
+    public void setThrottle(float throttle) throws IOException {
+        this.throttle = throttle;
         internalUpdateEngines();
-	}
+    }
 
-	public float getSteering() {
-		return steering;
-	}
+    public void setSteering(float steering) throws IOException {
+        this.steering = steering;
+        internalUpdateEngines();
+    }
+
+    public float getSteering() {
+        return steering;
+    }
 
     public float getLeg() {
         return leg;
@@ -91,29 +93,29 @@ public class VehiclePlatform {
     }
 
     private void internalUpdateEngines() {
-		try {
-			updateEngines();
-		} catch (IOException e) {
-			Logger.getLogger(VehiclePlatform.class.getName()).log(Level.SEVERE, "Could not update engine speed!");
-		}
-	}
+        try {
+            updateEngines();
+        } catch (IOException e) {
+            LOGGER.error("Could not update engine speed!", e);
+        }
+    }
 
-	private void updateEngines() throws IOException {
-		processEngine(throttle, throttleServo);
-		processEngine(steering, steeringServo);
-		processEngine(leg, legServo);
-		processEngine(shift, shiftServo);
-	}
+    private void updateEngines() throws IOException {
+        processEngine(throttle, throttleServo);
+        processEngine(steering, steeringServo);
+        processEngine(leg, legServo);
+        processEngine(shift, shiftServo);
+    }
 
-	private void processEngine(float value, Servo engine) throws IOException {
+    private void processEngine(float value, Servo engine) throws IOException {
 
-		if (value == signalEquilibrium) {
-			engine.setInput(signalEquilibrium);
-		} else if (value < signalEquilibrium) {
-			engine.setInput(-value);
-		} else {
-			engine.setInput(value);
-		}
-	}
+        if (value == signalEquilibrium) {
+            engine.setInput(signalEquilibrium);
+        } else if (value < signalEquilibrium) {
+            engine.setInput(-value);
+        } else {
+            engine.setInput(value);
+        }
+    }
 
 }

@@ -21,11 +21,11 @@
 module robo4j.core {
     requires java.logging;
     requires java.xml;
+    requires org.slf4j;
 
     exports com.robo4j;
     exports com.robo4j.util;
     exports com.robo4j.configuration;
-    exports com.robo4j.logging;
     exports com.robo4j.reflect;
     exports com.robo4j.scheduler;
     exports com.robo4j.net;

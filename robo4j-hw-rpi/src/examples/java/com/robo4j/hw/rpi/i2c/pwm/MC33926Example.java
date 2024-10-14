@@ -17,6 +17,8 @@
 package com.robo4j.hw.rpi.i2c.pwm;
 
 import com.robo4j.hw.rpi.utils.GpioPin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -29,13 +31,13 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class MC33926Example {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(MC33926Example.class);
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        System.out.println("Creating device...");
+        LOGGER.info("Creating device...");
 
         if (args.length != 3) {
-            System.out.println("Usage: MC33926Example <speed> <duration>");
+            LOGGER.info("Usage: MC33926Example <speed> <duration>");
             System.out.flush();
             System.exit(2);
         }
@@ -50,12 +52,12 @@ public class MC33926Example {
         HBridgeMC33926Device engine = new HBridgeMC33926Device("Engine", pwm.getChannel(4),
                 GpioPin.GPIO_02, GpioPin.GPIO_03, true);
 
-        System.out.printf("Running for %d ms at speed %f...%n", duration, speed);
+        LOGGER.info("Running for {}ms at speed:{}...%n", duration, speed);
 
         engine.setSpeed(speed);
         Thread.sleep(duration);
         engine.setSpeed(0);
 
-        System.out.println("Done!");
+        LOGGER.info("Done!");
     }
 }

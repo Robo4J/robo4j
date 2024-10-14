@@ -9,6 +9,7 @@ module robo4j.hw.rpi {
     requires com.pi4j;
     requires com.pi4j.plugin.raspberrypi;
     requires com.pi4j.plugin.linuxfs;
+    requires org.slf4j;
 
     exports com.robo4j.hw.rpi;
     exports com.robo4j.hw.rpi.camera;

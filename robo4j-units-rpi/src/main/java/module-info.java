@@ -2,6 +2,7 @@ module robo4j.units.rpi {
     requires jdk.jfr;
     requires transitive robo4j.core;
     requires transitive robo4j.hw.rpi;
+    requires org.slf4j;
 
     exports com.robo4j.units.rpi.accelerometer;
     exports com.robo4j.units.rpi.camera;

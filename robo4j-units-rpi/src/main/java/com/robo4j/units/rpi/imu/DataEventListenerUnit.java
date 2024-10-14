@@ -20,7 +20,8 @@ package com.robo4j.units.rpi.imu;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
-import com.robo4j.logging.SimpleLoggingUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DataEventListener unit listens to {@link DataEvent3f} event types produced by
@@ -30,13 +31,14 @@ import com.robo4j.logging.SimpleLoggingUtil;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class DataEventListenerUnit extends RoboUnit<DataEvent3f> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataEventListenerUnit.class);
 
-	public DataEventListenerUnit(RoboContext context, String id) {
-		super(DataEvent3f.class, context, id);
-	}
+    public DataEventListenerUnit(RoboContext context, String id) {
+        super(DataEvent3f.class, context, id);
+    }
 
-	@Override
-	public void onMessage(DataEvent3f message) {
-		SimpleLoggingUtil.info(getClass(), "received:" + message);
-	}
+    @Override
+    public void onMessage(DataEvent3f message) {
+        LOGGER.info("received:{}", message);
+    }
 }

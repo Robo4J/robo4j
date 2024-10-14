@@ -21,9 +21,10 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.hw.lego.util.EscapeButtonUtil;
 import com.robo4j.util.SystemUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
-import java.io.InputStream;
 
 /**
  * InfraPushTankPlatformExample lego platform example with push and infra red sensor
@@ -32,28 +33,28 @@ import java.io.InputStream;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class InfraPushTankPlatformExample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(InfraPushTankPlatformExample.class);
 
     public static void main(String[] args) throws Exception {
-        final String robo4jSystem = "robo4jSystem.xml";
-        final String robo4jConfig= "robo4jInfraPushTankPlatformExample.xml";
-        final InputStream systemSystem = InfraSensorExample.class.getClassLoader().getResourceAsStream(robo4jSystem);
-        InputStream settings = GripperSonicTankPlatformExample.class.getClassLoader().getResourceAsStream(robo4jConfig);
+        final var robo4jSystem = "robo4jSystem.xml";
+        final var robo4jConfig = "robo4jInfraPushTankPlatformExample.xml";
+        final var systemSystem = InfraSensorExample.class.getClassLoader().getResourceAsStream(robo4jSystem);
+        var settings = GripperSonicTankPlatformExample.class.getClassLoader().getResourceAsStream(robo4jConfig);
         if (args.length != 1) {
-            System.out.println(String.format("No file specified, using default %s", robo4jConfig));
+            LOGGER.info("No file specified, using default {}", robo4jConfig);
         } else {
             settings = new FileInputStream(args[0]);
         }
 
-        final RoboBuilder builder = new RoboBuilder(systemSystem);
-        if(settings == null){
-            System.out.println("Could not find the settings for test!");
+        final var builder = new RoboBuilder(systemSystem);
+        if (settings == null) {
+            LOGGER.warn("Could not find the settings for test!");
             System.exit(2);
         }
 
         builder.add(settings);
         RoboContext system = builder.build();
-        System.out.println(SystemUtil.printStateReport(system));
-
+        LOGGER.info(SystemUtil.printStateReport(system));
 
         system.start();
 

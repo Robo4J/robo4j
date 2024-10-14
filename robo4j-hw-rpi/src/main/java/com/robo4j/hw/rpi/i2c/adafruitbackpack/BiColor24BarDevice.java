@@ -18,6 +18,8 @@
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
 import com.robo4j.hw.rpi.utils.I2cBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -30,7 +32,7 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class BiColor24BarDevice extends AbstractBackpack {
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(BiColor24BarDevice.class);
 	public static final int MAX_BARS = 24;
 
 	public BiColor24BarDevice(I2cBus bus, int address, int brightness) throws IOException {
@@ -43,7 +45,7 @@ public class BiColor24BarDevice extends AbstractBackpack {
 
 	public void setBar(int bar, BiColor color) {
 		if (!validatePosition(bar)) {
-			System.out.println("addBar: not allowed bar= %s" + bar);
+            LOGGER.debug("addBar: not allowed bar= %s{}", bar);
 			return;
 		}
 		short a, c;

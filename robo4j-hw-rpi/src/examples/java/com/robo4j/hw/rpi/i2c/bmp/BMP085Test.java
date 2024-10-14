@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import com.robo4j.hw.rpi.i2c.bmp.BMP085Device;
 import com.robo4j.hw.rpi.i2c.bmp.BMP085Device.OperatingMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Repeatedly reads and displays the temperature (in C), pressure (in hPa) and
@@ -29,10 +31,11 @@ import com.robo4j.hw.rpi.i2c.bmp.BMP085Device.OperatingMode;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class BMP085Test {
+	private static final Logger LOGGER = LoggerFactory.getLogger(BMP085Test.class);
 	public static void main(String[] args) throws IOException, InterruptedException {
 		BMP085Device bmp = new BMP085Device(OperatingMode.STANDARD);
 		while (true) {
-			System.out.printf("Temperature: %.1fC, Pressure: %dhPa, Altitude: %.1fm%n",
+			LOGGER.debug("Temperature: {}C, Pressure: {}hPa, Altitude: {}m",
 					bmp.readTemperature(),
 					bmp.readPressure() / 100,
 					bmp.readAltitude());

@@ -18,10 +18,10 @@ package com.robo4j.hw.rpi.pwm.roboclaw;
 
 import com.robo4j.hw.rpi.Motor;
 import com.robo4j.hw.rpi.Servo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A RoboClaw engine controller, controlled with a standard servo PWM signal.
@@ -29,124 +29,118 @@ import java.util.logging.Logger;
  * over USB. This class will only work with the RoboClaw in RC-mode, and a PWM
  * controller sending RC servo style signals (20 ms pulse period, 1.5 ms high
  * centered). It assumes mixing is not enabled.
- * 
+ * <p>
  * Note that this class is not thread safe. If changes can be initiated from
  * different threads, the instance must be protected.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class RoboClawRCTank implements Motor {
-	private final static float EPSILON = 0.05f;
-	private final Servo leftEngine;
-	private final Servo rightEngine;
-	private float speed;
-	private float direction;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoboClawRCTank.class);
+    private final static float EPSILON = 0.05f;
+    private final Servo leftEngine;
+    private final Servo rightEngine;
+    private float speed;
+    private float direction;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param leftEngine
-	 *            the servo controlling the left engine.
-	 * @param rightEngine
-	 *            the servo controlling the right engine.
-	 * 
-	 * @throws IOException
-	 *             exception
-	 */
-	public RoboClawRCTank(Servo leftEngine, Servo rightEngine) throws IOException {
-		this.leftEngine = leftEngine;
-		this.rightEngine = rightEngine;
-		resetServos();
-	}
+    /**
+     * Constructor.
+     *
+     * @param leftEngine  the servo controlling the left engine.
+     * @param rightEngine the servo controlling the right engine.
+     * @throws IOException exception
+     */
+    public RoboClawRCTank(Servo leftEngine, Servo rightEngine) throws IOException {
+        this.leftEngine = leftEngine;
+        this.rightEngine = rightEngine;
+        resetServos();
+    }
 
-	private void resetServos() throws IOException {
-		this.leftEngine.setInput(0);
-		this.rightEngine.setInput(0);
-	}
+    private void resetServos() throws IOException {
+        this.leftEngine.setInput(0);
+        this.rightEngine.setInput(0);
+    }
 
-	@Override
-	public void setSpeed(float speed) throws IOException {
-		this.speed = speed;
-		internalUpdateEngines();
-	}
+    @Override
+    public void setSpeed(float speed) throws IOException {
+        this.speed = speed;
+        internalUpdateEngines();
+    }
 
-	/**
-	 * @return tank engine direction in radians
-	 */
-	public float getDirection() {
-		return direction;
-	}
+    /**
+     * @return tank engine direction in radians
+     */
+    public float getDirection() {
+        return direction;
+    }
 
-	/**
-	 * Sets the "direction" for the platform. This directly corresponds to the
-	 * velocity distribution between the engines.
-	 * 
-	 * @param direction
-	 *            the desired "direction" in radians. Math.PI means all velocity
-	 *            goes to the left engine, turning the vehicle max right.
-	 * 
-	 * @throws IOException
-	 *             exception
-	 */
-	public void setDirection(float direction) throws IOException {
-		this.direction = direction;
-		if (speed != 0) {
-			internalUpdateEngines();
-		}
-	}
+    /**
+     * Sets the "direction" for the platform. This directly corresponds to the
+     * velocity distribution between the engines.
+     *
+     * @param direction the desired "direction" in radians. Math.PI means all velocity
+     *                  goes to the left engine, turning the vehicle max right.
+     * @throws IOException exception
+     */
+    public void setDirection(float direction) throws IOException {
+        this.direction = direction;
+        if (speed != 0) {
+            internalUpdateEngines();
+        }
+    }
 
-	private void updateEngines() throws IOException {
-		// If a component is rather small, just interpret is as zero
-		double rightComponent = round(Math.sin(direction));
-		double forwardComponent = round(Math.cos(direction));
+    private void updateEngines() throws IOException {
+        // If a component is rather small, just interpret is as zero
+        double rightComponent = round(Math.sin(direction));
+        double forwardComponent = round(Math.cos(direction));
 
-		if (speed == 0) {
-			leftEngine.setInput(0);
-			rightEngine.setInput(0);
-		} else if (Math.abs(forwardComponent) < EPSILON) {
-			// If we are trying to move, but the speed component
-			// forwards/backwards is very small (trying to turn a lot), then we
-			// turn tank style - i.e. move the wheels in opposite directions.
-			if (rightComponent > 0) {
-				rightEngine.setInput(-speed / 2);
-				leftEngine.setInput(speed / 2);
-			} else {
-				rightEngine.setInput(speed / 2);
-				leftEngine.setInput(-speed / 2);
-			}
-		} else {
-			float forward = 1;
-			if (forwardComponent < 0) {
-				forward = -1;
-			}
-			leftEngine.setInput(forward * (float) (speed + rightComponent * speed));
-			rightEngine.setInput(forward * (float) (speed - rightComponent * speed));
-		}
-		emitEngineEvent();
-	}
+        if (speed == 0) {
+            leftEngine.setInput(0);
+            rightEngine.setInput(0);
+        } else if (Math.abs(forwardComponent) < EPSILON) {
+            // If we are trying to move, but the speed component
+            // forwards/backwards is very small (trying to turn a lot), then we
+            // turn tank style - i.e. move the wheels in opposite directions.
+            if (rightComponent > 0) {
+                rightEngine.setInput(-speed / 2);
+                leftEngine.setInput(speed / 2);
+            } else {
+                rightEngine.setInput(speed / 2);
+                leftEngine.setInput(-speed / 2);
+            }
+        } else {
+            float forward = 1;
+            if (forwardComponent < 0) {
+                forward = -1;
+            }
+            leftEngine.setInput(forward * (float) (speed + rightComponent * speed));
+            rightEngine.setInput(forward * (float) (speed - rightComponent * speed));
+        }
+        emitEngineEvent();
+    }
 
-	private void emitEngineEvent() {
-		EngineEvent event = new EngineEvent();
-		event.setDirection(direction);
-		event.setSpeed(speed);
-		event.commit();
-	}
+    private void emitEngineEvent() {
+        EngineEvent event = new EngineEvent();
+        event.setDirection(direction);
+        event.setSpeed(speed);
+        event.commit();
+    }
 
-	private void internalUpdateEngines() {
-		try {
-			updateEngines();
-		} catch (IOException e) {
-			Logger.getLogger(RoboClawRCTank.class.getName()).log(Level.SEVERE, "Could not update engine speed!");
-		}
-	}
+    private void internalUpdateEngines() {
+        try {
+            updateEngines();
+        } catch (IOException e) {
+            LOGGER.error("Could not update engine speed!", e);
+        }
+    }
 
-	private double round(double val) {
-		return Math.abs(val) < EPSILON ? 0 : val;
-	}
+    private double round(double val) {
+        return Math.abs(val) < EPSILON ? 0 : val;
+    }
 
-	@Override
-	public float getSpeed() throws IOException {
-		return leftEngine.getInput();
-	}
+    @Override
+    public float getSpeed() throws IOException {
+        return leftEngine.getInput();
+    }
 }

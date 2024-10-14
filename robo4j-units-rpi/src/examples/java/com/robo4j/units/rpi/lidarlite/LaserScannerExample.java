@@ -16,67 +16,69 @@
  */
 package com.robo4j.units.rpi.lidarlite;
 
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboBuilderException;
+import com.robo4j.RoboReference;
+import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationBuilder;
+import com.robo4j.units.rpi.pwm.ServoUnitExample;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import com.robo4j.RoboBuilder;
-import com.robo4j.RoboBuilderException;
-import com.robo4j.RoboContext;
-import com.robo4j.RoboReference;
-import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationBuilder;
-import com.robo4j.units.rpi.pwm.ServoUnitExample;
-
 /**
  * Runs the laser scanner, printing the max range and min range found on stdout.
  * (To see all data, run with JFR and dump a recording.)
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class LaserScannerExample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LaserScannerExample.class);
 
-	public static void main(String[] args) throws RoboBuilderException, IOException {
-		float startAngle = -45.0f;
-		float range = 90.0f;
-		float step = 1.0f;
-		InputStream settings;
+    public static void main(String[] args) throws RoboBuilderException, IOException {
+        float startAngle = -45.0f;
+        float range = 90.0f;
+        float step = 1.0f;
+        InputStream settings;
 
-		switch (args.length) {
-		case 1:
-			settings = Files.newInputStream(Paths.get(args[0]));
-			break;
-		case 3:
-			startAngle = Float.parseFloat(args[0]);
-			range = Float.parseFloat(args[1]);
-			step = Float.parseFloat(args[2]);
-		default:
-			settings = ServoUnitExample.class.getClassLoader().getResourceAsStream("lidarexample.xml");
-		}
+        switch (args.length) {
+            case 1:
+                settings = Files.newInputStream(Paths.get(args[0]));
+                break;
+            case 3:
+                startAngle = Float.parseFloat(args[0]);
+                range = Float.parseFloat(args[1]);
+                step = Float.parseFloat(args[2]);
+            default:
+                settings = ServoUnitExample.class.getClassLoader().getResourceAsStream("lidarexample.xml");
+        }
 
-		Configuration controllerConfiguration = new ConfigurationBuilder()
-				.addFloat(LaserScannerTestController.CONFIG_KEY_START_ANGLE, startAngle)
-				.addFloat(LaserScannerTestController.CONFIG_KEY_RANGE, range).addFloat(LaserScannerTestController.CONFIG_KEY_STEP, step)
-				.build();
+        Configuration controllerConfiguration = new ConfigurationBuilder()
+                .addFloat(LaserScannerTestController.CONFIG_KEY_START_ANGLE, startAngle)
+                .addFloat(LaserScannerTestController.CONFIG_KEY_RANGE, range).addFloat(LaserScannerTestController.CONFIG_KEY_STEP, step)
+                .build();
 
-		System.out.println(String.format("Running scans with startAngle=%2.1f, range=%2.1f and step=%2.1f", startAngle, range, step));
+        LOGGER.info("Running scans with startAngle={}, range={} and step={}", startAngle, range, step);
 
-		RoboBuilder builder = new RoboBuilder();
-		if (settings == null) {
-			System.out.println("Could not find the settings for the LaserScannerExample!");
-			System.exit(2);
-		}
-		builder.add(settings).add(LaserScannerTestController.class, controllerConfiguration, "controller").add(LaserScanProcessor.class,
-				"processor");
-		RoboContext ctx = builder.build();
-		RoboReference<Float> tiltServo = ctx.getReference("laserscanner.tilt");
-		tiltServo.sendMessage(Float.valueOf(0));
-		RoboReference<String> reference = ctx.getReference("controller");
-		ctx.start();
-		System.out.println("Starting scanning for ever\nPress <Enter> to quit");
-		reference.sendMessage("scan");
-		System.in.read();
-	}
+        var builder = new RoboBuilder();
+        if (settings == null) {
+            LOGGER.warn("Could not find the settings for the LaserScannerExample!");
+            System.exit(2);
+        }
+        builder.add(settings).add(LaserScannerTestController.class, controllerConfiguration, "controller").add(LaserScanProcessor.class,
+                "processor");
+        var ctx = builder.build();
+        RoboReference<Float> tiltServo = ctx.getReference("laserscanner.tilt");
+        tiltServo.sendMessage(Float.valueOf(0));
+        RoboReference<String> reference = ctx.getReference("controller");
+        ctx.start();
+        LOGGER.info("Starting scanning for ever\nPress <Enter> to quit");
+        reference.sendMessage("scan");
+        System.in.read();
+    }
 }

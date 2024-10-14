@@ -27,78 +27,74 @@ import com.robo4j.socket.http.util.HttpPathUtils;
 import com.robo4j.util.StringConstants;
 import com.robo4j.util.Utf8Constant;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
 import java.util.Collections;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- *
- *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 class HttpContextTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpContextTests.class);
 
-	@Test
-	void serverNotInitiatedContextTest() {
+    @Test
+    void serverNotInitiatedContextTest() {
+        ServerContext context = new ServerContext();
 
-		ServerContext context = new ServerContext();
-		System.out.println("context:" + context);
-		assertNotNull(context);
-		assertTrue(context.isEmpty());
+        printContext(context);
+        assertNotNull(context);
+        assertTrue(context.isEmpty());
 
-	}
+    }
 
-	@Test
-	void serverDefaultContextTest() {
+    @Test
+    void serverDefaultContextTest() {
+        var context = new ServerContext();
+        HttpPathUtils.updateHttpServerContextPaths(null, context, Collections.emptyList());
 
-		ServerContext context = new ServerContext();
-		HttpPathUtils.updateHttpServerContextPaths(null, context, Collections.emptyList());
+        printContext(context);
+        assertNotNull(context);
+        assertFalse(context.isEmpty());
+        assertTrue(context.containsPath(new PathHttpMethod(Utf8Constant.UTF8_SOLIDUS, HttpMethod.GET)));
 
-		System.out.println("context:" + context);
-		assertNotNull(context);
-		assertTrue(!context.isEmpty());
-		assertTrue(context.containsPath(new PathHttpMethod(Utf8Constant.UTF8_SOLIDUS, HttpMethod.GET)));
+    }
 
-	}
+    @Test
+    void clientDefaultContextTest() {
+        var context = new ClientContext();
 
-	@Test
-	void clientDefaultContextTest() {
+        printContext(context);
+        assertNotNull(context);
+        assertTrue(context.isEmpty());
+    }
 
-		ClientContext context = new ClientContext();
+    @Test
+    void clientSimpleContextTest() throws Exception {
+        var builderProducer = new RoboBuilder();
+        var contextIS = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("robo_client_context.xml");
+        builderProducer.add(contextIS);
+        var paths = Collections.singletonList(new HttpPathMethodDTO(StringConstants.EMPTY,
+                HttpMethod.GET, Collections.singletonList(StringConsumer.NAME)));
+        var context = new ClientContext();
+        HttpPathUtils.updateHttpClientContextPaths(context, paths);
 
-		System.out.println("context: " + context);
-		assertNotNull(context);
-		assertTrue(context.isEmpty());
-	}
+        var basicGet = new PathHttpMethod(Utf8Constant.UTF8_SOLIDUS, HttpMethod.GET);
 
-	@Test
-	void clientSimpleContextTest() throws Exception {
+        printContext(context);
+        assertNotNull(context);
+        assertNotNull(context.getPathConfig(basicGet));
+        assertFalse(context.getPathConfig(basicGet).getCallbacks().isEmpty());
+        assertEquals(HttpMethod.GET, context.getPathConfig(basicGet).getMethod());
+        assertEquals(1, context.getPathConfig(basicGet).getCallbacks().size());
+        assertEquals(StringConsumer.NAME, context.getPathConfig(basicGet).getCallbacks().get(0));
+    }
 
-		RoboBuilder builderProducer = new RoboBuilder();
-		InputStream contextIS = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream("robo_client_context.xml");
-		builderProducer.add(contextIS);
-
-		List<HttpPathMethodDTO> paths = Collections.singletonList(new HttpPathMethodDTO(StringConstants.EMPTY,
-				HttpMethod.GET, Collections.singletonList(StringConsumer.NAME)));
-
-		ClientContext context = new ClientContext();
-		HttpPathUtils.updateHttpClientContextPaths(context, paths);
-
-		PathHttpMethod basicGet = new PathHttpMethod(Utf8Constant.UTF8_SOLIDUS, HttpMethod.GET);
-
-		System.out.println("context: " + context);
-		assertNotNull(context);
-		assertNotNull(context.getPathConfig(basicGet));
-		assertTrue(!context.getPathConfig(basicGet).getCallbacks().isEmpty());
-		assertEquals(HttpMethod.GET, context.getPathConfig(basicGet).getMethod());
-		assertEquals(1, context.getPathConfig(basicGet).getCallbacks().size());
-		assertEquals(StringConsumer.NAME, context.getPathConfig(basicGet).getCallbacks().get(0));
-	}
+    private static <T> void printContext(T context) {
+        LOGGER.debug("context:{}", context);
+    }
 }

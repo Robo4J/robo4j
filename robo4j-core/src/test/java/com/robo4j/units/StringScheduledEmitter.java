@@ -19,6 +19,8 @@ package com.robo4j.units;
 import com.robo4j.*;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.util.StringConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class StringScheduledEmitter extends RoboUnit<String> {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(StringScheduledEmitter.class);
     public static final String DEFAULT_UNIT_NAME = "scheduledEmitter";
     public static final String ATTR_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
     public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
@@ -75,10 +77,10 @@ public class StringScheduledEmitter extends RoboUnit<String> {
 
     @Override
     public void start() {
-        System.out.println("start scheduler");
+        LOGGER.info("start scheduler");
         getContext().getScheduler().scheduleAtFixedRate(() -> {
             var messageForTarget = messages.get(target);
-            System.out.println("scheduler message: " + messageForTarget + ", target: " + target);
+            LOGGER.info("scheduler message: {}, target: {}", messageForTarget, target);
             getContext().getReference(target).sendMessage(messageForTarget);
         }, initSchedulerDelayMillis, schedulerPeriodMillis, TimeUnit.MILLISECONDS);
     }

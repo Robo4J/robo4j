@@ -20,6 +20,8 @@ import com.robo4j.hw.rpi.gps.GPS;
 import com.robo4j.hw.rpi.gps.GPSListener;
 import com.robo4j.hw.rpi.gps.PositionEvent;
 import com.robo4j.hw.rpi.gps.VelocityEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -30,23 +32,25 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GPSTest {
-	// TODO remove duplicates
-	public static void main(String[] args) throws InterruptedException, IOException {
-		GPS sparkFunGPS = new TitanX1GPS();
-		sparkFunGPS.addListener(new GPSListener() {
-			@Override
-			public void onPosition(PositionEvent event) {
-				System.out.println(event);
-			}
+    private static final Logger LOGGER = LoggerFactory.getLogger(GPSTest.class);
 
-			@Override
-			public void onVelocity(VelocityEvent event) {
-				System.out.println(event);
-			}
-		});
-		sparkFunGPS.start();
-		System.out.println("Press <Enter> to quit!");
-		System.in.read();
-		sparkFunGPS.shutdown();
-	}
+    // TODO remove duplicates
+    public static void main(String[] args) throws InterruptedException, IOException {
+        GPS sparkFunGPS = new TitanX1GPS();
+        sparkFunGPS.addListener(new GPSListener() {
+            @Override
+            public void onPosition(PositionEvent event) {
+                LOGGER.debug("onPosition,event:{}", event);
+            }
+
+            @Override
+            public void onVelocity(VelocityEvent event) {
+                LOGGER.debug("onVelocity,event:{}", event);
+            }
+        });
+        sparkFunGPS.start();
+        LOGGER.info("Press <Enter> to quit!");
+        System.in.read();
+        sparkFunGPS.shutdown();
+    }
 }

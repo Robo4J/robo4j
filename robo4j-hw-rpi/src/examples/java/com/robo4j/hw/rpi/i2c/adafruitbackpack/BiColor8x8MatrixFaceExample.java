@@ -17,6 +17,9 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -28,31 +31,32 @@ import java.util.concurrent.TimeUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class BiColor8x8MatrixFaceExample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BiColor8x8MatrixFaceExample.class);
 
-	public static void main(String[] args) throws Exception {
-		System.out.println("=== BiColor 8x8 Matrix Face Example ===");
+    public static void main(String[] args) throws Exception {
+        LOGGER.debug("=== BiColor 8x8 Matrix Face Example ===");
 
-		BiColor8x8MatrixDevice led = new BiColor8x8MatrixDevice();
+        BiColor8x8MatrixDevice led = new BiColor8x8MatrixDevice();
 
-		char[] faceSmile = "00333300,03000030,30300303,30000003,30300303,30033003,03000030,00333300".toCharArray();
-		char[] faceNeutral = "00222200,02000020,20200202,20000002,20222202,20000002,02000020,00222200".toCharArray();
-		char[] faceSad = "00111100,01000010,10100101,10000001,10011001,10100101,01000010,00111100".toCharArray();
+        char[] faceSmile = "00333300,03000030,30300303,30000003,30300303,30033003,03000030,00333300".toCharArray();
+        char[] faceNeutral = "00222200,02000020,20200202,20000002,20222202,20000002,02000020,00222200".toCharArray();
+        char[] faceSad = "00111100,01000010,10100101,10000001,10011001,10100101,01000010,00111100".toCharArray();
 
-		List<char[]> availableFaces = Arrays.asList(faceSad, faceNeutral, faceSmile);
+        List<char[]> availableFaces = Arrays.asList(faceSad, faceNeutral, faceSmile);
 
-		for (char[] face : availableFaces) {
-			led.clear();
-			led.display();
-			byte[] faceBytes = LedBackpackUtils.createMatrixBiColorArrayByCharSequence(led.getWidth(), ',', face);
-			LedBackpackUtils.paintByBiColorByteArray(led, faceBytes);
-			led.display();
-			TimeUnit.SECONDS.sleep(1);
-		}
+        for (char[] face : availableFaces) {
+            led.clear();
+            led.display();
+            byte[] faceBytes = LedBackpackUtils.createMatrixBiColorArrayByCharSequence(led.getWidth(), ',', face);
+            LedBackpackUtils.paintByBiColorByteArray(led, faceBytes);
+            led.display();
+            TimeUnit.SECONDS.sleep(1);
+        }
 
-		System.out.println("Press <Enter> to quit!");
-		System.in.read();
-		led.clear();
-		led.display();
+        LOGGER.debug("Press <Enter> to quit!");
+        System.in.read();
+        led.clear();
+        led.display();
 
-	}
+    }
 }

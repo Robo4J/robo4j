@@ -28,12 +28,9 @@ import com.robo4j.math.geometry.Point2f;
 import com.robo4j.math.geometry.impl.ScanResultImpl;
 import com.robo4j.math.jfr.ScanEvent;
 import com.robo4j.math.jfr.ScanId;
-import jdk.jfr.Category;
-import jdk.jfr.Description;
-import jdk.jfr.Event;
-import jdk.jfr.Label;
-import jdk.jfr.Name;
-import jdk.jfr.StackTrace;
+import jdk.jfr.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -42,8 +39,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Driver for the ydlidar device.
@@ -69,7 +64,7 @@ import java.util.logging.Logger;
  * @author Miro Wengner (@miragemiko)
  */
 public class YDLidarDevice {
-    private static final Logger LOGGER = Logger.getLogger(YDLidarDevice.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(YDLidarDevice.class);
     private static final int DEFAULT_SERIAL_TIMEOUT = 800;
 
     public static final String SERIAL_PORT_AUTO = "auto";
@@ -200,7 +195,7 @@ public class YDLidarDevice {
                     try {
                         DataHeader header = readDataHeader(DEFAULT_SERIAL_TIMEOUT * 4);
                         if (!header.isValid()) {
-                            LOGGER.log(Level.SEVERE, "Got invalid header - stopping scanner");
+                            LOGGER.warn("Got invalid header - stopping scanner");
                             stopScanning();
                             return;
                         }
@@ -216,7 +211,7 @@ public class YDLidarDevice {
                             // If we aren't scanning, we got here since we are
                             // shutting down scanning, and there is not much
                             // left to do.
-                            LOGGER.log(Level.SEVERE, "Failed to read data from the ydlidar - stopping scanner", e);
+                            LOGGER.error("Failed to read data from the ydlidar - stopping scanner", e);
                             stopScanning();
                         }
                         return;
@@ -487,7 +482,7 @@ public class YDLidarDevice {
                 disableDataCapturing();
                 serial.close();
             } catch (IllegalStateException | IOException | InterruptedException e) {
-                LOGGER.log(Level.WARNING, "Problem shutting down ydlidar serial", e);
+                LOGGER.error("Problem shutting down ydlidar serial", e);
             }
         }
     }
@@ -590,7 +585,7 @@ public class YDLidarDevice {
         Set<SerialDeviceDescriptor> availableUSBSerialDevices = SerialUtil.getAvailableUSBSerialDevices();
         for (SerialDeviceDescriptor descriptor : availableUSBSerialDevices) {
             if (VENDOR_ID.equals(descriptor.getVendorId()) && PRODUCT_ID.equals(descriptor.getProductId())) {
-                LOGGER.info("Bound ydlidar to " + descriptor);
+                LOGGER.info("Bound ydlidar to {}", descriptor);
                 return descriptor.getPath();
             }
         }

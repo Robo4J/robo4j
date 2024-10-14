@@ -1,5 +1,6 @@
 module robo4j.http {
     requires transitive robo4j.core;
+    requires org.slf4j;
 
     exports com.robo4j.socket.http;
     exports com.robo4j.socket.http.codec;

@@ -21,9 +21,10 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.message.HttpDecoratedRequest;
 import com.robo4j.socket.http.util.RoboHttpUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -36,35 +37,35 @@ import java.util.Map;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class HttpClientNetConfigUnit extends RoboUnit<Map> {
-
     public static final String PROPERTY_TARGET = "target";
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientNetConfigUnit.class);
     private String target;
 
-	public HttpClientNetConfigUnit(RoboContext context, String id) {
-		super(Map.class, context, id);
-	}
+    public HttpClientNetConfigUnit(RoboContext context, String id) {
+        super(Map.class, context, id);
+    }
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-		target = configuration.getString(PROPERTY_TARGET, null);
-		if (target == null) {
-			throw ConfigurationException.createMissingConfigNameException(PROPERTY_TARGET);
-		}
-	}
+    @Override
+    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+        target = configuration.getString(PROPERTY_TARGET, null);
+        if (target == null) {
+            throw ConfigurationException.createMissingConfigNameException(PROPERTY_TARGET);
+        }
+    }
 
-	@Override
-	public void onMessage(Map message) {
-		Map<String, String> map = (Map<String, String>) message;
-		SimpleLoggingUtil.info(getClass(), "RECEIVED: " + map);
+    @Override
+    public void onMessage(Map message) {
+        Map<String, String> map = (Map<String, String>) message;
+        LOGGER.info("RECEIVED:{}", map);
 
-		String host = map.get(RoboHttpUtils.PROPERTY_HOST);
-		Integer port = Integer.valueOf(map.get(RoboHttpUtils.PROPERTY_SOCKET_PORT));
+        String host = map.get(RoboHttpUtils.PROPERTY_HOST);
+        Integer port = Integer.valueOf(map.get(RoboHttpUtils.PROPERTY_SOCKET_PORT));
 
-		RoboReference<HttpDecoratedRequest> httpUnitRef = getContext().getReference(target);
-		HttpDecoratedRequest confMessage = new HttpDecoratedRequest();
-		confMessage.setHost(host);
-		confMessage.setPort(port);
-		httpUnitRef.sendMessage(confMessage);
+        RoboReference<HttpDecoratedRequest> httpUnitRef = getContext().getReference(target);
+        HttpDecoratedRequest confMessage = new HttpDecoratedRequest();
+        confMessage.setHost(host);
+        confMessage.setPort(port);
+        httpUnitRef.sendMessage(confMessage);
 
-	}
+    }
 }

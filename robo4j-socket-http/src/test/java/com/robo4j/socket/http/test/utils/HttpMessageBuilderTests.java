@@ -24,6 +24,8 @@ import com.robo4j.socket.http.message.HttpRequestDenominator;
 import com.robo4j.socket.http.util.HttpMessageBuilder;
 import com.robo4j.socket.http.util.RoboHttpUtils;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.robo4j.socket.http.provider.DefaultValuesProvider.BASIC_HEADER_MAP;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -34,38 +36,40 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Miroslav Wengner (@miragemiko)
  */
 class HttpMessageBuilderTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpMessageBuilderTests.class);
 
-	@Test
-	void getRequestTest() {
-		HttpMessageBuilder getMessageBuilder = getDefaultMessageBuilderByMethod(HttpMethod.GET);
+    @Test
+    void getRequestTest() {
+        var getMessageBuilder = getDefaultMessageBuilderByMethod(HttpMethod.GET);
 
-		final String getMessage = getMessageBuilder.build();
-		assertNotNull(getMessage);
-		assertTrue(getMessage.contains("GET / HTTP/1.1"));
-		assertTrue(getMessage.contains("host: localhost"));
-		System.out.println("toMessage: " + getMessage);
-	}
+        var message = getMessageBuilder.build();
 
-	@Test
-	void postRequestTest() {
-		String message = "magic";
-		HttpMessageBuilder postMessageBuilder = getDefaultMessageBuilderByMethod(HttpMethod.POST);
-		postMessageBuilder.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()));
+        LOGGER.info("toMessage: {}", message);
+        assertNotNull(message);
+        assertTrue(message.contains("GET / HTTP/1.1"));
+        assertTrue(message.contains("host: localhost"));
+    }
 
-		final String postRequest = postMessageBuilder.build(message);
+    @Test
+    void postRequestTest() {
+        String message = "magic";
+        HttpMessageBuilder postMessageBuilder = getDefaultMessageBuilderByMethod(HttpMethod.POST);
+        postMessageBuilder.addHeaderElement(HttpHeaderFieldNames.CONTENT_LENGTH, String.valueOf(message.length()));
 
-		assertNotNull(postRequest);
-		assertTrue(postRequest.contains("POST / HTTP/1.1"));
-		assertTrue(postRequest.contains("host: localhost"));
-		assertTrue(postRequest.contains("content-length: 5"));
-		assertTrue(postRequest.contains(message));
-	}
+        final String postRequest = postMessageBuilder.build(message);
+
+        assertNotNull(postRequest);
+        assertTrue(postRequest.contains("POST / HTTP/1.1"));
+        assertTrue(postRequest.contains("host: localhost"));
+        assertTrue(postRequest.contains("content-length: 5"));
+        assertTrue(postRequest.contains(message));
+    }
 
 
-	private HttpMessageBuilder getDefaultMessageBuilderByMethod(HttpMethod method) {
-		HttpRequestDenominator getDenominator = new HttpRequestDenominator(method, HttpVersion.HTTP_1_1);
-		return HttpMessageBuilder.Build().setDenominator(getDenominator)
-				.addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost("localhost", ProtocolType.HTTP.getPort()))
-				.addHeaderElements(BASIC_HEADER_MAP);
-	}
+    private HttpMessageBuilder getDefaultMessageBuilderByMethod(HttpMethod method) {
+        HttpRequestDenominator getDenominator = new HttpRequestDenominator(method, HttpVersion.HTTP_1_1);
+        return HttpMessageBuilder.Build().setDenominator(getDenominator)
+                .addHeaderElement(HttpHeaderFieldNames.HOST, RoboHttpUtils.createHost("localhost", ProtocolType.HTTP.getPort()))
+                .addHeaderElements(BASIC_HEADER_MAP);
+    }
 }

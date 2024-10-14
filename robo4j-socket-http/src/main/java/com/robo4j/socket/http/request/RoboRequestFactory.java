@@ -18,7 +18,6 @@ package com.robo4j.socket.http.request;
 
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.socket.http.HttpMethod;
 import com.robo4j.socket.http.dto.ResponseAttributeDTO;
 import com.robo4j.socket.http.dto.ResponseDecoderUnitDTO;
@@ -29,6 +28,8 @@ import com.robo4j.socket.http.units.ServerPathConfig;
 import com.robo4j.socket.http.units.SocketDecoder;
 import com.robo4j.socket.http.util.JsonUtil;
 import com.robo4j.socket.http.util.ReflectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,98 +44,96 @@ import java.util.stream.Collectors;
  * @author Miro Wengner (@miragemiko)
  */
 public class RoboRequestFactory implements DefaultRequestFactory<Object> {
-	private static final List<HttpMethod> GET_POST_METHODS = Arrays.asList(HttpMethod.GET, HttpMethod.POST);
-	private final CodecRegistry codecRegistry;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoboRequestFactory.class);
+    private static final List<HttpMethod> GET_POST_METHODS = Arrays.asList(HttpMethod.GET, HttpMethod.POST);
+    private final CodecRegistry codecRegistry;
 
-	public RoboRequestFactory(final CodecRegistry codecRegistry) {
-		this.codecRegistry = codecRegistry;
-	}
+    public RoboRequestFactory(final CodecRegistry codecRegistry) {
+        this.codecRegistry = codecRegistry;
+    }
 
-	/**
-	 * Generic robo context overview. It returns all units registered into the context including system id.
-	 * The 1st position is reserved for the system
-	 *
-	 * @param context
-	 *            robo context
-	 * @return descripton of desired context
-	 */
-	@Override
-	public Object processGet(RoboContext context) {
-		if (!context.getUnits().isEmpty()) {
+    /**
+     * Generic robo context overview. It returns all units registered into the context including system id.
+     * The 1st position is reserved for the system
+     *
+     * @param context robo context
+     * @return descripton of desired context
+     */
+    @Override
+    public Object processGet(RoboContext context) {
+        if (!context.getUnits().isEmpty()) {
 
-			final List<ResponseUnitDTO> unitList = context.getUnits().stream()
-					.map(u -> new ResponseUnitDTO(u.getId(), u.getState())).collect(Collectors.toList());
-			unitList.add(0, new ResponseUnitDTO(context.getId(), context.getState()));
-			return JsonUtil.toJsonArray(unitList);
-		} else {
-			SimpleLoggingUtil.error(getClass(), "internal error: no units available");
-		}
-		return null;
-	}
+            final List<ResponseUnitDTO> unitList = context.getUnits().stream()
+                    .map(u -> new ResponseUnitDTO(u.getId(), u.getState())).collect(Collectors.toList());
+            unitList.add(0, new ResponseUnitDTO(context.getId(), context.getState()));
+            return JsonUtil.toJsonArray(unitList);
+        } else {
+            LOGGER.error("internal error: no units available");
+        }
+        return null;
+    }
 
-	// FIXME correct available methods according to the configuration
-	@Override
-	public Object processGet(ServerPathConfig pathConfig) {
-		final RoboReference<?> unitRef = pathConfig.getRoboUnit();
-		final SocketDecoder<?, ?> decoder = codecRegistry.getDecoder(unitRef.getMessageType());
+    // FIXME correct available methods according to the configuration
+    @Override
+    public Object processGet(ServerPathConfig pathConfig) {
+        final RoboReference<?> unitRef = pathConfig.getRoboUnit();
+        final SocketDecoder<?, ?> decoder = codecRegistry.getDecoder(unitRef.getMessageType());
 
-		if(unitRef.getMessageType().equals(Object.class) || decoder == null){
-			 List<ResponseAttributeDTO> attrList = unitRef.getKnownAttributes().stream()
-					 .map(d -> {
-						 try {
-							 Object val = unitRef.getAttribute(d).get();
-							 ResponseAttributeDTO attributeDTO = new ResponseAttributeDTO();
-							 attributeDTO.setId(d.getAttributeName());
-							 attributeDTO.setType(d.getAttributeType().getTypeName());
-							 attributeDTO.setValue(String.valueOf(val));
+        if (unitRef.getMessageType().equals(Object.class) || decoder == null) {
+            List<ResponseAttributeDTO> attrList = unitRef.getKnownAttributes().stream()
+                    .map(d -> {
+                        try {
+                            Object val = unitRef.getAttribute(d).get();
+                            ResponseAttributeDTO attributeDTO = new ResponseAttributeDTO();
+                            attributeDTO.setId(d.getAttributeName());
+                            attributeDTO.setType(d.getAttributeType().getTypeName());
+                            attributeDTO.setValue(String.valueOf(val));
 
-							 if(d.getAttributeName().equals(HttpServerUnit.ATTR_PATHS)){
-								 attributeDTO.setType("java.util.ArrayList");
-							 }
-							 return attributeDTO;
-
-
-						 } catch (InterruptedException | ExecutionException e) {
-							 SimpleLoggingUtil.error(getClass(), e.getMessage());
-							 return null;
-						 }
-					 })
-					 .filter(Objects::nonNull)
-					 .collect(Collectors.toList());
-			 return JsonUtil.toJsonArrayServer(attrList);
-
-		} else {
-			final ResponseDecoderUnitDTO result = new ResponseDecoderUnitDTO();
-			result.setId(unitRef.getId());
-			result.setCodec(decoder.getDecodedClass().getName());
-			result.setMethods(GET_POST_METHODS);
-			return ReflectUtils.createJson(result);
-		}
+                            if (d.getAttributeName().equals(HttpServerUnit.ATTR_PATHS)) {
+                                attributeDTO.setType("java.util.ArrayList");
+                            }
+                            return attributeDTO;
 
 
-	}
+                        } catch (InterruptedException | ExecutionException e) {
+                            LOGGER.error("error:{}", e.getMessage(), e);
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            return JsonUtil.toJsonArrayServer(attrList);
 
-	@Override
-	public Object processServerGet(ServerPathConfig pathConfig) {
-		final ResponseDecoderUnitDTO result = new ResponseDecoderUnitDTO();
-		return ReflectUtils.createJson(result);
-	}
+        } else {
+            final ResponseDecoderUnitDTO result = new ResponseDecoderUnitDTO();
+            result.setId(unitRef.getId());
+            result.setCodec(decoder.getDecodedClass().getName());
+            result.setMethods(GET_POST_METHODS);
+            return ReflectUtils.createJson(result);
+        }
 
-	/**
-	 * currently is supported POST message in JSON format
-	 *
-	 * example: { "value" : "move" }
-	 *
-	 * @param unitReference
-	 *            desired unit
-	 * @param message
-	 *            string message
-	 * @return processed object
-	 */
-	@Override
-	public Object processPost(final RoboReference<?> unitReference, final String message) {
-		final SocketDecoder<Object, ?> decoder = codecRegistry.getDecoder(unitReference.getMessageType());
-		return decoder != null ? decoder.decode(message) : null;
-	}
+
+    }
+
+    @Override
+    public Object processServerGet(ServerPathConfig pathConfig) {
+        final ResponseDecoderUnitDTO result = new ResponseDecoderUnitDTO();
+        return ReflectUtils.createJson(result);
+    }
+
+    /**
+     * currently is supported POST message in JSON format
+     * <p>
+     * example: { "value" : "move" }
+     *
+     * @param unitReference desired unit
+     * @param message       string message
+     * @return processed object
+     */
+    @Override
+    public Object processPost(final RoboReference<?> unitReference, final String message) {
+        final SocketDecoder<Object, ?> decoder = codecRegistry.getDecoder(unitReference.getMessageType());
+        return decoder != null ? decoder.decode(message) : null;
+    }
 
 }

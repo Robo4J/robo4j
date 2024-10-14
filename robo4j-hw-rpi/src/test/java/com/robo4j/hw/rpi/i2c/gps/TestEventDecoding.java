@@ -16,48 +16,45 @@
  */
 package com.robo4j.hw.rpi.i2c.gps;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import com.robo4j.hw.rpi.gps.*;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.robo4j.hw.rpi.gps.GPS;
-import com.robo4j.hw.rpi.gps.MockGPS;
-import com.robo4j.hw.rpi.gps.NmeaUtils;
-import com.robo4j.hw.rpi.gps.PositionEvent;
-import com.robo4j.hw.rpi.gps.VelocityEvent;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestEventDecoding {
-	@Test
-	void testDecodePositionString() {
-		GPS gps = new MockGPS();
-		String line = "$GNGGA,223249.000,4704.833492,N,00826.465532,E,1,12,0.87,445.503,M,48.002,M,,*70";
-		assertTrue(NmeaUtils.hasValidCheckSum(line), "Not a valid checksum!");
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestEventDecoding.class);
 
-		PositionEvent event = XA1110PositionEvent.decode(gps, line);
+    @Test
+    void testDecodePositionString() {
+        GPS gps = new MockGPS();
+        String line = "$GNGGA,223249.000,4704.833492,N,00826.465532,E,1,12,0.87,445.503,M,48.002,M,,*70";
 
-		assertSame(gps, event.getSource());
-		assertNotNull(event.getSource());
-		assertNotNull(event);
-		assertNotNull(event.getLocation());
-		
-		System.out.println(event);
-	}
+        PositionEvent event = XA1110PositionEvent.decode(gps, line);
 
-	@Test
-	void testDecodeVelocityString() {
-		GPS gps = new MockGPS();
-		String line = "$GNVTG,343.70,T,,M,0.70,N,1.30,K,A*25";
-		assertTrue(NmeaUtils.hasValidCheckSum(line), "Not a valid checksum!");
+        LOGGER.info(event.toString());
 
-		VelocityEvent event = XA1110VelocityEvent.decode(gps, line);
+        assertTrue(NmeaUtils.hasValidCheckSum(line), "Not a valid checksum!");
+        assertSame(gps, event.getSource());
+        assertNotNull(event.getSource());
+        assertNotNull(event);
+        assertNotNull(event.getLocation());
+    }
 
-		assertSame(gps, event.getSource());
-		assertNotNull(event.getSource());
-		assertNotNull(event);
-		assertNotNull(event.getGroundSpeed());
-		
-		System.out.println(event);
-	}
+    @Test
+    void testDecodeVelocityString() {
+        GPS gps = new MockGPS();
+        String line = "$GNVTG,343.70,T,,M,0.70,N,1.30,K,A*25";
+        assertTrue(NmeaUtils.hasValidCheckSum(line), "Not a valid checksum!");
+
+        VelocityEvent event = XA1110VelocityEvent.decode(gps, line);
+
+        LOGGER.info("event: {}", event);
+
+        assertSame(gps, event.getSource());
+        assertNotNull(event.getSource());
+        assertNotNull(event);
+        event.getGroundSpeed();
+    }
 }

@@ -16,7 +16,8 @@
  */
 package com.robo4j.socket.http.channel;
 
-import com.robo4j.logging.SimpleLoggingUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -28,6 +29,7 @@ import java.nio.channels.SocketChannel;
  * @author Miro Wengner (@miragemiko)
  */
 public class ConnectSelectionKeyHandler implements SelectionKeyHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectSelectionKeyHandler.class);
 
     private final SelectionKey key;
 
@@ -37,11 +39,11 @@ public class ConnectSelectionKeyHandler implements SelectionKeyHandler {
 
     @Override
     public SelectionKey handle() {
-        try{
+        try {
             SocketChannel channel = (SocketChannel) key.channel();
             channel.finishConnect();
-        } catch (Exception e){
-            SimpleLoggingUtil.error(getClass(), "handle connect", e);
+        } catch (Exception e) {
+            LOGGER.error("handle connect:{}", e.getMessage(), e);
         }
         return key;
     }

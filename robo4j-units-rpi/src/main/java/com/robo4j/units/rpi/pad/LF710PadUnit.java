@@ -27,7 +27,8 @@ import com.robo4j.hw.rpi.pad.LF710Message;
 import com.robo4j.hw.rpi.pad.LF710Pad;
 import com.robo4j.hw.rpi.pad.PadInputResponseListener;
 import com.robo4j.hw.rpi.pad.RoboControlPad;
-import com.robo4j.logging.SimpleLoggingUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Paths;
 
@@ -37,8 +38,8 @@ import java.nio.file.Paths;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class LF710PadUnit extends RoboUnit<Object>{
-
+public class LF710PadUnit extends RoboUnit<Object> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LF710PadUnit.class);
     private RoboControlPad pad;
     private LF710ButtonObserver observer;
     private PadInputResponseListener listener;
@@ -54,7 +55,7 @@ public class LF710PadUnit extends RoboUnit<Object>{
         var input = configuration.getString("input", null);
         target = configuration.getString("target", null);
 
-        if(input == null){
+        if (input == null) {
             throw ConfigurationException.createMissingConfigNameException("input");
         }
         if (target == null) {
@@ -71,9 +72,9 @@ public class LF710PadUnit extends RoboUnit<Object>{
         pad.connect();
         observer = new LF710ButtonObserver(pad);
         listener = (LF710Message response) -> {
-            if(getState() == LifecycleState.STARTED){
-                if(targetRef == null){
-                    SimpleLoggingUtil.info(getClass(), "PAD pressed: " + response);
+            if (getState() == LifecycleState.STARTED) {
+                if (targetRef == null) {
+                    LOGGER.warn("PAD pressed:{}", response);
                 } else {
                     targetRef.sendMessage(response);
                 }

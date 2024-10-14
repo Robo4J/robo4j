@@ -18,49 +18,50 @@ package com.robo4j.units.rpi.gyro;
 
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboBuilderException;
-import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.units.rpi.gyro.GyroRequest.GyroAction;
 import com.robo4j.util.SystemUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Runs the gyro continuously.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GyroExample {
-	private static final String ID_PROCESSOR = "processor";
+    private static final Logger LOGGER = LoggerFactory.getLogger(GyroExample.class);
+    private static final String ID_PROCESSOR = "processor";
 
-	public static void main(String[] args) throws RoboBuilderException, IOException {
-		RoboBuilder builder = new RoboBuilder();
-		InputStream settings = GyroExample.class.getClassLoader().getResourceAsStream("gyroexample.xml");
-		if (settings == null) {
-			System.out.println("Could not find the settings for the GyroExample!");
-			System.exit(2);
-		}
-		builder.add(settings);
-		builder.add(GyroProcessor.class, ID_PROCESSOR);
-		RoboContext ctx = builder.build();
+    public static void main(String[] args) throws RoboBuilderException, IOException {
+        var builder = new RoboBuilder();
+        var settings = GyroExample.class.getClassLoader().getResourceAsStream("gyroexample.xml");
+        if (settings == null) {
+            LOGGER.warn("Could not find the settings for the GyroExample!");
+            System.exit(2);
+        }
+        builder.add(settings);
+        builder.add(GyroProcessor.class, ID_PROCESSOR);
+        var ctx = builder.build();
 
-		System.out.println("State before start:");
-		System.out.println(SystemUtil.printStateReport(ctx));
-		ctx.start();
+        LOGGER.info("State before start:");
+        LOGGER.info(SystemUtil.printStateReport(ctx));
+        ctx.start();
 
-		System.out.println("State after start:");
-		System.out.println(SystemUtil.printStateReport(ctx));
+        LOGGER.info("State after start:");
+        LOGGER.info(SystemUtil.printStateReport(ctx));
 
-		RoboReference<GyroRequest> gyro = ctx.getReference("gyro");
-		RoboReference<GyroEvent> processor = ctx.getReference(ID_PROCESSOR);
+        RoboReference<GyroRequest> gyro = ctx.getReference("gyro");
+        RoboReference<GyroEvent> processor = ctx.getReference(ID_PROCESSOR);
 
-		System.out.println("Let the gyro unit be absolutely still, then press enter to calibrate and start!");
-		System.in.read();
-		gyro.sendMessage(new GyroRequest(processor, GyroAction.CONTINUOUS, new Tuple3f(1.0f, 1.0f, 1.0f)));
-		System.out.println("Will report angular changes indefinitely.\nPress <Enter> to quit!");
-		System.in.read();
-	}
+        LOGGER.info("Let the gyro unit be absolutely still, then press enter to calibrate and start!");
+        System.in.read();
+        gyro.sendMessage(new GyroRequest(processor, GyroAction.CONTINUOUS, new Tuple3f(1.0f, 1.0f, 1.0f)));
+        LOGGER.info("Will report angular changes indefinitely.\nPress <Enter> to quit!");
+        System.in.read();
+    }
 }

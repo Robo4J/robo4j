@@ -16,20 +16,17 @@
  */
 package com.robo4j.reflect;
 
-import com.robo4j.logging.SimpleLoggingUtil;
 import com.robo4j.util.StreamUtils;
 import com.robo4j.util.StringConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -42,19 +39,20 @@ import java.util.zip.ZipInputStream;
  * @author Miro Wengner (@miragemiko)
  */
 public final class ReflectionScan {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionScan.class);
     private static final String FILE = "file:";
     private static final String SUFFIX = ".class";
-    private static final String EXCLAMATION = "\u0021";		//Exclamation mark !
+    private static final String EXCLAMATION = "\u0021";        //Exclamation mark !
     private static final char SLASH = '/';
     private static final char DOT = '.';
 
     private final ClassLoader loader;
 
-    public ReflectionScan(ClassLoader loader){
+    public ReflectionScan(ClassLoader loader) {
         this.loader = loader;
     }
 
-    public List<String> scanForEntities(String... entityPackages){
+    public List<String> scanForEntities(String... entityPackages) {
         final List<String> result = new ArrayList<>();
         for (String packageName : entityPackages) {
             packageName = packageName.trim();
@@ -63,8 +61,7 @@ public final class ReflectionScan {
                 if (classesInPackage.isEmpty()) {
                     classesInPackage.addAll(scanPackageOnDisk(loader, packageName));
                     if (classesInPackage.isEmpty()) {
-                        SimpleLoggingUtil.debug(getClass(),
-                                "We did not find any annotated classes in package " + packageName);
+                        LOGGER.debug("We did not find any annotated classes in package {}", packageName);
                     } else {
                         result.addAll(classesInPackage);
                     }
@@ -72,8 +69,7 @@ public final class ReflectionScan {
                     result.addAll(classesInPackage);
                 }
             } catch (IOException e) {
-                // TODO: provide robust logging
-                e.printStackTrace();
+                LOGGER.error(e.getMessage(), e);
             }
         }
         return result;
@@ -114,7 +110,7 @@ public final class ReflectionScan {
     }
 
     private List<String> scanPackageOnDisk(ClassLoader loader, String packageName) throws IOException {
-        final var packagePathStr =  slashify(packageName);
+        final var packagePathStr = slashify(packageName);
         // TODO: improve reflection, review usage
         return loader.resources(packagePathStr).map(URL::getFile).map(File::new)
                 .map(f -> findClasses(f, packageName)).flatMap(List::stream).collect(Collectors.toList());
@@ -135,8 +131,8 @@ public final class ReflectionScan {
             } else if (file.getName().endsWith(SUFFIX)) {
                 final StringBuilder sb = new StringBuilder();
                 sb.append(path.replace(File.separatorChar, DOT))
-                    .append(DOT)
-                    .append(file.getName(), 0, file.getName().length() - SUFFIX.length());
+                        .append(DOT)
+                        .append(file.getName(), 0, file.getName().length() - SUFFIX.length());
 
                 result.add(sb.toString());
             }
