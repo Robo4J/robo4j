@@ -16,11 +16,17 @@
  */
 package com.robo4j.units;
 
-import com.robo4j.*;
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.ConfigurationException;
+import com.robo4j.DefaultAttributeDescriptor;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
+import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,15 +39,46 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Miro Wengner (@miragemiko)
  */
 public class CounterUnit extends RoboUnit<CounterCommand> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CounterUnit.class);
-    private final AtomicInteger counter = new AtomicInteger(0);
+    private final class CounterRunner implements Runnable {
+        private final RoboReference<Integer> target;
+        private final CountDownLatch latchReportMessages;
 
+        private CounterRunner(RoboReference<Integer> target, CountDownLatch latchReportMessages) {
+            this.target = target;
+            this.latchReportMessages = latchReportMessages;
+        }
+
+        @Override
+        public void run() {
+            if (target != null) {
+                LOGGER.debug("send message:{} to unit:{}", counter.get(), target);
+                target.sendMessage(counter.getAndIncrement());
+                latchReportMessages.countDown();
+            } else {
+                LOGGER.error("The target {} for the CounterUnit does not exist! Could not send count!", target);
+            }
+        }
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CounterUnit.class);
+
+    private final AtomicInteger counter = new AtomicInteger(0);
     private int interval;
+    private int reportReceivedMessagesNumber;
+
+
+    public static final String ATTR_COUNTER = "Counter";
+    public static final String ATTR_REPORT_RECEIVED_MESSAGES_LATCH = "reportMessagesLatch";
+
+    public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_REPORT_RECEIVED_MESSAGES_LATCH = DefaultAttributeDescriptor
+            .create(CountDownLatch.class, ATTR_REPORT_RECEIVED_MESSAGES_LATCH);
 
     /**
      * This configuration key controls the interval between the updates, in ms.
      */
     public static final String KEY_INTERVAL = "interval";
+
+    public static final String KEY_RECEIVED_MESSAGE = "reportMessages";
 
     /**
      * The default period, if no period is configured.
@@ -49,11 +86,26 @@ public class CounterUnit extends RoboUnit<CounterCommand> {
     public static final int DEFAULT_INTERVAL = 1000;
 
     /**
+     * The report latch when requested number of message is received
+     */
+    public static final int DEFAULT_RECEIVED_MESSAGE = 2;
+
+    /**
      * This configuration key controls the target of the counter updates. This
      * configuration key is mandatory. Also, the target must exist when the
      * counter unit is started, and any change whilst running will be ignored.
      */
     public static final String KEY_TARGET = "target";
+
+    /**
+     * latch helps to identify the STOP state,
+     */
+    private CountDownLatch unitLatch = new CountDownLatch(1);
+
+    /**
+     * latch for reporting specific number of messages are received, by default it signal that any message was received
+     */
+    private CountDownLatch latchReportReceivedMessages = new CountDownLatch(1);
 
     /*
      * The currently running timer updater.
@@ -65,22 +117,6 @@ public class CounterUnit extends RoboUnit<CounterCommand> {
      */
     private String targetId;
 
-    private final class CounterUnitAction implements Runnable {
-        private final RoboReference<Integer> target;
-
-        public CounterUnitAction(RoboReference<Integer> target) {
-            this.target = target;
-        }
-
-        @Override
-        public void run() {
-            if (target != null) {
-                target.sendMessage(counter.getAndIncrement());
-            } else {
-                LOGGER.error("The target {} for the CounterUnit does not exist! Could not send count!", targetId);
-            }
-        }
-    }
 
     /**
      * Constructor.
@@ -95,6 +131,8 @@ public class CounterUnit extends RoboUnit<CounterCommand> {
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
         interval = configuration.getInteger(KEY_INTERVAL, DEFAULT_INTERVAL);
+        reportReceivedMessagesNumber = configuration.getInteger(KEY_RECEIVED_MESSAGE, DEFAULT_RECEIVED_MESSAGE);
+        latchReportReceivedMessages = new CountDownLatch(reportReceivedMessagesNumber);
         targetId = configuration.getString(KEY_TARGET, null);
         if (targetId == null) {
             throw ConfigurationException.createMissingConfigNameException(KEY_TARGET);
@@ -107,13 +145,20 @@ public class CounterUnit extends RoboUnit<CounterCommand> {
             super.onMessage(message);
             switch (message) {
                 case START:
+                    var counterUnitAction = new CounterRunner(getContext().getReference(targetId), latchReportReceivedMessages);
                     scheduledFuture = getContext().getScheduler().scheduleAtFixedRate(
-                            new CounterUnitAction(getContext().getReference(targetId)), 0, interval, TimeUnit.MILLISECONDS);
+                            counterUnitAction, 0, interval, TimeUnit.MILLISECONDS);
                     break;
                 case STOP:
-                    scheduledFuture.cancel(false);
+                    if (scheduledFuture.cancel(false)) {
+                        unitLatch.countDown();
+                    } else {
+                        scheduledFuture.cancel(true);
+                        LOGGER.error("scheduled feature could not be properly cancelled!");
+                    }
                     break;
                 case RESET:
+                    unitLatch = new CountDownLatch(reportReceivedMessagesNumber);
                     counter.set(0);
                     break;
             }
@@ -123,8 +168,12 @@ public class CounterUnit extends RoboUnit<CounterCommand> {
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-        if (attribute.getAttributeName().equals("Counter") && attribute.getAttributeType() == Integer.class) {
+        if (attribute.getAttributeName().equals(ATTR_COUNTER) && attribute.getAttributeType() == Integer.class) {
             return (R) (Integer) counter.get();
+        }
+        if (attribute.getAttributeName().equals(ATTR_REPORT_RECEIVED_MESSAGES_LATCH)
+                && attribute.getAttributeType() == CountDownLatch.class) {
+            return (R) latchReportReceivedMessages;
         }
         return null;
     }

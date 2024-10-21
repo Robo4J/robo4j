@@ -16,7 +16,11 @@
  */
 package com.robo4j.net;
 
-import com.robo4j.*;
+import com.robo4j.ConfigurationException;
+import com.robo4j.RoboBuilder;
+import com.robo4j.RoboBuilderException;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.units.StringConsumer;
@@ -30,8 +34,12 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Note that on Mac OS X, it seems the easiest way to get this test to run is to
@@ -43,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class RemoteContextTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteContextTests.class);
+    private static final int TIMEOUT_SEC = 30;
     private static final String ACK_CONSUMER = "ackConsumer";
     private static final String REMOTE_UNIT_EMITTER = "remoteEmitter";
     private static final int NUMBER_ITERATIONS = 10;
@@ -193,7 +202,7 @@ class RemoteContextTests {
         remoteTestMessageProducer.sendMessage(RemoteTestMessageProducer.ATTR_SEND_MESSAGE);
         CountDownLatch ackConsumerCountDownLatch = ackConsumer
                 .getAttribute(AckingStringConsumer.DESCRIPTOR_ACK_LATCH).get();
-        ackConsumerCountDownLatch.await();
+        var ackConsumerLatch = ackConsumerCountDownLatch.await(TIMEOUT_SEC, TimeUnit.SECONDS);
 
         List<TestMessageType> receivedMessages = (List<TestMessageType>) ackConsumer
                 .getAttribute(AckingStringConsumer.DESCRIPTOR_MESSAGES).get();
@@ -201,13 +210,16 @@ class RemoteContextTests {
 
         CountDownLatch producerCountDownLatch = remoteTestMessageProducer
                 .getAttribute(RemoteTestMessageProducer.DESCRIPTOR_COUNT_DOWN_LATCH).get();
-        producerCountDownLatch.await();
+        var producedMessagesLatch = producerCountDownLatch.await(TIMEOUT_SEC, TimeUnit.SECONDS);
         CountDownLatch producerAckLatch = remoteTestMessageProducer
                 .getAttribute(RemoteTestMessageProducer.DESCRIPTOR_ACK_LATCH).get();
-        producerAckLatch.await();
+        var producedMessagesAckLatch = producerAckLatch.await(TIMEOUT_SEC, TimeUnit.SECONDS);
         Integer producerAcknowledge = remoteTestMessageProducer
                 .getAttribute(RemoteTestMessageProducer.DESCRIPTOR_TOTAL_ACK).get();
         assertTrue(producerAcknowledge > 0);
+        assertTrue(ackConsumerLatch);
+        assertTrue(producedMessagesLatch);
+        assertTrue(producedMessagesAckLatch);
     }
 
     @Disabled("for individual testing")

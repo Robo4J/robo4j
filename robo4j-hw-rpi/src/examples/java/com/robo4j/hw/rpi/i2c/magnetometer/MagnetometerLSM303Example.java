@@ -41,6 +41,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class MagnetometerLSM303Example {
     private static final Logger LOGGER = LoggerFactory.getLogger(MagnetometerLSM303Example.class);
+    private static final int TIMEOUT_SEC = 1;
     private final static ScheduledExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor();
 
     enum PrintStyle {
@@ -126,7 +127,11 @@ public class MagnetometerLSM303Example {
         EXECUTOR_SERVICE.scheduleAtFixedRate(dg, 0, period, TimeUnit.MILLISECONDS);
         System.in.read();
         EXECUTOR_SERVICE.shutdown();
-        EXECUTOR_SERVICE.awaitTermination(1, TimeUnit.SECONDS);
+        var terminated = EXECUTOR_SERVICE.awaitTermination(TIMEOUT_SEC, TimeUnit.SECONDS);
+        if (!terminated) {
+            LOGGER.warn("note terminated properly");
+            EXECUTOR_SERVICE.shutdownNow();
+        }
         printMessage(printStyle, "Collected " + dg.getCount() + " values!");
     }
 

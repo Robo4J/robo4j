@@ -16,14 +16,12 @@
  */
 package com.robo4j.units;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.robo4j.AttributeDescriptor;
-import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboUnit;
-import com.robo4j.configuration.Configuration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -31,11 +29,11 @@ import com.robo4j.configuration.Configuration;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class IntegerConsumer extends RoboUnit<Integer> {
-	private List<Integer> receivedMessages = new ArrayList<>();
+	private final List<Integer> receivedMessages = new ArrayList<>();
 
 	/**
-	 * @param context
-	 * @param id
+	 * @param context robo-context
+	 * @param id unit id
 	 */
 	public IntegerConsumer(RoboContext context, String id) {
 		super(Integer.class, context, id);
@@ -50,12 +48,7 @@ public class IntegerConsumer extends RoboUnit<Integer> {
 		receivedMessages.add(message);
 	}
 
-	@Override
-	protected void onInitialization(Configuration configuration) throws ConfigurationException {
-
-	}
-
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
 		if (attribute.getAttributeName().equals("NumberOfReceivedMessages") && attribute.getAttributeType() == Integer.class) {

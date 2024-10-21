@@ -68,7 +68,7 @@ public interface Bno080Device {
 
 	/**
 	 * Do calibration cycle. Will block until calibration results are good
-	 * enough, or the time out is reached.
+	 * enough, or the timeout is reached. unit milliseconds
 	 */
 	void calibrate(long timeout);
 }

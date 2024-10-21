@@ -39,10 +39,10 @@ import java.util.concurrent.ThreadFactory;
  */
 public class MessageClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageClient.class);
-    public final static String KEY_SO_TIMEOUT = "timeout";
+    public final static String KEY_SO_TIMEOUT_MILLS = "timeout";
     public final static String KEY_KEEP_ALIVE = "keepAlive";
     public final static String KEY_RETRIES = "retries";
-    public final static int DEFAULT_SO_TIMEOUT = 2000000;
+    public final static int DEFAULT_SO_TIMEOUT_MILLS = 2000000;
     public final static boolean DEFAULT_KEEP_ALIVE = true;
 
     /*
@@ -128,7 +128,7 @@ public class MessageClient {
 //			socket = new Socket(messageServerURI.getHost(), messageServerURI.getPort());
             socket = new Socket(messageServerURI.getHost(), messageServerURI.getPort());
             socket.setKeepAlive(configuration.getBoolean(KEY_KEEP_ALIVE, DEFAULT_KEEP_ALIVE));
-            socket.setSoTimeout(configuration.getInteger(KEY_SO_TIMEOUT, DEFAULT_SO_TIMEOUT));
+            socket.setSoTimeout(configuration.getInteger(KEY_SO_TIMEOUT_MILLS, DEFAULT_SO_TIMEOUT_MILLS));
         }
         objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
         objectOutputStream.writeShort(MessageProtocolConstants.MAGIC);

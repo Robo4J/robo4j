@@ -28,7 +28,16 @@ import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataEventType;
 import com.robo4j.hw.rpi.imu.bno.DataListener;
 import com.robo4j.hw.rpi.imu.bno.VectorEvent;
-import com.robo4j.hw.rpi.imu.bno.shtp.*;
+import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportId;
+import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportId;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpChannel;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperation;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationBuilder;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationResponse;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketResponse;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpReportIds;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils;
 import com.robo4j.hw.rpi.utils.GpioPin;
 import com.robo4j.math.geometry.Tuple3f;
 import org.slf4j.Logger;
@@ -39,7 +48,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.*;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.EMPTY_EVENT;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.calculateNumberOfBytesInPacket;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.intToFloat;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.toInt8U;
 
 /**
  * Abstraction for a BNO080 absolute orientation device.
@@ -69,7 +81,7 @@ public class Bno080SPIDevice extends AbstractBno080Device {
     public static final SpiChipSelect DEFAULT_SPI_CHANNEL = SpiChipSelect.CS_0;
 
     public static final int MAX_PACKET_SIZE = 32762;
-    public static final int DEFAULT_TIMEOUT_MS = 1000;
+    public static final int TIMEOUT_SEC = 1;
     public static final int UNIT_TICK_MICRO = 100;
     public static final int TIMEBASE_REFER_DELTA = 120;
     public static final int MAX_SPI_COUNT = 255;
@@ -78,10 +90,6 @@ public class Bno080SPIDevice extends AbstractBno080Device {
     private final AtomicInteger spiWaitCounter = new AtomicInteger();
 
     private final Spi spiDevice;
-    // private GpioPinDigitalInput intGpio;
-    // private GpioPinDigitalOutput wakeGpio;
-    // private GpioPinDigitalOutput rstGpio;
-    // private GpioPinDigitalOutput csGpio; // select slave SS = chip select CS
 
     private DigitalOutput intGpio;
     private DigitalOutput wakeGpio;
@@ -344,22 +352,18 @@ public class Bno080SPIDevice extends AbstractBno080Device {
     }
 
     private ShtpReportIds getReportType(ShtpChannel channel, ShtpPacketResponse response) {
-        switch (channel) {
-            case CONTROL:
-                return ControlReportId.getById(response.getBodyFirst());
-            case REPORTS:
-                return SensorReportId.getById(response.getBodyFirst());
-            default:
-                return ControlReportId.NONE;
-        }
+        return switch (channel) {
+            case CONTROL -> ControlReportId.getById(response.getBodyFirst());
+            case REPORTS -> SensorReportId.getById(response.getBodyFirst());
+            default -> ControlReportId.NONE;
+        };
     }
 
     private boolean waitForLatch(CountDownLatch latch) {
         try {
-            latch.await(DEFAULT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-            return true;
+            return latch.await(TIMEOUT_SEC, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            LOGGER.debug("waitForLatch e: {}", e.getMessage());
+            LOGGER.warn("waitForLatch e: {}", e.getMessage());
             return false;
         }
     }

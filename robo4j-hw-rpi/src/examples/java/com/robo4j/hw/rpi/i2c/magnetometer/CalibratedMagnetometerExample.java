@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class CalibratedMagnetometerExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(CalibratedMagnetometerExample.class);
+    private static final int TIMEOUT_SEC = 1;
     private final static ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(1);
 
     private static class MagnetometerPoller implements Runnable {
@@ -71,7 +72,11 @@ public class CalibratedMagnetometerExample {
         EXECUTOR.scheduleAtFixedRate(new MagnetometerPoller(magnetometer), 100, 500, TimeUnit.MILLISECONDS);
         System.in.read();
         EXECUTOR.shutdown();
-        EXECUTOR.awaitTermination(1, TimeUnit.SECONDS);
+        var terminated = EXECUTOR.awaitTermination(TIMEOUT_SEC, TimeUnit.SECONDS);
+        if(!terminated){
+            LOGGER.warn("example not terminated properly.");
+            EXECUTOR.shutdownNow();
+        }
         LOGGER.info("Goodbye!");
     }
 }

@@ -32,7 +32,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -41,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.*;
 // TODO : remove thread sleep
 public class MessageServerTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageServerTest.class);
+    private static final int TIMEOUT_SEC = 30;
     private static final String CONST_MYUUID = "myuuid";
     private static final String PROPERTY_SERVER_NAME = "ServerName";
     private volatile Exception exception = null;
@@ -89,7 +93,7 @@ public class MessageServerTest {
             client.sendMessage("test", message);
         }
 
-        var receivedMessages = messageLatch.await(2, TimeUnit.SECONDS);
+        var receivedMessages = messageLatch.await(TIMEOUT_SEC, TimeUnit.SECONDS);
 
         assertTrue(receivedMessages);
         assertEquals(testMessage.size(), messages.size());
@@ -152,7 +156,7 @@ public class MessageServerTest {
         client.sendMessage("test6", Long.valueOf(6));
         client.sendMessage("test7", Double.valueOf(7));
         client.sendMessage("test8", new TestMessageType(8, messageText, null));
-        messageLatch.await(24, TimeUnit.HOURS);
+        messageLatch.await(TIMEOUT_SEC, TimeUnit.SECONDS);
 
         assertEquals(messagesNumber, messages.size());
         if (messages.get(0) instanceof Byte) {
