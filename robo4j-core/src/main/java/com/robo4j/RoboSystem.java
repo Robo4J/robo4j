@@ -57,6 +57,8 @@ final class RoboSystem implements RoboContext {
 
     private static final EnumSet<LifecycleState> MESSAGE_DELIVERY_CRITERIA = EnumSet.of(LifecycleState.STARTED, LifecycleState.STOPPED,
             LifecycleState.STOPPING);
+    private static final int SERVER_LISTEN_URI_MILLIS = 100;
+    private static final int SERVER_LISTEN_REPEATS = 5;
 
     private final AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
     private final Map<String, RoboUnit<?>> units = new HashMap<>();
@@ -517,14 +519,16 @@ final class RoboSystem implements RoboContext {
 
     private static URI getListeningURI(MessageServer server) {
         if (server != null) {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < SERVER_LISTEN_REPEATS; i++) {
                 URI uri = server.getListeningURI();
                 if (uri != null) {
                     return uri;
                 }
-                SystemUtil.sleep(100);
+                SystemUtil.sleep(SERVER_LISTEN_URI_MILLIS);
             }
+            LOGGER.warn("getListeningURI server:{}, not found", server);
         }
+        LOGGER.warn("getListeningURI undefined server");
         return null;
     }
 }

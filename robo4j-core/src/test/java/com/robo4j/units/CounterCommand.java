@@ -23,5 +23,5 @@ package com.robo4j.units;
  * @author Miro Wengner (@miragemiko)
  */
 public enum CounterCommand {
-	START, STOP, RESET
+	START, STOP, RESET, COUNTER_INC
 }

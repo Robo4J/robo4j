@@ -47,57 +47,60 @@ public class MessageServerTest {
     private static final int TIMEOUT_SEC = 30;
     private static final String CONST_MYUUID = "myuuid";
     private static final String PROPERTY_SERVER_NAME = "ServerName";
+    private static final int SERVER_LISTEN_DELAY_MILLIS = 250;
     private volatile Exception exception = null;
 
     @Test
     void testClientServerMessagePassing() throws Exception {
-        final List<String> messages = new ArrayList<>();
-        final CountDownLatch messageLatch = new CountDownLatch(3);
+        final var messageCache = new ArrayList<>();
+        final var messagesLatch = new CountDownLatch(3);
 
-        Configuration serverConfig = new ConfigurationBuilder().addString(PROPERTY_SERVER_NAME, "Server Name")
-                .addString(MessageServer.KEY_HOST_NAME, "localhost").build();
-        MessageServer server = new MessageServer((uuid, id, message) -> {
+        var messageServerConfig = new ConfigurationBuilder()
+                .addString(PROPERTY_SERVER_NAME, "Server Name")
+                .addString(MessageServer.KEY_HOST_NAME, "localhost")
+                .build();
+        var messageServer = new MessageServer((uuid, id, message) -> {
             printInfo(uuid, id, message);
-            messages.add(String.valueOf(message));
-            messageLatch.countDown();
-        }, serverConfig);
+            messageCache.add(String.valueOf(message));
+            messagesLatch.countDown();
+        }, messageServerConfig);
 
-        Thread t = new Thread(() -> {
+        var serverListenerThread = new Thread(() -> {
             try {
-                server.start();
+                messageServer.start();
             } catch (IOException e) {
                 exception = e;
                 fail(e.getMessage());
             }
         }, "Server Listener");
-        t.setDaemon(true);
-        t.start();
+        serverListenerThread.setDaemon(true);
+        serverListenerThread.start();
         for (int i = 0; i < 10; i++) {
-            if (server.getListeningPort() == 0) {
-                Thread.sleep(250);
+            if (messageServer.getListeningPort() == 0) {
+                Thread.sleep(SERVER_LISTEN_DELAY_MILLIS);
             } else {
                 break;
             }
         }
 
-        Configuration clientConfig = ConfigurationFactory.createEmptyConfiguration();
-        MessageClient client = new MessageClient(server.getListeningURI(), CONST_MYUUID, clientConfig);
+        var messageReceiverConfig = ConfigurationFactory.createEmptyConfiguration();
+        var messageReceiver = new MessageClient(messageServer.getListeningURI(), CONST_MYUUID, messageReceiverConfig);
         if (exception != null) {
             throw exception;
         }
 
         List<String> testMessage = getOrderedTestMessage("My First Little Message!", "My Second Little Message!",
                 "My Third Little Message!");
-        client.connect();
+        messageReceiver.connect();
         for (String message : testMessage) {
-            client.sendMessage("test", message);
+            messageReceiver.sendMessage("test", message);
         }
 
-        var receivedMessages = messageLatch.await(TIMEOUT_SEC, TimeUnit.SECONDS);
+        var receivedMessages = messagesLatch.await(TIMEOUT_SEC, TimeUnit.SECONDS);
 
         assertTrue(receivedMessages);
-        assertEquals(testMessage.size(), messages.size());
-        assertArrayEquals(testMessage.toArray(), messages.toArray());
+        assertEquals(testMessage.size(), messageCache.size());
+        assertArrayEquals(testMessage.toArray(), messageCache.toArray());
     }
 
     private List<String> getOrderedTestMessage(String... messages) {

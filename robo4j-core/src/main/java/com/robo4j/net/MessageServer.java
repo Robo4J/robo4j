@@ -17,13 +17,21 @@
 package com.robo4j.net;
 
 import com.robo4j.configuration.Configuration;
+import com.robo4j.scheduler.RoboThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This is a server that listens on messages, and sends them off to the
@@ -35,35 +43,22 @@ import java.net.*;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class MessageServer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessageServer.class);
-    public final static String KEY_HOST_NAME = "hostname";
+    public static final String KEY_HOST_NAME = "hostname";
     public static final String KEY_PORT = "port";
 
-    private volatile int listeningPort = 0;
-    private volatile String listeningHost;
-    private volatile boolean running = false;
-    private volatile Thread startingThread = null;
-    private final MessageCallback callback;
-    private final Configuration configuration;
-
-    private class MessageHandler implements Runnable {
-        private final Socket socket;
-
-        public MessageHandler(Socket socket) {
-            this.socket = socket;
-        }
+    private record MessageHandler(Socket socket, MessageCallback callback,
+                                  AtomicBoolean serverActive) implements Runnable {
 
         @Override
         public void run() {
-            try (ObjectInputStream objectInputStream = new ObjectInputStream(
-                    new BufferedInputStream(socket.getInputStream()))) {
+            try (ObjectInputStream objectInputStream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()))) {
                 // Init protocol. First check magic...
                 if (checkMagic(objectInputStream.readShort())) {
-                    final String uuid = objectInputStream.readUTF();
-                    final ServerRemoteRoboContext context = new ServerRemoteRoboContext(uuid, socket.getOutputStream());
+                    final var uuid = objectInputStream.readUTF();
+                    final var serverRemoteContext = new ServerRemoteRoboContext(uuid, socket.getOutputStream());
                     // Then keep reading string, byte, data triplets until dead
-                    ReferenceDescriptor.setCurrentContext(context);
-                    while (running) {
+                    ReferenceDescriptor.setCurrentContext(serverRemoteContext);
+                    while (serverActive.get()) {
                         String id = objectInputStream.readUTF();
                         Object message = decodeMessage(objectInputStream);
                         callback.handleMessage(uuid, id, message);
@@ -83,35 +78,36 @@ public class MessageServer {
 
         private Object decodeMessage(ObjectInputStream objectInputStream) throws IOException, ClassNotFoundException {
             byte dataType = objectInputStream.readByte();
-            // TODO: replace by better switch
-            switch (dataType) {
-                case MessageProtocolConstants.OBJECT:
-                    return objectInputStream.readObject();
-                case MessageProtocolConstants.MOD_UTF8:
-                    return objectInputStream.readUTF();
-                case MessageProtocolConstants.BYTE:
-                    return objectInputStream.readByte();
-                case MessageProtocolConstants.SHORT:
-                    return objectInputStream.readShort();
-                case MessageProtocolConstants.FLOAT:
-                    return objectInputStream.readFloat();
-                case MessageProtocolConstants.INT:
-                    return objectInputStream.readInt();
-                case MessageProtocolConstants.DOUBLE:
-                    return objectInputStream.readDouble();
-                case MessageProtocolConstants.LONG:
-                    return objectInputStream.readLong();
-                case MessageProtocolConstants.CHAR:
-                    return objectInputStream.readChar();
-                default:
-                    throw new IOException("The type with id " + dataType + " is not supported!");
-            }
+            return switch (dataType) {
+                case MessageProtocolConstants.OBJECT -> objectInputStream.readObject();
+                case MessageProtocolConstants.MOD_UTF8 -> objectInputStream.readUTF();
+                case MessageProtocolConstants.BYTE -> objectInputStream.readByte();
+                case MessageProtocolConstants.SHORT -> objectInputStream.readShort();
+                case MessageProtocolConstants.FLOAT -> objectInputStream.readFloat();
+                case MessageProtocolConstants.INT -> objectInputStream.readInt();
+                case MessageProtocolConstants.DOUBLE -> objectInputStream.readDouble();
+                case MessageProtocolConstants.LONG -> objectInputStream.readLong();
+                case MessageProtocolConstants.CHAR -> objectInputStream.readChar();
+                default -> throw new IOException("The type with id " + dataType + " is not supported!");
+            };
         }
 
         private boolean checkMagic(short magic) {
             return magic == MessageProtocolConstants.MAGIC;
         }
     }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageServer.class);
+    private static final String NAME_COMMUNICATION_WORKER_POOL = "Robo4J Communication Worker Pool";
+    private static final String NAME_COMMUNICATION_THREAD_PREFIX = "Robo4J-Communication-Worker";
+
+    private volatile int listeningPort = 0;
+    private volatile String listeningHost;
+    private final AtomicBoolean serverActive = new AtomicBoolean(false);
+    private final MessageCallback callback;
+    private final Configuration configuration;
+    private final ExecutorService executors;
+
 
     /**
      * Constructor
@@ -122,6 +118,8 @@ public class MessageServer {
     public MessageServer(MessageCallback callback, Configuration configuration) {
         this.callback = callback;
         this.configuration = configuration;
+        // TODO : consider to have configurable thread-pool
+        this.executors = Executors.newCachedThreadPool(new RoboThreadFactory(new ThreadGroup(NAME_COMMUNICATION_WORKER_POOL), NAME_COMMUNICATION_THREAD_PREFIX, true));
     }
 
     /**
@@ -131,7 +129,6 @@ public class MessageServer {
      * @throws IOException exception
      */
     public void start() throws IOException {
-        startingThread = Thread.currentThread();
         String host = configuration.getString(KEY_HOST_NAME, null);
         InetAddress bindAddress = null;
         if (host != null) {
@@ -142,26 +139,21 @@ public class MessageServer {
                 configuration.getInteger("backlog", 20), bindAddress)) {
             listeningHost = serverSocket.getInetAddress().getHostAddress();
             listeningPort = serverSocket.getLocalPort();
-            ThreadGroup g = new ThreadGroup("Robo4J communication threads");
-            running = true;
-            while (running) {
-                MessageHandler handler = new MessageHandler(serverSocket.accept());
-                Thread t = new Thread(g, handler, "Communication [" + handler.socket.getRemoteSocketAddress() + "]");
-                t.setDaemon(true);
-                t.start();
+            var threadGroup = new ThreadGroup("Robo4J communication threads");
+            serverActive.set(true);
+            while (serverActive.get()) {
+                var messageHandler = new MessageHandler(serverSocket.accept(), callback, serverActive);
+                executors.submit(messageHandler);
             }
         } finally {
-            running = false;
-            startingThread = null;
+            serverActive.set(false);
+            executors.shutdown();
         }
     }
 
     public void stop() {
-        running = false;
-        Thread startingThread = this.startingThread;
-        if (startingThread != null) {
-            startingThread.interrupt();
-        }
+        serverActive.set(false);
+        executors.shutdown();
     }
 
     public int getListeningPort() {
@@ -174,7 +166,7 @@ public class MessageServer {
      * configured.
      */
     public URI getListeningURI() {
-        if (!running) {
+        if (!serverActive.get()) {
             return null;
         }
 

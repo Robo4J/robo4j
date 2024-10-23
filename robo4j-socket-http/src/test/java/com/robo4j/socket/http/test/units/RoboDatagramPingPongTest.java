@@ -37,7 +37,10 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.TimeUnit;
 
 import static com.robo4j.socket.http.test.units.HttpUnitTests.CODECS_UNITS_TEST_PACKAGE;
-import static com.robo4j.socket.http.util.RoboHttpUtils.*;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_PACKAGES;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_SOCKET_PORT;
+import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_UNIT_PATHS_CONFIG;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -56,7 +59,7 @@ class RoboDatagramPingPongTest {
 
     @Test
     void datagramPingPongTest() throws Exception {
-        var pongSystem = configurePongSystem(TOTAL_NUMBER);
+        var pongSystem = configurePongSystem();
         var pingSystem = configurePingSystem();
 
         pongSystem.start();
@@ -78,7 +81,7 @@ class RoboDatagramPingPongTest {
             udpClient.sendMessage(request);
         }
 
-        totalMessageLatch.await(TIMEOUT, TIME_UNIT);
+        var messagesReceived = totalMessageLatch.await(TIMEOUT, TIME_UNIT);
         final int pongConsumerTotalNumber = pongStringConsumerReference.getAttribute(StringConsumer.DESCRIPTOR_MESSAGES_TOTAL).get();
 
 
@@ -89,6 +92,7 @@ class RoboDatagramPingPongTest {
         pingSystem.shutdown();
         pongSystem.shutdown();
 
+        assertTrue(messagesReceived);
         assertTrue(pongConsumerTotalNumber > 0 && pongConsumerTotalNumber <= TOTAL_NUMBER);
 
     }
@@ -113,13 +117,13 @@ class RoboDatagramPingPongTest {
      * @return roboContext
      * @throws Exception exception
      */
-    private RoboContext configurePongSystem(int totalNumberOfMessage) throws Exception {
+    private RoboContext configurePongSystem() throws Exception {
         RoboBuilder builder = new RoboBuilder();
         Configuration config = new ConfigurationBuilder().addString(PROPERTY_CODEC_PACKAGES, CODECS_UNITS_TEST_PACKAGE)
                 .addString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"stringConsumer\",\"filters\":[]}]").build();
         builder.add(DatagramServerUnit.class, config, UDP_SERVER);
 
-        config = new ConfigurationBuilder().addInteger(StringConsumer.PROP_TOTAL_NUMBER_MESSAGES, totalNumberOfMessage).build();
+        config = new ConfigurationBuilder().addInteger(StringConsumer.PROP_TOTAL_NUMBER_MESSAGES, RoboDatagramPingPongTest.TOTAL_NUMBER).build();
         builder.add(StringConsumer.class, config, StringConsumer.NAME);
 
         return builder.build();

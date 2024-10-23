@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -90,6 +90,7 @@ class RunnableProcessCounterUnitTests {
 
     @Test
     void runnableGetStoppedProcessReferenceTest() throws RoboBuilderException, ExecutionException, InterruptedException, TimeoutException {
+        var updatedMessageOffsetAfterStop = CounterUnit.DEFAULT_RECEIVED_MESSAGE + 2;
         var counterMessageProducerInterval = 1000;
         RoboBuilder builder = new RoboBuilder();
         builder.add(IntegerConsumer.class, CONSUMER_ID);
@@ -100,45 +101,31 @@ class RunnableProcessCounterUnitTests {
         RoboReference<CounterCommand> messageProducer = context.getReference(COUNTER_PRODUCER_ID);
         messageProducer.sendMessage(CounterCommand.START);
         var latchCreatedMessagesInInterval = getAttributeOrTimeout(messageProducer, CounterUnit.DESCRIPTOR_REPORT_RECEIVED_MESSAGES_LATCH);
-        var createdMessages = latchCreatedMessagesInInterval.await(TIMEOUT_MIN, TimeUnit.MINUTES);
+        var unitActiveInternalProcessDone = getAttributeOrTimeout(messageProducer, CounterUnit.DESCRIPTOR_PROCESS_DONE);
+        var createdMessagesAfterStart = latchCreatedMessagesInInterval.await(TIMEOUT_MIN, TimeUnit.MINUTES);
         messageProducer.sendMessage(CounterCommand.STOP);
+        messageProducer.sendMessage(CounterCommand.COUNTER_INC);
+        messageProducer.sendMessage(CounterCommand.COUNTER_INC);
+        messageProducer.sendMessage(CounterCommand.RESET);
+        var latchCreatedMessagesAfterStop = getAttributeOrTimeout(messageProducer, CounterUnit.DESCRIPTOR_REPORT_RECEIVED_MESSAGES_LATCH);
+
+        var activeAfterStopLatch = latchCreatedMessagesAfterStop.await(TIMEOUT_MIN, TimeUnit.MINUTES);
+        var updatedReceivedMessageOffset = getAttributeOrTimeout(messageProducer, CounterUnit.DESCRIPTOR_RECEIVED_MESSAGE_OFFSET);
+        var internalProcessDone = getAttributeOrTimeout(messageProducer, CounterUnit.DESCRIPTOR_PROCESS_DONE);
 
         RoboReference<Integer> consumer = context.getReference(CONSUMER_ID);
         var receivedMessages = getAttributeOrTimeout(consumer, NUMBER_OF_MESSAGES);
 
 
-        assertTrue(createdMessages);
-        assertEquals(CounterUnit.DEFAULT_RECEIVED_MESSAGE, receivedMessages);
+        assertFalse(unitActiveInternalProcessDone);
+        assertTrue(createdMessagesAfterStart);
         assertEquals(LifecycleState.STARTED, context.getState());
+        assertTrue(activeAfterStopLatch);
+        assertTrue(internalProcessDone);
+        assertEquals(CounterUnit.DEFAULT_RECEIVED_MESSAGE, receivedMessages);
+        assertEquals(updatedMessageOffsetAfterStop, updatedReceivedMessageOffset);
     }
 
-    @Test
-    void test() throws RoboBuilderException, InterruptedException, ExecutionException {
-        // FIXME(Marcus/Aug 20, 2017): We really should get rid of the sleeps
-        // here and use waits with timeouts...
-        RoboBuilder builder = new RoboBuilder();
-        builder.add(IntegerConsumer.class, CONSUMER_ID);
-        builder.add(CounterUnit.class, getCounterConfiguration(CONSUMER_ID, 1000), COUNTER_PRODUCER_ID);
-        RoboContext context = builder.build();
-        context.start();
-        assertEquals(LifecycleState.STARTED, context.getState());
-        RoboReference<CounterCommand> counter = context.getReference(COUNTER_PRODUCER_ID);
-        RoboReference<Integer> consumer = context.getReference(CONSUMER_ID);
-        counter.sendMessage(CounterCommand.START);
-        Thread.sleep(2500);
-        assertTrue(consumer.getAttribute(NUMBER_OF_MESSAGES).get() > 2);
-        counter.sendMessage(CounterCommand.STOP);
-        Thread.sleep(200);
-        Integer count = consumer.getAttribute(NUMBER_OF_MESSAGES).get();
-        Thread.sleep(2500);
-        assertEquals(count, consumer.getAttribute(NUMBER_OF_MESSAGES).get());
-        ArrayList<Integer> messages = consumer.getAttribute(MESSAGES).get();
-        assertNotEquals(0, messages.size());
-        assertNotEquals(0, (int) messages.get(messages.size() - 1));
-        counter.sendMessage(CounterCommand.RESET);
-        Thread.sleep(1000);
-        assertEquals(0, (int) counter.getAttribute(COUNTER).get());
-    }
 
     private Configuration getCounterConfiguration(String target, int interval) {
         return new ConfigurationBuilder().addString(CounterUnit.KEY_TARGET, target)

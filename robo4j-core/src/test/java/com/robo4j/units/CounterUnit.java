@@ -64,14 +64,20 @@ public class CounterUnit extends RoboUnit<CounterCommand> {
 
     private final AtomicInteger counter = new AtomicInteger(0);
     private int interval;
-    private int reportReceivedMessagesNumber;
+    private int receivedMessagesOffset;
 
 
+    public static final String ATTR_RECEIVED_MESSAGES_OFFSET = "receivedMessagesOffset";
     public static final String ATTR_COUNTER = "Counter";
     public static final String ATTR_REPORT_RECEIVED_MESSAGES_LATCH = "reportMessagesLatch";
+    public static final String ATTR_PROCESS_ACTIVE = "processActive";
 
     public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_REPORT_RECEIVED_MESSAGES_LATCH = DefaultAttributeDescriptor
             .create(CountDownLatch.class, ATTR_REPORT_RECEIVED_MESSAGES_LATCH);
+    public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_RECEIVED_MESSAGE_OFFSET = DefaultAttributeDescriptor
+            .create(Integer.class, ATTR_RECEIVED_MESSAGES_OFFSET);
+    public static final DefaultAttributeDescriptor<Boolean> DESCRIPTOR_PROCESS_DONE = DefaultAttributeDescriptor
+            .create(Boolean.class, ATTR_PROCESS_ACTIVE);
 
     /**
      * This configuration key controls the interval between the updates, in ms.
@@ -131,8 +137,8 @@ public class CounterUnit extends RoboUnit<CounterCommand> {
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
         interval = configuration.getInteger(KEY_INTERVAL, DEFAULT_INTERVAL);
-        reportReceivedMessagesNumber = configuration.getInteger(KEY_RECEIVED_MESSAGE, DEFAULT_RECEIVED_MESSAGE);
-        latchReportReceivedMessages = new CountDownLatch(reportReceivedMessagesNumber);
+        receivedMessagesOffset = configuration.getInteger(KEY_RECEIVED_MESSAGE, DEFAULT_RECEIVED_MESSAGE);
+        latchReportReceivedMessages = new CountDownLatch(receivedMessagesOffset);
         targetId = configuration.getString(KEY_TARGET, null);
         if (targetId == null) {
             throw ConfigurationException.createMissingConfigNameException(KEY_TARGET);
@@ -144,23 +150,25 @@ public class CounterUnit extends RoboUnit<CounterCommand> {
         synchronized (this) {
             super.onMessage(message);
             switch (message) {
-                case START:
+                case START -> {
                     var counterUnitAction = new CounterRunner(getContext().getReference(targetId), latchReportReceivedMessages);
                     scheduledFuture = getContext().getScheduler().scheduleAtFixedRate(
                             counterUnitAction, 0, interval, TimeUnit.MILLISECONDS);
-                    break;
-                case STOP:
+                }
+
+                case STOP -> {
                     if (scheduledFuture.cancel(false)) {
                         unitLatch.countDown();
                     } else {
                         scheduledFuture.cancel(true);
                         LOGGER.error("scheduled feature could not be properly cancelled!");
                     }
-                    break;
-                case RESET:
-                    unitLatch = new CountDownLatch(reportReceivedMessagesNumber);
+                }
+                case RESET -> {
                     counter.set(0);
-                    break;
+                }
+                case COUNTER_INC -> receivedMessagesOffset++;
+
             }
         }
     }
@@ -168,12 +176,19 @@ public class CounterUnit extends RoboUnit<CounterCommand> {
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
+        if (attribute.getAttributeName().equals(ATTR_RECEIVED_MESSAGES_OFFSET) && attribute.getAttributeType() == Integer.class) {
+            return (R) (Integer) receivedMessagesOffset;
+        }
         if (attribute.getAttributeName().equals(ATTR_COUNTER) && attribute.getAttributeType() == Integer.class) {
             return (R) (Integer) counter.get();
         }
         if (attribute.getAttributeName().equals(ATTR_REPORT_RECEIVED_MESSAGES_LATCH)
                 && attribute.getAttributeType() == CountDownLatch.class) {
             return (R) latchReportReceivedMessages;
+        }
+        if (attribute.getAttributeName().equals(ATTR_PROCESS_ACTIVE)
+                && attribute.getAttributeType() == Boolean.class) {
+            return (R) (Boolean) scheduledFuture.isDone();
         }
         return null;
     }

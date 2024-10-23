@@ -52,6 +52,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RemoteContextTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteContextTests.class);
     private static final int TIMEOUT_SEC = 30;
+    private static final int LOOKUP_DELAY_MILLIS = 100;
     private static final String ACK_CONSUMER = "ackConsumer";
     private static final String REMOTE_UNIT_EMITTER = "remoteEmitter";
     private static final int NUMBER_ITERATIONS = 10;
@@ -69,7 +70,7 @@ class RemoteContextTests {
 
         service.start();
         for (int i = 0; i < NUMBER_ITERATIONS && (service.getDescriptor("6") == null); i++) {
-            SystemUtil.sleep(200);
+            SystemUtil.sleep(LOOKUP_DELAY_MILLIS);
         }
         RoboContextDescriptor descriptor = service.getDescriptor("6");
 
@@ -99,7 +100,7 @@ class RemoteContextTests {
         service.start();
 
         for (int i = 0; i < NUMBER_ITERATIONS && (service.getDescriptor("7") == null); i++) {
-            SystemUtil.sleep(200);
+            SystemUtil.sleep(LOOKUP_DELAY_MILLIS);
         }
         assertFalse(service.getDiscoveredContexts().isEmpty());
         RoboContextDescriptor descriptor = service.getDescriptor("7");
@@ -117,7 +118,7 @@ class RemoteContextTests {
 
         remoteStringProducer.sendMessage("sendRandomMessage");
         for (int i = 0; i < NUMBER_ITERATIONS && consumer.getReceivedMessages().isEmpty(); i++) {
-            SystemUtil.sleep(200);
+            SystemUtil.sleep(LOOKUP_DELAY_MILLIS);
         }
 
         printMessagesInfo(consumer.getReceivedMessages());
@@ -143,7 +144,7 @@ class RemoteContextTests {
         service.start();
 
         for (int i = 0; i < NUMBER_ITERATIONS && (service.getDescriptor("9") == null); i++) {
-            SystemUtil.sleep(200);
+            SystemUtil.sleep(LOOKUP_DELAY_MILLIS);
         }
         assertFalse(service.getDiscoveredContexts().isEmpty());
         RoboContextDescriptor descriptor = service.getDescriptor("9");
@@ -232,38 +233,6 @@ class RemoteContextTests {
 
         LookupServiceProvider.setDefaultLookupService(service);
         service.start();
-        System.in.read();
-    }
-
-    @Disabled("for individual testing")
-    @Test
-    void startRemoteSenderTest() throws Exception {
-        // Note that all this cludging about with local lookup service
-        // implementations etc would normally not be needed.
-        // This is just to isolate this test from other tests.
-        final LocalLookupServiceImpl localLookup = new LocalLookupServiceImpl();
-        final LookupService service = LookupServiceTests.getLookupService(localLookup);
-
-        LookupServiceProvider.setDefaultLookupService(service);
-        service.start();
-
-        // context has been discovered
-        RoboContextDescriptor descriptor = getRoboContextDescriptor(service, CONTEXT_ID_REMOTE_RECEIVER);
-        assertFalse(service.getDiscoveredContexts().isEmpty());
-        assertNotNull(descriptor);
-
-        // build the producer system
-        RoboContext producerEmitterSystem = buildEmitterContext(String.class, UNIT_STRING_CONSUMER,
-                REMOTE_UNIT_EMITTER);
-        localLookup.addContext(producerEmitterSystem);
-
-        producerEmitterSystem.start();
-        RoboReference<String> remoteTestMessageProducer = producerEmitterSystem.getReference(REMOTE_UNIT_EMITTER);
-
-        for (int i = 0; i < 10; i++) {
-            remoteTestMessageProducer.sendMessage("REMOTE MESSAGE :" + i);
-        }
-
         System.in.read();
     }
 
