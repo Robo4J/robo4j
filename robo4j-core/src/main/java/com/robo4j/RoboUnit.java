@@ -63,7 +63,7 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	 * @return the {@link RoboSystem} unique identifier for this unit.
 	 */
 	@Override
-	public String getId() {
+	public String id() {
 		return id;
 	}
 
@@ -250,7 +250,7 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	RoboReference<T> internalGetReference() {
 		// NOTE(Marcus/Jan 27, 2017): Can we avoid this?
 		if (reference == null) {
-			return getContext().getReference(getId());
+			return getContext().getReference(id());
 		} else {
 			return reference;
 		}
@@ -287,6 +287,6 @@ public abstract class RoboUnit<T> implements RoboReference<T> {
 	 */
 	@Override
 	public String toString() {
-		return String.format("%s [id=%s]", getClass().getName(), getId());
+		return String.format("%s [id=%s]", getClass().getName(), id());
 	}
 }

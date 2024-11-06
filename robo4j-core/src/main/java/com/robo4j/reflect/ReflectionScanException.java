@@ -16,6 +16,8 @@
  */
 package com.robo4j.reflect;
 
+import java.io.Serial;
+
 /**
  * ReflectionScanException.
  *
@@ -23,6 +25,7 @@ package com.robo4j.reflect;
  * @author Miro Wengner (@miragemiko)
  */
 public class ReflectionScanException extends RuntimeException {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public ReflectionScanException(String message, Throwable cause) {

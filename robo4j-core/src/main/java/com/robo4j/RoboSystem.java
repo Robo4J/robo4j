@@ -67,6 +67,7 @@ final class RoboSystem implements RoboContext {
     private final Scheduler systemScheduler;
 
     private final ThreadPoolExecutor workExecutor;
+    // TODO: review usage of workQueue and blockingQueue, maybe better abstraction
     private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
 
     private final ThreadPoolExecutor blockingExecutor;
@@ -121,8 +122,8 @@ final class RoboSystem implements RoboContext {
         }
 
         @Override
-        public String getId() {
-            return unit.getId();
+        public String id() {
+            return unit.id();
         }
 
         @Override
@@ -155,7 +156,7 @@ final class RoboSystem implements RoboContext {
 
         @Override
         public String toString() {
-            return "LocalReference id: " + unit.getId() + " (system: " + uid + ")";
+            return "LocalReference id: " + unit.id() + " (system: " + uid + ")";
         }
 
         private void deliverOnQueue(T message) {
@@ -196,7 +197,7 @@ final class RoboSystem implements RoboContext {
 
         @Serial
         Object writeReplace() throws ObjectStreamException {
-            return new ReferenceDescriptor(RoboSystem.this.getId(), getId(), getMessageType().getName());
+            return new ReferenceDescriptor(RoboSystem.this.getId(), id(), getMessageType().getName());
         }
     }
 
@@ -216,7 +217,7 @@ final class RoboSystem implements RoboContext {
             try {
                 unit.onMessage(message);
             } catch (Throwable t) {
-                LOGGER_MESSENGER.error("Error processing message, unit:{}", unit.getId(), t);
+                LOGGER_MESSENGER.error("Error processing message, unit:{}", unit.id(), t);
             }
         }
     }
@@ -449,13 +450,13 @@ final class RoboSystem implements RoboContext {
     }
 
     private void addToMap(Set<RoboUnit<?>> unitSet) {
-        unitSet.forEach(unit -> units.put(unit.getId(), unit));
+        unitSet.forEach(unit -> units.put(unit.id(), unit));
     }
 
     private void addToMap(RoboUnit<?>... unitArray) {
         // NOTE(Marcus/Aug 9, 2017): Do not streamify...
         for (RoboUnit<?> unit : unitArray) {
-            units.put(unit.getId(), unit);
+            units.put(unit.id(), unit);
         }
     }
 
@@ -476,6 +477,7 @@ final class RoboSystem implements RoboContext {
             return new MessageServer(new MessageCallback() {
                 @Override
                 public void handleMessage(String sourceUuid, String id, Object message) {
+                    // TODO: save message null message or not registered id
                     getReference(id).sendMessage(message);
                 }
             }, serverConfiguration);

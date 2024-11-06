@@ -34,7 +34,7 @@ public interface RoboReference<T> {
 	 * 
 	 * @return the id for the unit.
 	 */
-	String getId();
+	String id();
 
 	/**
 	 * Returns the life cycle state (@see {@link LifecycleState}) of this unit.

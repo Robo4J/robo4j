@@ -65,7 +65,7 @@ public class ServerRemoteRoboContext implements RoboContext {
         }
 
         @Override
-        public String getId() {
+        public String id() {
             return id;
         }
 
@@ -103,7 +103,7 @@ public class ServerRemoteRoboContext implements RoboContext {
                 // FIXME: Change the serialization to be the same as for the
                 // client to server
                 outputStream.writeUTF(getTargetContextId());
-                outputStream.writeUTF(getId());
+                outputStream.writeUTF(id());
                 outputStream.writeObject(message);
             } catch (IOException e) {
                 LOGGER.error("send message:{}", message, e);

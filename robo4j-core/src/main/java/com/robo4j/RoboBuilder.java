@@ -443,7 +443,7 @@ public final class RoboBuilder {
             throw new RoboBuilderException("Cannot add the null unit! Skipping");
         } else if (units.contains(unit)) {
             throw new RoboBuilderException(
-                    "Only one unit with the id " + unit.getId() + " can be active at a time. Skipping " + unit.toString());
+                    "Only one unit with the id " + unit.id() + " can be active at a time. Skipping " + unit.toString());
         }
         units.add(unit);
     }

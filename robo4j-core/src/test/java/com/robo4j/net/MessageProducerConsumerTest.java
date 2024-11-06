@@ -14,14 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.robo4j.net;
 
-/**
- * Context messages. Used internally.
- * 
- * @author Marcus Hirt (@hirt)
- * @author Miroslav Wengner (@miragemiko)
- */
-enum ContextMessage {
-	Start, End, Shutdown
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class MessageProducerConsumerTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageProducerConsumerTest.class);
+    private static final int TIMEOUT_SEC = 30;
+    private static final String CONST_MYUUID = "myuuid";
+    private static final String PROPERTY_SERVER_NAME = "ServerName";
+    private static final int SERVER_LISTEN_DELAY_MILLIS = 250;
 }

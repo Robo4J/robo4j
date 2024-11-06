@@ -42,7 +42,7 @@ public final class SystemUtil {
         // no instances
     }
 
-    public static final Comparator<RoboReference<?>> ID_COMPARATOR = Comparator.comparing(RoboReference::getId);
+    public static final Comparator<RoboReference<?>> ID_COMPARATOR = Comparator.comparing(RoboReference::id);
 
     public static InputStream getInputStreamByResourceName(String resourceName) {
         return Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
@@ -58,7 +58,7 @@ public final class SystemUtil {
                 .append(DELIMITER_HORIZONTAL).append(BREAK);
         for (RoboReference<?> reference : references) {
             builder.append(
-                            String.format("    %-25s   %13s", reference.getId(), reference.getState().getLocalizedName()))
+                            String.format("    %-25s   %13s", reference.id(), reference.getState().getLocalizedName()))
                     .append(BREAK);
         }
         // formatter:on
@@ -79,7 +79,7 @@ public final class SystemUtil {
 				.append(SLASH)
 				.append("units")
 				.append(SLASH)
-				.append(codecUnit.getId())
+				.append(codecUnit.id())
 				.append(BREAK)
 				.append("Supported http methods: GET and POST")
 				.append(BREAK)

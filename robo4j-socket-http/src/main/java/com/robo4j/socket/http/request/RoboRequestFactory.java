@@ -64,7 +64,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
         if (!context.getUnits().isEmpty()) {
 
             final List<ResponseUnitDTO> unitList = context.getUnits().stream()
-                    .map(u -> new ResponseUnitDTO(u.getId(), u.getState())).collect(Collectors.toList());
+                    .map(u -> new ResponseUnitDTO(u.id(), u.getState())).collect(Collectors.toList());
             unitList.add(0, new ResponseUnitDTO(context.getId(), context.getState()));
             return JsonUtil.toJsonArray(unitList);
         } else {
@@ -106,7 +106,7 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
 
         } else {
             final ResponseDecoderUnitDTO result = new ResponseDecoderUnitDTO();
-            result.setId(unitRef.getId());
+            result.setId(unitRef.id());
             result.setCodec(decoder.getDecodedClass().getName());
             result.setMethods(GET_POST_METHODS);
             return ReflectUtils.createJson(result);

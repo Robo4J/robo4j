@@ -81,7 +81,7 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
                         resultBuilder.setResult(factory.processGet(context));
                     } else {
 
-                        resultBuilder.setTarget(pathConfig.getRoboUnit().getId());
+                        resultBuilder.setTarget(pathConfig.getRoboUnit().id());
                         final Object unitDescription;
                         // the system needs to have one more worker thread to evaluate Future get
                         final HttpRequestDenominator denominator = (HttpRequestDenominator) decoratedRequest
@@ -91,7 +91,7 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
                         if (requestAttributes == null) {
                             unitDescription = factory.processGet(pathConfig);
                         } else if (requestAttributes.isEmpty()) {
-                            RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().getId());
+                            RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().id());
 
                             PathAttributeListDTO pathAttributes = new PathAttributeListDTO();
                             unit.getKnownAttributes().forEach(a -> {
@@ -102,7 +102,7 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
                             });
                             unitDescription = ReflectUtils.createJson(pathAttributes);
                         } else {
-                            RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().getId());
+                            RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().id());
 
                             List<PathAttributeDTO> attributes = new ArrayList<>();
                             for (AttributeDescriptor attr : unit.getKnownAttributes()) {
@@ -131,7 +131,7 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
                     if (pathConfig.getPath().equals(UTF8_SOLIDUS)) {
                         resultBuilder.setCode(StatusCode.BAD_REQUEST);
                     } else {
-                        resultBuilder.setTarget(pathConfig.getRoboUnit().getId());
+                        resultBuilder.setTarget(pathConfig.getRoboUnit().id());
                         Object respObj = factory.processPost(pathConfig.getRoboUnit(), decoratedRequest.getMessage());
                         if (respObj == null) {
                             resultBuilder.setCode(StatusCode.BAD_REQUEST);

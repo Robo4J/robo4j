@@ -133,7 +133,7 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
         final String text = StringToolkit.getRandomMessage(10);
 
         // We're sending a reference to ourself for getting the acks...
-        final TestMessageType message = new TestMessageType(number, text, getContext().getReference(getId()));
+        final TestMessageType message = new TestMessageType(number, text, getContext().getReference(id()));
         RoboContext ctx = LookupServiceProvider.getDefaultLookupService().getContext(targetContext);
         ctx.getReference(target).sendMessage(message);
     }

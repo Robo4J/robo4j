@@ -138,7 +138,7 @@ class RunnableProcessCounterUnitTests {
         var attribute = roboReference.getAttribute(attributeDescriptor).get(TIMEOUT_MIN, TimeUnit.MINUTES);
         if (attribute == null) {
             attribute = roboReference.getAttribute(attributeDescriptor).get(TIMEOUT_MIN, TimeUnit.MINUTES);
-            LOGGER.error("roboReference:{}, no attribute:{}", roboReference.getId(), attributeDescriptor.getAttributeName());
+            LOGGER.error("roboReference:{}, no attribute:{}", roboReference.id(), attributeDescriptor.getAttributeName());
         }
         return attribute;
     }

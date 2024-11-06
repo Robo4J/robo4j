@@ -22,12 +22,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.robo4j.net.HearbeatMessageCodec.notHeartBeatMessage;
 
 /**
  * Package local default implementation of the {@link LookupService}. Will
@@ -41,6 +49,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 class LookupServiceImpl implements LookupService {
     private static final Logger LOGGER = LoggerFactory.getLogger(LookupServiceImpl.class);
+    private static final int PORT_ZERO = 0;
+    private static final NetworkInterface LOCAL_NETWORK_INTERFACE_NULL = null;
     // FIXME(marcus/6 Nov 2017): This should be calculated, and used when
     // constructing the packet
     private final static int MAX_PACKET_SIZE = 1500;
@@ -72,7 +82,7 @@ class LookupServiceImpl implements LookupService {
         private void process(DatagramPacket packet) {
             // First a few quick checks. We want to reject updating anything as
             // early as possible
-            if (!HearbeatMessageCodec.isHeartBeatMessage(packet.getData())) {
+            if (notHeartBeatMessage(packet.getData())) {
                 LOGGER.debug("Non-heartbeat packet sent to LookupService! Ignoring.");
                 return;
             }
@@ -122,8 +132,7 @@ class LookupServiceImpl implements LookupService {
         }
     }
 
-    public LookupServiceImpl(String address, int port, float missedHeartbeatsBeforeRemoval, LocalLookupServiceImpl localContexts)
-            throws SocketException, UnknownHostException {
+    public LookupServiceImpl(String address, int port, float missedHeartbeatsBeforeRemoval, LocalLookupServiceImpl localContexts) throws SocketException, UnknownHostException {
         this.address = address;
         this.port = port;
         this.localContexts = localContexts;
@@ -155,7 +164,8 @@ class LookupServiceImpl implements LookupService {
     public synchronized void start() throws IOException {
         stop();
         socket = new MulticastSocket(port);
-        socket.joinGroup(InetAddress.getByName(address));
+        socket.joinGroup(new InetSocketAddress(address, PORT_ZERO), LOCAL_NETWORK_INTERFACE_NULL);
+//        socket.joinGroup(InetAddress.getByName(address));
         currentUpdater = new Updater();
         Thread t = new Thread(currentUpdater, "LookupService listener");
         t.setDaemon(true);

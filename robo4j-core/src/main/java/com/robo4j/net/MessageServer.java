@@ -139,7 +139,6 @@ public class MessageServer {
                 configuration.getInteger("backlog", 20), bindAddress)) {
             listeningHost = serverSocket.getInetAddress().getHostAddress();
             listeningPort = serverSocket.getLocalPort();
-            var threadGroup = new ThreadGroup("Robo4J communication threads");
             serverActive.set(true);
             while (serverActive.get()) {
                 var messageHandler = new MessageHandler(serverSocket.accept(), callback, serverActive);

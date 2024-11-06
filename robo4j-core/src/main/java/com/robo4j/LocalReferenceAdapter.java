@@ -16,11 +16,11 @@
  */
 package com.robo4j;
 
+import com.robo4j.configuration.Configuration;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.Future;
-
-import com.robo4j.configuration.Configuration;
 
 /**
  * This is a useful adapter to hand off a RoboReference to a unit which will
@@ -56,7 +56,7 @@ public abstract class LocalReferenceAdapter<T> implements RoboReference<T> {
 	}
 
 	@Override
-	public String getId() {
+	public String id() {
 		return null;
 	}
 

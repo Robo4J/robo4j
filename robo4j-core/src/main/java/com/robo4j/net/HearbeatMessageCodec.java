@@ -55,7 +55,7 @@ class HearbeatMessageCodec {
     }
 
     public static RoboContextDescriptor decode(byte[] message) {
-        if (!isHeartBeatMessage(message)) {
+        if (notHeartBeatMessage(message)) {
             throw new IllegalArgumentException("Invalid message! Must start with the proper magic.");
         }
         int version = getSupportedVersion(message);
@@ -73,8 +73,8 @@ class HearbeatMessageCodec {
         return data[2] == PROTOCOL_VERSION;
     }
 
-    public static boolean isHeartBeatMessage(byte[] message) {
-        return message[0] == MAGIC[0] && message[1] == MAGIC[1];
+    public static boolean notHeartBeatMessage(byte[] message) {
+        return message[0] != MAGIC[0] || message[1] != MAGIC[1];
     }
 
     public static String parseId(byte[] message) {
