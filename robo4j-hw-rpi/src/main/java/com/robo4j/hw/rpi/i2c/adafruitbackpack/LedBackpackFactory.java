@@ -29,17 +29,12 @@ import java.io.IOException;
  */
 public final class LedBackpackFactory {
 
-	public static AbstractBackpack createDevice(I2cBus bus, int address, LedBackpackType type, int brightness)
-			throws IOException {
-		switch (type) {
-		case BI_COLOR_BAR_24:
-			return new BiColor24BarDevice(bus, address, brightness);
-		case BI_COLOR_MATRIX_8x8:
-			return new BiColor8x8MatrixDevice(bus, address, brightness);
-		case ALPHANUMERIC:
-			return new AlphanumericDevice(bus, address, brightness);
-		default:
-			throw new IllegalStateException("not available backpack: " + type);
-		}
-	}
+    public static AbstractBackpack createDevice(I2cBus bus, int address, LedBackpackType type, int brightness)
+            throws IOException {
+        return switch (type) {
+            case BI_COLOR_BAR_24 -> new BiColor24BarDevice(bus, address, brightness);
+            case BI_COLOR_MATRIX_8x8 -> new BiColor8x8MatrixDevice(bus, address, brightness);
+            case ALPHANUMERIC -> new AlphanumericDevice(bus, address, brightness);
+        };
+    }
 }

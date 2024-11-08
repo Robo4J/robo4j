@@ -29,7 +29,7 @@ import static com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice.SHTP_HEADER_SIZE;
 public final class ShtpPacketRequest {
 	private final int[] header = new int[SHTP_HEADER_SIZE];
 	private final int sequenceNumber;
-	private int[] body;
+	private final int[] body;
 
 	public ShtpPacketRequest(int size, int sequenceNumber) {
 		this.body = new int[size];

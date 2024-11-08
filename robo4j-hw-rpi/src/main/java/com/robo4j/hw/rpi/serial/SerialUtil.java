@@ -51,7 +51,6 @@ public class SerialUtil {
      * @param serial  the (opened) serial port to read from.
      * @param timeout the timeout after which to fail.
      * @return the byte [] with the result.
-     * @throws IOException           exception
      * @throws IllegalStateException illegal exception
      * @throws InterruptedException  interrupted exception
      */
@@ -71,7 +70,6 @@ public class SerialUtil {
      * @param serial  the (opened) serial port to read from.
      * @param bytes   the number of bytes to read.
      * @param timeout the timeout after which to fail.
-     * @throws IllegalStateException
      * @throws InterruptedException
      */
     public static void readBytes(ByteBuffer buffer, Serial serial, int bytes, long timeout)

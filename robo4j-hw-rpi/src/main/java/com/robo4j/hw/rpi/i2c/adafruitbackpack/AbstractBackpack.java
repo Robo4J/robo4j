@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * AbstractBackpack is the abstraction for all Adafruit Backpack devices
@@ -84,20 +85,20 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
                 // Turn on red LED.
                 buffer[y] |= _BV(intToShort(x + 8));
                 // Turn off green LED.
-                buffer[y] &= ~_BV(x);
+                buffer[y] &= (short) ~_BV(x);
                 break;
             case YELLOW:
                 // Turn on green and red LED.
-                buffer[y] |= _BV(intToShort(x + 8)) | _BV(x);
+                buffer[y] |= (short) (_BV(intToShort(x + 8)) | _BV(x));
                 break;
             case GREEN:
                 // Turn on green LED.
                 buffer[y] |= _BV(x);
                 // Turn off red LED.
-                buffer[y] &= ~_BV(intToShort(x + 8));
+                buffer[y] &= (short) ~_BV(intToShort(x + 8));
                 break;
             case OFF:
-                buffer[y] &= ~_BV(x) & ~_BV(intToShort(x + 8));
+                buffer[y] &= (short) (~_BV(x) & ~_BV(intToShort(x + 8)));
                 break;
             default:
                 LOGGER.warn("setColorByMatrixToBuffer: {}", color);
@@ -137,21 +138,21 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
                 // Turn on red LED.
                 buffer[c] |= _BV(a);
                 // Turn off green LED.
-                buffer[c] &= ~_BV(intToShort(a + 8));
+                buffer[c] &= (short) ~_BV(intToShort(a + 8));
                 break;
             case YELLOW:
                 // Turn on red and green LED.
-                buffer[c] |= _BV(a) | _BV(intToShort(a + 8));
+                buffer[c] |= (short) (_BV(a) | _BV(intToShort(a + 8)));
                 break;
             case GREEN:
                 // Turn on green LED.
                 buffer[c] |= _BV(intToShort(a + 8));
                 // Turn off red LED.
-                buffer[c] &= ~_BV(a);
+                buffer[c] &= (short) ~_BV(a);
                 break;
             case OFF:
                 // Turn off red and green LED.
-                buffer[c] &= ~_BV(a) & ~_BV(intToShort(a + 8));
+                buffer[c] &= (short) (~_BV(a) & ~_BV(intToShort(a + 8)));
                 break;
             default:
                 LOGGER.warn("setColorToBarBuffer: {}", color);
@@ -170,18 +171,16 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
 
     private void writeDisplay() throws IOException {
         int address = 0;
-        for (int i = 0; i < buffer.length; i++) {
+        for (short value : buffer) {
 //			i2CConfig.write(address++, (byte) (buffer[i] & 0xFF));
 //			i2CConfig.write(address++, (byte) (buffer[i] >> 8));
-            writeByte(address++, (byte) (buffer[i] & 0xFF));
-            writeByte(address++, (byte) (buffer[i] >> 8));
+            writeByte(address++, (byte) (value & 0xFF));
+            writeByte(address++, (byte) (value >> 8));
         }
     }
 
     private void clearBuffer() throws IOException {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = 0;
-        }
+        Arrays.fill(buffer, (short) 0);
     }
 
     private short _BV(short i) {

@@ -65,6 +65,7 @@ public class BiColor8x8MatrixDevice extends AbstractBackpack implements MatrixLe
 			throw new IllegalArgumentException("x and/or y out of bounds. x=" + x + " y=" + y);
 		}
 
+		// TODO : correct switch
 		switch (rotation) {
 		case DEFAULT_X_Y:
 			break;

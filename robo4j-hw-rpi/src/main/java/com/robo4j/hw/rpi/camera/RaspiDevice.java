@@ -43,6 +43,7 @@ public class RaspiDevice {
 	public byte[] executeCommandRaspistill(String command) {
 		final Runtime runtime = Runtime.getRuntime();
 		try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+			// TODO: solve deprecated
 			Process process = runtime.exec(command);
 			InputStream imageArray = process.getInputStream();
 

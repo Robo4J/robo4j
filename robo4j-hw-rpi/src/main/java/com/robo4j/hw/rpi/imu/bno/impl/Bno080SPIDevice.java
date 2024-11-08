@@ -102,8 +102,8 @@ public class Bno080SPIDevice extends AbstractBno080Device {
     /**
      * Constructor.
      *
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException exception
+     * @throws InterruptedException exception
      */
     public Bno080SPIDevice() throws IOException, InterruptedException {
         this(DEFAULT_SPI_CHANNEL, DEFAULT_SPI_MODE, DEFAULT_SPI_SPEED);
@@ -115,8 +115,8 @@ public class Bno080SPIDevice extends AbstractBno080Device {
      * @param channel the {@link SpiChipSelect} to use.
      * @param mode    the {@link SpiMode} to use.
      * @param speed   the speed in Hz to use for communication.
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException exception
+     * @throws InterruptedException exception
      */
     public Bno080SPIDevice(SpiChipSelect channel, SpiMode mode, int speed) throws IOException, InterruptedException {
         // this(channel, mode, speed, RaspiPin.GPIO_00, RaspiPin.GPIO_25,

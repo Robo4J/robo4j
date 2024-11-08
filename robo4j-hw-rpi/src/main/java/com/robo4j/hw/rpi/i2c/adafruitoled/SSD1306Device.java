@@ -124,7 +124,7 @@ public class SSD1306Device extends AbstractI2CDevice {
     private enum MemoryModes {
         HORIZONTAL((byte) 0), VERTICAL((byte) 1), PAGE((byte) 2);
 
-        private byte value;
+        private final byte value;
 
         MemoryModes(byte value) {
             this.value = value;

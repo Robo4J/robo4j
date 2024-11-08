@@ -48,7 +48,7 @@ public final class ShtpUtils {
      */
     public static float intToFloat(int fixedPointValue, int qPoint) {
         float qFloat = (short) fixedPointValue;
-        qFloat *= Math.pow(2, (qPoint & 0xFF) * -1);
+        qFloat *= (float) Math.pow(2, (qPoint & 0xFF) * -1);
         return qFloat;
     }
 

@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.io.IOException;
 
+import static com.robo4j.hw.rpi.lcd.StringUtils.STRING_SPACE;
+
 /**
  * Example which prints Hello World and draws a little. It also shows the image
  * in a JFrame, so that it is easy to know what to expect.
@@ -57,7 +59,7 @@ public class SSD1306DeviceTest {
         LOGGER.info("If the number of lines do not match your device,");
         LOGGER.info("please add the number of lines as the first argument!");
 
-        String text = args.length > 0 ? String.join(" ", args) : "Hello Maxi!";
+        String text = args.length > 0 ? String.join(STRING_SPACE, args) : "Hello Maxi!";
         Graphics2D gc = oled.getGraphicsContext();
         gc.setColor(Color.white);
         gc.setBackground(Color.black);

@@ -24,7 +24,7 @@ package com.robo4j.hw.rpi.i2c.adafruitbackpack;
  * @author Miroslav Wengner (@miragemiko)
  */
 public enum MatrixRotation {
-	//@formatter:off
+    //@formatter:off
 	NONE				(0, "none"),
     DEFAULT_X_Y	 		(1,"default setup to pins"),
     RIGHT_90 			(2, "90d to default, right"),
@@ -36,24 +36,24 @@ public enum MatrixRotation {
 	LEFT_270			(8, "270d to default, left");
     //@formatter:on
 
-	private int id;
-	private final String note;
+    private final int id;
+    private final String note;
 
-	MatrixRotation(int id, String note) {
-		this.id = id;
-		this.note = note;
-	}
+    MatrixRotation(int id, String note) {
+        this.id = id;
+        this.note = note;
+    }
 
-	public String getNote() {
-		return note;
-	}
+    public String getNote() {
+        return note;
+    }
 
-	public static MatrixRotation getById(int code) {
-		for (MatrixRotation r : values()) {
-			if (code == r.id) {
-				return r;
-			}
-		}
-		return NONE;
-	}
+    public static MatrixRotation getById(int code) {
+        for (MatrixRotation r : values()) {
+            if (code == r.id) {
+                return r;
+            }
+        }
+        return NONE;
+    }
 }

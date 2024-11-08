@@ -38,7 +38,7 @@ public class DataHeader {
 	public enum PacketType {
 		POINT_CLOUD(0x0), ZERO(0x1), UNKNOWN(-1);
 
-		private int packetCode;
+		private final int packetCode;
 
 		PacketType(int packetCode) {
 			this.packetCode = packetCode;
@@ -175,11 +175,8 @@ public class DataHeader {
 		if (headerData[0] != ANSWER_SYNC_BYTE1) {
 			return false;
 		}
-		if (headerData[1] != ANSWER_SYNC_BYTE2) {
-			return false;
-		}
-		return true;
-	}
+        return headerData[1] == ANSWER_SYNC_BYTE2;
+    }
 
 	private static int getByte(byte[] headerData, int index) {
 		return (headerData[index] & 0xFF);

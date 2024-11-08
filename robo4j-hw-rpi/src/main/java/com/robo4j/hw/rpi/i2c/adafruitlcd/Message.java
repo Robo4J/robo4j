@@ -36,11 +36,11 @@ public class Message {
         }
         Color color = Color.GREEN;
         String message = "";
-        for (int i = 0; i < params.length; i++) {
-            if (params[i].startsWith(COLOR_PREFIX)) {
-                color = Color.getByName(params[i].substring(COLOR_PREFIX.length()));
+        for (String param : params) {
+            if (param.startsWith(COLOR_PREFIX)) {
+                color = Color.getByName(param.substring(COLOR_PREFIX.length()));
             } else {
-                message = params[i];
+                message = param;
             }
         }
         AdafruitLcd lcd = LcdFactory.createLCD();

@@ -107,7 +107,7 @@ public abstract class AbstractBno080Device implements Bno080Device {
         CLEAR_DCD       (11);
         //@formatter:on
 
-        private static Map<Integer, CommandId> map = getMap();
+        private static final Map<Integer, CommandId> map = getMap();
         private final int id;
 
         CommandId(int id) {
@@ -167,7 +167,7 @@ public abstract class AbstractBno080Device implements Bno080Device {
     }
 
     static class ShtpPacketBodyBuilder {
-        private int[] body;
+        private final int[] body;
         private final AtomicInteger counter = new AtomicInteger();
 
         ShtpPacketBodyBuilder(int size) {

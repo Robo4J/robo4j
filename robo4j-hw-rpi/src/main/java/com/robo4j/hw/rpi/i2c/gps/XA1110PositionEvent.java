@@ -137,11 +137,11 @@ public class XA1110PositionEvent extends AbstractGPSEvent implements PositionEve
 		if (nmeaMessage == null) {
 			return false;
 		}
-		for (int i = 0; i < ACCEPTED_MESSAGES.length; i++) {
-			if (nmeaMessage.startsWith(ACCEPTED_MESSAGES[i])) {
-				return true;
-			}
-		}
+        for (String acceptedMessage : ACCEPTED_MESSAGES) {
+            if (nmeaMessage.startsWith(acceptedMessage)) {
+                return true;
+            }
+        }
 		return false;
 	}
 

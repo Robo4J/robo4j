@@ -16,6 +16,8 @@
  */
 package com.robo4j.hw.rpi.pad;
 
+import java.io.Serial;
+
 /**
  * Logitech F710 Gamepad exception
  *
@@ -23,7 +25,8 @@ package com.robo4j.hw.rpi.pad;
  * @author Miro Wengner (@miragemiko)
  */
 public class LF710Exception extends RuntimeException {
-	private static final long serialVersionUID = 1L;
+	@Serial
+    private static final long serialVersionUID = 1L;
 
 	public LF710Exception(String message) {
         super(message);

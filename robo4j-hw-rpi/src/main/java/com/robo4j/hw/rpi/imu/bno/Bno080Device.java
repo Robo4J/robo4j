@@ -50,7 +50,7 @@ public interface Bno080Device {
 	 *            the kind of data to start listening for.
 	 * @param reportPeriod
 	 *            report period in ms.
-	 * @return
+	 * @return boolean status
 	 */
 	boolean start(SensorReportId report, int reportPeriod);
 

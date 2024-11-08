@@ -25,7 +25,9 @@ import org.slf4j.LoggerFactory;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-class StringUtils {
+public class StringUtils {
+    public static final String EMPTY_STRING = "";
+    public static final String STRING_SPACE = " ";
     private static final Logger LOGGER = LoggerFactory.getLogger(StringUtils.class);
 
     public static String rightFormat(String string, int length) {
@@ -38,11 +40,7 @@ class StringUtils {
     }
 
     private static String getSpaces(int total) {
-        String tmp = "";
-        for (int i = 0; i < total; i++) {
-            tmp += " ";
-        }
-        return tmp;
+        return STRING_SPACE.repeat(Math.max(0, total));
     }
 
     public static void main(String... bla) {
