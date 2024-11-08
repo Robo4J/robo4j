@@ -16,6 +16,7 @@
  */
 package com.robo4j.units.rpi.camera;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
@@ -28,7 +29,8 @@ import static com.robo4j.util.Utf8Constant.UTF8_SPACE;
  * @author Miroslav Wengner (@miragemiko)
  */
 public abstract class RaspiRequest<T> implements Serializable {
-	private static final long serialVersionUID = 1L;
+	@Serial
+    private static final long serialVersionUID = 1L;
 	protected final Map<RpiCameraProperty, String> parameters;
     private final boolean active;
 
@@ -48,17 +50,15 @@ public abstract class RaspiRequest<T> implements Serializable {
     }
 
     protected  String create(String command){
-        return new StringBuilder()
-                .append(command)
-                .append(UTF8_SPACE)
-                .append(parameters.entrySet().stream()
+        return command +
+                UTF8_SPACE +
+                parameters.entrySet().stream()
                         .filter(e -> Objects.nonNull(e.getValue()))
                         .map(e ->
-                                new StringBuilder().append(e.getKey().getProperty())
-                                        .append(UTF8_SPACE)
-                                        .append(e.getValue()).toString())
-                        .collect(Collectors.joining(UTF8_SPACE)))
-                .toString();
+                                e.getKey().getProperty() +
+                                        UTF8_SPACE +
+                                        e.getValue())
+                        .collect(Collectors.joining(UTF8_SPACE));
     }
 }
 

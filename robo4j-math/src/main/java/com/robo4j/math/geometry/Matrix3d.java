@@ -122,38 +122,26 @@ public class Matrix3d implements Matrix {
 	public double getValue(int row, int column) {
 		switch (row) {
 		case 0:
-			switch (column) {
-			case 0:
-				return m11;
-			case 1:
-				return m12;
-			case 2:
-				return m13;
-			default:
-				throw new IllegalArgumentException("Column does not exist: " + column);
-			}
+            return switch (column) {
+                case 0 -> m11;
+                case 1 -> m12;
+                case 2 -> m13;
+                default -> throw new IllegalArgumentException("Column does not exist: " + column);
+            };
 		case 1:
-			switch (column) {
-			case 0:
-				return m21;
-			case 1:
-				return m22;
-			case 2:
-				return m23;
-			default:
-				throw new IllegalArgumentException("Column does not exist: " + column);
-			}
+            return switch (column) {
+                case 0 -> m21;
+                case 1 -> m22;
+                case 2 -> m23;
+                default -> throw new IllegalArgumentException("Column does not exist: " + column);
+            };
 		case 2:
-			switch (column) {
-			case 0:
-				return m31;
-			case 1:
-				return m32;
-			case 2:
-				return m33;
-			default:
-				throw new IllegalArgumentException("Column does not exist: " + column);
-			}
+            return switch (column) {
+                case 0 -> m31;
+                case 1 -> m32;
+                case 2 -> m33;
+                default -> throw new IllegalArgumentException("Column does not exist: " + column);
+            };
 		default:
 			throw new IllegalArgumentException("Row does not exist: " + row);
 		}
@@ -169,25 +157,15 @@ public class Matrix3d implements Matrix {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		long temp;
-		temp = Double.doubleToLongBits(m11);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m12);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m13);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m21);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m22);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m23);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m31);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m32);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m33);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = prime * result + Double.hashCode(m11);
+        result = prime * result + Double.hashCode(m12);
+        result = prime * result + Double.hashCode(m13);
+        result = prime * result + Double.hashCode(m21);
+        result = prime * result + Double.hashCode(m22);
+        result = prime * result + Double.hashCode(m23);
+        result = prime * result + Double.hashCode(m31);
+        result = prime * result + Double.hashCode(m32);
+        result = prime * result + Double.hashCode(m33);
 		return result;
 	}
 
@@ -216,10 +194,8 @@ public class Matrix3d implements Matrix {
 			return false;
 		if (Double.doubleToLongBits(m32) != Double.doubleToLongBits(other.m32))
 			return false;
-		if (Double.doubleToLongBits(m33) != Double.doubleToLongBits(other.m33))
-			return false;
-		return true;
-	}
+        return Double.doubleToLongBits(m33) == Double.doubleToLongBits(other.m33);
+    }
 
 	@Override
 	public int getRows() {

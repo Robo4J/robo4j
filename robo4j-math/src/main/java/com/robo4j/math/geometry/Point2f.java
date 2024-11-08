@@ -112,10 +112,9 @@ public class Point2f {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof Point2f))
+		if (!(obj instanceof Point2f other))
 			return false;
-		Point2f other = (Point2f) obj;
-		if (Float.floatToIntBits(angle) != Float.floatToIntBits(other.angle))
+        if (Float.floatToIntBits(angle) != Float.floatToIntBits(other.angle))
 			return false;
         return Float.floatToIntBits(range) == Float.floatToIntBits(other.range);
     }

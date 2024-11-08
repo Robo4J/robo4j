@@ -128,7 +128,7 @@ public class FeatureExtraction {
 
         float[] alphas = new float[Point2fs.size()];
         for (int i = 0; i < Point2fs.size(); i++) {
-            Point2f before = i == 0 ? Point2fs.get(0) : Point2fs.get(i - 1);
+            Point2f before = i == 0 ? Point2fs.getFirst() : Point2fs.get(i - 1);
             Point2f center = Point2fs.get(i);
             Point2f following = i == Point2fs.size() - 1 ? Point2fs.get(i) : Point2fs.get(i + 1);
             alphas[i] = calculateVectorAngle(before, center, following);

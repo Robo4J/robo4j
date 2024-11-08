@@ -51,6 +51,6 @@ public class AccelerometerEvent {
 	// TODO reiview
 	@Override
 	public String toString() {
-		return "Angles: " + angles == null ? "null" : angles.toString();
+		return angles.toString();
 	}
 }
