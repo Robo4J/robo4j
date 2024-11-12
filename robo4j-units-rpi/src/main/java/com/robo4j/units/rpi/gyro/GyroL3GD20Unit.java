@@ -129,6 +129,7 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
                 return gyro.read();
             } catch (IOException e) {
                 LOGGER.error("Could not read gyro, aborting:{}", e.getMessage(), e);
+                // TODO : fix null by Empty Tunple3f
                 return null;
             }
         }
@@ -167,7 +168,7 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
     public void onMessage(GyroRequest message) {
         RoboReference<GyroEvent> notificationTarget = message.getTarget();
         switch (message.getAction()) {
-            case CALIBRATE:
+            case CALIBRATE -> {
                 try {
                     gyro.calibrate();
                     scanner.reset();
@@ -177,16 +178,13 @@ public class GyroL3GD20Unit extends I2CRoboUnit<GyroRequest> {
                 } catch (IOException e) {
                     LOGGER.error("Failed to calibrate:{}", e.getMessage(), e);
                 }
-                break;
-            case STOP:
-                stopForNotificationTarget(notificationTarget);
-                break;
-            case ONCE:
-            case CONTINUOUS:
+            }
+            case STOP -> stopForNotificationTarget(notificationTarget);
+            case ONCE, CONTINUOUS -> {
                 if (message.getNotificationThreshold() != null) {
                     setUpNotification(message);
                 }
-                break;
+            }
         }
     }
 

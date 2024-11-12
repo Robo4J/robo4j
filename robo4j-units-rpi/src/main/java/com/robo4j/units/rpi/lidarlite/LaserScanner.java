@@ -135,6 +135,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
 
         @Override
         public void run() {
+            // TODO : introduced conditional switch
             int currentRun = invokeCount.incrementAndGet();
             if (currentRun == 1) {
                 // On first step, only move servo to start position
@@ -193,6 +194,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
             }
         }
 
+        // TODO : introduce atomic operation
         private void updateTargetAngle() {
             if (lowToHigh) {
                 currentAngle += request.getStep();
@@ -282,7 +284,7 @@ public class LaserScanner extends I2CRoboUnit<ScanRequest> {
             lidar = new LidarLiteDevice(getBus(), getAddress());
         } catch (IOException e) {
             throw new ConfigurationException(String.format(
-                    "Failed to initialize lidar device. Make sure it is hooked up to bus: %d address: %xd", getBus(), getAddress()), e);
+                    "Failed to initialize lidar device. Make sure it is hooked up to bus: %s address: %xd", getBus(), getAddress()), e);
         }
     }
 

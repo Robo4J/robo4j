@@ -41,18 +41,13 @@ abstract class AbstractI2CBackpackUnit extends I2CRoboUnit<DrawMessage> {
 
     void processMessage(AbstractBackpack device, DrawMessage message) {
         switch (message.getType()) {
-            case CLEAR:
-                device.clear();
-                break;
-            case PAINT:
-                paint(message);
-                break;
-            case DISPLAY:
+            case CLEAR -> device.clear();
+            case PAINT -> paint(message);
+            case DISPLAY -> {
                 paint(message);
                 device.display();
-                break;
-            default:
-                LOGGER.warn("Illegal message: {}", message);
+            }
+            default -> LOGGER.error("Unknown message type: {}", message.getType());
         }
     }
 

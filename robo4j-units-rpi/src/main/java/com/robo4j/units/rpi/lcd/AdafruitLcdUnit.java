@@ -127,14 +127,12 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
      */
     private void processLcdMessage(LcdMessage message) throws IOException {
         switch (message.getType()) {
-            case CLEAR:
-                lcd.clear();
-                break;
-            case DISPLAY_ENABLE:
-                final boolean disen = Boolean.valueOf(message.getText().trim());
-                lcd.setDisplayEnabled(disen);
-                break;
-            case SCROLL:
+            case CLEAR -> lcd.clear();
+            case DISPLAY_ENABLE -> {
+                final boolean displayEnable = Boolean.parseBoolean(message.getText().trim());
+                lcd.setDisplayEnabled(displayEnable);
+            }
+            case SCROLL -> {
                 // TODO: consider enum as the constant
                 switch (message.getText().trim()) {
                     case "left":
@@ -147,8 +145,9 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
                         LOGGER.warn("unknown scroll direction:{}", message.getText());
                         break;
                 }
-                break;
-            case SET_TEXT:
+            }
+
+            case SET_TEXT -> {
                 if (message.getColor() != null) {
                     lcd.setBacklight(message.getColor());
                 }
@@ -157,13 +156,9 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
                     lcd.setText(text);
                     stringMessage.set(text);
                 }
-                break;
-            case STOP:
-                lcd.stop();
-                break;
-            default:
-                LOGGER.warn("demo not supported:{}", message.getType());
-                break;
+            }
+            case STOP -> lcd.stop();
+            default -> LOGGER.warn("demo not supported:{}", message.getType());
         }
     }
 

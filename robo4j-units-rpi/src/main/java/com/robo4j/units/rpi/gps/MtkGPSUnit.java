@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -88,7 +87,7 @@ public class MtkGPSUnit extends RoboUnit<GPSRequest> {
     public static final String ATTRIBUTE_NAME_READ_INTERVAL = "readInterval";
 
     public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
-            .unmodifiableCollection(Arrays.asList(DefaultAttributeDescriptor.create(Tuple3f.class, ATTRIBUTE_NAME_READ_INTERVAL)));
+            .unmodifiableCollection(List.of(DefaultAttributeDescriptor.create(Tuple3f.class, ATTRIBUTE_NAME_READ_INTERVAL)));
     private static final Logger LOGGER = LoggerFactory.getLogger(MtkGPSUnit.class);
 
     private MTK3339GPS mtk3339gps;
@@ -151,15 +150,9 @@ public class MtkGPSUnit extends RoboUnit<GPSRequest> {
         super.onMessage(message);
         RoboReference<GPSEvent> targetReference = message.getTarget();
         switch (message.getOperation()) {
-            case REGISTER:
-                register(targetReference);
-                break;
-            case UNREGISTER:
-                unregister(targetReference);
-                break;
-            default:
-                LOGGER.warn("Unknown operation:{}", message.getOperation());
-                break;
+            case REGISTER -> register(targetReference);
+            case UNREGISTER -> unregister(targetReference);
+            default -> LOGGER.warn("Unknown operation:{}", message.getOperation());
         }
     }
 

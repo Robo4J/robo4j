@@ -64,18 +64,13 @@ public class RaspividUnit extends RoboUnit<RaspividRequest> {
     @Override
     public void onMessage(RaspividRequest message) {
         switch (message.getType()) {
-            case CONFIG:
+            case CONFIG -> {
                 message.put(RpiCameraProperty.OUTPUT, output);
                 processId = String.valueOf(device.executeCommandReturnPID(message.create()));
-                break;
-            case START:
-                LOGGER.info("not necessary start message: {}", message);
-                break;
-            case STOP:
-                stop();
-                break;
-            default:
-                LOGGER.error("message: {}", message);
+            }
+            case START -> LOGGER.info("not necessary start message: {}", message);
+            case STOP -> stop();
+            default -> LOGGER.error("message: {}", message);
         }
     }
 
