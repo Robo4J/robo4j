@@ -16,7 +16,6 @@
  */
 package com.robo4j.net;
 
-import com.robo4j.RoboContext;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,11 +69,11 @@ class LookupServiceTests {
     }
 
     @Test
-    void testLookup() throws IOException, InterruptedException {
-        final LookupService service = getLookupService(new LocalLookupServiceImpl());
+    void lookupEmitterTest() throws IOException, InterruptedException {
+        final var service = getLookupService(new LocalLookupServiceImpl());
         service.start();
-        RoboContextDescriptor descriptor = createRoboContextDescriptor();
-        ContextEmitter emitter = new ContextEmitter(descriptor, InetAddress.getByName(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS),
+        var descriptor = createRoboContextDescriptor();
+        var emitter = new ContextEmitter(descriptor, InetAddress.getByName(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS),
                 LookupServiceProvider.DEFAULT_PORT, 250);
 
         // TODO : review sleep usage
@@ -83,9 +82,9 @@ class LookupServiceTests {
             Thread.sleep(250);
         }
 
-        Map<String, RoboContextDescriptor> discoveredContexts = service.getDiscoveredContexts();
-        RoboContext context = service.getContext(descriptor.getId());
-        ClientRemoteRoboContext remoteContext = (ClientRemoteRoboContext) context;
+        var discoveredContexts = service.getDiscoveredContexts();
+        var context = service.getContext(descriptor.getId());
+        var remoteContext = (ClientRemoteRoboContext) context;
 
         LOGGER.info("discoveredContexts:{}", discoveredContexts);
         LOGGER.info("Address:{}", remoteContext.getAddress());

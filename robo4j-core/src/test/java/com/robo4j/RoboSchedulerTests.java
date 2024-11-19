@@ -16,7 +16,6 @@
  */
 package com.robo4j;
 
-import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.scheduler.FinalInvocationListener;
 import com.robo4j.scheduler.Scheduler;
@@ -25,7 +24,10 @@ import com.robo4j.units.StringProducer;
 import com.robo4j.units.StringScheduledEmitter;
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.*;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -93,6 +95,7 @@ class RoboSchedulerTests {
         var consumerCountDownLatch = consumer.onGetAttribute(StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH);
 
         system.addUnits(producer, scheduledEmitter, consumer);
+        system.setState(LifecycleState.INITIALIZED);
         system.start();
 
         for (int i = 0; i < totalMessages; i++) {

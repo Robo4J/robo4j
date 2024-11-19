@@ -48,13 +48,13 @@ public class AckingStringConsumer extends RoboUnit<TestMessageType> {
 	public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_TOTAL_RECEIVED_MESSAGES = DefaultAttributeDescriptor
 			.create(Integer.class, ATTR_TOTAL_RECEIVED_MESSAGES);
 	public static final String ATTR_ACKNOWLEDGE = "acknowledge";
-	private volatile AtomicInteger counter;
+	private final AtomicInteger counter;
 	private CountDownLatch acknowledgeLatch;
-	private List<TestMessageType> receivedMessages = new ArrayList<>();
+	private final List<TestMessageType> receivedMessages = new ArrayList<>();
 
 	/**
-	 * @param context
-	 * @param id
+	 * @param context system context
+	 * @param id system id
 	 */
 	public AckingStringConsumer(RoboContext context, String id) {
 		super(TestMessageType.class, context, id);

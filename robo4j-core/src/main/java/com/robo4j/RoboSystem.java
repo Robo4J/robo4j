@@ -18,7 +18,11 @@ package com.robo4j;
 
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
-import com.robo4j.net.*;
+import com.robo4j.net.ContextEmitter;
+import com.robo4j.net.MessageCallback;
+import com.robo4j.net.MessageServer;
+import com.robo4j.net.ReferenceDescriptor;
+import com.robo4j.net.RoboContextDescriptor;
 import com.robo4j.scheduler.DefaultScheduler;
 import com.robo4j.scheduler.RoboThreadFactory;
 import com.robo4j.scheduler.Scheduler;
@@ -33,8 +37,18 @@ import java.io.Serializable;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.WeakHashMap;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -299,34 +313,25 @@ final class RoboSystem implements RoboContext {
 
     @Override
     public void start() {
-        if (state.compareAndSet(LifecycleState.STOPPED, LifecycleState.STARTING)) {
-            // NOTE(Marcus/Sep 4, 2017): Do we want to support starting a
-            // stopped system?
-            startUnits();
+        var currentState = state.get();
+        switch (currentState) {
+            case INITIALIZED, STOPPED -> {
+                state.compareAndSet(currentState, LifecycleState.STARTING);
+                startUnits();
+            }
         }
-        if (state.compareAndSet(LifecycleState.INITIALIZED, LifecycleState.STARTING)) {
-            startUnits();
-        }
-
-        // This is only used from testing for now, it should never happen from
-        // the builder.
-        if (state.compareAndSet(LifecycleState.UNINITIALIZED, LifecycleState.STARTING)) {
-            startUnits();
-        }
-
         // If we have a server, start it, then set up emitter
-        blockingExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                if (messageServer != null) {
-                    try {
-                        messageServer.start();
-                    } catch (IOException e) {
-                        LOGGER.error("Could not start the message server. Proceeding without.", e);
-                    }
+        blockingExecutor.execute(() -> {
+            if (messageServer != null) {
+                try {
+                    messageServer.start();
+                } catch (IOException e) {
+                    LOGGER.error("Could not start the message server. Proceeding without.", e);
                 }
             }
         });
+
+        // TODO : make emitter configurable
         final ContextEmitter emitter = initEmitter(emitterConfiguration, getListeningURI(messageServer));
         if (emitter != null) {
             emitterFuture = getScheduler().scheduleAtFixedRate(emitter::emit, 0, emitter.getHeartBeatInterval(), TimeUnit.MILLISECONDS);

@@ -22,7 +22,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 /**
  * This class is used by the {@link RoboContext} to make it discoverable. This
@@ -80,8 +84,8 @@ public final class ContextEmitter {
         this.multicastAddress = multicastAddress;
         this.port = port;
         this.heartBeatInterval = heartBeatInterval;
-        socket = new DatagramSocket();
-        message = HearbeatMessageCodec.encode(entry);
+        this.socket = new DatagramSocket();
+        this.message = HearbeatMessageCodec.encode(entry);
     }
 
     public ContextEmitter(RoboContextDescriptor entry, Configuration emitterConfiguration)
@@ -104,17 +108,18 @@ public final class ContextEmitter {
         }
     }
 
+
+    public int getHeartBeatInterval() {
+        return heartBeatInterval;
+    }
+
     /**
      * Emits a context heartbeat message. Will throw an exception on trouble.
      *
      * @throws IOException exception
      */
-    public void emitWithException() throws IOException {
+    private void emitWithException() throws IOException {
         DatagramPacket packet = new DatagramPacket(message, message.length, multicastAddress, port);
         socket.send(packet);
-    }
-
-    public int getHeartBeatInterval() {
-        return heartBeatInterval;
     }
 }
