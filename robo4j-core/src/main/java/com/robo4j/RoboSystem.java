@@ -19,7 +19,6 @@ package com.robo4j;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.net.ContextEmitter;
-import com.robo4j.net.MessageCallback;
 import com.robo4j.net.MessageServer;
 import com.robo4j.net.ReferenceDescriptor;
 import com.robo4j.net.RoboContextDescriptor;
@@ -41,6 +40,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
@@ -175,17 +175,10 @@ final class RoboSystem implements RoboContext {
 
         private void deliverOnQueue(T message) {
             switch (deliveryPolicy) {
-                case SYSTEM:
-                    systemScheduler.execute(new Messenger<T>(unit, message));
-                    break;
-                case WORK:
-                    workExecutor.execute(new Messenger<T>(unit, message));
-                    break;
-                case BLOCKING:
-                    blockingExecutor.execute(new Messenger<T>(unit, message));
-                    break;
-                default:
-                    LOGGER_LOCAL.error("not supported policy: {}", deliveryPolicy);
+                case SYSTEM -> systemScheduler.execute(new Messenger<T>(unit, message));
+                case WORK -> workExecutor.execute(new Messenger<T>(unit, message));
+                case BLOCKING -> blockingExecutor.execute(new Messenger<T>(unit, message));
+                default -> LOGGER_LOCAL.error("not supported policy: {}", deliveryPolicy);
             }
         }
 
@@ -377,12 +370,7 @@ final class RoboSystem implements RoboContext {
 
         // Then schedule shutdowns on the scheduler threads...
         for (RoboUnit<?> unit : units.values()) {
-            getScheduler().execute(new Runnable() {
-                @Override
-                public void run() {
-                    RoboSystem.shutdownUnit(unit);
-                }
-            });
+            getScheduler().execute(() -> RoboSystem.shutdownUnit(unit));
         }
 
         // Then shutdown the system scheduler. Will wait until the termination
@@ -479,12 +467,9 @@ final class RoboSystem implements RoboContext {
 
     private MessageServer initServer(Configuration serverConfiguration) {
         if (serverConfiguration != null) {
-            return new MessageServer(new MessageCallback() {
-                @Override
-                public void handleMessage(String sourceUuid, String id, Object message) {
-                    // TODO: save message null message or not registered id
-                    getReference(id).sendMessage(message);
-                }
+            return new MessageServer((sourceUuid, id, message) -> {
+                // TODO: save message null message or not registered id
+                Objects.requireNonNull(getReference(id)).sendMessage(message);
             }, serverConfiguration);
         } else {
             return null;

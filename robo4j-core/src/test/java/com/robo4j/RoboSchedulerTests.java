@@ -16,19 +16,23 @@
  */
 package com.robo4j;
 
+import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.scheduler.FinalInvocationListener;
-import com.robo4j.scheduler.Scheduler;
 import com.robo4j.units.StringConsumer;
 import com.robo4j.units.StringProducer;
 import com.robo4j.units.StringScheduledEmitter;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+import static com.robo4j.RoboUnitTestUtils.getAttributeOrTimeout;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -48,26 +52,44 @@ class RoboSchedulerTests {
         }
     }
 
-    @Test
-    void testScheduler() throws InterruptedException, ExecutionException {
-        // FIXME: 20.08.17 (miro,marcus): when notification implemented, correct the test
-        RoboSystem system = new RoboSystem();
-        StringConsumer consumer = new StringConsumer(system, "consumer");
-        system.addUnits(consumer);
-        consumer.setState(LifecycleState.STARTED);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoboSchedulerTests.class);
 
-        Scheduler scheduler = system.getScheduler();
-        RoboReference<Object> reference = system.getReference("consumer");
-        SchedulerListener listener = new SchedulerListener();
-        ScheduledFuture<?> schedule = scheduler.schedule(reference, "Lalalala", 1, 4, TimeUnit.SECONDS, 3, listener);
+    @Test
+    void testScheduler() throws InterruptedException, ExecutionException, TimeoutException, RoboBuilderException, CancellationException {
+        // FIXME: 20.08.17 (miro,marcus): when notification implemented, correct the test
+        final var usedTimeUnitMills = TimeUnit.MILLISECONDS;
+        final var maxDelayMills = 2;
+        final var initSystemDelayMills = 1;
+        final var scheduledMessageRepeatExclusive = 4;
+        final var usedScheduledMessage = "Lalalala";
+        final int expectedMessagesMax = 3;
+        final var expectedConsumerName = "consumer";
+        final Configuration consumerConf = new ConfigurationBuilder()
+                .addInteger(StringConsumer.PROP_TOTAL_MESSAGES, expectedMessagesMax).build();
+
+        var roboSystemBuilder = new RoboBuilder();
+        roboSystemBuilder.add(StringConsumer.class, consumerConf, expectedConsumerName);
+        var system = (RoboSystem) roboSystemBuilder.build();
+        system.start();
+
+        var consumerRef = system.getReference(expectedConsumerName);
+        assert consumerRef != null;
+        var scheduler = system.getScheduler();
+        var consumerReference = system.getReference(expectedConsumerName);
+        var countDownLatchConsumer = getAttributeOrTimeout(consumerRef, StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH);
+        var listener = new SchedulerListener();
+        var schedule = scheduler.schedule(consumerReference, usedScheduledMessage, initSystemDelayMills, scheduledMessageRepeatExclusive, usedTimeUnitMills, expectedMessagesMax, listener);
         try {
             schedule.get();
         } catch (CancellationException e) {
-            // Expected - using this to wait for completion.
+            LOGGER.info("expected exception due to the cancellation of scheduler,e:{}", String.valueOf(e));
         }
 
-        Thread.sleep(1000);
-        assertEquals(3, consumer.getReceivedMessages().size());
+        var receivedMessages = countDownLatchConsumer.await(maxDelayMills, usedTimeUnitMills);
+        var totalReceivedMessages = getAttributeOrTimeout(consumerRef, StringConsumer.DESCRIPTOR_TOTAL_MESSAGES);
+
+        assertTrue(receivedMessages);
+        assertEquals(expectedMessagesMax, totalReceivedMessages);
         assertTrue(listener.wasFinalCalled);
         system.shutdown();
     }
@@ -100,7 +122,6 @@ class RoboSchedulerTests {
 
         for (int i = 0; i < totalMessages; i++) {
             producer.onMessage(StringProducer.PROPERTY_SEND_RANDOM_MESSAGE);
-            TimeUnit.MILLISECONDS.sleep(10);
         }
 
         var producerSentMessages = producerCountDownLatch.await(totalTestTimeoutMills, TimeUnit.MILLISECONDS);
@@ -112,11 +133,11 @@ class RoboSchedulerTests {
         assertTrue(producerSentMessages);
         assertEquals(totalMessages, producerTotalMessagesCount);
         assertTrue(consumerReceivedMessages);
-        assert(totalMessages <= consumer.getReceivedMessages().size());
+        assert (totalMessages <= consumer.getReceivedMessages().size());
     }
 
     @Test
-    void testSchedulerWithPressureAndMultipleTasks() throws InterruptedException, ExecutionException {
+    void schedulerWithPressureAndMultipleTasksTest() throws InterruptedException, ExecutionException {
         RoboSystem system = new RoboSystem();
         StringConsumer consumer = new StringConsumer(system, "consumer");
         system.addUnits(consumer);

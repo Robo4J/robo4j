@@ -129,7 +129,7 @@ public class RoboBuilderTests {
 
         RoboReference<String> consumer = system.getReference(CONSUMER_UNIT_NAME);
 
-        CountDownLatch countDownLatchConsumer = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH);
+        var countDownLatchConsumer = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH);
         var receivedMessages = countDownLatchConsumer.await(TIMEOUT_MIN, TimeUnit.MINUTES);
         var totalReceivedMessages = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_TOTAL_MESSAGES);
 
@@ -207,7 +207,7 @@ public class RoboBuilderTests {
     }
 
     @Test
-    void testProgrammaticConfiguration() throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
+    void programmaticConfigurationTest() throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
         ConfigurationBuilder systemConfigBuilder = new ConfigurationBuilder()
                 .addInteger(RoboBuilder.KEY_SCHEDULER_POOL_SIZE, 11).addInteger(RoboBuilder.KEY_WORKER_POOL_SIZE, 5)
                 .addInteger(RoboBuilder.KEY_BLOCKING_POOL_SIZE, 13);
