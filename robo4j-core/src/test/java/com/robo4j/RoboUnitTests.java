@@ -21,7 +21,11 @@ import com.robo4j.units.StringConsumer;
 import com.robo4j.units.StringProducer;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.TimeUnit;
+
+import static com.robo4j.RoboUnitTestUtils.getAttributeOrTimeout;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test(s) for the RoboUnits.
@@ -31,60 +35,85 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class RoboUnitTests {
 
-	@Test
-	void systemUninitializedTest(){
-		RoboSystem system = new RoboSystem();
-		assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
-	}
+    @Test
+    void systemUninitializedTest() {
+        RoboSystem system = new RoboSystem();
+        assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+    }
 
-	@Test
-	void systemInitializedTest(){
-		var system = new RoboSystem();
-		var consumer = new StringConsumer(system, "consumer");
-		system.addUnits(consumer);
-		system.setState(LifecycleState.INITIALIZED);
-		system.start();
+    @Test
+    void systemInitializedTest() {
+        var system = new RoboSystem();
+        var consumer = new StringConsumer(system, "consumer");
+        system.addUnits(consumer);
+        system.setState(LifecycleState.INITIALIZED);
+        system.start();
 
-		assertEquals(LifecycleState.STARTED, system.getState());
-		system.shutdown();
-	}
+        assertEquals(LifecycleState.STARTED, system.getState());
+        system.shutdown();
+    }
 
-	@Test
-	void systemStartTest() throws Exception {
-		int totalMessages = 10;
-		var system = new RoboSystem();
-		var producer = new StringProducer(system, "producer");
-		var config = new ConfigurationBuilder().addString(StringProducer.PROP_TARGET, "consumer")
-				.addInteger(StringProducer.PROP_TOTAL_MESSAGES, totalMessages)
-				.build();
-		producer.initialize(config);
-		var consumer = new StringConsumer(system, "consumer");
-		system.addUnits(producer, consumer);
-		system.setState(LifecycleState.INITIALIZED);
-		system.start();
-		for (int i = 0; i < totalMessages; i++) {
-			producer.sendRandomMessage();
-		}
-        Thread.sleep(10);
+    @Test
+    void systemStartTest() throws Exception {
+        var consideredTimeUnit = TimeUnit.MILLISECONDS;
+        var totalTestTimeoutMills = 10;
+        int expectedTotalMessages = 10;
+        var system = new RoboSystem();
+        var producer = new StringProducer(system, "producer");
+        var producerConfig = new ConfigurationBuilder().addString(StringProducer.PROP_TARGET, "consumer")
+                .addInteger(StringProducer.PROP_TOTAL_MESSAGES, expectedTotalMessages)
+                .build();
+        producer.initialize(producerConfig);
+        var consumer = new StringConsumer(system, "consumer");
+        var consumerConfig = new ConfigurationBuilder().addInteger(StringConsumer.PROP_TOTAL_MESSAGES, expectedTotalMessages).build();
+        consumer.initialize(consumerConfig);
 
-		assertEquals(system.getState(), LifecycleState.STARTED);
-		assertEquals(totalMessages, consumer.getReceivedMessages().size());
-		system.shutdown();
-	}
+        system.addUnits(producer, consumer);
+        system.setState(LifecycleState.INITIALIZED);
+        system.start();
 
-	@Test
-	void systemStartedReferenceMessagesTest() throws Exception {
-		var system = new RoboSystem();
-		var consumer = new StringConsumer(system, "consumer");
-		system.addUnits(consumer);
-		system.setState(LifecycleState.INITIALIZED);
-		system.start();
+        var countDownLatchConsumer = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH);
 
-		RoboReference<String> ref = system.getReference(consumer.id());
-		assert ref != null;
-		consumer.sendMessage("Lalalala");
-		ref.sendMessage("Lalala");
-		system.shutdown();
-		assertEquals(2, consumer.getReceivedMessages().size());
-	}
+        for (int i = 0; i < expectedTotalMessages; i++) {
+            producer.sendRandomMessage();
+        }
+        var consumerReceivedMessages = countDownLatchConsumer.await(totalTestTimeoutMills, consideredTimeUnit);
+        var totalReceivedMessages = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_TOTAL_MESSAGES);
+
+        assertTrue(consumerReceivedMessages);
+        assertEquals(system.getState(), LifecycleState.STARTED);
+        assertEquals(expectedTotalMessages, totalReceivedMessages);
+        system.shutdown();
+
+    }
+
+    @Test
+    void systemStartedReferenceMessagesTest() throws Exception {
+        var consideredTimeUnit = TimeUnit.MILLISECONDS;
+        var totalTestTimeoutMills = 10;
+        var randomMessage = "Lalalala";
+        var expectedTotalMessages = 2;
+        var system = new RoboSystem();
+        var consumer = new StringConsumer(system, "consumer");
+        var consumerConfig = new ConfigurationBuilder().addInteger(StringConsumer.PROP_TOTAL_MESSAGES, expectedTotalMessages).build();
+        consumer.initialize(consumerConfig);
+        system.addUnits(consumer);
+        system.setState(LifecycleState.INITIALIZED);
+        system.start();
+
+        var consumerRef = system.getReference(consumer.id());
+        assert consumerRef != null;
+
+        var countDownLatchConsumer = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH);
+        consumer.sendMessage(randomMessage);
+        consumerRef.sendMessage(randomMessage);
+
+
+        var consumerReceivedMessages = countDownLatchConsumer.await(totalTestTimeoutMills, consideredTimeUnit);
+        var totalReceivedMessages = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_TOTAL_MESSAGES);
+        system.shutdown();
+
+        assertTrue(consumerReceivedMessages);
+        assertEquals(expectedTotalMessages, totalReceivedMessages);
+    }
 }

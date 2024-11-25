@@ -17,15 +17,28 @@
 
 package com.robo4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 final public class RoboUnitTestUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoboUnitTestUtils.class);
     private static final int TIMEOUT = 5;
 
     public static <T, R> R getAttributeOrTimeout(RoboReference<T> roboReference, AttributeDescriptor<R> attributeDescriptor) throws InterruptedException, ExecutionException, TimeoutException {
         return roboReference.getAttribute(attributeDescriptor).get(TIMEOUT, TimeUnit.MINUTES);
+    }
+
+    public static void futureGetSafe(ScheduledFuture<?> f) {
+        try {
+            f.get();
+        } catch (Throwable e) {
+            LOGGER.warn("error:{}", e.getMessage(), e);
+        }
     }
 
 }
