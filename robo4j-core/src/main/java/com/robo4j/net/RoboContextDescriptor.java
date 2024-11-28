@@ -25,47 +25,44 @@ import java.util.Map;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboContextDescriptor {
-	public static final String KEY_URI = "uri";
+    public static final String KEY_URI = "uri";
 
-	private final String id;
-	private final int heartBeatInterval;
-	private final Map<String, String> metaData;
+    private final String id;
+    private final int heartBeatInterval;
+    private final Map<String, String> metaData;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param id
-	 *            the robo reference id.
-	 * @param heartBeatInterval
-	 *            how often to send a heart beat
-	 * @param metaData
-	 *            the metadata describing the RoboContext.
-	 */
-	public RoboContextDescriptor(String id, int heartBeatInterval, Map<String, String> metaData) {
-		this.id = id;
-		this.heartBeatInterval = heartBeatInterval;
-		this.metaData = metaData;
-	}
+    /**
+     * Constructor.
+     *
+     * @param id                the robo reference id.
+     * @param heartBeatInterval how often to send a heart beat in milliseconds
+     * @param metaData          the metadata describing the RoboContext.
+     */
+    public RoboContextDescriptor(String id, int heartBeatInterval, Map<String, String> metaData) {
+        this.id = id;
+        this.heartBeatInterval = heartBeatInterval;
+        this.metaData = metaData;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public Map<String, String> getMetadata() {
-		return metaData;
-	}
+    public Map<String, String> getMetadata() {
+        return metaData;
+    }
 
-	/**
-	 * The heart beat interval for this RoboContext, in ms.
-	 * 
-	 * @return the heart beat interval in ms.
-	 */
-	public int getHeartBeatInterval() {
-		return heartBeatInterval;
-	}
+    /**
+     * The heart beat interval for this RoboContext, in ms.
+     *
+     * @return the heart beat interval in milliseconds.
+     */
+    public int getHeartBeatInterval() {
+        return heartBeatInterval;
+    }
 
-	@Override
-	public String toString() {
-		return "RoboContextDescriptor [id=" + id + ", heartbeat=" + heartBeatInterval + ", metadata=[" + metaData.toString() + "]";
-	}
+    @Override
+    public String toString() {
+        return "RoboContextDescriptor [id=" + id + ", heartbeat=" + heartBeatInterval + ", metadata=[" + metaData.toString() + "]";
+    }
 }

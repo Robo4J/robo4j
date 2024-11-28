@@ -41,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-// TODO : remove thread sleep
 public class MessageServerTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageServerTest.class);
     private static final int TIMEOUT_SEC = 30;
@@ -51,7 +50,7 @@ public class MessageServerTest {
     private volatile Exception exception = null;
 
     @Test
-    void testClientServerMessagePassing() throws Exception {
+    void clientServerMessagePassingTest() throws Exception {
         final var messageCache = new ArrayList<>();
         final var messagesLatch = new CountDownLatch(3);
 
@@ -151,13 +150,13 @@ public class MessageServerTest {
         client.connect();
 
         // TODO : review boxing
-        client.sendMessage("test1", Byte.valueOf((byte) 1));
-        client.sendMessage("test2", Short.valueOf((short) 2));
+        client.sendMessage("test1", (byte) 1);
+        client.sendMessage("test2", (short) 2);
         client.sendMessage("test3", Character.valueOf((char) 3));
-        client.sendMessage("test4", Integer.valueOf(4));
-        client.sendMessage("test5", Float.valueOf(5.0f));
-        client.sendMessage("test6", Long.valueOf(6));
-        client.sendMessage("test7", Double.valueOf(7));
+        client.sendMessage("test4", 4);
+        client.sendMessage("test5", 5.0f);
+        client.sendMessage("test6", 6L);
+        client.sendMessage("test7", 7d);
         client.sendMessage("test8", new TestMessageType(8, messageText, null));
         messageLatch.await(TIMEOUT_SEC, TimeUnit.SECONDS);
 

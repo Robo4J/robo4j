@@ -53,15 +53,14 @@ class LookupServiceTests {
     }
 
     @Test
-    void testEncodeDecode() throws IOException {
-        Map<String, String> metadata = new HashMap<>();
-        String id = "MyID";
-        int heartBeatInterval = 1234;
-        metadata.put("name", "Pretty Human Readable Name");
-        metadata.put("uri", "robo4j://localhost:12345");
-        RoboContextDescriptor descriptor = new RoboContextDescriptor(id, heartBeatInterval, metadata);
-        byte[] encodedDescriptor = HearbeatMessageCodec.encode(descriptor);
-        RoboContextDescriptor decodedDescriptor = HearbeatMessageCodec.decode(encodedDescriptor);
+    void encodeDecodeTest() {
+        var metadata = Map.of("name", "Pretty Human Readable Name", "uri", "robo4j://localhost:12345");
+        var id = "MyID";
+        var heartBeatInterval = 1234;
+
+        var descriptor = new RoboContextDescriptor(id, heartBeatInterval, metadata);
+        var encodedDescriptor = HearbeatMessageCodec.encode(descriptor);
+        var decodedDescriptor = HearbeatMessageCodec.decode(encodedDescriptor);
 
         assertEquals(descriptor.getId(), decodedDescriptor.getId());
         assertEquals(descriptor.getHeartBeatInterval(), decodedDescriptor.getHeartBeatInterval());
@@ -70,16 +69,19 @@ class LookupServiceTests {
 
     @Test
     void lookupEmitterTest() throws IOException, InterruptedException {
+        final var expectedDiscoveredContexts = 1;
         final var service = getLookupService(new LocalLookupServiceImpl());
-        service.start();
-        var descriptor = createRoboContextDescriptor();
-        var emitter = new ContextEmitter(descriptor, InetAddress.getByName(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS),
-                LookupServiceProvider.DEFAULT_PORT, 250);
+        final var descriptor = createRoboContextDescriptor();
+        final var heartBeatIntervalMills = 1;
+        final var emittedMessagesHearBeatInterval = 1;
+        final var emitter = new ContextEmitter(descriptor, InetAddress.getByName(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS),
+                LookupServiceProvider.DEFAULT_PORT, heartBeatIntervalMills);
 
+        service.start();
         // TODO : review sleep usage
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < emittedMessagesHearBeatInterval; i++) {
             emitter.emit();
-            Thread.sleep(250);
+            Thread.sleep(heartBeatIntervalMills);
         }
 
         var discoveredContexts = service.getDiscoveredContexts();
@@ -90,12 +92,12 @@ class LookupServiceTests {
         LOGGER.info("Address:{}", remoteContext.getAddress());
         assertNotNull(context);
         assertNotNull(remoteContext.getAddress());
-        assertEquals(1, discoveredContexts.size());
+        assertEquals(expectedDiscoveredContexts, discoveredContexts.size());
     }
 
     private static RoboContextDescriptor createRoboContextDescriptor() {
-        Map<String, String> metadata = new HashMap<>();
-        String id = "MyID";
+        var metadata = new HashMap<String, String>();
+        var id = "MyID";
         int heartBeatInterval = 1234;
         metadata.put("name", "Pretty Human Readable Name");
         metadata.put(RoboContextDescriptor.KEY_URI, "robo4j://localhost:12345");

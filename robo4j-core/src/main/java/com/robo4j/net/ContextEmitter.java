@@ -73,17 +73,17 @@ public final class ContextEmitter {
     /**
      * Constructor.
      *
-     * @param entry             the information to emit.
-     * @param multicastAddress  the address to emit to.
-     * @param port              the port.
-     * @param heartBeatInterval the heart beat interval
+     * @param entry                  the information to emit.
+     * @param multicastAddress       the address to emit to.
+     * @param port                   the port.
+     * @param heartBeatIntervalMills the heart beat interval in milliseconds
      * @throws SocketException possible exception
      */
-    public ContextEmitter(RoboContextDescriptor entry, InetAddress multicastAddress, int port, int heartBeatInterval)
+    public ContextEmitter(RoboContextDescriptor entry, InetAddress multicastAddress, int port, int heartBeatIntervalMills)
             throws SocketException {
         this.multicastAddress = multicastAddress;
         this.port = port;
-        this.heartBeatInterval = heartBeatInterval;
+        this.heartBeatInterval = heartBeatIntervalMills;
         this.socket = new DatagramSocket();
         this.message = HearbeatMessageCodec.encode(entry);
     }
@@ -104,6 +104,7 @@ public final class ContextEmitter {
         try {
             emitWithException();
         } catch (IOException e) {
+            // TODO: properly report the exception
             LOGGER.error("Failed to emit heartbeat message", e);
         }
     }

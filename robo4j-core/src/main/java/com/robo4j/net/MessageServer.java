@@ -33,6 +33,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.robo4j.util.StringConstants.EMPTY;
+
 /**
  * This is a server that listens on messages, and sends them off to the
  * indicated local recipient. It is associated to RoboContext.
@@ -45,6 +47,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MessageServer {
     public static final String KEY_HOST_NAME = "hostname";
     public static final String KEY_PORT = "port";
+    public static final String DEFAULT_SCHEME_ROBO4J = "robo4j";
 
     private record MessageHandler(Socket socket, MessageCallback callback,
                                   AtomicBoolean serverActive) implements Runnable {
@@ -72,7 +75,7 @@ public class MessageServer {
             } catch (ClassNotFoundException e) {
                 LOGGER.error("Could not find class to deserialize message to - will stop receiving messages from {}", socket.getRemoteSocketAddress(), e);
             }
-            LOGGER.info("Shutting down socket {}", socket.toString());
+            LOGGER.info("Shutting down socket {}", socket);
 
         }
 
@@ -172,9 +175,9 @@ public class MessageServer {
         try {
             String host = configuration.getString(KEY_HOST_NAME, null);
             if (host != null) {
-                return new URI("robo4j", "", host, listeningPort, "", "", "");
+                return new URI(DEFAULT_SCHEME_ROBO4J, EMPTY, host, listeningPort, EMPTY, EMPTY, EMPTY);
             } else {
-                return new URI("robo4j", "", listeningHost, listeningPort, "", "", "");
+                return new URI(DEFAULT_SCHEME_ROBO4J, EMPTY, listeningHost, listeningPort, EMPTY, EMPTY, EMPTY);
             }
         } catch (URISyntaxException e) {
             LOGGER.error("Could not create URI for listening URI");
