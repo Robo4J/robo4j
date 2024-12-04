@@ -47,6 +47,8 @@ public class MessageServerTest {
     private static final String CONST_MYUUID = "myuuid";
     private static final String PROPERTY_SERVER_NAME = "ServerName";
     private static final int SERVER_LISTEN_DELAY_MILLIS = 250;
+    private static final String LOCALHOST_VALUE = "localhost";
+    private static final String MESSAGE_SERVER_NAME = "Server Name";
     private volatile Exception exception = null;
 
     @Test
@@ -55,8 +57,8 @@ public class MessageServerTest {
         final var messagesLatch = new CountDownLatch(3);
 
         var messageServerConfig = new ConfigurationBuilder()
-                .addString(PROPERTY_SERVER_NAME, "Server Name")
-                .addString(MessageServer.KEY_HOST_NAME, "localhost")
+                .addString(PROPERTY_SERVER_NAME, MESSAGE_SERVER_NAME)
+                .addString(MessageServer.KEY_HOST_NAME, LOCALHOST_VALUE)
                 .build();
         var messageServer = new MessageServer((uuid, id, message) -> {
             printInfo(uuid, id, message);
@@ -116,9 +118,11 @@ public class MessageServerTest {
         final List<Object> messages = new ArrayList<>(messagesNumber);
         final CountDownLatch messageLatch = new CountDownLatch(messagesNumber);
 
-        Configuration serverConfig = new ConfigurationBuilder().addString(PROPERTY_SERVER_NAME, "Server Name")
-                .addString(MessageServer.KEY_HOST_NAME, "localhost").build();
-        MessageServer server = new MessageServer((uuid, id, message) -> {
+        final var serverConfig = new ConfigurationBuilder()
+                .addString(PROPERTY_SERVER_NAME, MESSAGE_SERVER_NAME)
+                .addString(MessageServer.KEY_HOST_NAME, LOCALHOST_VALUE)
+                .build();
+        var messageServer = new MessageServer((uuid, id, message) -> {
             printInfo(uuid, id, message);
             messages.add(message);
             messageLatch.countDown();
@@ -126,7 +130,7 @@ public class MessageServerTest {
 
         Thread t = new Thread(() -> {
             try {
-                server.start();
+                messageServer.start();
             } catch (IOException e) {
                 exception = e;
                 fail(e.getMessage());
@@ -135,7 +139,7 @@ public class MessageServerTest {
         t.setDaemon(true);
         t.start();
         for (int i = 0; i < 10; i++) {
-            if (server.getListeningPort() == 0) {
+            if (messageServer.getListeningPort() == 0) {
                 Thread.sleep(250);
             } else {
                 break;
@@ -143,7 +147,7 @@ public class MessageServerTest {
         }
 
         Configuration clientConfig = ConfigurationFactory.createEmptyConfiguration();
-        MessageClient client = new MessageClient(server.getListeningURI(), CONST_MYUUID, clientConfig);
+        MessageClient client = new MessageClient(messageServer.getListeningURI(), CONST_MYUUID, clientConfig);
         if (exception != null) {
             throw exception;
         }

@@ -39,6 +39,8 @@ public final class DefaultScheduler implements Scheduler {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultScheduler.class);
     private static final int DEFAULT_NUMBER_OF_THREADS = 2;
     private static final int TERMINATION_TIMEOUT_SEC = 4;
+    private static final String THREAD_GROUP_SCHEDULER_NAME = "Robo4J Scheduler";
+    private static final String THREAD_PREFIX_SCHEDULER_NAME = "Robo4J-Scheduler-";
 
     private final ScheduledExecutorService executor;
     private final RoboContext context;
@@ -60,8 +62,12 @@ public final class DefaultScheduler implements Scheduler {
      */
     public DefaultScheduler(RoboContext context, int numberOfThreads) {
         this.context = context;
-        this.executor = new ScheduledThreadPoolExecutor(numberOfThreads,
-                new RoboThreadFactory(new ThreadGroup("Robo4J Scheduler"), "Robo4J Scheduler", true));
+        var schedulerThreadFactory = new RoboThreadFactory
+                .Builder(THREAD_GROUP_SCHEDULER_NAME)
+                .addThreadPrefix(THREAD_PREFIX_SCHEDULER_NAME)
+                .build();
+
+        this.executor = new ScheduledThreadPoolExecutor(numberOfThreads, schedulerThreadFactory);
     }
 
     @Override

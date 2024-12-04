@@ -26,6 +26,33 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboThreadFactory implements ThreadFactory {
+
+	public static final class Builder {
+		private final String groupName;
+		private String threadPrefix = "robo4j-worker-";
+		private boolean isDaemon = true;
+
+		public Builder(String groupName) {
+			this.groupName = groupName;
+		}
+
+		public Builder addThreadPrefix(String prefix) {
+			this.threadPrefix = prefix;
+			return this;
+		}
+
+		public Builder setDaemonThread(boolean daemon) {
+			this.isDaemon = daemon;
+			return this;
+		}
+
+		public RoboThreadFactory build() {
+			var roboThreadGroup = new ThreadGroup(groupName);
+			return new RoboThreadFactory(roboThreadGroup, threadPrefix, isDaemon);
+		}
+
+	}
+
 	/**
 	 * The thread group to use.
 	 */

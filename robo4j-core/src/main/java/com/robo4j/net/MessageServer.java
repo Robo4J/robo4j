@@ -122,7 +122,11 @@ public class MessageServer {
         this.callback = callback;
         this.configuration = configuration;
         // TODO : consider to have configurable thread-pool
-        this.executors = Executors.newCachedThreadPool(new RoboThreadFactory(new ThreadGroup(NAME_COMMUNICATION_WORKER_POOL), NAME_COMMUNICATION_THREAD_PREFIX, true));
+        var roboThreadFactory = new RoboThreadFactory
+                .Builder(NAME_COMMUNICATION_WORKER_POOL)
+                .addThreadPrefix(NAME_COMMUNICATION_THREAD_PREFIX)
+                .build();
+        this.executors = Executors.newCachedThreadPool(roboThreadFactory);
     }
 
     /**

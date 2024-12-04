@@ -62,8 +62,8 @@ import java.util.stream.Collectors;
  */
 final class RoboSystem implements RoboContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(RoboSystem.class);
-    private static final String NAME_BLOCKING_POOL = "Robo4J Blocking Pool";
-    private static final String NAME_WORKER_POOL = "Robo4J Worker Pool";
+    private static final String THREAD_GROUP_BLOCKING_NAME_BLOCKING_POOL = "Robo4J Blocking Pool";
+    private static final String THREAD_GROUP_NAME_WORKER_POOL = "Robo4J Worker Pool";
     private static final int DEFAULT_BLOCKING_POOL_SIZE = 4;
     private static final int DEFAULT_WORKER_POOL_SIZE = 2;
     private static final int DEFAULT_SCHEDULER_POOL_SIZE = 2;
@@ -252,10 +252,19 @@ final class RoboSystem implements RoboContext {
         int schedulerPoolSize = configuration.getInteger(RoboBuilder.KEY_SCHEDULER_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE);
         int workerPoolSize = configuration.getInteger(RoboBuilder.KEY_WORKER_POOL_SIZE, DEFAULT_WORKER_POOL_SIZE);
         int blockingPoolSize = configuration.getInteger(RoboBuilder.KEY_BLOCKING_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE);
-        workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
-                new RoboThreadFactory(new ThreadGroup(NAME_WORKER_POOL), NAME_WORKER_POOL, true));
-        blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, blockingQueue,
-                new RoboThreadFactory(new ThreadGroup(NAME_BLOCKING_POOL), NAME_BLOCKING_POOL, true));
+
+        var workThreadFactory = new RoboThreadFactory
+                .Builder(THREAD_GROUP_NAME_WORKER_POOL)
+                .addThreadPrefix(THREAD_GROUP_NAME_WORKER_POOL)
+                .build();
+
+        var blockingThreadFactory = new RoboThreadFactory
+                .Builder(THREAD_GROUP_BLOCKING_NAME_BLOCKING_POOL)
+                .addThreadPrefix(THREAD_GROUP_BLOCKING_NAME_BLOCKING_POOL)
+                .build();
+
+        workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue, workThreadFactory);
+        blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, blockingQueue, blockingThreadFactory);
         systemScheduler = new DefaultScheduler(this, schedulerPoolSize);
         messageServer = initServer(configuration.getChildConfiguration(RoboBuilder.KEY_CONFIGURATION_SERVER));
         emitterConfiguration = configuration.getChildConfiguration(RoboBuilder.KEY_CONFIGURATION_EMITTER);
