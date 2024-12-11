@@ -28,12 +28,12 @@ public interface AttributeDescriptor<T> {
 	 * 
 	 * @return the attribute type.
 	 */
-	Class<T> getAttributeType();
+	Class<T> attributeType();
 
 	/**
 	 * Returns the name of the attribute.
 	 * 
 	 * @return the attribute name.
 	 */
-	String getAttributeName();
+	String attributeName();
 }

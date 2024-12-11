@@ -111,18 +111,18 @@ public class RemoteTestMessageProducer extends RoboUnit<String> {
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-        if (attribute.getAttributeName().equals(ATTR_TOTAL_MESSAGES) && attribute.getAttributeType() == Integer.class) {
+        if (attribute.attributeName().equals(ATTR_TOTAL_MESSAGES) && attribute.attributeType() == Integer.class) {
             return (R) (Integer) totalCounter.get();
         }
-        if (attribute.getAttributeName().equals(ATTR_COUNT_DOWN_LATCH)
-                && attribute.getAttributeType() == CountDownLatch.class) {
+        if (attribute.attributeName().equals(ATTR_COUNT_DOWN_LATCH)
+                && attribute.attributeType() == CountDownLatch.class) {
             return (R) countDownLatch;
         }
-        if (attribute.getAttributeName().equals(ATTR_ACK_LATCH)
-                && attribute.getAttributeType() == CountDownLatch.class) {
+        if (attribute.attributeName().equals(ATTR_ACK_LATCH)
+                && attribute.attributeType() == CountDownLatch.class) {
             return (R) ackLatch;
         }
-        if (attribute.getAttributeName().equals(ATTR_ACK) && attribute.getAttributeType() == Integer.class) {
+        if (attribute.attributeName().equals(ATTR_ACK) && attribute.attributeType() == Integer.class) {
             return (R) Integer.valueOf(ackCounter.get());
         }
         return null;

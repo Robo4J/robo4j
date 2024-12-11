@@ -33,5 +33,6 @@ public class Utf8Constant {
 	public static final String UTF8_CURLY_BRACKET_RIGHT = "\u007D";
 	public static final String UTF8_SQUARE_BRACKET_LEFT = "\u005B";
 	public static final String UTF8_SQUARE_BRACKET_RIGHT = "\u005D";
+	public static final String UTF8_EXCLAMATION = "\u0021";        //Exclamation mark !
 
 }

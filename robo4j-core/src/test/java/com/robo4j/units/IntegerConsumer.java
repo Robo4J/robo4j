@@ -51,10 +51,10 @@ public class IntegerConsumer extends RoboUnit<Integer> {
     @SuppressWarnings("unchecked")
 	@Override
 	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-		if (attribute.getAttributeName().equals("NumberOfReceivedMessages") && attribute.getAttributeType() == Integer.class) {
+		if (attribute.attributeName().equals("NumberOfReceivedMessages") && attribute.attributeType() == Integer.class) {
 			return (R) (Integer) receivedMessages.size();
 		}
-		if (attribute.getAttributeName().equals("ReceivedMessages") && attribute.getAttributeType() == ArrayList.class) {
+		if (attribute.attributeName().equals("ReceivedMessages") && attribute.attributeType() == ArrayList.class) {
 			return (R) receivedMessages;
 		}
 		return null;

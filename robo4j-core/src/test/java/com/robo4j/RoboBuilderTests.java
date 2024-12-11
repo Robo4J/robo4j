@@ -54,24 +54,24 @@ public class RoboBuilderTests {
     void testParsingFileWithSystemConfigAndInitiate() throws RoboBuilderException {
         var fileSystemAndUnitsConfigName = "testsystem.xml";
         var contextLoader = Thread.currentThread().getContextClassLoader();
-        RoboBuilder builder = new RoboBuilder(
+        var builder = new RoboBuilder(
                 contextLoader.getResourceAsStream(fileSystemAndUnitsConfigName));
         builder.add(contextLoader.getResourceAsStream(fileSystemAndUnitsConfigName));
-        RoboContext system = builder.build();
+        var system = builder.build();
         assertEquals(SYSTEM_CONFIG_NAME, system.getId());
-        assertEquals(system.getState(), LifecycleState.INITIALIZED);
+        assertEquals(LifecycleState.INITIALIZED, system.getState());
     }
 
     @Test
     void testParsingFileWithSystemConfigAndStart() throws RoboBuilderException {
         var fileSystemAndUnitsConfigName = "testsystem.xml";
         var contextLoader = Thread.currentThread().getContextClassLoader();
-        RoboBuilder builder = new RoboBuilder(
+        var builder = new RoboBuilder(
                 contextLoader.getResourceAsStream(fileSystemAndUnitsConfigName));
         builder.add(contextLoader.getResourceAsStream(fileSystemAndUnitsConfigName));
-        RoboContext system = builder.build();
+        var system = builder.build();
         system.start();
-        assertSame(system.getState(), LifecycleState.STARTED);
+        assertSame(LifecycleState.STARTED, system.getState());
     }
 
 
@@ -256,7 +256,7 @@ public class RoboBuilderTests {
         var attribute = roboReference.getAttribute(attributeDescriptor).get(TIMEOUT_MIN, TimeUnit.MINUTES);
         if (attribute == null) {
             attribute = roboReference.getAttribute(attributeDescriptor).get(TIMEOUT_MIN, TimeUnit.MINUTES);
-            LOGGER.error("roboReference:{}, no attribute:{}", roboReference.id(), attributeDescriptor.getAttributeName());
+            LOGGER.error("roboReference:{}, no attribute:{}", roboReference.id(), attributeDescriptor.attributeName());
         }
         return attribute;
     }

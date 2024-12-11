@@ -47,8 +47,8 @@ public class HttpTwoAttributesGetController extends RoboUnit<TestCommandEnum> {
     public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
             .unmodifiableCollection(Arrays.asList(DESCRIPTOR_NUMBER, DESCRIPTOR_TEXT));
 
-    private int number = 42;
-    private String text = "Some magic text";
+    private final int number = 42;
+    private final String text = "Some magic text";
     private String target;
 
     public HttpTwoAttributesGetController(RoboContext context, String id) {
@@ -71,10 +71,10 @@ public class HttpTwoAttributesGetController extends RoboUnit<TestCommandEnum> {
     @SuppressWarnings("unchecked")
     @Override
     protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
-        if (AttributeUtils.validateAttributeByNameAndType(descriptor, ATTR_NUMBER, DESCRIPTOR_NUMBER.getAttributeType())) {
+        if (AttributeUtils.validateAttributeByNameAndType(descriptor, ATTR_NUMBER, DESCRIPTOR_NUMBER.attributeType())) {
             return (R) Integer.valueOf(number);
         }
-        if(AttributeUtils.validateAttributeByNameAndType(descriptor, ATTR_TEXT, DESCRIPTOR_TEXT.getAttributeType())){
+        if(AttributeUtils.validateAttributeByNameAndType(descriptor, ATTR_TEXT, DESCRIPTOR_TEXT.attributeType())){
             return (R) text;
         }
         return null;

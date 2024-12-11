@@ -60,13 +60,10 @@ public class RemoteStringProducer extends RoboUnit<String> {
             counter.incrementAndGet();
             String[] input = message.split("::");
             String messageType = input[0];
-            switch (messageType) {
-                case "sendRandomMessage":
-                    sendRandomMessage();
-                    break;
-                default:
-                    LOGGER.info("don't understand message: {}", message);
-
+            if (messageType.equals("sendRandomMessage")) {
+                sendRandomMessage();
+            } else {
+                LOGGER.info("don't understand message: {}", message);
             }
         }
     }
@@ -74,7 +71,7 @@ public class RemoteStringProducer extends RoboUnit<String> {
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-        if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
+        if (attribute.attributeName().equals("getNumberOfSentMessages") && attribute.attributeType() == Integer.class) {
             return (R) (Integer) counter.get();
         }
         return null;

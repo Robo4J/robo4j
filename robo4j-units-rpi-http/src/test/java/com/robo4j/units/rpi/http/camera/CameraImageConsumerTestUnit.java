@@ -16,7 +16,10 @@
  */
 package com.robo4j.units.rpi.http.camera;
 
-import com.robo4j.*;
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.DefaultAttributeDescriptor;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.socket.http.codec.CameraMessage;
 import org.slf4j.Logger;
@@ -54,7 +57,7 @@ public class CameraImageConsumerTestUnit extends RoboUnit<CameraMessage> {
     }
 
     @Override
-    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+    protected void onInitialization(Configuration configuration) {
         int totalNumber = configuration.getInteger(PROP_TOTAL_NUMBER_MESSAGES, 0);
         if (totalNumber > 0) {
             messagesLatch = new CountDownLatch(totalNumber);
@@ -83,16 +86,16 @@ public class CameraImageConsumerTestUnit extends RoboUnit<CameraMessage> {
     @SuppressWarnings("unchecked")
     @Override
     protected synchronized <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
-        if (descriptor.getAttributeType() == Integer.class
-                && descriptor.getAttributeName().equals(ATTR_RECEIVED_IMAGES)) {
+        if (descriptor.attributeType() == Integer.class
+                && descriptor.attributeName().equals(ATTR_RECEIVED_IMAGES)) {
             return (R) Integer.valueOf(counter.get());
         }
-        if (descriptor.getAttributeName().equals(ATTR_IMAGES_LATCH)
-                && descriptor.getAttributeType() == CountDownLatch.class) {
+        if (descriptor.attributeName().equals(ATTR_IMAGES_LATCH)
+                && descriptor.attributeType() == CountDownLatch.class) {
             return (R) messagesLatch;
         }
-        if (descriptor.getAttributeName().equals(ATTR_START_LATCH)
-                && descriptor.getAttributeType() == CountDownLatch.class) {
+        if (descriptor.attributeName().equals(ATTR_START_LATCH)
+                && descriptor.attributeType() == CountDownLatch.class) {
             return (R) startLatch;
         }
         return super.onGetAttribute(descriptor);

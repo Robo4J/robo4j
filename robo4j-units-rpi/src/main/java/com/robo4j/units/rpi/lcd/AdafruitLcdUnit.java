@@ -165,9 +165,9 @@ public class AdafruitLcdUnit extends I2CRoboUnit<LcdMessage> {
     @SuppressWarnings("unchecked")
     @Override
     public <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-        if (ATTRIBUTE_NAME_TEXT.equals(attribute.getAttributeName())) {
+        if (ATTRIBUTE_NAME_TEXT.equals(attribute.attributeName())) {
             return (R) stringMessage.get();
-        } else if (ATTRIBUTE_NAME_COLOR.equals(attribute.getAttributeName())) {
+        } else if (ATTRIBUTE_NAME_COLOR.equals(attribute.attributeName())) {
             try {
                 return (R) lcd.getBacklight();
             } catch (IOException e) {

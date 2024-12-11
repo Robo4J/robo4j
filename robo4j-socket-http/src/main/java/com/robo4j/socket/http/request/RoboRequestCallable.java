@@ -96,8 +96,8 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
                             PathAttributeListDTO pathAttributes = new PathAttributeListDTO();
                             unit.getKnownAttributes().forEach(a -> {
                                 PathAttributeDTO attributeDescriptor = new PathAttributeDTO();
-                                attributeDescriptor.setName(a.getAttributeName());
-                                attributeDescriptor.setValue(a.getAttributeType().getCanonicalName());
+                                attributeDescriptor.setName(a.attributeName());
+                                attributeDescriptor.setValue(a.attributeType().getCanonicalName());
                                 pathAttributes.addAttribute(attributeDescriptor);
                             });
                             unitDescription = ReflectUtils.createJson(pathAttributes);
@@ -106,11 +106,11 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
 
                             List<PathAttributeDTO> attributes = new ArrayList<>();
                             for (AttributeDescriptor attr : unit.getKnownAttributes()) {
-                                if (requestAttributes.contains(attr.getAttributeName())) {
+                                if (requestAttributes.contains(attr.attributeName())) {
                                     PathAttributeDTO attribute = new PathAttributeDTO();
                                     String valueString = String.valueOf(unit.getAttribute(attr).get());
                                     attribute.setValue(valueString);
-                                    attribute.setName(attr.getAttributeName());
+                                    attribute.setName(attr.attributeName());
                                     attributes.add(attribute);
                                 }
                             }

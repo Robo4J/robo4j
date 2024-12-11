@@ -68,7 +68,7 @@ public final class SystemUtil {
     // TODO: 1/25/18 (miro) convert it to JSON message
     public static String printSocketEndPoint(RoboReference<?> point, RoboReference<?> codecUnit) {
         final int port = point.getConfiguration().getInteger("port", 0);
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
         //@formatter:off
 		sb.append("RoboSystem end-points:")
 				.append(BREAK)

@@ -21,49 +21,32 @@ import java.io.Serializable;
 
 /**
  * Default implementation of an attribute descriptor.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class DefaultAttributeDescriptor<T> implements AttributeDescriptor<T>, Serializable {
+public record DefaultAttributeDescriptor<T>(Class<T> attributeType,
+											String attributeName) implements AttributeDescriptor<T>, Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;
-	private final Class<T> attributeType;
-	private final String attributeName;
 
 	/**
 	 * Constructor.
-	 * 
-	 * @param attributeType
-	 *            the type of the attribute. Needed since the generic type is
-	 *            erased.
-	 * @param attributeName
-	 *            the name of the attribute.
+	 *
+	 * @param attributeType the type of the attribute. Needed since the generic type is
+	 *                      erased.
+	 * @param attributeName the name of the attribute.
 	 */
-	public DefaultAttributeDescriptor(Class<T> attributeType, String attributeName) {
-		this.attributeType = attributeType;
-		this.attributeName = attributeName;
+	public DefaultAttributeDescriptor {
 	}
 
-	@Override
-	public Class<T> getAttributeType() {
-		return attributeType;
-	}
-
-	@Override
-	public String getAttributeName() {
-		return attributeName;
-	}
 
 	/**
 	 * Factory method for creating attribute descriptors.
-	 * 
-	 * @param attributeType
-	 *            the type of the attribute.
-	 * @param attributeName
-	 *            the name of the attribute.
-	 * @param <T>
-	 *            attribute type class
+	 *
+	 * @param attributeType the type of the attribute.
+	 * @param attributeName the name of the attribute.
+	 * @param <T>           attribute type class
 	 * @return created attribute
 	 */
 	public static <T> DefaultAttributeDescriptor<T> create(Class<T> attributeType, String attributeName) {

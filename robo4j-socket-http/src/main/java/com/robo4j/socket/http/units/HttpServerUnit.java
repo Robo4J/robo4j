@@ -114,15 +114,15 @@ public class HttpServerUnit extends RoboUnit<Object> {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
-		if (descriptor.getAttributeName().equals(ATTR_ADDRESS) && descriptor.getAttributeType() == String.class) {
+		if (descriptor.attributeName().equals(ATTR_ADDRESS) && descriptor.attributeType() == String.class) {
 			return (R) serverAddress;
 		}
 
-		if (descriptor.getAttributeName().equals(ATTR_PORT) && descriptor.getAttributeType() == Integer.class) {
+		if (descriptor.attributeName().equals(ATTR_PORT) && descriptor.attributeType() == Integer.class) {
 			return (R) serverPort;
 		}
 
-		if (descriptor.getAttributeName().equals(ATTR_PATHS) && descriptor.getAttributeType() == String.class) {
+		if (descriptor.attributeName().equals(ATTR_PATHS) && descriptor.attributeType() == String.class) {
 			return (R) JsonUtil.toJsonArray(paths);
 		}
 

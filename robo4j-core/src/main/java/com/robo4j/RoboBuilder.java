@@ -92,18 +92,14 @@ public final class RoboBuilder {
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
             switch (qName) {
-                case ELEMENT_ROBO_UNIT:
-                    currentId = attributes.getValue("id");
-                    break;
-                case SystemXMLHandler.ELEMENT_SYSTEM:
-                    inSystemElement = true;
-                    break;
-                case XmlConfigurationFactory.ELEMENT_CONFIG:
+                case ELEMENT_ROBO_UNIT -> currentId = attributes.getValue("id");
+                case SystemXMLHandler.ELEMENT_SYSTEM -> inSystemElement = true;
+                case XmlConfigurationFactory.ELEMENT_CONFIG -> {
                     if (!configState && !inSystemElement) {
                         currentConfiguration = StringConstants.EMPTY;
                         configState = true;
-                        break;
                     }
+                }
             }
             lastElement = qName;
             if (configState) {
@@ -147,14 +143,8 @@ public final class RoboBuilder {
             // NOTE(Marcus/Jan 22, 2017): Seems these can be called repeatedly
             // for a single text() node.
             switch (lastElement) {
-                case XmlConfigurationFactory.ELEMENT_CONFIG:
-                    currentConfiguration += toString(ch, start, length);
-                    break;
-                case "class":
-                    currentClassName += toString(ch, start, length);
-                    break;
-                default:
-                    break;
+                case XmlConfigurationFactory.ELEMENT_CONFIG -> currentConfiguration += toString(ch, start, length);
+                case XmlConfigurationFactory.ELEMENT_CLASS -> currentClassName += toString(ch, start, length);
             }
         }
 
@@ -202,15 +192,13 @@ public final class RoboBuilder {
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
             switch (qName) {
-                case ELEMENT_SYSTEM:
-                    currentId = attributes.getValue("id");
-                    break;
-                case XmlConfigurationFactory.ELEMENT_CONFIG:
+                case ELEMENT_SYSTEM -> currentId = attributes.getValue("id");
+                case XmlConfigurationFactory.ELEMENT_CONFIG -> {
                     if (!configState) {
                         currentConfiguration = StringConstants.EMPTY;
                         configState = true;
-                        break;
                     }
+                }
             }
             lastElement = qName;
             if (configState) {
@@ -249,12 +237,8 @@ public final class RoboBuilder {
             }
             // NOTE(Marcus/Jan 22, 2017): Seems these can be called repeatedly
             // for a single text() node.
-            switch (lastElement) {
-                case XmlConfigurationFactory.ELEMENT_CONFIG:
-                    currentConfiguration += toString(ch, start, length);
-                    break;
-                default:
-                    break;
+            if (lastElement.equals(XmlConfigurationFactory.ELEMENT_CONFIG)) {
+                currentConfiguration += toString(ch, start, length);
             }
         }
 

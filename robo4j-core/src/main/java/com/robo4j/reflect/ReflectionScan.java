@@ -26,11 +26,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import static com.robo4j.util.Utf8Constant.UTF8_EXCLAMATION;
 
 /**
  * Util class for reflection scan.
@@ -42,7 +48,6 @@ public final class ReflectionScan {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionScan.class);
     private static final String FILE = "file:";
     private static final String SUFFIX = ".class";
-    private static final String EXCLAMATION = "\u0021";        //Exclamation mark !
     private static final char SLASH = '/';
     private static final char DOT = '.';
 
@@ -84,7 +89,7 @@ public final class ReflectionScan {
 
         StreamUtils.streamOfEnumeration(resources, false).map(url -> {
             try {
-                String jarFile = url.getFile().split(EXCLAMATION)[0].replace(FILE, StringConstants.EMPTY);
+                String jarFile = url.getFile().split(UTF8_EXCLAMATION)[0].replace(FILE, StringConstants.EMPTY);
                 if (new File(jarFile).isDirectory()) {
                     return null;
                 }
@@ -129,12 +134,11 @@ public final class ReflectionScan {
                 // TODO review StringBuilders
                 result.addAll(findClassesIntern(file, new StringBuilder().append(path).append(DOT).append(file.getName()).toString()));
             } else if (file.getName().endsWith(SUFFIX)) {
-                final StringBuilder sb = new StringBuilder();
-                sb.append(path.replace(File.separatorChar, DOT))
+                var sb = new StringBuilder().append(path.replace(File.separatorChar, DOT))
                         .append(DOT)
-                        .append(file.getName(), 0, file.getName().length() - SUFFIX.length());
+                        .append(file.getName(), 0, file.getName().length() - SUFFIX.length()).toString();
 
-                result.add(sb.toString());
+                result.add(sb);
             }
         });
         return result;

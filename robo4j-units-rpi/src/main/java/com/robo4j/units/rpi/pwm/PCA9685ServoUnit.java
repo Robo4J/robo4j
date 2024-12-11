@@ -120,7 +120,7 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
     @SuppressWarnings("unchecked")
     @Override
     protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
-        if (descriptor.getAttributeName().equals("input") && descriptor.getAttributeType() == Float.class) {
+        if (descriptor.attributeName().equals("input") && descriptor.attributeType() == Float.class) {
             try {
                 return (R) Float.valueOf(servo.getInput());
             } catch (IOException e) {
@@ -139,7 +139,7 @@ public class PCA9685ServoUnit extends I2CRoboUnit<Float> {
     public void shutdown() {
         if (shutdownValue != null) {
             try {
-                servo.setInput(shutdownValue.floatValue());
+                servo.setInput(shutdownValue);
             } catch (IOException e) {
                 LOGGER.error("Failed to set the shutdown value:{}", e.getMessage(), e);
             }

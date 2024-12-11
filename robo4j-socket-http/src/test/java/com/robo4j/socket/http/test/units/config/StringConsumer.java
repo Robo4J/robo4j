@@ -75,16 +75,16 @@ public class StringConsumer extends RoboUnit<String> {
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-        if (attribute.getAttributeName().equals(ATTR_MESSAGES_TOTAL)
-                && attribute.getAttributeType() == Integer.class) {
+        if (attribute.attributeName().equals(ATTR_MESSAGES_TOTAL)
+                && attribute.attributeType() == Integer.class) {
             return (R) Integer.valueOf(counter.get());
         }
-        if (attribute.getAttributeName().equals(ATTR_RECEIVED_MESSAGES)
-                && attribute.getAttributeType() == List.class) {
+        if (attribute.attributeName().equals(ATTR_RECEIVED_MESSAGES)
+                && attribute.attributeType() == List.class) {
             return (R) receivedMessages;
         }
-        if (attribute.getAttributeName().equals(ATTR_MESSAGES_LATCH)
-                && attribute.getAttributeType() == CountDownLatch.class) {
+        if (attribute.attributeName().equals(ATTR_MESSAGES_LATCH)
+                && attribute.attributeType() == CountDownLatch.class) {
             return (R) messagesLatch;
         }
         return null;

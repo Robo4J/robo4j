@@ -90,16 +90,16 @@ public class MtkGPSUnit extends RoboUnit<GPSRequest> {
             .unmodifiableCollection(List.of(DefaultAttributeDescriptor.create(Tuple3f.class, ATTRIBUTE_NAME_READ_INTERVAL)));
     private static final Logger LOGGER = LoggerFactory.getLogger(MtkGPSUnit.class);
 
+    private final List<GPSEventListener> listeners = new ArrayList<>();
     private MTK3339GPS mtk3339gps;
     private String serialPort;
     private int readInterval = DEFAULT_READ_INTERVAL;
-    private List<GPSEventListener> listeners = new ArrayList<>();
 
     // The future, if scheduled with the platform scheduler
     private volatile ScheduledFuture<?> scheduledFuture;
 
     private static class GPSEventListener implements GPSListener {
-        private RoboReference<GPSEvent> target;
+        private final RoboReference<GPSEvent> target;
 
         GPSEventListener(RoboReference<GPSEvent> target) {
             this.target = target;
@@ -159,7 +159,7 @@ public class MtkGPSUnit extends RoboUnit<GPSRequest> {
     @SuppressWarnings("unchecked")
     @Override
     protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
-        if (descriptor.getAttributeType() == Integer.class && descriptor.getAttributeName().equals(ATTRIBUTE_NAME_READ_INTERVAL)) {
+        if (descriptor.attributeType() == Integer.class && descriptor.attributeName().equals(ATTRIBUTE_NAME_READ_INTERVAL)) {
             return (R) Integer.valueOf(readInterval);
         }
         return super.onGetAttribute(descriptor);

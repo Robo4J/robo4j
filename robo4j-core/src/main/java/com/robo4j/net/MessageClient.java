@@ -18,17 +18,21 @@ package com.robo4j.net;
 
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
+import com.robo4j.scheduler.RoboThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 /**
  * Message client. Normally used by RemoteRoboContext to communicate with a
@@ -39,23 +43,25 @@ import java.util.concurrent.ThreadFactory;
  */
 public class MessageClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageClient.class);
-    public final static String KEY_SO_TIMEOUT_MILLS = "timeout";
-    public final static String KEY_KEEP_ALIVE = "keepAlive";
-    public final static String KEY_RETRIES = "retries";
-    public final static int DEFAULT_SO_TIMEOUT_MILLS = 2000000;
-    public final static boolean DEFAULT_KEEP_ALIVE = true;
+    public static final String KEY_SO_TIMEOUT_MILLS = "timeout";
+    public static final String KEY_KEEP_ALIVE = "keepAlive";
+    public static final String KEY_RETRIES = "retries";
+    public static final int DEFAULT_SO_TIMEOUT_MILLS = 2000000;
+    public static final int DEFAULT_FAILED_CONNECTION_MAX = 3;
+    public static final boolean DEFAULT_KEEP_ALIVE = true;
+    private final String sourceUUID;
+    private final Configuration configuration;
+    private final URI messageServerURI;
+    private final int maxFailCount;
+    private Socket socket;
+    private ObjectOutputStream objectOutputStream;
+    private int failCount;
+    private RemoteReferenceListener remoteReferenceListener;
 
     /*
      * Executor for incoming messages from the server
      */
-    private final ExecutorService remoteReferenceCallExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r, "RemoteReferenceCallExecutor for " + messageServerURI);
-            t.setDaemon(true);
-            return t;
-        }
-    });
+    private final ExecutorService remoteReferenceCallExecutor;
 
     /*
      * Listening to incoming messages from the server, initiated by serialized
@@ -107,25 +113,18 @@ public class MessageClient {
 
     }
 
-    private final URI messageServerURI;
-    private final String sourceUUID;
-    private final Configuration configuration;
-    private Socket socket;
-    private ObjectOutputStream objectOutputStream;
-    private int failCount;
-    private final int maxFailCount;
-    private RemoteReferenceListener remoteReferenceListener;
-
     public MessageClient(URI messageServerURI, String sourceUUID, Configuration configuration) {
         this.messageServerURI = messageServerURI;
         this.sourceUUID = sourceUUID;
         this.configuration = configuration;
-        this.maxFailCount = configuration.getInteger(KEY_RETRIES, 3);
+        this.maxFailCount = configuration.getInteger(KEY_RETRIES, DEFAULT_FAILED_CONNECTION_MAX);
+        this.remoteReferenceCallExecutor = Executors.newSingleThreadExecutor(
+                new RoboThreadFactory.Builder("Message-Client")
+                        .addThreadPrefix("RemoteReferenceCallExecutor for " + messageServerURI).build());
     }
 
     public void connect() throws UnknownHostException, IOException {
         if (socket == null || socket.isClosed() || !socket.isConnected()) {
-//			socket = new Socket(messageServerURI.getHost(), messageServerURI.getPort());
             socket = new Socket(messageServerURI.getHost(), messageServerURI.getPort());
             socket.setKeepAlive(configuration.getBoolean(KEY_KEEP_ALIVE, DEFAULT_KEEP_ALIVE));
             socket.setSoTimeout(configuration.getInteger(KEY_SO_TIMEOUT_MILLS, DEFAULT_SO_TIMEOUT_MILLS));
@@ -152,37 +151,50 @@ public class MessageClient {
     }
 
     private void deliverMessage(String id, Object message) throws IOException {
-        // TODO : replace by switch
         objectOutputStream.writeUTF(id);
-        if (message instanceof String) {
-            objectOutputStream.writeByte(MessageProtocolConstants.MOD_UTF8);
-            objectOutputStream.writeUTF((String) message);
-        } else if (message instanceof Number) {
-            if (message instanceof Float) {
-                objectOutputStream.writeByte(MessageProtocolConstants.FLOAT);
-                objectOutputStream.writeFloat((Float) message);
-            } else if (message instanceof Integer) {
-                objectOutputStream.writeByte(MessageProtocolConstants.INT);
-                objectOutputStream.writeInt((Integer) message);
-            } else if (message instanceof Double) {
-                objectOutputStream.writeByte(MessageProtocolConstants.DOUBLE);
-                objectOutputStream.writeDouble((Double) message);
-            } else if (message instanceof Long) {
-                objectOutputStream.writeByte(MessageProtocolConstants.LONG);
-                objectOutputStream.writeLong((Long) message);
-            } else if (message instanceof Byte) {
-                objectOutputStream.writeByte(MessageProtocolConstants.BYTE);
-                objectOutputStream.writeByte((Byte) message);
-            } else if (message instanceof Short) {
-                objectOutputStream.writeByte(MessageProtocolConstants.SHORT);
-                objectOutputStream.writeShort((Short) message);
+        switch (message) {
+            case String s -> {
+                objectOutputStream.writeByte(MessageProtocolConstants.MOD_UTF8);
+                objectOutputStream.writeUTF(s);
             }
-        } else if (message instanceof Character) {
-            objectOutputStream.writeByte(MessageProtocolConstants.CHAR);
-            objectOutputStream.writeChar((Character) message);
-        } else {
-            objectOutputStream.writeByte(MessageProtocolConstants.OBJECT);
-            objectOutputStream.writeObject(message);
+            case Number number -> {
+                switch (number) {
+                    case Float v -> {
+                        objectOutputStream.writeByte(MessageProtocolConstants.FLOAT);
+                        objectOutputStream.writeFloat(v);
+                    }
+                    case Integer i -> {
+                        objectOutputStream.writeByte(MessageProtocolConstants.INT);
+                        objectOutputStream.writeInt(i);
+                    }
+                    case Double v -> {
+                        objectOutputStream.writeByte(MessageProtocolConstants.DOUBLE);
+                        objectOutputStream.writeDouble(v);
+                    }
+                    case Long l -> {
+                        objectOutputStream.writeByte(MessageProtocolConstants.LONG);
+                        objectOutputStream.writeLong(l);
+                    }
+                    case Byte b -> {
+                        objectOutputStream.writeByte(MessageProtocolConstants.BYTE);
+                        objectOutputStream.writeByte(b);
+                    }
+                    case Short i -> {
+                        objectOutputStream.writeByte(MessageProtocolConstants.SHORT);
+                        objectOutputStream.writeShort(i);
+                    }
+                    default -> {
+                    }
+                }
+            }
+            case Character c -> {
+                objectOutputStream.writeByte(MessageProtocolConstants.CHAR);
+                objectOutputStream.writeChar(c);
+            }
+            case null, default -> {
+                objectOutputStream.writeByte(MessageProtocolConstants.OBJECT);
+                objectOutputStream.writeObject(message);
+            }
         }
         objectOutputStream.flush();
     }
@@ -199,7 +211,7 @@ public class MessageClient {
             remoteReferenceCallExecutor.shutdown();
             socket.close();
         } catch (IOException e) {
-            // Do not care.
+            LOGGER.error("Failed to close remote reference listener!", e);
         }
     }
 }

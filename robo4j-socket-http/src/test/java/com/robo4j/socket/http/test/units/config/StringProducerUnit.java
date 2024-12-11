@@ -38,8 +38,8 @@ public class StringProducerUnit extends RoboUnit<String> {
     private String target;
 
     /**
-     * @param context
-     * @param id
+     * @param context RoboContext
+     * @param id      RoboId
      */
     public StringProducerUnit(RoboContext context, String id) {
         super(String.class, context, id);
@@ -68,8 +68,8 @@ public class StringProducerUnit extends RoboUnit<String> {
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-        if (attribute.getAttributeName().equals("getNumberOfSentMessages")
-                && attribute.getAttributeType() == Integer.class) {
+        if (attribute.attributeName().equals("getNumberOfSentMessages")
+                && attribute.attributeType() == Integer.class) {
             return (R) (Integer) counter.get();
         }
         return null;

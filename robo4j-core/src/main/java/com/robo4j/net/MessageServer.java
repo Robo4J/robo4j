@@ -121,7 +121,6 @@ public class MessageServer {
     public MessageServer(MessageCallback callback, Configuration configuration) {
         this.callback = callback;
         this.configuration = configuration;
-        // TODO : consider to have configurable thread-pool
         var roboThreadFactory = new RoboThreadFactory
                 .Builder(NAME_COMMUNICATION_WORKER_POOL)
                 .addThreadPrefix(NAME_COMMUNICATION_THREAD_PREFIX)

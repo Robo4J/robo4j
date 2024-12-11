@@ -176,18 +176,18 @@ public class CounterUnit extends RoboUnit<CounterCommand> {
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-        if (attribute.getAttributeName().equals(ATTR_RECEIVED_MESSAGES_OFFSET) && attribute.getAttributeType() == Integer.class) {
+        if (attribute.attributeName().equals(ATTR_RECEIVED_MESSAGES_OFFSET) && attribute.attributeType() == Integer.class) {
             return (R) (Integer) receivedMessagesOffset;
         }
-        if (attribute.getAttributeName().equals(ATTR_COUNTER) && attribute.getAttributeType() == Integer.class) {
+        if (attribute.attributeName().equals(ATTR_COUNTER) && attribute.attributeType() == Integer.class) {
             return (R) (Integer) counter.get();
         }
-        if (attribute.getAttributeName().equals(ATTR_REPORT_RECEIVED_MESSAGES_LATCH)
-                && attribute.getAttributeType() == CountDownLatch.class) {
+        if (attribute.attributeName().equals(ATTR_REPORT_RECEIVED_MESSAGES_LATCH)
+                && attribute.attributeType() == CountDownLatch.class) {
             return (R) latchReportReceivedMessages;
         }
-        if (attribute.getAttributeName().equals(ATTR_PROCESS_ACTIVE)
-                && attribute.getAttributeType() == Boolean.class) {
+        if (attribute.attributeName().equals(ATTR_PROCESS_ACTIVE)
+                && attribute.attributeType() == Boolean.class) {
             return (R) (Boolean) scheduledFuture.isDone();
         }
         return null;

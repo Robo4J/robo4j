@@ -16,20 +16,18 @@
  */
 package com.robo4j.configuration;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Deque;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
+import com.robo4j.util.StringConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.robo4j.util.StringConstants;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * Factory for creating configurations from XML and vice versa.
@@ -39,6 +37,7 @@ import com.robo4j.util.StringConstants;
  */
 public class XmlConfigurationFactory {
 	public static final String ELEMENT_CONFIG = "config";
+	public static final String ELEMENT_CLASS = "class";
 	public static final String ATTRIBUTE_NAME = "name";
 	public static final String ATTRIBUTE_TYPE = "type";
 	public static final String ATTRIBUTE_PATH = "path";
