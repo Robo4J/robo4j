@@ -36,8 +36,6 @@ public class HBridgeMC33926Device implements Motor {
     private final String name;
     private final PWMChannel channel;
     private final boolean invert;
-    //    private final GpioPinDigitalOutput in1;
-//    private final GpioPinDigitalOutput in2;
     private final DigitalOutput gpioOut1;
     private final DigitalOutput gpioOut2;
 
@@ -58,9 +56,6 @@ public class HBridgeMC33926Device implements Motor {
         var gpioConfig1 = digitalOutputBuilder.address(pin1.address()).onState(DigitalState.LOW).build();
         var gpioConfig2 = digitalOutputBuilder.address(pin2.address()).onState(DigitalState.HIGH).build();
 
-//		GpioController gpio = GpioFactory.getInstance();
-//		this.in1 = gpio.provisionDigitalOutputPin(in1, "IN1", PinState.LOW);
-//		this.in2 = gpio.provisionDigitalOutputPin(in2, "IN2", PinState.HIGH);
         gpioOut1 = pi4jRpiContext.dout().create(gpioConfig1);
         gpioOut2 = pi4jRpiContext.dout().create(gpioConfig2);
         setDirection(Direction.FORWARD);
@@ -110,13 +105,9 @@ public class HBridgeMC33926Device implements Motor {
         }
 
         if (forward) {
-//            in1.setState(PinState.HIGH);
-//            in2.setState(PinState.LOW);
             gpioOut1.setState(digitalStateToByte(DigitalState.HIGH));
             gpioOut2.setState(digitalStateToByte(DigitalState.LOW));
         } else {
-//            in1.setState(PinState.LOW);
-//            in2.setState(PinState.HIGH);
             gpioOut1.setState(digitalStateToByte(DigitalState.LOW));
             gpioOut2.setState(digitalStateToByte(DigitalState.HIGH));
         }

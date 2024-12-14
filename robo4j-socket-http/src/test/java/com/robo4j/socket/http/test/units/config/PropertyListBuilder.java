@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class PropertyListBuilder<Type> {
 
-    private List<Type> list;
+    private final List<Type> list;
 
     private PropertyListBuilder() {
         this.list = new LinkedList<>();

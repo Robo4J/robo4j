@@ -73,7 +73,7 @@ class JsonUtilTests {
 
         printInfo(result);
         assertNotNull(result);
-        assertEquals(result, expectedJson);
+        assertEquals(expectedJson, result);
     }
 
     @Test
@@ -84,7 +84,7 @@ class JsonUtilTests {
 
         printInfo(result);
         assertNotNull(result);
-        assertEquals(result, expectedJson);
+        assertEquals(expectedJson, result);
     }
 
     private static void printInfo(String result) {

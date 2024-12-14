@@ -36,8 +36,8 @@ public enum AdvancedTestCommandEnum implements TestEnum {
 
     //@formatter:on
 	private static volatile Map<Integer, AdvancedTestCommandEnum> nameToEnum;
-	private int id;
-	private String name;
+	private final int id;
+	private final String name;
 
 	AdvancedTestCommandEnum(int id, String name) {
 		this.id = id;

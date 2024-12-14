@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class MessageServerTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageServerTest.class);
     private static final int TIMEOUT_SEC = 30;
-    private static final String CONST_MYUUID = "myuuid";
+    private static final String CONST_MY_UUID = "myuuid";
     private static final String PROPERTY_SERVER_NAME = "ServerName";
     private static final int SERVER_LISTEN_DELAY_MILLIS = 250;
     private static final String LOCALHOST_VALUE = "localhost";
@@ -53,6 +53,7 @@ public class MessageServerTest {
 
     @Test
     void clientServerMessagePassingTest() throws Exception {
+
         final var messageCache = new ArrayList<>();
         final var messagesLatch = new CountDownLatch(3);
 
@@ -85,7 +86,7 @@ public class MessageServerTest {
         }
 
         var messageReceiverConfig = ConfigurationFactory.createEmptyConfiguration();
-        var messageReceiver = new MessageClient(messageServer.getListeningURI(), CONST_MYUUID, messageReceiverConfig);
+        var messageReceiver = new MessageClient(messageServer.getListeningURI(), CONST_MY_UUID, messageReceiverConfig);
         if (exception != null) {
             throw exception;
         }
@@ -147,7 +148,7 @@ public class MessageServerTest {
         }
 
         Configuration clientConfig = ConfigurationFactory.createEmptyConfiguration();
-        MessageClient client = new MessageClient(messageServer.getListeningURI(), CONST_MYUUID, clientConfig);
+        MessageClient client = new MessageClient(messageServer.getListeningURI(), CONST_MY_UUID, clientConfig);
         if (exception != null) {
             throw exception;
         }

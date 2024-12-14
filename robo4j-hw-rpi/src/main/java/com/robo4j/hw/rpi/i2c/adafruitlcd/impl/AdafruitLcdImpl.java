@@ -60,34 +60,34 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
     }
 
     // LCD Commands
-    private static final int LCD_CLEARDISPLAY = 0x01;
-    private static final int LCD_RETURNHOME = 0x02;
-    private static final int LCD_ENTRYMODESET = 0x04;
-    private static final int LCD_DISPLAYCONTROL = 0x08;
-    private static final int LCD_CURSORSHIFT = 0x10;
+    private static final int LCD_DISPLAY_CLEAR = 0x01;
+    private static final int LCD_DISPLAY_CONTROL = 0x08;
+    private static final int LCD_RETURN_HOME = 0x02;
+    private static final int LCD_ENTRY_MODE_SET = 0x04;
+    private static final int LCD_CURSOR_SHIFT = 0x10;
     // private static final int LCD_FUNCTIONSET = 0x20;
-    private static final int LCD_SETCGRAMADDR = 0x40;
-    private static final int LCD_SETDDRAMADDR = 0x80;
+    private static final int LCD_SET_CGRAMADDR = 0x40;
+    private static final int LCD_SET_DDRAMADDR = 0x80;
 
     // Flags for display on/off control
-    private static final int LCD_DISPLAYON = 0x04;
-    // private static final int LCD_DISPLAYOFF = 0x00;
-    private static final int LCD_CURSORON = 0x02;
-    private static final int LCD_CURSOROFF = 0x00;
-    private static final int LCD_BLINKON = 0x01;
-    private static final int LCD_BLINKOFF = 0x00;
+    private static final int LCD_DISPLAY_ON = 0x04;
+    // private static final int LCD_DISPLAY_OFF = 0x00;
+    private static final int LCD_CURSOR_ON = 0x02;
+    private static final int LCD_CURSOR_OFF = 0x00;
+    private static final int LCD_BLINK_ON = 0x01;
+    private static final int LCD_BLINK_OFF = 0x00;
 
     // Flags for display entry mode
-    // private static final int LCD_ENTRYRIGHT = 0x00;
-    private static final int LCD_ENTRYLEFT = 0x02;
-    private static final int LCD_ENTRYSHIFTINCREMENT = 0x01;
-    private static final int LCD_ENTRYSHIFTDECREMENT = 0x00;
+    // private static final int LCD_ENTRY_RIGHT = 0x00;
+    private static final int LCD_ENTRY_LEFT = 0x02;
+    private static final int LCD_ENTRY_SHIFT_INCREMENT = 0x01;
+    private static final int LCD_ENTRY_SHIFT_DECREMENT = 0x00;
 
     // Flags for display/cursor shift
-    private static final int LCD_DISPLAYMOVE = 0x08;
-    private static final int LCD_CURSORMOVE = 0x00;
-    private static final int LCD_MOVERIGHT = 0x04;
-    private static final int LCD_MOVELEFT = 0x00;
+    private static final int LCD_DISPLAY_MOVE = 0x08;
+    private static final int LCD_CURSOR_MOVE = 0x00;
+    private static final int LCD_MOVE_RIGHT = 0x04;
+    private static final int LCD_MOVE_LEFT = 0x00;
 
     // Port expander registers
     // IOCON when Bank 0 active
@@ -112,9 +112,9 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
     private int portA = 0x00;
     private int portB = 0x00;
     private int ddrB = 0x10;
-    private int displayShift = LCD_CURSORMOVE | LCD_MOVERIGHT;
-    private int displayMode = LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT;
-    private int displayControl = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF;
+    private int displayShift = LCD_CURSOR_MOVE | LCD_MOVE_RIGHT;
+    private int displayMode = LCD_ENTRY_LEFT | LCD_ENTRY_SHIFT_DECREMENT;
+    private int displayControl = LCD_DISPLAY_ON | LCD_CURSOR_OFF | LCD_BLINK_OFF;
     private Color color = Color.WHITE;
 
     public AdafruitLcdImpl() throws IOException {
@@ -175,11 +175,11 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
         write(0x33); // Init
         write(0x32); // Init
         write(0x28); // 2 line 5x8 matrix
-        write(LCD_CLEARDISPLAY);
-        write(LCD_CURSORSHIFT | displayShift);
-        write(LCD_ENTRYMODESET | displayMode);
-        write(LCD_DISPLAYCONTROL | displayControl);
-        write(LCD_RETURNHOME);
+        write(LCD_DISPLAY_CLEAR);
+        write(LCD_CURSOR_SHIFT | displayShift);
+        write(LCD_ENTRY_MODE_SET | displayMode);
+        write(LCD_DISPLAY_CONTROL | displayControl);
+        write(LCD_RETURN_HOME);
     }
 
     private synchronized void write(int i, byte[] registers, int j, int length) throws IOException {
@@ -204,7 +204,7 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 
         // If a poll-worthy instruction was issued, reconfigure D7
         // pin as input to indicate need for polling on next call.
-        if (value == LCD_CLEARDISPLAY || value == LCD_RETURNHOME) {
+        if (value == LCD_DISPLAY_CLEAR || value == LCD_RETURN_HOME) {
             ddrB |= 0x10;
             // i2CConfig.write(MCP23017_IODIRB, (byte) ddrB);
             writeByte(MCP23017_IODIRB, (byte) ddrB);
@@ -315,7 +315,7 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
      */
     @Override
     public synchronized void setCursorPosition(int row, int column) throws IOException {
-        write(LCD_SETDDRAMADDR | (column + ROW_OFFSETS[row]));
+        write(LCD_SET_DDRAMADDR | (column + ROW_OFFSETS[row]));
     }
 
     /*
@@ -362,7 +362,7 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
      */
     @Override
     public synchronized void clear() throws IOException {
-        write(LCD_CLEARDISPLAY);
+        write(LCD_DISPLAY_CLEAR);
     }
 
     /*
@@ -372,7 +372,7 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
      */
     @Override
     public synchronized void home() throws IOException {
-        write(LCD_RETURNHOME);
+        write(LCD_RETURN_HOME);
     }
 
     /*
@@ -383,11 +383,11 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
     @Override
     public synchronized void setCursorEnabled(boolean enable) throws IOException {
         if (enable) {
-            displayControl |= LCD_CURSORON;
-            write(LCD_DISPLAYCONTROL | displayControl);
+            displayControl |= LCD_CURSOR_ON;
+            write(LCD_DISPLAY_CONTROL | displayControl);
         } else {
-            displayControl &= ~LCD_CURSORON;
-            write(LCD_DISPLAYCONTROL | displayControl);
+            displayControl &= ~LCD_CURSOR_ON;
+            write(LCD_DISPLAY_CONTROL | displayControl);
         }
     }
 
@@ -398,7 +398,7 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
      */
     @Override
     public synchronized boolean isCursorEnabled() {
-        return (displayControl & LCD_CURSORON) > 0;
+        return (displayControl & LCD_CURSOR_ON) > 0;
     }
 
     /*
@@ -409,11 +409,11 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
     @Override
     public synchronized void setDisplayEnabled(boolean enable) throws IOException {
         if (enable) {
-            displayControl |= LCD_DISPLAYON;
-            write(LCD_DISPLAYCONTROL | displayControl);
+            displayControl |= LCD_DISPLAY_ON;
+            write(LCD_DISPLAY_CONTROL | displayControl);
         } else {
-            displayControl &= ~LCD_DISPLAYON;
-            write(LCD_DISPLAYCONTROL | displayControl);
+            displayControl &= ~LCD_DISPLAY_ON;
+            write(LCD_DISPLAY_CONTROL | displayControl);
         }
     }
 
@@ -424,7 +424,7 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
      */
     @Override
     public synchronized boolean isDisplayEnabled() {
-        return (displayControl & LCD_DISPLAYON) > 0;
+        return (displayControl & LCD_DISPLAY_ON) > 0;
     }
 
     /*
@@ -435,11 +435,11 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
     @Override
     public synchronized void setBlinkEnabled(boolean enable) throws IOException {
         if (enable) {
-            displayControl |= LCD_BLINKON;
-            write(LCD_DISPLAYCONTROL | displayControl);
+            displayControl |= LCD_BLINK_ON;
+            write(LCD_DISPLAY_CONTROL | displayControl);
         } else {
-            displayControl &= ~LCD_BLINKON;
-            write(LCD_DISPLAYCONTROL | displayControl);
+            displayControl &= ~LCD_BLINK_ON;
+            write(LCD_DISPLAY_CONTROL | displayControl);
         }
     }
 
@@ -450,7 +450,7 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
      */
     @Override
     public synchronized boolean isBlinkEnabled() {
-        return (displayControl & LCD_BLINKON) > 0;
+        return (displayControl & LCD_BLINK_ON) > 0;
     }
 
     /*
@@ -481,11 +481,11 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
     @Override
     public synchronized void scrollDisplay(Direction direction) throws IOException {
         if (direction == Direction.LEFT) {
-            displayShift = LCD_DISPLAYMOVE | LCD_MOVELEFT;
-            write(LCD_CURSORSHIFT | displayShift);
+            displayShift = LCD_DISPLAY_MOVE | LCD_MOVE_LEFT;
+            write(LCD_CURSOR_SHIFT | displayShift);
         } else {
-            displayShift = LCD_DISPLAYMOVE | LCD_MOVERIGHT;
-            write(LCD_CURSORSHIFT | displayShift);
+            displayShift = LCD_DISPLAY_MOVE | LCD_MOVE_RIGHT;
+            write(LCD_CURSOR_SHIFT | displayShift);
         }
     }
 
@@ -499,12 +499,12 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
     public synchronized void setTextFlowDirection(Direction direction) throws IOException {
         if (direction == Direction.LEFT) {
             // This is for text that flows right to left
-            displayMode &= ~LCD_ENTRYLEFT;
-            write(LCD_ENTRYMODESET | displayMode);
+            displayMode &= ~LCD_ENTRY_LEFT;
+            write(LCD_ENTRY_MODE_SET | displayMode);
         } else {
             // This is for text that flows left to right
-            displayMode |= LCD_ENTRYLEFT;
-            write(LCD_ENTRYMODESET | displayMode);
+            displayMode |= LCD_ENTRY_LEFT;
+            write(LCD_ENTRY_MODE_SET | displayMode);
         }
     }
 
@@ -517,12 +517,12 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
     public synchronized void setAutoScrollEnabled(boolean enable) throws IOException {
         if (enable) {
             // This will 'right justify' text from the cursor
-            displayMode |= LCD_ENTRYSHIFTINCREMENT;
-            write(LCD_ENTRYMODESET | displayMode);
+            displayMode |= LCD_ENTRY_SHIFT_INCREMENT;
+            write(LCD_ENTRY_MODE_SET | displayMode);
         } else {
             // This will 'left justify' text from the cursor
-            displayMode &= ~LCD_ENTRYSHIFTINCREMENT;
-            write(LCD_ENTRYMODESET | displayMode);
+            displayMode &= ~LCD_ENTRY_SHIFT_INCREMENT;
+            write(LCD_ENTRY_MODE_SET | displayMode);
         }
     }
 
@@ -533,7 +533,7 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
      */
     @Override
     public synchronized boolean isAutoScrollEnabled() {
-        return (displayControl & LCD_ENTRYSHIFTINCREMENT) > 0;
+        return (displayControl & LCD_ENTRY_SHIFT_INCREMENT) > 0;
     }
 
     /*
@@ -586,7 +586,7 @@ public class AdafruitLcdImpl extends AbstractI2CDevice implements AdafruitLcd {
 
         // Send ccgram update command
         location &= 0x7; // Only position 0..7 are allowed
-        int command = LCD_SETCGRAMADDR | (location << 3);
+        int command = LCD_SET_CGRAMADDR | (location << 3);
         write(command);
 
         // Send custom character definition

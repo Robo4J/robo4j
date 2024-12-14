@@ -62,6 +62,9 @@ class RemoteContextTests {
 
     @Test
     void discoveryOfDiscoveryEnabledRoboContextTest() throws RoboBuilderException, IOException {
+        var expectedMetaDataName = "Caprica";
+        var expectedMetaDataClass = "Cylon";
+
         RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testDiscoverableSystem.xml"));
         RoboContext ctx = builder.build();
         ctx.start();
@@ -75,8 +78,8 @@ class RemoteContextTests {
         RoboContextDescriptor descriptor = service.getDescriptor("6");
 
         assertFalse(service.getDiscoveredContexts().isEmpty());
-        assertEquals(descriptor.getMetadata().get("name"), "Caprica");
-        assertEquals(descriptor.getMetadata().get("class"), "Cylon");
+        assertEquals(expectedMetaDataName, descriptor.getMetadata().get("name"));
+        assertEquals(expectedMetaDataClass, descriptor.getMetadata().get("class"));
         ctx.shutdown();
     }
 

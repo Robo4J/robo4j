@@ -18,63 +18,67 @@ package com.robo4j.hw.rpi.gps;
 
 /**
  * A 2D location on earth.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public final class Location {
-	private static final String STR_DEGREE = "\u00B0";
-	private static final String STR_MINUTE = "'"; // "\u2032";
-	private static final String STR_SECOND = "\""; // \u2033";
+    private static final String STR_DEGREE = "\u00B0";
+    private static final String STR_MINUTE = "'"; // "\u2032";
+    private static final String STR_SECOND = "\""; // \u2033";
+    public static final int DEGREE_MINS = 60;
+    public static final int DEGREE_SECONDS = 3600;
 
-	private final float latitude;
-	private final float longitude;
+    private final float latitude;
+    private final float longitude;
 
-	/**
-	 * Creates a new location.
-	 * 
-	 * @param latitude
-	 *            the latitude in decimal degrees.
-	 * @param longitude
-	 *            the longitude in decimal degrees.
-	 */
-	public Location(float latitude, float longitude) {
-		this.latitude = latitude;
-		this.longitude = longitude;
-	}
+    /**
+     * Creates a new location.
+     *
+     * @param latitude  the latitude in decimal degrees.
+     * @param longitude the longitude in decimal degrees.
+     */
+    public Location(float latitude, float longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 
-	/**
-	 * @return the decimal degree for the latitude.
-	 */
-	public float getLatitude() {
-		return latitude;
-	}
+    /**
+     * @return the decimal degree for the latitude.
+     */
+    public float getLatitude() {
+        return latitude;
+    }
 
-	/**
-	 * @return the decimal degree for the longitude.
-	 */
-	public float getLongitude() {
-		return longitude;
-	}
+    /**
+     * @return the decimal degree for the longitude.
+     */
+    public float getLongitude() {
+        return longitude;
+    }
 
-	/**
-	 * Returns the coordinates as a String in degrees, minutes and seconds format.
-	 * 
-	 * @return the coordinates as a String in degrees, minutes and seconds format.
-	 */
-	public String asDMS() {
-		return String.format("%s%s %s%s", toDMS(latitude), latitude > 0 ? "N" : "S", toDMS(longitude), longitude > 0 ? "E" : "W");
-	}
+    /**
+     * Returns the coordinates as a String in degrees, minutes and seconds format.
+     *
+     * @return the coordinates as a String in degrees, minutes and seconds format.
+     */
+    public String asDMS() {
+        return String.format("%s%s %s%s", toDMS(latitude), latitude > 0 ? "N" : "S", toDMS(longitude), longitude > 0 ? "E" : "W");
+    }
 
-	private Object toDMS(float coordinate) {
-		int deg = Math.abs((int) coordinate);
-		int minute = Math.abs((int) (coordinate * 60) % 60);
-		int second = Math.abs((int) (coordinate * 3600) % 60);
-		return String.format("%d%s%d%s%d%s", deg, STR_DEGREE, minute, STR_MINUTE, second, STR_SECOND);
-	}
+    private Object toDMS(float coordinateInDegree) {
+        int degreesIntAbs = Math.abs((int) coordinateInDegree);
+        int minute = convertDegreesByConversionType(degreesIntAbs, DEGREE_MINS);
+        int second = convertDegreesByConversionType(degreesIntAbs, DEGREE_SECONDS);
+        return String.format("%d%s%d%s%d%s", degreesIntAbs, STR_DEGREE, minute, STR_MINUTE, second, STR_SECOND);
+    }
 
-	@Override
-	public String toString() {
-		return asDMS();
-	}
+    @Override
+    public String toString() {
+        return asDMS();
+    }
+
+    private int convertDegreesByConversionType(int degree, int multiplier) {
+        return (degree * multiplier) % DEGREE_MINS;
+    }
 }
