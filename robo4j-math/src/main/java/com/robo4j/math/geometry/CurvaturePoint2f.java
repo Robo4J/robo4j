@@ -56,10 +56,8 @@ public class CurvaturePoint2f extends Point2f {
 		if (getClass() != obj.getClass())
 			return false;
 		CurvaturePoint2f other = (CurvaturePoint2f) obj;
-		if (Float.floatToIntBits(curvature) != Float.floatToIntBits(other.curvature))
-			return false;
-		return true;
-	}
+        return Float.floatToIntBits(curvature) == Float.floatToIntBits(other.curvature);
+    }
 
 	/**
 	 * Factory method for creating a point from polar coordinates.

@@ -141,38 +141,26 @@ public class Matrix3i implements Matrix {
 	public int getValue(int row, int column) {
 		switch (row) {
 		case 0:
-			switch (column) {
-			case 0:
-				return m11;
-			case 1:
-				return m12;
-			case 2:
-				return m13;
-			default:
-				throw new IllegalArgumentException("Column does not exist: " + column);
-			}
+            return switch (column) {
+                case 0 -> m11;
+                case 1 -> m12;
+                case 2 -> m13;
+                default -> throw new IllegalArgumentException("Column does not exist: " + column);
+            };
 		case 1:
-			switch (column) {
-			case 0:
-				return m21;
-			case 1:
-				return m22;
-			case 2:
-				return m23;
-			default:
-				throw new IllegalArgumentException("Column does not exist: " + column);
-			}
+            return switch (column) {
+                case 0 -> m21;
+                case 1 -> m22;
+                case 2 -> m23;
+                default -> throw new IllegalArgumentException("Column does not exist: " + column);
+            };
 		case 2:
-			switch (column) {
-			case 0:
-				return m31;
-			case 1:
-				return m32;
-			case 2:
-				return m33;
-			default:
-				throw new IllegalArgumentException("Column does not exist: " + column);
-			}
+            return switch (column) {
+                case 0 -> m31;
+                case 1 -> m32;
+                case 2 -> m33;
+                default -> throw new IllegalArgumentException("Column does not exist: " + column);
+            };
 		default:
 			throw new IllegalArgumentException("Row does not exist: " + row);
 		}

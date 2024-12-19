@@ -156,57 +156,37 @@ public class Matrix4d implements Matrix {
 	public double getValue(int row, int column) {
 		switch (row) {
 		case 0:
-			switch (column) {
-			case 0:
-				return m11;
-			case 1:
-				return m12;
-			case 2:
-				return m13;
-			case 3:
-				return m14;
-			default:
-				throw new IllegalArgumentException("Column does not exist: " + column);
-			}
+            return switch (column) {
+                case 0 -> m11;
+                case 1 -> m12;
+                case 2 -> m13;
+                case 3 -> m14;
+                default -> throw new IllegalArgumentException("Column does not exist: " + column);
+            };
 		case 1:
-			switch (column) {
-			case 0:
-				return m21;
-			case 1:
-				return m22;
-			case 2:
-				return m23;
-			case 3:
-				return m24;
-			default:
-				throw new IllegalArgumentException("Column does not exist: " + column);
-			}
+            return switch (column) {
+                case 0 -> m21;
+                case 1 -> m22;
+                case 2 -> m23;
+                case 3 -> m24;
+                default -> throw new IllegalArgumentException("Column does not exist: " + column);
+            };
 		case 2:
-			switch (column) {
-			case 0:
-				return m31;
-			case 1:
-				return m32;
-			case 2:
-				return m33;
-			case 3:
-				return m34;
-			default:
-				throw new IllegalArgumentException("Column does not exist: " + column);
-			}
+            return switch (column) {
+                case 0 -> m31;
+                case 1 -> m32;
+                case 2 -> m33;
+                case 3 -> m34;
+                default -> throw new IllegalArgumentException("Column does not exist: " + column);
+            };
 		case 3:
-			switch (column) {
-			case 0:
-				return m41;
-			case 1:
-				return m42;
-			case 2:
-				return m43;
-			case 3:
-				return m44;
-			default:
-				throw new IllegalArgumentException("Column does not exist: " + column);
-			}
+            return switch (column) {
+                case 0 -> m41;
+                case 1 -> m42;
+                case 2 -> m43;
+                case 3 -> m44;
+                default -> throw new IllegalArgumentException("Column does not exist: " + column);
+            };
 		default:
 			throw new IllegalArgumentException("Row does not exist: " + row);
 		}
@@ -223,39 +203,22 @@ public class Matrix4d implements Matrix {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		long temp;
-		temp = Double.doubleToLongBits(m11);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m12);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m13);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m14);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m21);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m22);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m23);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m24);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m31);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m32);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m33);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m34);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m41);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m42);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m43);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(m44);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = prime * result + Double.hashCode(m11);
+        result = prime * result + Double.hashCode(m12);
+        result = prime * result + Double.hashCode(m13);
+        result = prime * result + Double.hashCode(m14);
+        result = prime * result + Double.hashCode(m21);
+        result = prime * result + Double.hashCode(m22);
+        result = prime * result + Double.hashCode(m23);
+        result = prime * result + Double.hashCode(m24);
+        result = prime * result + Double.hashCode(m31);
+        result = prime * result + Double.hashCode(m32);
+        result = prime * result + Double.hashCode(m33);
+        result = prime * result + Double.hashCode(m34);
+        result = prime * result + Double.hashCode(m41);
+        result = prime * result + Double.hashCode(m42);
+        result = prime * result + Double.hashCode(m43);
+        result = prime * result + Double.hashCode(m44);
 		return result;
 	}
 

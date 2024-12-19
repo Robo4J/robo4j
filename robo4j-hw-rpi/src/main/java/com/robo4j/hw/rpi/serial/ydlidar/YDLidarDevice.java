@@ -28,7 +28,12 @@ import com.robo4j.math.geometry.Point2f;
 import com.robo4j.math.geometry.impl.ScanResultImpl;
 import com.robo4j.math.jfr.ScanEvent;
 import com.robo4j.math.jfr.ScanId;
-import jdk.jfr.*;
+import jdk.jfr.Category;
+import jdk.jfr.Description;
+import jdk.jfr.Event;
+import jdk.jfr.Label;
+import jdk.jfr.Name;
+import jdk.jfr.StackTrace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,8 +107,8 @@ public class YDLidarDevice {
     public enum RangingFrequency {
         FOUR_KHZ((byte) 0x00, 4), EIGHT_KHZ((byte) 0x01, 8), NINE_KHZ((byte) 0x02, 9);
 
-        byte frequencyCode;
-        int frequency;
+        private final byte frequencyCode;
+        private final int frequency;
 
         RangingFrequency(byte frequencyCode, int frequency) {
             this.frequencyCode = frequencyCode;
@@ -142,7 +147,7 @@ public class YDLidarDevice {
     @Label("Yd Debug")
     @Description("This is an event to help debug the ydlidar if there is trouble")
     @StackTrace(false)
-    public class YDLidarDebugEvent extends Event {
+    public static class YDLidarDebugEvent extends Event {
         @Label("Scan Id")
         @Description("The numerical identifier, uniquely identifying the scan")
         @ScanId
@@ -217,7 +222,7 @@ public class YDLidarDevice {
                         return;
                     }
                 }
-                if (scanResult.getPoints().size() != 0) {
+                if (!scanResult.getPoints().isEmpty()) {
                     receiver.onScan(scanResult);
                     event.commit();
                 }
@@ -296,8 +301,8 @@ public class YDLidarDevice {
      * scans for 360 degrees from -180 to 180.
      *
      * @param receiver call back for the receiver of the scans.
-     * @throws InterruptedException
-     * @throws IOException
+     * @throws InterruptedException exception
+     * @throws IOException          exception
      */
     public YDLidarDevice(ScanReceiver receiver) throws IOException, InterruptedException {
         this(SERIAL_PORT_AUTO, receiver);
@@ -309,8 +314,8 @@ public class YDLidarDevice {
      * @param serialPort the serial port to use, or SERIAL_PORT_AUTO if an attempt to
      *                   auto resolve should be made.
      * @param receiver   call back for the receiver of the scans.
-     * @throws InterruptedException
-     * @throws IOException
+     * @throws InterruptedException exception
+     * @throws IOException          exception
      */
     public YDLidarDevice(String serialPort, ScanReceiver receiver) throws IOException, InterruptedException {
         this.receiver = receiver;

@@ -46,21 +46,21 @@ public class CalibratedGyro extends CalibratedFloat3DDevice {
      */
     public void calibrate() throws IOException {
         setCalibration(new Tuple3f(), Tuple3f.createIdentity());
-        float[] xvalues = new float[NUMBER_OF_CALIBRATION_READINGS];
-        float[] yvalues = new float[NUMBER_OF_CALIBRATION_READINGS];
-        float[] zvalues = new float[NUMBER_OF_CALIBRATION_READINGS];
+        float[] xValues = new float[NUMBER_OF_CALIBRATION_READINGS];
+        float[] yValues = new float[NUMBER_OF_CALIBRATION_READINGS];
+        float[] zValues = new float[NUMBER_OF_CALIBRATION_READINGS];
 
         for (int i = 0; i < NUMBER_OF_CALIBRATION_READINGS; i++) {
             Tuple3f tmp = read();
-            xvalues[i] = tmp.x;
-            yvalues[i] = tmp.y;
-            zvalues[i] = tmp.z;
+            xValues[i] = tmp.x;
+            yValues[i] = tmp.y;
+            zValues[i] = tmp.z;
             sleep(20);
         }
         Tuple3f calibration = new Tuple3f();
-        calibration.x = calibrate(xvalues, NUMBER_OF_CALIBRATION_READINGS_TO_DROP);
-        calibration.y = calibrate(yvalues, NUMBER_OF_CALIBRATION_READINGS_TO_DROP);
-        calibration.z = calibrate(zvalues, NUMBER_OF_CALIBRATION_READINGS_TO_DROP);
+        calibration.x = calibrate(xValues, NUMBER_OF_CALIBRATION_READINGS_TO_DROP);
+        calibration.y = calibrate(yValues, NUMBER_OF_CALIBRATION_READINGS_TO_DROP);
+        calibration.z = calibrate(zValues, NUMBER_OF_CALIBRATION_READINGS_TO_DROP);
         LOGGER.info("calibrate:{}", RANGE_MULTIPLIERS);
         setCalibration(calibration, RANGE_MULTIPLIERS);
     }

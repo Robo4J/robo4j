@@ -16,6 +16,7 @@
  */
 package com.robo4j.units.rpi.camera;
 
+import java.io.Serial;
 import java.util.LinkedHashMap;
 
 /**
@@ -23,7 +24,8 @@ import java.util.LinkedHashMap;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RaspividRequest extends RaspiRequest<RaspividRequest>{
-	private static final long serialVersionUID = 1L;
+	@Serial
+    private static final long serialVersionUID = 1L;
 	private static final String RASPIVID_COMMAND = "raspivid";
     private final RaspividRequestType type;
 

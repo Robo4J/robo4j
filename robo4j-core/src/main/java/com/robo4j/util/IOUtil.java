@@ -16,6 +16,9 @@
  */
 package com.robo4j.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -34,9 +37,10 @@ import static com.robo4j.util.StreamUtils.STREAM_END;
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class IOUtil {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IOUtil.class);
 
     private IOUtil() {
-        throw new UnsupportedOperationException("Toolkit!");
+        throw new UnsupportedOperationException("Not allowed!");
     }
 
     public static String readStringFromUTF8Stream(InputStream is) throws IOException {
@@ -66,7 +70,7 @@ public final class IOUtil {
         try {
             c.close();
         } catch (IOException e) {
-            // Ignore
+            LOGGER.error(e.getMessage(), e);
         }
     }
 

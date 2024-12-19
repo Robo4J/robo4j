@@ -50,6 +50,6 @@ public class GyroEvent {
 
 	@Override
 	public String toString() {
-		return "Angles: " + angles == null ? "null" : angles.toString();
+		return angles.toString();
 	}
 }

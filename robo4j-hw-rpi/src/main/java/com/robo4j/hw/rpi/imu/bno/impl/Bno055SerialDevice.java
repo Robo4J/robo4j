@@ -165,38 +165,18 @@ public class Bno055SerialDevice extends AbstractBno055Device implements Readable
     }
 
     private IOException createErrorCodeException(byte b) {
-        String message;
-        switch (b) {
-            case 0x02:
-                message = "Read fail";
-                break;
-            case 0x03:
-                message = "Write fail";
-                break;
-            case 0x04:
-                message = "Regmap invalid address";
-                break;
-            case 0x05:
-                message = "Regmap write disabled";
-                break;
-            case 0x06:
-                message = "Wrong start byte";
-                break;
-            case BUFFER_OVERRUN:
-                message = "Buffer overrun error";
-                break;
-            case 0x08:
-                message = "Max length error";
-                break;
-            case 0x09:
-                message = "Min length error";
-                break;
-            case 0x0A:
-                message = "Receive character timeout";
-                break;
-            default:
-                message = "Got unknown error code " + b;
-        }
+        String message = switch (b) {
+            case 0x02 -> "Read fail";
+            case 0x03 -> "Write fail";
+            case 0x04 -> "Regmap invalid address";
+            case 0x05 -> "Regmap write disabled";
+            case 0x06 -> "Wrong start byte";
+            case BUFFER_OVERRUN -> "Buffer overrun error";
+            case 0x08 -> "Max length error";
+            case 0x09 -> "Min length error";
+            case 0x0A -> "Receive character timeout";
+            default -> "Got unknown error code " + b;
+        };
         return new IOException(message);
     }
 

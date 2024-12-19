@@ -34,6 +34,8 @@ import java.util.concurrent.*;
  */
 public class TitanX1GPS implements GPS {
     private static final Logger LOGGER = LoggerFactory.getLogger(TitanX1GPS.class);
+    // TODO : consider configurable
+    private static final int TIMEOUT_MILLS = 10;
     private static final long READ_INTERVAL = 1000;
 
     private final XA1110Device device;
@@ -146,8 +148,13 @@ public class TitanX1GPS implements GPS {
 
     private void awaitTermination() {
         try {
-            internalExecutor.awaitTermination(10, TimeUnit.MILLISECONDS);
-            internalExecutor.shutdown();
+            var terminated = internalExecutor.awaitTermination(TIMEOUT_MILLS, TimeUnit.MILLISECONDS);
+            if(terminated){
+                internalExecutor.shutdown();
+            } else {
+                LOGGER.warn("unit not terminated properly");
+                internalExecutor.shutdownNow();
+            }
         } catch (InterruptedException e) {
             LOGGER.error("awaitTermination", e);
             // Don't care if we were interrupted.

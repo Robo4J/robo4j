@@ -59,7 +59,7 @@ public enum LF710State {
     public static LF710State getByMask(Short mask) {
         if (internMapByMask == null)
             internMapByMask = initMapping();
-        return internMapByMask.entrySet().stream().map(Map.Entry::getValue).filter(e -> e.getMask() == mask).findFirst()
+        return internMapByMask.values().stream().filter(e -> e.getMask() == mask).findFirst()
                 .orElse(null);
     }
 

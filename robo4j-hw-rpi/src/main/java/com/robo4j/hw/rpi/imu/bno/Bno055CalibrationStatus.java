@@ -30,7 +30,7 @@ public final class Bno055CalibrationStatus {
 
 		private final int statusValue;
 
-		private CalibrationStatus(int statusValue) {
+		CalibrationStatus(int statusValue) {
 			this.statusValue = statusValue;
 		}
 

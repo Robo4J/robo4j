@@ -19,6 +19,7 @@ package com.robo4j.hw.rpi.imu.bno;
 
 import com.robo4j.math.geometry.Tuple3f;
 
+import java.io.Serial;
 import java.util.EnumSet;
 import java.util.Objects;
 
@@ -29,6 +30,7 @@ import java.util.Objects;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class VectorEvent extends DataEvent3f {
+	@Serial
 	private static final long serialVersionUID = 1L;
 	private static final EnumSet<DataEventType> ALLOWED = EnumSet.of(DataEventType.VECTOR_ROTATION, DataEventType.VECTOR_GAME);
 

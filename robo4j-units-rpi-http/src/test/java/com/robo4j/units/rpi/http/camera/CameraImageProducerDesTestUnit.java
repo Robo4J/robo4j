@@ -17,7 +17,6 @@
 package com.robo4j.units.rpi.http.camera;
 
 import com.robo4j.AttributeDescriptor;
-import com.robo4j.ConfigurationException;
 import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
@@ -57,7 +56,7 @@ public class CameraImageProducerDesTestUnit extends RoboUnit<Boolean> {
     protected String target;
     protected String httpTarget;
     protected String fileName;
-    private volatile AtomicInteger counter = new AtomicInteger(0);
+    private final AtomicInteger counter = new AtomicInteger(0);
     protected volatile CountDownLatch generatedImagesLatch;
     private Integer numberOfImages;
 
@@ -66,7 +65,7 @@ public class CameraImageProducerDesTestUnit extends RoboUnit<Boolean> {
     }
 
     @Override
-    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+    protected void onInitialization(Configuration configuration) {
         target = configuration.getString("target", null);
         httpTarget = configuration.getString("httpTarget", null);
         fileName = configuration.getString("fileName", null);
@@ -97,14 +96,14 @@ public class CameraImageProducerDesTestUnit extends RoboUnit<Boolean> {
     @SuppressWarnings("unchecked")
     @Override
     protected synchronized <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
-        if (descriptor.getAttributeType() == Integer.class) {
-            if (descriptor.getAttributeName().equals(ATTR_TOTAL_IMAGES)) {
+        if (descriptor.attributeType() == Integer.class) {
+            if (descriptor.attributeName().equals(ATTR_TOTAL_IMAGES)) {
                 return (R) numberOfImages;
-            } else if (descriptor.getAttributeName().equals(ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME)) {
+            } else if (descriptor.attributeName().equals(ATTRIBUTE_NUMBER_OF_SENT_IMAGES_NAME)) {
                 return (R) Integer.valueOf(counter.get());
             }
         }
-        if (descriptor.getAttributeName().equals(ATTR_GENERATED_IMAGES_LATCH) && descriptor.getAttributeType() == CountDownLatch.class) {
+        if (descriptor.attributeName().equals(ATTR_GENERATED_IMAGES_LATCH) && descriptor.attributeType() == CountDownLatch.class) {
             return (R) generatedImagesLatch;
         }
         return super.onGetAttribute(descriptor);

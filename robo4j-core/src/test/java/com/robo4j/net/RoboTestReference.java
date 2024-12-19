@@ -44,7 +44,7 @@ public class RoboTestReference implements RoboReference<String>{
 	}
 	
 	@Override
-	public String getId() {
+	public String id() {
 		return id;
 	}
 

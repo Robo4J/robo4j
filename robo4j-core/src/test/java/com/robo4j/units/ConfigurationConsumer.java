@@ -65,11 +65,11 @@ public class ConfigurationConsumer extends RoboUnit<String> {
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-        if (attribute.getAttributeName().equals("getNumberOfSentMessages") && attribute.getAttributeType() == Integer.class) {
+        if (attribute.attributeName().equals("getNumberOfSentMessages") && attribute.attributeType() == Integer.class) {
             return (R) (Integer) counter.get();
         }
-        if (attribute.getAttributeName().equals("getReceivedMessages")
-                && attribute.getAttributeType() == ArrayList.class) {
+        if (attribute.attributeName().equals("getReceivedMessages")
+                && attribute.attributeType() == ArrayList.class) {
             return (R) receivedMessages;
         }
         return null;

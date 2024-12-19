@@ -16,6 +16,8 @@
  */
 package com.robo4j.configuration;
 
+import java.io.Serial;
+
 /**
  * Exception for when failing to create a configuration.
  * 
@@ -23,6 +25,7 @@ package com.robo4j.configuration;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ConfigurationFactoryException extends Exception {
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	/**

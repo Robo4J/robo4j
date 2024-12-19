@@ -22,14 +22,18 @@ import com.robo4j.units.StringConsumer;
 import com.robo4j.units.StringProducer;
 import com.robo4j.util.SystemUtil;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static com.robo4j.RoboUnitTestUtils.getAttributeOrTimeout;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test(s) for the builder.
@@ -38,8 +42,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboBuilderTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoboBuilderTests.class);
     private static final int MESSAGES = 10;
-    private static final int TIMEOUT = 100;
+    private static final int TIMEOUT_MIN = 2;
     private static final String SYSTEM_CONFIG_NAME = "mySystem";
     private static final String PRODUCER_UNIT_NAME = "producer";
     private static final String CONSUMER_UNIT_NAME = "consumer";
@@ -49,24 +54,24 @@ public class RoboBuilderTests {
     void testParsingFileWithSystemConfigAndInitiate() throws RoboBuilderException {
         var fileSystemAndUnitsConfigName = "testsystem.xml";
         var contextLoader = Thread.currentThread().getContextClassLoader();
-        RoboBuilder builder = new RoboBuilder(
+        var builder = new RoboBuilder(
                 contextLoader.getResourceAsStream(fileSystemAndUnitsConfigName));
         builder.add(contextLoader.getResourceAsStream(fileSystemAndUnitsConfigName));
-        RoboContext system = builder.build();
+        var system = builder.build();
         assertEquals(SYSTEM_CONFIG_NAME, system.getId());
-        assertEquals(system.getState(), LifecycleState.INITIALIZED);
+        assertEquals(LifecycleState.INITIALIZED, system.getState());
     }
 
     @Test
     void testParsingFileWithSystemConfigAndStart() throws RoboBuilderException {
         var fileSystemAndUnitsConfigName = "testsystem.xml";
         var contextLoader = Thread.currentThread().getContextClassLoader();
-        RoboBuilder builder = new RoboBuilder(
+        var builder = new RoboBuilder(
                 contextLoader.getResourceAsStream(fileSystemAndUnitsConfigName));
         builder.add(contextLoader.getResourceAsStream(fileSystemAndUnitsConfigName));
-        RoboContext system = builder.build();
+        var system = builder.build();
         system.start();
-        assertSame(system.getState(), LifecycleState.STARTED);
+        assertSame(LifecycleState.STARTED, system.getState());
     }
 
 
@@ -89,12 +94,12 @@ public class RoboBuilderTests {
         for (int i = 0; i < MESSAGES; i++) {
             producer.sendMessage("sendRandomMessage");
         }
-        var messagesProduced = producerLatch.await(TIMEOUT, TimeUnit.MINUTES);
+        var messagesProduced = producerLatch.await(TIMEOUT_MIN, TimeUnit.MINUTES);
         var totalProducedMessages = getAttributeOrTimeout(producer, StringProducer.DESCRIPTOR_TOTAL_MESSAGES);
 
         RoboReference<String> consumer = system.getReference(CONSUMER_UNIT_NAME);
         CountDownLatch countDownLatchConsumer = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH);
-        var messageReceived = countDownLatchConsumer.await(TIMEOUT, TimeUnit.MINUTES);
+        var messageReceived = countDownLatchConsumer.await(TIMEOUT_MIN, TimeUnit.MINUTES);
         var totalReceivedMessages = consumer.getAttribute(StringConsumer.DESCRIPTOR_TOTAL_MESSAGES).get();
 
         system.stop();
@@ -124,8 +129,8 @@ public class RoboBuilderTests {
 
         RoboReference<String> consumer = system.getReference(CONSUMER_UNIT_NAME);
 
-        CountDownLatch countDownLatchConsumer = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH);
-        var receivedMessages = countDownLatchConsumer.await(TIMEOUT, TimeUnit.MINUTES);
+        var countDownLatchConsumer = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH);
+        var receivedMessages = countDownLatchConsumer.await(TIMEOUT_MIN, TimeUnit.MINUTES);
         var totalReceivedMessages = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_TOTAL_MESSAGES);
 
         system.stop();
@@ -152,13 +157,13 @@ public class RoboBuilderTests {
         for (int i = 0; i < MESSAGES; i++) {
             producer.sendMessage("sendRandomMessage");
         }
-        var messagesProduced = producerLatch.await(TIMEOUT, TimeUnit.MINUTES);
+        var messagesProduced = producerLatch.await(TIMEOUT_MIN, TimeUnit.MINUTES);
         var totalProducedMessages = producer.getAttribute(StringProducer.DESCRIPTOR_TOTAL_MESSAGES).get();
 
         RoboReference<String> consumer = system.getReference(CONSUMER_UNIT_NAME);
 
         CountDownLatch countDownLatchConsumer = getAttributeOrTimeout(consumer, StringProducer.DESCRIPTOR_COUNT_DOWN_LATCH);
-        var receivedMessages = countDownLatchConsumer.await(TIMEOUT, TimeUnit.MINUTES);
+        var receivedMessages = countDownLatchConsumer.await(TIMEOUT_MIN, TimeUnit.MINUTES);
         var totalReceivedMessages = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_TOTAL_MESSAGES);
 
         system.stop();
@@ -202,7 +207,7 @@ public class RoboBuilderTests {
     }
 
     @Test
-    void testProgrammaticConfiguration() throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
+    void programmaticConfigurationTest() throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
         ConfigurationBuilder systemConfigBuilder = new ConfigurationBuilder()
                 .addInteger(RoboBuilder.KEY_SCHEDULER_POOL_SIZE, 11).addInteger(RoboBuilder.KEY_WORKER_POOL_SIZE, 5)
                 .addInteger(RoboBuilder.KEY_BLOCKING_POOL_SIZE, 13);
@@ -224,14 +229,14 @@ public class RoboBuilderTests {
         for (int i = 0; i < MESSAGES; i++) {
             producer.sendMessage(StringProducer.PROPERTY_SEND_RANDOM_MESSAGE);
         }
-        var producedMessage = producerLatch.await(TIMEOUT, TimeUnit.MINUTES);
+        var producedMessage = producerLatch.await(TIMEOUT_MIN, TimeUnit.MINUTES);
         var totalProducedMessages = producer.getAttribute(StringProducer.DESCRIPTOR_TOTAL_MESSAGES).get();
 
 
         RoboReference<String> consumer = system.getReference(CONSUMER_UNIT_NAME);
         // We need to fix these tests so that we can get a callback.
         CountDownLatch countDownLatchConsumer = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH);
-        var messageReceived = countDownLatchConsumer.await(TIMEOUT, TimeUnit.MINUTES);
+        var messageReceived = countDownLatchConsumer.await(TIMEOUT_MIN, TimeUnit.MINUTES);
 
         int totalReceivedMessages = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_TOTAL_MESSAGES);
 
@@ -245,6 +250,15 @@ public class RoboBuilderTests {
 
         system.stop();
         system.shutdown();
+    }
+
+    private static <T, R> R getAttributeOrTimeout(RoboReference<T> roboReference, AttributeDescriptor<R> attributeDescriptor) throws InterruptedException, ExecutionException, TimeoutException {
+        var attribute = roboReference.getAttribute(attributeDescriptor).get(TIMEOUT_MIN, TimeUnit.MINUTES);
+        if (attribute == null) {
+            attribute = roboReference.getAttribute(attributeDescriptor).get(TIMEOUT_MIN, TimeUnit.MINUTES);
+            LOGGER.error("roboReference:{}, no attribute:{}", roboReference.id(), attributeDescriptor.attributeName());
+        }
+        return attribute;
     }
 
 }

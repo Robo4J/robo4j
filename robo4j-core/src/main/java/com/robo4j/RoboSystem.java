@@ -18,7 +18,10 @@ package com.robo4j;
 
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
-import com.robo4j.net.*;
+import com.robo4j.net.ContextEmitter;
+import com.robo4j.net.MessageServer;
+import com.robo4j.net.ReferenceDescriptor;
+import com.robo4j.net.RoboContextDescriptor;
 import com.robo4j.scheduler.DefaultScheduler;
 import com.robo4j.scheduler.RoboThreadFactory;
 import com.robo4j.scheduler.Scheduler;
@@ -33,8 +36,19 @@ import java.io.Serializable;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import java.util.WeakHashMap;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -48,8 +62,8 @@ import java.util.stream.Collectors;
  */
 final class RoboSystem implements RoboContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(RoboSystem.class);
-    private static final String NAME_BLOCKING_POOL = "Robo4J Blocking Pool";
-    private static final String NAME_WORKER_POOL = "Robo4J Worker Pool";
+    private static final String THREAD_GROUP_BLOCKING_NAME_BLOCKING_POOL = "Robo4J Blocking Pool";
+    private static final String THREAD_GROUP_NAME_WORKER_POOL = "Robo4J Worker Pool";
     private static final int DEFAULT_BLOCKING_POOL_SIZE = 4;
     private static final int DEFAULT_WORKER_POOL_SIZE = 2;
     private static final int DEFAULT_SCHEDULER_POOL_SIZE = 2;
@@ -57,6 +71,8 @@ final class RoboSystem implements RoboContext {
 
     private static final EnumSet<LifecycleState> MESSAGE_DELIVERY_CRITERIA = EnumSet.of(LifecycleState.STARTED, LifecycleState.STOPPED,
             LifecycleState.STOPPING);
+    private static final int SERVER_LISTEN_URI_MILLIS = 100;
+    private static final int SERVER_LISTEN_REPEATS = 5;
 
     private final AtomicReference<LifecycleState> state = new AtomicReference<>(LifecycleState.UNINITIALIZED);
     private final Map<String, RoboUnit<?>> units = new HashMap<>();
@@ -65,6 +81,7 @@ final class RoboSystem implements RoboContext {
     private final Scheduler systemScheduler;
 
     private final ThreadPoolExecutor workExecutor;
+    // TODO: review usage of workQueue and blockingQueue, maybe better abstraction
     private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
 
     private final ThreadPoolExecutor blockingExecutor;
@@ -119,8 +136,8 @@ final class RoboSystem implements RoboContext {
         }
 
         @Override
-        public String getId() {
-            return unit.getId();
+        public String id() {
+            return unit.id();
         }
 
         @Override
@@ -153,22 +170,15 @@ final class RoboSystem implements RoboContext {
 
         @Override
         public String toString() {
-            return "LocalReference id: " + unit.getId() + " (system: " + uid + ")";
+            return "LocalReference id: " + unit.id() + " (system: " + uid + ")";
         }
 
         private void deliverOnQueue(T message) {
             switch (deliveryPolicy) {
-                case SYSTEM:
-                    systemScheduler.execute(new Messenger<T>(unit, message));
-                    break;
-                case WORK:
-                    workExecutor.execute(new Messenger<T>(unit, message));
-                    break;
-                case BLOCKING:
-                    blockingExecutor.execute(new Messenger<T>(unit, message));
-                    break;
-                default:
-                    LOGGER_LOCAL.error("not supported policy: {}", deliveryPolicy);
+                case SYSTEM -> systemScheduler.execute(new Messenger<T>(unit, message));
+                case WORK -> workExecutor.execute(new Messenger<T>(unit, message));
+                case BLOCKING -> blockingExecutor.execute(new Messenger<T>(unit, message));
+                default -> LOGGER_LOCAL.error("not supported policy: {}", deliveryPolicy);
             }
         }
 
@@ -194,7 +204,7 @@ final class RoboSystem implements RoboContext {
 
         @Serial
         Object writeReplace() throws ObjectStreamException {
-            return new ReferenceDescriptor(RoboSystem.this.getId(), getId(), getMessageType().getName());
+            return new ReferenceDescriptor(RoboSystem.this.getId(), id(), getMessageType().getName());
         }
     }
 
@@ -214,7 +224,7 @@ final class RoboSystem implements RoboContext {
             try {
                 unit.onMessage(message);
             } catch (Throwable t) {
-                LOGGER_MESSENGER.error("Error processing message, unit:{}", unit.getId(), t);
+                LOGGER_MESSENGER.error("Error processing message, unit:{}", unit.id(), t);
             }
         }
     }
@@ -242,10 +252,19 @@ final class RoboSystem implements RoboContext {
         int schedulerPoolSize = configuration.getInteger(RoboBuilder.KEY_SCHEDULER_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE);
         int workerPoolSize = configuration.getInteger(RoboBuilder.KEY_WORKER_POOL_SIZE, DEFAULT_WORKER_POOL_SIZE);
         int blockingPoolSize = configuration.getInteger(RoboBuilder.KEY_BLOCKING_POOL_SIZE, DEFAULT_SCHEDULER_POOL_SIZE);
-        workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue,
-                new RoboThreadFactory(new ThreadGroup(NAME_WORKER_POOL), NAME_WORKER_POOL, true));
-        blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, blockingQueue,
-                new RoboThreadFactory(new ThreadGroup(NAME_BLOCKING_POOL), NAME_BLOCKING_POOL, true));
+
+        var workThreadFactory = new RoboThreadFactory
+                .Builder(THREAD_GROUP_NAME_WORKER_POOL)
+                .addThreadPrefix(THREAD_GROUP_NAME_WORKER_POOL)
+                .build();
+
+        var blockingThreadFactory = new RoboThreadFactory
+                .Builder(THREAD_GROUP_BLOCKING_NAME_BLOCKING_POOL)
+                .addThreadPrefix(THREAD_GROUP_BLOCKING_NAME_BLOCKING_POOL)
+                .build();
+
+        workExecutor = new ThreadPoolExecutor(workerPoolSize, workerPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, workQueue, workThreadFactory);
+        blockingExecutor = new ThreadPoolExecutor(blockingPoolSize, blockingPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, blockingQueue, blockingThreadFactory);
         systemScheduler = new DefaultScheduler(this, schedulerPoolSize);
         messageServer = initServer(configuration.getChildConfiguration(RoboBuilder.KEY_CONFIGURATION_SERVER));
         emitterConfiguration = configuration.getChildConfiguration(RoboBuilder.KEY_CONFIGURATION_EMITTER);
@@ -296,34 +315,25 @@ final class RoboSystem implements RoboContext {
 
     @Override
     public void start() {
-        if (state.compareAndSet(LifecycleState.STOPPED, LifecycleState.STARTING)) {
-            // NOTE(Marcus/Sep 4, 2017): Do we want to support starting a
-            // stopped system?
-            startUnits();
+        var currentState = state.get();
+        switch (currentState) {
+            case INITIALIZED, STOPPED -> {
+                state.compareAndSet(currentState, LifecycleState.STARTING);
+                startUnits();
+            }
         }
-        if (state.compareAndSet(LifecycleState.INITIALIZED, LifecycleState.STARTING)) {
-            startUnits();
-        }
-
-        // This is only used from testing for now, it should never happen from
-        // the builder.
-        if (state.compareAndSet(LifecycleState.UNINITIALIZED, LifecycleState.STARTING)) {
-            startUnits();
-        }
-
         // If we have a server, start it, then set up emitter
-        blockingExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                if (messageServer != null) {
-                    try {
-                        messageServer.start();
-                    } catch (IOException e) {
-                        LOGGER.error("Could not start the message server. Proceeding without.", e);
-                    }
+        blockingExecutor.execute(() -> {
+            if (messageServer != null) {
+                try {
+                    messageServer.start();
+                } catch (IOException e) {
+                    LOGGER.error("Could not start the message server. Proceeding without.", e);
                 }
             }
         });
+
+        // TODO : make emitter configurable
         final ContextEmitter emitter = initEmitter(emitterConfiguration, getListeningURI(messageServer));
         if (emitter != null) {
             emitterFuture = getScheduler().scheduleAtFixedRate(emitter::emit, 0, emitter.getHeartBeatInterval(), TimeUnit.MILLISECONDS);
@@ -369,12 +379,7 @@ final class RoboSystem implements RoboContext {
 
         // Then schedule shutdowns on the scheduler threads...
         for (RoboUnit<?> unit : units.values()) {
-            getScheduler().execute(new Runnable() {
-                @Override
-                public void run() {
-                    RoboSystem.shutdownUnit(unit);
-                }
-            });
+            getScheduler().execute(() -> RoboSystem.shutdownUnit(unit));
         }
 
         // Then shutdown the system scheduler. Will wait until the termination
@@ -447,13 +452,13 @@ final class RoboSystem implements RoboContext {
     }
 
     private void addToMap(Set<RoboUnit<?>> unitSet) {
-        unitSet.forEach(unit -> units.put(unit.getId(), unit));
+        unitSet.forEach(unit -> units.put(unit.id(), unit));
     }
 
     private void addToMap(RoboUnit<?>... unitArray) {
         // NOTE(Marcus/Aug 9, 2017): Do not streamify...
         for (RoboUnit<?> unit : unitArray) {
-            units.put(unit.getId(), unit);
+            units.put(unit.id(), unit);
         }
     }
 
@@ -471,11 +476,9 @@ final class RoboSystem implements RoboContext {
 
     private MessageServer initServer(Configuration serverConfiguration) {
         if (serverConfiguration != null) {
-            return new MessageServer(new MessageCallback() {
-                @Override
-                public void handleMessage(String sourceUuid, String id, Object message) {
-                    getReference(id).sendMessage(message);
-                }
+            return new MessageServer((sourceUuid, id, message) -> {
+                // TODO: save message null message or not registered id
+                Objects.requireNonNull(getReference(id)).sendMessage(message);
             }, serverConfiguration);
         } else {
             return null;
@@ -517,14 +520,16 @@ final class RoboSystem implements RoboContext {
 
     private static URI getListeningURI(MessageServer server) {
         if (server != null) {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < SERVER_LISTEN_REPEATS; i++) {
                 URI uri = server.getListeningURI();
                 if (uri != null) {
                     return uri;
                 }
-                SystemUtil.sleep(100);
+                SystemUtil.sleep(SERVER_LISTEN_URI_MILLIS);
             }
+            LOGGER.warn("getListeningURI server:{}, not found", server);
         }
+        LOGGER.warn("getListeningURI undefined server");
         return null;
     }
 }

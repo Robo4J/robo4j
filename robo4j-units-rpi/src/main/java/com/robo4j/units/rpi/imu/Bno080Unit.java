@@ -100,14 +100,9 @@ public class Bno080Unit extends RoboUnit<BnoRequest> {
     public void onMessage(BnoRequest message) {
         RoboReference<DataEvent3f> target = message.getTarget();
         switch (message.getListenerAction()) {
-            case REGISTER:
-                register(target);
-                break;
-            case UNREGISTER:
-                unregister(target);
-                break;
-            default:
-                LOGGER.error("Unknown operation: {}", message);
+            case REGISTER -> register(target);
+            case UNREGISTER -> unregister(target);
+            default -> LOGGER.error("Unknown operation: {}", message);
         }
 
     }

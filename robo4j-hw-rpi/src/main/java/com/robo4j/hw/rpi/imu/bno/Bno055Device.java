@@ -233,7 +233,7 @@ public interface Bno055Device {
 		 * Temperature unit (Fahrenheit)
 		 */
 		FAHRENHEIT(2f);
-		private float factor;
+		private final float factor;
 
 		Unit(float factor) {
 			this.factor = factor;

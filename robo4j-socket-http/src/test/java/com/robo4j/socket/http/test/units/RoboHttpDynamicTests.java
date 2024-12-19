@@ -59,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class RoboHttpDynamicTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(RoboHttpDynamicTests.class);
-    private static final int TIMEOUT = 20;
+    private static final int TIMEOUT_MIN = 1;
     private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
     private static final String ID_HTTP_SERVER = "http";
     private static final int PORT = 8025;
@@ -98,10 +98,10 @@ class RoboHttpDynamicTests {
 
         // TODO: review how to receiving attributes
         var countDownLatchDecoratedProducer = getAttributeOrTimeout(decoratedProducer, SocketMessageDecoratedProducerUnit.DESCRIPTOR_MESSAGES_LATCH);
-        var messagesProduced = countDownLatchDecoratedProducer.await(TIMEOUT, TIME_UNIT);
+        var messagesProduced = countDownLatchDecoratedProducer.await(TIMEOUT_MIN, TIME_UNIT);
         var stringConsumer = mainSystem.getReference(StringConsumer.NAME);
         var countDownLatch = getAttributeOrTimeout(stringConsumer, StringConsumer.DESCRIPTOR_MESSAGES_LATCH);
-        var messagesReceived = countDownLatch.await(TIMEOUT, TIME_UNIT);
+        var messagesReceived = countDownLatch.await(TIMEOUT_MIN, TIME_UNIT);
         var receivedMessages = getAttributeOrTimeout(stringConsumer, StringConsumer.DESCRIPTOR_MESSAGES_TOTAL);
 
         clientSystem.shutdown();
@@ -203,11 +203,12 @@ class RoboHttpDynamicTests {
         return result;
     }
 
+    // TODO: maybe some duplication
     private static <T, R> R getAttributeOrTimeout(RoboReference<T> roboReference, AttributeDescriptor<R> attributeDescriptor) throws InterruptedException, ExecutionException, TimeoutException {
-        var attribute = roboReference.getAttribute(attributeDescriptor).get(TIMEOUT, TimeUnit.MINUTES);
+        var attribute = roboReference.getAttribute(attributeDescriptor).get(TIMEOUT_MIN, TimeUnit.MINUTES);
         if (attribute == null) {
-            attribute = roboReference.getAttribute(attributeDescriptor).get(TIMEOUT, TimeUnit.MINUTES);
-            LOGGER.error("roboReference:{}, no attribute:{}", roboReference.getId(), attributeDescriptor.getAttributeName());
+            attribute = roboReference.getAttribute(attributeDescriptor).get(TIMEOUT_MIN, TimeUnit.MINUTES);
+            LOGGER.error("roboReference:{}, no attribute:{}", roboReference.id(), attributeDescriptor.attributeName());
         }
         return attribute;
     }

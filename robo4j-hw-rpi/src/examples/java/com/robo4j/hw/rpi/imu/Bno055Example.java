@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Bno055Example {
     private static final Logger LOGGER = LoggerFactory.getLogger(Bno055Example.class);
+    private static final int TIMEOUT_SEC = 1;
     private final static ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(1);
 
     private final static class BNOPrinter implements Runnable {
@@ -105,7 +106,11 @@ public class Bno055Example {
         EXECUTOR.scheduleAtFixedRate(new BNOPrinter(bno), 40, 500, TimeUnit.MILLISECONDS);
         System.in.read();
         EXECUTOR.shutdown();
-        EXECUTOR.awaitTermination(1000, TimeUnit.MILLISECONDS);
+        var terminated = EXECUTOR.awaitTermination(TIMEOUT_SEC, TimeUnit.SECONDS);
+        if (!terminated) {
+            LOGGER.warn("not terminated properly");
+            EXECUTOR.shutdownNow();
+        }
         LOGGER.info("Bye, bye!");
         bno.shutdown();
     }

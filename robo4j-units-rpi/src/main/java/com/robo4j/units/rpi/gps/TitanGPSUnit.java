@@ -93,15 +93,9 @@ public class TitanGPSUnit extends RoboUnit<GPSRequest> {
         super.onMessage(message);
         RoboReference<GPSEvent> targetReference = message.getTarget();
         switch (message.getOperation()) {
-            case REGISTER:
-                register(targetReference);
-                break;
-            case UNREGISTER:
-                unregister(targetReference);
-                break;
-            default:
-                LOGGER.error("Unknown operation:{}", message.getOperation());
-                break;
+            case REGISTER -> register(targetReference);
+            case UNREGISTER -> unregister(targetReference);
+            default -> LOGGER.error("Unknown operation:{}", message.getOperation());
         }
     }
 

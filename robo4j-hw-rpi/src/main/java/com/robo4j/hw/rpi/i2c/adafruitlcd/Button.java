@@ -16,20 +16,20 @@
  */
 package com.robo4j.hw.rpi.i2c.adafruitlcd;
 
+import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl;
-
 /**
  * Enumeration of the Buttons on the LCD shield.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public enum Button {
 
-	// @formatter:off
+    // @formatter:off
 	SELECT		(0),
 	RIGHT		(1),
 	DOWN		(2),
@@ -37,52 +37,48 @@ public enum Button {
 	LEFT		(4);
 	// @formatter:on
 
-	// Port expander input pin definition
-	private final int pin;
+    // Port expander input pin definition
+    private final int pin;
 
-	Button(int pin) {
-		this.pin = pin;
-	}
+    Button(int pin) {
+        this.pin = pin;
+    }
 
-	/**
-	 * The pin corresponding to the button.
-	 * 
-	 * @return the pin of the button.
-	 */
-	public int getPin() {
-		return pin;
-	}
+    /**
+     * The pin corresponding to the button.
+     *
+     * @return the pin of the button.
+     */
+    public int getPin() {
+        return pin;
+    }
 
-	/**
-	 * Checks if a button is pressed, given an input mask.
-	 * 
-	 * @param mask
-	 *            the input mask.
-	 * @return true if the button is pressed, false otherwise.
-	 * 
-	 * @see AdafruitLcdImpl#buttonsPressedBitmask()
-	 */
-	public boolean isButtonPressed(int mask) {
-		return ((mask >> getPin()) & 1) > 0;
-	}
+    /**
+     * Checks if a button is pressed, given an input mask.
+     *
+     * @param mask the input mask.
+     * @return true if the button is pressed, false otherwise.
+     * @see AdafruitLcdImpl#buttonsPressedBitmask()
+     */
+    public boolean isButtonPressed(int mask) {
+        return ((mask >> getPin()) & 1) > 0;
+    }
 
-	/**
-	 * Returns a set of the buttons that are pressed, according to the input
-	 * mask.
-	 * 
-	 * @param mask
-	 *            the input mask.
-	 * @return a set of the buttons pressed.
-	 * 
-	 * @see AdafruitLcdImpl#buttonsPressedBitmask()
-	 */
-	public static Set<Button> getButtonsPressed(int mask) {
-		Set<Button> buttons = new HashSet<>();
-		for (Button button : values()) {
-			if (button.isButtonPressed(mask)) {
-				buttons.add(button);
-			}
-		}
-		return buttons;
-	}
+    /**
+     * Returns a set of the buttons that are pressed, according to the input
+     * mask.
+     *
+     * @param mask the input mask.
+     * @return a set of the buttons pressed.
+     * @see AdafruitLcdImpl#buttonsPressedBitmask()
+     */
+    public static Set<Button> getButtonsPressed(int mask) {
+        var buttons = new HashSet<Button>();
+        for (Button button : values()) {
+            if (button.isButtonPressed(mask)) {
+                buttons.add(button);
+            }
+        }
+        return buttons;
+    }
 }

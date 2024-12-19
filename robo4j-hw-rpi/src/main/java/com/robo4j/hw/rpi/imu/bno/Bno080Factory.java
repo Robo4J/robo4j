@@ -16,13 +16,13 @@
  */
 package com.robo4j.hw.rpi.imu.bno;
 
-import java.io.IOException;
-
 import com.pi4j.io.spi.SpiChipSelect;
 import com.pi4j.io.spi.SpiMode;
 import com.robo4j.hw.rpi.imu.bno.Bno055Device.OperatingMode;
 import com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice;
 import com.robo4j.hw.rpi.utils.GpioPin;
+
+import java.io.IOException;
 
 /**
  * Factory for creating BNO080 devices
@@ -101,7 +101,7 @@ public final class Bno080Factory {
 	 * @return an SPI connected BNO80 device.
 	 * @throws IOException
 	 *             exception
-	 * @throws InterruptedException
+	 * @throws InterruptedException exception
 	 */
 	public static Bno080Device createDefaultSPIDevice() throws IOException, InterruptedException {
 		return new Bno080SPIDevice();
@@ -114,7 +114,7 @@ public final class Bno080Factory {
 	 * @return an SPI connected BNO80 device.
 	 * @throws IOException
 	 *             exception
-	 * @throws InterruptedException 
+	 * @throws InterruptedException exception
 	 */
 	public static Bno080Device createDefaultSPIDevice(SpiChipSelect channel, SpiMode mode, int speed, GpioPin wake, GpioPin cs, GpioPin reset, GpioPin interrupt) throws IOException, InterruptedException {
 		return new Bno080SPIDevice(channel, mode, speed, wake, cs, reset, interrupt);

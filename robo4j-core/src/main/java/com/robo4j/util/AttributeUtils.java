@@ -43,6 +43,6 @@ public final class AttributeUtils {
 	 */
 	public static <R> boolean validateAttributeByNameAndType(AttributeDescriptor<R> descriptor, String name,
 			Class<?> clazz) {
-		return (descriptor.getAttributeName().equals(name) && descriptor.getAttributeType() == clazz);
+		return (descriptor.attributeName().equals(name) && descriptor.attributeType() == clazz);
 	}
 }

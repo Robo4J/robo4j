@@ -24,9 +24,9 @@ import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.socket.http.test.units.config.enums.TestCommandEnum;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * HttpOneAttributeGetController contains attributes that are exposed over HttpSocket
@@ -41,9 +41,9 @@ public class HttpOneAttributeGetController extends RoboUnit<TestCommandEnum> {
             .create(Integer.class, ATTR_NUMBER);
 
     public static final Collection<AttributeDescriptor<?>> KNOWN_ATTRIBUTES = Collections
-            .unmodifiableCollection(Arrays.asList(DESCRIPTOR_NUMBER));
+            .unmodifiableCollection(List.of(DESCRIPTOR_NUMBER));
 
-    private int number = 42;
+    private final int number = 42;
     private String target;
 
     public HttpOneAttributeGetController(RoboContext context, String id) {
@@ -66,8 +66,8 @@ public class HttpOneAttributeGetController extends RoboUnit<TestCommandEnum> {
     @SuppressWarnings("unchecked")
     @Override
     protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
-        if (descriptor.getAttributeName().equals(ATTR_NUMBER)
-                && descriptor.getAttributeType() == Integer.class) {
+        if (descriptor.attributeName().equals(ATTR_NUMBER)
+                && descriptor.attributeType() == Integer.class) {
             return (R) Integer.valueOf(number);
         }
         return null;

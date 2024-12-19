@@ -35,7 +35,7 @@ public enum ShtpChannel {
     //@formatter:on
 
 	private static final Map<Byte, ShtpChannel> map = getMap();
-	private byte channel;
+	private final byte channel;
 
 	ShtpChannel(int channel) {
 		this.channel = (byte) channel;

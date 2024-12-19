@@ -17,6 +17,7 @@
 
 package com.robo4j.hw.rpi.imu.bno;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -29,6 +30,7 @@ import com.robo4j.math.geometry.Tuple3f;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class DataEvent3f implements Serializable {
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	private final DataEventType type;

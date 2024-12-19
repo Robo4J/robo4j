@@ -16,6 +16,8 @@
  */
 package com.robo4j;
 
+import java.io.Serial;
+
 /**
  * Exception thrown when a problem occurs configuring a RoboUnit.
  * 
@@ -23,6 +25,7 @@ package com.robo4j;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class ConfigurationException extends Exception {
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	/**

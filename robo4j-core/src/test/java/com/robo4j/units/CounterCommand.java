@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Robo4J. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.robo4j.net;
+package com.robo4j.units;
 
 /**
- * Context messages. Used internally.
+ * Controls the CounterUnit.
  * 
  * @author Marcus Hirt (@hirt)
- * @author Miroslav Wengner (@miragemiko)
+ * @author Miro Wengner (@miragemiko)
  */
-enum ContextMessage {
-	Start, End, Shutdown
+public enum CounterCommand {
+	START, STOP, RESET, COUNTER_INC
 }

@@ -49,7 +49,7 @@ public class ReferenceDescriptor implements Serializable {
     Object readResolve() throws ObjectStreamException {
         ServerRemoteRoboContext remoteRoboContext = ACTIVE_CONTEXT.get();
         if (remoteRoboContext == null) {
-            LOGGER.error("No remote context set!");
+            LOGGER.warn("No remote context set!");
             return null;
         }
         return remoteRoboContext.getRoboReference(ctxId, id, fqn);

@@ -154,7 +154,7 @@ public class PCA9685Servo implements Servo {
 
 	@Override
 	public String toString() {
-		return String.format("Servo on ch %d [min:%d, max:%d, invert:%s, trim:%f, dualrate:%f, expo:%f]",
+		return String.format("Servo on ch %s [min:%d, max:%d, invert:%s, trim:%f, dualrate:%f, expo:%f]",
 				channel.getChannelID(), min, max, invert, trim, dualRate, expo);
 	}
 

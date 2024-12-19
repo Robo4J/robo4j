@@ -23,6 +23,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Scanner;
 
+import static com.robo4j.hw.rpi.lcd.StringUtils.STRING_SPACE;
+
 /**
  * This is a simple example allowing you to try out the servos connected to a
  * PCA9685.
@@ -50,7 +52,7 @@ public class ServoTester {
         printPrompt();
         while (!"q".equals(lastCommand = scanner.nextLine())) {
             lastCommand = lastCommand.trim();
-            String[] split = lastCommand.split(" ");
+            String[] split = lastCommand.split(STRING_SPACE);
             if (split.length != 2) {
                 LOGGER.debug("Could not parse {}. Please try again!", lastCommand);
                 continue;

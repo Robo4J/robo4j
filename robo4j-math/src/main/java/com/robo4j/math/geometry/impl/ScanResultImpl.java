@@ -16,16 +16,15 @@
  */
 package com.robo4j.math.geometry.impl;
 
+import com.robo4j.math.geometry.Point2f;
+import com.robo4j.math.geometry.ScanResult2D;
+import com.robo4j.math.jfr.ScanPoint2DEvent;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
-
-import com.robo4j.math.geometry.Point2f;
-import com.robo4j.math.geometry.ScanResult2D;
-import com.robo4j.math.jfr.ScanPoint2DEvent;
 
 /**
  * The implementation of a scan result. This particular implementation will emit
@@ -36,7 +35,7 @@ import com.robo4j.math.jfr.ScanPoint2DEvent;
  */
 public class ScanResultImpl implements ScanResult2D {
 	private static final PointComparator POINT_COMPARATOR = new PointComparator();
-	private static final AtomicInteger SCANCOUNTER = new AtomicInteger(0);
+	private static final AtomicInteger SCAN_COUNTER = new AtomicInteger(0);
 	private static final Predicate<Point2f> PREDICATE_KEEP_ALL = new KeepAllPredicate();
 
 	private final List<Point2f> points;
@@ -70,7 +69,7 @@ public class ScanResultImpl implements ScanResult2D {
 
 	public ScanResultImpl(int size, float angularResolution, Predicate<Point2f> pointFilter) {
 		this.pointFilter = pointFilter;
-		scanId = SCANCOUNTER.incrementAndGet();
+		scanId = SCAN_COUNTER.incrementAndGet();
 		this.angularResolution = angularResolution;
 		points = new ArrayList<Point2f>(size);
 	}
@@ -184,14 +183,14 @@ public class ScanResultImpl implements ScanResult2D {
 
 	@Override
 	public Point2f getLeftmostPoint() {
-		return points.get(0);
+		return points.getFirst();
 	}
 
 	@Override
 	public Point2f getRightmostPoint() {
 		// NOTE(Marcus/Sep 5, 2017): Should be fine, as the add phase is
 		// separate from the read phase.
-		return points.get(points.size() - 1);
+		return points.getLast();
 	}
 
 	/**

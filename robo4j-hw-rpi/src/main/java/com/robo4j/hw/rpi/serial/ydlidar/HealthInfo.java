@@ -34,7 +34,7 @@ public class HealthInfo {
 		UNKNOWN((byte) -1);
 		//@formatter:on
 
-		byte statusCode;
+		private final byte statusCode;
 
 		HealthStatus(byte status) {
 			this.statusCode = status;

@@ -81,7 +81,7 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
                         resultBuilder.setResult(factory.processGet(context));
                     } else {
 
-                        resultBuilder.setTarget(pathConfig.getRoboUnit().getId());
+                        resultBuilder.setTarget(pathConfig.getRoboUnit().id());
                         final Object unitDescription;
                         // the system needs to have one more worker thread to evaluate Future get
                         final HttpRequestDenominator denominator = (HttpRequestDenominator) decoratedRequest
@@ -91,26 +91,26 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
                         if (requestAttributes == null) {
                             unitDescription = factory.processGet(pathConfig);
                         } else if (requestAttributes.isEmpty()) {
-                            RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().getId());
+                            RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().id());
 
                             PathAttributeListDTO pathAttributes = new PathAttributeListDTO();
                             unit.getKnownAttributes().forEach(a -> {
                                 PathAttributeDTO attributeDescriptor = new PathAttributeDTO();
-                                attributeDescriptor.setName(a.getAttributeName());
-                                attributeDescriptor.setValue(a.getAttributeType().getCanonicalName());
+                                attributeDescriptor.setName(a.attributeName());
+                                attributeDescriptor.setValue(a.attributeType().getCanonicalName());
                                 pathAttributes.addAttribute(attributeDescriptor);
                             });
                             unitDescription = ReflectUtils.createJson(pathAttributes);
                         } else {
-                            RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().getId());
+                            RoboReference<?> unit = context.getReference(pathConfig.getRoboUnit().id());
 
                             List<PathAttributeDTO> attributes = new ArrayList<>();
                             for (AttributeDescriptor attr : unit.getKnownAttributes()) {
-                                if (requestAttributes.contains(attr.getAttributeName())) {
+                                if (requestAttributes.contains(attr.attributeName())) {
                                     PathAttributeDTO attribute = new PathAttributeDTO();
                                     String valueString = String.valueOf(unit.getAttribute(attr).get());
                                     attribute.setValue(valueString);
-                                    attribute.setName(attr.getAttributeName());
+                                    attribute.setName(attr.attributeName());
                                     attributes.add(attribute);
                                 }
                             }
@@ -131,7 +131,7 @@ public class RoboRequestCallable implements Callable<HttpResponseProcess> {
                     if (pathConfig.getPath().equals(UTF8_SOLIDUS)) {
                         resultBuilder.setCode(StatusCode.BAD_REQUEST);
                     } else {
-                        resultBuilder.setTarget(pathConfig.getRoboUnit().getId());
+                        resultBuilder.setTarget(pathConfig.getRoboUnit().id());
                         Object respObj = factory.processPost(pathConfig.getRoboUnit(), decoratedRequest.getMessage());
                         if (respObj == null) {
                             resultBuilder.setCode(StatusCode.BAD_REQUEST);

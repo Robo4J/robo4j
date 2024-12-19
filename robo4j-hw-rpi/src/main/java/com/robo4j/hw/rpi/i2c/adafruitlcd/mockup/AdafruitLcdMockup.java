@@ -16,20 +16,6 @@
  */
 package com.robo4j.hw.rpi.i2c.adafruitlcd.mockup;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.util.Arrays;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
-
 import com.robo4j.hw.rpi.i2c.adafruitlcd.AdafruitLcd;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Button;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonListener;
@@ -37,6 +23,15 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.ButtonPressedObserver;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.Color;
 import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl.Direction;
 import com.robo4j.hw.rpi.utils.I2cBus;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.util.Arrays;
+
+import static com.robo4j.hw.rpi.lcd.StringUtils.STRING_SPACE;
 
 // TODO maybe move to examples
 /**
@@ -190,12 +185,12 @@ public class AdafruitLcdMockup implements AdafruitLcd {
 	}
 
 	private static String goRight(String data) {
-		data = " " + data;
+		data = STRING_SPACE + data;
 		int nlIndex = data.indexOf("\n");
 		if (nlIndex == -1) {
 			return data;
 		}
-		return data.substring(0, nlIndex) + " " + data.substring(nlIndex + 1);
+		return data.substring(0, nlIndex) + STRING_SPACE + data.substring(nlIndex + 1);
 	}
 
 	public void setTextFlowDirection(Direction direction) {

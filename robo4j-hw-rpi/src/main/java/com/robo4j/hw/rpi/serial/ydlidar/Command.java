@@ -18,12 +18,12 @@ package com.robo4j.hw.rpi.serial.ydlidar;
 
 /**
  * The commands available.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public enum Command {
-	//@formatter:off
+    //@formatter:off
 	FORCE_STOP(0x00),
 	LOW_POWER_CONSUMPTION(0x01),
 	LOW_POWER_SHUTDOWN(0x02),
@@ -72,13 +72,13 @@ public enum Command {
 	GET_RANGING_FREQUENCY(0xD1);
 	//@formatter:on
 
-	int instructionCode;
+    private final int instructionCode;
 
-	Command(int instructionCode) {
-		this.instructionCode = instructionCode;
-	}
+    Command(int instructionCode) {
+        this.instructionCode = instructionCode;
+    }
 
-	public int getInstructionCode() {
-		return instructionCode;
-	}
+    public int getInstructionCode() {
+        return instructionCode;
+    }
 }

@@ -93,10 +93,10 @@ public class StringScheduledEmitter extends RoboUnit<String> {
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-        if (attribute.getAttributeName().equals(ATTR_GET_NUMBER_OF_SENT_MESSAGES) && attribute.getAttributeType() == Integer.class) {
+        if (attribute.attributeName().equals(ATTR_GET_NUMBER_OF_SENT_MESSAGES) && attribute.attributeType() == Integer.class) {
             return (R) (Integer) counter.get();
         }
-        if (attribute.getAttributeName().equals(ATTR_COUNT_DOWN_LATCH) && attribute.getAttributeType() == CountDownLatch.class) {
+        if (attribute.attributeName().equals(ATTR_COUNT_DOWN_LATCH) && attribute.attributeType() == CountDownLatch.class) {
             return (R) latch;
         }
         return null;

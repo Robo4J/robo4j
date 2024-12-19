@@ -16,6 +16,8 @@
  */
 package com.robo4j.hw.rpi.serial.ydlidar;
 
+import java.io.Serial;
+
 /**
  * The response header.
  * 
@@ -33,6 +35,7 @@ public class ResponseHeader {
 	private final int responseLength;
 
 	public static class BadResponseException extends Exception {
+		@Serial
 		private static final long serialVersionUID = 1L;
 
 		public BadResponseException(String message) {
@@ -44,7 +47,7 @@ public class ResponseHeader {
 	public enum ResponseType {
 		DEVICE_INFO(0x4), DEVICE_HEALTH(0x6), MEASUREMENT(0x81), UNKNOWN(-1);
 
-		private int responseCode;
+		private final int responseCode;
 
 		ResponseType(int responseCode) {
 			this.responseCode = responseCode;
@@ -125,11 +128,8 @@ public class ResponseHeader {
 		if (headerData[0] != ANSWER_SYNC_BYTE1) {
 			return false;
 		}
-		if (headerData[1] != ANSWER_SYNC_BYTE2) {
-			return false;
-		}
-		return true;
-	}
+        return headerData[1] == ANSWER_SYNC_BYTE2;
+    }
 
 	private static int getResponseLength(byte[] headerData) {
 		int responseLength = headerData[5] & 0x3F;
@@ -141,14 +141,11 @@ public class ResponseHeader {
 
 	private static ResponseMode getResponseMode(byte[] headerData) {
 		int mode = (headerData[5] & 0xC0) >> 6;
-		switch (mode) {
-		case 0:
-			return ResponseMode.SINGLE;
-		case 1:
-			return ResponseMode.CONTINUOUS;
-		default:
-			return ResponseMode.UNDEFINED;
-		}
+        return switch (mode) {
+            case 0 -> ResponseMode.SINGLE;
+            case 1 -> ResponseMode.CONTINUOUS;
+            default -> ResponseMode.UNDEFINED;
+        };
 	}
 
 	/**

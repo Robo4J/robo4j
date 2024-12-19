@@ -29,7 +29,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.concurrent.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Code to talk to the Adafruit "ultimate GPS" over the serial port.
@@ -41,7 +45,6 @@ import java.util.concurrent.*;
  * @author Miro Wengner (@miragemiko)
  */
 public class MTK3339GPS implements GPS {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MTK3339GPS.class);
 
     /**
      * The position accuracy without any
@@ -61,6 +64,8 @@ public class MTK3339GPS implements GPS {
      */
     public static final String DEFAULT_GPS_PORT = "/dev/serial0";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MTK3339GPS.class);
+    private static final int TIMEOUT_SEC = 1;
     private static final String POSITION_TAG = "$GPGGA";
     private static final String VELOCITY_TAG = "$GPVTG";
 
@@ -150,10 +155,14 @@ public class MTK3339GPS implements GPS {
 
     private void awaitTermination() {
         try {
-            internalExecutor.awaitTermination(10, TimeUnit.MILLISECONDS);
+            var terminated = internalExecutor.awaitTermination(TIMEOUT_SEC, TimeUnit.SECONDS);
+            if (!terminated) {
+                LOGGER.warn("not terminated");
+            }
             internalExecutor.shutdown();
         } catch (InterruptedException e) {
             // Don't care if we were interrupted.
+            LOGGER.error("termination:{}", e.getMessage(), e);
         }
     }
 

@@ -16,11 +16,14 @@
  */
 package com.robo4j.hw.rpi.camera;
 
+import java.io.Serial;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class CameraClientException extends RuntimeException {
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	public CameraClientException(String message, Throwable cause) {

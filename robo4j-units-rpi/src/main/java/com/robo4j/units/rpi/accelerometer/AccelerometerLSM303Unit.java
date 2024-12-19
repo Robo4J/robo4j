@@ -178,7 +178,7 @@ public class AccelerometerLSM303Unit extends I2CRoboUnit<AccelerometerRequest> {
     @SuppressWarnings("unchecked")
     @Override
     protected <R> R onGetAttribute(AttributeDescriptor<R> descriptor) {
-        if (descriptor.getAttributeType() == Tuple3f.class && descriptor.getAttributeName().equals(ATTRIBUTE_NAME_STATE)) {
+        if (descriptor.attributeType() == Tuple3f.class && descriptor.attributeName().equals(ATTRIBUTE_NAME_STATE)) {
             try {
                 return (R) accelerometer.read();
             } catch (IOException e) {

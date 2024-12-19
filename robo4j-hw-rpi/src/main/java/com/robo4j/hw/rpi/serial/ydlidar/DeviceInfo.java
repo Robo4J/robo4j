@@ -29,7 +29,7 @@ public class DeviceInfo {
 	public enum Model {
 		F4(1), T1(2), F2(3), S4(4), G4(5), X4(6), F4Pro(8), G4C(9), UNKNOWN(-1);
 
-		int modelCode;
+		private final int modelCode;
 
 		Model(int modelCode) {
 			this.modelCode = modelCode;

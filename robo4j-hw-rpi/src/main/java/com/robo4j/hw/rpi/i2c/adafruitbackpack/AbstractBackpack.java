@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * AbstractBackpack is the abstraction for all Adafruit Backpack devices
@@ -80,28 +81,24 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
      */
     void setColorByMatrixToBuffer(short x, short y, BiColor color) {
         switch (color) {
-            case RED:
+            case RED -> {
                 // Turn on red LED.
                 buffer[y] |= _BV(intToShort(x + 8));
                 // Turn off green LED.
-                buffer[y] &= ~_BV(x);
-                break;
-            case YELLOW:
+                buffer[y] &= (short) ~_BV(x);
+            }
+            case YELLOW -> {
                 // Turn on green and red LED.
-                buffer[y] |= _BV(intToShort(x + 8)) | _BV(x);
-                break;
-            case GREEN:
+                buffer[y] |= (short) (_BV(intToShort(x + 8)) | _BV(x));
+            }
+            case GREEN -> {
                 // Turn on green LED.
                 buffer[y] |= _BV(x);
                 // Turn off red LED.
-                buffer[y] &= ~_BV(intToShort(x + 8));
-                break;
-            case OFF:
-                buffer[y] &= ~_BV(x) & ~_BV(intToShort(x + 8));
-                break;
-            default:
-                LOGGER.warn("setColorByMatrixToBuffer: {}", color);
-                break;
+                buffer[y] &= (short) ~_BV(intToShort(x + 8));
+            }
+            case OFF -> buffer[y] &= (short) (~_BV(x) & ~_BV(intToShort(x + 8)));
+            default -> LOGGER.warn("setColorByMatrixToBuffer: {}", color);
         }
     }
 
@@ -133,36 +130,31 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
      */
     void setColorToBarBuffer(short a, short c, BiColor color) {
         switch (color) {
-            case RED:
+            case RED -> {
                 // Turn on red LED.
                 buffer[c] |= _BV(a);
                 // Turn off green LED.
-                buffer[c] &= ~_BV(intToShort(a + 8));
-                break;
-            case YELLOW:
+                buffer[c] &= (short) ~_BV(intToShort(a + 8));
+            }
+            case YELLOW -> {
                 // Turn on red and green LED.
-                buffer[c] |= _BV(a) | _BV(intToShort(a + 8));
-                break;
-            case GREEN:
+                buffer[c] |= (short) (_BV(a) | _BV(intToShort(a + 8)));
+            }
+            case GREEN -> {
                 // Turn on green LED.
                 buffer[c] |= _BV(intToShort(a + 8));
                 // Turn off red LED.
-                buffer[c] &= ~_BV(a);
-                break;
-            case OFF:
+                buffer[c] &= (short) ~_BV(a);
+            }
+            case OFF -> {
                 // Turn off red and green LED.
-                buffer[c] &= ~_BV(a) & ~_BV(intToShort(a + 8));
-                break;
-            default:
-                LOGGER.warn("setColorToBarBuffer: {}", color);
-                break;
+                buffer[c] &= (short) (~_BV(a) & ~_BV(intToShort(a + 8)));
+            }
+            default -> LOGGER.warn("setColorToBarBuffer: {}", color);
         }
     }
 
     private void initiate(int brightness) throws IOException {
-//		i2CConfig.write((byte) (OSCILLATOR_TURN_ON)); // Turn on oscilator
-//		i2CConfig.write(blinkRate(HT16K33_BLINK_OFF));
-//		i2CConfig.write(setBrightness(brightness));
         writeByte((byte) (OSCILLATOR_TURN_ON)); // Turn on oscilator
         writeByte(blinkRate(HT16K33_BLINK_OFF));
         writeByte(setBrightness(brightness));
@@ -170,18 +162,14 @@ public abstract class AbstractBackpack extends AbstractI2CDevice {
 
     private void writeDisplay() throws IOException {
         int address = 0;
-        for (int i = 0; i < buffer.length; i++) {
-//			i2CConfig.write(address++, (byte) (buffer[i] & 0xFF));
-//			i2CConfig.write(address++, (byte) (buffer[i] >> 8));
-            writeByte(address++, (byte) (buffer[i] & 0xFF));
-            writeByte(address++, (byte) (buffer[i] >> 8));
+        for (short value : buffer) {
+            writeByte(address++, (byte) (value & 0xFF));
+            writeByte(address++, (byte) (value >> 8));
         }
     }
 
     private void clearBuffer() throws IOException {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = 0;
-        }
+        Arrays.fill(buffer, (short) 0);
     }
 
     private short _BV(short i) {

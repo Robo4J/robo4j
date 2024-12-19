@@ -75,24 +75,15 @@ public class AdafruitButtonUnit extends I2CRoboUnit<Object> {
             if (getState() == LifecycleState.STARTED) {
                 try {
                     switch (button) {
-                        case UP:
-                            targetRef.sendMessage(AdafruitButtonEnum.UP);
-                            break;
-                        case DOWN:
-                            targetRef.sendMessage(AdafruitButtonEnum.DOWN);
-                            break;
-                        case RIGHT:
-                            targetRef.sendMessage(AdafruitButtonEnum.LEFT);
-                            break;
-                        case LEFT:
-                            targetRef.sendMessage(AdafruitButtonEnum.RIGHT);
-                            break;
-                        case SELECT:
-                            targetRef.sendMessage(AdafruitButtonEnum.SELECT);
-                            break;
-                        default:
+                        case UP -> targetRef.sendMessage(AdafruitButtonEnum.UP);
+                        case DOWN -> targetRef.sendMessage(AdafruitButtonEnum.DOWN);
+                        case RIGHT -> targetRef.sendMessage(AdafruitButtonEnum.LEFT);
+                        case LEFT -> targetRef.sendMessage(AdafruitButtonEnum.RIGHT);
+                        case SELECT -> targetRef.sendMessage(AdafruitButtonEnum.SELECT);
+                        default -> {
                             lcd.clear();
-                            lcd.setText(String.format("Button %s\nis not in use...", button.toString()));
+                            lcd.setText(String.format("Button %s\nis not in use...", button));
+                        }
                     }
                 } catch (IOException e) {
                     handleException(e);

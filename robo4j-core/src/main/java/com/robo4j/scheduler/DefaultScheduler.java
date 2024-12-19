@@ -22,7 +22,12 @@ import com.robo4j.RoboUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This is the default scheduler used in Robo4J.
@@ -30,10 +35,12 @@ import java.util.concurrent.*;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class DefaultScheduler implements Scheduler {
+public final class DefaultScheduler implements Scheduler {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultScheduler.class);
     private static final int DEFAULT_NUMBER_OF_THREADS = 2;
     private static final int TERMINATION_TIMEOUT_SEC = 4;
+    private static final String THREAD_GROUP_SCHEDULER_NAME = "Robo4J Scheduler";
+    private static final String THREAD_PREFIX_SCHEDULER_NAME = "Robo4J-Scheduler-";
 
     private final ScheduledExecutorService executor;
     private final RoboContext context;
@@ -55,8 +62,12 @@ public class DefaultScheduler implements Scheduler {
      */
     public DefaultScheduler(RoboContext context, int numberOfThreads) {
         this.context = context;
-        this.executor = new ScheduledThreadPoolExecutor(numberOfThreads,
-                new RoboThreadFactory(new ThreadGroup("Robo4J Scheduler"), "Robo4J Scheduler", true));
+        var schedulerThreadFactory = new RoboThreadFactory
+                .Builder(THREAD_GROUP_SCHEDULER_NAME)
+                .addThreadPrefix(THREAD_PREFIX_SCHEDULER_NAME)
+                .build();
+
+        this.executor = new ScheduledThreadPoolExecutor(numberOfThreads, schedulerThreadFactory);
     }
 
     @Override

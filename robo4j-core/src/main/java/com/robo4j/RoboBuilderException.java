@@ -16,6 +16,8 @@
  */
 package com.robo4j;
 
+import java.io.Serial;
+
 /**
  * Exception thrown from the RoboBuilder.
  * 
@@ -23,6 +25,7 @@ package com.robo4j;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboBuilderException extends Exception {
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	/**

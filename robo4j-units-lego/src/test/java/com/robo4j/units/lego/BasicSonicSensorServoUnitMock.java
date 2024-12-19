@@ -58,7 +58,7 @@ public class BasicSonicSensorServoUnitMock extends BasicSonicServoUnit {
     @SuppressWarnings("unchecked")
     @Override
     public <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-        if (attribute.getAttributeName().equals("getStatus") && attribute.getAttributeType() == Boolean.class) {
+        if (attribute.attributeName().equals("getStatus") && attribute.attributeType() == Boolean.class) {
             return (R) Boolean.valueOf(true);
         }
         return null;

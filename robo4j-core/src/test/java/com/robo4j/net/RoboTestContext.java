@@ -93,7 +93,7 @@ public class RoboTestContext implements RoboContext {
 	}
 
 	public void addRef(RoboTestReference roboTestReference) {
-		referenceMap.put(roboTestReference.getId(), roboTestReference);
+		referenceMap.put(roboTestReference.id(), roboTestReference);
 	}
 
 }

@@ -68,18 +68,13 @@ public class AdafruitAlphanumericUnit extends I2CRoboUnit<AlphaNumericMessage> {
     @Override
     public void onMessage(AlphaNumericMessage message) {
         switch (message.getCommand()) {
-            case CLEAR:
-                device.clear();
-                break;
-            case PAINT:
-                render(message);
-                break;
-            case DISPLAY:
+            case CLEAR -> device.clear();
+            case PAINT -> render(message);
+            case DISPLAY -> {
                 render(message);
                 device.display();
-                break;
-            default:
-                LOGGER.error("Illegal message: {}", message);
+            }
+            default -> LOGGER.error("Illegal message: {}", message);
         }
     }
 

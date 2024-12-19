@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -37,7 +37,7 @@ class InternalUtilTests {
     void testSeparator() {
         var separator = SystemPropertyUtils.get("line.separator", "\n\n");
 
-        LOGGER.info("Separator: {}", Arrays.asList(separator.toCharArray()));
+        LOGGER.info("Separator: {}", List.of(separator.toCharArray()));
         assertNotNull(separator.toCharArray());
 
     }

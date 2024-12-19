@@ -17,7 +17,6 @@
 package com.robo4j.units.lego;
 
 import com.robo4j.AttributeDescriptor;
-import com.robo4j.ConfigurationException;
 import com.robo4j.RoboContext;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.lego.enums.AnalogPortEnum;
@@ -38,7 +37,7 @@ public class SimpleTankUnitMock extends SimpleTankUnit {
     }
 
     @Override
-    protected void onInitialization(Configuration configuration) throws ConfigurationException {
+    protected void onInitialization(Configuration configuration) {
         super.rightMotor = new MotorTestWrapper(AnalogPortEnum.C,
                 MotorTypeEnum.NXT);
         super.leftMotor = new MotorTestWrapper(AnalogPortEnum.B,
@@ -54,7 +53,7 @@ public class SimpleTankUnitMock extends SimpleTankUnit {
     @SuppressWarnings("unchecked")
     @Override
     public <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-        if (attribute.getAttributeName().equals("getStatus") && attribute.getAttributeType() == Boolean.class) {
+        if (attribute.attributeName().equals("getStatus") && attribute.attributeType() == Boolean.class) {
             return (R) Boolean.valueOf(true);
         }
         return null;

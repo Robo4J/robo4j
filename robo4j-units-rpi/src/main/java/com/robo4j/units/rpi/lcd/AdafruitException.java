@@ -16,12 +16,15 @@
  */
 package com.robo4j.units.rpi.lcd;
 
+import java.io.Serial;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
 public class AdafruitException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
+	@Serial
+    private static final long serialVersionUID = 1L;
 
 	public AdafruitException(String message, Throwable cause) {
         super(message, cause);

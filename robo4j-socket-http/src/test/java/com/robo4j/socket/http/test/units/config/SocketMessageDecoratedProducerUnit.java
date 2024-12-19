@@ -138,16 +138,16 @@ public class SocketMessageDecoratedProducerUnit extends RoboUnit<Integer> {
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-        if (attribute.getAttributeName().equals(ATTR_TOTAL_SENT_MESSAGES)
-                && attribute.getAttributeType() == Integer.class) {
+        if (attribute.attributeName().equals(ATTR_TOTAL_SENT_MESSAGES)
+                && attribute.attributeType() == Integer.class) {
             return (R) (Integer) counter.get();
         }
-        if (attribute.getAttributeName().equals(ATTR_MESSAGES_LATCH)
-                && attribute.getAttributeType() == CountDownLatch.class) {
+        if (attribute.attributeName().equals(ATTR_MESSAGES_LATCH)
+                && attribute.attributeType() == CountDownLatch.class) {
             return (R) messagesLatch;
         }
-        if (attribute.getAttributeName().equals(ATTR_SETUP_LATCH)
-                && attribute.getAttributeType() == CountDownLatch.class) {
+        if (attribute.attributeName().equals(ATTR_SETUP_LATCH)
+                && attribute.attributeType() == CountDownLatch.class) {
             return (R) setupLatch;
         }
         return null;

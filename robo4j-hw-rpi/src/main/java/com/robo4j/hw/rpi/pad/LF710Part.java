@@ -58,7 +58,8 @@ public enum LF710Part {
     public static LF710Part getByMask(Short mask) {
         if (internMapByMask == null)
             internMapByMask = initMapping();
-        return internMapByMask.entrySet().stream().map(Map.Entry::getValue).filter(e -> e.getMask() == mask).findFirst()
+        // TODO: introduce Empty part and remove null
+        return internMapByMask.values().stream().filter(e -> e.getMask() == mask).findFirst()
                 .orElse(null);
     }
 
