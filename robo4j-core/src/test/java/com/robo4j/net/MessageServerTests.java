@@ -16,9 +16,7 @@
  */
 package com.robo4j.net;
 
-import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
-import com.robo4j.configuration.ConfigurationFactory;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.robo4j.configuration.Configuration.EMPTY_CONFIGURATION;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,8 +40,8 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class MessageServerTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessageServerTest.class);
+public class MessageServerTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageServerTests.class);
     private static final int TIMEOUT_SEC = 30;
     private static final String CONST_MY_UUID = "myuuid";
     private static final String PROPERTY_SERVER_NAME = "ServerName";
@@ -85,7 +84,7 @@ public class MessageServerTest {
             }
         }
 
-        var messageReceiverConfig = ConfigurationFactory.createEmptyConfiguration();
+        var messageReceiverConfig = EMPTY_CONFIGURATION;
         var messageReceiver = new MessageClient(messageServer.getListeningURI(), CONST_MY_UUID, messageReceiverConfig);
         if (exception != null) {
             throw exception;
@@ -147,8 +146,7 @@ public class MessageServerTest {
             }
         }
 
-        Configuration clientConfig = ConfigurationFactory.createEmptyConfiguration();
-        MessageClient client = new MessageClient(messageServer.getListeningURI(), CONST_MY_UUID, clientConfig);
+        MessageClient client = new MessageClient(messageServer.getListeningURI(), CONST_MY_UUID, EMPTY_CONFIGURATION);
         if (exception != null) {
             throw exception;
         }

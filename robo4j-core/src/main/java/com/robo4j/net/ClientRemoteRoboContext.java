@@ -21,7 +21,6 @@ import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.scheduler.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +28,12 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.Future;
+
+import static com.robo4j.configuration.Configuration.EMPTY_CONFIGURATION;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -88,7 +90,7 @@ public class ClientRemoteRoboContext implements RoboContext {
 
     private static MessageClient initializeClient(RoboContextDescriptorEntry descriptorEntry) {
         return new MessageClient(URI.create(descriptorEntry.descriptor.getMetadata().get(RoboContextDescriptor.KEY_URI)),
-                descriptorEntry.descriptor.getId(), ConfigurationFactory.createEmptyConfiguration());
+                descriptorEntry.descriptor.getId(), EMPTY_CONFIGURATION);
     }
 
     private final RoboContextDescriptorEntry descriptorEntry;
@@ -123,8 +125,7 @@ public class ClientRemoteRoboContext implements RoboContext {
 
     @Override
     public Collection<RoboReference<?>> getUnits() {
-        // TODO Auto-generated method stub
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
@@ -143,7 +144,6 @@ public class ClientRemoteRoboContext implements RoboContext {
 
     @Override
     public Configuration getConfiguration() {
-        // TODO Auto-generated method stub
-        return null;
+        return EMPTY_CONFIGURATION;
     }
 }

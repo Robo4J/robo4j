@@ -21,7 +21,6 @@ import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.configuration.ConfigurationBuilder;
-import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.socket.http.message.DatagramDecoratedRequest;
 import com.robo4j.socket.http.message.DatagramDenominator;
 import com.robo4j.socket.http.test.units.config.StringConsumer;
@@ -36,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.robo4j.configuration.Configuration.EMPTY_CONFIGURATION;
 import static com.robo4j.socket.http.test.units.HttpUnitTests.CODECS_UNITS_TEST_PACKAGE;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_CODEC_PACKAGES;
 import static com.robo4j.socket.http.util.RoboHttpUtils.PROPERTY_HOST;
@@ -105,7 +105,7 @@ class RoboDatagramPingPongTest {
                 .addString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"stringConsumer\",\"callbacks\": [\"stringConsumer\"]}]").build();
         builder.add(DatagramClientUnit.class, config, UDP_CLIENT);
 
-        config = ConfigurationFactory.createEmptyConfiguration();
+        config = EMPTY_CONFIGURATION;
         builder.add(StringConsumer.class, config, StringConsumer.NAME);
 
         return builder.build();

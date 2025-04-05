@@ -58,26 +58,31 @@ public final class ReflectionScan {
     }
 
     public List<String> scanForEntities(String... entityPackages) {
-        final List<String> result = new ArrayList<>();
-        for (String packageName : entityPackages) {
-            packageName = packageName.trim();
-            try {
-                List<String> classesInPackage = scanJarPackage(loader, packageName);
-                if (classesInPackage.isEmpty()) {
-                    classesInPackage.addAll(scanPackageOnDisk(loader, packageName));
+        if (entityPackages == null || entityPackages.length == 0) {
+            return Collections.emptyList();
+        } else {
+            // TODO: verify, there could be 2 instances inside the tests
+            final List<String> result = new ArrayList<>();
+            for (String packageName : entityPackages) {
+                packageName = packageName.trim();
+                try {
+                    List<String> classesInPackage = scanJarPackage(loader, packageName);
                     if (classesInPackage.isEmpty()) {
-                        LOGGER.debug("We did not find any annotated classes in package {}", packageName);
+                        classesInPackage.addAll(scanPackageOnDisk(loader, packageName));
+                        if (classesInPackage.isEmpty()) {
+                            LOGGER.debug("We did not find any annotated classes in package {}", packageName);
+                        } else {
+                            result.addAll(classesInPackage);
+                        }
                     } else {
                         result.addAll(classesInPackage);
                     }
-                } else {
-                    result.addAll(classesInPackage);
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage(), e);
                 }
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
             }
+            return result;
         }
-        return result;
     }
 
     //Private Methods
@@ -125,6 +130,13 @@ public final class ReflectionScan {
         return dir.exists() ? findClassesIntern(dir, path) : Collections.emptyList();
     }
 
+    /**
+     * Find classes inside the path
+     *
+     * @param dir
+     * @param path
+     * @return List of ClassNames
+     */
     private List<String> findClassesIntern(File dir, String path) {
         List<String> result = new ArrayList<>();
         File[] files = dir.listFiles();

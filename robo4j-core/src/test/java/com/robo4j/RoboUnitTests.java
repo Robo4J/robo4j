@@ -38,7 +38,7 @@ class RoboUnitTests {
     @Test
     void systemUninitializedTest() {
         RoboSystem system = new RoboSystem();
-        assertEquals(system.getState(), LifecycleState.UNINITIALIZED);
+        assertEquals(LifecycleState.UNINITIALIZED, system.getState());
     }
 
     @Test
@@ -81,7 +81,7 @@ class RoboUnitTests {
         var totalReceivedMessages = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_TOTAL_MESSAGES);
 
         assertTrue(consumerReceivedMessages);
-        assertEquals(system.getState(), LifecycleState.STARTED);
+        assertEquals(LifecycleState.STARTED, system.getState());
         assertEquals(expectedTotalMessages, totalReceivedMessages);
         system.shutdown();
 

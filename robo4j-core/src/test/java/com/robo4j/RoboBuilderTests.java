@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class RoboBuilderTests {
+class RoboBuilderTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(RoboBuilderTests.class);
     private static final int MESSAGES = 10;
     private static final int TIMEOUT_MIN = 2;
@@ -51,7 +51,7 @@ public class RoboBuilderTests {
 
 
     @Test
-    void testParsingFileWithSystemConfigAndInitiate() throws RoboBuilderException {
+    void parseFileWithSystemConfigAndInitiateTest() throws RoboBuilderException {
         var fileSystemAndUnitsConfigName = "testsystem.xml";
         var contextLoader = Thread.currentThread().getContextClassLoader();
         var builder = new RoboBuilder(
@@ -63,7 +63,7 @@ public class RoboBuilderTests {
     }
 
     @Test
-    void testParsingFileWithSystemConfigAndStart() throws RoboBuilderException {
+    void parseFileWithSystemConfigAndStartTest() throws RoboBuilderException {
         var fileSystemAndUnitsConfigName = "testsystem.xml";
         var contextLoader = Thread.currentThread().getContextClassLoader();
         var builder = new RoboBuilder(
@@ -79,7 +79,7 @@ public class RoboBuilderTests {
      * Configuration of the system and units resides inside the same file, testsystem.xml
      */
     @Test
-    void testParsingFileWithSystemConfig()
+    void perseFileWithSystemConfigTest()
             throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
         var fileSystemAndUnitsConfigName = "testsystem.xml";
         var contextLoader = Thread.currentThread().getContextClassLoader();
@@ -114,11 +114,11 @@ public class RoboBuilderTests {
     }
 
     @Test
-    void testParsingFile()
+    void parseFileTest()
             throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
-        RoboBuilder builder = new RoboBuilder();
+        var builder = new RoboBuilder();
         builder.add(SystemUtil.getInputStreamByResourceName("test.xml"));
-        RoboContext system = builder.build();
+        var system = builder.build();
         system.start();
 
         RoboReference<String> producer = system.getReference(PRODUCER_UNIT_NAME);
@@ -144,11 +144,11 @@ public class RoboBuilderTests {
 
 
     @Test
-    void testSeparateSystemUnitsSystemConfig()
+    void separateSystemUnitsSystemConfigTest()
             throws RoboBuilderException, InterruptedException, ExecutionException, TimeoutException {
-        RoboBuilder builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRoboSystemOnly.xml"));
+        var builder = new RoboBuilder(SystemUtil.getInputStreamByResourceName("testRoboSystemOnly.xml"));
         builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("testRoboUnitsOnly.xml"));
-        RoboContext system = builder.build();
+        var system = builder.build();
 
         system.start();
 
@@ -180,8 +180,8 @@ public class RoboBuilderTests {
 
 
     @Test
-    void testAddingNonUnique() {
-        RoboBuilder builder = new RoboBuilder();
+    void addNonUniqueUnitTest() {
+        var builder = new RoboBuilder();
         boolean gotException = false;
         try {
             builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("double.xml"));
@@ -192,13 +192,13 @@ public class RoboBuilderTests {
     }
 
     @Test
-    void testComplexConfiguration() throws RoboBuilderException {
+    void complexConfigurationAndStartTest() throws RoboBuilderException {
         RoboBuilder builder = new RoboBuilder();
         builder.add(Thread.currentThread().getContextClassLoader().getResourceAsStream("testsubconfig.xml"));
         RoboContext system = builder.build();
         system.start();
 
-        RoboReference<Object> reference = system.getReference(CONSUMER_UNIT_NAME);
+        var reference = system.getReference(CONSUMER_UNIT_NAME);
 
         system.stop();
         system.shutdown();

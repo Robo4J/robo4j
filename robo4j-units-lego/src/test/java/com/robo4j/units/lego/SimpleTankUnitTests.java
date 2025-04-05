@@ -20,11 +20,10 @@ import com.robo4j.DefaultAttributeDescriptor;
 import com.robo4j.RoboBuilder;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
-import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.units.lego.platform.LegoPlatformMessage;
 import org.junit.jupiter.api.Test;
 
+import static com.robo4j.configuration.Configuration.EMPTY_CONFIGURATION;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -33,27 +32,26 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SimpleTankUnitTests {
 
-	@Test
-	void simpleTankUnitMockTest() throws Exception {
-		RoboBuilder builder = new RoboBuilder();
+    @Test
+    void simpleTankUnitMockTest() throws Exception {
+        RoboBuilder builder = new RoboBuilder();
 
-		Configuration config = ConfigurationFactory.createEmptyConfiguration();
-		builder.add(SimpleTankUnitMock.class, config, "tank");
+        builder.add(SimpleTankUnitMock.class, EMPTY_CONFIGURATION, "tank");
 
-		DefaultAttributeDescriptor<Boolean> descriptor = DefaultAttributeDescriptor.create(Boolean.class, "getStatus");
+        DefaultAttributeDescriptor<Boolean> descriptor = DefaultAttributeDescriptor.create(Boolean.class, "getStatus");
 
-		RoboContext context = builder.build();
-		RoboReference<LegoPlatformMessage> tank = context.getReference("tank");
+        RoboContext context = builder.build();
+        RoboReference<LegoPlatformMessage> tank = context.getReference("tank");
 
-		tank.sendMessage(new LegoPlatformMessage("right"));
-		tank.sendMessage(new LegoPlatformMessage("left"));
-		tank.sendMessage(new LegoPlatformMessage("move"));
-		tank.sendMessage(new LegoPlatformMessage("back"));
-		tank.sendMessage(new LegoPlatformMessage("stop"));
+        tank.sendMessage(new LegoPlatformMessage("right"));
+        tank.sendMessage(new LegoPlatformMessage("left"));
+        tank.sendMessage(new LegoPlatformMessage("move"));
+        tank.sendMessage(new LegoPlatformMessage("back"));
+        tank.sendMessage(new LegoPlatformMessage("stop"));
 
-		assertTrue(tank.getAttribute(descriptor).get());
+        assertTrue(tank.getAttribute(descriptor).get());
 
-		context.shutdown();
-	}
+        context.shutdown();
+    }
 
 }

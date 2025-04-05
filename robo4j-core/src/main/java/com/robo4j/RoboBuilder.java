@@ -17,7 +17,6 @@
 package com.robo4j;
 
 import com.robo4j.configuration.Configuration;
-import com.robo4j.configuration.ConfigurationFactory;
 import com.robo4j.configuration.ConfigurationFactoryException;
 import com.robo4j.configuration.XmlConfigurationFactory;
 import com.robo4j.net.LookupServiceProvider;
@@ -38,6 +37,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import static com.robo4j.configuration.Configuration.EMPTY_CONFIGURATION;
 
 /**
  * Builds a RoboSystem from various different sources.
@@ -84,7 +85,7 @@ public final class RoboBuilder {
         private static final String ELEMENT_ROBO_UNIT = "roboUnit";
         private String currentId = StringConstants.EMPTY;
         private String currentClassName = StringConstants.EMPTY;
-        private String currentConfiguration = StringConstants.EMPTY;
+        private String currentConfigElement = StringConstants.EMPTY;
         private String lastElement = StringConstants.EMPTY;
         private boolean configState = false;
         private boolean inSystemElement = false;
@@ -96,14 +97,14 @@ public final class RoboBuilder {
                 case SystemXMLHandler.ELEMENT_SYSTEM -> inSystemElement = true;
                 case XmlConfigurationFactory.ELEMENT_CONFIG -> {
                     if (!configState && !inSystemElement) {
-                        currentConfiguration = StringConstants.EMPTY;
+                        currentConfigElement = StringConstants.EMPTY;
                         configState = true;
                     }
                 }
             }
             lastElement = qName;
             if (configState) {
-                currentConfiguration += String.format("<%s %s>", qName, toString(attributes));
+                currentConfigElement += String.format("<%s %s>", qName, toString(attributes));
             }
         }
 
@@ -120,8 +121,8 @@ public final class RoboBuilder {
                         @SuppressWarnings("unchecked")
                         Class<RoboUnit<?>> roboUnitClass = (Class<RoboUnit<?>>) Thread.currentThread().getContextClassLoader()
                                 .loadClass(currentClassName.trim());
-                        Configuration config = currentConfiguration.trim().equals(StringConstants.EMPTY) ? null
-                                : XmlConfigurationFactory.fromXml(currentConfiguration);
+                        Configuration config = currentConfigElement.trim().equals(StringConstants.EMPTY) ? null
+                                : XmlConfigurationFactory.fromXml(currentConfigElement);
                         internalAddUnit(instantiateAndInitialize(roboUnitClass, currentId.trim(), config));
                     } catch (Exception e) {
                         throw new SAXException("Failed to parse robo unit", e);
@@ -131,19 +132,19 @@ public final class RoboBuilder {
                 configState = false;
             }
             if (configState) {
-                currentConfiguration += String.format("</%s>", qName);
+                currentConfigElement += String.format("</%s>", qName);
             }
         }
 
         @Override
         public void characters(char[] ch, int start, int length) throws SAXException {
             if (configState) {
-                currentConfiguration += toString(ch, start, length);
+                currentConfigElement += toString(ch, start, length);
             }
             // NOTE(Marcus/Jan 22, 2017): Seems these can be called repeatedly
             // for a single text() node.
             switch (lastElement) {
-                case XmlConfigurationFactory.ELEMENT_CONFIG -> currentConfiguration += toString(ch, start, length);
+                case XmlConfigurationFactory.ELEMENT_CONFIG -> currentConfigElement += toString(ch, start, length);
                 case XmlConfigurationFactory.ELEMENT_CLASS -> currentClassName += toString(ch, start, length);
             }
         }
@@ -159,7 +160,7 @@ public final class RoboBuilder {
         private void clearCurrentVariables() {
             currentId = StringConstants.EMPTY;
             currentClassName = StringConstants.EMPTY;
-            currentConfiguration = StringConstants.EMPTY;
+            currentConfigElement = StringConstants.EMPTY;
         }
 
         private boolean verifyUnit() {
@@ -350,7 +351,7 @@ public final class RoboBuilder {
      * @throws RoboBuilderException if the creation or adding of the unit failed.
      */
     public RoboBuilder add(Class<? extends RoboUnit<?>> clazz, String id) throws RoboBuilderException {
-        internalAddUnit(instantiateAndInitialize(clazz, id, ConfigurationFactory.createEmptyConfiguration()));
+        internalAddUnit(instantiateAndInitialize(clazz, id, EMPTY_CONFIGURATION));
         return this;
     }
 

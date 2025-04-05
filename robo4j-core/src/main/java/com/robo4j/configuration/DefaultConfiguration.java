@@ -16,6 +16,9 @@
  */
 package com.robo4j.configuration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,8 +36,10 @@ import java.util.Set;
  * @author Miroslav Wengner (@miragemiko)
  */
 class DefaultConfiguration implements Configuration {
+
     @Serial
     private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultConfiguration.class);
     private final Map<String, Object> settings = new HashMap<>();
     private final Map<String, Configuration> configurations = new HashMap<>();
 
@@ -55,6 +60,7 @@ class DefaultConfiguration implements Configuration {
 
     @Override
     public String getString(String name, String defaultValue) {
+        LOGGER.info("getString: name={}, defaultValue={}", name, defaultValue);
         return (String) getVal(name, defaultValue);
     }
 
@@ -97,8 +103,14 @@ class DefaultConfiguration implements Configuration {
         return (Boolean) getVal(name, defaultValue);
     }
 
+    @Override
+    public boolean isDefined() {
+        return settings.isEmpty() && configurations.isEmpty();
+    }
+
+    // TODO: review usage
     public Configuration createChildConfiguration(String name) {
-        DefaultConfiguration config = new DefaultConfiguration();
+        DefaultConfiguration config = (DefaultConfiguration) EMPTY_CONFIGURATION;
         configurations.put(name, config);
         return config;
     }
@@ -127,6 +139,12 @@ class DefaultConfiguration implements Configuration {
         settings.put(name, f);
     }
 
+    /*
+     * Package local, to be used by the builder.
+     */
+    void addChildConfiguration(String name, Configuration config) {
+        configurations.put(name, config);
+    }
 
     private Object getVal(String name, Object defaultValue) {
         Object val = settings.get(name);
@@ -151,13 +169,6 @@ class DefaultConfiguration implements Configuration {
 
     @Override
     public String toString() {
-        return "Settings: " + settings.toString() + " Configurations: " + configurations.toString();
-    }
-
-    /*
-     * Package local, to be used by the builder.
-     */
-    void addChildConfiguration(String name, Configuration config) {
-        configurations.put(name, config);
+        return "Settings: " + new HashMap<>(this.settings) + " Configurations: " + this.configurations.size();
     }
 }

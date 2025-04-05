@@ -57,12 +57,11 @@ public class RoboRequestFactory implements DefaultRequestFactory<Object> {
      * The 1st position is reserved for the system
      *
      * @param context robo context
-     * @return descripton of desired context
+     * @return description of desired context
      */
     @Override
     public Object processGet(RoboContext context) {
         if (!context.getUnits().isEmpty()) {
-
             final List<ResponseUnitDTO> unitList = context.getUnits().stream()
                     .map(u -> new ResponseUnitDTO(u.id(), u.getState())).collect(Collectors.toList());
             unitList.addFirst(new ResponseUnitDTO(context.getId(), context.getState()));

@@ -147,7 +147,7 @@ public class MessageServer {
             listeningPort = serverSocket.getLocalPort();
             serverActive.set(true);
             while (serverActive.get()) {
-                var messageHandler = new MessageHandler(serverSocket.accept(), callback, serverActive);
+                MessageHandler messageHandler = new MessageHandler(serverSocket.accept(), callback, serverActive);
                 executors.submit(messageHandler);
             }
         } finally {

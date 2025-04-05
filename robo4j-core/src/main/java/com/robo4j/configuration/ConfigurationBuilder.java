@@ -16,142 +16,140 @@
  */
 package com.robo4j.configuration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import static com.robo4j.configuration.Configuration.EMPTY_CONFIGURATION;
+
 /**
  * Helper to make it easier to build configurations programmatically.
- * 
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class ConfigurationBuilder {
-	private final DefaultConfiguration inProgress = new DefaultConfiguration();
-	private final Map<String, ConfigurationBuilder> children = new HashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationBuilder.class);
+    private final DefaultConfiguration instance = (DefaultConfiguration) EMPTY_CONFIGURATION;
+    private final Map<String, ConfigurationBuilder> children = new HashMap<>();
 
-	/**
-	 * Stores the Boolean value b under the specified name.
-	 * 
-	 * @param name
-	 *            the name under which to store the value.
-	 * @param b
-	 *            the Boolean to store.
-	 * @return the builder
-	 */
-	public ConfigurationBuilder addBoolean(String name, Boolean b) {
-		inProgress.setBoolean(name, b);
-		return this;
-	}
+    /**
+     * Stores the Boolean value b under the specified name.
+     *
+     * @param name the name under which to store the value.
+     * @param b    the Boolean to store.
+     * @return the builder
+     */
+    public ConfigurationBuilder addBoolean(String name, Boolean b) {
+        instance.setBoolean(name, b);
+        return this;
+    }
 
-	/**
-	 * Stores the Double value d under the specified name.
-	 * 
-	 * @param name
-	 *            the name under which to store the value.
-	 * @param d
-	 *            the Double to store.
-	 * @return the builder
-	 */
-	public ConfigurationBuilder addDouble(String name, Double d) {
-		inProgress.setDouble(name, d);
-		return this;
-	}
+    /**
+     * Stores the Double value d under the specified name.
+     *
+     * @param name the name under which to store the value.
+     * @param d    the Double to store.
+     * @return the builder
+     */
+    public ConfigurationBuilder addDouble(String name, Double d) {
+        instance.setDouble(name, d);
+        return this;
+    }
 
-	/**
-	 * Stores the Float value f under the specified name.
-	 * 
-	 * @param name
-	 *            the name under which to store the value.
-	 * @param f
-	 *            the Float to store.
-	 * @return the builder
-	 */
-	public ConfigurationBuilder addFloat(String name, Float f) {
-		inProgress.setFloat(name, f);
-		return this;
-	}
+    /**
+     * Stores the Float value f under the specified name.
+     *
+     * @param name the name under which to store the value.
+     * @param f    the Float to store.
+     * @return the builder
+     */
+    public ConfigurationBuilder addFloat(String name, Float f) {
+        LOGGER.info("addFloat '{}' with value '{}'", name, f);
+        instance.setFloat(name, f);
+        return this;
+    }
 
-	/**
-	 * Stores the Integer value i under the specified name.
-	 * 
-	 * @param name
-	 *            the name under which to store the value.
-	 * @param i
-	 *            the Integer to store.
-	 * @return the builder
-	 */
-	public ConfigurationBuilder addInteger(String name, Integer i) {
-		inProgress.setInteger(name, i);
-		return this;
-	}
+    /**
+     * Stores the Integer value i under the specified name.
+     *
+     * @param name the name under which to store the value.
+     * @param i    the Integer to store.
+     * @return the builder
+     */
+    public ConfigurationBuilder addInteger(String name, Integer i) {
+        LOGGER.info("addInteger '{}' with value '{}'", name, i);
+        instance.setInteger(name, i);
+        return this;
+    }
 
-	/**
-	 * Stores the Long value l under the specified name.
-	 * 
-	 * @param name
-	 *            the name under which to store the value.
-	 * @param l
-	 *            the Long to store.
-	 * @return the builder
-	 */
-	public ConfigurationBuilder addLong(String name, Long l) {
-		inProgress.setLong(name, l);
-		return this;
-	}
+    public ConfigurationBuilder addInteger(String name, int i) {
+        LOGGER.info("addIntegerPrim '{}' with value '{}'", name, i);
+        instance.setInteger(name, i);
+        return this;
+    }
 
-	/**
-	 * Stores the Character value c under the specified name.
-	 * 
-	 * @param name
-	 *            the name under which to store the value.
-	 * @param c
-	 *            the Character to store.
-	 * @return the builder
-	 */
-	public ConfigurationBuilder addCharacter(String name, Character c) {
-		inProgress.setCharacter(name, c);
-		return this;
-	}
+    /**
+     * Stores the Long value l under the specified name.
+     *
+     * @param name the name under which to store the value.
+     * @param l    the Long to store.
+     * @return the builder
+     */
+    public ConfigurationBuilder addLong(String name, Long l) {
+        instance.setLong(name, l);
+        return this;
+    }
 
-	/**
-	 * Stores the String value s under the specified name.
-	 * 
-	 * @param name
-	 *            the name under which to store the value.
-	 * @param s
-	 *            the String to store.
-	 * @return the builder
-	 */
-	public ConfigurationBuilder addString(String name, String s) {
-		inProgress.setString(name, s);
-		return this;
-	}
+    /**
+     * Stores the Character value c under the specified name.
+     *
+     * @param name the name under which to store the value.
+     * @param c    the Character to store.
+     * @return the builder
+     */
+    public ConfigurationBuilder addCharacter(String name, Character c) {
+        instance.setCharacter(name, c);
+        return this;
+    }
 
-	/**
-	 * Adds a builder as a child to this builder. When the builder is built, the
-	 * result from the added builders will be added as a child configurations.
-	 * 
-	 * @param name
-	 *            the name under which to add the configuration
-	 * @param builder
-	 *            the builder to add
-	 * @return the builder
-	 */
-	public ConfigurationBuilder addBuilder(String name, ConfigurationBuilder builder) {
-		children.put(name, builder);
-		return this;
-	}
+    /**
+     * Stores the String value s under the specified name.
+     *
+     * @param name the name under which to store the value.
+     * @param s    the String to store.
+     * @return the builder
+     */
+    public ConfigurationBuilder addString(String name, String s) {
+        instance.setString(name, s);
+        return this;
+    }
 
-	/**
-	 * Builds the configuration.
-	 * 
-	 * @return the configuration
-	 */
-	public Configuration build() {
-		for (Entry<String, ConfigurationBuilder> entry : children.entrySet()) {
-			inProgress.addChildConfiguration(entry.getKey(), entry.getValue().build());
-		}
-		return inProgress;
-	}
+    /**
+     * Adds a builder as a child to this builder. When the builder is built, the
+     * result from the added builders will be added as a child configurations.
+     *
+     * @param name    the name under which to add the configuration
+     * @param builder the builder to add
+     * @return the builder
+     */
+    public ConfigurationBuilder addBuilder(String name, ConfigurationBuilder builder) {
+        children.put(name, builder);
+        return this;
+    }
+
+    /**
+     * Builds the configuration.
+     *
+     * @return the configuration
+     */
+    public Configuration build() {
+        for (Entry<String, ConfigurationBuilder> entry : children.entrySet()) {
+            instance.addChildConfiguration(entry.getKey(), entry.getValue().build());
+        }
+        return instance;
+    }
 }

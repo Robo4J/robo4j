@@ -22,11 +22,13 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.Future;
 
+import static com.robo4j.configuration.Configuration.EMPTY_CONFIGURATION;
+
 /**
  * This is a useful adapter to hand off a RoboReference to a unit which will
  * only use it as a callback. Note that this has several serious limits. First,
  * it must only be sent to a local unit. Secondly, you must know that the
- * RoboReference will only used to pass on a message. Thirdly, the message will
+ * RoboReference will only use to pass on a message. Thirdly, the message will
  * be handled in the same thread as the thread handling the message calling the
  * reference. Never block or spend much time in the onMessage method.
  * 
@@ -52,7 +54,7 @@ public abstract class LocalReferenceAdapter<T> implements RoboReference<T> {
 
 	@Override
 	public Configuration getConfiguration() {
-		return null;
+		return EMPTY_CONFIGURATION;
 	}
 
 	@Override
