@@ -17,6 +17,7 @@
 package com.robo4j;
 
 import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.configuration.ConfigurationFactoryException;
 import com.robo4j.configuration.XmlConfigurationFactory;
 import com.robo4j.net.LookupServiceProvider;
@@ -37,8 +38,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import static com.robo4j.configuration.Configuration.EMPTY_CONFIGURATION;
 
 /**
  * Builds a RoboSystem from various different sources.
@@ -91,7 +90,7 @@ public final class RoboBuilder {
         private boolean inSystemElement = false;
 
         @Override
-        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+        public void startElement(String uri, String localName, String qName, Attributes attributes) {
             switch (qName) {
                 case ELEMENT_ROBO_UNIT -> currentId = attributes.getValue("id");
                 case SystemXMLHandler.ELEMENT_SYSTEM -> inSystemElement = true;
@@ -137,7 +136,7 @@ public final class RoboBuilder {
         }
 
         @Override
-        public void characters(char[] ch, int start, int length) throws SAXException {
+        public void characters(char[] ch, int start, int length)  {
             if (configState) {
                 currentConfigElement += toString(ch, start, length);
             }
@@ -191,7 +190,7 @@ public final class RoboBuilder {
         private RoboSystem system;
 
         @Override
-        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+        public void startElement(String uri, String localName, String qName, Attributes attributes) {
             switch (qName) {
                 case ELEMENT_SYSTEM -> currentId = attributes.getValue("id");
                 case XmlConfigurationFactory.ELEMENT_CONFIG -> {
@@ -208,7 +207,7 @@ public final class RoboBuilder {
         }
 
         @Override
-        public void endElement(String uri, String localName, String qName) throws SAXException {
+        public void endElement(String uri, String localName, String qName) {
             if (qName.equals(ELEMENT_SYSTEM)) {
                 LOGGER.debug("Loading system id={}", currentId);
                 Configuration config;
@@ -232,7 +231,7 @@ public final class RoboBuilder {
         }
 
         @Override
-        public void characters(char[] ch, int start, int length) throws SAXException {
+        public void characters(char[] ch, int start, int length) {
             if (configState) {
                 currentConfiguration += toString(ch, start, length);
             }
@@ -319,6 +318,7 @@ public final class RoboBuilder {
      * @throws RoboBuilderException possible exception
      * @see RoboUnit#initialize(Configuration)
      */
+    // TODO : verify usage
     public RoboBuilder addAll(Collection<RoboUnit<?>> units) throws RoboBuilderException {
         for (RoboUnit<?> unit : units) {
             add(unit);
@@ -351,7 +351,7 @@ public final class RoboBuilder {
      * @throws RoboBuilderException if the creation or adding of the unit failed.
      */
     public RoboBuilder add(Class<? extends RoboUnit<?>> clazz, String id) throws RoboBuilderException {
-        internalAddUnit(instantiateAndInitialize(clazz, id, EMPTY_CONFIGURATION));
+        internalAddUnit(instantiateAndInitialize(clazz, id, ConfigurationBuilder.createEmptyConfiguration()));
         return this;
     }
 
@@ -428,7 +428,7 @@ public final class RoboBuilder {
             throw new RoboBuilderException("Cannot add the null unit! Skipping");
         } else if (units.contains(unit)) {
             throw new RoboBuilderException(
-                    "Only one unit with the id " + unit.id() + " can be active at a time. Skipping " + unit.toString());
+                    "Only one unit with the id " + unit.id() + " can be active at a time. Skipping " + unit);
         }
         units.add(unit);
     }

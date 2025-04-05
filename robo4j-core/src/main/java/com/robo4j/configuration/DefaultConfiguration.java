@@ -110,7 +110,7 @@ class DefaultConfiguration implements Configuration {
 
     // TODO: review usage
     public Configuration createChildConfiguration(String name) {
-        DefaultConfiguration config = (DefaultConfiguration) EMPTY_CONFIGURATION;
+        DefaultConfiguration config = new DefaultConfiguration();
         configurations.put(name, config);
         return config;
     }
@@ -169,6 +169,6 @@ class DefaultConfiguration implements Configuration {
 
     @Override
     public String toString() {
-        return "Settings: " + new HashMap<>(this.settings) + " Configurations: " + this.configurations.size();
+        return "Settings: " + settings + " Configurations: " + configurations;
     }
 }

@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import static com.robo4j.configuration.Configuration.EMPTY_CONFIGURATION;
-
 /**
  * Helper to make it easier to build configurations programmatically.
  *
@@ -33,9 +31,12 @@ import static com.robo4j.configuration.Configuration.EMPTY_CONFIGURATION;
  */
 public final class ConfigurationBuilder {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationBuilder.class);
-    private final DefaultConfiguration instance = (DefaultConfiguration) EMPTY_CONFIGURATION;
+    private final DefaultConfiguration instance = (DefaultConfiguration) createEmptyConfiguration();
     private final Map<String, ConfigurationBuilder> children = new HashMap<>();
 
+    public static Configuration createEmptyConfiguration(){
+        return new DefaultConfiguration();
+    }
     /**
      * Stores the Boolean value b under the specified name.
      *

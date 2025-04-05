@@ -21,6 +21,7 @@ import com.robo4j.LifecycleState;
 import com.robo4j.RoboContext;
 import com.robo4j.RoboReference;
 import com.robo4j.configuration.Configuration;
+import com.robo4j.configuration.ConfigurationBuilder;
 import com.robo4j.scheduler.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +91,7 @@ public class ClientRemoteRoboContext implements RoboContext {
 
     private static MessageClient initializeClient(RoboContextDescriptorEntry descriptorEntry) {
         return new MessageClient(URI.create(descriptorEntry.descriptor.getMetadata().get(RoboContextDescriptor.KEY_URI)),
-                descriptorEntry.descriptor.getId(), EMPTY_CONFIGURATION);
+                descriptorEntry.descriptor.getId(), ConfigurationBuilder.createEmptyConfiguration());
     }
 
     private final RoboContextDescriptorEntry descriptorEntry;

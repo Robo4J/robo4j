@@ -26,14 +26,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Marcus Hirt
  * @author Miroslav Wengner (@miragemiko)
  */
-class ConfigurationBuilderTest {
+class ConfigurationTests {
     @Test
-    void testBasicConfiguration() {
-        ConfigurationBuilder builder = new ConfigurationBuilder().addInteger("MyInt", 1).addLong("MyLong", 2L).addFloat("MyFloat", 1.0f)
-                .addDouble("MyDouble", 2.0).addString("MyString", "toodiloo").addCharacter("MyCharacter", 'C')
+    void basicConfigurationTest() {
+        ConfigurationBuilder configBuilder = new ConfigurationBuilder().addInteger("MyInt", 1).addLong("MyLong", 2L)
+                .addFloat("MyFloat", 1.0f).addDouble("MyDouble", 2.0).addString("MyString", "toodiloo").addCharacter("MyCharacter", 'C')
                 .addBoolean("MyBoolean", true);
-        Configuration config = builder.build();
-
+        Configuration config = configBuilder.build();
         assertEquals(1, (int) config.getInteger("MyInt", -1));
         assertEquals(2L, (long) config.getLong("MyLong", -1L));
         assertEquals(1.0f, config.getFloat("MyFloat", -1f), 0.000000001f);
@@ -44,13 +43,13 @@ class ConfigurationBuilderTest {
     }
 
     @Test
-    void testSubConfigurations() {
-        // Testing that we can also have the same name for an entry and a sub
-        // tree.
-        ConfigurationBuilder builder = new ConfigurationBuilder().addBuilder("sub", new ConfigurationBuilder().addString("c", "child"))
-                .addDouble("sub", 2.0);
-        Configuration config = builder.build();
+    void subConfigurationsTest() {
+        // Children have their own namespace
+        ConfigurationBuilder configBuilder = new ConfigurationBuilder()
+                .addBuilder("sub", new ConfigurationBuilder().addString("c", "child")).addDouble("sub", 2.0);
+        Configuration config = configBuilder.build();
         assertEquals(2.0, config.getDouble("sub", null), 0.000000001f);
         assertEquals("child", config.getChildConfiguration("sub").getString("c", null));
     }
+
 }
