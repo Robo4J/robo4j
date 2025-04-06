@@ -16,9 +16,6 @@
  */
 package com.robo4j.configuration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -30,7 +27,6 @@ import java.util.Map.Entry;
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class ConfigurationBuilder {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationBuilder.class);
     private final DefaultConfiguration instance = (DefaultConfiguration) createEmptyConfiguration();
     private final Map<String, ConfigurationBuilder> children = new HashMap<>();
 
@@ -69,7 +65,6 @@ public final class ConfigurationBuilder {
      * @return the builder
      */
     public ConfigurationBuilder addFloat(String name, Float f) {
-        LOGGER.info("addFloat '{}' with value '{}'", name, f);
         instance.setFloat(name, f);
         return this;
     }
@@ -82,13 +77,11 @@ public final class ConfigurationBuilder {
      * @return the builder
      */
     public ConfigurationBuilder addInteger(String name, Integer i) {
-        LOGGER.info("addInteger '{}' with value '{}'", name, i);
         instance.setInteger(name, i);
         return this;
     }
 
     public ConfigurationBuilder addInteger(String name, int i) {
-        LOGGER.info("addIntegerPrim '{}' with value '{}'", name, i);
         instance.setInteger(name, i);
         return this;
     }

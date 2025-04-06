@@ -27,7 +27,7 @@ import java.util.Set;
  */
 public interface Configuration extends Serializable {
 
-    Configuration EMPTY_CONFIGURATION = new DefaultConfiguration();
+    Configuration EMPTY_CONFIGURATION = ConfigurationBuilder.createEmptyConfiguration();
 
     /**
      * Returns the child configuration with the specified name.

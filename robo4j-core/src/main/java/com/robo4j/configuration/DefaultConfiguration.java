@@ -16,9 +16,6 @@
  */
 package com.robo4j.configuration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +36,6 @@ class DefaultConfiguration implements Configuration {
 
     @Serial
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultConfiguration.class);
     private final Map<String, Object> settings = new HashMap<>();
     private final Map<String, Configuration> configurations = new HashMap<>();
 
@@ -60,7 +56,6 @@ class DefaultConfiguration implements Configuration {
 
     @Override
     public String getString(String name, String defaultValue) {
-        LOGGER.info("getString: name={}, defaultValue={}", name, defaultValue);
         return (String) getVal(name, defaultValue);
     }
 
@@ -105,12 +100,17 @@ class DefaultConfiguration implements Configuration {
 
     @Override
     public boolean isDefined() {
-        return settings.isEmpty() && configurations.isEmpty();
+        return !settings.isEmpty() || !configurations.isEmpty();
     }
 
-    // TODO: review usage
+    /**
+     * Allows to add child configuration programmatically
+     *
+     * @param name configuration name
+     * @return created child configuration
+     */
     public Configuration createChildConfiguration(String name) {
-        DefaultConfiguration config = new DefaultConfiguration();
+        DefaultConfiguration config = (DefaultConfiguration) ConfigurationBuilder.createEmptyConfiguration();
         configurations.put(name, config);
         return config;
     }

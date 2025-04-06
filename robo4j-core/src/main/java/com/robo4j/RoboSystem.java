@@ -175,9 +175,9 @@ final class RoboSystem implements RoboContext {
 
         private void deliverOnQueue(T message) {
             switch (deliveryPolicy) {
-                case SYSTEM -> systemScheduler.execute(new Messenger<T>(unit, message));
-                case WORK -> workExecutor.execute(new Messenger<T>(unit, message));
-                case BLOCKING -> blockingExecutor.execute(new Messenger<T>(unit, message));
+                case SYSTEM -> systemScheduler.execute(new Messenger<>(unit, message));
+                case WORK -> workExecutor.execute(new Messenger<>(unit, message));
+                case BLOCKING -> blockingExecutor.execute(new Messenger<>(unit, message));
                 default -> LOGGER_LOCAL.error("not supported policy: {}", deliveryPolicy);
             }
         }
@@ -470,8 +470,10 @@ final class RoboSystem implements RoboContext {
     }
 
     private static Configuration createConfiguration(int schedulerPoolSize, int workerPoolSize, int blockingPoolSize) {
-        return new ConfigurationBuilder().addInteger(RoboBuilder.KEY_SCHEDULER_POOL_SIZE, schedulerPoolSize)
-                .addInteger(RoboBuilder.KEY_WORKER_POOL_SIZE, workerPoolSize).addInteger(RoboBuilder.KEY_BLOCKING_POOL_SIZE, blockingPoolSize).build();
+        return new ConfigurationBuilder()
+                .addInteger(RoboBuilder.KEY_SCHEDULER_POOL_SIZE, schedulerPoolSize)
+                .addInteger(RoboBuilder.KEY_WORKER_POOL_SIZE, workerPoolSize)
+                .addInteger(RoboBuilder.KEY_BLOCKING_POOL_SIZE, blockingPoolSize).build();
     }
 
     private MessageServer initServer(Configuration serverConfiguration) {

@@ -19,6 +19,7 @@ package com.robo4j.configuration;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Testing supported variables types potentially used for roboUnit configuration
@@ -28,29 +29,62 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class ConfigurationBuilderTests {
     @Test
-    void basicConfigurationTest() {
-        ConfigurationBuilder builder = new ConfigurationBuilder().addInteger("MyInt", 1).addLong("MyLong", 2L).addFloat("MyFloat", 1.0f)
-                .addDouble("MyDouble", 2.0).addString("MyString", "toodiloo").addCharacter("MyCharacter", 'C')
-                .addBoolean("MyBoolean", true);
+    void allowedConfigurationTypesTest() {
+        var parentIntValueName = "MyInt";
+        var parentIntValue = 1;
+        var parentLongValueName = "MyLong";
+        var parentLongValue = 2L;
+        var parentFloatValueName = "MyFloat";
+        var parentFloatValue = 1.0f;
+        var parentDoubleValueName = "MyDouble";
+        var parentDoubleValue = 2.0;
+        var parentStringValueName = "MyString";
+        var parentStringValue = "toodiloo";
+        var parentCharacterValueName = "MyCharacter";
+        var parentCharacterValue = 'C';
+        var parentBooleanValueName = "MyBoolean";
+        var parentBooleanValue = true;
+
+        ConfigurationBuilder builder = new ConfigurationBuilder()
+                .addInteger(parentIntValueName, parentIntValue)
+                .addLong(parentLongValueName, parentLongValue)
+                .addFloat(parentFloatValueName, parentFloatValue)
+                .addDouble(parentDoubleValueName, parentDoubleValue)
+                .addString(parentStringValueName, parentStringValue)
+                .addCharacter(parentCharacterValueName, parentCharacterValue)
+                .addBoolean(parentBooleanValueName, parentBooleanValue);
         Configuration config = builder.build();
 
-        assertEquals(1, (int) config.getInteger("MyInt", -1));
-        assertEquals(2L, (long) config.getLong("MyLong", -1L));
-        assertEquals(1.0f, config.getFloat("MyFloat", -1f), 0.000000001f);
-        assertEquals(2.0, config.getDouble("MyDouble", -1.0), 0.000000001f);
-        assertEquals("toodiloo", config.getString("MyString", "nope"));
-        assertEquals(Character.valueOf('C'), config.getCharacter("MyCharacter", 'A'));
-        assertEquals(true, config.getBoolean("MyBoolean", false));
+        assertTrue(config.isDefined());
+        assertEquals(parentIntValue, config.getInteger(parentIntValueName, -1));
+        assertEquals(parentLongValue, (long) config.getLong(parentLongValueName, -1L));
+        assertEquals(parentFloatValue, config.getFloat(parentFloatValueName, -1f), 0.000000001f);
+        assertEquals(parentDoubleValue, config.getDouble(parentDoubleValueName, -1.0), 0.000000001f);
+        assertEquals(parentStringValue, config.getString(parentStringValueName, "nope"));
+        assertEquals(Character.valueOf(parentCharacterValue), config.getCharacter(parentCharacterValueName, 'A'));
+        assertEquals(parentBooleanValue, config.getBoolean(parentBooleanValueName, false));
     }
 
     @Test
-    void subConfigurationsTest() {
+    void parentChildConfigurationsTest() {
         // Testing that we can also have the same name for an entry and a sub
         // tree.
-        ConfigurationBuilder builder = new ConfigurationBuilder().addBuilder("sub", new ConfigurationBuilder().addString("c", "child"))
-                .addDouble("sub", 2.0);
-        Configuration config = builder.build();
-        assertEquals(2.0, config.getDouble("sub", null), 0.000000001f);
-        assertEquals("child", config.getChildConfiguration("sub").getString("c", null));
+        var parentValueName = "parentDouble";
+        var parentValue = 2.0;
+        var childConfigName = "childConfig";
+        var childStringName = "childString";
+        var childStringValue = "child";
+
+        Configuration config = new ConfigurationBuilder()
+                .addBuilder(childConfigName,
+                        new ConfigurationBuilder()
+                                .addString(childStringName, childStringValue)
+                )
+                .addDouble(parentValueName, parentValue).build();
+
+        assertTrue(config.isDefined());
+        assertEquals(parentValue, config.getDouble(parentValueName, null), 0.000000001f);
+        assertEquals(childStringValue, config.getChildConfiguration(childConfigName).getString(childStringName, null));
     }
+
 }

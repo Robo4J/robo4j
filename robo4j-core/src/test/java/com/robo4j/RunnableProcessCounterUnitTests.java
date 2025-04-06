@@ -128,7 +128,8 @@ class RunnableProcessCounterUnitTests {
 
 
     private Configuration getCounterConfiguration(String target, int interval) {
-        return new ConfigurationBuilder().addString(CounterUnit.KEY_TARGET, target)
+        return new ConfigurationBuilder()
+                .addString(CounterUnit.KEY_TARGET, target)
                 .addInteger(CounterUnit.KEY_INTERVAL, interval)
                 .addInteger(CounterUnit.KEY_RECEIVED_MESSAGE, CounterUnit.DEFAULT_RECEIVED_MESSAGE)
                 .build();
