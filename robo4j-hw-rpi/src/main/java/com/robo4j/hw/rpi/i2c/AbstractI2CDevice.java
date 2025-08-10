@@ -16,18 +16,18 @@
  */
 package com.robo4j.hw.rpi.i2c;
 
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pi4j.Pi4J;
 import com.pi4j.exception.InitializeException;
 import com.pi4j.io.i2c.I2C;
 import com.pi4j.io.i2c.I2CConfig;
 import com.pi4j.plugin.linuxfs.provider.i2c.LinuxFsI2CProviderImpl;
-import com.robo4j.hw.rpi.i2c.magnetometer.MagnetometerLSM303Device;
 import com.robo4j.hw.rpi.utils.I2cBus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Abstract super class for I2C devices.
