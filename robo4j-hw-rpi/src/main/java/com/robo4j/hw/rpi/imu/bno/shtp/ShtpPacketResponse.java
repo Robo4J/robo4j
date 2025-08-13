@@ -17,11 +17,10 @@
 
 package com.robo4j.hw.rpi.imu.bno.shtp;
 
-import com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice;
+import static com.robo4j.hw.rpi.imu.bno.impl.AbstractBno080Device.SHTP_HEADER_SIZE;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice.SHTP_HEADER_SIZE;
 
 /**
  * ShtpPacketResponse represent SPI device response see

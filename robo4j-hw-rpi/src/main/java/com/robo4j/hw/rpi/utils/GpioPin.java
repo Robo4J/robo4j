@@ -17,7 +17,6 @@
 
 package com.robo4j.hw.rpi.utils;
 
-import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 
 /**
