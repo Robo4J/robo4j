@@ -146,7 +146,7 @@ class RoboSchedulerTests {
 
         var countDownLatchConsumer = getAttributeOrTimeout(consumer, StringConsumer.DESCRIPTOR_COUNT_DOWN_LATCH);
         var listener = new SchedulerListener();
-        var f1 = system.getScheduler().schedule(consumer, "Lalalala", 0, 2, consideredTimeUnit, splitTotalInvocations,
+        var f1 = system. getScheduler().schedule(consumer, "Lalalala", 0, 2, consideredTimeUnit, splitTotalInvocations,
                 listener);
         var f2 = system.getScheduler().schedule(consumer, "bläblä", 1, 2, consideredTimeUnit, splitTotalInvocations);
         futureGetSafe(f1);

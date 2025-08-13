@@ -119,8 +119,10 @@ class RoboDatagramPingPongTest {
      */
     private RoboContext configurePongSystem() throws Exception {
         RoboBuilder builder = new RoboBuilder();
-        Configuration config = new ConfigurationBuilder().addString(PROPERTY_CODEC_PACKAGES, CODECS_UNITS_TEST_PACKAGE)
-                .addString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"stringConsumer\",\"filters\":[]}]").build();
+        Configuration config = new ConfigurationBuilder()
+                .addString(PROPERTY_CODEC_PACKAGES, CODECS_UNITS_TEST_PACKAGE)
+                .addString(PROPERTY_UNIT_PATHS_CONFIG, "[{\"roboUnit\":\"stringConsumer\",\"filters\":[]}]")
+                .build();
         builder.add(DatagramServerUnit.class, config, UDP_SERVER);
 
         config = new ConfigurationBuilder().addInteger(StringConsumer.PROP_TOTAL_NUMBER_MESSAGES, RoboDatagramPingPongTest.TOTAL_NUMBER).build();

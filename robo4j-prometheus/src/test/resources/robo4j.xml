@@ -1,0 +1,12 @@
+<robo4j>
+    <roboUnit id="metrics">
+        <class>com.robo4j.prometheus.PrometheusMetricsUnit</class>
+        <config name="com.robo4j.root">
+            <value name="metricsJvmEnable" type="boolean">true</value>
+            <value name="metricsUri" type="String">/metrics</value>
+            <value name="jpmsListModules" type="boolean">true</value>
+            <value name="jpmsUri" type="String">/modules</value>
+            <value name="jpmsFilterModules" type="String">java</value>
+        </config>
+    </roboUnit>
+</robo4j>

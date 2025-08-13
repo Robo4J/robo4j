@@ -24,4 +24,6 @@ package com.robo4j.util;
  */
 public final class StringConstants {
     public static final String EMPTY = "";
+    public static final String COMMA = ",";
+    public static final String LINE_BREAK = "\n";
 }

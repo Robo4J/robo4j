@@ -84,8 +84,7 @@ public class MessageServerTests {
             }
         }
 
-        var messageReceiverConfig = EMPTY_CONFIGURATION;
-        var messageReceiver = new MessageClient(messageServer.getListeningURI(), CONST_MY_UUID, messageReceiverConfig);
+        var messageReceiver = new MessageClient(messageServer.getListeningURI(), CONST_MY_UUID, EMPTY_CONFIGURATION);
         if (exception != null) {
             throw exception;
         }

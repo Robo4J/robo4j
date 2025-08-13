@@ -62,8 +62,8 @@ import java.util.stream.Collectors;
  */
 final class RoboSystem implements RoboContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(RoboSystem.class);
-    private static final String THREAD_GROUP_BLOCKING_NAME_BLOCKING_POOL = "Robo4J Blocking Pool";
-    private static final String THREAD_GROUP_NAME_WORKER_POOL = "Robo4J Worker Pool";
+    private static final String THREAD_GROUP_BLOCKING_NAME_BLOCKING_POOL = "robo4j-blocking-pool";
+    private static final String THREAD_GROUP_NAME_WORKER_POOL = "robo4j-worker-pool";
     private static final int DEFAULT_BLOCKING_POOL_SIZE = 4;
     private static final int DEFAULT_WORKER_POOL_SIZE = 2;
     private static final int DEFAULT_SCHEDULER_POOL_SIZE = 2;

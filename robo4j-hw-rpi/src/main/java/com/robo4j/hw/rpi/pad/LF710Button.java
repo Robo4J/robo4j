@@ -29,18 +29,16 @@ import java.util.stream.Stream;
 public enum LF710Button implements LF710Input {
 
     //@formatter:off
-    BLUE                ((short)0,  "blue"),
-    GREEN               ((short)1,  "green"),
-    RED                 ((short)2,  "red"),
+    GREEN               ((short)0,  "green"),
+    RED                 ((short)1,  "red"),
+    BLUE                ((short)2,  "blue"),
     YELLOW              ((short)3,  "yellow"),
     FRONT_UP_LEFT       ((short)4,  "front_up_left"),
     FRONT_UP_RIGHT      ((short)5,  "front_up_right"),
-    FRONT_DOWN_LEFT     ((short)6,  "front_down_left"),
-    FRONT_DOWN_RIGHT    ((short)7,  "front_down_right"),
-    BACK                ((short)8,  "back"),
-    START               ((short)9,  "start"),
-    JOYSTICK_LEFT       ((short)10, "joystick left"),
-    JOYSTICK_RIGHT      ((short)11, "joystick right"),
+    BACK                ((short)6,  "back"),
+    START               ((short)7,  "start"),
+    JOYSTICK_LEFT       ((short)9, "joystick_left"),
+    JOYSTICK_RIGHT      ((short)10, "joystick_right"),
     UNKNOWN((short)-1, "")
     ;
     //@formatter:on

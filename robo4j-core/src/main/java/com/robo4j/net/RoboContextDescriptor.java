@@ -25,6 +25,7 @@ import java.util.Map;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboContextDescriptor {
+    public static final String KEY_NAME = "name";
     public static final String KEY_URI = "uri";
 
     private final String id;

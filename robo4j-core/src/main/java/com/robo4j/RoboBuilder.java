@@ -457,6 +457,7 @@ public final class RoboBuilder {
         return unit;
     }
 
+    //TODO : provides solution with Path
     private RoboSystem readSystemFromXML(InputStream stream) throws RoboBuilderException {
         try {
             SystemXMLHandler handler = new SystemXMLHandler();
@@ -465,6 +466,12 @@ public final class RoboBuilder {
             return handler.createSystem();
         } catch (SAXException | IOException | ParserConfigurationException e) {
             throw new RoboBuilderException("Could not initialize system from xml", e);
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
+            }
         }
     }
 }

@@ -42,6 +42,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class LookupServiceTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(LookupServiceTests.class);
     private static final float ALLOWED_HEARTBEAT_MISSES = 22f;
+    private static final String TEST_URI = "robo4j://localhost:12345";
+    private static final String TEST_NAME = "Pretty Human Readable Name";
 
     static LookupService getLookupService(LocalLookupServiceImpl localLookupService) {
         return DefaultLookupServiceBuilder.Build()
@@ -54,7 +56,7 @@ class LookupServiceTests {
 
     @Test
     void encodeDecodeTest() {
-        var metadata = Map.of("name", "Pretty Human Readable Name", "uri", "robo4j://localhost:12345");
+        var metadata = Map.of(RoboContextDescriptor.KEY_NAME, TEST_NAME, RoboContextDescriptor.KEY_URI, TEST_URI);
         var id = "MyID";
         var heartBeatInterval = 1234;
 
@@ -99,8 +101,8 @@ class LookupServiceTests {
         var metadata = new HashMap<String, String>();
         var id = "MyID";
         int heartBeatInterval = 1234;
-        metadata.put("name", "Pretty Human Readable Name");
-        metadata.put(RoboContextDescriptor.KEY_URI, "robo4j://localhost:12345");
+        metadata.put(RoboContextDescriptor.KEY_NAME, TEST_NAME);
+        metadata.put(RoboContextDescriptor.KEY_URI, TEST_URI);
         return new RoboContextDescriptor(id, heartBeatInterval, metadata);
     }
 

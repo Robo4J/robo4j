@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2023, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2025, Marcus Hirt, Miroslav Wengner
  *
  * ********************************************************************
  * Robo4J: math module

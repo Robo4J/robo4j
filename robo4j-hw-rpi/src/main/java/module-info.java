@@ -4,10 +4,8 @@ module robo4j.hw.rpi {
 
     requires transitive robo4j.math;
     requires jdk.jfr;
-    requires java.logging;
     requires java.desktop;
     requires com.pi4j;
-    requires com.pi4j.plugin.raspberrypi;
     requires com.pi4j.plugin.linuxfs;
     requires org.slf4j;
 
