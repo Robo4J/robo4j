@@ -17,3 +17,4 @@ robo4j-socket-http/out
 robo4j-units-rpi/out
 /.nb-gradle/
 .nb-gradle-properties
+dependency-reduced-pom.xml

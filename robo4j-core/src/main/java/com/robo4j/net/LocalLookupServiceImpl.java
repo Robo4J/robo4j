@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2025, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
  */
 package com.robo4j.net;
 
-import com.robo4j.RoboContext;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.robo4j.RoboContext;
 
 /**
  *
@@ -51,10 +51,11 @@ public class LocalLookupServiceImpl implements LookupService {
 
 	@Override
 	public RoboContext getContext(String id) {
-		return contexts.get(id).getContext();
+		LocalRoboContextDescriptor descriptor = contexts.get(id);
+		return descriptor != null ? descriptor.getContext() : null;
 	}
-	
-	public LocalRoboContextDescriptor getLocalDescriptor(String id) {
+
+	LocalRoboContextDescriptor getLocalDescriptor(String id) {
 		return contexts.get(id);
 	}
 
@@ -72,7 +73,7 @@ public class LocalLookupServiceImpl implements LookupService {
 	}
 
 	public void addContext(RoboContext context) {
-		contexts.put(context.getId(), new LocalRoboContextDescriptor(context));			
+		contexts.put(context.getId(), new LocalRoboContextDescriptor(context));
 	}
 
 }

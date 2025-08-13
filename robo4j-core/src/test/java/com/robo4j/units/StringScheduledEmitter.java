@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2025, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,89 +16,106 @@
  */
 package com.robo4j.units;
 
-import com.robo4j.*;
-import com.robo4j.configuration.Configuration;
-import com.robo4j.util.StringConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.robo4j.AttributeDescriptor;
+import com.robo4j.ConfigurationException;
+import com.robo4j.DefaultAttributeDescriptor;
+import com.robo4j.RoboContext;
+import com.robo4j.RoboUnit;
+import com.robo4j.configuration.Configuration;
+import com.robo4j.util.StringConstants;
 
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class StringScheduledEmitter extends RoboUnit<String> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(StringScheduledEmitter.class);
-    public static final String DEFAULT_UNIT_NAME = "scheduledEmitter";
-    public static final String ATTR_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
-    public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
-    public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_TOTAL_MESSAGES = DefaultAttributeDescriptor
-            .create(Integer.class, ATTR_GET_NUMBER_OF_SENT_MESSAGES);
-    public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor
-            .create(CountDownLatch.class, ATTR_COUNT_DOWN_LATCH);
-    /* default sent messages */
-    private static final int DEFAULT = 0;
-    private static final long DEFAULT_INIT_DELAY_MILLS = 10;
-    public static final String PROP_TARGET = "target";
-    public static final String PROP_INIT_DELAY = "initSchedulerDelay";
-    public static final String PROP_PERIOD = "schedulerPeriod";
-    private CountDownLatch latch;
-    private AtomicInteger counter;
-    private String target;
-    private Long initSchedulerDelayMillis;
-    private Long schedulerPeriodMillis;
-    private final Map<String, String> messages = new ConcurrentHashMap<>(10);
+	private static final Logger LOGGER = LoggerFactory.getLogger(StringScheduledEmitter.class);
+	public static final String DEFAULT_UNIT_NAME = "scheduledEmitter";
+	public static final String ATTR_GET_NUMBER_OF_SENT_MESSAGES = "getNumberOfSentMessages";
+	public static final String ATTR_COUNT_DOWN_LATCH = "countDownLatch";
+	public static final DefaultAttributeDescriptor<Integer> DESCRIPTOR_TOTAL_MESSAGES = DefaultAttributeDescriptor.create(Integer.class,
+			ATTR_GET_NUMBER_OF_SENT_MESSAGES);
+	public static final DefaultAttributeDescriptor<CountDownLatch> DESCRIPTOR_COUNT_DOWN_LATCH = DefaultAttributeDescriptor.create(CountDownLatch.class,
+			ATTR_COUNT_DOWN_LATCH);
+	private static final long DEFAULT_INIT_DELAY_MILLS = 10;
+	public static final String PROP_TARGET = "target";
+	public static final String PROP_INIT_DELAY = "initSchedulerDelay";
+	public static final String PROP_PERIOD = "schedulerPeriod";
+	private CountDownLatch latch;
+	private AtomicInteger counter;
+	private String target;
+	private Long initSchedulerDelayMillis;
+	private Long schedulerPeriodMillis;
+	private final Map<String, String> messages = new ConcurrentHashMap<>(10);
+	private volatile ScheduledFuture<?> scheduledFuture;
 
+	/**
+	 * @param context
+	 *            context
+	 * @param id
+	 *            identifier
+	 */
+	public StringScheduledEmitter(RoboContext context, String id) {
+		super(String.class, context, id);
+	}
 
-    /**
-     * @param context context
-     * @param id      identifier
-     */
-    public StringScheduledEmitter(RoboContext context, String id) {
-        super(String.class, context, id);
-    }
+	@Override
+	protected void onInitialization(Configuration configuration) throws ConfigurationException {
+		target = configuration.getString(PROP_TARGET, null);
+		if (target == null) {
+			throw ConfigurationException.createMissingConfigNameException(PROP_TARGET);
+		}
+		initSchedulerDelayMillis = configuration.getLong(PROP_INIT_DELAY, DEFAULT_INIT_DELAY_MILLS);
+		schedulerPeriodMillis = configuration.getLong(PROP_PERIOD, DEFAULT_INIT_DELAY_MILLS);
 
-    @Override
-    protected void onInitialization(Configuration configuration) throws ConfigurationException {
-        target = configuration.getString(PROP_TARGET, null);
-        if (target == null) {
-            throw ConfigurationException.createMissingConfigNameException(PROP_TARGET);
-        }
-        initSchedulerDelayMillis = configuration.getLong(PROP_INIT_DELAY, DEFAULT_INIT_DELAY_MILLS);
-        schedulerPeriodMillis = configuration.getLong(PROP_PERIOD, DEFAULT_INIT_DELAY_MILLS);
+		messages.put(target, StringConstants.EMPTY);
+		counter = new AtomicInteger(0);
+		latch = new CountDownLatch(1);
+	}
 
-        messages.put(target, StringConstants.EMPTY);
-    }
+	@Override
+	public void start() {
+		LOGGER.info("start scheduler");
+		scheduledFuture = getContext().getScheduler().scheduleAtFixedRate(() -> {
+			var messageForTarget = messages.get(target);
+			LOGGER.info("scheduler message: {}, target: {}", messageForTarget, target);
+			getContext().getReference(target).sendMessage(messageForTarget);
+			counter.incrementAndGet();
+		}, initSchedulerDelayMillis, schedulerPeriodMillis, TimeUnit.MILLISECONDS);
+	}
 
-    @Override
-    public void start() {
-        LOGGER.info("start scheduler");
-        getContext().getScheduler().scheduleAtFixedRate(() -> {
-            var messageForTarget = messages.get(target);
-            LOGGER.info("scheduler message: {}, target: {}", messageForTarget, target);
-            getContext().getReference(target).sendMessage(messageForTarget);
-        }, initSchedulerDelayMillis, schedulerPeriodMillis, TimeUnit.MILLISECONDS);
-    }
+	@Override
+	public void stop() {
+		if (scheduledFuture != null) {
+			scheduledFuture.cancel(true);
+		}
+		super.stop();
+	}
 
-    @Override
-    public void onMessage(String message) {
-        messages.replace(target, message);
-    }
+	@Override
+	public void onMessage(String message) {
+		messages.replace(target, message);
+	}
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
-        if (attribute.attributeName().equals(ATTR_GET_NUMBER_OF_SENT_MESSAGES) && attribute.attributeType() == Integer.class) {
-            return (R) (Integer) counter.get();
-        }
-        if (attribute.attributeName().equals(ATTR_COUNT_DOWN_LATCH) && attribute.attributeType() == CountDownLatch.class) {
-            return (R) latch;
-        }
-        return null;
-    }
+	@SuppressWarnings("unchecked")
+	@Override
+	public synchronized <R> R onGetAttribute(AttributeDescriptor<R> attribute) {
+		if (attribute.attributeName().equals(ATTR_GET_NUMBER_OF_SENT_MESSAGES) && attribute.attributeType() == Integer.class) {
+			return (R) (Integer) counter.get();
+		}
+		if (attribute.attributeName().equals(ATTR_COUNT_DOWN_LATCH) && attribute.attributeType() == CountDownLatch.class) {
+			return (R) latch;
+		}
+		return null;
+	}
 }

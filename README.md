@@ -10,9 +10,6 @@ Robo4J provides an easy way of getting started with building custom hardware and
 
 The current [Robo4j.io][] version is 0.6-SNAPSHOT
 
-<a href="https://foojay.io/today/works-with-openjdk"><img align="left" src="https://github.com/foojayio/badges/raw/main/works_with_openjdk/Works-with-OpenJDK.png" width="100"></a>
-<br><br><br>
-
 ## Requirements
 [Git][], [Maven][], [OpenJDK 21][]
 
@@ -21,6 +18,33 @@ If you are looking for a JDK 21 ARM hard float build for Raspbian, we recommend 
 ## Documentation
 See current [Robo4j documentation][].
 > **Note:** Under construction.
+
+## Network Configuration
+
+Robo4J supports both IPv4 and IPv6 multicast for service discovery with automatic detection:
+
+### System Properties
+- `robo4j.net.family=auto|ipv4|ipv6` - Force IP family (default: auto)
+- `robo4j.net.group=<address>` - Override multicast group address
+- `robo4j.net.iface=<name>` - Force specific network interface
+- `robo4j.net.ifaddr=<address>` - Force interface by IP address
+
+### Examples
+```bash
+# Force IPv6
+-Drobo4j.net.family=ipv6
+
+# Custom multicast group
+-Drobo4j.net.group=ff02::5678
+
+# Specific interface
+-Drobo4j.net.iface=wlan0
+
+# Specific interface by address
+-Drobo4j.net.ifaddr=192.168.1.100
+```
+
+The system automatically prefers IPv4 when available, falling back to IPv6 when IPv4 multicast is not supported.
 
 ## Building from Source
 The Robo4j framework uses build [Maven][] management tool.
