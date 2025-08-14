@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2025, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,6 @@
  */
 package com.robo4j.reflect;
 
-import com.robo4j.util.StreamUtils;
-import com.robo4j.util.StringConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,6 +31,12 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.robo4j.util.StreamUtils;
+
+import static com.robo4j.util.StringConstants.EMPTY;
 import static com.robo4j.util.Utf8Constant.UTF8_EXCLAMATION;
 
 /**
@@ -89,7 +90,7 @@ public final class ReflectionScan {
 
         StreamUtils.streamOfEnumeration(resources, false).map(url -> {
             try {
-                String jarFile = url.getFile().split(UTF8_EXCLAMATION)[0].replace(FILE, StringConstants.EMPTY);
+                String jarFile = url.getFile().split(UTF8_EXCLAMATION)[0].replace(FILE, EMPTY);
                 if (new File(jarFile).isDirectory()) {
                     return null;
                 }
@@ -103,7 +104,7 @@ public final class ReflectionScan {
                     if (!entry.isDirectory() && entry.getName().contains(slashifyPackage)
                             && entry.getName().endsWith(SUFFIX)) {
 
-                        String cName = entry.getName().replace(SLASH, DOT).replace(SUFFIX, StringConstants.EMPTY);
+                        String cName = entry.getName().replace(SLASH, DOT).replace(SUFFIX, EMPTY);
                         classes.add(cName);
                     }
                 }

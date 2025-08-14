@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2025, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,60 +16,63 @@
  */
 package com.robo4j.net;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import com.robo4j.net.NetworkUtil.IpFamily;
 
 /**
- * Builder helps to build  {@link LookupService}
+ * Builder helps to build {@link LookupService}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public class DefaultLookupServiceBuilder {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLookupServiceBuilder.class);
-    private String address;
-    private Integer port;
-    private Float missedHeartbeatsBeforeRemoval;
-    private LocalLookupServiceImpl localContexts;
+	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLookupServiceBuilder.class);
+	private Integer port;
+	private Float missedHeartbeatsBeforeRemoval;
+	private LocalLookupServiceImpl localContexts;
+
+	private DefaultLookupServiceBuilder() {
+
+	}
+
+	public static DefaultLookupServiceBuilder Build() {
+		return new DefaultLookupServiceBuilder();
+	}
 
 
-    private DefaultLookupServiceBuilder() {
+	public DefaultLookupServiceBuilder setPort(int port) {
+		this.port = port;
+		return this;
+	}
 
-    }
+	public DefaultLookupServiceBuilder setMissedHeartbeatsBeforeRemoval(float missedHeartbeatsBeforeRemoval) {
+		this.missedHeartbeatsBeforeRemoval = missedHeartbeatsBeforeRemoval;
+		return this;
+	}
 
-    public static DefaultLookupServiceBuilder Build() {
-        return new DefaultLookupServiceBuilder();
-    }
+	public DefaultLookupServiceBuilder setLocalContexts(LocalLookupServiceImpl localContexts) {
+		this.localContexts = localContexts;
+		return this;
+	}
 
-    public DefaultLookupServiceBuilder setAddress(String address) {
-        this.address = address;
-        return this;
-    }
+	public LookupService build() {
+		try {
+			// Do all the smart network detection here
+			final String groupOverride = System.getProperty(LookupServiceProvider.PROP_GROUP);
+			final IpFamily family = NetworkUtil.decideFamily(groupOverride);
+			final InetAddress multicastGroup = LookupServiceProvider.getMulticastGroup(family);
+			final NetworkInterface networkInterface = NetworkUtil.pickMulticastInterface(family);
 
-    public DefaultLookupServiceBuilder setPort(int port) {
-        this.port = port;
-        return this;
-    }
-
-    public DefaultLookupServiceBuilder setMissedHeartbeatsBeforeRemoval(float missedHeartbeatsBeforeRemoval) {
-        this.missedHeartbeatsBeforeRemoval = missedHeartbeatsBeforeRemoval;
-        return this;
-    }
-
-    public DefaultLookupServiceBuilder setLocalContexts(LocalLookupServiceImpl localContexts) {
-        this.localContexts = localContexts;
-        return this;
-    }
-
-    public LookupService build() {
-        try {
-            return new LookupServiceImpl(address, port, missedHeartbeatsBeforeRemoval, localContexts);
-        } catch (SocketException | UnknownHostException e) {
-            LOGGER.error("Failed to set up LookupService! No multicast route? Will use null provider...", e);
-            return new NullLookupService();
-        }
-    }
+			return new LookupServiceImpl(multicastGroup, networkInterface, port, missedHeartbeatsBeforeRemoval, localContexts);
+		} catch (IOException e) {
+			LOGGER.warn("Failed to set up LookupService! No multicast route? Will use null provider: {}", e.getMessage());
+			return new NullLookupService();
+		}
+	}
 }

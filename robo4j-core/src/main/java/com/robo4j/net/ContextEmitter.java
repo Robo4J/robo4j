@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2025, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,17 +16,18 @@
  */
 package com.robo4j.net;
 
-import com.robo4j.RoboContext;
-import com.robo4j.configuration.Configuration;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import com.robo4j.RoboContext;
+import com.robo4j.configuration.Configuration;
+import com.robo4j.net.NetworkUtil.IpFamily;
 
 /**
  * This class is used by the {@link RoboContext} to make it discoverable. This
@@ -37,90 +38,114 @@ import java.net.UnknownHostException;
  */
 public final class ContextEmitter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ContextEmitter.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ContextEmitter.class);
 
-    /**
-     * Defaults to {@link #DEFAULT_HEARTBEAT_INTERVAL}
-     */
-    public static final String KEY_HEARTBEAT_INTERVAL = "heartBeatInterval";
+	/**
+	 * Defaults to {@link #DEFAULT_HEARTBEAT_INTERVAL}
+	 */
+	public static final String KEY_HEARTBEAT_INTERVAL = "heartBeatInterval";
 
-    /**
-     * Defaults to {@link LookupServiceProvider#DEFAULT_MULTICAST_ADDRESS}
-     */
-    public static final String KEY_MULTICAST_ADDRESS = "multicastAddress";
+	/**
+	 * Defaults to automatic selection based on IP family and system properties
+	 */
+	public static final String KEY_MULTICAST_ADDRESS = "multicastAddress";
 
-    /**
-     * Defaults to {@link LookupServiceProvider#DEFAULT_PORT}
-     */
-    public static final String KEY_PORT = "port";
+	/**
+	 * Defaults to {@link LookupServiceProvider#DEFAULT_PORT}
+	 */
+	public static final String KEY_PORT = "port";
 
-    /**
-     * Defaults to false.
-     */
-    public static final String KEY_ENABLED = "enabled";
+	/**
+	 * Defaults to false.
+	 */
+	public static final String KEY_ENABLED = "enabled";
 
-    /**
-     * The default heartbeat interval.
-     */
-    public static final Integer DEFAULT_HEARTBEAT_INTERVAL = 1000;
+	/**
+	 * The default heartbeat interval.
+	 */
+	public static final Integer DEFAULT_HEARTBEAT_INTERVAL = 1000;
 
-    private final InetAddress multicastAddress;
-    private final int port;
-    private final int heartBeatInterval;
-    private final DatagramSocket socket;
-    private final byte[] message;
+	private final InetAddress multicastAddress;
+	private final int port;
+	private final int heartBeatInterval;
+	private final MulticastSocket socket;
+	private final NetworkInterface networkInterface;
+	private final byte[] message;
 
-    /**
-     * Constructor.
-     *
-     * @param entry                  the information to emit.
-     * @param multicastAddress       the address to emit to.
-     * @param port                   the port.
-     * @param heartBeatIntervalMills the heart beat interval in milliseconds
-     * @throws SocketException possible exception
-     */
-    public ContextEmitter(RoboContextDescriptor entry, InetAddress multicastAddress, int port, int heartBeatIntervalMills)
-            throws SocketException {
-        this.multicastAddress = multicastAddress;
-        this.port = port;
-        this.heartBeatInterval = heartBeatIntervalMills;
-        this.socket = new DatagramSocket();
-        this.message = HearbeatMessageCodec.encode(entry);
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param entry
+	 *            the information to emit.
+	 * @param multicastAddress
+	 *            the address to emit to.
+	 * @param port
+	 *            the port.
+	 * @param heartBeatIntervalMills
+	 *            the heart beat interval in milliseconds
+	 * @throws IOException
+	 *             possible exception
+	 */
+	public ContextEmitter(RoboContextDescriptor entry, InetAddress multicastAddress, int port, int heartBeatIntervalMills)
+			throws IOException {
+		this.multicastAddress = multicastAddress;
+		this.port = port;
+		this.heartBeatInterval = heartBeatIntervalMills;
+		this.socket = new MulticastSocket();
 
-    public ContextEmitter(RoboContextDescriptor entry, Configuration emitterConfiguration)
-            throws SocketException, UnknownHostException {
-        this(entry,
-                InetAddress.getByName(emitterConfiguration.getString(KEY_MULTICAST_ADDRESS,
-                        LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS)),
-                emitterConfiguration.getInteger(KEY_PORT, LookupServiceProvider.DEFAULT_PORT),
-                emitterConfiguration.getInteger(KEY_HEARTBEAT_INTERVAL, DEFAULT_HEARTBEAT_INTERVAL));
-    }
+		IpFamily family = NetworkUtil.decideFamily(System.getProperty(LookupServiceProvider.PROP_GROUP));
+		this.networkInterface = NetworkUtil.pickMulticastInterface(family);
+		this.socket.setNetworkInterface(this.networkInterface);
 
-    /**
-     * Emits a context heartbeat message. Will log any problems.
-     */
-    public void emit() {
-        try {
-            emitWithException();
-        } catch (IOException e) {
-            // TODO: properly report the exception
-            LOGGER.error("Failed to emit heartbeat message", e);
-        }
-    }
+		this.message = HearbeatMessageCodec.encode(entry);
+	}
 
+	public ContextEmitter(RoboContextDescriptor entry, Configuration emitterConfiguration) throws IOException {
+		this(entry, getConfiguredMulticastAddress(emitterConfiguration),
+				emitterConfiguration.getInteger(KEY_PORT, LookupServiceProvider.DEFAULT_PORT),
+				emitterConfiguration.getInteger(KEY_HEARTBEAT_INTERVAL, DEFAULT_HEARTBEAT_INTERVAL));
+	}
 
-    public int getHeartBeatInterval() {
-        return heartBeatInterval;
-    }
+	/**
+	 * Gets the configured multicast address from configuration, falling back to
+	 * system properties and IP family auto-detection.
+	 */
+	private static InetAddress getConfiguredMulticastAddress(Configuration config) throws IOException {
+		String configuredAddress = config.getString(KEY_MULTICAST_ADDRESS, null);
+		if (configuredAddress != null) {
+			return InetAddress.getByName(configuredAddress);
+		}
 
-    /**
-     * Emits a context heartbeat message. Will throw an exception on trouble.
-     *
-     * @throws IOException exception
-     */
-    private void emitWithException() throws IOException {
-        DatagramPacket packet = new DatagramPacket(message, message.length, multicastAddress, port);
-        socket.send(packet);
-    }
+		// Fall back to system property and auto-detection
+		String groupOverride = System.getProperty(LookupServiceProvider.PROP_GROUP);
+		IpFamily family = NetworkUtil.decideFamily(groupOverride);
+		return LookupServiceProvider.getMulticastGroup(family);
+	}
+
+	/**
+	 * Emits a context heartbeat message. Will log any problems.
+	 */
+	public void emit() {
+		try {
+			emitWithException();
+		} catch (IOException e) {
+			// TODO: properly report the exception
+			LOGGER.error("Failed to emit heartbeat message", e);
+		}
+	}
+
+	public int getHeartBeatInterval() {
+		return heartBeatInterval;
+	}
+
+	/**
+	 * Emits a context heartbeat message. Will throw an exception on trouble.
+	 *
+	 * @throws IOException
+	 *             exception
+	 */
+	private void emitWithException() throws IOException {
+		DatagramPacket packet = new DatagramPacket(message, message.length, multicastAddress, port);
+		socket.send(packet);
+	}
 }

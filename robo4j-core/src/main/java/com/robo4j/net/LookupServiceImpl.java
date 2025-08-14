@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2025, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,13 +16,12 @@
  */
 package com.robo4j.net;
 
-import com.robo4j.RoboContext;
-import com.robo4j.net.LocalLookupServiceImpl.LocalRoboContextDescriptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.robo4j.net.HearbeatMessageCodec.notHeartBeatMessage;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
@@ -35,7 +34,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.robo4j.net.HearbeatMessageCodec.notHeartBeatMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.robo4j.RoboContext;
+import com.robo4j.net.LocalLookupServiceImpl.LocalRoboContextDescriptor;
 
 /**
  * Package local default implementation of the {@link LookupService}. Will
@@ -48,141 +51,180 @@ import static com.robo4j.net.HearbeatMessageCodec.notHeartBeatMessage;
  * @author Miroslav Wengner (@miragemiko)
  */
 class LookupServiceImpl implements LookupService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LookupServiceImpl.class);
-    private static final int PORT_ZERO = 0;
-    private static final NetworkInterface LOCAL_NETWORK_INTERFACE_NULL = null;
-    // FIXME(marcus/6 Nov 2017): This should be calculated, and used when
-    // constructing the packet
-    private final static int MAX_PACKET_SIZE = 1500;
-    private final String address;
-    private final int port;
-    private final Map<String, RoboContextDescriptorEntry> entries = new ConcurrentHashMap<>();
-    private MulticastSocket socket;
-    private Updater currentUpdater;
-    private final LocalLookupServiceImpl localContexts;
+	private static final Logger LOGGER = LoggerFactory.getLogger(LookupServiceImpl.class);
 
-    private class Updater implements Runnable {
-        private final byte[] buffer = new byte[MAX_PACKET_SIZE];
-        private volatile boolean isRunning;
+	private final static int DEFAULT_MAX_PACKET_SIZE = 1500;
+	private final InetAddress multicastGroup;
+	private final NetworkInterface networkInterface;
+	private final int port;
+	private final Map<String, RoboContextDescriptorEntry> entries = new ConcurrentHashMap<>();
+	private MulticastSocket socket;
+	private Updater currentUpdater;
+	private final LocalLookupServiceImpl localContexts;
+	private int maxPacketSize = DEFAULT_MAX_PACKET_SIZE;
 
-        @Override
-        public void run() {
-            while (!isRunning) {
-                try {
-                    DatagramPacket packet = new DatagramPacket(buffer, MAX_PACKET_SIZE);
-                    socket.receive(packet);
-                    process(packet);
-                } catch (IOException e) {
-                    LOGGER.error("Failed to look for lookupservice packets. Lookup service will no longer discover new remote contexts.", e);
-                    isRunning = false;
-                }
-            }
-        }
+	private class Updater implements Runnable {
+		private final byte[] buffer;
+		private volatile boolean isRunning = true;
+		private volatile Thread runnerThread;
 
-        private void process(DatagramPacket packet) {
-            // First a few quick checks. We want to reject updating anything as
-            // early as possible
-            if (notHeartBeatMessage(packet.getData())) {
-                LOGGER.debug("Non-heartbeat packet sent to LookupService! Ignoring.");
-                return;
-            }
-            if (!HearbeatMessageCodec.isSupportedVersion(packet.getData())) {
-                LOGGER.debug("Wrong protocol heartbeat packet sent to LookupService! Ignoring.");
-                return;
-            }
-            String id = parseId(packet.getData());
-            if (entries.containsKey(id)) {
-                updateEntry(entries.get(id));
-            } else {
-                addNewEntry(packet);
-            }
-        }
+		public Updater() {
+			this.buffer = new byte[maxPacketSize];
+		}
 
-        private void addNewEntry(DatagramPacket packet) {
-            RoboContextDescriptorEntry entry = parse(packet);
-            synchronized (LookupServiceImpl.this) {
-                entries.put(entry.descriptor.getId(), entry);
-            }
-        }
+		@Override
+		public void run() {
+			runnerThread = Thread.currentThread();
+			while (isRunning && !Thread.currentThread().isInterrupted()) {
+				try {
+					DatagramPacket packet = new DatagramPacket(buffer, maxPacketSize);
+					socket.receive(packet);
+					process(packet);
+				} catch (IOException e) {
+					if (isRunning) { // Only log if not intentionally stopped
+						LOGGER.error("Failed to look for lookupservice packets. Lookup service will no longer discover new remote contexts.",
+								e);
+					}
+					break;
+				}
+			}
+		}
 
-        private RoboContextDescriptorEntry parse(DatagramPacket packet) {
-            RoboContextDescriptorEntry entry = new RoboContextDescriptorEntry();
-            SocketAddress address = packet.getSocketAddress();
-            if (address instanceof InetSocketAddress) {
-                entry.address = ((InetSocketAddress) address).getAddress();
-            }
-            entry.descriptor = HearbeatMessageCodec.decode(packet.getData());
-            return entry;
-        }
+		private void process(DatagramPacket packet) {
+			// First a few quick checks. We want to reject updating anything as
+			// early as possible
+			if (notHeartBeatMessage(packet.getData())) {
+				LOGGER.debug("Non-heartbeat packet sent to LookupService! Ignoring.");
+				return;
+			}
+			if (!HearbeatMessageCodec.isSupportedVersion(packet.getData())) {
+				LOGGER.debug("Wrong protocol heartbeat packet sent to LookupService! Ignoring.");
+				return;
+			}
+			String id = parseId(packet.getData());
+			if (entries.containsKey(id)) {
+				updateEntry(entries.get(id));
+			} else {
+				addNewEntry(packet);
+			}
+		}
 
-        private void updateEntry(RoboContextDescriptorEntry roboContextDescriptorEntry) {
-            roboContextDescriptorEntry.lastAccess = System.currentTimeMillis();
-        }
+		private void addNewEntry(DatagramPacket packet) {
+			RoboContextDescriptorEntry entry = parse(packet);
+			synchronized (LookupServiceImpl.this) {
+				entries.put(entry.descriptor.getId(), entry);
+			}
+		}
 
-        private String parseId(byte[] data) {
-            return new String(data, 9, readShort(7, data));
-        }
+		private RoboContextDescriptorEntry parse(DatagramPacket packet) {
+			RoboContextDescriptorEntry entry = new RoboContextDescriptorEntry();
+			SocketAddress address = packet.getSocketAddress();
+			if (address instanceof InetSocketAddress) {
+				entry.address = ((InetSocketAddress) address).getAddress();
+			}
+			entry.descriptor = HearbeatMessageCodec.decode(packet.getData());
+			return entry;
+		}
 
-        private int readShort(int i, byte[] data) {
-            return (data[i] << 8) + (data[i + 1] & 0xFF);
-        }
+		private void updateEntry(RoboContextDescriptorEntry roboContextDescriptorEntry) {
+			roboContextDescriptorEntry.lastAccess = System.currentTimeMillis();
+		}
 
-        public void stop() {
-            isRunning = false;
-        }
-    }
+		private String parseId(byte[] data) {
+			return new String(data, 9, readShort(7, data));
+		}
 
-    public LookupServiceImpl(String address, int port, float missedHeartbeatsBeforeRemoval, LocalLookupServiceImpl localContexts) throws SocketException, UnknownHostException {
-        this.address = address;
-        this.port = port;
-        this.localContexts = localContexts;
+		private int readShort(int i, byte[] data) {
+			return (data[i] << 8) + (data[i + 1] & 0xFF);
+		}
 
-    }
+		public void stop() {
+			isRunning = false;
+			if (runnerThread != null) {
+				runnerThread.interrupt();
+			}
+		}
+	}
 
-    @Override
-    public synchronized Map<String, RoboContextDescriptor> getDiscoveredContexts() {
-        Map<String, RoboContextDescriptor> map = new HashMap<>(entries.size() + localContexts.getDiscoveredContexts().size());
-        map.putAll(localContexts.getDiscoveredContexts());
-        for (Entry<String, RoboContextDescriptorEntry> entry : entries.entrySet()) {
-            map.put(entry.getKey(), entry.getValue().descriptor);
-        }
-        return Collections.unmodifiableMap(map);
-    }
+	public LookupServiceImpl(InetAddress multicastGroup, NetworkInterface networkInterface, int port, float missedHeartbeatsBeforeRemoval, LocalLookupServiceImpl localContexts)
+			throws SocketException, UnknownHostException {
+		this.multicastGroup = multicastGroup;
+		this.networkInterface = networkInterface;
+		this.port = port;
+		this.localContexts = localContexts;
 
-    @Override
-    public RoboContext getContext(String id) {
-        RoboContextDescriptorEntry entry = entries.get(id);
-        if (entry != null) {
-            return new ClientRemoteRoboContext(entry);
-        } else {
-            LocalRoboContextDescriptor localEntry = localContexts.getLocalDescriptor(id);
-            return localEntry != null ? localEntry.getContext() : null;
-        }
-    }
+		// Calculate appropriate packet size based on interface MTU
+		calculateMaxPacketSize();
+	}
 
-    @Override
-    public synchronized void start() throws IOException {
-        stop();
-        socket = new MulticastSocket(port);
-        socket.joinGroup(new InetSocketAddress(address, PORT_ZERO), LOCAL_NETWORK_INTERFACE_NULL);
-//        socket.joinGroup(InetAddress.getByName(address));
-        currentUpdater = new Updater();
-        Thread t = new Thread(currentUpdater, "LookupService listener");
-        t.setDaemon(true);
-        t.start();
-    }
+	private void calculateMaxPacketSize() {
+		try {
+			int mtu = networkInterface.getMTU();
+			// Reserve space for IP header (20 bytes IPv4, 40 bytes IPv6) and UDP header (8 bytes)
+			boolean isIPv6 = multicastGroup instanceof Inet6Address;
+			int headerOverhead = isIPv6 ? 48 : 28;
+			maxPacketSize = Math.max(512, mtu - headerOverhead); // Minimum 512 bytes
+			LOGGER.debug("Using packet size {} for interface {} (MTU: {})", maxPacketSize, networkInterface.getName(), mtu);
+		} catch (SocketException e) {
+			LOGGER.warn("Could not determine MTU for interface {}, using default packet size {}", networkInterface.getName(), maxPacketSize);
+		}
+	}
 
-    @Override
-    public synchronized void stop() {
-        if (currentUpdater != null) {
-            currentUpdater.stop();
-            currentUpdater = null;
-        }
-    }
+	@Override
+	public synchronized Map<String, RoboContextDescriptor> getDiscoveredContexts() {
+		Map<String, RoboContextDescriptor> map = new HashMap<>(entries.size() + localContexts.getDiscoveredContexts().size());
+		map.putAll(localContexts.getDiscoveredContexts());
+		for (Entry<String, RoboContextDescriptorEntry> entry : entries.entrySet()) {
+			map.put(entry.getKey(), entry.getValue().descriptor);
+		}
+		return Collections.unmodifiableMap(map);
+	}
 
-    @Override
-    public RoboContextDescriptor getDescriptor(String id) {
-        RoboContextDescriptorEntry entry = entries.get(id);
-        return entry != null ? entry.descriptor : localContexts.getDescriptor(id);
-    }
+	@Override
+	public RoboContext getContext(String id) {
+		RoboContextDescriptorEntry entry = entries.get(id);
+		if (entry != null) {
+			return new ClientRemoteRoboContext(entry);
+		} else {
+			LocalRoboContextDescriptor localEntry = localContexts.getLocalDescriptor(id);
+			return localEntry != null ? localEntry.getContext() : null;
+		}
+	}
+
+	@Override
+	public synchronized void start() throws IOException {
+		stop();
+		socket = new MulticastSocket(port);
+		socket.setReuseAddress(true);
+		socket.setNetworkInterface(networkInterface);
+		socket.joinGroup(new InetSocketAddress(multicastGroup, port), networkInterface);
+
+		currentUpdater = new Updater();
+		Thread t = new Thread(currentUpdater, "LookupService listener");
+		t.setDaemon(true);
+		t.start();
+	}
+
+	@Override
+	public synchronized void stop() {
+		if (currentUpdater != null) {
+			currentUpdater.stop();
+			currentUpdater = null;
+		}
+		if (socket != null) {
+			try {
+				socket.leaveGroup(new InetSocketAddress(multicastGroup, port), networkInterface);
+			} catch (IOException e) {
+				LOGGER.warn("Failed to leave multicast group during stop", e);
+			}
+			socket.close();
+			socket = null;
+		}
+	}
+
+	@Override
+	public RoboContextDescriptor getDescriptor(String id) {
+		RoboContextDescriptorEntry entry = entries.get(id);
+		return entry != null ? entry.descriptor : localContexts.getDescriptor(id);
+	}
 }
