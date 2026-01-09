@@ -20,6 +20,7 @@ import com.robo4j.RoboContext;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A lookup service for discovery and lookup of remote {@link RoboContext}s.
@@ -70,4 +71,21 @@ public interface LookupService {
 	 *             possible exception
 	 */
 	void stop() throws IOException;
+
+	/**
+	 * Waits until the service is ready to receive packets.
+	 * Implementations that don't require async initialization can use the default
+	 * implementation which returns immediately.
+	 *
+	 * @param timeout
+	 *            the maximum time to wait
+	 * @param unit
+	 *            the time unit of the timeout argument
+	 * @return true if ready, false if timeout elapsed
+	 * @throws InterruptedException
+	 *             if interrupted while waiting
+	 */
+	default boolean awaitReady(long timeout, TimeUnit unit) throws InterruptedException {
+		return true;
+	}
 }
