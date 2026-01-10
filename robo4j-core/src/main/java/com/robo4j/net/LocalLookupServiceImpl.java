@@ -72,7 +72,6 @@ public class LocalLookupServiceImpl implements LookupService {
 	}
 
 	public void addContext(RoboContext context) {
-		contexts.put(context.getId(), new LocalRoboContextDescriptor(context));			
+		contexts.put(context.getId(), new LocalRoboContextDescriptor(context));
 	}
-
 }
