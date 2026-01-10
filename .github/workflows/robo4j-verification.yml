@@ -5,6 +5,7 @@ on:
     branches:
       - 'master'
       - 'feature/**'
+      - 'fix/**'
 jobs:
   robo4j-install:
     runs-on: ubuntu-latest
