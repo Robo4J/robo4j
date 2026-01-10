@@ -34,6 +34,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static com.robo4j.net.HearbeatMessageCodec.notHeartBeatMessage;
 
@@ -63,20 +65,26 @@ class LookupServiceImpl implements LookupService {
 
     private class Updater implements Runnable {
         private final byte[] buffer = new byte[MAX_PACKET_SIZE];
-        private volatile boolean isRunning;
+        private final CountDownLatch readyLatch = new CountDownLatch(1);
+        private volatile boolean isStopped;
 
         @Override
         public void run() {
-            while (!isRunning) {
+            readyLatch.countDown();
+            while (!isStopped) {
                 try {
                     DatagramPacket packet = new DatagramPacket(buffer, MAX_PACKET_SIZE);
                     socket.receive(packet);
                     process(packet);
                 } catch (IOException e) {
                     LOGGER.error("Failed to look for lookupservice packets. Lookup service will no longer discover new remote contexts.", e);
-                    isRunning = false;
+                    isStopped = true;
                 }
             }
+        }
+
+        boolean awaitReady(long timeout, TimeUnit unit) throws InterruptedException {
+            return readyLatch.await(timeout, unit);
         }
 
         private void process(DatagramPacket packet) {
@@ -128,7 +136,7 @@ class LookupServiceImpl implements LookupService {
         }
 
         public void stop() {
-            isRunning = false;
+            isStopped = true;
         }
     }
 
@@ -184,5 +192,14 @@ class LookupServiceImpl implements LookupService {
     public RoboContextDescriptor getDescriptor(String id) {
         RoboContextDescriptorEntry entry = entries.get(id);
         return entry != null ? entry.descriptor : localContexts.getDescriptor(id);
+    }
+
+    @Override
+    public boolean awaitReady(long timeout, TimeUnit unit) throws InterruptedException {
+        Updater updater = currentUpdater;
+        if (updater == null) {
+            throw new IllegalStateException("LookupService has not been started");
+        }
+        return updater.awaitReady(timeout, unit);
     }
 }
