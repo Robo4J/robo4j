@@ -24,11 +24,15 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.robo4j.net.LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS;
 import static com.robo4j.net.LookupServiceProvider.DEFAULT_PORT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.robo4j.RoboContext;
 
 
 /**
@@ -73,26 +77,35 @@ class LookupServiceTests {
         final var service = getLookupService(new LocalLookupServiceImpl());
         final var descriptor = createRoboContextDescriptor();
         final var heartBeatIntervalMills = 1;
-        final var emittedMessagesHearBeatInterval = 1;
         final var emitter = new ContextEmitter(descriptor, InetAddress.getByName(LookupServiceProvider.DEFAULT_MULTICAST_ADDRESS),
                 LookupServiceProvider.DEFAULT_PORT, heartBeatIntervalMills);
 
         service.start();
-        // TODO : review sleep usage
-        for (int i = 0; i < emittedMessagesHearBeatInterval; i++) {
-            emitter.emit();
-            Thread.sleep(heartBeatIntervalMills);
-        }
+        assertTrue(service.awaitReady(1, TimeUnit.SECONDS), "Service should be ready");
+        emitter.emit();
 
-        var discoveredContexts = service.getDiscoveredContexts();
-        var context = service.getContext(descriptor.getId());
+        // Wait for context to be discovered
+        var context = awaitContext(service, descriptor.getId(), 1, TimeUnit.SECONDS);
+        assertNotNull(context, "Context should be discovered within timeout");
         var remoteContext = (ClientRemoteRoboContext) context;
+        var discoveredContexts = service.getDiscoveredContexts();
 
         LOGGER.info("discoveredContexts:{}", discoveredContexts);
         LOGGER.info("Address:{}", remoteContext.getAddress());
-        assertNotNull(context);
         assertNotNull(remoteContext.getAddress());
         assertEquals(expectedDiscoveredContexts, discoveredContexts.size());
+    }
+
+    private RoboContext awaitContext(LookupService service, String id, long timeout, TimeUnit unit) throws InterruptedException {
+        long deadlineNanos = System.nanoTime() + unit.toNanos(timeout);
+        while (System.nanoTime() < deadlineNanos) {
+            var context = service.getContext(id);
+            if (context != null) {
+                return context;
+            }
+            Thread.sleep(1);
+        }
+        return null;
     }
 
     private static RoboContextDescriptor createRoboContextDescriptor() {

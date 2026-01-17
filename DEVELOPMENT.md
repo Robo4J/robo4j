@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- Java 21 (OpenJDK)
+- Java 25 (OpenJDK)
 - Maven 3.9+
 
 For Raspberry Pi ARM builds, [Liberica JDK](https://www.bell-sw.com/java.html) or [Azul Zulu](https://www.azul.com/downloads/?package=jdk#zulu) are recommended.

@@ -5,19 +5,20 @@ on:
     branches:
       - 'master'
       - 'feature/**'
+      - 'fix/**'
 jobs:
   robo4j-install:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Setup Java 21
+      - name: Setup Java 25
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '21'
+          java-version: '25'
           java-package: 'jdk'
-          mvn-toolchain-id: 'JavaSE-21'
+          mvn-toolchain-id: 'JavaSE-25'
       - name: Setup Maven
         uses: stCarolas/setup-maven@v4.5
         with:
