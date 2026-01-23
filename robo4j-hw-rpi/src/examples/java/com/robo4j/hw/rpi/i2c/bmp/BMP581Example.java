@@ -34,6 +34,7 @@ public class BMP581Example {
         System.out.println("BMP581 Chip ID: 0x" + Integer.toHexString(bmp.getChipId()));
         System.out.println("Temperature OSR: " + bmp.getTemperatureOversampling());
         System.out.println("Pressure OSR: " + bmp.getPressureOversampling());
+        System.out.println("IIR Filter: " + bmp.getPressureIirFilter());
         System.out.println("Power Mode: " + bmp.getPowerMode());
         System.out.println();
 

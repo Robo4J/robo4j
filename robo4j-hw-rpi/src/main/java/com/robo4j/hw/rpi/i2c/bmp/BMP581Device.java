@@ -50,9 +50,10 @@ public final class BMP581Device extends AbstractI2CDevice {
     private static final int REG_CHIP_ID = 0x01;
     private static final int REG_TEMP_DATA_XLSB = 0x1D;
     private static final int REG_PRESS_DATA_XLSB = 0x20;
+    private static final int REG_INT_SOURCE = 0x15;
     private static final int REG_INT_STATUS = 0x27;
-    private static final int REG_DSP_IIR = 0x30;
-    private static final int REG_DSP_CONFIG = 0x31;
+    private static final int REG_DSP_CONFIG = 0x30;
+    private static final int REG_DSP_IIR = 0x31;
     private static final int REG_OSR_CONFIG = 0x36;
     private static final int REG_ODR_CONFIG = 0x37;
     private static final int REG_CMD = 0x7E;
@@ -60,8 +61,8 @@ public final class BMP581Device extends AbstractI2CDevice {
     // Commands
     private static final byte CMD_SOFT_RESET = (byte) 0xB6;
 
-    // Data ready bit in INT_STATUS register
-    private static final int DRDY_DATA_REG = 0x01;
+    // Data ready interrupt enable (INT_SOURCE) and status (INT_STATUS)
+    private static final int DRDY_DATA_REG_EN = 0x01;
 
     // Bit 6 in OSR_CONFIG enables pressure measurement
     private static final int PRESS_EN = 0x40;
@@ -188,8 +189,8 @@ public final class BMP581Device extends AbstractI2CDevice {
     private Oversampling temperatureOversampling = Oversampling.OSR_4X;
     private Oversampling pressureOversampling = Oversampling.OSR_4X;
     private PowerMode powerMode = PowerMode.NORMAL;
-    private IirFilter temperatureIirFilter = IirFilter.COEFF_4;
-    private IirFilter pressureIirFilter = IirFilter.COEFF_4;
+    private IirFilter temperatureIirFilter = IirFilter.BYPASS;
+    private IirFilter pressureIirFilter = IirFilter.BYPASS;
 
     /**
      * Constructs a BMP581Device using default settings (I2C BUS_1, address 0x47).
@@ -228,11 +229,14 @@ public final class BMP581Device extends AbstractI2CDevice {
         // Perform soft reset
         softReset();
 
+        // Enable data ready status in INT_STATUS register
+        writeByte(REG_INT_SOURCE, (byte) DRDY_DATA_REG_EN);
+
         // Configure default oversampling (OSR_4X for both)
         setOversampling(Oversampling.OSR_4X, Oversampling.OSR_4X);
 
-        // Configure default IIR filter (COEFF_4 for both)
-        setIirFilter(IirFilter.COEFF_4, IirFilter.COEFF_4);
+        // IIR filter defaults to BYPASS (matching hardware default)
+        // Users can enable filtering via setIirFilter() if desired
 
         // Set power mode to NORMAL
         setPowerMode(PowerMode.NORMAL);
@@ -308,20 +312,20 @@ public final class BMP581Device extends AbstractI2CDevice {
         this.temperatureIirFilter = temperatureIir;
         this.pressureIirFilter = pressureIir;
 
-        // DSP_IIR register: bits [5:3] = temp IIR, bits [2:0] = press IIR
-        int iirConfig = (temperatureIir.getValue() << 3) | pressureIir.getValue();
+        // DSP_IIR register: bits [5:3] = press IIR (set_iir_p), bits [2:0] = temp IIR (set_iir_t)
+        int iirConfig = (pressureIir.getValue() << 3) | temperatureIir.getValue();
         writeByte(REG_DSP_IIR, (byte) iirConfig);
 
-        // DSP_CONFIG register: bit 0 = select IIR temp output, bit 1 = select IIR press output
+        // DSP_CONFIG register: bit 3 = shdw_sel_iir_t (temp IIR), bit 5 = shdw_sel_iir_p (press IIR)
         // Read current config to preserve FIFO settings, then set IIR selection bits
         int dspConfig = readByte(REG_DSP_CONFIG);
-        // Clear bits 0 and 1, then set based on whether IIR is enabled
-        dspConfig = dspConfig & 0xFC;
+        // Clear bits 3 and 5, then set based on whether IIR is enabled
+        dspConfig = dspConfig & ~0x28;  // Clear bits 3 (0x08) and 5 (0x20)
         if (temperatureIir != IirFilter.BYPASS) {
-            dspConfig |= 0x01;  // Enable IIR for temperature
+            dspConfig |= 0x08;  // Enable IIR for temperature (bit 3)
         }
         if (pressureIir != IirFilter.BYPASS) {
-            dspConfig |= 0x02;  // Enable IIR for pressure
+            dspConfig |= 0x20;  // Enable IIR for pressure (bit 5)
         }
         writeByte(REG_DSP_CONFIG, (byte) dspConfig);
 
@@ -402,10 +406,16 @@ public final class BMP581Device extends AbstractI2CDevice {
      * @throws IOException if there was a communication problem or timeout
      */
     private void waitForDataReady() throws IOException {
+        // In Normal/Continuous mode, data registers always contain valid data.
+        // Only need to wait in Forced mode for measurement to complete.
+        if (powerMode != PowerMode.FORCED) {
+            return;
+        }
+
         long startTime = System.currentTimeMillis();
         while ((System.currentTimeMillis() - startTime) < MAX_WAIT_TIME_MS) {
             int status = readByte(REG_INT_STATUS);
-            if ((status & DRDY_DATA_REG) != 0) {
+            if ((status & DRDY_DATA_REG_EN) != 0) {
                 return;
             }
             sleep(1);

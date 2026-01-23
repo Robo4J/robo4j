@@ -16,6 +16,7 @@
  */
 package com.robo4j.hw.rpi.i2c.bmp;
 
+import com.robo4j.hw.rpi.i2c.bmp.BMP581Device.IirFilter;
 import com.robo4j.hw.rpi.i2c.bmp.BMP581Device.Oversampling;
 
 import java.io.IOException;
@@ -43,7 +44,10 @@ public class BMP581OversamplingExample {
 
         // Use high oversampling for best accuracy
         bmp.setOversampling(Oversampling.OSR_128X, Oversampling.OSR_128X);
+        // Enable IIR low-pass filter to reduce short-term noise
+        bmp.setIirFilter(IirFilter.COEFF_2, IirFilter.COEFF_2);
         System.out.println("Oversampling: " + bmp.getPressureOversampling());
+        System.out.println("IIR Filter: " + bmp.getPressureIirFilter());
         System.out.println();
 
         // Wait for user to position sensor
