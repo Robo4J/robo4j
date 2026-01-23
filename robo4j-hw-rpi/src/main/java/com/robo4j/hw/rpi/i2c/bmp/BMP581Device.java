@@ -51,6 +51,8 @@ public final class BMP581Device extends AbstractI2CDevice {
     private static final int REG_TEMP_DATA_XLSB = 0x1D;
     private static final int REG_PRESS_DATA_XLSB = 0x20;
     private static final int REG_INT_STATUS = 0x27;
+    private static final int REG_DSP_IIR = 0x30;
+    private static final int REG_DSP_CONFIG = 0x31;
     private static final int REG_OSR_CONFIG = 0x36;
     private static final int REG_ODR_CONFIG = 0x37;
     private static final int REG_CMD = 0x7E;
@@ -133,9 +135,61 @@ public final class BMP581Device extends AbstractI2CDevice {
         }
     }
 
+    /**
+     * IIR filter coefficients for temperature and pressure measurements.
+     * Higher coefficients provide more smoothing at the cost of slower response.
+     * The effective filter coefficient is 2^n where n is the setting value.
+     */
+    public enum IirFilter {
+        /**
+         * Filter bypassed (no filtering).
+         */
+        BYPASS(0x00),
+        /**
+         * Filter coefficient 2.
+         */
+        COEFF_2(0x01),
+        /**
+         * Filter coefficient 4.
+         */
+        COEFF_4(0x02),
+        /**
+         * Filter coefficient 8.
+         */
+        COEFF_8(0x03),
+        /**
+         * Filter coefficient 16.
+         */
+        COEFF_16(0x04),
+        /**
+         * Filter coefficient 32.
+         */
+        COEFF_32(0x05),
+        /**
+         * Filter coefficient 64.
+         */
+        COEFF_64(0x06),
+        /**
+         * Filter coefficient 128.
+         */
+        COEFF_128(0x07);
+
+        private final int value;
+
+        IirFilter(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
+
     private Oversampling temperatureOversampling = Oversampling.OSR_4X;
     private Oversampling pressureOversampling = Oversampling.OSR_4X;
     private PowerMode powerMode = PowerMode.NORMAL;
+    private IirFilter temperatureIirFilter = IirFilter.COEFF_4;
+    private IirFilter pressureIirFilter = IirFilter.COEFF_4;
 
     /**
      * Constructs a BMP581Device using default settings (I2C BUS_1, address 0x47).
@@ -176,6 +230,9 @@ public final class BMP581Device extends AbstractI2CDevice {
 
         // Configure default oversampling (OSR_4X for both)
         setOversampling(Oversampling.OSR_4X, Oversampling.OSR_4X);
+
+        // Configure default IIR filter (COEFF_4 for both)
+        setIirFilter(IirFilter.COEFF_4, IirFilter.COEFF_4);
 
         // Set power mode to NORMAL
         setPowerMode(PowerMode.NORMAL);
@@ -236,6 +293,39 @@ public final class BMP581Device extends AbstractI2CDevice {
         writeByte(REG_ODR_CONFIG, (byte) odrConfig);
 
         LOGGER.debug("Power mode set to: {}", mode);
+    }
+
+    /**
+     * Sets the IIR low-pass filter configuration for temperature and pressure.
+     * The IIR filter smooths the output data, reducing short-term noise at the
+     * cost of slower response to actual changes.
+     *
+     * @param temperatureIir IIR filter coefficient for temperature
+     * @param pressureIir    IIR filter coefficient for pressure
+     * @throws IOException if there was a communication problem
+     */
+    public void setIirFilter(IirFilter temperatureIir, IirFilter pressureIir) throws IOException {
+        this.temperatureIirFilter = temperatureIir;
+        this.pressureIirFilter = pressureIir;
+
+        // DSP_IIR register: bits [5:3] = temp IIR, bits [2:0] = press IIR
+        int iirConfig = (temperatureIir.getValue() << 3) | pressureIir.getValue();
+        writeByte(REG_DSP_IIR, (byte) iirConfig);
+
+        // DSP_CONFIG register: bit 0 = select IIR temp output, bit 1 = select IIR press output
+        // Read current config to preserve FIFO settings, then set IIR selection bits
+        int dspConfig = readByte(REG_DSP_CONFIG);
+        // Clear bits 0 and 1, then set based on whether IIR is enabled
+        dspConfig = dspConfig & 0xFC;
+        if (temperatureIir != IirFilter.BYPASS) {
+            dspConfig |= 0x01;  // Enable IIR for temperature
+        }
+        if (pressureIir != IirFilter.BYPASS) {
+            dspConfig |= 0x02;  // Enable IIR for pressure
+        }
+        writeByte(REG_DSP_CONFIG, (byte) dspConfig);
+
+        LOGGER.debug("IIR filter set to: temp={}, press={}", temperatureIir, pressureIir);
     }
 
     /**
@@ -348,5 +438,23 @@ public final class BMP581Device extends AbstractI2CDevice {
      */
     public PowerMode getPowerMode() {
         return powerMode;
+    }
+
+    /**
+     * Returns the current temperature IIR filter setting.
+     *
+     * @return the temperature IIR filter coefficient
+     */
+    public IirFilter getTemperatureIirFilter() {
+        return temperatureIirFilter;
+    }
+
+    /**
+     * Returns the current pressure IIR filter setting.
+     *
+     * @return the pressure IIR filter coefficient
+     */
+    public IirFilter getPressureIirFilter() {
+        return pressureIirFilter;
     }
 }
