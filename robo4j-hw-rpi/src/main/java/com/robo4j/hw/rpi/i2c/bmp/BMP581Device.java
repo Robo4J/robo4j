@@ -33,6 +33,7 @@ import java.io.IOException;
  *   <li>No external calibration data required (internal compensation)</li>
  * </ul>
  *
+ * @see <a href="https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmp581-ds004.pdf">BMP581 Datasheet</a>
  * @author Marcus Hirt (@hirt)
  */
 public final class BMP581Device extends AbstractI2CDevice {
@@ -275,15 +276,21 @@ public final class BMP581Device extends AbstractI2CDevice {
 
     /**
      * Reads the raw 24-bit temperature data from the sensor.
+     * The value is sign-extended to 32 bits to handle negative temperatures.
      *
-     * @return the raw temperature value
+     * @return the raw temperature value (signed)
      * @throws IOException if there was a communication problem
      */
     private int readTemperatureRaw() throws IOException {
         byte[] data = new byte[3];
         readBufferByAddress(REG_TEMP_DATA_XLSB, data, 0, 3);
         // Data is LSB first: XLSB, LSB, MSB
-        return ((data[2] & 0xFF) << 16) | ((data[1] & 0xFF) << 8) | (data[0] & 0xFF);
+        int raw = ((data[2] & 0xFF) << 16) | ((data[1] & 0xFF) << 8) | (data[0] & 0xFF);
+        // Sign-extend from 24-bit to 32-bit for negative temperatures
+        if ((raw & 0x800000) != 0) {
+            raw |= 0xFF000000;
+        }
+        return raw;
     }
 
     /**
