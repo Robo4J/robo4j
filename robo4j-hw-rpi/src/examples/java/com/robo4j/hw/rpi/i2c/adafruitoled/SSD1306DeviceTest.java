@@ -18,8 +18,6 @@ package com.robo4j.hw.rpi.i2c.adafruitoled;
 
 import com.robo4j.hw.rpi.i2c.adafruitoled.SSD1306Device.OLEDVariant;
 import com.robo4j.hw.rpi.utils.GpioPin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.IOException;
@@ -36,7 +34,6 @@ import static com.robo4j.hw.rpi.lcd.StringUtils.STRING_SPACE;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class SSD1306DeviceTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SSD1306DeviceTest.class);
     private static final String DEFAULT_LINES = "32";
     private static final GpioPin RESET_PIN = GpioPin.GPIO_25;
 
@@ -46,7 +43,7 @@ public class SSD1306DeviceTest {
      */
     public static void main(String[] args) throws IOException {
         System.setProperty("java.awt.headless", "true");
-        LOGGER.info("Headless:{}", System.getProperty("java.awt.headless"));
+        System.out.println("Headless:" + System.getProperty("java.awt.headless"));
         String lines = DEFAULT_LINES;
         if (args.length > 0) {
             lines = args[0];
@@ -55,9 +52,9 @@ public class SSD1306DeviceTest {
         OLEDVariant variant = lines.equals(DEFAULT_LINES) ? OLEDVariant.Type128x32 : OLEDVariant.Type128x64;
         final SSD1306Device oled = new SSD1306Device(variant, RESET_PIN);
 
-        LOGGER.info("Running OLED device example for {} with reset pin {}.", variant, RESET_PIN);
-        LOGGER.info("If the number of lines do not match your device,");
-        LOGGER.info("please add the number of lines as the first argument!");
+        System.out.println("Running OLED device example for " + variant + " with reset pin " + RESET_PIN + ".");
+        System.out.println("If the number of lines do not match your device,");
+        System.out.println("please add the number of lines as the first argument!");
 
         String text = args.length > 0 ? String.join(STRING_SPACE, args) : "Hello Maxi!";
         Graphics2D gc = oled.getGraphicsContext();
@@ -69,7 +66,7 @@ public class SSD1306DeviceTest {
         gc.setBackground(Color.white);
         gc.fillOval(127 - 16, -16, 32, 32);
         oled.pushImage();
-        LOGGER.info("There is nothing");
+        System.out.println("There is nothing");
 
         // TODO : create optional possibility to use JFrame as an output
 //		JFrame frame = new JFrame();
@@ -90,7 +87,7 @@ public class SSD1306DeviceTest {
 //		frame.setSize(256, 256);
 //		frame.getContentPane().add(new JLabel(new ImageIcon(oled.getImage())));
 //		frame.setVisible(true);
-        LOGGER.info("Press <Enter> to quit!");
+        System.out.println("Press <Enter> to quit!");
         System.in.read();
         oled.setEnabled(false);
 //		frame.setVisible(false);

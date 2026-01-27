@@ -16,9 +16,6 @@
  */
 package com.robo4j.hw.rpi.pad;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -35,7 +32,6 @@ import java.nio.file.Paths;
  * @author Miro Wengner (@miragemiko)
  */
 public class LF710PadExample implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LF710PadExample.class);
     private static final String REGISTERED_INPUT = "/dev/input/js0";
     private static final int ANDING_LEFT = 0x00ff;
     private static final int ANDING_LONG_LEFT = 0x00000000000000ff;
@@ -51,7 +47,7 @@ public class LF710PadExample implements Runnable {
     private final Path inputPath = Paths.get(REGISTERED_INPUT);
 
     public static void main(String[] args) {
-        LOGGER.info("start joystick logitech F710");
+        System.out.println("start joystick logitech F710");
         LF710PadExample pad = new LF710PadExample();
         new Thread(pad).start();
     }
@@ -78,10 +74,10 @@ public class LF710PadExample implements Runnable {
                         final LF710Part lf710Part = LF710Part.getByMask(part);
                         switch (lf710Part) {
                             case BUTTON:
-                                LOGGER.info("BUTTON: {} state: {} time: {}", LF710Button.getByMask(element), getInputState(amount), time);
+                                System.out.printf("BUTTON: %s state: %s time: %d%n", LF710Button.getByMask(element), getInputState(amount), time);
                                 break;
                             case JOYSTICK:
-                                LOGGER.info("JOYSTICK: {} state: {} time: {}", LF710JoystickButton.getByMask(element), getInputState(amount), time);
+                                System.out.printf("JOYSTICK: %s state: %s time: %d%n", LF710JoystickButton.getByMask(element), getInputState(amount), time);
                                 break;
                             default:
                                 throw new RuntimeException("uknonw pad part:" + lf710Part);

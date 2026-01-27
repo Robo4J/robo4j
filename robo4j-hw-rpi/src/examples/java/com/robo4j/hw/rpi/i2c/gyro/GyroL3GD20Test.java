@@ -17,8 +17,6 @@
 package com.robo4j.hw.rpi.i2c.gyro;
 
 import com.robo4j.hw.rpi.i2c.gyro.GyroL3GD20Device.Sensitivity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -30,14 +28,13 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GyroL3GD20Test {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GyroL3GD20Test.class);
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        LOGGER.info("Initializing...");
+        System.out.println("Initializing...");
         GyroL3GD20Device device = new GyroL3GD20Device(Sensitivity.DPS_245);
 
         while (true) {
-            LOGGER.info("device,read:{}", device.read());
+            System.out.println("device,read:" + device.read());
             Thread.sleep(200);
         }
     }

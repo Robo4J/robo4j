@@ -17,8 +17,6 @@
 package com.robo4j.hw.rpi.lcd;
 
 import com.robo4j.hw.rpi.lcd.Lcd20x4.Alignment;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -29,7 +27,6 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class Lcd20x4Example {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Lcd20x4Example.class);
 
     private static class Demo implements Runnable {
         private final Lcd20x4 lcd;
@@ -77,7 +74,7 @@ public class Lcd20x4Example {
         Demo demo = new Demo(lcd);
         Thread t = new Thread(demo, "LCD Demo Thread");
         t.start();
-        LOGGER.debug("Running LCD demo. Press <Enter> to quit!");
+        System.out.println("Running LCD demo. Press <Enter> to quit!");
         System.in.read();
         demo.quit();
     }

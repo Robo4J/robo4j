@@ -16,9 +16,6 @@
  */
 package com.robo4j.hw.rpi.serial.ydlidar;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
@@ -30,26 +27,25 @@ import java.util.concurrent.TimeoutException;
  * @author Miro Wengner (@miragemiko)
  */
 public class YDLidarTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(YDLidarTest.class);
 
     //TODO: review example with sleep
     public static void main(String[] args) throws IOException, InterruptedException, TimeoutException {
-        YDLidarDevice device = new YDLidarDevice(scanResult -> LOGGER.info("Got scan result:{}", scanResult));
-        LOGGER.info("Restarting the device to make sure we start with a clean slate");
+        YDLidarDevice device = new YDLidarDevice(scanResult -> System.out.println("Got scan result:" + scanResult));
+        System.out.println("Restarting the device to make sure we start with a clean slate");
         device.restart();
         // Takes some serious time to restart this thing ;)
-        LOGGER.info("Waiting 4s for the device to properly boot up");
+        System.out.println("Waiting 4s for the device to properly boot up");
         Thread.sleep(4000);
-        LOGGER.info("device:{}", device);
-        LOGGER.info("deviceInfo:{}", device.getDeviceInfo());
-        LOGGER.info("deviceHealth:{}", device.getHealthInfo());
-        LOGGER.info("Ranging Frequency:{}", device.getRangingFrequency());
-        LOGGER.info("Will capture data for 10 seconds...");
+        System.out.println("device:" + device);
+        System.out.println("deviceInfo:" + device.getDeviceInfo());
+        System.out.println("deviceHealth:" + device.getHealthInfo());
+        System.out.println("Ranging Frequency:" + device.getRangingFrequency());
+        System.out.println("Will capture data for 10 seconds...");
         device.setScanning(true);
         Thread.sleep(10000);
         device.setScanning(false);
         device.shutdown();
-        LOGGER.info("Done!");
+        System.out.println("Done!");
     }
 
 }

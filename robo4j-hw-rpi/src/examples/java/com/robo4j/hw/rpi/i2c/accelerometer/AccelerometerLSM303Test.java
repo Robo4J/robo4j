@@ -18,8 +18,6 @@ package com.robo4j.hw.rpi.i2c.accelerometer;
 
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
 import com.robo4j.math.geometry.Tuple3f;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -30,7 +28,6 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class AccelerometerLSM303Test {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AccelerometerLSM303Test.class);
 
     public static void main(String[] args) throws IOException, InterruptedException {
         ReadableDevice<Tuple3f> device = new AccelerometerLSM303Device();
@@ -44,12 +41,12 @@ public class AccelerometerLSM303Test {
     }
 
     private static void print(Stats stats) {
-        LOGGER.debug("Result:{}", stats);
+        System.out.println("Result:" + stats);
     }
 
     private static void prompt(String msg) throws IOException {
-        LOGGER.debug(msg);
-        LOGGER.debug("Press <Enter> to continue!");
+        System.out.println(msg);
+        System.out.println("Press <Enter> to continue!");
         System.in.read();
     }
 
@@ -61,10 +58,10 @@ public class AccelerometerLSM303Test {
             stats.addValue(fl);
             Thread.sleep(20);
             if (i % 25 == 0) {
-                LOGGER.debug(".");
+                System.out.print(".");
             }
         }
-        LOGGER.debug("");
+        System.out.println();
         return stats;
     }
 }

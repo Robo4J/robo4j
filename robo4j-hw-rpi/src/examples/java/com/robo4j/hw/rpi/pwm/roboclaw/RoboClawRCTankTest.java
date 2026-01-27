@@ -19,8 +19,6 @@ package com.robo4j.hw.rpi.pwm.roboclaw;
 import com.robo4j.hw.rpi.Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PCA9685Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -34,14 +32,13 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class RoboClawRCTankTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RoboClawRCTankTest.class);
     // The internetz says 50Hz is the standard PWM frequency for operating RC
     // servos.
     private static final int SERVO_FREQUENCY = 50;
 
     public static void main(String[] args) throws IOException, InterruptedException {
         if (args.length != 3) {
-            LOGGER.info("Usage: Tank <speed> <direction> <duration>");
+            System.out.println("Usage: Tank <speed> <direction> <duration>");
             System.out.flush();
             System.exit(2);
         }
@@ -50,12 +47,12 @@ public class RoboClawRCTankTest {
         int duration = Integer.parseInt(args[2]);
 
         testEngine(speed, direction, duration);
-        LOGGER.info("All done! Bye!");
+        System.out.println("All done! Bye!");
     }
 
     public static void testEngine(float speed, float direction, int duration) throws IOException, InterruptedException {
         // TODO: add measurement units
-        LOGGER.info("duration:{}ms with speed:{} and direction:{}", duration, speed, direction);
+        System.out.printf("duration:%dms with speed:%s and direction:%s%n", duration, speed, direction);
         PWMPCA9685Device device = new PWMPCA9685Device();
         device.setPWMFrequency(SERVO_FREQUENCY);
         Servo leftEngine = new PCA9685Servo(device.getChannel(6));

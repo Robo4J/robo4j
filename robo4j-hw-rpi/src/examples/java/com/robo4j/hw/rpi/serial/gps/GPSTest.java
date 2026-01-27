@@ -20,8 +20,6 @@ import com.robo4j.hw.rpi.gps.GPS;
 import com.robo4j.hw.rpi.gps.GPSListener;
 import com.robo4j.hw.rpi.gps.PositionEvent;
 import com.robo4j.hw.rpi.gps.VelocityEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -32,23 +30,22 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GPSTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GPSTest.class);
 
     public static void main(String[] args) throws InterruptedException, IOException {
         GPS mtk3339gps = new MTK3339GPS();
         mtk3339gps.addListener(new GPSListener() {
             @Override
             public void onPosition(PositionEvent event) {
-                LOGGER.info("onPosition, event:{}", event);
+                System.out.println("onPosition, event:" + event);
             }
 
             @Override
             public void onVelocity(VelocityEvent event) {
-                LOGGER.info("onVelocity, event:{}", event);
+                System.out.println("onVelocity, event:" + event);
             }
         });
         mtk3339gps.start();
-        LOGGER.info("Press <Enter> to quit!");
+        System.out.println("Press <Enter> to quit!");
         System.in.read();
         mtk3339gps.shutdown();
     }

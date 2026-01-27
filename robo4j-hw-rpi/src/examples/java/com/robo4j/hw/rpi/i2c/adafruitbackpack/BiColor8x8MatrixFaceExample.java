@@ -17,9 +17,6 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -31,10 +28,9 @@ import java.util.concurrent.TimeUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class BiColor8x8MatrixFaceExample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BiColor8x8MatrixFaceExample.class);
 
     public static void main(String[] args) throws Exception {
-        LOGGER.debug("=== BiColor 8x8 Matrix Face Example ===");
+        System.out.println("=== BiColor 8x8 Matrix Face Example ===");
 
         BiColor8x8MatrixDevice led = new BiColor8x8MatrixDevice();
 
@@ -53,7 +49,7 @@ public class BiColor8x8MatrixFaceExample {
             TimeUnit.SECONDS.sleep(1);
         }
 
-        LOGGER.debug("Press <Enter> to quit!");
+        System.out.println("Press <Enter> to quit!");
         System.in.read();
         led.clear();
         led.display();

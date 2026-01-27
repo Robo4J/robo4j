@@ -17,8 +17,6 @@
 package com.robo4j.hw.rpi.pwm;
 
 import com.robo4j.hw.rpi.utils.GpioPin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -29,19 +27,18 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class PWMServoExample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PWMServoExample.class);
 
     public static void main(String[] args) throws IOException,
             InterruptedException {
         if (args.length != 1) {
-            LOGGER.info("Usage: PWMExample <input>");
+            System.out.println("Usage: PWMExample <input>");
             System.exit(2);
         }
         float input = Float.parseFloat(args[0]);
         PWMServo servo = new PWMServo(GpioPin.GPIO_01, false);
-        LOGGER.info("Setting input to {}", input);
+        System.out.println("Setting input to " + input);
         servo.setInput(input);
-        LOGGER.info("Press <Enter> to quit");
+        System.out.println("Press <Enter> to quit");
         System.in.read();
     }
 }

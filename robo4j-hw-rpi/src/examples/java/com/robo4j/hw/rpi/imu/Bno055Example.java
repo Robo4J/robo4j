@@ -22,8 +22,6 @@ import com.robo4j.hw.rpi.imu.bno.Bno055Device.OperatingMode;
 import com.robo4j.hw.rpi.imu.bno.Bno055Factory;
 import com.robo4j.hw.rpi.imu.bno.Bno055SelfTestResult;
 import com.robo4j.math.geometry.Tuple3f;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
@@ -37,7 +35,6 @@ import java.util.concurrent.TimeUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class Bno055Example {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Bno055Example.class);
     private static final int TIMEOUT_SEC = 1;
     private final static ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(1);
 
@@ -55,10 +52,11 @@ public class Bno055Example {
                 Tuple3f orientation = device.read();
                 float temperature = device.getTemperature();
 
-                LOGGER.info("heading: {}, roll: {}, pitch: {} - temp:{}", orientation.x,
+                System.out.printf("heading: %s, roll: %s, pitch: %s - temp:%s%n", orientation.x,
                         orientation.y, orientation.z, temperature);
             } catch (Throwable e) {
-                LOGGER.error("error", e);
+                System.err.println("error");
+                e.printStackTrace();
             }
         }
 
@@ -74,44 +72,44 @@ public class Bno055Example {
      */
     public static void main(String[] args) throws IOException, InterruptedException {
         // TODO: review sleeps
-        LOGGER.info("Starting the BNO055 Example.");
+        System.out.println("Starting the BNO055 Example.");
         Bno055Device bno = Bno055Factory.createDefaultSerialDevice();
         Thread.sleep(20);
 
-        LOGGER.info("Resetting device...");
+        System.out.println("Resetting device...");
         bno.reset();
         Thread.sleep(20);
 
-        LOGGER.info("Running Self Test...");
+        System.out.println("Running Self Test...");
         Bno055SelfTestResult testResult = bno.performSelfTest();
-        LOGGER.info("Result of self test: ");
-        LOGGER.info("result:{}", testResult);
+        System.out.println("Result of self test: ");
+        System.out.println("result:" + testResult);
         Thread.sleep(20);
 
-        LOGGER.info("Operating mode: {}", bno.getOperatingMode());
+        System.out.println("Operating mode: " + bno.getOperatingMode());
         if (bno.getOperatingMode() != OperatingMode.NDOF) {
-            LOGGER.info("Switching mode to NDOF");
+            System.out.println("Switching mode to NDOF");
             bno.setOperatingMode(OperatingMode.NDOF);
-            LOGGER.info("Operating mode: {}", bno.getOperatingMode());
+            System.out.println("Operating mode: " + bno.getOperatingMode());
         }
 
-        LOGGER.info("Starting calibration sequence...");
+        System.out.println("Starting calibration sequence...");
         Bno055CalibrationStatus calibrationStatus = null;
         while (!(calibrationStatus = bno.getCalibrationStatus()).isFullyCalibrated()) {
-            LOGGER.info("Calibration status: system:{}, gyro:{}, accelerometer:{}, magnetometer:{}", calibrationStatus.getSystemCalibrationStatus(), calibrationStatus.getGyroCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus());
+            System.out.printf("Calibration status: system:%s, gyro:%s, accelerometer:%s, magnetometer:%s%n", calibrationStatus.getSystemCalibrationStatus(), calibrationStatus.getGyroCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus());
             Thread.sleep(500);
         }
-        LOGGER.info("System fully calibrated. Now printing data. Press <Enter> to quit!");
+        System.out.println("System fully calibrated. Now printing data. Press <Enter> to quit!");
 
         EXECUTOR.scheduleAtFixedRate(new BNOPrinter(bno), 40, 500, TimeUnit.MILLISECONDS);
         System.in.read();
         EXECUTOR.shutdown();
         var terminated = EXECUTOR.awaitTermination(TIMEOUT_SEC, TimeUnit.SECONDS);
         if (!terminated) {
-            LOGGER.warn("not terminated properly");
+            System.err.println("not terminated properly");
             EXECUTOR.shutdownNow();
         }
-        LOGGER.info("Bye, bye!");
+        System.out.println("Bye, bye!");
         bno.shutdown();
     }
 

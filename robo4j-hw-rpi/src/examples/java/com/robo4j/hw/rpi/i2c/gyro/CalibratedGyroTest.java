@@ -17,8 +17,6 @@
 package com.robo4j.hw.rpi.i2c.gyro;
 
 import com.robo4j.hw.rpi.i2c.gyro.GyroL3GD20Device.Sensitivity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -30,22 +28,21 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class CalibratedGyroTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CalibratedGyroTest.class);
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        LOGGER.info("Initializing...");
+        System.out.println("Initializing...");
         GyroL3GD20Device device = new GyroL3GD20Device(Sensitivity.DPS_245);
         CalibratedGyro gyro = new CalibratedGyro(device);
 
-        LOGGER.info("Keep the device still, and press enter to start calibration.");
+        System.out.println("Keep the device still, and press enter to start calibration.");
         System.in.read();
-        LOGGER.info("Calibrating...");
+        System.out.println("Calibrating...");
         gyro.calibrate();
-        LOGGER.info("Calibration done!");
+        System.out.println("Calibration done!");
 
         // TODO : improve example
         while (true) {
-            LOGGER.info("gyro, read:{}", gyro.read());
+            System.out.println("gyro, read:" + gyro.read());
             Thread.sleep(200);
         }
     }

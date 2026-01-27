@@ -18,8 +18,6 @@ package com.robo4j.hw.rpi.i2c.magnetometer;
 
 import com.robo4j.math.geometry.Tuple3f;
 import com.robo4j.math.geometry.Tuple3i;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
@@ -40,7 +38,6 @@ import java.util.concurrent.TimeUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class MagnetometerLSM303Example {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MagnetometerLSM303Example.class);
     private static final int TIMEOUT_SEC = 1;
     private final static ScheduledExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor();
 
@@ -67,17 +64,16 @@ public class MagnetometerLSM303Example {
                 switch (printStyle) {
                     case RAW:
                         Tuple3i raw = readRaw();
-                        LOGGER.debug("Raw Value {}} = {}", count, raw.toString());
+                        System.out.println("Raw Value " + count + " = " + raw.toString());
                         break;
                     case CSV:
                         Tuple3f val = read();
-                        LOGGER.debug("{};{};{}", val.x, val.y, val.z);
+                        System.out.println(val.x + ";" + val.y + ";" + val.z);
                         break;
                     default:
                         val = read();
-                        var message = String.format("Value %d = %s\\tHeading:%f", count, val.toString(),
+                        System.out.printf("Value %d = %s\tHeading:%f%n", count, val.toString(),
                                 MagnetometerLSM303Device.getCompassHeading(val));
-                        LOGGER.debug("{}", message);
                 }
             }
             count++;
@@ -87,7 +83,8 @@ public class MagnetometerLSM303Example {
             try {
                 return device.readRaw();
             } catch (IOException e) {
-                LOGGER.error("Error reading raw data", e);
+                System.err.println("Error reading raw data");
+                e.printStackTrace();
                 System.exit(3);
             }
             return null;
@@ -97,7 +94,8 @@ public class MagnetometerLSM303Example {
             try {
                 return device.read();
             } catch (IOException e) {
-                LOGGER.error("Error reading data", e);
+                System.err.println("Error reading data");
+                e.printStackTrace();
                 System.exit(4);
             }
             return null;
@@ -111,7 +109,7 @@ public class MagnetometerLSM303Example {
     // FIXME(Marcus/Dec 5, 2016): Verify that this one works.
     public static void main(String[] args) throws IOException, InterruptedException {
         if (args.length < 2) {
-            LOGGER.info(
+            System.out.println(
                     "Usage: MagnetometerLSM303Test <read periodicity (ms)> <print every Nth read> [<print style (pretty|raw|csv)>] ");
             System.exit(1);
         }
@@ -129,15 +127,14 @@ public class MagnetometerLSM303Example {
         EXECUTOR_SERVICE.shutdown();
         var terminated = EXECUTOR_SERVICE.awaitTermination(TIMEOUT_SEC, TimeUnit.SECONDS);
         if (!terminated) {
-            LOGGER.warn("note terminated properly");
+            System.err.println("not terminated properly");
             EXECUTOR_SERVICE.shutdownNow();
         }
         printMessage(printStyle, "Collected " + dg.getCount() + " values!");
     }
 
     private static void printMessage(PrintStyle printStyle, String message) {
-        LOGGER.info("{}{}", getPrefix(printStyle), message);
-
+        System.out.println(getPrefix(printStyle) + message);
     }
 
     private static String getPrefix(PrintStyle printStyle) {

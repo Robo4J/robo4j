@@ -17,9 +17,6 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -29,15 +26,14 @@ import java.util.concurrent.TimeUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class AlphanumericDeviceExample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AlphanumericDeviceExample.class);
 
     public static void main(String[] args) throws Exception {
-        LOGGER.debug("=== Alphanumeric Backpack Example ===");
+        System.out.println("=== Alphanumeric Backpack Example ===");
 
         AlphanumericDevice device = new AlphanumericDevice();
         device.clear();
         device.display();
-        LOGGER.debug("Adding Characters");
+        System.out.println("Adding Characters");
         device.addCharacter('A', false);
         device.addCharacter('B', true);
         device.addCharacter('C', false);
@@ -53,7 +49,7 @@ public class AlphanumericDeviceExample {
         device.display();
 
 
-        LOGGER.debug("Press <Enter> to quit!");
+        System.out.println("Press <Enter> to quit!");
         System.in.read();
         device.clear();
         device.display();

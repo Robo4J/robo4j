@@ -19,8 +19,6 @@ package com.robo4j.hw.rpi.pwm;
 import com.robo4j.hw.rpi.Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PCA9685Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -31,7 +29,6 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class PCA9685TruckPlatformExample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PCA9685TruckPlatformExample.class);
 
     private static final int SERVO_THROTTLE = 0;
     private static final int SERVO_STEERING = 5;
@@ -41,7 +38,7 @@ public class PCA9685TruckPlatformExample {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         if (args.length != 5) {
-            LOGGER.info("Usage: <throttle> <steering> <leg> <shift> <duration>");
+            System.out.println("Usage: <throttle> <steering> <leg> <shift> <duration>");
             System.out.flush();
             System.exit(2);
         }
@@ -52,12 +49,12 @@ public class PCA9685TruckPlatformExample {
         int duration = Integer.parseInt(args[4]);
 
         testMotor(throttle, steering, leg, shift, duration);
-        LOGGER.info("All done! Bye!");
+        System.out.println("All done! Bye!");
     }
 
     public static void testMotor(float throttle, float steering, float leg, float shift, int duration)
             throws IOException, InterruptedException {
-        LOGGER.debug("Running for {} ms with throttle {}, steering {}, leg {}, shift {}", duration,
+        System.out.printf("Running for %d ms with throttle %s, steering %s, leg %s, shift %s%n", duration,
                 throttle, steering, leg, shift);
         PWMPCA9685Device device = new PWMPCA9685Device();
         device.setPWMFrequency(SERVO_FREQUENCY);
