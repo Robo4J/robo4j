@@ -18,106 +18,59 @@ package com.robo4j.hw.rpi.imu.bno;
 
 import com.pi4j.io.spi.SpiChipSelect;
 import com.pi4j.io.spi.SpiMode;
-import com.robo4j.hw.rpi.imu.bno.Bno055Device.OperatingMode;
-import com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice;
+import com.robo4j.hw.rpi.imu.bno.bno08x.Bno08xFactory;
 import com.robo4j.hw.rpi.utils.GpioPin;
 
-import java.io.IOException;
-
 /**
- * Factory for creating BNO080 devices
- * 
+ * Factory for creating BNO080 devices.
+ *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
+ * @deprecated Use {@link Bno08xFactory} instead.
  */
+@Deprecated(forRemoval = true)
 public final class Bno080Factory {
+
 	/**
-	 * Will create an I2C connected BNO080 device.
-	 * 
-	 * NOTE(Marcus/Sept 01, 2019): Note that due to the Raspberry Pi not
-	 * properly supporting clock stretching, using the BNO080 with I2C on the
-	 * RaspberryPi will not work (yet).
-	 * 
-	 * @return an I2C connected BNO080Device
-	 * @throws IOException
-	 *             exception
+	 * Creates a BNO080 device connected via I2C with default settings.
+	 *
+	 * @return an I2C connected BNO080 device
+	 * @deprecated Use {@link Bno08xFactory#createDefaultI2CDevice()} instead.
 	 */
-	public static Bno080Device createDefaultI2CDevice() throws IOException {
-		throw new UnsupportedOperationException("Not implemented yet");
+	@Deprecated(forRemoval = true)
+	public static Bno080Device createDefaultI2CDevice() {
+		return Bno08xFactory.createDefaultI2CDevice();
 	}
 
 	/**
-	 * Will create a BNO080 device connected over serial.
-	 * 
-	 * @return a serial connected BNO80 device.
-	 * @throws IOException
-	 *             exception
+	 * Creates a BNO080 device connected via SPI with default settings.
+	 *
+	 * @return an SPI connected BNO080 device
+	 * @throws InterruptedException if interrupted during initialization
+	 * @deprecated Use {@link Bno08xFactory#createDefaultSPIDevice()} instead.
 	 */
-	public static Bno080Device createDefaultSerialDevice() throws IOException {
-		throw new UnsupportedOperationException("Not implemented yet");
+	@Deprecated(forRemoval = true)
+	public static Bno080Device createDefaultSPIDevice() throws InterruptedException {
+		return Bno08xFactory.createDefaultSPIDevice();
 	}
 
 	/**
-	 * Will create an I2C connected BNO080 device.
-	 * 
-	 * @param bus
-	 *            the I2C bus to use.
-	 * @param address
-	 *            the I2C address to use.
-	 * @param operatingMode
-	 *            the (initial) operating mode.
-	 * @return I2C connected BNO080Device
-	 * @throws IOException
-	 *             exception
+	 * Creates a BNO080 device connected via SPI with the provided settings.
+	 *
+	 * @param channel   the SPI chip select
+	 * @param mode      the SPI mode
+	 * @param speed     the SPI clock speed in Hz
+	 * @param wake      GPIO pin for wake
+	 * @param cs        GPIO pin for chip select
+	 * @param reset     GPIO pin for reset
+	 * @param interrupt GPIO pin for interrupt
+	 * @return an SPI connected BNO080 device
+	 * @throws InterruptedException if interrupted during initialization
+	 * @deprecated Use {@link Bno08xFactory#createSPIDevice(SpiChipSelect, SpiMode, int, GpioPin, GpioPin, GpioPin, GpioPin)} instead.
 	 */
-	public static Bno080Device createDevice(int bus, int address, OperatingMode operatingMode) throws IOException {
-		throw new UnsupportedOperationException("Not implemented yet");
+	@Deprecated(forRemoval = true)
+	public static Bno080Device createDefaultSPIDevice(SpiChipSelect channel, SpiMode mode, int speed,
+			GpioPin wake, GpioPin cs, GpioPin reset, GpioPin interrupt) throws InterruptedException {
+		return Bno08xFactory.createSPIDevice(channel, mode, speed, wake, cs, reset, interrupt);
 	}
-
-	/**
-	 * Will create a BNO080 device connected over serial.
-	 * 
-	 * @param serialPort
-	 *            the serial port to use.
-	 * @param operatingMode
-	 *            the (initial) operating mode to use.
-	 * @param retryTimeout
-	 *            the timeout on buffer overruns before trying again.
-	 * @param noOfRetries
-	 *            the number of times to retry.
-	 * @return a serial connected BNO80 device.
-	 * @throws IOException
-	 *             exception
-	 */
-	public static Bno080Device createDevice(String serialPort, OperatingMode operatingMode, long retryTimeout, int noOfRetries)
-			throws IOException {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
-	/**
-	 * Will create a BNO080 device connected over SPI using the default
-	 * settings.
-	 * 
-	 * @return an SPI connected BNO80 device.
-	 * @throws IOException
-	 *             exception
-	 * @throws InterruptedException exception
-	 */
-	public static Bno080Device createDefaultSPIDevice() throws IOException, InterruptedException {
-		return new Bno080SPIDevice();
-	}
-
-	/**
-	 * Will create a BNO080 device connected over SPI using the provided
-	 * settings.
-	 * 
-	 * @return an SPI connected BNO80 device.
-	 * @throws IOException
-	 *             exception
-	 * @throws InterruptedException exception
-	 */
-	public static Bno080Device createDefaultSPIDevice(SpiChipSelect channel, SpiMode mode, int speed, GpioPin wake, GpioPin cs, GpioPin reset, GpioPin interrupt) throws IOException, InterruptedException {
-		return new Bno080SPIDevice(channel, mode, speed, wake, cs, reset, interrupt);
-	}
-
 }
