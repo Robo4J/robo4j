@@ -17,6 +17,7 @@
 
 package com.robo4j.hw.rpi.imu.bno;
 
+import com.robo4j.hw.rpi.imu.bno.bno08x.TareBasis;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportId;
 
 /**
@@ -29,7 +30,7 @@ public interface Bno080Device {
 
 	/**
 	 * Add a listener for new data.
-	 * 
+	 *
 	 * @param listener
 	 *            the listener to accept new data.
 	 */
@@ -37,7 +38,7 @@ public interface Bno080Device {
 
 	/**
 	 * Remove a listener for new data.
-	 * 
+	 *
 	 * @param listener
 	 *            the listener to remove.
 	 */
@@ -45,7 +46,7 @@ public interface Bno080Device {
 
 	/**
 	 * Starts listening for specific data.
-	 * 
+	 *
 	 * @param report
 	 *            the kind of data to start listening for.
 	 * @param reportPeriod
@@ -56,7 +57,7 @@ public interface Bno080Device {
 
 	/**
 	 * Stop listening for all kinds of reports.
-	 * 
+	 *
 	 * @return true if successfully stopped.
 	 */
 	boolean stop();
@@ -71,4 +72,95 @@ public interface Bno080Device {
 	 * enough, or the timeout is reached. unit milliseconds
 	 */
 	void calibrate(long timeout);
+
+	// --- Tare operations ---
+
+	/**
+	 * Perform a tare operation on all axes using the rotation vector as basis.
+	 * This zeroes out the current orientation as the reference.
+	 *
+	 * @return true if the command was sent successfully
+	 */
+	default boolean tareNow() {
+		return tareNow(false, TareBasis.ROTATION_VECTOR);
+	}
+
+	/**
+	 * Perform a tare operation.
+	 *
+	 * @param zAxisOnly if true, only tare the Z axis (heading); if false, tare all axes
+	 * @param basis     which rotation vector to use as the basis for tare
+	 * @return true if the command was sent successfully
+	 */
+	boolean tareNow(boolean zAxisOnly, TareBasis basis);
+
+	/**
+	 * Persist the current tare settings to flash memory.
+	 * The tare will be automatically applied on next power-up.
+	 *
+	 * @return true if the command was sent successfully
+	 */
+	boolean saveTare();
+
+	/**
+	 * Clear any previously applied tare.
+	 *
+	 * @return true if the command was sent successfully
+	 */
+	boolean clearTare();
+
+	// --- Dynamic Calibration Data (DCD) operations ---
+
+	/**
+	 * Save the current Dynamic Calibration Data (DCD) to flash.
+	 * This preserves calibration across power cycles for faster startup.
+	 *
+	 * @return true if the command was sent successfully
+	 */
+	boolean saveCalibration();
+
+	/**
+	 * Configure which sensors have dynamic calibration enabled.
+	 *
+	 * @param accel  enable accelerometer calibration
+	 * @param gyro   enable gyroscope calibration
+	 * @param mag    enable magnetometer calibration
+	 * @return true if the command was sent successfully
+	 */
+	boolean setCalibrationConfig(boolean accel, boolean gyro, boolean mag);
+
+	// --- Power management ---
+
+	/**
+	 * Put the sensor hub into sleep mode to conserve power.
+	 * Use {@link #wake()} to bring it back.
+	 *
+	 * @return true if the command was sent successfully
+	 */
+	boolean sleep();
+
+	/**
+	 * Wake the sensor hub from sleep mode.
+	 *
+	 * @return true if the command was sent successfully
+	 */
+	boolean wake();
+
+	// --- Status ---
+
+	/**
+	 * Check if the sensor has been reset since the last call to this method.
+	 * This can be used to detect unexpected resets and re-initialize sensors.
+	 *
+	 * @return true if a reset has occurred
+	 */
+	boolean wasReset();
+
+	/**
+	 * Get the reason for the last reset.
+	 * Values: 1=POR, 2=Internal reset, 3=Watchdog, 4=External reset, 5=Other
+	 *
+	 * @return reset reason code
+	 */
+	int getResetReason();
 }

@@ -19,8 +19,10 @@ package com.robo4j.hw.rpi.imu.bno.impl;
 
 import com.robo4j.hw.rpi.imu.bno.Bno080Device;
 import com.robo4j.hw.rpi.imu.bno.DataListener;
+import com.robo4j.hw.rpi.imu.bno.bno08x.TareBasis;
 import com.robo4j.hw.rpi.imu.bno.shtp.ControlReportId;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpChannel;
+import com.robo4j.hw.rpi.imu.bno.shtp.ShtpCommandId;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +42,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
+ * @deprecated Use {@link com.robo4j.hw.rpi.imu.bno.bno08x.Bno08xDriver} instead.
  */
+@Deprecated(forRemoval = true)
 public abstract class AbstractBno080Device implements Bno080Device {
-    public static final int SHTP_HEADER_SIZE = 4;
+    /**
+     * @deprecated Use {@link ShtpPacketRequest#SHTP_HEADER_SIZE} instead.
+     */
+    @Deprecated(forRemoval = true)
+    public static final int SHTP_HEADER_SIZE = ShtpPacketRequest.SHTP_HEADER_SIZE;
     static byte RECEIVE_WRITE_BYTE = (byte) 0xFF;
     static byte RECEIVE_WRITE_BYTE_CONTINUAL = (byte) 0;
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBno080Device.class);
@@ -92,7 +100,10 @@ public abstract class AbstractBno080Device implements Bno080Device {
     /**
      * Command IDs (section 6.4, page 42 in the manual). These are used to
      * calibrate, initialize, set orientation, tare etc the sensor.
+     *
+     * @deprecated Use {@link ShtpCommandId} instead.
      */
+    @Deprecated(forRemoval = true)
     public enum CommandId {
         //@formatter:off
         NONE            (0),
@@ -241,6 +252,53 @@ public abstract class AbstractBno080Device implements Bno080Device {
         ShtpPacketRequest packet = prepareShtpPacketRequest(shtpChannel, 1);
         packet.addBody(0, 1);
         return packet;
+    }
+
+    // --- Stub implementations for interface methods (deprecated class) ---
+
+    @Override
+    public boolean tareNow(boolean zAxisOnly, TareBasis basis) {
+        throw new UnsupportedOperationException("Use Bno08xDriver instead");
+    }
+
+    @Override
+    public boolean saveTare() {
+        throw new UnsupportedOperationException("Use Bno08xDriver instead");
+    }
+
+    @Override
+    public boolean clearTare() {
+        throw new UnsupportedOperationException("Use Bno08xDriver instead");
+    }
+
+    @Override
+    public boolean saveCalibration() {
+        throw new UnsupportedOperationException("Use Bno08xDriver instead");
+    }
+
+    @Override
+    public boolean setCalibrationConfig(boolean accel, boolean gyro, boolean mag) {
+        throw new UnsupportedOperationException("Use Bno08xDriver instead");
+    }
+
+    @Override
+    public boolean sleep() {
+        throw new UnsupportedOperationException("Use Bno08xDriver instead");
+    }
+
+    @Override
+    public boolean wake() {
+        throw new UnsupportedOperationException("Use Bno08xDriver instead");
+    }
+
+    @Override
+    public boolean wasReset() {
+        return false;
+    }
+
+    @Override
+    public int getResetReason() {
+        return 0;
     }
 
     private void awaitTermination() {

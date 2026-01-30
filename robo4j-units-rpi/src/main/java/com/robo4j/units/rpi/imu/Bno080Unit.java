@@ -23,21 +23,26 @@ import com.robo4j.RoboReference;
 import com.robo4j.RoboUnit;
 import com.robo4j.configuration.Configuration;
 import com.robo4j.hw.rpi.imu.bno.Bno080Device;
-import com.robo4j.hw.rpi.imu.bno.Bno080Factory;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataListener;
-import com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice;
+import com.robo4j.hw.rpi.imu.bno.bno08x.Bno08xFactory;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * IMU unit emitting data produced by {@link Bno080SPIDevice } to the target
- * provided by {@link BnoRequest}
+ * IMU unit emitting data produced by a BNO08x device to the target
+ * provided by {@link BnoRequest}.
+ *
+ * <p>Configuration properties:</p>
+ * <ul>
+ *     <li>{@code reportType} - sensor report type (e.g. ROTATION_VECTOR, GYROSCOPE)</li>
+ *     <li>{@code reportDelay} - report period in milliseconds</li>
+ *     <li>{@code deviceType} - transport type: "SPI" (default) or "I2C"</li>
+ * </ul>
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
@@ -46,6 +51,7 @@ public class Bno080Unit extends RoboUnit<BnoRequest> {
 
     public static final String PROPERTY_REPORT_TYPE = "reportType";
     public static final String PROPERTY_REPORT_DELAY = "reportDelay";
+    public static final String PROPERTY_DEVICE_TYPE = "deviceType";
     private static final Logger LOGGER = LoggerFactory.getLogger(Bno080Unit.class);
 
     private static final class BnoListenerEvent implements DataListener {
@@ -63,14 +69,12 @@ public class Bno080Unit extends RoboUnit<BnoRequest> {
 
     private final List<BnoListenerEvent> listeners = new ArrayList<>();
     private Bno080Device device;
+    private int reportDelay;
+    private SensorReportId report;
 
     public Bno080Unit(RoboContext context, String id) {
         super(BnoRequest.class, context, id);
     }
-
-    // TODO review field purpose
-    private int reportDelay;
-    private SensorReportId report;
 
     @Override
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
@@ -87,10 +91,15 @@ public class Bno080Unit extends RoboUnit<BnoRequest> {
         }
         this.reportDelay = delay;
 
+        final String deviceType = configuration.getString(PROPERTY_DEVICE_TYPE, "SPI");
+
         try {
-            // TODO: make device configurable
-            device = Bno080Factory.createDefaultSPIDevice();
-        } catch (IOException | InterruptedException e) {
+            device = switch (deviceType.toUpperCase()) {
+                case "I2C" -> Bno08xFactory.createDefaultI2CDevice();
+                case "SPI" -> Bno08xFactory.createDefaultSPIDevice();
+                default -> throw new ConfigurationException("Unknown deviceType: " + deviceType);
+            };
+        } catch (InterruptedException e) {
             throw new ConfigurationException("Could not initiate device", e);
         }
         device.start(report, reportDelay);

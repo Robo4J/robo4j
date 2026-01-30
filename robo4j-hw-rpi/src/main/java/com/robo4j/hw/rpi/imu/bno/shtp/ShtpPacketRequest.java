@@ -17,16 +17,19 @@
 
 package com.robo4j.hw.rpi.imu.bno.shtp;
 
-import static com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice.SHTP_HEADER_SIZE;
-
 /**
- * ShtpPacketRequest represent SHTP request format used by SPI devices
+ * ShtpPacketRequest represents the SHTP request packet format.
  * {@link ShtpOperation}
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
 public final class ShtpPacketRequest {
+	/**
+	 * SHTP header size in bytes: LSB, MSB, Channel, Sequence.
+	 */
+	public static final int SHTP_HEADER_SIZE = 4;
+
 	private final int[] header = new int[SHTP_HEADER_SIZE];
 	private final int sequenceNumber;
 	private final int[] body;
@@ -43,7 +46,7 @@ public final class ShtpPacketRequest {
 	 * @param shtpChannel device channel
 	 */
 	public void createHeader(ShtpChannel shtpChannel) {
-		int[] header = createSpiHeader(body.length + SHTP_HEADER_SIZE, shtpChannel, sequenceNumber);
+		int[] header = createHeader(body.length + SHTP_HEADER_SIZE, shtpChannel, sequenceNumber);
 		this.header[0] = header[0]; // LSB
 		this.header[1] = header[1]; // MSB
 		this.header[2] = header[2]; // Channel Number
@@ -88,7 +91,7 @@ public final class ShtpPacketRequest {
 		return body.length;
 	}
 
-	private int[] createSpiHeader(int packetLength, ShtpChannel shtpChannel, int sequenceNumber) {
+	private int[] createHeader(int packetLength, ShtpChannel shtpChannel, int sequenceNumber) {
 		int[] header = new int[SHTP_HEADER_SIZE];
 		header[0] = (byte) (packetLength & 0xFF); // LSB
 		header[1] = (byte) ((packetLength >> 8) & 0xFF); // MSB
