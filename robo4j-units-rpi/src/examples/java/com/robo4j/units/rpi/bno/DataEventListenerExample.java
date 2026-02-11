@@ -30,6 +30,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static java.lang.IO.*;
+
 /**
  * DataEventEmitterListenerExample is an example displaying received data from
  * GYROSCOPE. Data are provided by
@@ -89,7 +91,7 @@ public class DataEventListenerExample {
         bnoUnit.sendMessage(requestToRegister);
 
         LOGGER.info("Press <Enter> to start!");
-        System.in.read();
+        readln();
         ctx.shutdown();
 
     }

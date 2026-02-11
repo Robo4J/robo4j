@@ -32,6 +32,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static java.lang.IO.*;
+
 /**
  * VectorEventEmitterListenerExample is simple robo4j system displaying Rotation
  * Vector event from {@link com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice}
@@ -101,7 +103,7 @@ public class VectorEventListenerExample {
         bnoUnit.sendMessage(requestToRegister);
 
         LOGGER.info("Press <Enter> to start!");
-        System.in.read();
+        readln();
         ctx.shutdown();
     }
 }

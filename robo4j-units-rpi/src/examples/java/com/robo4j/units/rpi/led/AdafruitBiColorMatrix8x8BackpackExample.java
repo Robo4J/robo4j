@@ -28,6 +28,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.lang.IO.*;
+
 /**
  * Adafruit Bi-Color 8x8 Matrix example
  * <p>
@@ -64,7 +66,7 @@ public class AdafruitBiColorMatrix8x8BackpackExample {
         }, 2, 1, TimeUnit.SECONDS);
 
         LOGGER.info("Press enter to quit\n");
-        System.in.read();
+        readln();
         executor.shutdown();
         ctx.shutdown();
     }

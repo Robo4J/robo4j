@@ -19,6 +19,8 @@ package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.IO.*;
+
 /**
  * Simple example of using Adafruit BiColor Bargraph {@link BiColor24BarDevice}
  *
@@ -28,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 public class BiColor24BargraphExample {
 
     public static void main(String[] args) throws Exception {
-        System.out.println("=== Bi-BiColor 24 Bargraph ===");
+        println("=== Bi-BiColor 24 Bargraph ===");
 
         BiColor24BarDevice device = new BiColor24BarDevice();
         device.clear();
@@ -57,8 +59,8 @@ public class BiColor24BargraphExample {
             counter++;
         }
 
-        System.out.println("Press <Enter> to quit!");
-        System.in.read();
+        println("Press <Enter> to quit!");
+        readln();
         device.clear();
         device.display();
     }

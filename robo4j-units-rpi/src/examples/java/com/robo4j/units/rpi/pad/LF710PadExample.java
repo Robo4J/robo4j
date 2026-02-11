@@ -22,7 +22,7 @@ import com.robo4j.util.SystemUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import static java.lang.IO.*;
 
 /**
  * Logitech F710 Pad Example
@@ -33,7 +33,7 @@ import java.io.IOException;
 public class LF710PadExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(LF710PadExample.class);
 
-    public static void main(String[] args) throws RoboBuilderException, IOException {
+    public static void main(String[] args) throws RoboBuilderException {
         var settings = Thread.currentThread().getContextClassLoader().getResourceAsStream("logitechF710.xml");
         if (settings == null) {
             LOGGER.warn("Could not find the settings for the Gamepad!");
@@ -48,7 +48,7 @@ public class LF710PadExample {
         LOGGER.info(SystemUtil.printStateReport(system));
 
         LOGGER.info("Press <Enter> to quit!");
-        System.in.read();
+        readln();
         system.shutdown();
         LOGGER.info("Bye!");
     }

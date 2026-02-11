@@ -20,6 +20,8 @@ package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.IO.*;
+
 /**
  * Simple example using {@link BiColor8x8MatrixDevice}
  *
@@ -29,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class BiColor8x8MatrixFaceRotationExample {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        System.out.println("=== BiColor 8x8 Matrix Face Rotation Example ===");
+        println("=== BiColor 8x8 Matrix Face Rotation Example ===");
 
         BiColor8x8MatrixDevice ledMatrix = new BiColor8x8MatrixDevice();
         //@formatter:off
@@ -54,8 +56,8 @@ public class BiColor8x8MatrixFaceRotationExample {
             TimeUnit.SECONDS.sleep(1);
         }
 
-        System.out.println("Press <Enter> to quit!");
-        System.in.read();
+        println("Press <Enter> to quit!");
+        readln();
         ledMatrix.clear();
         ledMatrix.display();
     }

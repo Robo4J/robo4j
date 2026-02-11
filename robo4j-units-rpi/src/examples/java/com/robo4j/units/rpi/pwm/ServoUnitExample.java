@@ -22,7 +22,7 @@ import com.robo4j.RoboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import static java.lang.IO.*;
 
 /**
  * Small example panning and tilting two servos in a pan/tilt setup.
@@ -54,11 +54,7 @@ public class ServoUnitExample {
         thread.start();
 
         LOGGER.info("Press <Enter> to quit!");
-        try {
-            System.in.read();
-        } catch (IOException e) {
-            LOGGER.error("error:{}", e.getMessage(), e);
-        }
+        readln();
         stop = true;
         ctx.shutdown();
     }

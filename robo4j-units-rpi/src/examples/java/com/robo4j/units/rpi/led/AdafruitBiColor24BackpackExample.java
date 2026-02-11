@@ -31,6 +31,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.lang.IO.*;
+
 /**
  * Adafruit Bi-Color 24 Bargraph example
  * <p>
@@ -64,7 +66,7 @@ public class AdafruitBiColor24BackpackExample {
         }, 2, 1, TimeUnit.SECONDS);
 
         LOGGER.info("Press enter to quit");
-        System.in.read();
+        readln();
         executor.shutdown();
         ctx.shutdown();
 

@@ -21,6 +21,8 @@ import java.io.IOException;
 import com.robo4j.hw.rpi.i2c.bmp.BMP085Device;
 import com.robo4j.hw.rpi.i2c.bmp.BMP085Device.OperatingMode;
 
+import static java.lang.IO.*;
+
 /**
  * Repeatedly reads and displays the temperature (in C), pressure (in hPa) and
  * barometric altitude (in m). Good example to test that your BMP device is working.
@@ -32,10 +34,10 @@ public class BMP085Test {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		BMP085Device bmp = new BMP085Device(OperatingMode.STANDARD);
 		while (true) {
-			System.out.printf("Temperature: %sC, Pressure: %shPa, Altitude: %sm%n",
+			println("Temperature: %sC, Pressure: %shPa, Altitude: %sm".formatted(
 					bmp.readTemperature(),
 					bmp.readPressure() / 100,
-					bmp.readAltitude());
+					bmp.readAltitude()));
 			Thread.sleep(2000);
 		}
 	}

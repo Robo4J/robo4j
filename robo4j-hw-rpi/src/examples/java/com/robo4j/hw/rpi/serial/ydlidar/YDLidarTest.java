@@ -19,6 +19,8 @@ package com.robo4j.hw.rpi.serial.ydlidar;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+import static java.lang.IO.*;
+
 /**
  * Example. Gets some information from the lidar, prints it, and then captures
  * data for 10 seconds.
@@ -30,22 +32,22 @@ public class YDLidarTest {
 
     //TODO: review example with sleep
     public static void main(String[] args) throws IOException, InterruptedException, TimeoutException {
-        YDLidarDevice device = new YDLidarDevice(scanResult -> System.out.println("Got scan result:" + scanResult));
-        System.out.println("Restarting the device to make sure we start with a clean slate");
+        YDLidarDevice device = new YDLidarDevice(scanResult -> println("Got scan result:" + scanResult));
+        println("Restarting the device to make sure we start with a clean slate");
         device.restart();
         // Takes some serious time to restart this thing ;)
-        System.out.println("Waiting 4s for the device to properly boot up");
+        println("Waiting 4s for the device to properly boot up");
         Thread.sleep(4000);
-        System.out.println("device:" + device);
-        System.out.println("deviceInfo:" + device.getDeviceInfo());
-        System.out.println("deviceHealth:" + device.getHealthInfo());
-        System.out.println("Ranging Frequency:" + device.getRangingFrequency());
-        System.out.println("Will capture data for 10 seconds...");
+        println("device:" + device);
+        println("deviceInfo:" + device.getDeviceInfo());
+        println("deviceHealth:" + device.getHealthInfo());
+        println("Ranging Frequency:" + device.getRangingFrequency());
+        println("Will capture data for 10 seconds...");
         device.setScanning(true);
         Thread.sleep(10000);
         device.setScanning(false);
         device.shutdown();
-        System.out.println("Done!");
+        println("Done!");
     }
 
 }

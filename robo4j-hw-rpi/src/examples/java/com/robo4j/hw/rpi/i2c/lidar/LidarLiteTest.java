@@ -18,6 +18,8 @@ package com.robo4j.hw.rpi.i2c.lidar;
 
 import java.io.IOException;
 
+import static java.lang.IO.*;
+
 /**
  * This example will repeatedly acquire the range with the LidarLite. Good for
  * testing that it works.
@@ -32,7 +34,7 @@ public class LidarLiteTest {
         while (true) {
             ld.acquireRange();
             Thread.sleep(100);
-            System.out.println("Distance: " + ld.readDistance() + "m");
+            println("Distance: " + ld.readDistance() + "m");
             Thread.sleep(500);
         }
     }

@@ -30,6 +30,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static java.lang.IO.*;
+
 /**
  * Runs the laser scanner, printing the max range and min range found on stdout.
  * (To see all data, run with JFR and dump a recording.)
@@ -79,6 +81,6 @@ public class LaserScannerExample {
         ctx.start();
         LOGGER.info("Starting scanning for ever\nPress <Enter> to quit");
         reference.sendMessage("scan");
-        System.in.read();
+        readln();
     }
 }

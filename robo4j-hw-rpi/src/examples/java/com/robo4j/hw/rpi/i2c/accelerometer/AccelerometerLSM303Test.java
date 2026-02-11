@@ -21,6 +21,8 @@ import com.robo4j.math.geometry.Tuple3f;
 
 import java.io.IOException;
 
+import static java.lang.IO.*;
+
 /**
  * Example useful to check if your accelerometer is working properly.
  *
@@ -37,17 +39,17 @@ public class AccelerometerLSM303Test {
     private static void getReading(ReadableDevice<Tuple3f> device, String message)
             throws IOException, InterruptedException {
         prompt(message);
-        print(readValues(device));
+        printStats(readValues(device));
     }
 
-    private static void print(Stats stats) {
-        System.out.println("Result:" + stats);
+    private static void printStats(Stats stats) {
+        println("Result:" + stats);
     }
 
     private static void prompt(String msg) throws IOException {
-        System.out.println(msg);
-        System.out.println("Press <Enter> to continue!");
-        System.in.read();
+        println(msg);
+        println("Press <Enter> to continue!");
+        readln();
     }
 
     private static Stats readValues(ReadableDevice<Tuple3f> device) throws IOException, InterruptedException {
@@ -58,10 +60,10 @@ public class AccelerometerLSM303Test {
             stats.addValue(fl);
             Thread.sleep(20);
             if (i % 25 == 0) {
-                System.out.print(".");
+                print(".");
             }
         }
-        System.out.println();
+        println();
         return stats;
     }
 }

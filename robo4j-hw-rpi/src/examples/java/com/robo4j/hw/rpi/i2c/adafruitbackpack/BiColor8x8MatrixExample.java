@@ -19,6 +19,8 @@ package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.IO.*;
+
 /**
  * Simple example using {@link BiColor8x8MatrixDevice}
  *
@@ -28,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 public class BiColor8x8MatrixExample {
 
     public static void main(String[] args) throws Exception {
-        System.out.println("=== BiColor 8x8 Matrix Example ===");
+        println("=== BiColor 8x8 Matrix Example ===");
 
         BiColor8x8MatrixDevice matrix = new BiColor8x8MatrixDevice();
         matrix.clear();
@@ -51,8 +53,8 @@ public class BiColor8x8MatrixExample {
             matrix.clear();
         }
 
-        System.out.println("Press <Enter> to quit!");
-        System.in.read();
+        println("Press <Enter> to quit!");
+        readln();
         matrix.clear();
         matrix.display();
 

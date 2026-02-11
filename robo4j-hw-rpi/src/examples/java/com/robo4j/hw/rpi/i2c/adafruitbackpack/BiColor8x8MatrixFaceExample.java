@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.IO.*;
+
 /**
  * Simple example using {@link BiColor8x8MatrixDevice}
  *
@@ -30,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 public class BiColor8x8MatrixFaceExample {
 
     public static void main(String[] args) throws Exception {
-        System.out.println("=== BiColor 8x8 Matrix Face Example ===");
+        println("=== BiColor 8x8 Matrix Face Example ===");
 
         BiColor8x8MatrixDevice led = new BiColor8x8MatrixDevice();
 
@@ -49,8 +51,8 @@ public class BiColor8x8MatrixFaceExample {
             TimeUnit.SECONDS.sleep(1);
         }
 
-        System.out.println("Press <Enter> to quit!");
-        System.in.read();
+        println("Press <Enter> to quit!");
+        readln();
         led.clear();
         led.display();
 

@@ -28,6 +28,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.IO.*;
+
 /**
  * An example for the BNO device.
  *
@@ -52,8 +54,8 @@ public class Bno055Example {
                 Tuple3f orientation = device.read();
                 float temperature = device.getTemperature();
 
-                System.out.printf("heading: %s, roll: %s, pitch: %s - temp:%s%n", orientation.x,
-                        orientation.y, orientation.z, temperature);
+                println("heading: %s, roll: %s, pitch: %s - temp:%s".formatted(orientation.x,
+                        orientation.y, orientation.z, temperature));
             } catch (Throwable e) {
                 System.err.println("error");
                 e.printStackTrace();
@@ -72,44 +74,44 @@ public class Bno055Example {
      */
     public static void main(String[] args) throws IOException, InterruptedException {
         // TODO: review sleeps
-        System.out.println("Starting the BNO055 Example.");
+        println("Starting the BNO055 Example.");
         Bno055Device bno = Bno055Factory.createDefaultSerialDevice();
         Thread.sleep(20);
 
-        System.out.println("Resetting device...");
+        println("Resetting device...");
         bno.reset();
         Thread.sleep(20);
 
-        System.out.println("Running Self Test...");
+        println("Running Self Test...");
         Bno055SelfTestResult testResult = bno.performSelfTest();
-        System.out.println("Result of self test: ");
-        System.out.println("result:" + testResult);
+        println("Result of self test: ");
+        println("result:" + testResult);
         Thread.sleep(20);
 
-        System.out.println("Operating mode: " + bno.getOperatingMode());
+        println("Operating mode: " + bno.getOperatingMode());
         if (bno.getOperatingMode() != OperatingMode.NDOF) {
-            System.out.println("Switching mode to NDOF");
+            println("Switching mode to NDOF");
             bno.setOperatingMode(OperatingMode.NDOF);
-            System.out.println("Operating mode: " + bno.getOperatingMode());
+            println("Operating mode: " + bno.getOperatingMode());
         }
 
-        System.out.println("Starting calibration sequence...");
+        println("Starting calibration sequence...");
         Bno055CalibrationStatus calibrationStatus = null;
         while (!(calibrationStatus = bno.getCalibrationStatus()).isFullyCalibrated()) {
-            System.out.printf("Calibration status: system:%s, gyro:%s, accelerometer:%s, magnetometer:%s%n", calibrationStatus.getSystemCalibrationStatus(), calibrationStatus.getGyroCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus());
+            println("Calibration status: system:%s, gyro:%s, accelerometer:%s, magnetometer:%s".formatted(calibrationStatus.getSystemCalibrationStatus(), calibrationStatus.getGyroCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus()));
             Thread.sleep(500);
         }
-        System.out.println("System fully calibrated. Now printing data. Press <Enter> to quit!");
+        println("System fully calibrated. Now printing data. Press <Enter> to quit!");
 
         EXECUTOR.scheduleAtFixedRate(new BNOPrinter(bno), 40, 500, TimeUnit.MILLISECONDS);
-        System.in.read();
+        readln();
         EXECUTOR.shutdown();
         var terminated = EXECUTOR.awaitTermination(TIMEOUT_SEC, TimeUnit.SECONDS);
         if (!terminated) {
             System.err.println("not terminated properly");
             EXECUTOR.shutdownNow();
         }
-        System.out.println("Bye, bye!");
+        println("Bye, bye!");
         bno.shutdown();
     }
 

@@ -20,6 +20,8 @@ import com.robo4j.hw.rpi.i2c.gyro.GyroL3GD20Device.Sensitivity;
 
 import java.io.IOException;
 
+import static java.lang.IO.*;
+
 /**
  * Simple example which repeatedly reads the gyro. Good for checking that your
  * gyro is working.
@@ -30,11 +32,11 @@ import java.io.IOException;
 public class GyroL3GD20Test {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        System.out.println("Initializing...");
+        println("Initializing...");
         GyroL3GD20Device device = new GyroL3GD20Device(Sensitivity.DPS_245);
 
         while (true) {
-            System.out.println("device,read:" + device.read());
+            println("device,read:" + device.read());
             Thread.sleep(200);
         }
     }

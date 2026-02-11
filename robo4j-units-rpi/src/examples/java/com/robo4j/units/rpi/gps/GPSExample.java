@@ -25,7 +25,7 @@ import com.robo4j.util.SystemUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import static java.lang.IO.*;
 
 /**
  * Runs the gyro continuously.
@@ -38,7 +38,7 @@ public class GPSExample {
     private static final String ID_PROCESSOR = "processor";
     private static final String ID_GPS = "gps";
 
-    public static void main(String[] args) throws RoboBuilderException, IOException {
+    public static void main(String[] args) throws RoboBuilderException {
         var builder = new RoboBuilder();
         builder.add(MtkGPSUnit.class, ID_GPS);
         builder.add(GPSProcessor.class, ID_PROCESSOR);
@@ -55,18 +55,18 @@ public class GPSExample {
         RoboReference<GPSEvent> processor = ctx.getReference(ID_PROCESSOR);
 
         LOGGER.info("Press <Enter> to start requesting events, then press enter again to stop requesting events!");
-        System.in.read();
+        readln();
 
         LOGGER.info("Requesting GPS events! Press <Enter> to stop!");
         gps.sendMessage(new GPSRequest(processor, Operation.REGISTER));
-        System.in.read();
+        readln();
 
         LOGGER.info("Ending requesting GPS events...");
         gps.sendMessage(new GPSRequest(processor, Operation.UNREGISTER));
         // Note that we can still get a few more events after this, and that is
         // quite fine. ;)
         LOGGER.info("All done! Press <Enter> to quit!");
-        System.in.read();
+        readln();
 
         LOGGER.info("Exiting! Bye!");
         ctx.shutdown();

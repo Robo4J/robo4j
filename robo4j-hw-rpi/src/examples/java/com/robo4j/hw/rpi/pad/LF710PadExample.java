@@ -22,6 +22,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static java.lang.IO.*;
+
 /**
  * Java port of Logitech F710 Gamepad
  * optimised of raspberryPi
@@ -47,7 +49,7 @@ public class LF710PadExample implements Runnable {
     private final Path inputPath = Paths.get(REGISTERED_INPUT);
 
     public static void main(String[] args) {
-        System.out.println("start joystick logitech F710");
+        println("start joystick logitech F710");
         LF710PadExample pad = new LF710PadExample();
         new Thread(pad).start();
     }
@@ -74,10 +76,10 @@ public class LF710PadExample implements Runnable {
                         final LF710Part lf710Part = LF710Part.getByMask(part);
                         switch (lf710Part) {
                             case BUTTON:
-                                System.out.printf("BUTTON: %s state: %s time: %d%n", LF710Button.getByMask(element), getInputState(amount), time);
+                                println("BUTTON: %s state: %s time: %d".formatted(LF710Button.getByMask(element), getInputState(amount), time));
                                 break;
                             case JOYSTICK:
-                                System.out.printf("JOYSTICK: %s state: %s time: %d%n", LF710JoystickButton.getByMask(element), getInputState(amount), time);
+                                println("JOYSTICK: %s state: %s time: %d".formatted(LF710JoystickButton.getByMask(element), getInputState(amount), time));
                                 break;
                             default:
                                 throw new RuntimeException("uknonw pad part:" + lf710Part);

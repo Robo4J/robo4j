@@ -20,6 +20,8 @@ import com.robo4j.hw.rpi.utils.GpioPin;
 
 import java.io.IOException;
 
+import static java.lang.IO.*;
+
 /**
  * This example assumes a servo connected to the GPIO_01 hardware PWM pin.
  *
@@ -31,14 +33,14 @@ public class PWMServoExample {
     public static void main(String[] args) throws IOException,
             InterruptedException {
         if (args.length != 1) {
-            System.out.println("Usage: PWMExample <input>");
+            println("Usage: PWMExample <input>");
             System.exit(2);
         }
         float input = Float.parseFloat(args[0]);
         PWMServo servo = new PWMServo(GpioPin.GPIO_01, false);
-        System.out.println("Setting input to " + input);
+        println("Setting input to " + input);
         servo.setInput(input);
-        System.out.println("Press <Enter> to quit");
-        System.in.read();
+        println("Press <Enter> to quit");
+        readln();
     }
 }

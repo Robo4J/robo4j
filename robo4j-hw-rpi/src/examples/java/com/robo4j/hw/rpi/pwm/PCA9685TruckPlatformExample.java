@@ -22,6 +22,8 @@ import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
 
 import java.io.IOException;
 
+import static java.lang.IO.*;
+
 /**
  * This example assumes servo is connected to the specific channel
  *
@@ -38,7 +40,7 @@ public class PCA9685TruckPlatformExample {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         if (args.length != 5) {
-            System.out.println("Usage: <throttle> <steering> <leg> <shift> <duration>");
+            println("Usage: <throttle> <steering> <leg> <shift> <duration>");
             System.out.flush();
             System.exit(2);
         }
@@ -49,13 +51,13 @@ public class PCA9685TruckPlatformExample {
         int duration = Integer.parseInt(args[4]);
 
         testMotor(throttle, steering, leg, shift, duration);
-        System.out.println("All done! Bye!");
+        println("All done! Bye!");
     }
 
     public static void testMotor(float throttle, float steering, float leg, float shift, int duration)
             throws IOException, InterruptedException {
-        System.out.printf("Running for %d ms with throttle %s, steering %s, leg %s, shift %s%n", duration,
-                throttle, steering, leg, shift);
+        println("Running for %d ms with throttle %s, steering %s, leg %s, shift %s".formatted(duration,
+                throttle, steering, leg, shift));
         PWMPCA9685Device device = new PWMPCA9685Device();
         device.setPWMFrequency(SERVO_FREQUENCY);
         Servo throttleEngine = new PCA9685Servo(device.getChannel(SERVO_THROTTLE));

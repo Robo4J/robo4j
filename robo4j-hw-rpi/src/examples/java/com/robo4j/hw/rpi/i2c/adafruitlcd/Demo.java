@@ -20,6 +20,8 @@ import com.robo4j.hw.rpi.i2c.adafruitlcd.impl.AdafruitLcdImpl.Direction;
 
 import java.io.IOException;
 
+import static java.lang.IO.*;
+
 /**
  * Here is a demonstration of things that can be done with the LCD shield. Run
  * this as a standalone java program. Do not forget to have sudo rights.
@@ -77,7 +79,7 @@ public class Demo {
 
             private void runTest(int currentTest) {
                 LCDDemo test = TESTS[currentTest];
-                System.out.println("Running test " + test.getName());
+                println("Running test " + test.getName());
                 try {
                     test.run(lcd);
                 } catch (IOException e) {
@@ -85,8 +87,8 @@ public class Demo {
                 }
             }
         });
-        System.out.println("Press <Enter> to quit!");
-        System.in.read();
+        println("Press <Enter> to quit!");
+        readln();
         lcd.stop();
     }
 

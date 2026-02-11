@@ -19,6 +19,8 @@ package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.IO.*;
+
 /**
  * Simple example of displaying characters on {@link AlphanumericDevice}
  *
@@ -28,12 +30,12 @@ import java.util.concurrent.TimeUnit;
 public class AlphanumericDeviceExample {
 
     public static void main(String[] args) throws Exception {
-        System.out.println("=== Alphanumeric Backpack Example ===");
+        println("=== Alphanumeric Backpack Example ===");
 
         AlphanumericDevice device = new AlphanumericDevice();
         device.clear();
         device.display();
-        System.out.println("Adding Characters");
+        println("Adding Characters");
         device.addCharacter('A', false);
         device.addCharacter('B', true);
         device.addCharacter('C', false);
@@ -49,8 +51,8 @@ public class AlphanumericDeviceExample {
         device.display();
 
 
-        System.out.println("Press <Enter> to quit!");
-        System.in.read();
+        println("Press <Enter> to quit!");
+        readln();
         device.clear();
         device.display();
 

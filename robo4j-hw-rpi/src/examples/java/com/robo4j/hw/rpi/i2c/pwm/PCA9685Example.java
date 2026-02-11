@@ -23,6 +23,8 @@ import com.robo4j.hw.rpi.Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PCA9685Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
 
+import static java.lang.IO.*;
+
 /**
  * This example assumes two servos connected to channel 0 and 1, and two H bridges controlling DC engines on channel 2 and 3. 
  * <b>This example should be modified to suit your setup!</b>
@@ -41,7 +43,7 @@ public class PCA9685Example {
 
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
-		System.out.println("Creating device...");
+		println("Creating device...");
 		PWMPCA9685Device device = new PWMPCA9685Device();
 		device.setPWMFrequency(SERVO_FREQUENCY);
 		Servo servo0 = new PCA9685Servo(device.getChannel(0));
@@ -49,15 +51,15 @@ public class PCA9685Example {
 		PWMChannel motor0 = device.getChannel(2);
 		PWMChannel motor1 = device.getChannel(3);
 
-		System.out.println("Setting start conditions...");
+		println("Setting start conditions...");
 		servo0.setInput(0);
 		servo1.setInput(0);
 		motor0.setPWM(0, MOTOR_MIN);
 		motor1.setPWM(0, MOTOR_MIN);
 
-		System.out.println("Press <Enter> to run loop!");
-		System.in.read();
-		System.out.println("Running perpetual loop...");
+		println("Press <Enter> to run loop!");
+		readln();
+		println("Running perpetual loop...");
 		while (true) {
 			servo0.setInput(-1);
 			servo1.setInput(-1);

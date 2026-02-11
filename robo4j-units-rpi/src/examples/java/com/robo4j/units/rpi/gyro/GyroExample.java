@@ -25,7 +25,7 @@ import com.robo4j.util.SystemUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import static java.lang.IO.*;
 
 /**
  * Runs the gyro continuously.
@@ -37,7 +37,7 @@ public class GyroExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(GyroExample.class);
     private static final String ID_PROCESSOR = "processor";
 
-    public static void main(String[] args) throws RoboBuilderException, IOException {
+    public static void main(String[] args) throws RoboBuilderException {
         var builder = new RoboBuilder();
         var settings = GyroExample.class.getClassLoader().getResourceAsStream("gyroexample.xml");
         if (settings == null) {
@@ -59,9 +59,9 @@ public class GyroExample {
         RoboReference<GyroEvent> processor = ctx.getReference(ID_PROCESSOR);
 
         LOGGER.info("Let the gyro unit be absolutely still, then press enter to calibrate and start!");
-        System.in.read();
+        readln();
         gyro.sendMessage(new GyroRequest(processor, GyroAction.CONTINUOUS, new Tuple3f(1.0f, 1.0f, 1.0f)));
         LOGGER.info("Will report angular changes indefinitely.\nPress <Enter> to quit!");
-        System.in.read();
+        readln();
     }
 }

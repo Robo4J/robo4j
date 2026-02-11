@@ -20,6 +20,8 @@ import com.robo4j.hw.rpi.lcd.Lcd20x4.Alignment;
 
 import java.io.IOException;
 
+import static java.lang.IO.*;
+
 /**
  * Demo for the 20x4 LCD.
  *
@@ -74,8 +76,8 @@ public class Lcd20x4Example {
         Demo demo = new Demo(lcd);
         Thread t = new Thread(demo, "LCD Demo Thread");
         t.start();
-        System.out.println("Running LCD demo. Press <Enter> to quit!");
-        System.in.read();
+        println("Running LCD demo. Press <Enter> to quit!");
+        readln();
         demo.quit();
     }
 }

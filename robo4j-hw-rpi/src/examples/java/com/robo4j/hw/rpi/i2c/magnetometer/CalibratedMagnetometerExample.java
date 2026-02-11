@@ -24,8 +24,11 @@ import com.robo4j.math.geometry.Tuple3f;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
+
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.IO.*;
 
 /**
  * Magnetometer example for trying out a calibrated magnetometer.
@@ -48,7 +51,7 @@ public class CalibratedMagnetometerExample {
         public void run() {
             try {
                 Tuple3f magResult = magDevice.read();
-                System.out.println("Heading:" + MagnetometerLSM303Device.getCompassHeading(magResult));
+                println("Heading:" + MagnetometerLSM303Device.getCompassHeading(magResult));
             } catch (IOException e) {
                 System.err.println(e.getMessage());
                 e.printStackTrace();
@@ -64,17 +67,17 @@ public class CalibratedMagnetometerExample {
         Matrix3f transform = new Matrix3f(1.887f, 5.987f, -5.709f, 5.987f, 1.528f, -2.960f, -5.709f, -2.960f, 9.761f);
         MagnetometerLSM303Device magnetometer = new MagnetometerLSM303Device(I2cBus.BUS_1, 0x1e, Mode.CONTINUOUS_CONVERSION, Rate.RATE_7_5,
                 false, bias, transform);
-        System.out.println(
+        println(
                 "Starting to read and print the heading. Make sure the magnetometer is flat in the XY-plane (this example does not do tilt compensated heading).");
-        System.out.println("Press <Enter> to quit...");
+        println("Press <Enter> to quit...");
         EXECUTOR.scheduleAtFixedRate(new MagnetometerPoller(magnetometer), 100, 500, TimeUnit.MILLISECONDS);
-        System.in.read();
+        readln();
         EXECUTOR.shutdown();
         var terminated = EXECUTOR.awaitTermination(TIMEOUT_SEC, TimeUnit.SECONDS);
         if(!terminated){
             System.err.println("example not terminated properly.");
             EXECUTOR.shutdownNow();
         }
-        System.out.println("Goodbye!");
+        println("Goodbye!");
     }
 }

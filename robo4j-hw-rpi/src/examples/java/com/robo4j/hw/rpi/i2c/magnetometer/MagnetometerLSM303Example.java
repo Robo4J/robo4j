@@ -21,8 +21,11 @@ import com.robo4j.math.geometry.Tuple3i;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
+
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.IO.*;
 
 /**
  * Example program that can be used to produce csv data that can be used for
@@ -64,16 +67,16 @@ public class MagnetometerLSM303Example {
                 switch (printStyle) {
                     case RAW:
                         Tuple3i raw = readRaw();
-                        System.out.println("Raw Value " + count + " = " + raw.toString());
+                        println("Raw Value " + count + " = " + raw.toString());
                         break;
                     case CSV:
                         Tuple3f val = read();
-                        System.out.println(val.x + ";" + val.y + ";" + val.z);
+                        println(val.x + ";" + val.y + ";" + val.z);
                         break;
                     default:
                         val = read();
-                        System.out.printf("Value %d = %s\tHeading:%f%n", count, val.toString(),
-                                MagnetometerLSM303Device.getCompassHeading(val));
+                        println("Value %d = %s\tHeading:%f".formatted(count, val.toString(),
+                                MagnetometerLSM303Device.getCompassHeading(val)));
                 }
             }
             count++;
@@ -109,7 +112,7 @@ public class MagnetometerLSM303Example {
     // FIXME(Marcus/Dec 5, 2016): Verify that this one works.
     public static void main(String[] args) throws IOException, InterruptedException {
         if (args.length < 2) {
-            System.out.println(
+            println(
                     "Usage: MagnetometerLSM303Test <read periodicity (ms)> <print every Nth read> [<print style (pretty|raw|csv)>] ");
             System.exit(1);
         }
@@ -123,7 +126,7 @@ public class MagnetometerLSM303Example {
         printMessage(printStyle, "Starting to collect data...");
         printMessage(printStyle, "Press <Enter> to stop!");
         EXECUTOR_SERVICE.scheduleAtFixedRate(dg, 0, period, TimeUnit.MILLISECONDS);
-        System.in.read();
+        readln();
         EXECUTOR_SERVICE.shutdown();
         var terminated = EXECUTOR_SERVICE.awaitTermination(TIMEOUT_SEC, TimeUnit.SECONDS);
         if (!terminated) {
@@ -134,7 +137,7 @@ public class MagnetometerLSM303Example {
     }
 
     private static void printMessage(PrintStyle printStyle, String message) {
-        System.out.println(getPrefix(printStyle) + message);
+        println(getPrefix(printStyle) + message);
     }
 
     private static String getPrefix(PrintStyle printStyle) {

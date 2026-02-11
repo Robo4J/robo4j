@@ -20,6 +20,8 @@ import com.robo4j.hw.rpi.utils.GpioPin;
 
 import java.io.IOException;
 
+import static java.lang.IO.*;
+
 /**
  * This example assumes an MC33926 hooked up to channel 4 of .
  * <p>
@@ -31,10 +33,10 @@ import java.io.IOException;
 public class MC33926Example {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        System.out.println("Creating device...");
+        println("Creating device...");
 
         if (args.length != 3) {
-            System.out.println("Usage: MC33926Example <speed> <duration>");
+            println("Usage: MC33926Example <speed> <duration>");
             System.out.flush();
             System.exit(2);
         }
@@ -49,12 +51,12 @@ public class MC33926Example {
         HBridgeMC33926Device engine = new HBridgeMC33926Device("Engine", pwm.getChannel(4),
                 GpioPin.GPIO_02, GpioPin.GPIO_03, true);
 
-        System.out.printf("Running for %dms at speed:%s...%n", duration, speed);
+        println("Running for %dms at speed:%s...".formatted(duration, speed));
 
         engine.setSpeed(speed);
         Thread.sleep(duration);
         engine.setSpeed(0);
 
-        System.out.println("Done!");
+        println("Done!");
     }
 }

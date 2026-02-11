@@ -23,6 +23,8 @@ import com.robo4j.hw.rpi.gps.VelocityEvent;
 
 import java.io.IOException;
 
+import static java.lang.IO.*;
+
 /**
  * Listens for GPS event and prints them to stdout as they come.
  *
@@ -36,17 +38,17 @@ public class GPSTest {
         mtk3339gps.addListener(new GPSListener() {
             @Override
             public void onPosition(PositionEvent event) {
-                System.out.println("onPosition, event:" + event);
+                println("onPosition, event:" + event);
             }
 
             @Override
             public void onVelocity(VelocityEvent event) {
-                System.out.println("onVelocity, event:" + event);
+                println("onVelocity, event:" + event);
             }
         });
         mtk3339gps.start();
-        System.out.println("Press <Enter> to quit!");
-        System.in.read();
+        println("Press <Enter> to quit!");
+        readln();
         mtk3339gps.shutdown();
     }
 }

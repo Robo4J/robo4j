@@ -22,6 +22,8 @@ import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
 
 import java.io.IOException;
 
+import static java.lang.IO.*;
+
 /**
  * This example assumes two servos connected to specific channels (6 and 7). It
  * is important to modify this example to match your setup.
@@ -38,7 +40,7 @@ public class RoboClawRCTankTest {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         if (args.length != 3) {
-            System.out.println("Usage: Tank <speed> <direction> <duration>");
+            println("Usage: Tank <speed> <direction> <duration>");
             System.out.flush();
             System.exit(2);
         }
@@ -47,12 +49,12 @@ public class RoboClawRCTankTest {
         int duration = Integer.parseInt(args[2]);
 
         testEngine(speed, direction, duration);
-        System.out.println("All done! Bye!");
+        println("All done! Bye!");
     }
 
     public static void testEngine(float speed, float direction, int duration) throws IOException, InterruptedException {
         // TODO: add measurement units
-        System.out.printf("duration:%dms with speed:%s and direction:%s%n", duration, speed, direction);
+        println("duration:%dms with speed:%s and direction:%s".formatted(duration, speed, direction));
         PWMPCA9685Device device = new PWMPCA9685Device();
         device.setPWMFrequency(SERVO_FREQUENCY);
         Servo leftEngine = new PCA9685Servo(device.getChannel(6));

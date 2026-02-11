@@ -18,6 +18,8 @@ package com.robo4j.hw.rpi.i2c.bmp;
 
 import java.io.IOException;
 
+import static java.lang.IO.*;
+
 /**
  * Repeatedly reads and displays the temperature (in C), pressure (in hPa) and
  * barometric altitude (in m). Good example to test that your BMP581 device is working.
@@ -27,26 +29,26 @@ import java.io.IOException;
 public class BMP581Example {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        System.out.println("BMP581 Sensor Example");
-        System.out.println("=====================");
+        println("BMP581 Sensor Example");
+        println("=====================");
 
         BMP581Device bmp = new BMP581Device();
-        System.out.println("BMP581 Chip ID: 0x" + Integer.toHexString(bmp.getChipId()));
-        System.out.println("Temperature OSR: " + bmp.getTemperatureOversampling());
-        System.out.println("Pressure OSR: " + bmp.getPressureOversampling());
-        System.out.println("IIR Filter: " + bmp.getPressureIirFilter());
-        System.out.println("Power Mode: " + bmp.getPowerMode());
-        System.out.println();
+        println("BMP581 Chip ID: 0x" + Integer.toHexString(bmp.getChipId()));
+        println("Temperature OSR: " + bmp.getTemperatureOversampling());
+        println("Pressure OSR: " + bmp.getPressureOversampling());
+        println("IIR Filter: " + bmp.getPressureIirFilter());
+        println("Power Mode: " + bmp.getPowerMode());
+        println();
 
         while (true) {
             float temperature = bmp.readTemperature();
             float pressure = bmp.readPressure();
             float altitude = bmp.readAltitude();
 
-            System.out.printf("Temperature: %.2f°C, Pressure: %.2f hPa, Altitude: %.2f m%n",
+            println("Temperature: %.2f°C, Pressure: %.2f hPa, Altitude: %.2f m".formatted(
                     temperature,
                     pressure / 100.0f,
-                    altitude);
+                    altitude));
             Thread.sleep(2000);
         }
     }
