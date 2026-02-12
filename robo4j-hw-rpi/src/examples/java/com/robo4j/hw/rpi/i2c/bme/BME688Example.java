@@ -18,6 +18,8 @@ package com.robo4j.hw.rpi.i2c.bme;
 
 import java.io.IOException;
 
+import static java.lang.IO.*;
+
 /**
  * Repeatedly reads and displays temperature (in C), pressure (in hPa), humidity (in %),
  * gas resistance (in kOhm), and barometric altitude (in m) from a BME688 sensor.
@@ -28,40 +30,40 @@ import java.io.IOException;
 public class BME688Example {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        System.out.println("BME688 Environmental Sensor Example");
-        System.out.println("====================================");
+        println("BME688 Environmental Sensor Example");
+        println("====================================");
 
         BME688Device bme688 = new BME688Device();
-        System.out.println("BME688 sensor initialized successfully");
-        System.out.println();
+        println("BME688 sensor initialized successfully");
+        println();
 
-        System.out.println("Running self-test...");
+        println("Running self-test...");
         if (!bme688.selfTest()) {
-            System.out.println("Self-test FAILED. Check sensor wiring and connections.");
+            println("Self-test FAILED. Check sensor wiring and connections.");
             return;
         }
-        System.out.println("Self-test passed.");
-        System.out.println();
+        println("Self-test passed.");
+        println();
 
         int readCount = 0;
         while (true) {
             readCount++;
-            System.out.println("--- Reading #" + readCount + " ---");
+            println("--- Reading #" + readCount + " ---");
 
             // Read air quality data (includes T/P/H plus simplified IAQ metrics)
             BME688Device.AirQualityData data = bme688.readAirQuality();
 
-            System.out.printf("Temperature: %.2f C%n", data.getTemperature());
-            System.out.printf("Pressure: %.2f hPa%n", data.getPressureHPa());
-            System.out.printf("Humidity: %.2f%%%n", data.getHumidity());
-            System.out.printf("Gas Resistance: %.2f kOhm%n", data.getGasResistance() / 1000.0);
+            println("Temperature: %.2f C".formatted(data.getTemperature()));
+            println("Pressure: %.2f hPa".formatted(data.getPressureHPa()));
+            println("Humidity: %.2f%%".formatted(data.getHumidity()));
+            println("Gas Resistance: %.2f kOhm".formatted(data.getGasResistance() / 1000.0));
 
             // Simplified air quality estimates (for accurate values, use Bosch BSEC library)
             if (data.isValid()) {
-                System.out.printf("IAQ: %.0f (%s)%n", data.getIAQ(), data.getIAQLevel().getDescription());
-                System.out.printf("CO2 Equivalent: %.0f ppm%n", data.getCO2Equivalent());
+                println("IAQ: %.0f (%s)".formatted(data.getIAQ(), data.getIAQLevel().getDescription()));
+                println("CO2 Equivalent: %.0f ppm".formatted(data.getCO2Equivalent()));
             }
-            System.out.println();
+            println();
 
             Thread.sleep(3000);
         }

@@ -18,6 +18,8 @@ package com.robo4j.hw.rpi.i2c.bme;
 
 import java.io.IOException;
 
+import static java.lang.IO.*;
+
 /**
  * Establishes a stable baseline for the BME688 gas sensor and prints it out
  * for use in subsequent runs. Run this in clean air (outdoors or a well-ventilated room)
@@ -36,16 +38,16 @@ import java.io.IOException;
 public class BME688BaselineCalibrationExample {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        System.out.println("BME688 Baseline Calibration");
-        System.out.println("==========================");
-        System.out.println();
-        System.out.println("IMPORTANT: Run this in CLEAN AIR (outdoors or well-ventilated room).");
-        System.out.println("The sensor needs at least 30 minutes to fully stabilize.");
-        System.out.println();
+        println("BME688 Baseline Calibration");
+        println("==========================");
+        println();
+        println("IMPORTANT: Run this in CLEAN AIR (outdoors or well-ventilated room).");
+        println("The sensor needs at least 30 minutes to fully stabilize.");
+        println();
 
         BME688Device bme688 = new BME688Device();
-        System.out.println("BME688 sensor initialized. Starting calibration...");
-        System.out.println();
+        println("BME688 sensor initialized. Starting calibration...");
+        println();
 
         // Take readings for 30 minutes, letting the adaptive baseline stabilize.
         // The MOX gas sensor heater needs significant time to reach thermal equilibrium.
@@ -58,39 +60,39 @@ public class BME688BaselineCalibrationExample {
             BME688Device.AirQualityData data = bme688.readAirQuality();
             float currentBaseline = bme688.getBaselineResistance();
 
-            System.out.printf("  [%3d/%d] R=%.0f Ohms, T=%.1fC, H=%.1f%%, baseline=%.0f Ohms",
+            print("  [%3d/%d] R=%.0f Ohms, T=%.1fC, H=%.1f%%, baseline=%.0f Ohms".formatted(
                     i, totalReadings,
                     data.getGasResistance(),
                     data.getTemperature(),
                     data.getHumidity(),
-                    currentBaseline);
+                    currentBaseline));
 
             if (currentBaseline != lastBaseline) {
-                System.out.print(" *");
+                print(" *");
                 lastBaseline = currentBaseline;
             }
-            System.out.println();
+            println();
 
             Thread.sleep(3000);
         }
 
         // Take 10 more explicit calibration readings and average them
-        System.out.println();
-        System.out.println("Taking 10 final calibration readings...");
+        println();
+        println("Taking 10 final calibration readings...");
         bme688.calibrateBaseline(10);
 
         float baseline = bme688.getBaselineResistance();
-        System.out.println();
-        System.out.println("============================================");
-        System.out.printf("  BASELINE: %.0f%n", baseline);
-        System.out.println("============================================");
-        System.out.println();
-        System.out.println("To use this baseline in your application:");
-        System.out.println();
-        System.out.println("  BME688Device bme688 = new BME688Device();");
-        System.out.printf("  bme688.setBaselineResistance(%.0ff);%n", baseline);
-        System.out.println();
-        System.out.println("This skips the adaptive burn-in and gives immediate IAQ readings.");
-        System.out.println("Re-run this calibration monthly to account for sensor aging.");
+        println();
+        println("============================================");
+        println("  BASELINE: %.0f".formatted(baseline));
+        println("============================================");
+        println();
+        println("To use this baseline in your application:");
+        println();
+        println("  BME688Device bme688 = new BME688Device();");
+        println("  bme688.setBaselineResistance(%.0ff);".formatted(baseline));
+        println();
+        println("This skips the adaptive burn-in and gives immediate IAQ readings.");
+        println("Re-run this calibration monthly to account for sensor aging.");
     }
 }
