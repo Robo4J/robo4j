@@ -16,6 +16,8 @@
  */
 package com.robo4j.hw.rpi.i2c.buzzer;
 
+import static java.lang.IO.*;
+
 import java.io.IOException;
 
 /**
@@ -27,24 +29,24 @@ import java.io.IOException;
 public class QwiicBuzzerSoundEffectsExample {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        System.out.println("Qwiic Buzzer Sound Effects Example");
-        System.out.println("===================================");
+        println("Qwiic Buzzer Sound Effects Example");
+        println("===================================");
 
         QwiicBuzzerDevice buzzer = new QwiicBuzzerDevice();
 
-        System.out.println("Device ID: 0x" + Integer.toHexString(buzzer.getDeviceId()));
-        System.out.println("Firmware Version: " + buzzer.getFirmwareVersion());
-        System.out.println();
+        println("Device ID: 0x" + Integer.toHexString(buzzer.getDeviceId()));
+        println("Firmware Version: " + buzzer.getFirmwareVersion());
+        println();
 
         QwiicBuzzerDevice.Volume volume = QwiicBuzzerDevice.Volume.MID;
 
         for (QwiicBuzzerDevice.SoundEffect effect : QwiicBuzzerDevice.SoundEffect.values()) {
-            System.out.println("Playing: " + effect.name() + " (" + getDescription(effect) + ")");
+            println("Playing: " + effect.name() + " (" + getDescription(effect) + ")");
             buzzer.playSoundEffect(effect, volume);
             Thread.sleep(1500);
         }
 
-        System.out.println("Done!");
+        println("Done!");
     }
 
     private static String getDescription(QwiicBuzzerDevice.SoundEffect effect) {

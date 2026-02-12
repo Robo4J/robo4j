@@ -16,6 +16,8 @@
  */
 package com.robo4j.hw.rpi.i2c.buzzer;
 
+import static java.lang.IO.*;
+
 import java.io.IOException;
 
 /**
@@ -30,32 +32,32 @@ public class QwiicBuzzerMelodyExample {
     private static final int NOTE_GAP = 30;
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        System.out.println("Qwiic Buzzer Melody Example");
-        System.out.println("===========================");
+        println("Qwiic Buzzer Melody Example");
+        println("===========================");
 
         QwiicBuzzerDevice buzzer = new QwiicBuzzerDevice();
 
-        System.out.println("Device ID: 0x" + Integer.toHexString(buzzer.getDeviceId()));
-        System.out.println("Firmware Version: " + buzzer.getFirmwareVersion());
-        System.out.println();
+        println("Device ID: 0x" + Integer.toHexString(buzzer.getDeviceId()));
+        println("Firmware Version: " + buzzer.getFirmwareVersion());
+        println();
 
         QwiicBuzzerDevice.Volume volume = QwiicBuzzerDevice.Volume.MID;
 
-        System.out.println("Playing C major scale...");
+        println("Playing C major scale...");
         Note[] scale = {Note.C4, Note.D4, Note.E4, Note.F4, Note.G4, Note.A4, Note.B4, Note.C5};
         int[] scaleDurations = {1, 1, 1, 1, 1, 1, 1, 2};
         playMelody(buzzer, scale, scaleDurations, volume);
 
         Thread.sleep(500);
 
-        System.out.println("Playing descending scale...");
+        println("Playing descending scale...");
         Note[] descendingScale = {Note.C5, Note.B4, Note.A4, Note.G4, Note.F4, Note.E4, Note.D4, Note.C4};
         int[] descDurations = {1, 1, 1, 1, 1, 1, 1, 2};
         playMelody(buzzer, descendingScale, descDurations, volume);
 
         Thread.sleep(500);
 
-        System.out.println("Playing 'Mary Had a Little Lamb'...");
+        println("Playing 'Mary Had a Little Lamb'...");
         Note[] mary = {
             Note.E4, Note.D4, Note.C4, Note.D4, Note.E4, Note.E4, Note.E4,
             Note.D4, Note.D4, Note.D4, Note.E4, Note.G4, Note.G4,
@@ -72,7 +74,7 @@ public class QwiicBuzzerMelodyExample {
 
         Thread.sleep(500);
 
-        System.out.println("Playing 'Twinkle Twinkle Little Star'...");
+        println("Playing 'Twinkle Twinkle Little Star'...");
         Note[] twinkle = {
             Note.C4, Note.C4, Note.G4, Note.G4, Note.A4, Note.A4, Note.G4,
             Note.F4, Note.F4, Note.E4, Note.E4, Note.D4, Note.D4, Note.C4,
@@ -93,14 +95,14 @@ public class QwiicBuzzerMelodyExample {
 
         Thread.sleep(500);
 
-        System.out.println("Playing chromatic scale (C4 to C5)...");
+        println("Playing chromatic scale (C4 to C5)...");
         Note[] chromatic = {
             Note.C4, Note.CS4, Note.D4, Note.DS4, Note.E4, Note.F4,
             Note.FS4, Note.G4, Note.GS4, Note.A4, Note.AS4, Note.B4, Note.C5
         };
         playMelody(buzzer, chromatic, null, volume);
 
-        System.out.println("Done!");
+        println("Done!");
     }
 
     private static void playMelody(QwiicBuzzerDevice buzzer, Note[] notes, int[] durations,

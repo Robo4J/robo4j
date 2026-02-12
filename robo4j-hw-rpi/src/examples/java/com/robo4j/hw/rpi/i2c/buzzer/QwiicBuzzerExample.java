@@ -16,6 +16,8 @@
  */
 package com.robo4j.hw.rpi.i2c.buzzer;
 
+import static java.lang.IO.*;
+
 import java.io.IOException;
 
 /**
@@ -27,30 +29,30 @@ import java.io.IOException;
 public class QwiicBuzzerExample {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        System.out.println("Qwiic Buzzer Example");
-        System.out.println("====================");
+        println("Qwiic Buzzer Example");
+        println("====================");
 
         QwiicBuzzerDevice buzzer = new QwiicBuzzerDevice();
 
-        System.out.println("Device ID: 0x" + Integer.toHexString(buzzer.getDeviceId()));
-        System.out.println("Firmware Version: " + buzzer.getFirmwareVersion());
-        System.out.println();
+        println("Device ID: 0x" + Integer.toHexString(buzzer.getDeviceId()));
+        println("Firmware Version: " + buzzer.getFirmwareVersion());
+        println();
 
-        System.out.println("Playing beep at resonant frequency (2730 Hz)...");
+        println("Playing beep at resonant frequency (2730 Hz)...");
         buzzer.beep(500);
         Thread.sleep(1000);
 
-        System.out.println("Playing ascending tones...");
+        println("Playing ascending tones...");
         int[] frequencies = {500, 1000, 1500, 2000, 2730, 3500};
         for (int freq : frequencies) {
-            System.out.println("  " + freq + " Hz");
+            println("  " + freq + " Hz");
             buzzer.playTone(freq, 300, QwiicBuzzerDevice.Volume.MAX);
             Thread.sleep(400);
         }
 
         Thread.sleep(500);
 
-        System.out.println("Playing tones at different volumes...");
+        println("Playing tones at different volumes...");
         QwiicBuzzerDevice.Volume[] volumes = {
             QwiicBuzzerDevice.Volume.MIN,
             QwiicBuzzerDevice.Volume.LOW,
@@ -58,19 +60,19 @@ public class QwiicBuzzerExample {
             QwiicBuzzerDevice.Volume.MAX
         };
         for (QwiicBuzzerDevice.Volume volume : volumes) {
-            System.out.println("  Volume: " + volume);
+            println("  Volume: " + volume);
             buzzer.playTone(QwiicBuzzerDevice.RESONANT_FREQUENCY, 300, volume);
             Thread.sleep(400);
         }
 
         Thread.sleep(500);
 
-        System.out.println("Playing continuous tone for 2 seconds...");
+        println("Playing continuous tone for 2 seconds...");
         buzzer.configure(1000, 0, QwiicBuzzerDevice.Volume.MID);
         buzzer.on();
         Thread.sleep(2000);
         buzzer.off();
 
-        System.out.println("Done!");
+        println("Done!");
     }
 }
