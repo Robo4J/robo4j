@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@ import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device;
 import com.robo4j.hw.rpi.Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PCA9685Servo;
 import com.robo4j.hw.rpi.i2c.pwm.PWMPCA9685Device.PWMChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static java.lang.IO.*;
 
 /**
  * This example assumes two servos connected to channel 0 and 1, and two H bridges controlling DC engines on channel 2 and 3. 
@@ -35,8 +35,7 @@ import org.slf4j.LoggerFactory;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class PCA9685Example {
-	private static final Logger LOGGER = LoggerFactory.getLogger(PCA9685Example.class);
-	// The internetz says 50Hz is the standard PWM frequency for operating RC servos.  
+	// The internetz says 50Hz is the standard PWM frequency for operating RC servos.
 	private static final int SERVO_FREQUENCY = 50;
 	private static final int MOTOR_MIN = 0;
 	private static final int MOTOR_MEDIUM = 2048;
@@ -44,7 +43,7 @@ public class PCA9685Example {
 
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
-		LOGGER.info("Creating device...");
+		println("Creating device...");
 		PWMPCA9685Device device = new PWMPCA9685Device();
 		device.setPWMFrequency(SERVO_FREQUENCY);
 		Servo servo0 = new PCA9685Servo(device.getChannel(0));
@@ -52,15 +51,15 @@ public class PCA9685Example {
 		PWMChannel motor0 = device.getChannel(2);
 		PWMChannel motor1 = device.getChannel(3);
 
-		LOGGER.info("Setting start conditions...");
+		println("Setting start conditions...");
 		servo0.setInput(0);
 		servo1.setInput(0);
 		motor0.setPWM(0, MOTOR_MIN);
 		motor1.setPWM(0, MOTOR_MIN);
 
-		LOGGER.info("Press <Enter> to run loop!");
-		System.in.read();
-		LOGGER.info("Running perpetual loop...");
+		println("Press <Enter> to run loop!");
+		readln();
+		println("Running perpetual loop...");
 		while (true) {
 			servo0.setInput(-1);
 			servo1.setInput(-1);

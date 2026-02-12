@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,14 @@ import com.robo4j.hw.rpi.i2c.magnetometer.MagnetometerLSM303Device.Rate;
 import com.robo4j.hw.rpi.utils.I2cBus;
 import com.robo4j.math.geometry.Matrix3f;
 import com.robo4j.math.geometry.Tuple3f;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
+
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.IO.*;
 
 /**
  * Magnetometer example for trying out a calibrated magnetometer.
@@ -36,7 +37,6 @@ import java.util.concurrent.TimeUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class CalibratedMagnetometerExample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CalibratedMagnetometerExample.class);
     private static final int TIMEOUT_SEC = 1;
     private final static ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(1);
 
@@ -51,9 +51,10 @@ public class CalibratedMagnetometerExample {
         public void run() {
             try {
                 Tuple3f magResult = magDevice.read();
-                LOGGER.info("Heading:{}", MagnetometerLSM303Device.getCompassHeading(magResult));
+                println("Heading:" + MagnetometerLSM303Device.getCompassHeading(magResult));
             } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
+                System.err.println(e.getMessage());
+                e.printStackTrace();
             }
         }
     }
@@ -66,17 +67,17 @@ public class CalibratedMagnetometerExample {
         Matrix3f transform = new Matrix3f(1.887f, 5.987f, -5.709f, 5.987f, 1.528f, -2.960f, -5.709f, -2.960f, 9.761f);
         MagnetometerLSM303Device magnetometer = new MagnetometerLSM303Device(I2cBus.BUS_1, 0x1e, Mode.CONTINUOUS_CONVERSION, Rate.RATE_7_5,
                 false, bias, transform);
-        LOGGER.info(
+        println(
                 "Starting to read and print the heading. Make sure the magnetometer is flat in the XY-plane (this example does not do tilt compensated heading).");
-        LOGGER.info("Press <Enter> to quit...");
+        println("Press <Enter> to quit...");
         EXECUTOR.scheduleAtFixedRate(new MagnetometerPoller(magnetometer), 100, 500, TimeUnit.MILLISECONDS);
-        System.in.read();
+        readln();
         EXECUTOR.shutdown();
         var terminated = EXECUTOR.awaitTermination(TIMEOUT_SEC, TimeUnit.SECONDS);
         if(!terminated){
-            LOGGER.warn("example not terminated properly.");
+            System.err.println("example not terminated properly.");
             EXECUTOR.shutdownNow();
         }
-        LOGGER.info("Goodbye!");
+        println("Goodbye!");
     }
 }

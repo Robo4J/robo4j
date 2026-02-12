@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@ import java.io.IOException;
 
 import com.robo4j.hw.rpi.i2c.bmp.BMP085Device;
 import com.robo4j.hw.rpi.i2c.bmp.BMP085Device.OperatingMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static java.lang.IO.*;
 
 /**
  * Repeatedly reads and displays the temperature (in C), pressure (in hPa) and
@@ -31,14 +31,13 @@ import org.slf4j.LoggerFactory;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class BMP085Test {
-	private static final Logger LOGGER = LoggerFactory.getLogger(BMP085Test.class);
 	public static void main(String[] args) throws IOException, InterruptedException {
 		BMP085Device bmp = new BMP085Device(OperatingMode.STANDARD);
 		while (true) {
-			LOGGER.debug("Temperature: {}C, Pressure: {}hPa, Altitude: {}m",
+			println("Temperature: %sC, Pressure: %shPa, Altitude: %sm".formatted(
 					bmp.readTemperature(),
 					bmp.readPressure() / 100,
-					bmp.readAltitude());
+					bmp.readAltitude()));
 			Thread.sleep(2000);
 		}
 	}

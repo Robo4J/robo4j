@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,13 +22,13 @@ import com.robo4j.hw.rpi.imu.bno.Bno055Device.OperatingMode;
 import com.robo4j.hw.rpi.imu.bno.Bno055Factory;
 import com.robo4j.hw.rpi.imu.bno.Bno055SelfTestResult;
 import com.robo4j.math.geometry.Tuple3f;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.IO.*;
 
 /**
  * An example for the BNO device.
@@ -37,7 +37,6 @@ import java.util.concurrent.TimeUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class Bno055Example {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Bno055Example.class);
     private static final int TIMEOUT_SEC = 1;
     private final static ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(1);
 
@@ -55,10 +54,11 @@ public class Bno055Example {
                 Tuple3f orientation = device.read();
                 float temperature = device.getTemperature();
 
-                LOGGER.info("heading: {}, roll: {}, pitch: {} - temp:{}", orientation.x,
-                        orientation.y, orientation.z, temperature);
+                println("heading: %s, roll: %s, pitch: %s - temp:%s".formatted(orientation.x,
+                        orientation.y, orientation.z, temperature));
             } catch (Throwable e) {
-                LOGGER.error("error", e);
+                System.err.println("error");
+                e.printStackTrace();
             }
         }
 
@@ -74,44 +74,44 @@ public class Bno055Example {
      */
     public static void main(String[] args) throws IOException, InterruptedException {
         // TODO: review sleeps
-        LOGGER.info("Starting the BNO055 Example.");
+        println("Starting the BNO055 Example.");
         Bno055Device bno = Bno055Factory.createDefaultSerialDevice();
         Thread.sleep(20);
 
-        LOGGER.info("Resetting device...");
+        println("Resetting device...");
         bno.reset();
         Thread.sleep(20);
 
-        LOGGER.info("Running Self Test...");
+        println("Running Self Test...");
         Bno055SelfTestResult testResult = bno.performSelfTest();
-        LOGGER.info("Result of self test: ");
-        LOGGER.info("result:{}", testResult);
+        println("Result of self test: ");
+        println("result:" + testResult);
         Thread.sleep(20);
 
-        LOGGER.info("Operating mode: {}", bno.getOperatingMode());
+        println("Operating mode: " + bno.getOperatingMode());
         if (bno.getOperatingMode() != OperatingMode.NDOF) {
-            LOGGER.info("Switching mode to NDOF");
+            println("Switching mode to NDOF");
             bno.setOperatingMode(OperatingMode.NDOF);
-            LOGGER.info("Operating mode: {}", bno.getOperatingMode());
+            println("Operating mode: " + bno.getOperatingMode());
         }
 
-        LOGGER.info("Starting calibration sequence...");
+        println("Starting calibration sequence...");
         Bno055CalibrationStatus calibrationStatus = null;
         while (!(calibrationStatus = bno.getCalibrationStatus()).isFullyCalibrated()) {
-            LOGGER.info("Calibration status: system:{}, gyro:{}, accelerometer:{}, magnetometer:{}", calibrationStatus.getSystemCalibrationStatus(), calibrationStatus.getGyroCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus());
+            println("Calibration status: system:%s, gyro:%s, accelerometer:%s, magnetometer:%s".formatted(calibrationStatus.getSystemCalibrationStatus(), calibrationStatus.getGyroCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus(), calibrationStatus.getAccelerometerCalibrationStatus()));
             Thread.sleep(500);
         }
-        LOGGER.info("System fully calibrated. Now printing data. Press <Enter> to quit!");
+        println("System fully calibrated. Now printing data. Press <Enter> to quit!");
 
         EXECUTOR.scheduleAtFixedRate(new BNOPrinter(bno), 40, 500, TimeUnit.MILLISECONDS);
-        System.in.read();
+        readln();
         EXECUTOR.shutdown();
         var terminated = EXECUTOR.awaitTermination(TIMEOUT_SEC, TimeUnit.SECONDS);
         if (!terminated) {
-            LOGGER.warn("not terminated properly");
+            System.err.println("not terminated properly");
             EXECUTOR.shutdownNow();
         }
-        LOGGER.info("Bye, bye!");
+        println("Bye, bye!");
         bno.shutdown();
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.lang.IO.*;
 
 /**
  * Adafruit Bi-Color 8x8 Matrix example
@@ -64,7 +66,7 @@ public class AdafruitBiColorMatrix8x8BackpackExample {
         }, 2, 1, TimeUnit.SECONDS);
 
         LOGGER.info("Press enter to quit\n");
-        System.in.read();
+        readln();
         executor.shutdown();
         ctx.shutdown();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
 package com.robo4j.hw.rpi.i2c.gyro;
 
 import com.robo4j.hw.rpi.i2c.gyro.GyroL3GD20Device.Sensitivity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
+import static java.lang.IO.*;
 
 /**
  * Simple example which repeatedly reads the gyro. Good for checking that your
@@ -30,22 +30,21 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class CalibratedGyroTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CalibratedGyroTest.class);
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        LOGGER.info("Initializing...");
+        println("Initializing...");
         GyroL3GD20Device device = new GyroL3GD20Device(Sensitivity.DPS_245);
         CalibratedGyro gyro = new CalibratedGyro(device);
 
-        LOGGER.info("Keep the device still, and press enter to start calibration.");
-        System.in.read();
-        LOGGER.info("Calibrating...");
+        println("Keep the device still, and press enter to start calibration.");
+        readln();
+        println("Calibrating...");
         gyro.calibrate();
-        LOGGER.info("Calibration done!");
+        println("Calibration done!");
 
         // TODO : improve example
         while (true) {
-            LOGGER.info("gyro, read:{}", gyro.read());
+            println("gyro, read:" + gyro.read());
             Thread.sleep(200);
         }
     }

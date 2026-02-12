@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
 package com.robo4j.hw.rpi.lcd;
 
 import com.robo4j.hw.rpi.lcd.Lcd20x4.Alignment;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
+import static java.lang.IO.*;
 
 /**
  * Demo for the 20x4 LCD.
@@ -29,7 +29,6 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class Lcd20x4Example {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Lcd20x4Example.class);
 
     private static class Demo implements Runnable {
         private final Lcd20x4 lcd;
@@ -77,8 +76,8 @@ public class Lcd20x4Example {
         Demo demo = new Demo(lcd);
         Thread t = new Thread(demo, "LCD Demo Thread");
         t.start();
-        LOGGER.debug("Running LCD demo. Press <Enter> to quit!");
-        System.in.read();
+        println("Running LCD demo. Press <Enter> to quit!");
+        readln();
         demo.quit();
     }
 }

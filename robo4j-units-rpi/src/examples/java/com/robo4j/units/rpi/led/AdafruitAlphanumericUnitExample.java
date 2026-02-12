@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.lang.IO.*;
 
 /**
  * https://learn.adafruit.com/adafruit-led-backpack/0-54-alphanumeric
@@ -64,7 +66,7 @@ public class AdafruitAlphanumericUnitExample {
         }, 1, 500, TimeUnit.MILLISECONDS);
 
         LOGGER.info("Press enter to quit");
-        System.in.read();
+        readln();
         alphaUnit.sendMessage(AlphaNumericMessage.MESSAGE_CLEAR);
         alphaUnit.sendMessage(AlphaNumericMessage.MESSAGE_DISPLAY);
         executor.shutdown();

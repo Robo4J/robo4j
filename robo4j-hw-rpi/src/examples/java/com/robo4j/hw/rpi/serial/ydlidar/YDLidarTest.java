@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,10 @@
  */
 package com.robo4j.hw.rpi.serial.ydlidar;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
+
+import static java.lang.IO.*;
 
 /**
  * Example. Gets some information from the lidar, prints it, and then captures
@@ -30,26 +29,25 @@ import java.util.concurrent.TimeoutException;
  * @author Miro Wengner (@miragemiko)
  */
 public class YDLidarTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(YDLidarTest.class);
 
     //TODO: review example with sleep
     public static void main(String[] args) throws IOException, InterruptedException, TimeoutException {
-        YDLidarDevice device = new YDLidarDevice(scanResult -> LOGGER.info("Got scan result:{}", scanResult));
-        LOGGER.info("Restarting the device to make sure we start with a clean slate");
+        YDLidarDevice device = new YDLidarDevice(scanResult -> println("Got scan result:" + scanResult));
+        println("Restarting the device to make sure we start with a clean slate");
         device.restart();
         // Takes some serious time to restart this thing ;)
-        LOGGER.info("Waiting 4s for the device to properly boot up");
+        println("Waiting 4s for the device to properly boot up");
         Thread.sleep(4000);
-        LOGGER.info("device:{}", device);
-        LOGGER.info("deviceInfo:{}", device.getDeviceInfo());
-        LOGGER.info("deviceHealth:{}", device.getHealthInfo());
-        LOGGER.info("Ranging Frequency:{}", device.getRangingFrequency());
-        LOGGER.info("Will capture data for 10 seconds...");
+        println("device:" + device);
+        println("deviceInfo:" + device.getDeviceInfo());
+        println("deviceHealth:" + device.getHealthInfo());
+        println("Ranging Frequency:" + device.getRangingFrequency());
+        println("Will capture data for 10 seconds...");
         device.setScanning(true);
         Thread.sleep(10000);
         device.setScanning(false);
         device.shutdown();
-        LOGGER.info("Done!");
+        println("Done!");
     }
 
 }

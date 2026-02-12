@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,9 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.IO.*;
 
 /**
  * Simple example using {@link BiColor8x8MatrixDevice}
@@ -29,10 +28,9 @@ import java.util.concurrent.TimeUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class BiColor8x8MatrixExample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BiColor8x8MatrixExample.class);
 
     public static void main(String[] args) throws Exception {
-        LOGGER.debug("=== BiColor 8x8 Matrix Example ===");
+        println("=== BiColor 8x8 Matrix Example ===");
 
         BiColor8x8MatrixDevice matrix = new BiColor8x8MatrixDevice();
         matrix.clear();
@@ -55,8 +53,8 @@ public class BiColor8x8MatrixExample {
             matrix.clear();
         }
 
-        LOGGER.debug("Press <Enter> to quit!");
-        System.in.read();
+        println("Press <Enter> to quit!");
+        readln();
         matrix.clear();
         matrix.display();
 

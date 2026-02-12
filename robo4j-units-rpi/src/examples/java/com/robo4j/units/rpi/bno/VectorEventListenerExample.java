@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static java.lang.IO.*;
 
 /**
  * VectorEventEmitterListenerExample is simple robo4j system displaying Rotation
@@ -101,7 +103,7 @@ public class VectorEventListenerExample {
         bnoUnit.sendMessage(requestToRegister);
 
         LOGGER.info("Press <Enter> to start!");
-        System.in.read();
+        readln();
         ctx.shutdown();
     }
 }

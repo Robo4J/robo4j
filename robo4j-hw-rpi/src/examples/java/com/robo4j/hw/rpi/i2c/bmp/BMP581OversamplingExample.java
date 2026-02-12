@@ -21,6 +21,8 @@ import com.robo4j.hw.rpi.i2c.bmp.BMP581Device.Oversampling;
 
 import java.io.IOException;
 
+import static java.lang.IO.*;
+
 /**
  * Interactive demonstration of the BMP581 pressure sensor precision.
  * Establishes a baseline measurement, then shows real-time delta changes
@@ -35,51 +37,49 @@ public class BMP581OversamplingExample {
     private static final float HPA_TO_CM = 830.0f;
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        System.out.println("BMP581 Pressure Sensor Demo");
-        System.out.println("===========================");
-        System.out.println();
+        println("BMP581 Pressure Sensor Demo");
+        println("===========================");
+        println();
 
         BMP581Device bmp = new BMP581Device();
-        System.out.println("BMP581 Chip ID: 0x" + Integer.toHexString(bmp.getChipId()));
+        println("BMP581 Chip ID: 0x" + Integer.toHexString(bmp.getChipId()));
 
         // Use high oversampling for best accuracy
         bmp.setOversampling(Oversampling.OSR_128X, Oversampling.OSR_128X);
         // Enable IIR low-pass filter to reduce short-term noise
         bmp.setIirFilter(IirFilter.COEFF_2, IirFilter.COEFF_2);
-        System.out.println("Oversampling: " + bmp.getPressureOversampling());
-        System.out.println("IIR Filter: " + bmp.getPressureIirFilter());
-        System.out.println();
+        println("Oversampling: " + bmp.getPressureOversampling());
+        println("IIR Filter: " + bmp.getPressureIirFilter());
+        println();
 
         // Wait for user to position sensor
-        System.out.println("Place the sensor at baseline position (e.g., on desk).");
-        System.out.print("Press Enter when ready...");
-        System.in.read();
-        System.out.println();
+        readln("Place the sensor at baseline position (e.g., on desk). Press Enter when ready...");
+        println();
 
         // Measure baseline
-        System.out.println("Measuring baseline... do not move the sensor.");
+        println("Measuring baseline... do not move the sensor.");
         float baselinePressure = 0;
         for (int i = 0; i < BASELINE_SAMPLES; i++) {
             baselinePressure += bmp.readPressure();
-            System.out.print(".");
+            print(".");
             Thread.sleep(50);
         }
         baselinePressure /= BASELINE_SAMPLES;
-        System.out.println();
-        System.out.printf("Baseline: %.2f hPa%n", baselinePressure / 100.0f);
-        System.out.println();
+        println();
+        println("Baseline: %.2f hPa".formatted(baselinePressure / 100.0f));
+        println();
 
-        System.out.println("Now move the sensor around to see delta change in pressure (and approximate altitude).");
-        System.out.println("Press Ctrl+C to exit.");
-        System.out.println();
+        println("Now move the sensor around to see delta change in pressure (and approximate altitude).");
+        println("Press Ctrl+C to exit.");
+        println();
 
         while (true) {
             float pressure = bmp.readPressure();
             float deltaHpa = (pressure - baselinePressure) / 100.0f;
             float deltaCm = deltaHpa * HPA_TO_CM;
 
-            System.out.printf("\rPressure: %.2f hPa | Delta: %+.3f hPa | ~Altitude: %+.1f cm   ",
-                    pressure / 100.0f, deltaHpa, -deltaCm);
+            print("\rPressure: %.2f hPa | Delta: %+.3f hPa | ~Altitude: %+.1f cm   ".formatted(
+                    pressure / 100.0f, deltaHpa, -deltaCm));
 
             Thread.sleep(100);
         }

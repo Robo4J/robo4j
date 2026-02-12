@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import com.robo4j.util.SystemUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import static java.lang.IO.*;
 
 /**
  * Runs the accelerometer continuously and always prints what it reads.
@@ -36,7 +36,7 @@ public class AccelerometerExample {
     private static final String ID_PROCESSOR = "processor";
     private static final Logger LOGGER = LoggerFactory.getLogger(AccelerometerExample.class);
 
-    public static void main(String[] args) throws RoboBuilderException, IOException {
+    public static void main(String[] args) throws RoboBuilderException {
         var builder = new RoboBuilder();
         var settings = Thread.currentThread().getContextClassLoader()
                 .getResourceAsStream("accelerometerexample.xml");
@@ -59,9 +59,9 @@ public class AccelerometerExample {
         RoboReference<AccelerometerEvent> processor = ctx.getReference(ID_PROCESSOR);
 
         LOGGER.info("Press <Enter> to start!");
-        System.in.read();
+        readln();
         accelerometer.sendMessage(new AccelerometerRequest(processor, true, (Float3D) -> true));
         LOGGER.info("Will report angular changes indefinitely.\nPress <Enter> to quit!");
-        System.in.read();
+        readln();
     }
 }

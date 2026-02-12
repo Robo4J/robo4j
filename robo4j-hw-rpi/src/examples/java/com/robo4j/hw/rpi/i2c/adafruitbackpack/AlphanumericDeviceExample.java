@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,9 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.IO.*;
 
 /**
  * Simple example of displaying characters on {@link AlphanumericDevice}
@@ -29,15 +28,14 @@ import java.util.concurrent.TimeUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class AlphanumericDeviceExample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AlphanumericDeviceExample.class);
 
     public static void main(String[] args) throws Exception {
-        LOGGER.debug("=== Alphanumeric Backpack Example ===");
+        println("=== Alphanumeric Backpack Example ===");
 
         AlphanumericDevice device = new AlphanumericDevice();
         device.clear();
         device.display();
-        LOGGER.debug("Adding Characters");
+        println("Adding Characters");
         device.addCharacter('A', false);
         device.addCharacter('B', true);
         device.addCharacter('C', false);
@@ -53,8 +51,8 @@ public class AlphanumericDeviceExample {
         device.display();
 
 
-        LOGGER.debug("Press <Enter> to quit!");
-        System.in.read();
+        println("Press <Enter> to quit!");
+        readln();
         device.clear();
         device.display();
 

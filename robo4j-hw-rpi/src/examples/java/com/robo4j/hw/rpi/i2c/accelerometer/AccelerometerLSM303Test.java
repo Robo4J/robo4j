@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,10 @@ package com.robo4j.hw.rpi.i2c.accelerometer;
 
 import com.robo4j.hw.rpi.i2c.ReadableDevice;
 import com.robo4j.math.geometry.Tuple3f;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
+import static java.lang.IO.*;
 
 /**
  * Example useful to check if your accelerometer is working properly.
@@ -30,7 +30,6 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class AccelerometerLSM303Test {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AccelerometerLSM303Test.class);
 
     public static void main(String[] args) throws IOException, InterruptedException {
         ReadableDevice<Tuple3f> device = new AccelerometerLSM303Device();
@@ -40,17 +39,17 @@ public class AccelerometerLSM303Test {
     private static void getReading(ReadableDevice<Tuple3f> device, String message)
             throws IOException, InterruptedException {
         prompt(message);
-        print(readValues(device));
+        printStats(readValues(device));
     }
 
-    private static void print(Stats stats) {
-        LOGGER.debug("Result:{}", stats);
+    private static void printStats(Stats stats) {
+        println("Result:" + stats);
     }
 
     private static void prompt(String msg) throws IOException {
-        LOGGER.debug(msg);
-        LOGGER.debug("Press <Enter> to continue!");
-        System.in.read();
+        println(msg);
+        println("Press <Enter> to continue!");
+        readln();
     }
 
     private static Stats readValues(ReadableDevice<Tuple3f> device) throws IOException, InterruptedException {
@@ -61,10 +60,10 @@ public class AccelerometerLSM303Test {
             stats.addValue(fl);
             Thread.sleep(20);
             if (i % 25 == 0) {
-                LOGGER.debug(".");
+                print(".");
             }
         }
-        LOGGER.debug("");
+        println();
         return stats;
     }
 }

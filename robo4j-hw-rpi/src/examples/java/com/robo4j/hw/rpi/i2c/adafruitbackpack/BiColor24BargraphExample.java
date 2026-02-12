@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,9 @@
 
 package com.robo4j.hw.rpi.i2c.adafruitbackpack;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.IO.*;
 
 /**
  * Simple example of using Adafruit BiColor Bargraph {@link BiColor24BarDevice}
@@ -29,10 +28,9 @@ import java.util.concurrent.TimeUnit;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class BiColor24BargraphExample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BiColor24BargraphExample.class);
 
     public static void main(String[] args) throws Exception {
-        LOGGER.debug("=== Bi-BiColor 24 Bargraph ===");
+        println("=== Bi-BiColor 24 Bargraph ===");
 
         BiColor24BarDevice device = new BiColor24BarDevice();
         device.clear();
@@ -61,8 +59,8 @@ public class BiColor24BargraphExample {
             counter++;
         }
 
-        LOGGER.debug("Press <Enter> to quit!");
-        System.in.read();
+        println("Press <Enter> to quit!");
+        readln();
         device.clear();
         device.display();
     }

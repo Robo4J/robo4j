@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@ import com.robo4j.hw.rpi.imu.bno.Bno080Factory;
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataListener;
 import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static java.lang.IO.*;
 
 /**
  * Prints out accelerometer information to the console.
@@ -32,17 +32,16 @@ import org.slf4j.LoggerFactory;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class Bno080AccelerometerExample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Bno080AccelerometerExample.class);
 
     public static void main(String[] args) throws Exception {
-        DataListener listener = (DataEvent3f event) -> LOGGER.info("ShtpPacketResponse: {}", event);
-        LOGGER.info("BNO080 SPI Accelerometer Example");
+        DataListener listener = (DataEvent3f event) -> println("ShtpPacketResponse: " + event);
+        println("BNO080 SPI Accelerometer Example");
         // Change here to use other modes of communication
         Bno080Device device = Bno080Factory.createDefaultSPIDevice();
         device.addListener(listener);
         device.start(SensorReportId.ACCELEROMETER, 100);
-        LOGGER.info("Press <Enter> to quit!");
-        System.in.read();
+        println("Press <Enter> to quit!");
+        readln();
         device.shutdown();
     }
 }

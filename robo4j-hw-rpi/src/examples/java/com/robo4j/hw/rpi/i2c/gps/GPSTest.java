@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@ import com.robo4j.hw.rpi.gps.GPS;
 import com.robo4j.hw.rpi.gps.GPSListener;
 import com.robo4j.hw.rpi.gps.PositionEvent;
 import com.robo4j.hw.rpi.gps.VelocityEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
+import static java.lang.IO.*;
 
 /**
  * Listens for GPS event and prints them to stdout as they come.
@@ -32,7 +32,6 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GPSTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GPSTest.class);
 
     // TODO remove duplicates
     public static void main(String[] args) throws InterruptedException, IOException {
@@ -40,17 +39,17 @@ public class GPSTest {
         sparkFunGPS.addListener(new GPSListener() {
             @Override
             public void onPosition(PositionEvent event) {
-                LOGGER.debug("onPosition,event:{}", event);
+                println("onPosition,event:" + event);
             }
 
             @Override
             public void onVelocity(VelocityEvent event) {
-                LOGGER.debug("onVelocity,event:{}", event);
+                println("onVelocity,event:" + event);
             }
         });
         sparkFunGPS.start();
-        LOGGER.info("Press <Enter> to quit!");
-        System.in.read();
+        println("Press <Enter> to quit!");
+        readln();
         sparkFunGPS.shutdown();
     }
 }

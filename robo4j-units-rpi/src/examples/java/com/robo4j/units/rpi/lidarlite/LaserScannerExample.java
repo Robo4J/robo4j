@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import static java.lang.IO.*;
 
 /**
  * Runs the laser scanner, printing the max range and min range found on stdout.
@@ -79,6 +81,6 @@ public class LaserScannerExample {
         ctx.start();
         LOGGER.info("Starting scanning for ever\nPress <Enter> to quit");
         reference.sendMessage("scan");
-        System.in.read();
+        readln();
     }
 }

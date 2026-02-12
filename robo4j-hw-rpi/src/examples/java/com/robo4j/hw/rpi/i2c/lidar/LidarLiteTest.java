@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,9 @@
  */
 package com.robo4j.hw.rpi.i2c.lidar;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
+
+import static java.lang.IO.*;
 
 /**
  * This example will repeatedly acquire the range with the LidarLite. Good for
@@ -29,14 +28,13 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class LidarLiteTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LidarLiteTest.class);
 
     public static void main(String[] args) throws IOException, InterruptedException {
         LidarLiteDevice ld = new LidarLiteDevice();
         while (true) {
             ld.acquireRange();
             Thread.sleep(100);
-            LOGGER.info("Distance: {}m", ld.readDistance());
+            println("Distance: " + ld.readDistance() + "m");
             Thread.sleep(500);
         }
     }

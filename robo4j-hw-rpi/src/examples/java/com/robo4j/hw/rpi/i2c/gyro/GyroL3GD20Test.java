@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
 package com.robo4j.hw.rpi.i2c.gyro;
 
 import com.robo4j.hw.rpi.i2c.gyro.GyroL3GD20Device.Sensitivity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
+import static java.lang.IO.*;
 
 /**
  * Simple example which repeatedly reads the gyro. Good for checking that your
@@ -30,14 +30,13 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class GyroL3GD20Test {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GyroL3GD20Test.class);
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        LOGGER.info("Initializing...");
+        println("Initializing...");
         GyroL3GD20Device device = new GyroL3GD20Device(Sensitivity.DPS_245);
 
         while (true) {
-            LOGGER.info("device,read:{}", device.read());
+            println("device,read:" + device.read());
             Thread.sleep(200);
         }
     }

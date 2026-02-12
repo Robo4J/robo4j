@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
 package com.robo4j.hw.rpi.pwm;
 
 import com.robo4j.hw.rpi.utils.GpioPin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
+import static java.lang.IO.*;
 
 /**
  * This example assumes a servo connected to the GPIO_01 hardware PWM pin.
@@ -29,19 +29,18 @@ import java.io.IOException;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class PWMServoExample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PWMServoExample.class);
 
     public static void main(String[] args) throws IOException,
             InterruptedException {
         if (args.length != 1) {
-            LOGGER.info("Usage: PWMExample <input>");
+            println("Usage: PWMExample <input>");
             System.exit(2);
         }
         float input = Float.parseFloat(args[0]);
         PWMServo servo = new PWMServo(GpioPin.GPIO_01, false);
-        LOGGER.info("Setting input to {}", input);
+        println("Setting input to " + input);
         servo.setInput(input);
-        LOGGER.info("Press <Enter> to quit");
-        System.in.read();
+        println("Press <Enter> to quit");
+        readln();
     }
 }
