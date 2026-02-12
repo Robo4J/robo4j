@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static java.lang.IO.*;
+
 /**
  * Demo for the SparkFun SerLCD 20x4 RGB Backlight display.
  * <p>
@@ -32,8 +34,8 @@ public class SerLcdDemo {
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        System.out.println("SparkFun SerLCD 20x4 Demo");
-        System.out.println("=========================");
+        println("SparkFun SerLCD 20x4 Demo");
+        println("=========================");
 
         SparkFunSerLcdDevice lcd = new SparkFunSerLcdDevice();
         lcd.setContrast(50);
@@ -46,7 +48,7 @@ public class SerLcdDemo {
         lcd.printRow(3, "Robo4J Demo");
         Thread.sleep(2000);
 
-        System.out.println("Cycling through colors...");
+        println("Cycling through colors...");
         for (SparkFunSerLcdDevice.Color color : SparkFunSerLcdDevice.Color.values()) {
             if (color == SparkFunSerLcdDevice.Color.OFF) continue;
             lcd.printRow(2, "Color: " + color.name());
@@ -54,7 +56,7 @@ public class SerLcdDemo {
             Thread.sleep(800);
         }
 
-        System.out.println("Custom RGB colors...");
+        println("Custom RGB colors...");
         lcd.printRow(2, "Custom RGB:");
         int[][] customColors = {
             {255, 64, 0},    // Saturated orange
@@ -70,7 +72,7 @@ public class SerLcdDemo {
             Thread.sleep(800);
         }
 
-        System.out.println("Scroll demo...");
+        println("Scroll demo...");
         lcd.setBacklight(SparkFunSerLcdDevice.Color.WHITE);
         lcd.clear();
         lcd.printRow(0, "<<< Scroll Demo >>>");
@@ -97,7 +99,7 @@ public class SerLcdDemo {
         }
         Thread.sleep(1000);
 
-        System.out.println("Marquee demo...");
+        println("Marquee demo...");
         lcd.clear();
         lcd.setBacklight(SparkFunSerLcdDevice.Color.YELLOW);
         lcd.printRow(0, "--- Marquee Demo ---");
@@ -109,7 +111,7 @@ public class SerLcdDemo {
         }
         Thread.sleep(1000);
 
-        System.out.println("Showing clock for 5 seconds...");
+        println("Showing clock for 5 seconds...");
         lcd.setBacklight(SparkFunSerLcdDevice.Color.CYAN);
         lcd.clear();
         lcd.printRow(0, "   Robo4J Clock");
@@ -128,6 +130,6 @@ public class SerLcdDemo {
         lcd.printRow(2, "   SparkFun SerLCD");
         lcd.printRow(3, "      + Robo4J");
 
-        System.out.println("Demo complete!");
+        println("Demo complete!");
     }
 }
