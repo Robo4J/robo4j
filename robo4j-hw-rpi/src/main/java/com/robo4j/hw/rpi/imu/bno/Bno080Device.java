@@ -112,6 +112,14 @@ public interface Bno080Device {
 	// --- Dynamic Calibration Data (DCD) operations ---
 
 	/**
+	 * Clear the Dynamic Calibration Data (DCD) from flash.
+	 * Use this to remove bad calibration that causes persistent offsets.
+	 *
+	 * @return true if the command was sent successfully
+	 */
+	boolean clearCalibration();
+
+	/**
 	 * Save the current Dynamic Calibration Data (DCD) to flash.
 	 * This preserves calibration across power cycles for faster startup.
 	 *

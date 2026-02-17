@@ -93,10 +93,10 @@ public final class ShtpPacketRequest {
 
 	private int[] createHeader(int packetLength, ShtpChannel shtpChannel, int sequenceNumber) {
 		int[] header = new int[SHTP_HEADER_SIZE];
-		header[0] = (byte) (packetLength & 0xFF); // LSB
-		header[1] = (byte) ((packetLength >> 8) & 0xFF); // MSB
-		header[2] = (byte) (shtpChannel.getChannel() & 0xFF); // Channel Number
-		header[3] = (byte) (sequenceNumber & 0xFF); // Sequence number
+		header[0] = packetLength & 0xFF;                 // LSB
+		header[1] = (packetLength >> 8) & 0xFF;          // MSB
+		header[2] = shtpChannel.getChannel() & 0xFF;     // Channel Number
+		header[3] = sequenceNumber & 0xFF;                // Sequence number
 		return header;
 	}
 }

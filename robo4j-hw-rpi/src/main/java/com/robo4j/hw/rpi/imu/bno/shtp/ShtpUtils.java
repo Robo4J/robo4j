@@ -58,6 +58,9 @@ public final class ShtpUtils {
      * @return the string representing the pretty printed array.
      */
     public static String toHexString(int[] array) {
+        if (array == null || array.length == 0) {
+            return EMPTY;
+        }
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < array.length - 1; i++) {
             builder.append(Integer.toHexString(array[i] & 0xFF));

@@ -55,12 +55,9 @@ public class Bno08xSPIExample {
             Tuple4d quaternion = new Tuple4d(data.x, data.y, data.z, vectorEvent.getQuatReal());
             Tuple3d euler = QuaternionUtils.toEuler(quaternion);
 
-            double headingDeg = Math.toDegrees(euler.x);
-            double rollDeg = Math.toDegrees(euler.y);
-            double pitchDeg = Math.toDegrees(euler.z);
-
             System.out.printf("Heading: %6.1f°  Pitch: %6.1f°  Roll: %6.1f°  (accuracy: %.2f°)%n",
-                    headingDeg, pitchDeg, rollDeg, Math.toDegrees(vectorEvent.getRadianAccuracy()));
+                    Math.toDegrees(euler.x), Math.toDegrees(euler.y), Math.toDegrees(euler.z),
+                    Math.toDegrees(vectorEvent.getRadianAccuracy()));
         } else {
             System.out.println("Event: " + event);
         }

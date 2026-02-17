@@ -17,6 +17,9 @@
 
 package com.robo4j.hw.rpi.imu.bno.shtp;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Sensor reports received on ShtpChannel 3
  */
@@ -63,6 +66,7 @@ public enum SensorReportId implements ShtpReportIds {
     BASE_TIMESTAMP                  (0xFB);
     //@formatter:on
 
+    private static final Map<Integer, SensorReportId> map = getMap();
     private final int id;
     private final ShtpChannel shtpChannel = ShtpChannel.REPORTS;
 
@@ -81,11 +85,15 @@ public enum SensorReportId implements ShtpReportIds {
     }
 
     public static SensorReportId getById(int code) {
+        SensorReportId report = map.get(code & 0xFF);
+        return report == null ? NONE : report;
+    }
+
+    private static Map<Integer, SensorReportId> getMap() {
+        Map<Integer, SensorReportId> map = new HashMap<>();
         for (SensorReportId r : values()) {
-            if ((code & 0xFF) == r.getId()) {
-                return r;
-            }
+            map.put(r.getId(), r);
         }
-        return NONE;
+        return map;
     }
 }

@@ -32,7 +32,6 @@ import com.robo4j.hw.rpi.imu.bno.shtp.SensorReportId;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpChannel;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpCommandId;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperation;
-import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationBuilder;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpOperationResponse;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketResponse;
@@ -77,9 +76,8 @@ public class Bno08xDriver implements Bno080Device {
     static final byte RECEIVE_WRITE_BYTE = (byte) 0xFF;
     static final byte RECEIVE_WRITE_BYTE_CONTINUAL = (byte) 0;
 
-    private static final int TIMEOUT_SEC = 1;
+    private static final int TIMEOUT_SEC = 5;
     private static final int MAX_COUNTER = 255;
-    private static final int MAX_SPI_WAIT_CYCLES = 2;
     private static final short CHANNEL_COUNT = 6;
     private static final int AWAIT_TERMINATION = 10;
 
@@ -104,7 +102,6 @@ public class Bno08xDriver implements Bno080Device {
     private final AtomicBoolean ready = new AtomicBoolean(false);
     private final AtomicBoolean resetOccurred = new AtomicBoolean(false);
     private final AtomicInteger commandSequenceNumber = new AtomicInteger(0);
-    private final AtomicInteger waitCounter = new AtomicInteger(0);
     private final int[] sequenceNumberByChannel = new int[CHANNEL_COUNT];
     private volatile int lastResetReason = 0;
 
@@ -138,7 +135,6 @@ public class Bno08xDriver implements Bno080Device {
         if (reportPeriod > 0) {
             final CountDownLatch latch = new CountDownLatch(1);
             LOGGER.info("START: ready:{}, active:{}", ready.get(), active.get());
-            waitCounter.set(0);
             synchronized (executor) {
                 if (!ready.get()) {
                     initAndActive(latch, report, reportPeriod);
@@ -237,6 +233,15 @@ public class Bno08xDriver implements Bno080Device {
     }
 
     // --- Dynamic Calibration Data (DCD) operations ---
+
+    @Override
+    public boolean clearCalibration() {
+        ShtpPacketRequest packet = prepareShtpPacketRequest(ShtpChannel.CONTROL, 12);
+        packet.addBody(0, ControlReportId.COMMAND_REQUEST.getId());
+        packet.addBody(1, commandSequenceNumber.getAndIncrement());
+        packet.addBody(2, ShtpCommandId.CLEAR_DCD.getId());
+        return sendCommandPacket(packet);
+    }
 
     @Override
     public boolean saveCalibration() {
@@ -338,8 +343,7 @@ public class Bno08xDriver implements Bno080Device {
      * (was incorrectly writing to position 0 twice in the old implementation).
      */
     private ShtpPacketRequest createCalibrateCommandAll() {
-        ShtpChannel shtpChannel = ShtpChannel.COMMAND;
-        ShtpPacketRequest packet = prepareShtpPacketRequest(shtpChannel, 12);
+        ShtpPacketRequest packet = prepareShtpPacketRequest(ShtpChannel.CONTROL, 12);
         packet.addBody(0, ControlReportId.COMMAND_REQUEST.getId());
         packet.addBody(1, commandSequenceNumber.getAndIncrement());
         packet.addBody(2, ShtpCommandId.ME_CALIBRATE.getId());
@@ -366,13 +370,13 @@ public class Bno08xDriver implements Bno080Device {
     }
 
     private boolean processOperationChainByHead(ShtpOperation head) throws InterruptedException, IOException {
-        int counter = 0;
         boolean state = true;
         do {
             if (head.hasRequest()) {
                 transport.sendPacket(head.getRequest());
             }
             boolean waitForResponse = true;
+            int counter = 0;  // Reset counter for each operation in the chain
             while (waitForResponse && counter < MAX_COUNTER) {
                 ShtpPacketResponse response = transport.receivePacket(false, RECEIVE_WRITE_BYTE);
                 ShtpOperationResponse opResponse = new ShtpOperationResponse(
@@ -384,12 +388,23 @@ public class Bno08xDriver implements Bno080Device {
                 }
                 counter++;
             }
-            head = head.getNext();
-            if (state && counter >= MAX_COUNTER) {
+            if (counter >= MAX_COUNTER) {
+                LOGGER.warn("processOperationChainByHead: timed out waiting for response: {}", head.getResponse());
                 state = false;
             }
+            head = head.getNext();
         } while (head != null);
         return state;
+    }
+
+    // Package-visible for testing
+    boolean processOperationChainByHeadForTest(ShtpOperation head) throws InterruptedException, IOException {
+        return processOperationChainByHead(head);
+    }
+
+    // Package-visible for testing: parses a sensor input report packet
+    DataEvent3f parseInputReportForTest(ShtpPacketResponse packet) {
+        return parseInputReport(packet);
     }
 
     private DataEvent3f processReceivedPacket() {
@@ -430,25 +445,26 @@ public class Bno08xDriver implements Bno080Device {
     private DataEvent3f parseInputReport(ShtpPacketResponse packet) {
         int[] payload = packet.getBody();
         final int dataLength = packet.getBodySize();
-        long timeStamp = (payload[4] << 24) | (payload[3] << 16) | (payload[2] << 8) | (payload[1]);
+        long timeStamp = ((payload[4] & 0xFFL) << 24) | ((payload[3] & 0xFFL) << 16)
+                | ((payload[2] & 0xFFL) << 8) | (payload[1] & 0xFFL);
 
-        long accDelay = 17;
-        transport.setSensorReportDelay(timeStamp + accDelay);
+        // The 14-bit report delay: upper 6 bits in status byte [7:2], lower 8 bits in delay byte.
+        // Each LSB = 100us per the SH-2 reference manual.
+        int delayUpper = (payload[7] >> 2) & 0x3F;
+        int delayLower = payload[8] & 0xFF;
+        long reportDelayMicroSec = ((delayUpper << 8) | delayLower) * 100L;
+        transport.setSensorReportDelay(reportDelayMicroSec);
 
         int sensor = payload[5];
         int status = (payload[7] & 0x03) & 0xFF;
-        int data1 = ((payload[10] << 8) & 0xFFFF) | payload[9] & 0xFF;
-        int data2 = (payload[12] << 8 & 0xFFFF | (payload[11]) & 0xFF);
-        int data3 = (payload[14] << 8 & 0xFFFF) | (payload[13] & 0xFF);
-        int data4 = 0;
-        int data5 = 0;
 
-        if (payload.length > 15 && dataLength - 5 > 9) {
-            data4 = (payload[16] & 0xFFFF) << 8 | payload[15] & 0xFF;
-        }
-        if (payload.length > 17 && dataLength - 5 > 11) {
-            data5 = (payload[18] & 0xFFFF) << 8 | payload[17] & 0xFF;
-        }
+        // Extract 16-bit data words with bounds checking.
+        // Short sensor reports (tap, stability) may not have all data fields.
+        int data1 = payload.length > 10 ? ((payload[10] << 8) & 0xFFFF) | (payload[9] & 0xFF) : 0;
+        int data2 = payload.length > 12 ? ((payload[12] << 8) & 0xFFFF) | (payload[11] & 0xFF) : 0;
+        int data3 = payload.length > 14 ? ((payload[14] << 8) & 0xFFFF) | (payload[13] & 0xFF) : 0;
+        int data4 = payload.length > 16 ? ((payload[16] << 8) & 0xFFFF) | (payload[15] & 0xFF) : 0;
+        int data5 = payload.length > 18 ? ((payload[18] << 8) & 0xFFFF) | (payload[17] & 0xFF) : 0;
 
         final SensorReportId sensorReport = SensorReportId.getById(sensor);
 
@@ -489,9 +505,9 @@ public class Bno08xDriver implements Bno080Device {
             case STEP_COUNTER ->
                     createStepCounterEvent(timeStamp, status, payload);
             case TAP_DETECTOR ->
-                    new TapDetectorEvent(status, timeStamp, payload[5] & 0xFF);
+                    new TapDetectorEvent(status, timeStamp, payload[9] & 0xFF);
             case STABILITY_CLASSIFIER ->
-                    new StabilityClassifierEvent(status, timeStamp, payload[5] & 0xFF);
+                    new StabilityClassifierEvent(status, timeStamp, payload[9] & 0xFF);
             case PERSONAL_ACTIVITY_CLASSIFIER ->
                     createActivityClassifierEvent(timeStamp, status, payload);
 
@@ -521,18 +537,19 @@ public class Bno08xDriver implements Bno080Device {
     }
 
     private DataEvent3f createStepCounterEvent(long timeStamp, int status, int[] payload) {
-        // Step counter: latency (4 bytes) + steps (2 bytes)
-        long latency = ((payload[9] & 0xFFL) << 24) | ((payload[8] & 0xFFL) << 16)
-                | ((payload[7] & 0xFFL) << 8) | (payload[6] & 0xFFL);
-        int steps = ((payload[11] << 8) & 0xFFFF) | (payload[10] & 0xFF);
+        // Sensor-specific data starts at payload[9] (byte 4 of the sensor report).
+        // Step counter layout: steps (2 bytes LE) then latency (4 bytes LE).
+        int steps = ((payload[10] << 8) & 0xFFFF) | (payload[9] & 0xFF);
+        long latency = ((payload[14] & 0xFFL) << 24) | ((payload[13] & 0xFFL) << 16)
+                | ((payload[12] & 0xFFL) << 8) | (payload[11] & 0xFFL);
         return new StepCounterEvent(status, timeStamp, steps, latency);
     }
 
     private DataEvent3f createActivityClassifierEvent(long timeStamp, int status, int[] payload) {
-        int mostLikely = payload[6] & 0xFF;
+        int mostLikely = payload[10] & 0xFF;
         int[] confidences = new int[10];
-        for (int i = 0; i < 10 && (7 + i) < payload.length; i++) {
-            confidences[i] = payload[7 + i] & 0xFF;
+        for (int i = 0; i < 10 && (11 + i) < payload.length; i++) {
+            confidences[i] = payload[11 + i] & 0xFF;
         }
         return new ActivityClassifierEvent(status, timeStamp, mostLikely, confidences);
     }
@@ -590,31 +607,13 @@ public class Bno08xDriver implements Bno080Device {
         return request;
     }
 
-    private ShtpOperation getInitSequence(ShtpPacketRequest initRequest) {
-        ShtpOperationResponse advResponse = new ShtpOperationResponse(ShtpChannel.COMMAND, 0);
-        ShtpOperation headAdvertisementOp = new ShtpOperation(initRequest, advResponse);
-        ShtpOperationBuilder builder = new ShtpOperationBuilder(headAdvertisementOp);
-
-        ShtpOperationResponse reportIdResponse = new ShtpOperationResponse(ControlReportId.PRODUCT_ID_RESPONSE);
-        ShtpOperation productIdOperation = new ShtpOperation(getProductIdRequest(), reportIdResponse);
-        builder.addOperation(productIdOperation);
-
-        ShtpOperationResponse resetResponse = new ShtpOperationResponse(ControlReportId.COMMAND_RESPONSE);
-        ShtpOperation resetOperation = new ShtpOperation(null, resetResponse);
-        builder.addOperation(resetOperation);
-
-        return builder.build();
-    }
-
-    private ShtpOperation softResetSequence() {
-        ShtpPacketRequest request = getSoftResetPacket();
-        return getInitSequence(request);
-    }
-
     private boolean softReset() {
         try {
-            ShtpOperation opHead = softResetSequence();
-            return processOperationChainByHead(opHead);
+            ShtpPacketRequest resetPacket = getSoftResetPacket();
+            transport.sendPacket(resetPacket);
+            TimeUnit.MILLISECONDS.sleep(300);
+            drainQueuedPackets();
+            return true;
         } catch (InterruptedException | IOException e) {
             LOGGER.error("softReset error:{}", e.getMessage(), e);
         }
@@ -622,13 +621,59 @@ public class Bno08xDriver implements Bno080Device {
     }
 
     private boolean initiate() {
-        ShtpOperation opHead = getInitSequence(null);
+        // Follow SparkFun reference: soft reset → delay → drain → product ID check.
+        // After reset, the device sends unsolicited packets (advertisement, reset complete)
+        // in unpredictable order. Rather than matching them individually, drain them all,
+        // then verify communication with a product ID request.
         try {
-            active.set(processOperationChainByHead(opHead));
+            // Step 1: Send soft reset
+            ShtpPacketRequest resetPacket = getSoftResetPacket();
+            for (int attempt = 0; attempt < 5; attempt++) {
+                if (transport.sendPacket(resetPacket)) {
+                    LOGGER.debug("initiate: soft reset sent (attempt {})", attempt + 1);
+                    break;
+                }
+                TimeUnit.MILLISECONDS.sleep(30);
+            }
+
+            // Step 2: Wait for device to complete its reset sequence
+            TimeUnit.MILLISECONDS.sleep(300);
+
+            // Step 3: Drain all queued packets (advertisement, reset complete, etc.)
+            drainQueuedPackets();
+
+            // Step 4: Send product ID request and verify response
+            ShtpOperationResponse productIdResponse = new ShtpOperationResponse(ControlReportId.PRODUCT_ID_RESPONSE);
+            ShtpOperation productIdOp = new ShtpOperation(getProductIdRequest(), productIdResponse);
+            active.set(processOperationChainByHead(productIdOp));
+
+            LOGGER.debug("initiate: device initialized successfully={}", active.get());
         } catch (InterruptedException | IOException e) {
-            throw new IllegalStateException("Problem initializing device!");
+            LOGGER.error("initiate: failed to initialize device: {}", e.getMessage(), e);
+            active.set(false);
         }
         return active.get();
+    }
+
+    /**
+     * Drain all queued packets from the device. After a soft reset, the device
+     * sends advertisement and reset complete packets asynchronously. We read and
+     * discard them to clear the queue before sending our own requests.
+     */
+    private void drainQueuedPackets() throws InterruptedException, IOException {
+        int drained = 0;
+        for (int i = 0; i < 50; i++) {
+            transport.waitForDevice();
+            ShtpPacketResponse response = transport.receivePacket(false, RECEIVE_WRITE_BYTE);
+            if (!response.dataAvailable()) {
+                break;
+            }
+            ShtpChannel channel = ShtpChannel.getByChannel(response.getHeaderChannel());
+            LOGGER.debug("initiate: drained packet ch={}, body[0]=0x{}", channel,
+                    String.format("%02X", response.getBodyFirst()));
+            drained++;
+        }
+        LOGGER.debug("initiate: drained {} queued packets", drained);
     }
 
     private boolean waitForLatch(CountDownLatch latch) {
@@ -653,13 +698,21 @@ public class Bno08xDriver implements Bno080Device {
     private void reactivate(final CountDownLatch latch, SensorReportId report, int reportPeriod) {
         executor.submit(() -> {
             try {
-                ShtpOperation opHead = getInitSequence(null);
-                active.set(processOperationChainByHead(opHead));
+                // Send soft reset and wait for device to come back
+                ShtpPacketRequest resetPacket = getSoftResetPacket();
+                transport.sendPacket(resetPacket);
+                TimeUnit.MILLISECONDS.sleep(300);
+
+                // Drain queued post-reset packets, then verify with product ID
+                drainQueuedPackets();
+                ShtpOperationResponse productIdResponse = new ShtpOperationResponse(ControlReportId.PRODUCT_ID_RESPONSE);
+                ShtpOperation productIdOp = new ShtpOperation(getProductIdRequest(), productIdResponse);
+                active.set(processOperationChainByHead(productIdOp));
                 if (active.get() && enableSensorReport(report, reportPeriod)) {
                     latch.countDown();
                 }
             } catch (InterruptedException | IOException e) {
-                throw new IllegalStateException("not activated");
+                LOGGER.error("reactivate: failed: {}", e.getMessage(), e);
             }
         });
     }

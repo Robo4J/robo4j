@@ -153,7 +153,10 @@ public class ShtpSpiTransport implements ShtpTransport {
         }
 
         if (delay && sensorReportDelayMicroSec > 0) {
-            TimeUnit.MICROSECONDS.sleep(TIMEBASE_REFER_DELTA - sensorReportDelayMicroSec);
+            long sleepMicros = Math.max(0, TIMEBASE_REFER_DELTA - sensorReportDelayMicroSec);
+            if (sleepMicros > 0) {
+                TimeUnit.MICROSECONDS.sleep(sleepMicros);
+            }
         }
 
         csGpio.setState(DigitalState.LOW.value().intValue());

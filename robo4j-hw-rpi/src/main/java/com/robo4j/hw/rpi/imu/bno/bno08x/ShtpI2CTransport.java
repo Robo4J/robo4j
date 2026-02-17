@@ -44,18 +44,17 @@ import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.calculateNumberOfBytesInP
  * Alternate address is 0x4A (SA0=0).
  * </p>
  * <p>
- * <b>WARNING: I2C Clock Stretching Required</b><br>
- * The BNO08x uses I2C clock stretching extensively during communication.
- * Raspberry Pi's hardware I2C has limited clock stretching support, which
- * may cause communication failures, bus lockups, or timeouts. This affects
- * QWIIC and other I2C-only boards.
+ * <b>I2C Clock Stretching:</b><br>
+ * The BNO08x uses I2C clock stretching during communication. Raspberry Pi 5
+ * (RP1 chip) supports clock stretching properly. Older Pi models (3/4) have
+ * limited support and may experience bus lockups.
  * </p>
  * <p>
- * <b>Recommended alternatives:</b>
+ * <b>For older Raspberry Pi models:</b>
  * <ul>
  *   <li>Use SPI instead via {@link ShtpSpiTransport} (preferred - no clock stretching issues)</li>
  *   <li>Connect the INT pin and use interrupt-driven communication</li>
- *   <li>Reduce I2C baud rate to 50kHz in /boot/firmware/config.txt:
+ *   <li>Reduce I2C baud rate in /boot/firmware/config.txt:
  *       {@code dtparam=i2c_arm_baudrate=50000}</li>
  * </ul>
  * </p>
@@ -69,8 +68,8 @@ public class ShtpI2CTransport implements ShtpTransport {
     public static final int DEFAULT_I2C_ADDRESS = 0x4B;
     public static final int ALT_I2C_ADDRESS = 0x4A;
     private static final int MAX_I2C_PACKET_SIZE = 32762;
-    private static final int READ_BUFFER_SIZE = 256;  // Typical SHTP packets are under 128 bytes
-    private static final int WAIT_POLL_COUNT = 255;
+    private static final int WAIT_POLL_INTERVAL_MS = 1;
+    private static final int WAIT_POLL_COUNT = 500;  // 500 x 1ms = 500ms max wait
 
     private final Context pi4jContext;
     private final I2C i2c;
@@ -170,54 +169,78 @@ public class ShtpI2CTransport implements ShtpTransport {
         }
 
         if (delay && sensorReportDelayMicroSec > 0) {
-            TimeUnit.MICROSECONDS.sleep(120 - sensorReportDelayMicroSec);
+            long sleepMicros = Math.max(0, 120 - sensorReportDelayMicroSec);
+            if (sleepMicros > 0) {
+                TimeUnit.MICROSECONDS.sleep(sleepMicros);
+            }
         }
 
-        // BNO08x I2C requires reading the entire packet in a single transaction.
-        // Read a reasonable buffer size - typical packets are under 128 bytes.
-        byte[] buffer = new byte[READ_BUFFER_SIZE];
-        int bytesRead = i2c.read(buffer, 0, READ_BUFFER_SIZE);
-        if (bytesRead < SHTP_HEADER_SIZE) {
+        // Step 1: Read the 4-byte SHTP header to learn the packet size.
+        byte[] header = new byte[SHTP_HEADER_SIZE];
+        int headerRead = i2c.read(header, 0, SHTP_HEADER_SIZE);
+        if (headerRead < SHTP_HEADER_SIZE) {
+            LOGGER.debug("receivePacket: short header read ({} bytes)", headerRead);
             return new ShtpPacketResponse(0);
         }
 
-        int packetLSB = buffer[0] & 0xFF;
-        int packetMSB = buffer[1] & 0xFF;
-        int channelNumber = buffer[2] & 0xFF;
-        int sequenceNumber = buffer[3] & 0xFF;
+        int packetLSB = header[0] & 0xFF;
+        int packetMSB = header[1] & 0xFF;
+        int channelNumber = header[2] & 0xFF;
+        int sequenceNumber = header[3] & 0xFF;
 
         int totalPacketLength = calculateNumberOfBytesInPacket(packetMSB, packetLSB);
         int dataLength = totalPacketLength - SHTP_HEADER_SIZE;
         if (dataLength <= 0) {
+            LOGGER.debug("receivePacket: zero-length packet on channel {}", channelNumber);
             return new ShtpPacketResponse(0);
         }
+
+        // Clamp to max packet size
+        if (dataLength > MAX_I2C_PACKET_SIZE) {
+            LOGGER.warn("receivePacket: packet too large ({}), clamping to {}", dataLength, MAX_I2C_PACKET_SIZE);
+            dataLength = MAX_I2C_PACKET_SIZE;
+        }
+
+        // Step 2: Read the cargo (body) data.
+        // IMPORTANT: The BNO08x repeats the 4-byte SHTP header at the start of every
+        // I2C read transaction (each read() is a separate I2C transaction). So we must
+        // request (dataLength + 4) bytes and skip the first 4 (repeated header).
+        // This matches the SparkFun reference implementation's getData() approach.
+        byte[] rawRead = new byte[dataLength + SHTP_HEADER_SIZE];
+        int bytesRead = i2c.read(rawRead, 0, rawRead.length);
 
         ShtpPacketResponse response = new ShtpPacketResponse(dataLength);
         response.addHeader(packetLSB, packetMSB, channelNumber, sequenceNumber);
 
-        // Copy body from buffer (after header)
-        int bodyBytesAvailable = Math.min(bytesRead - SHTP_HEADER_SIZE, dataLength);
-        for (int i = 0; i < bodyBytesAvailable; i++) {
-            response.addBody(i, buffer[SHTP_HEADER_SIZE + i] & 0xFF);
+        // Skip the first 4 bytes (repeated header), copy cargo starting at offset 4
+        int cargoAvailable = Math.max(0, bytesRead - SHTP_HEADER_SIZE);
+        int bodyBytes = Math.min(cargoAvailable, dataLength);
+        for (int i = 0; i < bodyBytes; i++) {
+            response.addBody(i, rawRead[SHTP_HEADER_SIZE + i] & 0xFF);
         }
 
+        LOGGER.debug("receivePacket: ch={}, len={}, body[0]=0x{}", channelNumber, dataLength,
+                bodyBytes > 0 ? String.format("%02X", rawRead[SHTP_HEADER_SIZE] & 0xFF) : "empty");
         return response;
     }
 
     @Override
     public boolean waitForDevice() throws InterruptedException {
         if (intGpio == null) {
-            // No interrupt pin -- polling mode, add small delay for device to prepare
-            TimeUnit.MICROSECONDS.sleep(500);
+            // No interrupt pin (typical for Qwiic) -- polling mode.
+            // Use a reasonable delay to avoid monopolizing the I2C bus.
+            // The device will clock-stretch if data is not ready (BNO085)
+            // or return zero-length packets (BNO086).
+            TimeUnit.MILLISECONDS.sleep(WAIT_POLL_INTERVAL_MS);
             return true;
         }
         for (int i = 0; i < WAIT_POLL_COUNT; i++) {
             if (intGpio.isLow()) {
                 return true;
             }
-            TimeUnit.MICROSECONDS.sleep(1);
+            TimeUnit.MILLISECONDS.sleep(WAIT_POLL_INTERVAL_MS);
         }
-        LOGGER.debug("waitForDevice: timed out");
+        LOGGER.debug("waitForDevice: timed out after {}ms", WAIT_POLL_COUNT * WAIT_POLL_INTERVAL_MS);
         return false;
     }
 

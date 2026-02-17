@@ -80,6 +80,9 @@ public class Bno080Unit extends RoboUnit<BnoRequest> {
     protected void onInitialization(Configuration configuration) throws ConfigurationException {
 
         final String reportType = configuration.getString(PROPERTY_REPORT_TYPE, null);
+        if (reportType == null) {
+            throw new ConfigurationException(PROPERTY_REPORT_TYPE);
+        }
         report = SensorReportId.valueOf(reportType.toUpperCase());
         if (report.equals(SensorReportId.NONE)) {
             throw new ConfigurationException(PROPERTY_REPORT_TYPE);

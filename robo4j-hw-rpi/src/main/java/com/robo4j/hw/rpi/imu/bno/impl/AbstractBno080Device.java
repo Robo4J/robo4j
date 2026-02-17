@@ -272,6 +272,11 @@ public abstract class AbstractBno080Device implements Bno080Device {
     }
 
     @Override
+    public boolean clearCalibration() {
+        throw new UnsupportedOperationException("Use Bno08xDriver instead");
+    }
+
+    @Override
     public boolean saveCalibration() {
         throw new UnsupportedOperationException("Use Bno08xDriver instead");
     }
