@@ -24,6 +24,7 @@ import com.pi4j.io.gpio.digital.DigitalOutput;
 import com.pi4j.io.gpio.digital.DigitalState;
 import com.pi4j.io.gpio.digital.PullResistance;
 import com.pi4j.io.i2c.I2C;
+import com.pi4j.plugin.linuxfs.provider.i2c.LinuxFsI2CProviderImpl;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest;
 import com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketResponse;
 import com.robo4j.hw.rpi.utils.GpioPin;
@@ -104,7 +105,9 @@ public class ShtpI2CTransport implements ShtpTransport {
      * @param reset     optional reset GPIO pin (may be null)
      */
     public ShtpI2CTransport(I2cBus bus, int address, GpioPin interrupt, GpioPin reset) {
-        this.pi4jContext = Pi4J.newAutoContext();
+        this.pi4jContext = Pi4J.newContextBuilder()
+                .add(new LinuxFsI2CProviderImpl())
+                .build();
 
         var i2cConfig = I2C.newConfigBuilder(pi4jContext)
                 .id("bno08x-i2c")
