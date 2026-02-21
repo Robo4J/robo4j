@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,9 @@
 
 package com.robo4j.hw.rpi.imu.bno.shtp;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Sensor reports received on ShtpChannel 3
  */
@@ -32,6 +35,12 @@ public enum SensorReportId implements ShtpReportIds {
     GYRO_UNCALIBRATED               (0x07),
     GAME_ROTATION_VECTOR            (0x08),
     GEOMAGNETIC_ROTATION_VECTOR     (0x09),
+    PRESSURE                        (0x0A),
+    AMBIENT_LIGHT                   (0x0B),
+    HUMIDITY                        (0x0C),
+    PROXIMITY                       (0x0D),
+    TEMPERATURE                     (0x0E),
+    MAGNETIC_FIELD_UNCALIBRATED     (0x0F),
     TAP_DETECTOR                    (0x10),
     STEP_COUNTER                    (0x11),
     SIGNIFICANT_MOTION              (0x12),
@@ -51,15 +60,13 @@ public enum SensorReportId implements ShtpReportIds {
     PICKUP_DETECTOR                 (0x1B),
     STABILITY_DETECTOR              (0x1C),
     PERSONAL_ACTIVITY_CLASSIFIER    (0x1E),
+    SLEEP_DETECTOR                  (0x1F),
     GYRO_INT_ROTATION_VECTOR        (0x2A),
-    PRESSURE                        (0x0A),
-    AMBIENT_LIGHT                   (0x0B),
-    HUMIDITY                        (0x0C),
-    PROXIMITY                       (0x0D),
-    TEMPERATURE                     (0x0E),
+    IZRO_MOTION_REQUEST             (0x2B),
     BASE_TIMESTAMP                  (0xFB);
     //@formatter:on
 
+    private static final Map<Integer, SensorReportId> map = getMap();
     private final int id;
     private final ShtpChannel shtpChannel = ShtpChannel.REPORTS;
 
@@ -78,11 +85,15 @@ public enum SensorReportId implements ShtpReportIds {
     }
 
     public static SensorReportId getById(int code) {
+        SensorReportId report = map.get(code & 0xFF);
+        return report == null ? NONE : report;
+    }
+
+    private static Map<Integer, SensorReportId> getMap() {
+        Map<Integer, SensorReportId> map = new HashMap<>();
         for (SensorReportId r : values()) {
-            if ((code & 0xFF) == r.getId()) {
-                return r;
-            }
+            map.put(r.getId(), r);
         }
-        return NONE;
+        return map;
     }
 }

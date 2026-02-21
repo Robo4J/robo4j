@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest.SHTP_HEADER_SIZE;
 import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.EMPTY_EVENT;
 import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.calculateNumberOfBytesInPacket;
 import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.intToFloat;
@@ -72,7 +73,10 @@ import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpUtils.toInt8U;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
+ * @deprecated Use {@link com.robo4j.hw.rpi.imu.bno.bno08x.Bno08xDriver} with
+ *             {@link com.robo4j.hw.rpi.imu.bno.bno08x.ShtpSpiTransport} instead.
  */
+@Deprecated(forRemoval = true)
 public class Bno080SPIDevice extends AbstractBno080Device {
     private static final Logger LOGGER = LoggerFactory.getLogger(Bno080SPIDevice.class);
     public static final SpiMode DEFAULT_SPI_MODE = SpiMode.MODE_3;

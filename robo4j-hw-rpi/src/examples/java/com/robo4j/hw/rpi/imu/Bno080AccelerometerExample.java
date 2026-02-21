@@ -30,7 +30,9 @@ import static java.lang.IO.*;
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
+ * @deprecated Use {@link Bno08xI2CExample} or {@link Bno08xSPIExample} instead.
  */
+@Deprecated(forRemoval = true)
 public class Bno080AccelerometerExample {
 
     public static void main(String[] args) throws Exception {

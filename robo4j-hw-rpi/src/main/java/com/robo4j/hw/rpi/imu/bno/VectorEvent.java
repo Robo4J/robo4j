@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,14 @@ import java.util.Objects;
 public class VectorEvent extends DataEvent3f {
 	@Serial
 	private static final long serialVersionUID = 1L;
-	private static final EnumSet<DataEventType> ALLOWED = EnumSet.of(DataEventType.VECTOR_ROTATION, DataEventType.VECTOR_GAME);
+	private static final EnumSet<DataEventType> ALLOWED = EnumSet.of(
+			DataEventType.VECTOR_ROTATION,
+			DataEventType.VECTOR_GAME,
+			DataEventType.VECTOR_GEOMAGNETIC,
+			DataEventType.VECTOR_ARVR_STABILIZED,
+			DataEventType.VECTOR_ARVR_GAME_STABILIZED,
+			DataEventType.GYRO_INTEGRATED_RV
+	);
 
 	private final float quatReal;
 	private final float radianAccuracy;

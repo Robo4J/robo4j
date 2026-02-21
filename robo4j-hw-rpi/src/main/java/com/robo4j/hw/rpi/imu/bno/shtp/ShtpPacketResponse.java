@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,13 @@
 
 package com.robo4j.hw.rpi.imu.bno.shtp;
 
-import static com.robo4j.hw.rpi.imu.bno.impl.AbstractBno080Device.SHTP_HEADER_SIZE;
+import static com.robo4j.hw.rpi.imu.bno.shtp.ShtpPacketRequest.SHTP_HEADER_SIZE;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * ShtpPacketResponse represent SPI device response see
- * {@link com.robo4j.hw.rpi.imu.bno.impl.Bno080SPIDevice}
+ * ShtpPacketResponse represents an SHTP device response packet.
  *
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)

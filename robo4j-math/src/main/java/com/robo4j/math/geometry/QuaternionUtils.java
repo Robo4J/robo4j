@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,87 +17,87 @@
 package com.robo4j.math.geometry;
 
 /**
- * Class to help convert from quaternions to euler angles and vice versa.
- * 
- * @author Marcus
+ * Converts between quaternions and Euler angles using the ZXY decomposition
+ * (vehicle convention).
+ * <p>
+ * Assumes a right-handed coordinate system with X=right, Y=forward, Z=up
+ * (the BNO08x sensor frame). Euler angles are returned as:
+ * <ul>
+ *   <li>Heading (yaw): rotation around Z-up, range ±180°</li>
+ *   <li>Pitch: rotation around X-right (nose up/down), range ±90°</li>
+ *   <li>Roll: rotation around Y-forward (banking), range ±180°</li>
+ * </ul>
+ * Quaternion layout in {@link Tuple4d}: x=i, y=j, z=k, t=real (w).
+ *
+ * @author Marcus Hirt (@hirt)
  */
 public final class QuaternionUtils {
-	public final static double DEGREES_PRECISION_AT_POLES = Math.toRadians(0.5);
-	/**
-	 * This is the factor to test.
-	 */
-	private final static double EPSILON_TEST = Math.sin((Math.PI / 2.0) - DEGREES_PRECISION_AT_POLES) / 2.0;
 
 	/**
-	 * Returns the quaternion as Euler angles. x = heading, y = roll, z = pitch
-	 * from a quaternion.
-	 * 
-	 * @param quaternion
-	 *            the quaternion for which to calculate the euler angles.
-	 * @return the Euler angles.
+	 * Converts a unit quaternion to Euler angles using ZXY decomposition.
+	 * The returned Tuple3d contains: x=heading, y=pitch, z=roll (all in radians).
+	 *
+	 * @param quaternion the quaternion (x=i, y=j, z=k, t=real).
+	 * @return Euler angles: x=heading (±π), y=pitch (±π/2), z=roll (±π).
 	 */
 	public static Tuple3d toEuler(Tuple4d quaternion) {
-		Tuple3d result = new Tuple3d();
-		double sqw = quaternion.t * quaternion.t;
-		double sqx = quaternion.x * quaternion.x;
-		double sqy = quaternion.y * quaternion.y;
-		double sqz = quaternion.z * quaternion.z;
-		double unit = sqx + sqy + sqz + sqw;
-		double test = quaternion.x * quaternion.y + quaternion.z * quaternion.t;
-		if (test > EPSILON_TEST * unit) {
-			// singularity at north pole
-			result.x = (2.0 * Math.atan2(quaternion.x, quaternion.t));
-			result.y = 0;
-			result.z = Math.PI / 2.0;
-		} else if (test < -EPSILON_TEST * unit) {
-			// singularity at south pole
-			result.x = -2.0 * Math.atan2(quaternion.x, quaternion.t);
-			result.y = 0;
-			result.z = -Math.PI / 2;
-		} else {
-			result.x = Math.atan2(2.0 * quaternion.y * quaternion.t - 2.0 * quaternion.x * quaternion.z, sqx - sqy - sqz + sqw);
-			result.y = Math.atan2(2.0 * quaternion.x * quaternion.t - 2.0 * quaternion.y * quaternion.z, -sqx + sqy - sqz + sqw);
-			result.z = Math.asin(2.0 * test / unit);
+		double x = quaternion.x;
+		double y = quaternion.y;
+		double z = quaternion.z;
+		double w = quaternion.t;
+
+		// Normalize
+		double norm = Math.sqrt(w * w + x * x + y * y + z * z);
+		if (norm > 0) {
+			w /= norm;
+			x /= norm;
+			y /= norm;
+			z /= norm;
 		}
+
+		// ZXY Euler decomposition
+		double sinPitch = 2.0 * (y * z + w * x);
+		sinPitch = Math.max(-1.0, Math.min(1.0, sinPitch));
+
+		Tuple3d result = new Tuple3d();
+		result.x = Math.atan2(2.0 * (w * z - x * y), 1.0 - 2.0 * (x * x + z * z));
+		result.y = Math.asin(sinPitch);
+		result.z = Math.atan2(2.0 * (w * y - x * z), 1.0 - 2.0 * (x * x + y * y));
 		return result;
 	}
 
 	/**
-	 * Returns the Euler angles as a quaternion.
-	 * 
-	 * @param euler
-	 *            x = heading, y = roll, z = pitch, all in radians.
-	 * @return the Euler angles as a quaternion.
+	 * Converts Euler angles to a quaternion using ZXY decomposition.
+	 *
+	 * @param euler x=heading, y=pitch, z=roll (all in radians).
+	 * @return the quaternion (x=i, y=j, z=k, t=real).
 	 */
 	public static Tuple4d toQuaternion(Tuple3d euler) {
 		return toQuaternion(euler.x, euler.y, euler.z);
 	}
 
 	/**
-	 * Returns a quaternion describing the rotation.
-	 * 
-	 * @param heading
-	 *            the heading change in radians.
-	 * @param roll
-	 *            the roll change in radians.
-	 * @param pitch
-	 *            the pitch change in radians.
-	 * @return the resulting quaternion.
+	 * Converts Euler angles to a quaternion using ZXY decomposition.
+	 *
+	 * @param heading rotation around Z-up in radians.
+	 * @param pitch   rotation around X-right in radians.
+	 * @param roll    rotation around Y-forward in radians.
+	 * @return the quaternion (x=i, y=j, z=k, t=real).
 	 */
-	public static Tuple4d toQuaternion(double heading, double roll, double pitch) {
+	public static Tuple4d toQuaternion(double heading, double pitch, double roll) {
+		double cH = Math.cos(heading / 2);
+		double sH = Math.sin(heading / 2);
+		double cP = Math.cos(pitch / 2);
+		double sP = Math.sin(pitch / 2);
+		double cR = Math.cos(roll / 2);
+		double sR = Math.sin(roll / 2);
+
+		// ZXY: q = qZ * qX * qY
 		Tuple4d quat = new Tuple4d();
-		double c1 = Math.cos(heading / 2);
-		double s1 = Math.sin(heading / 2);
-		double c2 = Math.cos(pitch / 2);
-		double s2 = Math.sin(pitch / 2);
-		double c3 = Math.cos(roll / 2);
-		double s3 = Math.sin(roll / 2);
-		double c1c2 = c1 * c2;
-		double s1s2 = s1 * s2;
-		quat.t = c1c2 * c3 - s1s2 * s3;
-		quat.x = c1c2 * s3 + s1s2 * c3;
-		quat.y = s1 * c2 * c3 + c1 * s2 * s3;
-		quat.z = c1 * s2 * c3 - s1 * c2 * s3;
+		quat.t = cH * cP * cR - sH * sP * sR;
+		quat.x = cH * sP * cR - sH * cP * sR;
+		quat.y = cH * cP * sR + sH * sP * cR;
+		quat.z = cH * sP * sR + sH * cP * cR;
 		return quat;
 	}
 }

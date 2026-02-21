@@ -27,6 +27,7 @@ module robo4j.hw.rpi {
     exports com.robo4j.hw.rpi.i2c.magnetometer;
     exports com.robo4j.hw.rpi.i2c.pwm;
     exports com.robo4j.hw.rpi.imu.bno;
+    exports com.robo4j.hw.rpi.imu.bno.bno08x;
     exports com.robo4j.hw.rpi.imu.bno.impl;
     exports com.robo4j.hw.rpi.imu.bno.shtp;
     exports com.robo4j.hw.rpi.lcd;

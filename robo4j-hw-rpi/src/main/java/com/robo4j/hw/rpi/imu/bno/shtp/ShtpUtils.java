@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2024, Marcus Hirt, Miroslav Wengner
+ * Copyright (c) 2014, 2026, Marcus Hirt, Miroslav Wengner
  *
  * Robo4J is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ package com.robo4j.hw.rpi.imu.bno.shtp;
 
 import com.robo4j.hw.rpi.imu.bno.DataEvent3f;
 import com.robo4j.hw.rpi.imu.bno.DataEventType;
-import com.robo4j.hw.rpi.imu.bno.impl.AbstractBno080Device.CommandId;
 import com.robo4j.math.geometry.Tuple3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +58,9 @@ public final class ShtpUtils {
      * @return the string representing the pretty printed array.
      */
     public static String toHexString(int[] array) {
+        if (array == null || array.length == 0) {
+            return EMPTY;
+        }
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < array.length - 1; i++) {
             builder.append(Integer.toHexString(array[i] & 0xFF));
@@ -144,7 +146,7 @@ public final class ShtpUtils {
      *
      * @param commandId device command in response
      */
-    public static void debugPringCommandResponse(CommandId commandId, int[] payload) {
+    public static void debugPringCommandResponse(ShtpCommandId commandId, int[] payload) {
         switch (commandId) {
             case ME_CALIBRATE:
                 // R0 - Status (0 = success, non-zero = fail)
@@ -166,9 +168,9 @@ public final class ShtpUtils {
         if (report.equals(ControlReportId.COMMAND_RESPONSE)) {
             // The BNO080 responds with this report to command requests. It's up
             // to use to remember which command we issued.
-            CommandId command = CommandId.getById(payload[2] & 0xFF);
+            ShtpCommandId command = ShtpCommandId.getById(payload[2] & 0xFF);
             LOGGER.debug("parseCommandReport: commandResponse: {}", command);
-            if (CommandId.ME_CALIBRATE.equals(command)) {
+            if (ShtpCommandId.ME_CALIBRATE.equals(command)) {
                 LOGGER.debug("Calibration status{}", payload[5] & 0xFF);
             }
         } else {
